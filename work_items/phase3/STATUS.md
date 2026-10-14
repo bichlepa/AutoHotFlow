@@ -44,7 +44,7 @@ Session 3 start: 2026-10-14, work-item mode, HEAD `26211f2` on `v2-port`, main c
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
 | 1 | Implementer | sonnet | wi-41 (removed) | (deleted) | WI-41 | done, integrated |
-| 4 | Verifier WI-41 | sonnet | verify-7 | wip/verify-7 | fast, slow, foundation and arch on 2c20eff | running |
+| 4 | Verifier WI-41 | sonnet | verify-7 (removed) | (deleted) | verification of `2c20eff`: fast run 20261014-165741-2c20effb (566 passed, exit 0), slow run 20261014-165833-2c20effb (86 passed, 2 xfailed, exit 0), foundation run 20261014-170040-2c20effb (443 passed, 1 skipped, exit 0), no INTERNALERROR, arch 0 violations, no findings; tree hashes src `014d55ca`, tests `5a02bc9a`, tools `dd542ea8` | done |
 | 1 | Implementer WI-42 | opus | wi-42 | wip/wi-42 | WI-42 (after WI-41; starts from dea1db3) | running |
 | 2 | Bug hunter round 4 (review) | sonnet | hunt-7 | wip/hunt-7 | review of WI-41 variable persistence (src/engine/vars, storage var path); excluded: src/expr, ctx/EvalParams, elements, worker parameter path | running |
 | 2 | Bug hunter | sonnet | hunt-6 (removed) | (deleted) | F-18 (pipe DACL restricted to owner and system): fixed and closed, integrated as 9e4aa08, fe00e33, bc30f80 (rebased once onto v2-port, cleanup commit for a run folder name in CLOSED-ITEMS); workspace removed | done, verifier running |
@@ -86,6 +86,8 @@ Highest F-nn at session 2 start: F-74 (provisional F-73*, F-74*). F-44 was never
 | N | Verifier WI-40 (`84a3912`) | F-185 to F-194 |
 | L | Bug hunter round 3 | F-155 to F-164 |
 | M | Verifier WI-39 (`1e444c2`) | F-165 to F-174 |
+
+Open point (assumed, from the WI-41 review): at shutdown the engine does not wait for storage's answer to the variable writes. A storage crash at that exact moment loses the last changes without a message (FlushAll ignores late errors). Accepted by design so far (ARCHITECTURE 6.3); the owner should confirm.
 
 Open point (assumed, not tested, from the F-18 review): for an elevated process whose default owner is the Administrators group, a non-elevated client of the same user might be denied by the owner ACE. Not covered by any test. Check when the supervisor runs elevated.
 
