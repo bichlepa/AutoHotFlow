@@ -45,7 +45,8 @@ Session 2 start: 2026-10-14, work-item mode, HEAD `f0793ce` on `v2-port`, main c
 |---|---|---|---|---|---|---|
 | 1 | Implementer | sonnet | `wi-39` | `wip/wi-39` | WI-39 | running (started 2026-10-14) |
 | 2 | Bug hunter | sonnet | (removed) | (deleted) | OPEN-ITEMS round 2: F-73 analysed (decision needed, cause plausible: external close), integrated as 5251c04 | done |
-| 3 | Verifier | sonnet | `verify-2` | `wip/verify-2` | verification of `0506198` (fast, slow, arch check) | running (started 2026-10-14) |
+| 2b | Bug hunter | sonnet | `hunt-7` | `wip/hunt-7` | F-125 (strict XPASS of the F-17 test): make the test deterministic or non-strict | running (started 2026-10-14) |
+| 3 | Verifier | sonnet | (removed) | (deleted) | verification of `0506198`: fast green (run 20261014-061637-0506198e, 482 passed), slow red by one strict XPASS (F-125*, run 20261014-061730-0506198e), arch check 0 violations; finding integrated as 77c38b7 | done |
 | 4 | Resumed agent | - | - | - | - | none |
 
 ## ID blocks (OPEN-ITEMS)
@@ -62,7 +63,8 @@ Highest F-nn at session 2 start: F-74 (provisional F-73*, F-74*). F-44 was never
 | F | Implementer WI-38 | F-75 to F-84 (none used) |
 | G | Implementer WI-39 | F-105 to F-114 |
 | H | Bug hunter round 2 | F-115 to F-124 |
-| I | Verifier `0506198` | F-125 to F-134 |
+| I | Verifier `0506198` | F-125 to F-134 (F-125* used) |
+| J | Bug hunter F-125 | F-135 to F-144 |
 
 ## Bug hunter log
 
