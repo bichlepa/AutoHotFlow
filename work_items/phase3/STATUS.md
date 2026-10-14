@@ -13,7 +13,7 @@ Session start: 2026-10-13, work-item mode (no wishes). Main checkout clean, on `
 | WI-38 | Evaluator | done | sonnet (implementer) | integrated: ebcb01e to 0506198 (rebased once onto v2-port) | 0506198 | fast run 20261014-061523-4784 (482 passed, exit 0, on the rebased branch); verifier pending | 2026-10-14 | `src/expr/` evaluator, 31 us per typical expression (parse cache hit); decisions to confirm: `missing` field in the result, failed `+=` leaves `""`, text that looks like an integer counts as integer for E29, `mod` added, MIGRATION M-24 to M-26 |
 | WI-39 | Converter v1 expressions | done (owner accepted the catalog and the decisions of the implementer, 2026-10-14; F-105 stays open) | sonnet (implementer) | integrated: 7 commits, the last is 1e444c2 (rebased once onto v2-port) | 1e444c2 (first commit 7732b8e) | fast run 20261014-064430-17980 (514 passed, exit 0, rebased branch); verifier pending | 2026-10-14 | 1418 expression/script cases against the golden data: 726 agree after conversion, 490 accepted deviations, 194 depend on the WIP variable model (WI-40), 8 unsupported; open: owner review of the catalog (EXPRESSION-LANGUAGE 15.1), the five unsupported forms, F-105 (E30) decision; private golden cases not checked (no data on the machine) |
 | WI-40 | Variable model in the engine | done, verified | opus (implementer) | integrated: deade8e to 84a3912 (7 commits, rebased once onto v2-port) | 84a3912 | fast run 20261014-071610-364 (548 passed, exit 0, on the rebased tree; trees identical to 84a3912); verifier green: fast 20261014-071710-84a39123 (548 passed), slow 20261014-071759-84a39123 (86 passed, 2 xfailed, the F-85 and F-17 marks), arch 0 violations, golden test file in the fast run; foundation not run, no foundation-list file changed since aa81047 (verified there) | 2026-10-14 | `src/engine/vars/`; golden 2161 cases compared, all destination, checkname, replace (389/392 agree, 3 with class) and varset cases agree or have a class; decisions to confirm: M-43 (`object . "x"` gives empty plus warning), no Arrays in variables, SetVar rules, A_LanguageName real name; F-105 still open |
-| WI-41 | global/static permanent, data folder | open | | | | | 2026-10-13 | depends on WI-40; E33 (default data folder) is done in `9eb84e0`, the owner's commit, verified: fast run 20261013-182355-9eb84e08 (301 passed), foundation run 20261013-182435-9eb84e08 (437 passed, 1 skipped, not identified), exit 0 both |
+| WI-41 | global/static permanent, data folder | in progress | sonnet (implementer) | wip/wi-41 | | | 2026-10-14 | depends on WI-40; E33 (default data folder) is done in `9eb84e0`, the owner's commit, verified: fast run 20261013-182355-9eb84e08 (301 passed), foundation run 20261013-182435-9eb84e08 (437 passed, 1 skipped, not identified), exit 0 both |
 | WI-42 | Parameter evaluation and ctx API | open | | | | | 2026-10-13 | depends on WI-38, WI-39, WI-40 |
 | WI-43 | Acceptance S1 | open | | | | | 2026-10-13 | depends on all |
 
@@ -38,6 +38,15 @@ Verification of `9eb84e0` (before): fast run 20261013-182355-9eb84e08, foundatio
 Later commits on `v2-port` after `6f4241c` that did not change these trees: none verified yet. The verifier rule in `doc/ORCHESTRATOR.md` section 3d applies from now on.
 
 ## Agents
+
+Session 3 start: 2026-10-14, work-item mode, HEAD `26211f2` on `v2-port`, main checkout clean, no workspaces left over. WI-40 is verified (`fb50629`). WI-38 has no separate verifier run; its code is covered by the WI-40 verifier runs (`84a3912`, which contains it). Next: WI-41 (implementer, sonnet, workspace `wi-41`) in parallel with one bug hunter (sonnet, workspace `hunt-6`, excluded: F-17, F-85, storage, engine loading/shutdown, variable model).
+
+| Slot | Role | Model | Workspace | Branch | Task | State |
+|---|---|---|---|---|---|---|
+| 1 | Implementer | sonnet | wi-41 | wip/wi-41 | WI-41 | running |
+| 2 | Bug hunter | sonnet | hunt-6 | wip/hunt-6 | OPEN-ITEMS, two entries at most | running |
+
+ID blocks (session 3): implementer WI-41 F-195 to F-204; bug hunter hunt-6 F-205 to F-214. Verifier of the next integration: F-215 to F-224.
 
 Session 2 start: 2026-10-14, work-item mode, HEAD `f0793ce` on `v2-port`, main checkout clean, no workspaces left over. Since the last verified state `346341f`, source/tests changed (WI-36 finding format `769903d`, plus the owner's doc commits): a baseline verification of `f0793ce` is started (verifier, `verify-1`).
 
