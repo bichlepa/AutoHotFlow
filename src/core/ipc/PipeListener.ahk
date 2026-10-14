@@ -14,6 +14,8 @@
 ; name that is already served (another supervisor, a squatter) throws instead of sharing it.
 class PipeListener {
     static BUFFER_SIZE := 65536
+    ; Protected DACL: full access for the system (SY) and the owner (OW), nobody else.
+    static SDDL := "D:P(A;;GA;;;SY)(A;;GA;;;OW)"
 
     __New(pipeName) {
         this.Name := PipeConnection.FullName(pipeName)
@@ -78,10 +80,21 @@ class PipeListener {
         ; PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED (| FILE_FLAG_FIRST_PIPE_INSTANCE for the first)
         openMode := 0x40000003 | (this._first ? 0x00080000 : 0)
         ; PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS
+        ; Explicit DACL (F-18): only the owner of the pipe (the user of this process) and the system
+        ; get access. The default DACL would give read access to Everyone and anonymous.
+        psd := 0
+        if (!DllCall("advapi32\ConvertStringSecurityDescriptorToSecurityDescriptorW"
+            , "str", PipeListener.SDDL, "uint", 1, "ptr*", &psd, "ptr", 0))
+            throw AhfError("PipeListener: cannot build the security descriptor for " this.Name " (error " A_LastError ")", ErrCode.INTERNAL)
+        ; SECURITY_ATTRIBUTES: DWORD nLength; LPVOID lpSecurityDescriptor; BOOL bInheritHandle
+        sa := Buffer(A_PtrSize = 8 ? 24 : 12, 0)
+        NumPut("uint", sa.Size, sa, 0)
+        NumPut("ptr", psd, sa, A_PtrSize)
         h := DllCall("CreateNamedPipeW", "str", this.Name, "uint", openMode, "uint", 0x8
             , "uint", 255, "uint", PipeListener.BUFFER_SIZE, "uint", PipeListener.BUFFER_SIZE
-            , "uint", 0, "ptr", 0, "ptr")
+            , "uint", 0, "ptr", sa, "ptr")
         err := A_LastError
+        DllCall("LocalFree", "ptr", psd)
         if (h = -1 || h = 0)
             throw AhfError("PipeListener: CreateNamedPipeW failed for " this.Name " (error " err ")", ErrCode.INTERNAL)
         this._first := false

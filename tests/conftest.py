@@ -62,7 +62,7 @@ FOUNDATION_FILES = {
 FOUNDATION_AHK = {
     "frame", "message", "dispatcher", "child_launcher", "children_output", "supervisor_tick", "core_args",
     "core_debug", "core_errors", "core_ids", "core_log", "core_snapshot", "json", "diag_log", "diag_report",
-    "report_files", "selfcheck",
+    "report_files", "selfcheck", "pipe_listener_security",
 }
 FOUNDATION_RUNNER_CHECKS = {
     "test_failing_and_erroring_cases_are_reported_red", "test_unhandled_error_ends_run_without_dialog",
