@@ -34,7 +34,7 @@ Each step is worked through individually: **detail** (package files WI-xx with t
 | S0008 | Remaining elements | first the converter `tools/convert_element.py` (E0036, tested with the core set of S0002 as before/after cases), then the elements in groups: dialogs/worker, file/drive/process/internet/power/sound, window/user simulation/image, unsafe elements (AHK script with v2 code only, E0039; DllCall, TTS, Eject, Monitor, screen, input block), remaining triggers | the "Automatic tests" flows of the test corpus (WI-0057, adapted to v2 where needed) run green | rough |
 | S0009 | Phase 3 completion | overall acceptance, equality list with v1, performance budgets, documents, scope of Phase 4 | serial, parallel, stress green | rough |
 
-Not in Phase 3 (E0019): debugger (do not block the execution gate, ARCHITECTURE 4.3), compilation and installer (R0007), Chrome package (dropped).
+Not in Phase 3 (E0019): debugger (do not block the execution gate, ARCHITECTURE 4.3), compilation and installer (R0007).
 
 ## Decisions of the project owner (2026-10-12)
 

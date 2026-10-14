@@ -17,7 +17,7 @@ README of this phase (E0035, E0037), result of WI-0046, `doc/ELEMENT-API-V2.md` 
 3. **Test elements out of the product:** `Action_Test*` move to `tests/`, are included only by the test entry point, and register in the same way. A test checks that the product entry knows no `Action_Test*` class.
 4. **Language and icons of the package:** the language files of the elements (`v1/Source_Elements/Default/language/*.ini`) are copied unchanged to the package; `Lang()` (WI-0042) finds keys of the package. The icons go to the package (`static Icon`).
 5. **`Action_Sleep` and `Trigger_Manual`** to `Default`, with the parameters, `GenerateName` and language keys of v1 (`Sleep` as in ELEMENT-API 4). Old flows with these classes load and run as before.
-6. **Elements of unknown packages:** a flow with an element of another package (for example the dropped Chrome package) loads; the element is marked as unknown (as `v1Text`), runs into `exception` with a clear message, and is written back unchanged.
+6. **Elements of unknown packages:** a flow with an element of another package (for example an extension package that is not installed) loads; the element is marked as unknown (as `v1Text`), runs into `exception` with a clear message, and is written back unchanged.
 7. VS Code task `Tool: generate element include blocks`.
 
 ## Acceptance criteria

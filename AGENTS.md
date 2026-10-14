@@ -31,7 +31,7 @@ AutoHotFlow (AHF) is being ported from AutoHotkey v1 (AutoHotkey_H with `AhkThre
 - IPC over named pipes (frame: length prefix + JSON, wake-up via `PostMessage`), star topology through the supervisor.
 - Drawing happens in the editor process behind the `Renderer` interface (separable later).
 - Elements run `inline` (engine), `worker` (own process) or `trigger` (trigger host). Dialogs never run in the engine.
-- Old flows (`.json`) and variables (`.ahfvd`/`.ahfvar`) must load (E0021). v1 is not the yardstick (E0035): a loaded v1 flow may need small fixes, and every such place is marked with its MIGRATION ID. The Chrome package is dropped.
+- Old flows (`.json`) and variables (`.ahfvd`/`.ahfvar`) must load (E0021). v1 is not the yardstick (E0035): a loaded v1 flow may need small fixes, and every such place is marked with its MIGRATION ID.
 - Tests: pytest as the driver (e2e, fault injection, stress) plus small AHK unit tests.
 
 ## Folders

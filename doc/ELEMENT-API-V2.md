@@ -368,7 +368,7 @@ A converter (`tools/convert_element.py`, at the start of S0008, E0036; the core 
 
 - Exact form of `ctx.Request` and the variable functions in the worker (ARCHITECTURE R0004): decided and built in WI-0050, section 3.2.
 - Whether metadata and runtime code must be separated per role (ARCHITECTURE R0003): measured in S0002, WI-0046.
-- Element packages (`package`, `packageVersion`): decided (E0037). Files and include block per package, in phase 3 only `Default`; the Chrome package is dropped, the package information in flows stays; an element of an unknown package loads, is marked and ends with `exception` when it runs (WI-0047).
+- Element packages (`package`, `packageVersion`): decided (E0037). Files and include block per package, in phase 3 only `Default`; the package information in flows stays; an element of an unknown package loads, is marked and ends with `exception` when it runs (WI-0047).
 - Dialogs: decided (E0038). Elements show dialogs only through an indirection, so that tests can answer them (WI-0051).
 - AHK code elements: decided (E0039). They run AHK v2 code; an imported v1 script is kept as text and marked (MIGRATION M-0049, S0008).
 - Specification of a ported element (E0035): the v1 help text (`v1/Source_Elements/Default/help/en/`) and the AHK v2 behaviour, not the v1 code. A deliberate difference to v1 goes into MIGRATION.

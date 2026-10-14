@@ -71,7 +71,7 @@ Not E-numbered, but still waiting for the project owner: finding F-0043 (see the
 
 ## Earlier decisions without ID
 
-The Phase 0 and Phase 1 release by the project owner has nine items. The sources list them without IDs. They are numbered here only by position (item 1 to item 9) for reference. Source: `v2-phase2-final:work_items/STATUS.md`, section "Entscheidungen".
+The Phase 0 and Phase 1 release by the project owner has eight items. The sources list them without IDs. They are numbered here only by position (item 1 to item 8) for reference. Source: `v2-phase2-final:work_items/STATUS.md`, section "Entscheidungen".
 
 1. Several processes, one editor process per flow. Reason in `doc/ARCHITECTURE.md` 2.1.
 2. Drawing happens in the editor process behind the `Renderer` interface, separable later. Risk not measured; measurement in phase 3.
@@ -79,9 +79,8 @@ The Phase 0 and Phase 1 release by the project owner has nine items. The sources
 4. Target version AHK v2.
 5. Old flows and variables must load unchanged. (Narrowed by E0021 and E0035, see "Superseded".)
 6. Own branch `v2-port`; temporary `v1/` folder.
-7. The Chrome package is dropped.
-8. Tests with pytest (end-to-end, fault injection, stress) plus AHK unit tests.
-9. Direct port, no v1 fix branch.
+7. Tests with pytest (end-to-end, fault injection, stress) plus AHK unit tests.
+8. Direct port, no v1 fix branch.
 
 ## Notes on the sources
 
