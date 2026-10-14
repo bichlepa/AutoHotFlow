@@ -89,6 +89,7 @@ class VarAccess {
         if (hidden && (dest = "global" || dest = "static"))
             throw ElementError("a " dest " variable cannot be hidden ('" name "')")
         this._Table(dest, hidden)[name] := VarValues.Import(value)
+        this._Touch(dest, name)
         return 1
     }
 
@@ -98,6 +99,7 @@ class VarAccess {
         if (!IsObject(found) || found["loc"] = "builtin")
             return 0
         found["holder"].Delete(found["key"])
+        this._Touch(found["loc"], VarNames.Split(name)[1])
         return 1
     }
 
@@ -203,6 +205,7 @@ class VarAccess {
             key := IsObject(k) ? VarValues.NormKey(part) : k
         }
         holder[key] := stored
+        this._Touch(dest, root)
     }
 
     ; ---- internals --------------------------------------------------------------------------------------------
@@ -268,6 +271,17 @@ class VarAccess {
         if (this.common)
             return ""
         return this.inst.Vars.Has(name) ? "instance" : ""
+    }
+
+    ; A global or static variable has changed: VarWriter writes it (WI-41). name is the root name.
+    _Touch(location, name) {
+        if (location = "global") {
+            this.store.Touch("global", "", name)
+        } else if (location = "static") {
+            flowId := this.env.Get("flowId", "")
+            if (flowId != "")
+                this.store.Touch("static", flowId, name)
+        }
     }
 
     ; The Map of a scope.
