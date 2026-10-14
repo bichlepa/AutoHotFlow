@@ -34,7 +34,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-74* | Manual-check guide and start tasks do not match | verified, open (owner's agent) | |
 | F-85* | A burst of log lines closes the hub's link to `storage` and loses the lines | reproduced, open, decision needed (same fix as F-17) | yes |
 | F-125* | The F-17 xfail test passes (strict XPASS) in the slow tier | strict mark dropped after a second XPASS (F-165); watch | |
-| F-105* | A comparison with an empty or missing variable is true in v1 and false in v2 | verified in the golden data, decision needed (E30) | yes |
+| F-105* | A comparison with an empty or missing variable is true in v1 and false in v2 | verified in the golden data; decided 2026-10-14 (E34): per-flow option `strictTypes`, to implement in WI-42 | yes |
 | F-165* | The F-17 xfail test passes again (strict XPASS) in the slow tier, after the F-125 fix | fixed by dropping strict on the F-17 test; watch | |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
@@ -212,7 +212,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** Verified in the golden data (`python tools/golden_compare.py --list "text comparison"`): the cases `corpus.expression.1534a539.missing` (`countShuffleTries < 3`, `Condition_Expression`, flow 1210127300, element 54) and `corpus.expression.d4c51cf2.missing` (`myIndex <= 5`, flow 634320780, element 51) give 1 in v1 and the empty text in v2. These are two of 227 distinct expressions of the 22 example flows, both conditions on a counter variable. Not checked: whether the counter is set before the condition in these flows (the golden variants set no variable or a text).
 **Why it matters:** E30 accepted the deviation "because it is unlikely in real flows". It does occur in the example flows, in the form "variable not set yet".
 **Options:** (a) keep E30: a flow that relies on it must initialise its counters (MIGRATION M-25 says so); (b) the evaluator treats the empty text as 0 in a comparison with a number (a small deviation from AutoHotkey, in `ExprEvaluator`), which gives the v1 result for the empty and the missing variable, though not for a non-numeric text such as `"abc"`.
-**Action:** Decision of the project owner. WI-39 does not change the evaluator.
+**Decision (project owner, 2026-10-14, E34):** a per-flow option `strictTypes`. Migrated flows (formatVersion and v1Text marker) get `false`: v1 behaviour, E25 unchanged. New flows get `true`: a type error in a comparison or a calculation becomes an element error (`exception`). The `f1` warnings are shown in the editor in both modes. **Action:** implement in WI-42 (task 7) and in the editor (S4/S5). WI-39 does not change the evaluator.
 **Evidence:** the two case IDs above; deviation catalog in `doc/EXPRESSION-LANGUAGE.md` section 15.1 (class "text comparison").
 
 ### F-165*: The F-17 xfail test passes again (strict XPASS) in the slow tier, after the F-125 fix

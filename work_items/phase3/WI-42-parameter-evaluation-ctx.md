@@ -18,6 +18,7 @@ README of this phase (E25, E26, E28), `v1/Source_Execution/API/API for Elements.
 4. **Variable functions on `ctx`** (from the 88 v1 helpers in use, only the variable group): `GetVar`, `SetVar(name, value, scope, hidden)`, `DeleteVar`, `GetVarType`, `GetVarLocation`, `ListVars(scope)`, `ReplaceVariables(text, convertObjects)`, `EvaluateExpression(text)`, `EvaluateScript(text)`, `CheckVarName(name)`, `ExportInstanceVars()`, `ImportInstanceVars(map)`. Signatures in ELEMENT-API 3; what works in the worker (read from the copy) and what only comes with R4 (S2) is noted there.
 5. **Test element** from WI-39 used: one parameter of each content type; integration tests for each rule from task 2, inline and in the worker.
 6. **Error output:** Warnings from the evaluator (type errors, missing variable) as an `f1` log entry with flow, element and parameter.
+7. **Flow option `strictTypes` (E34, decided 2026-10-14):** a flow setting, `false` for migrated flows (formatVersion and v1Text marker of WI-39), `true` for new flows. In strict mode a type error in an evaluation (comparison or calculation, as E25 describes it) is an element error (`exception`) instead of an empty result with a warning; in compatibility mode E25 stays. Tests for both modes, inline and in the worker. The display of the `f1` warnings in the editor is not part of this package (S4/S5). Record the flow setting in the flow format (doc/PROTOCOL.md, doc/ARCHITECTURE.md section 7).
 
 ## Acceptance criteria
 
