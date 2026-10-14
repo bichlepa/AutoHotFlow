@@ -34,7 +34,16 @@ def kill_role(chain, name):
     death_watch(pid, death)
     psutil.Process(pid).kill()
     crashed = chain.rec.wait(event("evt.process.crashed", name=name), timeout=CRASH_BUDGET_S + 5)
-    assert crashed is not None, "no evt.process.crashed for %s:\n%s" % (name, chain.sup.text())
+    if crashed is None:
+        # F-236: the supervisor stderr is empty in a healthy run, so it says nothing. Show what the chain knows:
+        # was the killed process really gone, what the supervisor thinks of the role, which events arrived.
+        try:
+            states = chain.states()
+        except Exception as exc:        # the chain itself may be stuck; the message must still come out
+            states = "states unavailable: %r" % (exc,)
+        raise AssertionError("no evt.process.crashed for %s (pid %d, death seen by the watcher: %s):\n"
+                             "states: %s\nevents: %s\nstderr:\n%s" % (
+                                 name, pid, pid in death, states, [m.get("type") for _, m in chain.rec.items][-30:], chain.sup.text()))
     t_event, msg = crashed
     assert wait_until(lambda: pid in death, 3.0), "death of %s not seen" % name
     lag = t_event - death[pid]
