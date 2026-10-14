@@ -326,6 +326,20 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: parameter evaluation benchmark (10 parameters; result in %TEMP%/ahf_evalparams_bench.txt)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/ahkrun.py",
+                "--timeout",
+                "120",
+                "tests/ahk/helpers/evalparams_bench.ahk",
+                "${env:TEMP}/ahf_evalparams_bench.txt"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: run suite at HEAD + uncommitted changes (worktree, you can keep working)",
             "type": "shell",
             "command": "python",
