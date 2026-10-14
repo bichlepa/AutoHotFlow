@@ -341,6 +341,32 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: R3 measurement, parse time and memory with N element classes (run alone, about 6 min)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/measure_r3.py",
+                "parse",
+                "--out",
+                "${env:TEMP}/ahf_r3_parse.jsonl"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: R3 measurement, load phase of the engine with 200 big flows (run alone, about 10 min)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/measure_r3.py",
+                "load",
+                "--out",
+                "${env:TEMP}/ahf_r3_load.jsonl"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: expression parser benchmark (parse cache; result in %TEMP%/ahf_expr_bench.txt)",
             "type": "shell",
             "command": "python",
