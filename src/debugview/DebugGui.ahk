@@ -43,6 +43,7 @@ class DebugGui {
 
         this.tabs.UseTab(2)
         this.roleChoice := this.win.AddDropDownList("x20 y108 w260", [])
+        this.snapTime := this.win.AddText("x300 y112 w300", "")
         this.snapEdit := this.win.AddEdit("x20 y140 w740 h328 ReadOnly -Wrap HScroll VScroll", "")
         this.snapEdit.SetFont("s9", "Consolas")
 
@@ -203,8 +204,11 @@ class DebugGui {
         for i, name in this.snapRoles
             if (name = this.selectedRole)
                 this.roleChoice.Choose(i)
+        ; The time lives in its own label: inside the Edit text it changed at every refresh, so the text always
+        ; differed and the Edit jumped to the top (scroll and selection lost).
+        this.snapTime.Value := this.selectedRole = "" ? "" : "Stand " this.view.snapshots[this.selectedRole]["at"]
         text := this.selectedRole = "" ? "Noch kein Snapshot. 'Aktualisieren' fragt alle Rollen."
-            : "Stand " this.view.snapshots[this.selectedRole]["at"] "`n" this.view.snapshots[this.selectedRole]["text"]
+            : this.view.snapshots[this.selectedRole]["text"]
         text := StrReplace(text, "`n", "`r`n")
         if (text != this.snapText) {
             this.snapText := text
