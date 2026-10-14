@@ -2,7 +2,7 @@
 
 Specification of the language that parameters and scripts are written in, and of the library `src/expr/` that reads it.
 
-Status: tokenizer and parser are implemented and tested (`tests/ahk/expr_*.test.ahk`). **Evaluation is not part of this document's code yet** (WI-38); sections 14 and 15 name what is decided so far and what the later packages add.
+Status: tokenizer, parser and evaluator are implemented and tested (`tests/ahk/expr_*.test.ahk`). Section 17 describes the evaluator; section 14 lists the differences from AutoHotkey v2; section 15 is filled by the converter (WI-39). Variable scopes (WI-40) and the use in the engine (WI-42) are not part of this library.
 
 The language follows AutoHotkey v2 (decision E22) as far as that makes sense in AutoHotFlow. Where it deviates, section 14 says so.
 
@@ -113,7 +113,16 @@ args             = expr { "," expr }
 
 `name(arg, ...)` and `obj.method(arg, ...)` are parsed for **any** name. Arguments are expressions (also assignments); an empty argument or a trailing comma is an error. Only a name, a dynamic name or a path can be called; `"a"(1)`, `5(1)`, `f(1)(2)` are errors.
 
-Which functions exist is decided by the evaluator (WI-38); calling an unknown function is an evaluation error, not a syntax error. v1 knew `round`, `object` and `print` (they could never be called there, because of a parser bug). The set for v2 and its behaviour is defined in WI-38 together with the converter (WI-39). Names are case-insensitive.
+Which functions exist is decided by the evaluator; calling an unknown function is an evaluation error with position, not a syntax error. v1 knew `round`, `object` and `print` (they could never be called there, because of a parser bug). The functions of v2:
+
+| Function | Result |
+|---|---|
+| `round(number [, digits])` | AutoHotkey `Round`: `round(2.5)` is `3`, `round(-2.5)` is `-3`, `round(2.567, 2)` is `2.57`, a negative `digits` rounds left of the point (`round(1234, -2)` is `1200`). A text that is not a number gives the empty text and a warning |
+| `object([key, value, ...])` | a new `Map` that ignores case in its keys (E28). An odd number of arguments is a warning |
+| `print(value, ...)` | writes the values, separated by a space, to the log (level `f1`, text `print: ...`); an object is written as `<Map>`. Result is the empty text |
+| `mod(a, b)` | remainder with the sign of `a`, as AutoHotkey `Mod`; the replacement for the missing operator `%` (section 13). Division by zero is a warning |
+
+Names are case-insensitive. The table is extensible (`ExprFunctions.Register`, section 17). Methods (`a.b(1)`) cannot be called: they are an evaluation error.
 
 ## 8. Script form
 
@@ -227,13 +236,22 @@ Average 554 us uncached, 1.6 us cached (about 300 times faster). Filling the cac
 
 ## 14. Differences from AutoHotkey v2
 
-Decided by the project owner (2026-10-13) and to be implemented by the evaluator (WI-38):
+Decided by the project owner (2026-10-13) and implemented by the evaluator (WI-38, tests in `tests/ahk/expr_eval_operators.test.ahk`):
 
 - **E29: `/` with two integers** returns an Integer if the division is exact (`4/2` is `2`, `-8/-2` is `4`), else a Float (`7/2` is `3.5`). AutoHotkey v2 gives `2.0` for `4/2`. This is a rule of the language. `//` is the integer division as in AutoHotkey v2 (`7//2` is `3`, `-7//2` is `-3`; a Float operand is a `TypeError` there, handled as E25).
 - **E30: `<` `>` `<=` `>=` follow AutoHotkey v2.** A comparison with a text that is not a number throws a `TypeError` in AutoHotkey (`"a" < "B"`); in AutoHotFlow the evaluator catches it (E25): the result is the empty text (false) plus an `f1` log entry. A text comparison that v1 did alphabetically is therefore false. `"10" < "9"` compares numbers (false). `=` and `==` compare as in AutoHotkey.
 - **E31: `&&` and `||` return the operand** as AutoHotkey v2 does (`"a" || 0` is `"a"`, `0 && "x"` is `0`), not 1/0 as in v1. Evaluation is short-circuit (`0 and (x := 5)` does not assign). As a condition both behave the same.
 - **E32: text form of floats** is the AutoHotkey v2 form, without own formatting (`0.1+0.2` is `0.30000000000000004`, `1/3` is `0.33333333333333331`).
-- **E25: type errors** while calculating (`"" + 1`, `"abc" + 1`) are caught; the result is the empty text and an `f1` log entry (in AutoHotkey v2 they throw a `TypeError`).
+- **E25: type errors** while calculating (`"" + 1`, `"abc" + 1`) are caught; the result is the empty text and an `f1` log entry (in AutoHotkey v2 they throw a `TypeError`). The same holds for a division by zero (`1/0`, `1//0`, `mod(1, 0)`; `ZeroDivisionError` in AutoHotkey) and for any other calculation or function that fails. The entry is also a warning in the result (section 17).
+
+Smaller points of the evaluator that follow from these rules or from v1:
+
+- **A variable that does not exist** gives the empty text and an `f0` log entry (`Retrieving variable 'x' failed. It does not exist`), as in v1. The result lists it under `missing`; it is not a warning. Used in a calculation, the empty text is then a type error: `y + 1` with a missing `y` gives the empty text.
+- **Compound assignment** (`x += 1`) reads `x` first. If `x` does not exist, that is a missing variable and `"" + 1` is a type error: `x` becomes the empty text. `x .= "a"` works on a missing variable. If the calculation of a compound assignment fails, the variable gets the empty text, as the calculation did in v1.
+- **`mod(a, b)`** replaces the missing operator `%`.
+- **`MinInt // -1`** (the smallest Integer divided by -1) would end the AutoHotkey process, not just the call; the evaluator refuses it as a calculation error (warning, empty text). `MinInt / -1` gives a Float.
+- **`/` with texts:** a text that looks like an integer counts as an integer for E29 (`"4"/"2"` is `2`), as in all arithmetic; `"4.0"/2` is `2.0`.
+- **Script result:** the value of the last statement, as in v1. A script without statements gives the empty text; an `if` without `else` whose condition is false, and an empty block, give `0` (v1 gave `false`).
 
 Differences in the **syntax** (implemented and tested):
 
@@ -265,4 +283,40 @@ Filled by WI-39 (converter of old expressions). Known syntax differences the par
 
 `ExprTokenizer` produces `ExprToken` objects: `NUM` (with `value`), `STR` (with the decoded `value`), `WORD`, `OP`, `NL` (script form only; several in a row become one), `ERR` (unreadable text, already reported) and `EOF`. Each token has `pos`, `len`, `line`, `col` and `ws` (whitespace, comment or line break before it). A `.` that touches a value in front of it and a name or `%` behind it is marked `member`, and the name behind it is scanned as a plain word (so `a.1` and `a.and` work). The scan uses one `RegExMatch` per token part, not one call per character.
 
-Library files (`src/expr/`, includes only `src/core/` and itself, no GUI, no file access): `Expr` (entry point and cache use), `ExprParser`, `ExprTokenizer`, `ExprToken`, `ExprNode` (node constructors, the single place of the schema), `ExprNames`, `ExprDiag` (error records), `ExprCache`, `ExprAbort` (internal, never leaves the parser).
+Library files (`src/expr/`, includes only `src/core/` and itself, no GUI, no file access): `Expr` (entry point and cache use), `ExprParser`, `ExprTokenizer`, `ExprToken`, `ExprNode` (node constructors, the single place of the schema), `ExprNames`, `ExprDiag` (error records), `ExprCache`, `ExprAbort` (internal, never leaves the parser), `ExprEvaluator`, `ExprFunctions` (function table) and `ExprResolveError` (evaluator, section 17).
+
+## 17. Evaluation
+
+```
+res := Expr.Evaluate(text, resolver, logFn)          ; expression form; Expr.EvaluateScript(...) for the script form
+res["value"]       ; Integer, Float, String or a Map ("" for an empty expression)
+res["errors"]      ; Array of records (section 10 fields: message, line, col, pos, length; with lineText and marked)
+res["warnings"]    ; Array of records of the same form
+res["missing"]     ; Array of records for variables that were read and do not exist (plus "name")
+```
+
+`Expr.Evaluate` parses with the parse cache (section 12) and calls `ExprEvaluator(resolver, logFn).Run(parseResult, text)`. The evaluator walks the tree recursively, which is safe up to the height limit of section 11 (tested at the limit). It never throws because of what the user wrote. If the text has syntax errors, the parse errors are the errors of the result, the value is the empty text and nothing is evaluated.
+
+**Errors and warnings.** Evaluation goes on after both; the failed part is the empty text.
+
+| | Cause | Log |
+|---|---|---|
+| warning | a calculation or function call that fails: type error (E25), division by zero, `object("a")`, `round("abc")`, a failing compound assignment | `f1`, `Expression warning: '+' failed: <AutoHotkey message> (line L, column C)` |
+| error | unknown function, wrong number of arguments, method call, a name built by `%...%` that is not a valid variable name, a member of a value that has none, assignment to something that is not a variable, a refusal by the resolver | `f1`, `Expression error: <message> (line L, column C)` |
+| missing | a read of a variable that does not exist | `f0`, `Retrieving variable 'x' failed. It does not exist` (a member of a path: the dotted path as name) |
+
+Whether a warning or a missing variable matters is decided by the caller (WI-42).
+
+**Resolver.** The evaluator knows nothing about scopes. `resolver` is any object with
+
+- `Has(path)`: 1 if the variable or member exists
+- `Get(path)`: its value (called only after `Has` gave 1)
+- `Set(path, value)`: assigns
+
+`path` is an Array of the evaluated parts: `a.b[i]` gives `["a", "b", <value of i>]`, `x%n%` with `n = 1` gives `["x1"]`, `a.1` gives `["a", 1]` (an Integer). A resolver throws `ExprResolveError` for a request that fails because of the expression (a member of a text, a read-only variable); the evaluator records an error with position. Any other exception of the resolver is an internal error and leaves the evaluator. A member of a value that does not come from a variable (`object("a", 1).a`) is read directly from the `Map`; only reading is supported there.
+
+**Log.** `logFn(level, text)` receives the entries of the table above and the output of `print`. Pass `""` for none. A `logFn` that throws is ignored.
+
+**Functions.** `ExprFunctions.Register(name, fn, minArgs, maxArgs)`; `fn` is called as `fn(ctx, args*)` with the evaluator as `ctx` (`ctx.Log(level, text)`), and `maxArgs` -1 means any number. The number of arguments is checked before the call. A function reports a user error by throwing; that becomes a warning.
+
+**Measurement** (`tests/ahk/helpers/expr_eval_bench.ahk`, 5000 rounds each, parse cache hit, a log function installed, the simple resolver of the tests, one run on the development PC, AutoHotkey v2 64 bit): `x` 17 us, `x + 1` 22 us, `count * price` 29 us, `count >= 10` 19 us, `name = "abc"` 22 us, `(count >= 10 and name = "abc") or not done` 42 us, `o.width * (offset - 3) + count // 2` 56 us, `round(price * count, 1) . " total"` 43 us; a script of 7 lines with an `if` 94 us. The average of the 9 expressions is **31 us**, far below the aim of 0.2 ms (ARCHITECTURE 2.3). The cost of the real resolver (WI-40) comes on top and is not measured.
