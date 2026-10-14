@@ -314,6 +314,7 @@ class Executor {
         ctx := ExecContext(flowId, elementId, run["instanceId"], thread.Id
             , ObjBindMethod(this, "_OnFinish", run["instanceId"], thread.Id)
             , this._VarAccess(run, thread, def, elementId))
+        ctx.entryPoint := thread.EntryPoint      ; "head" or "tail" for a loop (v1 x_getEntryPoint)
         if (!def.HasElement(elementId)) {
             ; The element was deleted while the thread waited (ARCHITECTURE 4.2, M-17).
             Log.Write("f1", "engine", "element '" elementId "' was removed before it could start", flowId)
