@@ -45,10 +45,12 @@ Session 3 start: 2026-10-14, work-item mode, HEAD `26211f2` on `v2-port`, main c
 |---|---|---|---|---|---|---|
 | 1 | Implementer | sonnet | wi-41 (removed) | (deleted) | WI-41 | done, integrated |
 | 4 | Verifier WI-41 | sonnet | verify-7 | wip/verify-7 | fast, slow, foundation and arch on 2c20eff | running |
+| 1 | Implementer WI-42 | opus | wi-42 | wip/wi-42 | WI-42 (after WI-41; starts from dea1db3) | running |
+| 2 | Bug hunter round 4 (review) | sonnet | hunt-7 | wip/hunt-7 | review of WI-41 variable persistence (src/engine/vars, storage var path); excluded: src/expr, ctx/EvalParams, elements, worker parameter path | running |
 | 2 | Bug hunter | sonnet | hunt-6 (removed) | (deleted) | F-18 (pipe DACL restricted to owner and system): fixed and closed, integrated as 9e4aa08, fe00e33, bc30f80 (rebased once onto v2-port, cleanup commit for a run folder name in CLOSED-ITEMS); workspace removed | done, verifier running |
 | 3 | Verifier F-18 | sonnet | verify-6 (removed) | (deleted) | verification of `bc30f80`: fast run 20261014-164350-bc30f804 (548 passed, exit 0), slow run 20261014-164436-bc30f804 (86 passed, 2 xfailed, exit 0), foundation run 20261014-164640-bc30f804 (443 passed, 1 skipped, exit 0), no INTERNALERROR, arch 0 violations, no findings; tree hashes src `b07a425b`, tests `24710c35`, tools `dd542ea8` | done |
 
-ID blocks (session 3): implementer WI-41 F-195 to F-204; bug hunter hunt-6 F-205 to F-214 (none used, F-18 was already open); verifier verify-6 F-215 to F-224. 
+ID blocks (session 3): implementer WI-41 F-195 to F-204 (none used); bug hunter hunt-6 F-205 to F-214 (none used); verifier verify-6 and verify-7 F-215 to F-224; implementer WI-42 F-225 to F-234; bug hunter hunt-7 F-235 to F-244. 
 
 Session 2 start: 2026-10-14, work-item mode, HEAD `f0793ce` on `v2-port`, main checkout clean, no workspaces left over. Since the last verified state `346341f`, source/tests changed (WI-36 finding format `769903d`, plus the owner's doc commits): a baseline verification of `f0793ce` is started (verifier, `verify-1`).
 
