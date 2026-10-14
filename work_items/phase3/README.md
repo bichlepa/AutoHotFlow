@@ -155,6 +155,7 @@ WI-36 and WI-37 can run in parallel. WI-36 starts only after WI-34 (it changes `
 - **Verified (read):** a worker element already gets copies of the visible loop, thread and instance variables with the job (WI-40, MIGRATION M-45). R4 is what is left: global, static, hidden and built-in variables, writing variables, and `ReplaceVariables`/`EvaluateExpression` in the worker (ELEMENT-API 3, "Worker: R4 (S2)").
 - **Verified (counted):** element use in 46 flows (v1 examples plus the owner's private flows): `Condition_Expression` 128, `New_Variable` 123, `Variable_content_is` 101, `Trigger_Manual` 77, `Set_Flow_Status` 65, `Do_nothing` 56, `Execute_Flow` 44, `NumberIs` 32, `Sleep` 32, `Debug_dialog` 30, `Message_Box` 30, `Add_to_list` 29, `Tooltip` 27.
 - **Verified (counted):** of the 16 "Automatic tests" flows in `tests/data/flows/v1_examples/`, the core set below covers three completely: "variable test", "List test", "Loop test". The others need elements of S3 (`Set_Flow_Status`, triggers) or S8. The main load of the S2 tests is therefore on synthetic flows (WI-49, WI-57).
+- **Verified (read):** `Loop_Condition` (`v1/Source_Elements/Default/Loops/Condition.ahk`) evaluates its condition with `x_EvaluateExpression`. A ported element that evaluates a parameter itself must name it in `V1Syntax`, otherwise the loader leaves the v1 text unconverted (ELEMENT-API 2). The converter that would warn about this comes only in S8 (E36), so the smoke test checks it (WI-48).
 - **Verified (listed):** the v1 help texts of the elements are in `v1/Source_Elements/Default/help/en/<Kind>/<Name>.html` (E35: specification of an element).
 
 ### Core set
@@ -191,6 +192,8 @@ The trace points are in the first group on purpose: they record the path through
 | [WI-58](WI-58-acceptance-s2.md) | Acceptance S2 | S | all |
 
 **Order.** The orchestrator runs one implementation at a time (bug fixes and test runs in parallel). Proposed order: WI-44, WI-45, WI-46, WI-49 (they need no `ctx` and can start before WI-43 is finished), then WI-47, WI-48, WI-50, WI-51, then WI-52 to WI-56, then WI-57, WI-58. The column "Depends on" is binding, the order is not: if a package is blocked, any package whose dependencies are done may come first.
+
+**Load path of the engine (F-268, retrospective of WI-43).** Since S1 the engine loads 200 big flows more slowly (ready after 59 s instead of 45 s, largest snapshot answer 2.3 s instead of 0.5 s; suspected: the conversion at load and the variable loading). S2 makes this work grow on purpose: every class it registers lets the loader convert more elements. Therefore: WI-46 measures the load phase per flow as a baseline before the first class comes; and every package that adds work to the load path (WI-45, WI-47, WI-52 to WI-56) runs `tests/stress/test_big_flows.py` at its end and records the time to ready and the largest snapshot answer in its result. If the budget is broken, the package stops and the project owner decides (stagger the conversion, convert on first use, or save converted flows).
 
 **Files with conflict risk in S2:** `doc/ELEMENT-API-V2.md` (WI-47, WI-50, WI-51, WI-55, WI-56), `doc/PROTOCOL.md` (WI-50, WI-55), `doc/MIGRATION.md` (every element package). The generated include block is never merged by hand: it is generated again.
 

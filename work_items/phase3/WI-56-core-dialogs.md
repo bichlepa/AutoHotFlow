@@ -20,6 +20,7 @@ As WI-52, plus `doc/ARCHITECTURE.md` 2.3 and 6.4 (worker, blocking, `JobTimeoutM
 
 ## Acceptance criteria
 
+- **Load path (F-268, README S2):** `tests/stress/test_big_flows.py` was run at the end; the time to `evt.engine.ready` and the largest snapshot answer are in the result and within the budget.
 - Smoke test and e2e tests green without the `gui` tier.
 - One `gui` test per element (marked, run only by the project owner) shows the real dialog.
 

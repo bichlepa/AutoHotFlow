@@ -16,6 +16,7 @@ Every registered element is checked automatically, without its own test code: a 
    - metadata: `Mode` valid, `Level`, `Stability`, `Name()` and `Category()` give a text, `Icon` exists if set, `JobTimeoutMs` only for `worker`;
    - `Parameters("")` runs without the editor and returns a list; parameter ids are unique (case-insensitive); every `content` and `type` is known to `ctx.EvalParams` (ELEMENT-API 3.1); `result: "enum"` has `choices` and `enum` of the same length; `contentID` names an existing parameter;
    - `V1Syntax` names only existing parameters;
+   - **parameters that the element evaluates itself** (retrospective of WI-43; the warning of the converter comes only in S8, E36): if the v1 file of the class (`v1/Source_Elements/<package>/`, as long as `v1/` exists) calls `x_EvaluateExpression` or `x_EvaluateScript` on a parameter, that parameter has an expression content type or is named in `V1Syntax`. Known case in the core set: `Loop_Condition`. If the parameter cannot be found in the v1 code with certainty, the test names the class as "check by hand" instead of passing silently;
    - `GenerateName("", defaults)` with the defaults of `Parameters` gives a non-empty text;
    - the language keys used in `Name`, `Category`, `Parameters` and `GenerateName` exist in the English language file (no `f3` entry during the test);
    - the methods match the mode: `Run` for inline and worker, `Enable`/`Disable`/`TriggerVariables` for triggers.

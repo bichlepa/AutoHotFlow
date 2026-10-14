@@ -22,6 +22,7 @@ README of this phase (E35, E37), result of WI-46, `doc/ELEMENT-API-V2.md` 1, 2, 
 
 ## Acceptance criteria
 
+- **Load path (F-268, README S2):** `tests/stress/test_big_flows.py` was run at the end; the time to `evt.engine.ready` and the largest snapshot answer are in the result and within the budget.
 - All tests green, including those that use the test elements (now from `tests/`).
 - A stale include block fails the check.
 - `Lang()` returns the texts of the element language files (test with a key of `Default`).

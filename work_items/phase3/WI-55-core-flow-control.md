@@ -20,6 +20,7 @@ As WI-52, plus `doc/PROTOCOL.md` (`cmd.flow.start`, `cmd.flow.stop`, `evt.instan
 
 ## Acceptance criteria
 
+- **Load path (F-268, README S2):** `tests/stress/test_big_flows.py` was run at the end; the time to `evt.engine.ready` and the largest snapshot answer are in the result and within the budget.
 - Smoke test and e2e tests green, including the edge cases of task 3.
 - No call of an element blocks the engine while waiting for another flow (test: a third flow keeps running).
 

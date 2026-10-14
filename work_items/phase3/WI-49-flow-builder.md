@@ -28,4 +28,4 @@ Tests describe flows compactly in Python instead of writing flow JSON by hand, a
 
 ## Not part of this
 
-New engine commands; if the runner needs one (for example to read the variables of an ended instance), it is a test command (`cmd.test.*`, only with `--test-roles`) or is agreed in WI-55.
+New engine commands; if the runner needs one (for example to read the variables of an ended instance), it is a test command (`cmd.test.*`, only with `--test-roles`) until WI-50 brings the variable requests that a client can use (WI-50 task 5); then the runner switches to them.
