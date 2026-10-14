@@ -277,6 +277,14 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Status:** verified
 - **Source:** `tests/ahk/expr_v1convert.test.ahk`
 
+### `StrSplit("", ".")` gives an empty Array, not `[""]`
+
+- **Problem:** The variable access split a name at the dots and took `parts[1]` as the root. For the empty name the harness failed with `IndexError: Invalid index`.
+- **Wrong:** `parts := StrSplit(name, ".")` and then `parts[1]` without a check.
+- **Right:** Check `parts.Length = 0` first. `StrSplit("a.", ".")` gives two parts (`"a"` and `""`).
+- **Status:** verified (probe with `ahkrun.py`)
+- **Source:** `src/engine/vars/VarAccess.ahk` (`_Find`)
+
 ## Objects, Maps, Arrays
 
 ### Map with `CaseSense "Off"` keeps the spelling of the first insertion
@@ -359,6 +367,13 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Right:** Compare a parsed truth value with `1` (and accept `"1"` and `"true"` where a file may have been edited by hand), as `FlowExprConvert.IsMarked` does. `Json.Stringify` writes `Json.True` as `true`.
 - **Status:** verified (unit test `tests/ahk/engine_flow_convert.test.ahk`)
 - **Source:** `src/engine/core/FlowExprConvert.ahk`
+
+### A Map key `1` and `"1"` are two keys; Integer keys come before texts
+
+- **Problem:** In v1 `list.1`, `list[1]` and `list["1"]` are the same member. In an AutoHotkey v2 `Map` the Integer `1` and the text `"1"` are different keys (`m["10"] := 1` then `m.Has(10)` is 0), even with `CaseSense "Off"`. A Float key is stored as its text (`1.5` becomes `"1.5"`).
+- **Right:** Normalize keys when storing and looking up (`VarValues.NormKey`: a text of decimal digits becomes the Integer). A `Map` enumerates its Integer keys in ascending order first, then its text keys sorted (with `CaseSense "Off"` without case: `_` before `A` before `b`). That is the order of v1 objects, so no own sort is needed.
+- **Status:** verified (probe with `ahkrun.py`: `-3, 2, 10, "1.5", "1x", "_", "A", "b", "Z"`; golden case `objects.dict.whole`)
+- **Source:** `src/engine/vars/VarValues.ahk`
 
 ## Error handling
 
@@ -963,5 +978,5 @@ Append new entries at the end of the matching category. Correct or delete outdat
 ### Patching files with a Python script: a backslash and an n in the replacement become a line break
 
 - **Problem:** A patch script written in a shell heredoc replaced text with a replacement that contained a backslash followed by n (meant as the two characters, for a JSON text inside an AHK string). The file got a real line break instead, and did not load. The doubled backslash of the script was halved on its way (the pitfall of AGENTS.md about heredocs, here with `\\n`). The same script silently did not match when the file had CRLF line ends.
-- **Right:** Use the editor tool for small changes. In a script, build the backslash with `chr(92)` and the line break with `chr(10)`, read and write with `newline=""`, and check with `print(old in s)` that the text was found.
-- **Status:** verified (several failed patches in WI-39)
+- **Right:** Use the editor tool for small changes. In a script, build the backslash with `chr(92)` and the line break with `chr(10)`, read and write with `newline=""`, and check with `print(old in s)` that the text was found. Better still, write the patch script itself with the editor tool and run the file: in WI-40 a quoted heredoc (`<<'EOF'`) with a Python script still lost one of two backslashes, so `engine\\vars` arrived as `engine\vars` and Python made `\v` a vertical tab (an `#Include` that could not be opened); `"\\r\\n"` became a broken string.
+- **Status:** verified (several failed patches in WI-39 and WI-40)
