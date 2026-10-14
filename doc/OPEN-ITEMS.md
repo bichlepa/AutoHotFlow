@@ -20,7 +20,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-13 | Unprotected check-then-act spots in the engine | open (counts guarded in ad6ac7d; rest read and found protected) | |
 | F-14 | `Ids.Next` and `ExecContext.Finish` not atomic | open, low | yes |
 | F-17 | Chatty child gives up during a long supervisor stall | open, reproduced, decided 2026-10-14: option (a), not yet implemented (`src/core/`) | |
-| F-18 | Hub pipe not restricted to the user | open, low | |
 | F-20 | Supervisor messages after `storage` is gone go only to stderr | open, low | |
 | F-23 | Flow file parsed twice in the engine | open, not implemented | yes |
 | F-35 | Hub connection deadlines ignore supervisor stalls | open, low | |
@@ -80,15 +79,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Action:** Implement option (a) in its own work item (drop and count above the soft limit, one line `n log lines dropped`); then remove the xfail mark of the test. Not done yet. The test `tests/fault/test_log_burst.py::test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor` (slow tier) is `xfail(strict=True)` and fails as expected in 3 of 3 runs on the base commit f0793ce plus the test file (run IDs `20261014-060840-21784`, `20261014-060923-1844`, `20261014-061005-6576`, `-n 0`, machine loaded by other agents). Further evidence: 17 of 17 runs after that failed as expected (6 serial, 5 slow-tier parallel, 6 serial with the corrected precondition); the one strict XPASS (F-125) is explained by a late start of the burst (assumed). Remove the mark with the fix.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-22-supervisor-robustheit.md`.
 **F-125 and F-165:** strict XPASS seen in 1 of 2 slow-tier runs with the precondition fix (run IDs 20261014-063319-444 and 20261014-064633-1e444c2d); strict mark dropped (not strict: XPASS is reported, not an error).
-
-### F-18: Hub pipe not restricted to the user
-
-**What:** The hub pipe is not restricted to the Windows user. The option in point 5 of WI-22 was not implemented. The pipe name contains the session and the user.
-**Status:** Open, low priority.
-**Why deferred:** Low priority. The name contains session and user, but that is not an access control.
-**Sign that it matters:** A second Windows user on the same machine can connect. This is not checked (see "Not checked").
-**Action:** Implement point 5 of WI-22 if multi-user use matters.
-**Evidence:** `v2-phase2-final:work_items/phase2b/WI-22-supervisor-robustheit.md`.
 
 ### F-20: Supervisor messages after `storage` is gone go only to stderr
 
@@ -247,7 +237,7 @@ These items were deliberately not fixed in phase 2b. Closed items (F-05, F-07, F
 ## Not checked
 
 - Timing under system load (parallel runs; see F-36, F-45, F-47).
-- A second Windows user (relevant to F-18).
+- A real second Windows user connecting to the pipe (F-18 is closed on the DACL test only).
 - Standby (see the watch list item on deadlines after standby).
 - Screenshots with a locked desktop.
 - GUI operation of the stub and of the debug window by hand. Guides: `v2-phase2-final:work_items/phase2/WI-13-ui-stub.md` and `v2-phase2-final:work_items/phase2b/WI-28-diagnose-bericht-debugfenster.md`.

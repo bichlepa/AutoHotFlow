@@ -73,7 +73,7 @@ Consequences:
 
 - After each write, the sender sends `PostMessage(peerHwnd, WM_AHF_WAKE)`. On a wake-up call the receiver reads **and** additionally via a fallback timer (250 ms), so that a lost wake-up call blocks nothing.
 - The HWNDs are exchanged in the handshake (`sys.hello`/`sys.welcome`).
-- Pipes are `PIPE_REJECT_REMOTE_CLIENTS`; the name contains a session ID.
+- Pipes are `PIPE_REJECT_REMOTE_CLIENTS` and have a protected DACL (system and owner only); the name contains a session ID.
 
 ### 2.3 Element execution: inline or worker (D9)
 

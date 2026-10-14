@@ -10,6 +10,7 @@ This document lists findings that are closed or accepted. Moved from doc/OPEN-IT
 |---|---|---|---|
 | F-12 | `Scheduler.Advance` pops before the state change | closed (fixed in 183c561) | |
 | F-15 | Engine sends events for a deleted element | accepted | |
+| F-18 | Hub pipe not restricted to the user | closed (fixed in 7dc61bc) | |
 | F-25 | Permanently locked log file loses a whole batch | accepted (owner, 2026-10-13: acceptable risk; stall case fixed in 2675105) | |
 | F-28 | Worker log entries never reach `storage` | closed (fixed in 58e48d2) | yes |
 | F-29 | Child in handshake is not covered by the orphan guard | accepted (owner, 2026-10-13: low impact; 10 s instead of 3 s, option (b)); described in ARCHITECTURE 6.3 point 4 | |
@@ -39,6 +40,11 @@ This document lists findings that are closed or accepted. Moved from doc/OPEN-IT
 **Sign that it matters:** A client that does not ignore unknown element IDs.
 **Action:** None planned. Revisit if a client does not ignore unknown IDs.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-21-engine-korrektheit.md`.
+
+### F-18: Hub pipe not restricted to the user
+
+**What:** The hub pipe was not restricted to the Windows user. The name contains session and user, but that is no access control.
+**Status:** Closed (fixed in 7dc61bc). Verified: on the unchanged code the DACL of the pipe is `D:(A;;FA;;;SY)(A;;FA;;;BA)(A;;FA;;;<user>)(A;;FR;;;WD)(A;;FR;;;AN)`, i.e. read access for Everyone and anonymous. `PipeListener` now creates every instance with the protected DACL `D:P(A;;GA;;;SY)(A;;GA;;;OW)` (system and owner only). Test `tests/ahk/pipe_listener_security.test.ahk` (fails before, passes after); foundation run `20261014-163454-26211f26-wc`, 443 passed, 1 skipped, exit 0. Not checked: a real second Windows user, and an elevated supervisor (owner rights then refer to the Administrators group, assumed to work the same).
 
 ### F-25: Permanently locked log file loses a whole batch
 
