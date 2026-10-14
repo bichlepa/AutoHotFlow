@@ -38,7 +38,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-235* | `VarWriter.FlushAll` loses the variables beyond the limit of the peer (1000 waiting requests) | verified in a probe with a stand-in peer, open, low | |
 | F-236* | `test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted[0]` got no `evt.process.crashed` for `worker:1` in the slow tier | observed once, not reproducible in 8 runs, diagnostics added, open | |
 | F-255* | `#Warn` dialog for `Engine` in `VarLoader.ahk:101` seen in a manual unit test run | observed once, not analysed, open | |
-| F-256* | Debug window, Snapshots tab: text jumps to the top on every refresh (scroll reset) | open; time moved out of the text in bfda2d9, JSON still changes; research of the AHK v2 docs recommended | |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
 
@@ -242,13 +241,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Evidence:** dialog report of the unit test file `tests/ahk/engine_var_files.test.ahk` run by hand, 2026-10-14 16:42, workspace of the WI-41 implementer, commit `2c20eff` (the same code is on `v2-port`). The automated runs (fast and slow tier) were green, so the warning does not show up there.
 **Suspicion (assumed):** the class `Engine` is not known in the include list of that unit test file, so `#Warn` treats the name as an unset local. If so, it is a test-harness include problem, not a product bug. Not checked: whether the product entry point loads the same name without a warning.
 **Next step:** check which include list the unit test loads (`tests/ahk/`), confirm it is a harness problem, and fix the include. If the product shows the warning too, it is a product bug.
-
-### F-256*: Debug window, Snapshots tab: the text jumps to the top on every refresh
-
-**What:** On the Snapshots tab the JSON text jumps to the top on every 2-second refresh (owner's manual check, `doc/MANUAL-CHECKS.md` section 2 step 3). The expected result is that scroll and selection stay, and the text is replaced only when it has changed.
-**Status:** open. First cause and fix attempt did not work: the time "Stand ..." was moved out of the text into its own label (commit `bfda2d9`), but the snapshot JSON itself changes on every refresh (`uptimeMs` and `rssBytes` change), so the text still differs and the Edit value is still replaced. The fields are not to be removed (the owner's decision).
-**Evidence:** owner's manual check, 2026-10-14 and after commit `bfda2d9`. Code: `src/debugview/DebugGui.ahk`, `_DrawSnapshots` (sets `this.snapEdit.Value` whenever the text differs; setting `Value` resets the scroll position).
-**Recommendation (for the next step, not yet done):** research in the AutoHotkey v2 documentation how an Edit control keeps its scroll position when its text is replaced (the Edit control messages and the scroll-related control options, e.g. `EM_GETFIRSTVISIBLELINE` and `EM_LINESCROLL`, and whether `WM_SETREDRAW` helps around the replacement). Then save the first visible line and restore it after the text is set, or update only the changed lines. Assumed, not checked: that a save-and-restore of the first visible line is enough to meet the expected result. Verification is by the owner's manual check (`doc/MANUAL-CHECKS.md` section 2 step 3); there is no automated test for the GUI.
 
 ## Watch list (E7)
 

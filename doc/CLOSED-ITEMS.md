@@ -124,6 +124,12 @@ This document lists findings that are closed or accepted. Moved from doc/OPEN-IT
 **Verified:** `tests/fault/test_second_start.py` (real second-start command line, headless stub): failed before the change (no `stub.show`, no manager started), passes after. Fast tier: run 20261013-192725-2312, commit 10c1f01, exit 0, 338 passed, no `INTERNALERROR`. Foundation tier: run 20261013-192746-13396, commit 10c1f01, exit 0, 439 passed, 1 skipped, no `INTERNALERROR`. `python tools/arch_check.py`: 0 violations.
 **Not checked:** the visible window by hand (no `gui` test, see `doc/TEST-STRATEGY.md`): that `Show` and `Restore` bring the stub window to the front in front of other applications (Windows may only flash the taskbar button for a background process).
 
+### F-256: Debug window, Snapshots tab: text jumps to the top on every refresh
+
+**What:** On the Snapshots tab the JSON text jumped to the top on every 2-second refresh. Expected: scroll and selection stay, and the text is replaced only when it has changed.
+**Status:** Closed (fixed in ca9fbc6). Verified by the project owner's manual check, `doc/MANUAL-CHECKS.md` section 2 step 3 (2026-10-14): no jump, the selection stays, the time and the content update every 2 seconds. Not covered by an automated test (GUI). Horizontal scroll is not restored (not checked).
+**Fix:** `_SetEditKeepView` in `src/debugview/DebugGui.ahk`: the first visible line and the selection are read before the text is set and restored after it; redraw is off during the set. The time was moved into its own label earlier (bfda2d9); that alone did not fix the jump, because the JSON fields change on every refresh.
+
 ## Sources
 
 All sources are at the tag `v2-phase2-final` and can be read with `git show v2-phase2-final:<path>`:

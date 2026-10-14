@@ -48,7 +48,7 @@ Test on the debug window (role `debug`). The source records that the window was 
 |---|---|---|---|
 | 1 | Start the debug window (see above). | The window "AutoHotFlow - debug" appears. A second `--command=debug` does not open a second window; it brings the existing one to the front. | pass |
 | 2 | Processes tab: look at the table. Then stop one process by hand. | All roles are listed with state and PID. After the process is stopped, the table changes within about one second. | pass |
-| 3 | Snapshots tab: click "Aktualisieren" (Refresh), then select a role in the list. Tick "alle 2 s" and wait. | Formatted JSON is shown. The time at the top of the text keeps running. Scroll and selection positions do not jump; the text is replaced only when it has changed. | fail (see notes) |
+| 3 | Snapshots tab: click "Aktualisieren" (Refresh), then select a role in the list. Tick "alle 2 s" and wait. | Formatted JSON is shown. The time at the top of the text keeps running. Scroll and selection positions do not jump; the text is replaced only when it has changed. | pass (after the fix, see notes) |
 | 4 | Log tab: change the level filter and the source filter. Wait for new lines. | The list changes at once when a filter changes. New lines appear at the bottom. | pass |
 | 5 | Events tab: start a flow. Click "Pause", then "Weiter". | "Pause" stops the list and shows the text "angehalten bei Nr ... neue Ereignisse wartend". "Weiter" shows all events again. | pass |
 | 6 | Values tab: call `Debug.Dump(Map("a", 1), "test")` in a role (the guide suggests temporarily in the engine). Or run the VS Code task "Debug: trigger Debug.Dump in test role echo:a (ahf_dump.py)". Select the new entry. | The entry appears. The selection shows the JSON. | pass |
@@ -94,14 +94,16 @@ Run record (2026-10-14, debug window, section 2):
 Date: 2026-10-14
 Tester: Paul
 Stub (section 1): not part of this record (see the run record above)
-Debug window (section 2): steps 1, 2, 4 to 9 pass; step 3 fails
-Notes: Step 3 fails: the Snapshots text jumps to the top on every 2-second refresh.
-  Cause (src/debugview/DebugGui.ahk, _DrawSnapshots): the text changes on every
-  refresh and is replaced; setting the Edit value resets the scroll position.
-  First fix attempt (commit bfda2d9): the time "Stand ..." was moved out of the
-  text into its own label. This did not help, because uptimeMs and rssBytes in
-  the JSON change on every refresh as well. The fields stay. Still open: F-256*
-  in doc/OPEN-ITEMS.md (scroll position to be saved and restored). Step 1: the second start with --start=debug on a running
+Debug window (section 2): steps 1 to 9 pass (step 3 after the fix)
+Notes: Step 3 first failed: the Snapshots text jumped to the top on every 2-second
+  refresh. Cause (src/debugview/DebugGui.ahk, _DrawSnapshots): the text was replaced
+  on every refresh, and setting the Edit value resets the scroll position. First fix
+  attempt (commit bfda2d9): the time "Stand ..." was moved into its own label. This
+  did not help, because uptimeMs and rssBytes in the JSON change on every refresh as
+  well. Fix (commit ca9fbc6): the first visible line and the selection are kept when
+  the text is replaced. Re-checked after this fix: no jump, the selection stays, and the
+  time and the content update every 2 seconds. Horizontal scroll is not restored
+  (not checked). Step 1: the second start with --start=debug on a running
   system only shows the manager; the debug window was opened with --command=debug
   (the way the guide describes for a running system). Step 2: the table changed
   after the engine was stopped by hand (a crash report was written for each stop).
