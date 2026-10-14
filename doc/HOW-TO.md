@@ -246,6 +246,36 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Right:** Build the text: `"  " Chr(59) " comment"` (or escape the semicolon with a backtick). A `;` directly behind the opening quote (`"; comment"`) is fine.
 - **Status:** verified (load error and fix in `tests/ahk/expr_eval_vars.test.ahk`)
 
+### Comparing two characters with `>=` or `<=` throws a TypeError
+
+- **Problem:** `c >= "0" && c <= "9"` to test for a digit works for a digit and throws `TypeError` for a letter: `>=`, `<=`, `<` and `>` need numbers, or texts that look like numbers. This is the same rule that E30 applies to flows. In the converter (`V1ExprConverter`) the whole conversion of a text ended in the harness with "Expected a Number but got a String".
+- **Wrong:** `if (c >= "0" && c <= "9")`
+- **Right:** `InStr("0123456789", c)` with `c != ""`, or `Ord(c)`. Equal (`=`) and `==` work on any texts.
+- **Status:** verified
+- **Source:** `src/expr/V1ExprConverter.ahk` (`_IsDigit`)
+
+### A local variable has the name of a function or class: `lines`, `log`
+
+- **Problem:** Names ignore case. A function `Lines(...)` of a test file and a local variable `lines := []` in another function are the same name; the call `Lines(...)` then fails with "has no method" or "not assigned a value". The same for `log := []` and the class `Log`: `Log.Configure(...)` was called on the Array.
+- **Wrong:** `log := []` in a function that also uses `Log.Configure(...)`.
+- **Right:** Other names for locals (`entries`, `output`). When a call says "This value of type Array has no method named Configure", look for a local with the name of the class.
+- **Status:** verified
+- **Source:** `tests/ahk/engine_flow_convert.test.ahk`
+
+### `String(0.1)` is `0.10000000000000001`: a decimal literal rarely reads back as it was written
+
+- **Problem:** AutoHotkey v2 writes a Float with up to 17 significant digits. `String(Number("3.14"))` is `3.1400000000000001`, `String(Number("1.10"))` is `1.1000000000000001`; only values that a double holds exactly (`1.5`, `0.25`, `100.25`) come back as written. A check "does the text form of the number equal its spelling" is therefore true for few decimals. v1 passed a number literal on as text, so `x := 3.14` in a v1 flow must not become `3.1400000000000001`: the converter writes such a literal as a string where the text form counts.
+- **Right:** For the text of a decimal that the user typed, keep the string; for calculations the number is fine.
+- **Status:** verified (`String(Number(t))` for 9 spellings; golden cases)
+- **Source:** `src/expr/V1ExprConverter.ahk` (`_CheckLiteral`), E32
+
+### A backtick before an apostrophe in a single-quoted AHK string is an escape
+
+- **Problem:** In a test source `'"a`' esc 'b"'` the `` `' `` is an escaped apostrophe, so the string does not end there and the file does not load ("Missing "'""). The same holds for a double-quoted string with `` `" ``. A backtick followed by a letter that is not an escape (`` `x ``) is silently dropped, so a test text meant to contain a backtick did not.
+- **Wrong:** `'"a`' esc 'b"'`, `'"a`xb"'` to build texts with a backtick.
+- **Right:** Build the text with `Chr(96)`, or write `~` in the source and replace it (`B(text) => StrReplace(text, "~", Chr(96))`).
+- **Status:** verified
+- **Source:** `tests/ahk/expr_v1convert.test.ahk`
 
 ## Objects, Maps, Arrays
 
@@ -322,6 +352,13 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Right:** Use a unique name (`_CmdDiagSnapshot`). Before adding a method to `Role`, search for the name in all roles (`grep -n "_Name(" src`). A test that asks every role (`tests/fault/test_snapshot.py`) finds such a case.
 - **Status:** verified (red with `KeyError: 'snapshot'` for the engine; green after renaming)
 - **Source:** `src/core/Role.ahk`
+
+### `Json.Parse` returns `true` as 1, not as `Json.True`
+
+- **Problem:** `Json.True` and `Json.False` are for writing. A parsed `true` is the Integer 1, so `value == Json.True` is false for a marker that was read from a file.
+- **Right:** Compare a parsed truth value with `1` (and accept `"1"` and `"true"` where a file may have been edited by hand), as `FlowExprConvert.IsMarked` does. `Json.Stringify` writes `Json.True` as `true`.
+- **Status:** verified (unit test `tests/ahk/engine_flow_convert.test.ahk`)
+- **Source:** `src/engine/core/FlowExprConvert.ahk`
 
 ## Error handling
 
@@ -923,3 +960,8 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Right:** A test that only needs the text of each case cuts `kind` and `text` out of the line with a regular expression and decodes the string with `Json.Parse` (`tests/ahk/expr_eval_vars.test.ahk`). The regular expression sits in a single-quoted AHK string, where a backslash is literal and is not doubled.
 - **Status:** verified
 
+### Patching files with a Python script: a backslash and an n in the replacement become a line break
+
+- **Problem:** A patch script written in a shell heredoc replaced text with a replacement that contained a backslash followed by n (meant as the two characters, for a JSON text inside an AHK string). The file got a real line break instead, and did not load. The doubled backslash of the script was halved on its way (the pitfall of AGENTS.md about heredocs, here with `\\n`). The same script silently did not match when the file had CRLF line ends.
+- **Right:** Use the editor tool for small changes. In a script, build the backslash with `chr(92)` and the line break with `chr(10)`, read and write with `newline=""`, and check with `print(old in s)` that the text was found.
+- **Status:** verified (several failed patches in WI-39)

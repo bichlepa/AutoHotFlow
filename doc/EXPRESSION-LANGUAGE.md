@@ -2,7 +2,7 @@
 
 Specification of the language that parameters and scripts are written in, and of the library `src/expr/` that reads it.
 
-Status: tokenizer, parser and evaluator are implemented and tested (`tests/ahk/expr_*.test.ahk`). Section 17 describes the evaluator; section 14 lists the differences from AutoHotkey v2; section 15 is filled by the converter (WI-39). Variable scopes (WI-40) and the use in the engine (WI-42) are not part of this library.
+Status: tokenizer, parser, evaluator and converter are implemented and tested (`tests/ahk/expr_*.test.ahk`). Section 17 describes the evaluator; section 14 lists the differences from AutoHotkey v2; section 15 is the deviation catalog and the converter of old expressions (WI-39). Variable scopes (WI-40) and the use in the engine (WI-42) are not part of this library.
 
 The language follows AutoHotkey v2 (decision E22) as far as that makes sense in AutoHotFlow. Where it deviates, section 14 says so.
 
@@ -271,7 +271,7 @@ What the new language does with the expressions of v1, checked against the golde
 
 ### 15.1 Deviation catalog
 
-Reproduce with `python tools/golden_compare.py --plain` (list of the classes; `--list CLASS` shows the cases of one class). The check is `tests/golden/test_golden_v2.py`: every case of the groups `expression` and `script` in `tests/golden/cases/` (1418 cases) is evaluated by the new evaluator with the unchanged text, and the result and the variables afterwards are compared with v1. A case either agrees with v1 (`same`; numbers are compared as numbers, so `2.000000` and `2` agree) or gets exactly one class. A case without a class fails the test.
+Reproduce with `python tools/golden_compare.py --plain` (list of the classes; `--list CLASS` shows the cases of one class). The check is `tests/golden/test_golden_v2.py`: every case of the groups `expression` and `script` in `tests/golden/cases/` (1418 cases) is evaluated by the new evaluator with the unchanged text (`--plain`, the column "Cases"), and with the converted text (the column "After conversion"), and the result and the variables afterwards are compared with v1. A case either agrees with v1 (`same`; numbers are compared as numbers, so `2.000000` and `2` agree) or gets exactly one class. A case without a class fails the test.
 
 Handling: **accept** = decided, the converter does not rewrite it (entry in `doc/MIGRATION.md`); **rewrite** = the converter rewrites the text so that the result agrees (section 15.2); **unsupported** = syntax that the converter reports and does not convert (section 15.3); **later** = not part of the language, the cases are compared when the variable model exists (WI-40, WI-42). The column "After conversion" is the number of cases that still have the class when the converted text is evaluated.
 
@@ -285,7 +285,7 @@ Handling: **accept** = decided, the converter does not rewrite it (entry in `doc
 | keyword as name | 8 | 8 | `if` | (empty) | error: 'if' is only valid at the start of a line of a script | accept: if, else, and, or, not cannot be variable names in v2 |
 | no short circuit | 2 | 2 | `1 or (x := 5)` | `1` | `1` | accept: v1 evaluates both sides of and/or, v2 stops at the first that decides (E31) |
 | not | 16 | 16 | `not 0` | `0` | `1` | accept: not and ! do not negate at the start of an expression in v1 (bug); v2 negates |
-| number format | 19 | 19 | `x` | `0.500000` | `0.5` | accept: the same number in the text form of v2 (E24, E32) |
+| number format | 19 | 18 | `x` | `0.500000` | `0.5` | accept: the same number in the text form of v2 (E24, E32) |
 | number literal forms | 9 | 9 | `1e3` | `1` | `1000.0` | accept: v1 reads only digits (0x10 is 0, 1e3 is 1); v2 reads hexadecimal and exponent |
 | number-like texts | 3 | 3 | `"1.0"="1"` | `1` | `0` | accept: v1 compares two texts that look like numbers as numbers, v2 as texts |
 | operand as result | 23 | 23 | `5 && 6` | `1` | `6` | accept: and/or return an operand in v2, 1 or 0 in v1; the same as a condition (E31) |
@@ -297,11 +297,15 @@ Handling: **accept** = decided, the converter does not rewrite it (entry in `doc
 | built-in variable | 147 | 147 | `a_b` | (empty) | `u` | later: A_ names are provided by the variable model (WI-40) |
 | object model | 23 | 23 | `o` | an object | an object | later: keys of objects (integer keys, order, copies) belong to the variable model (WI-40) |
 | scope prefix | 24 | 24 | `global_i` | (empty) | `in instance store` | later: global_ and static_ names are provided by the variable model (WI-40, WI-41) |
-| backtick | 3 | 3 | ``"a`xb"`` | `axb` | error: unknown escape sequence `x | rewrite: a backtick in front of a character that v2 does not know as an escape |
-| concatenation dot | 3 | 3 | `"a"."b"` | `ab` | error: the concatenation operator '.' needs a space before and after it | rewrite: v1 reads "a"."b" as concatenation; v2 needs spaces around the dot |
-| number literal spelling | 3 | 3 | `1.50` | `1.50` | `1.5` | rewrite: v1 passes a number literal on as text (1.50, 007); v2 reads it as a number |
+| backtick | 3 | 0 | ``"a`xb"`` | `axb` | error: unknown escape sequence `x | rewrite: a backtick in front of a character that v2 does not know as an escape |
+| concatenation dot | 3 | 0 | `"a"."b"` | `ab` | error: the concatenation operator '.' needs a space before and after it | rewrite: v1 reads "a"."b" as concatenation; v2 needs spaces around the dot |
+| number literal spelling | 3 | 0 | `1.50` | `1.50` | `1.5` | rewrite: v1 passes a number literal on as text (1.50, 007); v2 reads it as a number |
 | unsupported syntax | 8 | 8 | `1<>2` | `1` | error: '<>' is not valid; write '!=' for not equal | unsupported: % as modulo, ^=, %=, <> and "a""b": reported, not converted |
 
+
+**Result (all 1418 cases, converted text):** 726 agree with v1; 490 deviate in a class with the handling "accept" (189 of them are cases where v1 itself fails or hangs); 194 are "later" (variable model, not compared yet); 8 use syntax that is reported (section 15.3); no case is without a class. The same check without the conversion (`--plain`) has 9 cases in the classes "backtick", "concatenation dot" and "number literal spelling" (3 each); the converter fixes these.
+
+**In the example flows** (group `corpus_flows`, 519 cases of the kinds expression and script, from 22 flows): 415 agree, 79 depend on the variable model (68 `A_` names, 11 `global_`/`static_`), 12 are `and`/`or` used as a value in a condition (same truth value), 6 differ in the number format only (`pi / 6`), 4 are comparisons of a missing or non-numeric variable with a number (`countShuffleTries < 3`, `myIndex <= 5`: true in v1, false in v2; finding F-105), 3 are v1 errors (`%a_windowID%`). Eleven distinct literals such as `4.9990` and `5.000000001` are converted to strings.
 
 Notes on the classes:
 
@@ -315,11 +319,40 @@ Notes on the classes:
 
 ### 15.2 Conversion
 
-The rewrite rules for the classes with the handling "rewrite" are built after the project owner has reviewed the catalog above.
+The converter is `V1ExprConverter.Convert(text, kind)` in `src/expr/V1ExprConverter.ahk` (`kind` is `expression` or `script`). It reads the v1 text with the v1 rules at the token level (strings, comments, numbers, names with paths, runs of operator characters) and changes only the places of the rules below; everything else, including the spaces and comments, stays as the user wrote it. The result is a status, the text and the list of changes:
+
+| Status | Meaning | Text |
+|---|---|---|
+| `unchanged` | nothing to change | the input |
+| `converted` | at least one rule applied | the converted text |
+| `unsupported` | the new language does not have a syntax the text uses (section 15.3) | the input |
+| `failed` | the new language cannot read the text (v1 could not read most of them either) | the input |
+
+Rules (classes with the handling "rewrite"):
+
+| Rule | v1 text | converted | Why |
+|---|---|---|---|
+| backtick | ``"a`xb"`` | `"axb"` | v1 drops every backtick in a string. Where v2 knows the escape (`` `n ``, `` `t ``, `` `" `` ...) the text is not changed (class "escape sequence"); an unknown one would be an error |
+| concatenation dot | `"a"."b"`, `x ."b"` | `"a" . "b"`, `x . "b"` | v1 reads a single dot that is not part of a number or a path (`a.b`, `m[1].x`) as the concatenation operator; v2 needs spaces around it, and `(1).x` would be a member access |
+| number literal spelling | `1.50`, `007`, `5.`, `3.14` | `"1.50"`, `"007"`, `"5."`, `"3.14"` | v1 passes a number literal on as text. v2 writes a number from its value, and most decimals with 17 digits (`3.14` is `3.1400000000000001`). Only where the text form counts: the whole expression, the right side of `:=` and `.=`, an operand of the concatenation, an argument of a function. In a calculation or comparison, behind a unary minus, as an index and as an operand of `and`/`or` the number stays a number (`x = 1.50` compares numbers) |
+
+The rules work on the text only. Which texts of a flow are converted, and when, is decided by the loader of the engine (`FlowExprConvert`, doc/ARCHITECTURE.md section 7): only parameters with an expression content type or named in `V1Syntax` of the element class, once per text. The text `%var%` in `String` parameters is not expression syntax and is not touched. Every conversion is in the log at level `f2` (flow, element, parameter, old and new text), every text that stays in v1 syntax at level `f1`.
+
+The conversion is idempotent (checked for all golden texts: converting the result changes nothing). Not rewritten on purpose, with an entry in `doc/MIGRATION.md`: `/` (E29), the comparison of texts with `<` and the like (E30), `&&`/`||` as a value (E31), the text form of floats (E32), the escapes that v2 knows, the start of an expression with `not`, assignments as values, and everything that v1 ignored (class "v1 ignores text": a second line, glued operators such as `*-`, a stray `)`).
 
 ### 15.3 Syntax that is not converted
 
-The five syntax forms of the table (`%` as modulo, `^=`, `%=`, `<>`, `"a""b"`) are reported and left unchanged until the project owner decides (`doc/OPEN-ITEMS.md`, open actions, item 2).
+A text that uses one of these forms keeps its text and gets the status `unsupported` with a message that is logged at level `f1` (`unsupported syntax: <message> (line L, column C)`). It is then read by the new parser as it stands and fails at the first use with an error that names the same place.
+
+| Form | v1 | New language | In the golden data |
+|---|---|---|---|
+| `%` as modulo | error at evaluation: `Can't apply operator %` (S3); never worked | not supported; `mod(a, b)` is the replacement | counted as "v1 error" |
+| `^=` | the right operand and the assignment are ignored: `x ^= 2` returns x and sets nothing | not supported | `assignment.expr.pow.eq`, `assignment.script.pow.eq` (the v1 parser hangs on it in a script) |
+| `%=` | like `^=` | not supported | `assignment.expr.mod.eq`, `assignment.script.mod.eq` |
+| `<>` | one unknown operator, the right operand is ignored: `1<>2` is `1` | error with the hint to write `!=` | `comparison.not.equal.sql*` |
+| `"a""b"` | two strings that touch: `ab`; the doubled quote was never an escape | error with the hint to write a quote as `` `" `` | `strings.doubled.*`, `strings.two.strings.touching` |
+
+**Decision needed (project owner, `doc/OPEN-ITEMS.md`, open actions, item 2):** whether these forms stay unsupported. None of them occurs in the expressions of the example flows (the corpus has only `%a_windowID%`, a text of unclear content type that the golden corpus also ran as an expression). Possible answers for the forms where v1 gave a value: convert to the v2 form that does what the author meant (`x ^= 2` and `x %= 2` do not exist in the language; `<>` to `!=`; `"a""b"` to `` "a`"b" ``), or convert to what v1 really did (`"a" "b"`, which is `ab`). Until the answer is there, all five are reported and left alone.
 
 ## 16. Tokens (for implementers)
 

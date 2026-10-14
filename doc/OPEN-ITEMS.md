@@ -34,6 +34,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-74* | Manual-check guide and start tasks do not match | verified, open (owner's agent) | |
 | F-85* | A burst of log lines closes the hub's link to `storage` and loses the lines | reproduced, open, decision needed (same fix as F-17) | yes |
 | F-125* | The F-17 xfail test passes (strict XPASS) in the slow tier | fixed in the test (commit e6bcfdd); cause assumed, XPASS not reproduced; watch | |
+| F-105* | A comparison with an empty or missing variable is true in v1 and false in v2 | verified in the golden data, decision needed (E30) | yes |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
 
@@ -203,6 +204,14 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Cause (assumed, not reproduced):** The test waited a fixed 0.2 s after sending the request and assumed the role was inside its loop. If the request reaches the role late (loaded machine, hub busy), the supervisor is suspended before the loop starts; the role then stays quiet during the 6 s, behaves like the healthy children of the existing stand-still test and survives. The product side is consistent with this: `Role._Enqueue` sends each line at once, and `PipeConnection.SendFrame` closes the connection at 1000 queued frames or 8 MB, so once the loop runs against a stopped hub the overflow is certain within milliseconds (verified for the failing case by the F-17 runs, assumed for the timing).
 **Fix:** The test waits until the first lines of the burst are in the log file (proof that the loop runs) before it suspends the supervisor, and skips if they do not appear within `scaled(20)` s (no `assert`: xfail would swallow it and hide the missing precondition). After the fix: 6 serial runs `xfailed` (exit 0), slow tier in parallel `86 passed, 2 xfailed` exit 0 (run log `20261014-063319-444`, commit `e6bcfdd`), fast tier `482 passed` exit 0 (`20261014-063423-24212`).
 **Action:** Watch. If a strict XPASS appears again, drop `strict` for this test and note the rate in F-17.
+### F-105*: A comparison with an empty or missing variable is true in v1 and false in v2 (phase 3)
+
+**What:** In v1 `<`, `>`, `<=` and `>=` compare two texts alphabetically when they are not both numbers. An empty text is smaller than every number, so `count < 3` is **true** in v1 while `count` does not exist or is empty. In v2 (E30, AutoHotkey rule) the comparison with a text that is not a number is a type error; by E25 the result is the empty text (false) and a warning. A condition that was true because a counter variable was not set yet is therefore false.
+**Status:** Verified in the golden data (`python tools/golden_compare.py --list "text comparison"`): the cases `corpus.expression.1534a539.missing` (`countShuffleTries < 3`, `Condition_Expression`, flow 1210127300, element 54) and `corpus.expression.d4c51cf2.missing` (`myIndex <= 5`, flow 634320780, element 51) give 1 in v1 and the empty text in v2. These are two of 227 distinct expressions of the 22 example flows, both conditions on a counter variable. Not checked: whether the counter is set before the condition in these flows (the golden variants set no variable or a text).
+**Why it matters:** E30 accepted the deviation "because it is unlikely in real flows". It does occur in the example flows, in the form "variable not set yet".
+**Options:** (a) keep E30: a flow that relies on it must initialise its counters (MIGRATION M-25 says so); (b) the evaluator treats the empty text as 0 in a comparison with a number (a small deviation from AutoHotkey, in `ExprEvaluator`), which gives the v1 result for the empty and the missing variable, though not for a non-numeric text such as `"abc"`.
+**Action:** Decision of the project owner. WI-39 does not change the evaluator.
+**Evidence:** the two case IDs above; deviation catalog in `doc/EXPRESSION-LANGUAGE.md` section 15.1 (class "text comparison").
 
 ## Watch list (E7)
 
@@ -248,7 +257,7 @@ Editor, real manager, real elements, trigger host (WI-14, decision E6: built ear
 Work that is open but is not a finding with an entry:
 
 1. **Hub accepts the pipe but does not answer `sys.hello` (F-29 follow-up).** Read in code, not checked: the `sys.hello` timeout closes the connection, and `Peer._OnConnClose` then calls `_BeginReconnect`, which sets `_budgetStart` to now (`src/core/ipc/Peer.ahk`, around lines 311 to 316). So each failed hello gets a new 10 s budget, and the role may not end by the budget. The orphan guard counts only `reconnecting` and resets its clock in `handshake` (`src/core/Role.ahk`, `_Guard`). So neither may end the role. *Action:* measure with a pipe that accepts and never answers. If the role does not end, decide the fix with the owner (budget counted from the first `Connect`, or a total cap).
-2. **Syntax list of the expression language (WI-37).** The owner confirms that `%` as modulo, `^=`, `%=`, `<>` and `"a""b"` stay unsupported (section 15 of `doc/EXPRESSION-LANGUAGE.md`). WI-39 depends on the answer.
+2. **Syntax list of the expression language (WI-37).** The owner confirms that `%` as modulo, `^=`, `%=`, `<>` and `"a""b"` stay unsupported (section 15 of `doc/EXPRESSION-LANGUAGE.md`). WI-39 depends on the answer. WI-39 has the conversion in place and reports all five as `unsupported` (text unchanged, `f1` log) until the answer is there (`doc/EXPRESSION-LANGUAGE.md` section 15.3).
 3. **`evalparam` in the golden data.** Decision for WI-42: a copy of the function in the harness, or stubs for all callees (see `tests/golden/FINDINGS.md`, "Not covered").
 4. **Three `uncaught/timeout` cases** in the groups `assignment` and `script` of the golden check (reported by the verifier, not investigated). Check whether they are the known hangs of the v1 parser.
 

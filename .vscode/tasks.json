@@ -503,6 +503,44 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: deviation catalog of the new expression language against the golden data of v1",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/golden_compare.py",
+                "--plain"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: golden data against the converted expressions (v2 after conversion)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/golden_compare.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: golden data of the private flows against the converted expressions (local only, counts)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/golden_compare.py",
+                "--private"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Start: product (supervisor, no window)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",

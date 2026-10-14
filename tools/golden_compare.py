@@ -288,6 +288,9 @@ def main(argv=None):
     if args.markdown:
         print(markdown(compare(PUBLIC, "plain", args.group), compare(PUBLIC, "convert", args.group)))
         return 0
+    if args.private and not (os.path.isdir(PRIVATE[0]) and os.path.isdir(PRIVATE[1])):
+        print("no private golden data: %s and %s are missing (see doc/TEST-STRATEGY.md section 7)" % PRIVATE)
+        return 2
     rows = compare(PRIVATE if args.private else PUBLIC, "plain" if args.plain else "convert", args.group)
     counts = summary(rows)
     print("cases compared: %d" % len(rows))
