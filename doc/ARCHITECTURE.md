@@ -119,8 +119,8 @@ The supervisor is the smallest and simplest process. It is a hub, because a rest
 | Flow definition (committed, with `rev`) | engine | editor (draft), manager (metadata for the list) |
 | Flow draft, undo/redo, selection, zoom, offset | `editor:<flowId>` | – |
 | Instances, threads, element execution status | engine | UI via event (`evt.element.state`) |
-| Variables `instance`/`thread`/`loop` | engine | – (worker receives a copy of the imported ones) |
-| Variables `global`/`static` (working copy) | engine | – |
+| Variables `instance`/`thread`/`loop` (each with a hidden table) | engine: `Instance.Vars`, `ThreadState.Vars`, `ThreadState.Loops` (WI-40, doc/EXPRESSION-LANGUAGE.md section 18) | – (a worker receives copies of the visible loop, thread and instance variables) |
+| Variables `global`/`static` (working copy) | engine: `EngineVars` (WI-40; loading and writing WI-41) | – |
 | Variable files on disk | storage | – (write-behind from the engine) |
 | Flow files, backups | storage | – |
 | Settings (runtime) | engine | everyone as read-only copy via `evt.settings.changed` |
@@ -362,6 +362,7 @@ AutoHotFlow/
 - **Test entry point (WI-29):** The product entry point `src/AutoHotFlow.ahk` includes only `src/AhfBoot.ahk` (the entire boot code and role registration) and calls `AhfMain()`. The test roles (`EchoRole`, `CrasherRole`, `HangerRole`, `SlowShutdownRole`, `RegisterFailure`) are in `tests/integration/helpers/`; the test entry point `tests/integration/helpers/AutoHotFlowTest.ahk` includes `AhfBoot.ahk` and these roles and sets `AhfTestRolesFn`. The supervisor starts children with `A_ScriptFullPath`, so they inherit the entry point. With `--test-roles` at the product entry point nothing happens (the roles are not compiled in there, their name is unknown). `src/` includes nothing from `tests/` (guard rule `include-tests`, no exception any more).
 - Each file under `src/` has at most one class (WI-29): `core/Errors.ahk` now includes only `ErrCode.ahk`, `AhfError.ahk`, `ProtocolError.ahk`, `AhfTimeoutError.ahk`, `ElementError.ahk`, `JsonError.ahk`; `PlaceholderRole` has `core/PlaceholderRole.ahk`; `engine/core/Loops.ahk` is called `LoopStack.ahk`.
 - `manager` is registered in the entry point, not in `core/RoleRegistry.ahk` (like `engine`, `storage`, `worker`), so that `core/` does not include any role folders.
+- `engine/vars/` (WI-40): the variable model of the engine (scopes, built-in variables, `%var%` substitution, the resolver of the evaluator), doc/EXPRESSION-LANGUAGE.md section 18. It replaces `elements/base/VarStore.ahk` of Phase 2; `ExecContext` gets the access object from the engine.
 
 Rule: a folder under `src/` is a process role or library module. `core/` may not include anything from role folders. Role folders include only `core/`, `expr/` (library, includes only `core/`), `ui_common/` (UI roles only) and `elements/`, never each other.
 

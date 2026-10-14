@@ -77,8 +77,11 @@ class Action_Example extends AhfElement {
 | `ctx.EvalParams(params)` | `x_AutoEvaluateParameters` | returns evaluated parameters, throws on error (no `_error`) |
 | `ctx.EvalParams(params, skipList)` | with `p_skipList` | – |
 | `ctx.Finish(result, msg := "")` | `x_finish` | `result`: `normal`, `yes`, `no`, `exception`, `head`, `tail` |
-| `ctx.SetVar(name, value, scope := "")` | `x_SetVariable` | `scope`: `thread`, `loop`, `instance`, `static`, `global`, as in v1. Phase 2 (WI-09): only `""`/`thread` and `instance`; other scopes throw `ElementError`. |
-| `ctx.GetVar(name, default := "")` | `x_GetVariable` | Searches the thread scope first, then the instance scope. Returns `default` if not set (Phase 2: parameter `default` added, WI-09). In a worker only via `imports` or `ctx.Request`. |
+| `ctx.SetVar(name, value, scope := "", hidden := false)` | `x_SetVariable` | The name decides the scope as in v1 (WI-40, doc/EXPRESSION-LANGUAGE.md section 18.2): `A_` names are loop or thread variables and need `scope` `"thread"` or `"loop"`; `global_` and `static_` names are global and static; any other name is an instance variable. Returns 1, or 0 if refused (logged `f0` with the v1 text). The value is copied; an Array becomes a `Map` with the keys 1..n. |
+| `ctx.GetVar(name, default := "", hidden := false)` | `x_GetVariable` | Reads a variable or a member (`"list.1"`) where its name says (an `A_` name: loop, thread, then built-in). Returns a copy, or `default` if it does not exist (no log). In a worker only via `imports` or `ctx.Request`. |
+| `ctx.DeleteVar(name, hidden := false)` | `x_DeleteVariable` | Deletes a variable or a member; 1 if it existed. Built-in variables cannot be deleted. |
+| `ctx.VarLocation(name, hidden := false)` | `x_GetVariableLocation` | `"loop"`, `"thread"`, `"builtin"`, `"instance"`, `"static"`, `"global"` or `""` |
+| `ctx.ListVars(scope := "")` | `x_GetListOf*Vars` | names of the visible variables of one scope, or of all scopes (`""`) in the order loop, thread, instance, static, global |
 | `ctx.After(ms, fn)` | `x_NewFunctionObject` + `SetTimer` | timer belongs to the execution and is cancelled automatically on stop/end |
 | `ctx.State` | `x_SetExecutionValue`/`x_GetExecutionValue`, `x_SetTriggerValue`/`x_getTriggerValue` | object per execution (Run) or per armed trigger |
 | `ctx.Fire(data := "")` | `x_trigger` | triggers only. Sends `evt.trigger.fired` |

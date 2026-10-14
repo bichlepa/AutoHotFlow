@@ -258,6 +258,9 @@ EXAMPLES = {
     "text comparison": "comparison.lt.text.upper",
     "backtick": "strings.escape.unknown",
     "number literal spelling": "numbers.trailing.zero",
+    "assignment refused": "assignment.expr.name.a.underscore",
+    "json text": "objects.convert.special.chars",
+    "path into global or static": "variables.global.object.path",
 }
 
 

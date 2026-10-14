@@ -2,7 +2,7 @@
 
 Specification of the language that parameters and scripts are written in, and of the library `src/expr/` that reads it.
 
-Status: tokenizer, parser, evaluator and converter are implemented and tested (`tests/ahk/expr_*.test.ahk`). Section 17 describes the evaluator; section 14 lists the differences from AutoHotkey v2; section 15 is the deviation catalog and the converter of old expressions (WI-39). Variable scopes (WI-40) and the use in the engine (WI-42) are not part of this library.
+Status: tokenizer, parser, evaluator and converter are implemented and tested (`tests/ahk/expr_*.test.ahk`). Section 17 describes the evaluator; section 14 lists the differences from AutoHotkey v2; section 15 is the deviation catalog and the converter of old expressions (WI-39). The variables (scopes, objects, built-in variables, `%var%` substitution) are not part of this library: they belong to the engine (`src/engine/vars/`, WI-40) and are described in section 18. The use in parameters (WI-42) is not part of this document yet.
 
 The language follows AutoHotkey v2 (decision E22) as far as that makes sense in AutoHotFlow. Where it deviates, section 14 says so.
 
@@ -42,7 +42,7 @@ The parser knows nothing about variables or functions: whether `foo(1)` names a 
 
 ## 3. Names
 
-A name consists of ASCII letters and digits, `_`, and any character above U+007F (umlauts, Cyrillic, emoji...). It must not start with a digit. Names ignore case (`ABC` = `abc`); the node keeps the spelling as written. Variable names are not limited to the names built into the language; where a variable lives is decided by the evaluator from the prefix (`A_`, `global_`, `static_`; WI-40).
+A name consists of ASCII letters and digits, `_`, and any character above U+007F (umlauts, Cyrillic, emoji...). It must not start with a digit. Names ignore case (`ABC` = `abc`); the node keeps the spelling as written. Variable names are not limited to the names built into the language; where a variable lives is decided by its name (`A_`, `global_`, `static_`; section 18).
 
 Rules for variable names in general (`ExprNames.Check`, the same answers as v1 `Var_CheckName(name, true)`): `"Empty"`, `"StartsWithNumber"`, `"ForbiddenCharacter"` or `"OK"`. In addition to the characters above, `#`, `@` and `$` are valid in a name (v1 accepted them), and a name has at most 253 characters. The expression language itself cannot write `#`, `@`, `$`; such variables can be reached through a dynamic name (section 4) or as parameter of type `VariableName`.
 
@@ -271,51 +271,52 @@ What the new language does with the expressions of v1, checked against the golde
 
 ### 15.1 Deviation catalog
 
-Reproduce with `python tools/golden_compare.py --plain` (list of the classes; `--list CLASS` shows the cases of one class). The check is `tests/golden/test_golden_v2.py`: every case of the groups `expression` and `script` in `tests/golden/cases/` (1418 cases) is evaluated by the new evaluator with the unchanged text (`--plain`, the column "Cases"), and with the converted text (the column "After conversion"), and the result and the variables afterwards are compared with v1. A case either agrees with v1 (`same`; numbers are compared as numbers, so `2.000000` and `2` agree) or gets exactly one class. A case without a class fails the test.
+Reproduce with `python tools/golden_compare.py --plain` (list of the classes; `--list CLASS` shows the cases of one class). The check is `tests/golden/test_golden_v2.py`: every case in `tests/golden/cases/` (2161 cases) is run by the harness `tests/golden/v2/harness.ahk` with the variable model of the engine (section 18) and compared with v1: the 1418 expressions and scripts with the unchanged text (`--plain`, the column "Cases") and with the converted text (the column "After conversion"), and the cases of the variable model (WI-40): `%var%` substitution (`replace`, 392), name rule (`checkname`, 151), scope of a name (`destination`, 52), reading and setting a variable through the element API (`varget`, 67, `varset`, 81). The value and the variables afterwards (per scope) are compared. A case either agrees with v1 (`same`; numbers are compared as numbers, so `2.000000` and `2` agree) or gets exactly one class. A case without a class fails the test.
 
-Handling: **accept** = decided, the converter does not rewrite it (entry in `doc/MIGRATION.md`); **rewrite** = the converter rewrites the text so that the result agrees (section 15.2); **unsupported** = syntax that the converter reports and does not convert (section 15.3); **later** = not part of the language, the cases are compared when the variable model exists (WI-40, WI-42). The column "After conversion" is the number of cases that still have the class when the converted text is evaluated.
+Handling: **accept** = decided, the converter does not rewrite it (entry in `doc/MIGRATION.md`); **rewrite** = the converter rewrites the text so that the result agrees (section 15.2); **unsupported** = syntax that the converter reports and does not convert (section 15.3). The column "After conversion" is the number of cases that still have the class when the converted text is evaluated.
 
 | Class | Cases | After conversion | Example | v1 | v2 | Handling |
 |---|---|---|---|---|---|---|
-| assignment to a path | 28 | 28 | `a.b := 5` | (empty) | `5` | accept: v1 cannot assign to a path (a.b := 1 only logs an error); v2 can |
-| assignment value | 33 | 33 | `x := 5` | (empty) | `5` | accept: an assignment has a value in v2; in v1 it has none (the empty text) |
+| assignment refused | 7 | 7 | `A_Index := 5` | (empty) | error: Setting variable 'A_Index' failed. No permission. | accept: an assignment that v1 refuses with an f0 log (an A_ name, no permission) is an error of the expression in v2, with the same text |
+| assignment to a path | 31 | 31 | `a.b := 5` | (empty) | `5` | accept: v1 cannot assign to a path (a.b := 1 only logs an error); v2 can |
+| assignment value | 36 | 36 | `x := 5` | (empty) | `5` | accept: an assignment has a value in v2; in v1 it has none (the empty text) |
+| built-in value | 2 | 2 | `A_PtrSize` | `4` | `8` | accept: A_PtrSize is 8 (64 bit only, E4); A_LanguageName is the name of the language, v1 always gave the empty text |
 | escape sequence | 11 | 11 | ``"a`nb"`` | `anb` | `a\nb` | accept: v1 drops the backtick in a string, v2 reads the escape (E22) |
 | integer division with float | 3 | 3 | `7.0//2` | `3.000000` | (empty) | accept: // with a float operand is a type error in AutoHotkey v2 (E25); v1 divided |
 | integer overflow | 1 | 1 | `12345678901234567890+1` | `-9223372036854775808` | `1.2345678901234567e+19` | accept: v1 wraps integers at 64 bit; v2 continues with a float |
+| json text | 2 | 2 | `%o%` | `{\n  "k": "q\"uote\\back\/slash\nnl\ttab"\n}` | `{\n  "k": "q\"uote\\back/slash\nnl\ttab"\n}` | accept: the JSON text of an object (ConvertObjectToString) writes / without a backslash and a float inside an object as a number; v1 wrote \/ and a text |
 | keyword as name | 8 | 8 | `if` | (empty) | error: 'if' is only valid at the start of a line of a script | accept: if, else, and, or, not cannot be variable names in v2 |
 | no short circuit | 2 | 2 | `1 or (x := 5)` | `1` | `1` | accept: v1 evaluates both sides of and/or, v2 stops at the first that decides (E31) |
 | not | 16 | 16 | `not 0` | `0` | `1` | accept: not and ! do not negate at the start of an expression in v1 (bug); v2 negates |
-| number format | 19 | 18 | `x` | `0.500000` | `0.5` | accept: the same number in the text form of v2 (E24, E32) |
+| number format | 22 | 21 | `x` | `0.500000` | `0.5` | accept: the same number in the text form of v2 (E24, E32) |
 | number literal forms | 9 | 9 | `1e3` | `1` | `1000.0` | accept: v1 reads only digits (0x10 is 0, 1e3 is 1); v2 reads hexadecimal and exponent |
 | number-like texts | 3 | 3 | `"1.0"="1"` | `1` | `0` | accept: v1 compares two texts that look like numbers as numbers, v2 as texts |
-| operand as result | 23 | 23 | `5 && 6` | `1` | `6` | accept: and/or return an operand in v2, 1 or 0 in v1; the same as a condition (E31) |
-| script result value | 71 | 71 | `x := 5` | (empty) | `5` | accept: the value of a script is the value of its last statement (v1: unspecific) |
-| text comparison | 16 | 16 | `"a"<"B"` | `1` | (empty) | accept: comparison with a text that is not a number: false in v2, alphabetical in v1 (E30, E25) |
+| object as text | 3 | 3 | `a . "x"` | `x` | (empty) | accept: an object in a concatenation is a type error in v2 (empty text and a warning, E25); v1 used the empty text for the object |
+| operand as result | 34 | 34 | `5 && 6` | `1` | `6` | accept: and/or return an operand in v2, 1 or 0 in v1; the same as a condition (E31) |
+| path into global or static | 6 | 6 | `global_o.a` | (empty) | `1` | accept: v1 cannot read a member of a global or static object (it looks for a file of that name); v2 can |
+| script result value | 79 | 79 | `x := 5` | (empty) | `5` | accept: the value of a script is the value of its last statement (v1: unspecific) |
+| text comparison | 26 | 26 | `"a"<"B"` | `1` | (empty) | accept: comparison with a text that is not a number: false in v2, alphabetical in v1 (E30, E25) |
 | true and false | 2 | 2 | `true` | (empty) | `1` | accept: keywords with the values 1 and 0 in v2; ordinary (missing) variables in v1 |
 | v1 error | 189 | 189 | `round(2.5)` | error: Expecting punctuation: ")" | `3` | accept: v1 reports an error or hangs; nothing to reproduce (E22) |
-| v1 ignores text | 57 | 57 | `2*-3` | `2` | `-6` | accept: v1 stops at a token it cannot use and ignores the rest (glued operators like *-, a stray ), unknown operators, a second line) |
-| built-in variable | 147 | 147 | `a_b` | (empty) | `u` | later: A_ names are provided by the variable model (WI-40) |
-| object model | 23 | 23 | `o` | an object | an object | later: keys of objects (integer keys, order, copies) belong to the variable model (WI-40) |
-| scope prefix | 24 | 24 | `global_i` | (empty) | `in instance store` | later: global_ and static_ names are provided by the variable model (WI-40, WI-41) |
+| v1 ignores text | 62 | 62 | `2*-3` | `2` | `-6` | accept: v1 stops at a token it cannot use and ignores the rest (glued operators like *-, a stray ), unknown operators, a second line) |
 | backtick | 3 | 0 | ``"a`xb"`` | `axb` | error: unknown escape sequence `x | rewrite: a backtick in front of a character that v2 does not know as an escape |
 | concatenation dot | 3 | 0 | `"a"."b"` | `ab` | error: the concatenation operator '.' needs a space before and after it | rewrite: v1 reads "a"."b" as concatenation; v2 needs spaces around the dot |
 | number literal spelling | 3 | 0 | `1.50` | `1.50` | `1.5` | rewrite: v1 passes a number literal on as text (1.50, 007); v2 reads it as a number |
 | unsupported syntax | 8 | 8 | `1<>2` | `1` | error: '<>' is not valid; write '!=' for not equal | unsupported: % as modulo, ^=, %=, <> and "a""b": reported, not converted |
 
+**Result (all 2161 cases, converted text):** 1600 agree with v1. Of the 1418 expressions and scripts, 867 agree, 543 deviate in a class with the handling "accept" (189 of them are cases where v1 itself fails or hangs), 8 use syntax that is reported (section 15.3); no case is without a class. The name rules (`checkname`, `destination`) and setting variables (`varset`) agree in every case; reading variables (`varget`, 67) has 7 deviations (a member of a global or static object, the number format), the substitution (`replace`, 392) has 3 (number format, JSON text). The same check without the conversion (`--plain`) has 9 cases in the classes "backtick", "concatenation dot" and "number literal spelling" (3 each); the converter fixes these.
 
-**Result (all 1418 cases, converted text):** 726 agree with v1; 490 deviate in a class with the handling "accept" (189 of them are cases where v1 itself fails or hangs); 194 are "later" (variable model, not compared yet); 8 use syntax that is reported (section 15.3); no case is without a class. The same check without the conversion (`--plain`) has 9 cases in the classes "backtick", "concatenation dot" and "number literal spelling" (3 each); the converter fixes these.
-
-**In the example flows** (group `corpus_flows`, 519 cases of the kinds expression and script, from 22 flows): 415 agree, 79 depend on the variable model (68 `A_` names, 11 `global_`/`static_`), 12 are `and`/`or` used as a value in a condition (same truth value), 6 differ in the number format only (`pi / 6`), 4 are comparisons of a missing or non-numeric variable with a number (`countShuffleTries < 3`, `myIndex <= 5`: true in v1, false in v2; finding F-105), 3 are v1 errors (`%a_windowID%`). Eleven distinct literals such as `4.9990` and `5.000000001` are converted to strings.
+**In the example flows** (group `corpus_flows`, from 22 flows): of 519 expressions, 473 agree, 23 are `and`/`or` used as a value in a condition (same truth value), 6 differ in the number format only (`pi / 6`), 14 are comparisons of a missing or non-numeric variable with a number (`a_index <= 3` in the variants where `A_Index` is missing or a text, `countShuffleTries < 3`, `myIndex <= 5`: true in v1, false in v2; finding F-105), 3 are v1 errors (`%a_windowID%`). All 310 substitutions and all 102 variable names agree. Eleven distinct literals such as `4.9990` and `5.000000001` are converted to strings.
 
 Notes on the classes:
 
 - **v1 error** also contains the calls of functions (`round(2.5)` never worked in v1, S1 of the findings), `%` as modulo, `!` at the start, unary minus in front of a variable or a parenthesis, and every script that hangs the v1 parser. v2 evaluates these texts as written (`round(2.5)` is `3`); nothing is reproduced.
-- **v1 ignores text** are cases where v1 stops reading at a token it cannot use and returns what it had until then (`2*-3` is `2` because `*-` is read as one unknown operator). The text was never meant to work that way; v2 reads it as written (`-6`). Not rewritten, because reproducing it would mean to cut off the text.
+- **v1 ignores text** are cases where v1 stops reading at a token it cannot use and returns what it had until then (`2*-3` is `2` because `*-` is read as one unknown operator; `m[1][2]` and `m[1].x` give `m[1]`). The text was never meant to work that way; v2 reads it as written (`-6`). Not rewritten, because reproducing it would mean to cut off the text.
 - **text comparison**, **operand as result**, **no short circuit**, **not**, **true and false**, **number format**, **integer division with float** are the decisions E30, E31, E25, E32 and E29 (section 14); **number-like texts** is the consequence of E30 for `=` with two texts that look like numbers.
 - **escape sequence**: in v1 a backtick in a string is dropped (S2); v2 reads `` `n `` as a line feed. Only escapes that v2 does not know (`` `x ``, `` `1 ``) are rewritten (the backtick is dropped, as v1 did), because without that the text would not load.
 - **assignment value**, **script result value**: an assignment has a value in v2 (`(x := 3) + 1` is `4`). The value of a script is only used by tests; the variables afterwards agree in all these cases.
 - **assignment to a path**: `a.b := 5` only logged an error in v1 (variable names must not contain a dot); v2 sets the member.
-- **later**: built-in variables (`A_`), the prefixes `global_` and `static_`, and objects depend on the variable model. The golden harness of v2 has one flat table of variables, so these cases are not compared here.
+- **assignment refused**, **built-in value**, **path into global or static**, **object as text**, **json text**: the variable model (section 18; MIGRATION M-38 and M-40 to M-43).
 
 ### 15.2 Conversion
 
@@ -394,4 +395,100 @@ Whether a warning or a missing variable matters is decided by the caller (WI-42)
 
 **Functions.** `ExprFunctions.Register(name, fn, minArgs, maxArgs)`; `fn` is called as `fn(ctx, args*)` with the evaluator as `ctx` (`ctx.Log(level, text)`), and `maxArgs` -1 means any number. The number of arguments is checked before the call. A function reports a user error by throwing; that becomes a warning.
 
-**Measurement** (`tests/ahk/helpers/expr_eval_bench.ahk`, 5000 rounds each, parse cache hit, a log function installed, the simple resolver of the tests, one run on the development PC, AutoHotkey v2 64 bit): `x` 17 us, `x + 1` 22 us, `count * price` 29 us, `count >= 10` 19 us, `name = "abc"` 22 us, `(count >= 10 and name = "abc") or not done` 42 us, `o.width * (offset - 3) + count // 2` 56 us, `round(price * count, 1) . " total"` 43 us; a script of 7 lines with an `if` 94 us. The average of the 9 expressions is **31 us**, far below the aim of 0.2 ms (ARCHITECTURE 2.3). The cost of the real resolver (WI-40) comes on top and is not measured.
+**Measurement** (`tests/ahk/helpers/expr_eval_bench.ahk`, 5000 rounds each, parse cache hit, a log function installed, the simple resolver of the tests, one run on the development PC, AutoHotkey v2 64 bit): `x` 17 us, `x + 1` 22 us, `count * price` 29 us, `count >= 10` 19 us, `name = "abc"` 22 us, `(count >= 10 and name = "abc") or not done` 42 us, `o.width * (offset - 3) + count // 2` 56 us, `round(price * count, 1) . " total"` 43 us; a script of 7 lines with an `if` 94 us. The average of the 9 expressions is **31 us**, far below the aim of 0.2 ms (ARCHITECTURE 2.3). The cost of the real resolver of the engine is in section 18.6.
+
+## 18. Variables
+
+The engine owns all variables (ARCHITECTURE section 4). The model ports the v1 functions of `v1/Source_Execution/Variables/Variables.ahk` and `v1/Source_Common/Variables/Global variables.ahk` (WI-40). Code in `src/engine/vars/`:
+
+| Class | Content |
+|---|---|
+| `VarNames` | the scope of a name (`Destination`), the name rule (`Check`), paths (`Split`) |
+| `VarValues` | values: copies, objects as `Map`, keys |
+| `VarAccess` | the view of one element run: element API, `%var%` substitution, resolver of the evaluator (section 17), imports of a worker |
+| `BuiltInVars` | the built-in variables (18.4), the working directory of a flow |
+| `EngineVars` | global and static variables (working copy in memory; loading and writing: WI-41) |
+| `VarJson` | JSON text of a value (substitution with `ConvertObjectToString`) |
+
+### 18.1 Scopes
+
+| Scope | Names | Owner | Lives |
+|---|---|---|---|
+| loop | `A_...` | the thread (`ThreadState.Loops`, the loop stack) | while the loop runs: entering a loop at `head` pushes the loop variables, leaving it (`tail`, `exception`) restores them (ARCHITECTURE 5.2) |
+| thread | `A_...` | the thread (`ThreadState.Vars`) | as long as the thread; a branch (clone) gets a copy |
+| instance | any name without prefix | the instance (`Instance.Vars`) | as long as the instance; shared by its threads |
+| static | `static_...` | `EngineVars`, one table per flow | permanent (WI-41) |
+| global | `global_...` | `EngineVars`, one table | permanent (WI-41) |
+| built-in | 68 `A_` names (18.4) | - | read only |
+
+Loop, thread and instance each have a **hidden** table (`LoopStack.Hidden`, `ThreadState.HiddenVars`, `Instance.HiddenVars`), for elements that protect a value from the user (in v1 the loop "work through a list" and the trace points). Only the element API with `hidden := true` reaches them; an expression, the substitution and `ListVars` never see them. Global and static variables cannot be hidden (`ElementError`, v1 threw an exception).
+
+At the start of an instance the trigger thread gets the thread variables `A_TriggerTime` (`A_Now`) and `A_TriggerID` (the ID of the trigger element), as in v1 `newInstance`.
+
+### 18.2 The name decides the scope
+
+**Reading** (v1 `Var_GetLocation`): an `A_` name is looked up in the loop variables, then in the thread variables, then in the built-in variables; a `global_` name in the global table; a `static_` name in the static table of the flow; any other name in the instance table. The prefixes ignore case (`a_index`, `GLOBAL_x`). A variable is only found in the table that its name names: an instance variable called `global_x` (which v1 could not create either) is invisible.
+
+**Setting** with the element API, `SetVar(name, value, location)` (v1 `Var_Set`, `Var_RetrieveDestination`):
+
+| Name | location `""` | location `thread` or `loop` |
+|---|---|---|
+| `A_...` | refused: `Setting variable 'A_x' failed. No permission.` | thread or loop |
+| `global_...`, `static_...` | global, static | refused: `Setting variable 'x' failed. It does not start with 'A_'.` |
+| other | instance | refused (same text) |
+
+Refused as well: an empty name (`Setting a variable failed. Its name is empty.`) and a name with a forbidden character (`Setting variable 'a.b' failed. It contains forbidden characters.`). A refusal is an `f0` log entry and the return value 0, as in v1. The name rule is that of section 3 (`ExprNames.Check`); as in v1, setting accepts a name that starts with a digit.
+
+**Setting in an expression** (`x := 1`) follows the same rules without a location: an `A_` name cannot be assigned from an expression. v1 logged `No permission`; v2 reports the same text as an error of the expression (`f1`, MIGRATION M-38).
+
+**The common place** is a view without instance and thread (v1 `*_Common`, used by the editor and the manager): only global, static and built-in variables are visible, only global and static can be set, any other name is `No permission`.
+
+### 18.3 Values and objects (E28)
+
+- A value is a text, a number (`Integer`, `Float`) or an object. A number keeps its type; v1 turned it into a text on the way through a variable (`0.5` came back as `0.500000`, M-39).
+- **An object is a `Map` with `CaseSense "Off"`. There are no Arrays in variables** (decided in WI-40): a list is a `Map` with the keys 1..n, as in v1, where a list was an object with integer keys. An Array that comes in (a JSON array of a variable file in WI-41, a value set by an element, an export of a worker) becomes such a `Map` (`VarValues.Import`). Reason: one kind of object for paths, assignment and the JSON text; `list.1` and `list[1]` must be the same member.
+- **Keys:** a key that is a text of decimal digits (an optional minus, at most 18 digits) is the `Integer`: `list.1`, `list[1]`, `list["1"]` and `list["01"]` are the same member, as in v1 (golden cases `objects.dict.key.*`). Every other key is a text and ignores case; the spelling of the first insertion stays.
+- **Order:** an object enumerates its `Integer` keys in ascending order, then its texts sorted without case (`-3, 1, 2, 10, A, b`), which is the order of v1 (golden case `objects.dict.whole`). This is the order of an AutoHotkey `Map` (verified).
+- **Copies:** a value is copied when it goes into a variable and when an element reads it. `b := a` gives `b` its own object; `b.k := 2` does not change `a` (as v1). A thread that is cloned and every level of the loop stack own their values.
+- **Paths:** `a.b.1` in a name (element API, `%a.b.1%`; split at every dot as v1 `parseObjectPath`) and `a.b[i]` in an expression. A member that does not exist, or a member of a text, does not exist (`f0`, as a missing variable). Assigning to a member in an expression creates the variable and the members on the way as objects; a member of a text is an error of the expression (`'t' is not an object; its member 'k' cannot be set`). A member of a global or static object can be read and set (v1 looked for a file with the dotted name, M-40). `DeleteVar("a.b")` removes a member. A name with a dot cannot be set with `SetVar` (forbidden character, as in v1); members are set in an expression.
+
+### 18.4 Built-in variables
+
+55 variables of AutoHotkey and 13 of AutoHotFlow (v1 `global_AllBuiltInVars` and `global_AllCustomBuiltInVars`, `Global variables.ahk:2` and `:4`; the phase plan counted 14, the v1 list has 13). Names ignore case. A thread or loop variable with the same name hides a built-in variable. A getter that fails gives the empty text.
+
+| Name | v1 | v2 | Deviation |
+|---|---|---|---|
+| `A_Space`, `A_Tab` | AutoHotkey | the AutoHotkey v2 variable | - |
+| `A_YYYY`, `A_Year`, `A_MM`, `A_Mon`, `A_DD`, `A_MDay`, `A_MMMM`, `A_MMM`, `A_DDDD`, `A_DDD`, `A_WDay`, `A_YDay`, `A_Hour`, `A_Min`, `A_Sec`, `A_MSec`, `A_Now`, `A_NowUTC` | AutoHotkey | the AutoHotkey v2 variable | - |
+| `A_TickCount`, `A_TimeIdle`, `A_TimeIdlePhysical` | AutoHotkey | the AutoHotkey v2 variable | - |
+| `A_Temp`, `A_WinDir`, `A_ProgramFiles`, `A_AppData`, `A_AppDataCommon`, `A_Desktop`, `A_DesktopCommon`, `A_StartMenu`, `A_StartMenuCommon`, `A_Programs`, `A_ProgramsCommon`, `A_Startup`, `A_StartupCommon`, `A_MyDocuments` | AutoHotkey | the AutoHotkey v2 variable | - |
+| `A_OSVersion`, `A_Is64bitOS`, `A_Language`, `A_ComputerName`, `A_UserName`, `A_IsAdmin`, `A_ScreenWidth`, `A_ScreenHeight`, `A_ScreenDPI`, `A_Cursor` | AutoHotkey | the AutoHotkey v2 variable | - |
+| `A_PtrSize` | AutoHotkey (4, 32 bit) | 8 | 64 bit only (E4), M-41 |
+| `A_ScriptDir` | AutoHotkey: the folder of the v1 program | `A_ScriptDir` of the engine: the folder of the v2 program (where `AutoHotFlow.ahk` is) | the folder, not the meaning |
+| `A_IPAddress1` to `A_IPAddress4` | AutoHotkey v1 | `SysGetIPAddresses()` (v2 has no such variables); `0.0.0.0` if there are fewer adapters | not checked against v1 |
+| `A_CaretX`, `A_CaretY` | AutoHotkey v1 | `CaretGetPos` with `CoordMode("Caret", "Window")` (relative to the active window, the v1 default); empty without a caret | not checked against v1 |
+| `A_YWeek` | own: the last two characters of `A_YWeek` (only the week) | the same | - |
+| `A_LineFeed`, `A_LF`, `A_CarriageReturn`, `A_CR` | own | line feed, carriage return | - |
+| `A_WorkingDir` | own: `x_GetWorkingDir` (flow setting `WorkingDir` unless `DefaultWorkingDir`, else the setting `FlowWorkingDir`) | the same rule (`BuiltInVars.WorkingDirOf`); until the settings exist (S4) the default is `A_MyDocuments "\AutoHotFlow"` (E28) | - |
+| `A_LanguageName` | own: always empty (a TODO in the v1 code) | the English name of the user's language (`A_Language` through `LCIDToLocaleName` and `GetLocaleInfoEx`, e.g. `German`) | M-41 |
+| `A_NowString` | own: `FormatTime` of `A_Now` with the default format | `FormatTime(A_Now)` | - |
+| `A_FlowName`, `A_ElementName` | own: read from the flow when the variable is read | from the revision of the flow the element started with | at most a rename during the element |
+| `A_FlowID`, `A_ElementID` | own | the IDs of the element run | - |
+| `A_AhfVersion` | own | `AhfVersion.Current` (`src/core/AhfVersion.ahk`) | the text of the version |
+| `A_VerticalTab`, `A_VT`, `A_Formfeed`, `A_FF` | handled by `BuiltInVariable_Get`, but in neither name list: they do not exist (golden case `builtin.vt`) | they do not exist | - |
+
+### 18.5 `%var%` substitution
+
+`VarAccess.Replace(text, convertObjects)` is v1 `Var_replaceVariables`, step by step, with its odd cases (golden group `replace`): the first pair of percent signs is taken (`SU).*%(.+)%.*`), whatever is between them is the name (also `a b` or `x+1`, which do not exist); the first occurrence of `%name%` in the result is replaced by the value, and in the rest of the search text by `_`. So `50% off %x%` gives `50x%` (the name is ` off `), and a value that contains `%y%` is not replaced again. A variable that does not exist gives the empty text and the `f0` entry `Retrieving variable 'x' failed. It does not exist` (in the common place: `... It does not exist or is neither global nor static`); its name is added to the list `missing` if the caller passes one. An object gives the empty text, or with `convertObjects` its JSON text (`VarJson`: indented by 2 spaces, in the common place on one line, as v1). The JSON text writes `/` as it is and a float as a number; v1 wrote `\/` and a float inside an object as a text (M-42).
+
+v1 wrote an `f3` entry for every variable that was read (`Retrieving instance variable 'x'`). v2 does not (a log call per read would cost more than the read itself); only missing variables are logged.
+
+### 18.6 The resolver and the element API
+
+`VarAccess` is the resolver of the evaluator (section 17): `Has(path)`, `Get(path)` (an object as a copy), `Set(path, value)` (the rules of 18.2 and 18.3; a refusal is an `ExprResolveError`, which the evaluator reports as an error with position).
+
+Measured with `tests/ahk/helpers/expr_eval_bench.ahk` and `VarAccess` instead of the test resolver (5000 rounds each, one run on the development PC): the average of the 9 expressions is 50.6 us (24.5 us with the test resolver in the same session), `x` 23.6 us, `o.width * (offset - 3) + count // 2` 111.1 us. Still below the aim of 0.2 ms; the cost is the lookup by name and the record of the place for every read.
+
+The element API (`ctx`, ELEMENT-API-V2 section 3) is `SetVar`, `GetVar` (a copy, or the default if it does not exist; no log), `DeleteVar`, `VarLocation` (`loop`, `thread`, `builtin`, `instance`, `static`, `global` or empty; v1 wrote `Loop`, `Thread`, `BuiltIn`) and `ListVars(scope)` (the visible variables of a scope, or of all scopes in the order loop, thread, instance, static, global; no hidden and no built-in variables, as v1 `Var_GetListOf*Vars`).
+
+**A worker** gets copies of the visible loop, thread and instance variables as its imports (a loop variable hides a thread variable of the same name); global, static, hidden and built-in variables are not sent. Its exports come back as variables where their name says (an `A_` name as a thread variable). Both are provisional until variables in the worker are reached through `ctx.Request` (S2, R4).
