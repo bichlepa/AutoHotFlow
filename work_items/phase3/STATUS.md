@@ -23,7 +23,9 @@ Owner's commits on `v2-port` (not made by an agent): `bdae120` (ORCHESTRATOR rul
 
 ## Last verified state
 
-Verified by the verifier: commit `346341f` (F-72, fast run 20261013-192931-346341fd (436 passed), slow run 20261013-193015-346341fd (86 passed), foundation run 20261013-193207-346341fd (439 passed, 1 skipped, the deliberate runner self-check skip), exit 0 each, no INTERNALERROR; architecture check 0 violations on the live tree). Before that, `6023cde` (WI-37, fast run 20261013-192532-6023cded). Before that, `6f4241c` (F-30, fast, slow and foundation runs green, run IDs in the table above). Tree hashes (`git rev-parse <commit>:src <commit>:tests <commit>:tools`):
+Verified by the verifier (session 2): commit `f0793ce`, no findings, no suspicions. Fast run 20261014-060416-f0793ce2 (436 passed, exit 0), slow run 20261014-060503-f0793ce2 (86 passed, exit 0), foundation run 20261014-060653-f0793ce2 (439 passed, 1 skipped = the deliberate skip of the runner self-check, exit 0), no INTERNALERROR; architecture check exit 0 (94 files, 0 violations). Tree hashes: `src` `5ed42d2a96faeae45924a42a798a392131090a02`, `tests` `4f0b26135dcdf6933f29d1d7fe0f68a131cd0447`, `tools` `0503826a18037e2f8eaba3aea61d677270f0edb6`. Not checked: gui, stress, soak; golden `--check`; open action 4 (three `uncaught/timeout` golden cases).
+
+Earlier verification: commit `346341f` (F-72, fast run 20261013-192931-346341fd (436 passed), slow run 20261013-193015-346341fd (86 passed), foundation run 20261013-193207-346341fd (439 passed, 1 skipped, the deliberate runner self-check skip), exit 0 each, no INTERNALERROR; architecture check 0 violations on the live tree). Before that, `6023cde` (WI-37, fast run 20261013-192532-6023cded). Before that, `6f4241c` (F-30, fast, slow and foundation runs green, run IDs in the table above). Tree hashes (`git rev-parse <commit>:src <commit>:tests <commit>:tools`):
 
 | Path | Tree hash |
 |---|---|
@@ -37,21 +39,26 @@ Later commits on `v2-port` after `6f4241c` that did not change these trees: none
 
 ## Agents
 
+Session 2 start: 2026-10-14, work-item mode, HEAD `f0793ce` on `v2-port`, main checkout clean, no workspaces left over. Since the last verified state `346341f`, source/tests changed (WI-36 finding format `769903d`, plus the owner's doc commits): a baseline verification of `f0793ce` is started (verifier, `verify-1`).
+
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
-| 1 | Implementer | sonnet | `wi-36` | `wip/wi-36` | WI-36 | running |
-| 2 | Bug hunter | sonnet | `hunt-1` | `wip/hunt-1` | OPEN-ITEMS mode, then review | running |
-| 3 | Verifier | - | - | - | after each integration | not started |
+| 1 | Implementer | sonnet | `wi-38` | `wip/wi-38` | WI-38 | running |
+| 2 | Bug hunter | sonnet | `hunt-5` | `wip/hunt-5` | OPEN-ITEMS mode | running |
+| 3 | Verifier | sonnet | (removed) | (deleted) | baseline `f0793ce`: done, see "Last verified state" | done |
 | 4 | Resumed agent | - | - | - | - | none |
 
 ## ID blocks (OPEN-ITEMS)
 
-Highest F-nn at session start: F-51 (provisional F-48* to F-51*). F-44 was never assigned and stays unused.
+Highest F-nn at session 2 start: F-74 (provisional F-73*, F-74*). F-44 was never assigned and stays unused.
 
 | Block | Given to | Range |
 |---|---|---|
 | A | Implementer WI-36 | F-52 to F-61 |
 | B | Bug hunter hunt-1 | F-62 to F-71 |
+| C | Implementer WI-38 | F-75 to F-84 |
+| D | Bug hunter hunt-5 | F-85 to F-94 |
+| E | Verifier baseline `f0793ce` | F-95 to F-104 |
 
 ## Bug hunter log
 
