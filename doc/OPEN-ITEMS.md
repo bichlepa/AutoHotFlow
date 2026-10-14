@@ -35,6 +35,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-125* | The F-17 xfail test passes (strict XPASS) in the slow tier | strict mark dropped after a second XPASS (F-165); watch | |
 | F-105* | A comparison with an empty or missing variable is true in v1 and false in v2 | verified in the golden data; decided 2026-10-14 (E34): per-flow option `strictTypes`, to implement in WI-42 | yes |
 | F-165* | The F-17 xfail test passes again (strict XPASS) in the slow tier, after the F-125 fix | fixed by dropping strict on the F-17 test; watch | |
+| F-235* | `VarWriter.FlushAll` loses the variables beyond the limit of the peer (1000 waiting requests) | verified in a probe with a stand-in peer, open, low | |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
 
@@ -212,6 +213,13 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Evidence:** run ID `20261014-064633-1e444c2d`, commit `1e444c2`, command `python tools/run_suite.py --ref HEAD -- tests -q --all -m slow` (4 workers), exit code 1, `1 failed, 86 passed, 1 xfailed in 130.43s`, no INTERNALERROR. The fast tier (run ID `20261014-064547-1e444c2d`, 514 passed, exit 0) and the foundation tier (run ID `20261014-064848-1e444c2d`, 439 passed, 1 skipped, exit 0) of the same commit are green. The architecture check reports 0 violations.
 **Suspicion (assumed):** The change under verification (WI-39: `src/engine/`, `src/expr/`, `src/elements/skeleton/`) does not touch `src/core/` or `src/supervisor/`, so it is probably not the cause. Either the F-125 fix is not enough (the loop runs, but the role's queue still does not reach the limit during the 6 s suspension, for example because the machine is fast), or the F-17 defect depends on timing in a way the test does not control. No second sample, so the rate is unknown.
 **Action:** Done: `strict` is dropped for this test (see F-125 and F-17). Watch the result; an XPASS is now reported, not an error. Note the rate in F-17.
+
+### F-235*: A shutdown with more than 1000 unwritten variables loses the rest
+
+**What:** `VarWriter.FlushAll` (WI-41) sends every marked variable as its own `cmd.storage.var.set` and ignores `MAX_INFLIGHT`. `Peer.Request` refuses a request when `Peer.MAX_PENDING` (1000) requests are already waiting (code `busy`). `_Send` then calls `_Failed` without a retry (the process ends), so every variable beyond the limit is not written; each one raises its own `evt.storage.error` and log line.
+**Status:** verified in a probe (AHK unit level, stand-in peer that refuses after 1000 requests): 1100 marked variables, 1000 sent, 100 errors. Not reproduced with the real engine. It needs more than 1000 variables changed within the write delay of 200 ms, or more than 1000 variables marked again after a long storage outage; both are unlikely for the v1 scope (flows with some dozens of variables).
+**Proposal:** if it ever matters, send the remainder in one request that carries several variables (a protocol change in `cmd.storage.var.set`), or report one summary line instead of one error per variable. No change made.
+**Evidence:** probe described above; code `src/engine/vars/VarWriter.ahk` (`FlushAll`, `_Send`), `src/core/ipc/Peer.ahk` (`Request`).
 
 ## Watch list (E7)
 
