@@ -7,7 +7,7 @@ Files are compared byte for byte; `.gitattributes` turns line-ending conversion 
 |---|---|---|
 | `flows/v1_examples/` | 23 example flows and 4 demo flows of AutoHotFlow v1, unchanged | copied from `v1/AppData/Saved Flows` and `v1/Saved Flows/demo flows` |
 | `flows/personal/` | 4 flows of the project owner, published with consent | copied from the owner's working directory; the only change is the user name in a path (`C:\Users\example\Downloads` in `Flow 1730863959`) |
-| `variables/` | Synthetic variable files (`.ahfvd`/`.ahfvar`) in the v1 format | hand-made, no real data |
+| `variables/` | Synthetic variable files (`.ahfvd`/`.ahfvar`) in the v1 format: objects (a list, a map) and texts (a float text `0.500000`, a text with a leading zero and a non-ASCII character), UTF-8 with BOM like the files of v1 (WI-41) | hand-made, no real data |
 | `skeleton_flow.json` | Minimal flow of the walking skeleton | hand-made |
 
 ## Rules
