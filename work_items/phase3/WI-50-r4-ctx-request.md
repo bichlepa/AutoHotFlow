@@ -36,3 +36,15 @@ A worker gets copies of the visible loop, thread and instance variables with the
 ## Not part of this
 
 `ctx.RunScript` (S8, E39).
+
+## Result
+
+- **Protocol (PROTOCOL 4.5, "Variable requests"):** `cmd.engine.var.get` (value, type and location in one answer), `.set`, `.delete`, `.list` (with `withValues` also the values: `ExportInstanceVars`), `.import`, `.replace`, `.eval` (`kind` expression or script). Address `execId` (worker; `from` must be the worker of the job, else `denied`) or `instanceId` with optional `threadId` (client). New error code `gone`. An error of the operation is `ok` with `elementError` (the inline text); `ok: false` only for errors of the request.
+- **Engine:** `src/engine/VarRequests.ahk` answers at once with the `ExecContext` of the running job (`WorkerBridge.JobOf`) or with a context made for the instance (`Executor.ContextOf`); global and static writes go through the write-behind. The job is forgotten before `cmd.worker.cancel` leaves, so a request after a stop gets `gone`.
+- **Worker:** every variable function of `WorkerContext` asks the engine and waits (`MsgWaitForMultipleObjectsEx` plus `Sleep(-1)`; `Sleep(1)` cost 15 ms per call). `ctx.Request` sends any `cmd.*` with the `execId` and calls back on a timer thread of its own. Timeout 5 s, then `ElementError` "engine did not answer".
+- **M-45 (final):** the job carries no copies of the variables (`imports` empty, kept for `ctx.RunScript`); `GetVar` always asks the engine, nothing is cached, so a `SetVar` is read back and a change of another thread is seen. Reason: equal to inline and to v1; copying all visible variables into every job costs more than about 1 ms per call of a worker element.
+- **Client use:** the flow runner has `begin`, `wait` and `instance_var` (reads a variable of a running instance; `gone` after its end).
+- **Tests:** `tests/elements/` (test elements, only in the test entry), `tests/integration/test_worker_vars.py` (every variable function inline and in a worker give the same report; client read and `gone`; ask after stop gets `gone`, the pool stays healthy; round trip), `tests/fault/test_worker_vars_faults.py` (engine killed and worker killed while an element asks: no process left, no unhandled error in the engine, next job runs), `tests/ahk/engine_var_requests.test.ahk` (engine side without processes).
+- **Measured:** round trip about 1.04 ms median, p95 about 1.2 ms (MEASUREMENTS M-31).
+- **Load path (stress, 200 big flows, `-m stress`, serial, code of this package):** ready after 57.4 s; largest snapshot answer during the load 797 ms (budget 1000 ms); no timeout, no storage error. The package does not change the load path (the engine only registers one more handler).
+- **Not done here:** `doc/TEST-STRATEGY.md` section 9 still says that instance variables cannot be read before WI-50 (the document is the owner's or the integrator's).

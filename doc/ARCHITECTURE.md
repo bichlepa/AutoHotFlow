@@ -82,7 +82,7 @@ AHK v2 has no `await`. An element that uses `RunWait`, `WinWait`, a download or 
 | Mode | Runs in | For | Rule |
 |---|---|---|---|
 | `inline` | engine | fast, non-blocking elements (variables, strings, numbers, lists, timers via `SetTimer`) | must **never** block. Anything long runs via `ctx.After(ms, fn)` or is split into parts. |
-| `worker` | own process from a pool | blocking, risky or UI-showing elements: dialogs (`MsgBox`, `InputBox`, `FileSelect`), `RunWait`, network, COM, DllCall, AHK script | receives **evaluated parameters** and an explicit import list, returns result plus export variables |
+| `worker` | own process from a pool | blocking, risky or UI-showing elements: dialogs (`MsgBox`, `InputBox`, `FileSelect`), `RunWait`, network, COM, DllCall, AHK script | receives **evaluated parameters**; reads and changes variables with requests to the engine (R4, WI-50, waiting blocking for the answer), returns result plus export variables |
 | `trigger` | triggerhost | all triggers | see [ELEMENT-API-V2.md](ELEMENT-API-V2.md) |
 
 This fulfills the requirement "no UI dialogs from the engine": dialog elements run in the worker. The engine "asks the UI by message". The worker is the UI process for this.
@@ -119,7 +119,7 @@ The supervisor is the smallest and simplest process. It is a hub, because a rest
 | Flow definition (committed, with `rev`) | engine | editor (draft), manager (metadata for the list) |
 | Flow draft, undo/redo, selection, zoom, offset | `editor:<flowId>` | – |
 | Instances, threads, element execution status | engine | UI via event (`evt.element.state`) |
-| Variables `instance`/`thread`/`loop` (each with a hidden table) | engine: `Instance.Vars`, `ThreadState.Vars`, `ThreadState.Loops` (WI-40, doc/EXPRESSION-LANGUAGE.md section 18) | – (a worker receives copies of the visible loop, thread and instance variables) |
+| Variables `instance`/`thread`/`loop` (each with a hidden table) | engine: `Instance.Vars`, `ThreadState.Vars`, `ThreadState.Loops` (WI-40, doc/EXPRESSION-LANGUAGE.md section 18) | – (a worker element reads and changes them through the engine, `cmd.engine.var.*`, WI-50; it holds no copies) |
 | Variables `global`/`static` (working copy) | engine: `EngineVars` (WI-40); `VarLoader` loads, `VarWriter` writes through `storage` (WI-41) | the files `Variables/` (storage) |
 | Variable files on disk | storage | – (write-behind from the engine) |
 | Parse cache of expression trees (`src/expr/`, up to 2000 texts, doc/EXPRESSION-LANGUAGE.md section 12) | the process that evaluates (engine, worker): a local cache of immutable trees, no state that anyone else reads | – |
@@ -162,7 +162,7 @@ UIs render what the engine reports. An editor does not mark an element as "runni
 The debugger is **not** built in Phase 2b. However, the following requirements must not be blocked by later designs:
 
 - An **execution gate** in the dispatcher of the engine: before each element, execution can be paused per instance or flow (pause, breakpoint on an element, single step, artificial delay after each element, e.g. 3 s). Pausing takes effect at element boundaries; a running element (especially in the worker) runs to its end.
-- During a pause, clients can read and change all variables of an instance (messages to the engine; the engine owns the variables, section 4).
+- During a pause, clients can read and change all variables of an instance (messages to the engine; the engine owns the variables, section 4). The messages exist since WI-50: `cmd.engine.var.*` with `instanceId` and optional `threadId` (PROTOCOL 4.5); the flow runner of the tests uses them.
 - Editing during a pause takes effect at the next step (follows from E1 and the table in 4.2).
 - The events for this (e.g. `evt.instance.paused`) and commands (`cmd.debug.*`) are designed in Phase 3 or later.
 
@@ -391,7 +391,7 @@ Rule: a folder under `src/` is a process role or library module. `core/` may not
 | R1 | Overlapped named pipes in AHK v2 are error-prone (OVERLAPPED structure, handle lifetime). | In Phase 2 as a tested library `core/ipc` with a Python counterpart, fault-injection tests. Spike exists. |
 | R2 | Drawing in the editor process could stutter with very large flows. | `Renderer` interface, measurement in Phase 3, separation criterion in 2.1. |
 | R3 | Including all element classes in every role costs parse time and memory (v1: 29,000 lines). With one entry point (D12) every process parses all elements; a split per role needs separate entry scripts. | **Measured (WI-46, `doc/MEASUREMENTS.md` M-27 to M-29): decision question for the project owner.** With 150 synthetic elements of 160 lines (the size of v1) the parse time grows by 48 ms and the start of a worker by 4 ms (both below the thresholds of 150 ms), but every process needs 11.5 MB more private memory (about 75 KB per class; threshold 10 MB, so exceeded). With about 10 processes this is about 115 MB on top of the budget of 100 MB (section 9), which the chain without elements already touches (private about 10 MB per process). Options (not implemented): (A) separate entry scripts per role: supervisor, storage and debug without elements, the worker only with worker elements, the engine with the runtime of the inline elements, the editor and the manager with the metadata; changes D12 (several entries) and R7 (one artifact per entry or a launcher). (B) Metadata (`Name`, `Parameters`, `GenerateName`, `CheckSettings`) and runtime code (`Run`) in separate files: only helps together with (A), because AHK includes are static and there is no lazy loading. (C) Only a smaller entry for the roles without elements (supervisor, storage, debug, a first step of A). (D) Accept the cost and redefine the memory budget as private bytes, or raise it. |
-| R4 | Elements with a need for callbacks to the engine (`GetVariable` in the worker) need request/response without `await`. | Callback API `ctx.Request(...)` with timeout (S2, WI-50). Workers may wait blocking (own process), the engine never. |
+| R4 | Elements with a need for callbacks to the engine (`GetVariable` in the worker) need request/response without `await`. | **Closed (WI-50).** The variable requests `cmd.engine.var.*` (PROTOCOL 4.5): every variable function of a worker element asks the engine and waits blocking for the answer (own process); the engine answers at once from its variable model and never waits. Round trip about 1 ms (MEASUREMENTS M-31). `ctx.Request(type, payload, callback, timeoutMs)` for other requests (ELEMENT-API-V2 3, 3.2). |
 | R5 | Execution policies (`default`, `parallel`, `skip`, `wait`, `stop`): exact semantics must be taken over from `newInstance` and `executionTask`. | Characterization tests against v1 before the port (Phase 3). |
 | R6 | Behavioral deviation: engine crash loses running instances. | Documented in [MIGRATION.md](MIGRATION.md). v1 had the same effect when the whole process crashed. |
 | R7 | Installer/compilation (Ahk2Exe v2, one artifact with role parameter). | Later phase, entry point is already prepared for it (D12). |

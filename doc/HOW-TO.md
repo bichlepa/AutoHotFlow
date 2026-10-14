@@ -728,6 +728,21 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Status:** cause verified by message and code (the interruption itself was not observed); fix proven statistically (60/60). Other places with the same pattern were not checked.
 - **Source:** `src/engine/Executor.ahk` (`_Advance`), `src/engine/core/Scheduler.ahk` (`Advance`), `tests/stress/test_parallel_instances.py`
 
+### Waiting for a message: `Sleep(1)` returns only at the next tick of the system timer
+
+- **Problem:** A worker element waits blocking for the answer of the engine (WI-50). A loop of `Sleep(1)` until the answer is there gave a round trip of 15 ms (median of 300 calls), although the answer arrives after about 1 ms: the wake-up message runs its handler during the `Sleep`, but `Sleep` itself ends only with the next tick of the system timer (15.6 ms).
+- **Wrong:** `while (!done) Sleep(1)`.
+- **Right:** Wait for a message, then let AHK handle what is queued: `DllCall("MsgWaitForMultipleObjectsEx", "UInt", 0, "Ptr", 0, "UInt", 50, "UInt", 0x4FF, "UInt", 0x4, "UInt")` (QS_ALLINPUT, MWMO_INPUTAVAILABLE: it also returns for a message that is already in the queue), then `Sleep(-1)`. Round trip 1.0 ms (median). The 50 ms bound keeps the loop able to check its own deadline. Only in the worker (a role that may block).
+- **Status:** verified (both variants measured with `tests/integration/test_worker_vars.py`, round trip test). Not checked: a thread that is `Critical` (its messages stay in the queue, the loop would then spin until its deadline; ELEMENT-API-V2 3.2 forbids the call there).
+- **Source:** `src/worker/WorkerContext.ahk` (`_WaitForMessages`)
+
+### A blocking wait inside a callback of the peer waits for nothing
+
+- **Problem:** The answer to a request arrives through `PipeConnection.Pump`, which has a guard against re-entry. Code that runs inside the pump (a request callback, a message handler) and then waits blocking for another answer would wait in vain: the pump that would read the answer returns at once because the outer one is still running. Only the deadline of the request ends the wait.
+- **Right:** Run code that may wait on a thread of its own: `ctx.Request` of a worker element calls its callback with `SetTimer(fn, -1)`, outside the pump, so the callback may use the variable functions (which wait).
+- **Status:** assumed (derived from the guard in `PipeConnection.Pump`, not reproduced)
+- **Source:** `src/worker/WorkerContext.ahk` (`_OnRequestAnswer`)
+
 ## GUI and hotkeys
 
 ### ListView: row clicks and selection after a rebuild
