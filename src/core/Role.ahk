@@ -39,6 +39,10 @@ class Role {
     static ORPHAN_MS := 3000
     static GUARD_MS := 200
     static LOG_QUEUE_MAX := 500
+    ; Log entries are droppable (F-17): above this many frames in the send queue to the hub an entry is dropped and
+    ; counted, so a log burst never drives the queue into the hard limit (PipeConnection.maxQueueFrames, 1000), which
+    ; would close the connection. The count is reported as one line when there is room again.
+    static LOG_SEND_SOFT := 500
     ; More than ERROR_LIMIT unhandled errors within ERROR_WINDOW_MS end the role with EXIT_TOO_MANY_ERRORS (WI-23).
     ; 20 in a minute is generous: a healthy role has none, one broken element or timer may throw a few times in a
     ; row, but 21 means the state is broken and a restart (engine, storage: Children restart rule) is better than
@@ -103,6 +107,7 @@ class Role {
         this.lostSince := 0
         this.logQueue := []
         this.logDropped := 0
+        this.logDropPending := 0       ; entries dropped since the last "n log lines dropped" line
         this.logTarget := ""
         this.errorTimes := []
         this.errorCount := 0           ; unhandled errors so far (snapshot)
@@ -216,6 +221,12 @@ class Role {
         if (flowId != "")
             entry["flowId"] := flowId
         if (this.logTarget != "" && IsObject(this.peer) && this.peer.status = "ready") {
+            if (this.peer.QueuedFrames >= Role.LOG_SEND_SOFT) {
+                this.logDropped += 1
+                this.logDropPending += 1
+                return
+            }
+            this._ReportLogDrops()
             this.peer.Send(this.logTarget, "evt.log.append", entry)
             return
         }
@@ -224,6 +235,18 @@ class Role {
             this.logQueue.RemoveAt(1)
             this.logDropped += 1
         }
+    }
+
+    ; One line for the entries dropped above LOG_SEND_SOFT, written when the queue has room again. Sent directly
+    ; (not through _Enqueue), so it cannot be dropped itself.
+    _ReportLogDrops() {
+        if (this.logDropPending = 0 || this.logTarget = "" || !IsObject(this.peer) || this.peer.status != "ready"
+            || this.peer.QueuedFrames >= Role.LOG_SEND_SOFT)
+            return
+        n := this.logDropPending
+        this.logDropPending := 0
+        this.peer.Send(this.logTarget, "evt.log.append", Map("ts", FormatTime(A_NowUTC, "yyyy-MM-dd HH:mm:ss")
+            , "level", "a1", "source", "role", "text", this.name " " n " log lines dropped (send queue to the hub was full)"))
     }
 
     _FlushLog() {
@@ -259,6 +282,7 @@ class Role {
             return
         if (this.peer.status != "reconnecting") {
             this.lostSince := 0
+            this._ReportLogDrops()
             return
         }
         now := Time.NowMs()

@@ -1,7 +1,8 @@
 """F-17 and F-275: a burst of log lines.
 
-Both tests show a defect that is known and not fixed yet; they are marked xfail(strict=True) and turn loud when the
-defect is fixed (remove the mark then).
+Both tests guard the fix: log entries are droppable. Above a soft limit of the send queue the entry is dropped and
+counted, and one line "n log lines dropped" is written when there is room again (Hub.LOG_SOFT_LIMIT,
+Role.LOG_SEND_SOFT). The link and the role survive; the burst itself may lose lines, but never silently.
 
 * F-275: a role logs thousands of lines in a tight loop. The hub's send queue to "storage" holds 1000 frames; the
   overflow closes the link to storage (queue_overflow), storage is judged hung and restarted, and the lines are lost.
@@ -11,6 +12,7 @@ defect is fixed (remove the mark then).
 The test role echo (tests/integration/helpers/EchoRole.ahk) writes the lines on request (cmd.test.log).
 """
 
+import re
 import threading
 import time
 
@@ -27,13 +29,12 @@ pytestmark = [pytest.mark.fault, pytest.mark.slow]
 BURST = 5000            # lines in one tight loop (3000 was enough in the first measurements)
 
 
-def log_text(datadir):
-    path = datadir / "Log" / "Log.txt"
+def log_text(datadir, name="Log.txt"):
+    path = datadir / "Log" / name
     return path.read_bytes().decode("utf-8", "replace") if path.exists() else ""
 
 
-@pytest.mark.xfail(strict=True, reason="F-275: a log burst overflows the hub's send queue to storage and closes the link")
-def test_a_burst_of_log_lines_does_not_cost_the_storage_link_or_the_lines(chains, datadir):
+def test_a_burst_of_log_lines_does_not_cost_the_storage_link(chains, datadir):
     chain = chains("storage,echo:a", ["--test-roles"])
     pids = chain.wait_ready(["storage", "echo:a"])
     request_ok(chain.obs, "echo:a", "cmd.test.setlogtarget", {"to": "storage"})
@@ -44,10 +45,15 @@ def test_a_burst_of_log_lines_does_not_cost_the_storage_link_or_the_lines(chains
     assert chain.sup.wait_exit(timeout=40) == 0, chain.sup.text()
     sup_text = chain.sup.text()
     assert "queue_overflow" not in sup_text, sup_text[:2000]
-    assert log_text(datadir).count("~echo~ entry ") == BURST
+    # Log.txt rotates into Log_old.txt (one old file). The drop notes are in the files of their sources.
+    written = sum(log_text(datadir, name).count("~echo~ entry ") for name in ("Log.txt", "Log_old.txt"))
+    dropped = sum(int(n) for source in ("hub", "role", "storage") for suffix in ("", "_old")
+                  for n in re.findall(r"(\d+) log lines dropped", log_text(datadir, f"Log_{source}{suffix}.txt")))
+    # No line is lost silently: every line is in the file or counted in a "n log lines dropped" line.
+    assert written > 0
+    assert written + dropped == BURST, (written, dropped)
 
 
-@pytest.mark.xfail(strict=False, reason="F-17: a chatty role gives up during a long stand-still of the supervisor")
 def test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor(chains, datadir):
     chain = chains("storage,echo:a", ["--test-roles"])
     pids = chain.wait_ready(["storage", "echo:a"])

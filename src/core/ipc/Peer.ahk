@@ -152,6 +152,9 @@ class Peer {
             this._SendSubscribe(topic)
     }
 
+    ; Frames waiting in the send queue of the connection (0 without a connection). See Role.LOG_SEND_SOFT (F-17).
+    QueuedFrames => IsObject(this._conn) ? this._conn.QueuedFrames : 0
+
     ; Sends an event or other message without an answer. Returns the message id, or "" when the
     ; peer is not ready or the frame was refused (counted in droppedSends). Events are not kept.
     Send(to, msgType, payload := "") {

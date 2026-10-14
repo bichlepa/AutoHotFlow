@@ -52,6 +52,10 @@ class Hub {
     ; for ROUTED_DEFAULT_MS, the longest standard deadline of the protocol (storage operations, PROTOCOL 2).
     static ROUTED_SLACK_MS := 1000
     static ROUTED_DEFAULT_MS := 30000
+    ; evt.log.append is droppable (F-275): above this many frames in the send queue to the target the hub drops it
+    ; and counts it per target (link["logDropped"]), so a log burst never drives the queue into the hard limit
+    ; (PipeConnection.maxQueueFrames, 1000), which would close the link. Other message types are never dropped here.
+    static LOG_SOFT_LIMIT := 800
 
     onHello := ""
     onLinkLost := ""
@@ -126,6 +130,9 @@ class Hub {
                 rec["conn"].Close()
             }
         }
+        for name, link in this._links
+            if (link.Get("logDropped", 0) > 0)
+                this._ReportLogDrops(link)
         due := []
         for id, rec in this._pending
             if (now >= rec["dueAt"])
@@ -423,6 +430,8 @@ class Hub {
             this._Refuse(link, msg, ErrCode.NOT_FOUND, "no peer '" to "'")
             return
         }
+        if (msg.type = "evt.log.append" && this._DropLog(target))
+            return
         try {
             text := msg.Serialize()
             sent := this._SendFrame(target, text)
@@ -435,6 +444,27 @@ class Hub {
             return
         }
         this._NoteRouted(link["name"], to, msg.type, msg.id, msg.corr, msg.timeoutMs)
+    }
+
+    ; True when an evt.log.append for this target is to be dropped (queue above LOG_SOFT_LIMIT); the drop is counted.
+    ; Otherwise reports earlier drops, if any, and returns false.
+    _DropLog(target) {
+        if (target["conn"].QueuedFrames >= Hub.LOG_SOFT_LIMIT) {
+            target["logDropped"] := target.Get("logDropped", 0) + 1
+            return true
+        }
+        this._ReportLogDrops(target)
+        return false
+    }
+
+    ; One line "n log lines dropped" per target when its queue has room again (called when a log message passes
+    ; and from Tick). The line goes through the log sink like every hub line.
+    _ReportLogDrops(target) {
+        n := target.Get("logDropped", 0)
+        if (n = 0 || target["conn"].QueuedFrames >= Hub.LOG_SOFT_LIMIT)
+            return
+        target["logDropped"] := 0
+        Log.Write("a1", "hub", n " log lines dropped (send queue to '" target["name"] "' was full)")
     }
 
     ; The fast way of _Route: the sender is set in the head, the payload text is passed on as it came.
@@ -457,6 +487,8 @@ class Hub {
             this._Refuse(link, stub, ErrCode.NOT_FOUND, "no peer '" to "'")
             return
         }
+        if (head["type"] = "evt.log.append" && this._DropLog(target))
+            return
         if (!this._SendFrame(target, out)) {
             this._Refuse(link, stub, ErrCode.PEER_GONE, "'" to "' does not accept the message")
             return

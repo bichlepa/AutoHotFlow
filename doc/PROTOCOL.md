@@ -306,6 +306,8 @@ Each event carries `seq` (increasing per engine epoch) and `epoch`.
 | `cmd.storage.settings.get/set` | `{ settings? }` | `{ ok, settings }` (Phase 3, not yet implemented) |
 | `evt.log.append` (`noReply`) | `{ ts, level, source, flowId?, text }` | none. Storage writes `Log.txt`, `Log_<source>.txt` and forwards to topic `log`. |
 
+`evt.log.append` is droppable (F-17, F-275): a sender (`Role`) drops it above 500 frames in its send queue, and the hub drops it above 800 frames in the queue to the target, so a log burst never overflows a queue (which would close the connection). Drops are counted and announced by one line "n log lines dropped" when there is room again. No other message type is dropped this way.
+
 **Implementation in WI-12 (`src/storage/`):**
 
 - All responses go through the queue (`WriteQueue`, two queues, time budget per timer run, see WI-25 below). The response is `Deferred` (section 2). Every request is answered exactly once, also on deadline, error or shutdown (`shutting_down`).
