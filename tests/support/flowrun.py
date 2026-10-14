@@ -25,8 +25,9 @@ What a FlowRun holds (all of it comes from the events of the flow topic and the 
   path, names  the element IDs and the names of the steps
   log          the log entries of the flow that were written while the instance ran (dicts: ts, level, source, text)
   probe(name)  the variables that a `FlowBuilder.probe` element copied: text, type and location of a variable at that
-               place of the flow. Instance and thread variables are not readable after the end of an instance (there
-               is no engine request for them before WI-50); the probe element is the way to see them.
+               place of the flow. Instance and thread variables are gone after the end of an instance; the probe
+               element is the way to see them there. While an instance runs (`begin`, then `wait`), `instance_var`
+               asks the engine for one of its variables (`cmd.engine.var.get`, WI-50).
 Events of several instances of one flow that run at the same time are not told apart (the element event has no
 instance ID): use one instance at a time, or read the steps of the flow as a whole.
 
@@ -140,6 +141,7 @@ class FlowRun:
     steps: list = field(default_factory=list)
     log: list = field(default_factory=list)
     _runner: object = None
+    _mark: int = 0
 
     @property
     def path(self):
@@ -388,6 +390,11 @@ class FlowRunner:
         """Runs one instance of a flow and waits for its end. `flow` is a FlowBuilder (added, and the session started or
         restarted if needed), or the ID of a flow that was added. Returns a FlowRun. Raises AssertionError if the
         instance does not end within `scaled(timeout)` seconds (the message has the output of the session)."""
+        return self.wait(self.begin(flow, trigger), timeout)
+
+    def begin(self, flow, trigger=None):
+        """Starts one instance like `run` and returns at once: a FlowRun with flow_id and instance_id only. While the
+        instance runs, `instance_var` reads its variables; `wait` waits for the end and fills the FlowRun."""
         flow_id = self.add(flow) if hasattr(flow, "to_dict") else flow
         assert flow_id in self.flows, "unknown flow '%s'" % flow_id
         if self._sup is not None and flow_id not in self._loaded:
@@ -400,17 +407,30 @@ class FlowRunner:
         if trigger is not None:
             payload["triggerId"] = str(trigger)
         started = self.request_ok("engine", "cmd.flow.start", payload)
-        instance_id = started["instanceId"]
+        return FlowRun(flow_id, started["instanceId"], _runner=self, _mark=mark)
+
+    def wait(self, run, timeout=RUN_TIMEOUT_S):
+        """Waits for the end of an instance started with `begin` and fills its FlowRun (reason, steps, log)."""
+        flow_id, instance_id, mark = run.flow_id, run.instance_id, run._mark
         found = self._rec.wait(lambda m: m.get("type") == "evt.instance.ended"
                                and m["payload"].get("instanceId") == instance_id, scaled(timeout), mark)
         if found is None:
             raise AssertionError("instance %s of '%s' did not end within %.1f s:\n%s"
                                  % (instance_id, flow_id, scaled(timeout), self.stderr_text()))
         index, ended = found
-        run = FlowRun(flow_id, instance_id, ended["payload"].get("reason", ""), _runner=self)
+        run.reason = ended["payload"].get("reason", "")
         run.steps = self._steps(flow_id, self._rec.slice(mark, index + 1))
         run.log = self._log_until(flow_id, mark, index)
         return run
+
+    def instance_var(self, instance_id, name, thread_id=None, hidden=False):
+        """A variable of a running instance, asked from the engine (`cmd.engine.var.get`, WI-50): the answer payload
+        (`exists`, `value`, `type`, `location`), or the error payload (`ok` false; `error.code` `gone` when the instance
+        has ended). Without thread_id there are no loop and thread variables."""
+        payload = {"instanceId": instance_id, "name": name, "hidden": bool(hidden)}
+        if thread_id is not None:
+            payload["threadId"] = thread_id
+        return self._obs.request("engine", "cmd.engine.var.get", payload, timeout=scaled(5.0))["payload"]
 
     def _steps(self, flow_id, events):
         names = self._names.get(flow_id, {})

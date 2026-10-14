@@ -395,6 +395,24 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: variable request round trip from a worker (300 GetVar; MEASURE line in the output)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/integration/test_worker_vars.py",
+                "-k",
+                "round_trip",
+                "-n",
+                "0",
+                "-s",
+                "-q"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: run suite at HEAD + uncommitted changes (worktree, you can keep working)",
             "type": "shell",
             "command": "python",

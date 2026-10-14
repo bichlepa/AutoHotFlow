@@ -10,6 +10,11 @@
 #Include HangerRole.ahk
 #Include SlowShutdownRole.ahk
 #Include RegisterFailure.ahk
+; Test elements that live in tests/ (WI-50), registered in every role of this entry
+#Include ..\..\elements\Action_TestVarFunctions.ahk
+#Include ..\..\elements\Action_TestVarFunctionsWorker.ahk
+#Include ..\..\elements\Action_TestVarBenchWorker.ahk
+#Include ..\..\elements\Action_TestAskAfterStopWorker.ahk
 
 AhfTestRolesFn := AhfRegisterTestRoles
 
