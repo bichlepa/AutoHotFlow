@@ -12,7 +12,7 @@ Session start: 2026-10-13, work-item mode (no wishes). Main checkout clean, on `
 | WI-37 | Expression language v2: spec, tokenizer, parser | done | sonnet (implementer) | integrated: 0a24b4c to 6023cde | 6023cde | fast run 20261013-192532-6023cded (434 passed, exit 0), arch check 0 violations (live tree) | 2026-10-13 | `src/expr/`, `doc/EXPRESSION-LANGUAGE.md` (renamed from the German file name), L1 tests. Decisions to confirm: unsupported syntax (spec section 15: `%` modulo, `^=`, `%=`, `<>`, `"a""b"`), tree height limit 200. One flaky failure of `test_worker_reports_not_busy_after_a_cancel_too` in an implementer run, not reproduced on the integrated state. |
 | WI-38 | Evaluator | done | sonnet (implementer) | integrated: ebcb01e to 0506198 (rebased once onto v2-port) | 0506198 | fast run 20261014-061523-4784 (482 passed, exit 0, on the rebased branch); verifier pending | 2026-10-14 | `src/expr/` evaluator, 31 us per typical expression (parse cache hit); decisions to confirm: `missing` field in the result, failed `+=` leaves `""`, text that looks like an integer counts as integer for E29, `mod` added, MIGRATION M-24 to M-26 |
 | WI-39 | Converter v1 expressions | done (owner accepted the catalog and the decisions of the implementer, 2026-10-14; F-105 stays open) | sonnet (implementer) | integrated: 7 commits, the last is 1e444c2 (rebased once onto v2-port) | 1e444c2 (first commit 7732b8e) | fast run 20261014-064430-17980 (514 passed, exit 0, rebased branch); verifier pending | 2026-10-14 | 1418 expression/script cases against the golden data: 726 agree after conversion, 490 accepted deviations, 194 depend on the WIP variable model (WI-40), 8 unsupported; open: owner review of the catalog (EXPRESSION-LANGUAGE 15.1), the five unsupported forms, F-105 (E30) decision; private golden cases not checked (no data on the machine) |
-| WI-40 | Variable model in the engine | in progress | opus (implementer) | `wip/wi-40` | - | - | 2026-10-14 | depends on WI-38 (done) |
+| WI-40 | Variable model in the engine | done, verification pending | opus (implementer) | integrated: deade8e to 84a3912 (7 commits, rebased once onto v2-port) | 84a3912 | fast run 20261014-071610-364 (548 passed, exit 0, on the rebased tree; trees identical to 84a3912); verifier running | 2026-10-14 | `src/engine/vars/`; golden 2161 cases compared, all destination, checkname, replace (389/392 agree, 3 with class) and varset cases agree or have a class; decisions to confirm: M-43 (`object . "x"` gives empty plus warning), no Arrays in variables, SetVar rules, A_LanguageName real name; F-105 still open |
 | WI-41 | global/static permanent, data folder | open | | | | | 2026-10-13 | depends on WI-40; E33 (default data folder) is done in `9eb84e0`, the owner's commit, verified: fast run 20261013-182355-9eb84e08 (301 passed), foundation run 20261013-182435-9eb84e08 (437 passed, 1 skipped, not identified), exit 0 both |
 | WI-42 | Parameter evaluation and ctx API | open | | | | | 2026-10-13 | depends on WI-38, WI-39, WI-40 |
 | WI-43 | Acceptance S1 | open | | | | | 2026-10-13 | depends on all |
@@ -43,13 +43,14 @@ Session 2 start: 2026-10-14, work-item mode, HEAD `f0793ce` on `v2-port`, main c
 
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
-| 1 | Implementer | opus | `wi-40` | `wip/wi-40` | WI-40 | running (started 2026-10-14) |
+| 1 | Implementer | opus | (removed) | (deleted) | WI-40 | done (see the WI-40 row) |
 | 2 | Bug hunter | sonnet | (removed) | (deleted) | OPEN-ITEMS round 2: F-73 analysed (decision needed, cause plausible: external close), integrated as 5251c04 | done |
 | 2b | Bug hunter | sonnet | (removed) | (deleted) | F-125: test precondition fixed (waits for the log burst, skip otherwise), 11 runs without XPASS; integrated as d354ff5, 107bb65. Tested tree equals v2-port tree (tests `bb0f06e`); slow run 20261014-063319-444 (86 passed, 2 xfailed), fast run 20261014-063423-24212 (482 passed) | done |
 | 3 | Verifier | sonnet | (removed) | (deleted) | verification of `1e444c2` (WI-39): fast green (run 20261014-064547-1e444c2d, 514 passed), foundation green (run 20261014-064848-1e444c2d, 439 passed, 1 skipped), slow red by the F-17 strict XPASS again (F-165*, run 20261014-064633-1e444c2d), arch 0 violations; finding integrated as 87b17de | done |
 | 4 | Fix (drop strict on the F-17 test, per the F-125 action) | haiku | (removed) | (deleted) | F-125, F-165: strict dropped (e843ebb), notes (a7dc7dd, F-165 action line); tests: file with -m slow run 20261014-065332-17556 (2 xfailed, exit 0), fast run 20261014-065448-19324 (514 passed, exit 0) | done |
 | 2 | Bug hunter round 3 | sonnet | (removed) | (deleted) | F-29 follow-up (hello never answered): fix in `src/core/ipc/Peer.ahk` accepted by the owner, integrated as e5542f0, aa81047 (ARCHITECTURE 6.3 sentence); verification running | done, verification pending |
 | 3 | Verifier F-29 fix | sonnet | (removed) | (deleted) | verification of `aa81047`: fast 20261014-070717-aa81047f (514 passed), foundation 20261014-070803-aa81047f (440 passed, 1 skipped), slow 20261014-070955-aa81047f (86 passed, 2 xfailed), arch 0 violations, single test with --all 20261014-071204-aa81047f (passed); no findings | done |
+| 3 | Verifier WI-40 | sonnet | `verify-5` | `wip/verify-5` | verification of `84a3912` (fast, slow, arch, golden check) | running (started 2026-10-14) |
 
 ## ID blocks (OPEN-ITEMS)
 
@@ -67,7 +68,9 @@ Highest F-nn at session 2 start: F-74 (provisional F-73*, F-74*). F-44 was never
 | H | Bug hunter round 2 | F-115 to F-124 |
 | I | Verifier `0506198` | F-125 to F-134 (F-125* used) |
 | J | Bug hunter F-125 | F-135 to F-144 (used: F-125 fix) |
-| K | Implementer WI-40 | F-145 to F-154 |
+| - | Next: WI-41 after the WI-40 verification (depends on WI-40 only); WI-42 after WI-41 is not required by the plan order but depends on WI-40 and WI-39 (both done) |
+| K | Implementer WI-40 | F-145 to F-154 (none used) |
+| N | Verifier WI-40 (`84a3912`) | F-185 to F-194 |
 | L | Bug hunter round 3 | F-155 to F-164 |
 | M | Verifier WI-39 (`1e444c2`) | F-165 to F-174 |
 
