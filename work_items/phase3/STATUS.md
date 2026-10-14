@@ -108,6 +108,8 @@ Step S2 planning (2026-10-14): integrated as 62d518c and 407a050 (the rebase of 
 
 Owner's decisions (2026-10-14, after WI-43): the migration entries M-38 to M-48 are confirmed ("Die Migrationseinträge passen"); the stress finding F-268* is watched, not repeated now. The change in `doc/PARALLEL-WORK.md` (other agents only when the owner directs them) is the owner's and is committed (9682478).
 
+Owner's decision (2026-10-14, after the retrospective of WI-43): F-268* is no longer only watched but scheduled in S2: WI-46 measures the load phase, and the S2 packages on the load path run the big-flows stress test at their end (`caf62ab`, OPEN-ITEMS F-268).
+
 Owner's manual checks (2026-10-14, `doc/MANUAL-CHECKS.md`, not yet committed by the orchestrator; the owner's file): stub steps 1 to 6 pass; debug window steps 1, 2, 4 to 9 pass, step 3 fails (snapshot text jumps to the top on every refresh; the time "Stand ..." is in the same text). Fix in progress (implementer row 7). Open from the owner's notes: the step 1 debug task opens the debug window next to the stub window (doc does not say so); the step 5 exit code comes from the `ahkrun.py` log, not from the VS Code task; step 8 is not fully clear which debug window ended (one "debug gone" entry in the hub log). #Warn dialog from the variable loader: F-255*, open.
 
 ## Bug hunter log
