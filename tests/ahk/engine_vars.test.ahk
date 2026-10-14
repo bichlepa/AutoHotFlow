@@ -180,7 +180,8 @@ CheckNestedLoops() {
     Assert.Equal(owner.LastEndReason(), "finished")
 }
 
-; A worker gets copies of the visible loop, thread and instance variables; its exports come back by name.
+; A worker job carries no copies of the variables (M-45, WI-50); the job keeps the engine context of the element, which
+; the variable requests use; its exports come back by name.
 CheckWorkerImportsAndExports() {
     VarLog.Reset()
     owner := NewOwner(FlowText([SetEl("s1", "x", "inst value"), SetEl("s2", "A_T", "thread value", "thread")
@@ -188,11 +189,12 @@ CheckWorkerImportsAndExports() {
         , [Conn("c1", "t0", "s1"), Conn("c2", "s1", "s2"), Conn("c3", "s2", "s3"), Conn("c4", "s3", "w")
         , Conn("c5", "w", "g1"), Conn("c6", "g1", "g2")]))
     Start(owner)
-    imports := owner.workers.imports[1]
-    Assert.Equal(imports["x"], "inst value")
-    Assert.Equal(imports["A_T"], "thread value")
-    Assert.Equal(imports.Has("global_g"), false, "no global variables")
-    Assert.Equal(imports.Has("A_TriggerID"), true, "thread variables of the trigger")
+    Assert.Equal(owner.workers.imports[1].Count, 0, "no copies of the variables")
+    ctx := owner.workers.payloads["fx-1"]["ctx"]
+    Assert.Equal(ctx.GetVar("x"), "inst value")
+    Assert.Equal(ctx.GetVar("A_T"), "thread value")
+    Assert.Equal(ctx.GetVar("global_g"), "global value")
+    Assert.Equal(ctx.GetVarLocation("A_TriggerID"), "thread", "thread variables of the trigger")
     owner.workers.Complete("fx-1", "normal", Map("out", "o", "A_Out", "ao"))
     owner.Drive()
     Assert.Equal(VarLog.Values("g1"), "o", "a plain export is an instance variable")
@@ -215,7 +217,7 @@ TestRun.Case("threads: own thread variables, shared instance variables", CheckTh
 TestRun.Case("static per flow, global shared, both outlive the instance", CheckStaticPerFlowAndGlobalShared)
 TestRun.Case("a new instance starts without instance variables", CheckNewInstanceStartsEmpty)
 TestRun.Case("nested loops: the loop stack keeps the outer A_Index", CheckNestedLoops)
-TestRun.Case("worker: imports are copies, exports come back by name", CheckWorkerImportsAndExports)
+TestRun.Case("worker: no imports, the job keeps the context, exports come back by name", CheckWorkerImportsAndExports)
 TestRun.Case("trigger variables A_TriggerID and A_TriggerTime", CheckTriggerVariables)
 
 TestRun.Finish()

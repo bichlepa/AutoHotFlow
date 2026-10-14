@@ -396,23 +396,6 @@ CheckListVars() {
     Assert.Throws(() => a.ListVars("nowhere"), ValueError)
 }
 
-CheckImports() {
-    f := Fx()
-    f.inst.Vars["x"] := VarValues.Import(NewMap("k", "v"))
-    f.thread.Vars["A_Foo"] := "thread"
-    f.thread.Vars["A_Index"] := "thread"
-    f.thread.Loops.Visible["A_Index"] := "loop"
-    f.inst.HiddenVars["h"] := 1
-    f.store.Global["global_g"] := 1
-    f.store.Static("flow1")["static_s"] := 1
-    imports := f.access.Imports()
-    Assert.Equal(Keys(imports), "A_Foo,A_Index,x")
-    Assert.Equal(imports["A_Index"], "loop", "a loop variable hides a thread variable")
-    imports["x"]["k"] := "changed"
-    Assert.Equal(f.inst.Vars["x"]["k"], "v", "imports are copies")
-    Assert.Equal(VarAccess(f.store, "", "", Map()).Imports().Count, 0, "nothing in common")
-}
-
 ; ---- loop stack and threads ----------------------------------------------------------------------------------------
 
 CheckLoopStackKeepsOuterLoopVariables() {
@@ -466,7 +449,6 @@ TestRun.Case("working directory of a flow", CheckWorkingDir)
 TestRun.Case("replace: %var% as v1 Var_replaceVariables", CheckReplace)
 TestRun.Case("JSON text of objects", CheckJsonText)
 TestRun.Case("ListVars per scope and all", CheckListVars)
-TestRun.Case("imports of a worker", CheckImports)
 TestRun.Case("loop stack: inner loop hides and restores outer loop variables", CheckLoopStackKeepsOuterLoopVariables)
 TestRun.Case("thread clone copies its variables", CheckThreadCloneCopiesVariables)
 

@@ -36,19 +36,26 @@ class FakeWorkers {
 
     Free() => this.hasFree
 
-    Run(classId, params, imports, env, onDone, jobTimeoutMs := 0, evaluated := "") {
+    Run(classId, params, imports, env, onDone, jobTimeoutMs := 0, evaluated := "", ctx := "") {
         this.runs += 1
         this.timeouts.Push(jobTimeoutMs)
         this.imports.Push(imports)
         execId := "fx-" this.runs
         this.payloads[execId] := Map("classId", classId, "params", params, "imports", imports, "env", env
-            , "evaluated", evaluated)
+            , "evaluated", evaluated, "ctx", ctx)
         if (this.failAtOnce) {
             onDone("exception", "worker not available", Map())
             return execId
         }
         this.jobs[execId] := onDone
         return execId
+    }
+
+    ; As WorkerBridge.JobOf (WI-50): the context of an open job, the slot is always "worker:fake".
+    JobOf(execId) {
+        if (!this.jobs.Has(execId))
+            return ""
+        return Map("ctx", this.payloads[execId]["ctx"], "slot", "worker:fake")
     }
 
     Cancel(execId) {

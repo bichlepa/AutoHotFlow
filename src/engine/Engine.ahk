@@ -8,6 +8,7 @@
 #Include FlowTable.ahk
 #Include Executor.ahk
 #Include WorkerBridge.ahk
+#Include VarRequests.ahk
 #Include vars\EngineVars.ahk
 #Include vars\VarLoader.ahk
 #Include vars\VarWriter.ahk
@@ -68,6 +69,7 @@ class Engine extends Role {
         this.executor := Executor(this)
         pool := Engine._PoolOptions(args)
         this.workers := WorkerBridge(this, pool["size"], pool["warm"], pool["idleMs"])
+        this.varRequests := VarRequests(this)   ; cmd.engine.var.* of worker elements and clients (WI-50)
         this._flowsLoaded := false     ; not _loaded: that name is the method _Loaded (case-insensitive)
         this._loadTries := 0           ; failed flow lists in a row for a real reason (not: storage missing)
         this._loadActive := false      ; flows.list or flow.read requests are on their way
@@ -93,6 +95,7 @@ class Engine extends Role {
         this.On("cmd.flow.patch", (msg) => this._CmdFlowPatch(msg))
         this.On("cmd.flow.save", (msg) => this._CmdFlowSave(msg))
         this.On("evt.worker.done", (msg) => this.workers.OnDone(msg))
+        this.On("cmd.engine.var.", (msg) => this.varRequests.Handle(msg))
         ; The topic "process" tells the engine when storage is ready (start, WI-31) and, with a pool, which worker
         ; crashed (the supervisor owns the process handles).
         this.On("evt.process.", (msg) => this._OnProcessEvent(msg))

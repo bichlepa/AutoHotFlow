@@ -149,21 +149,6 @@ class VarAccess {
         return out
     }
 
-    ; The variables a worker gets (WI-40 task 9): copies of the visible loop, thread and instance variables in one
-    ; table. Global, static, hidden and built-in variables are not part of it.
-    Imports() {
-        out := VarValues.NewMap()
-        if (this.common)
-            return out
-        for name, value in this.inst.Vars
-            out[name] := VarValues.Copy(value)
-        for name, value in this.thread.Vars
-            out[name] := VarValues.Copy(value)
-        for name, value in this.thread.Loops.Visible
-            out[name] := VarValues.Copy(value)    ; a loop variable hides a thread variable of the same name
-        return out
-    }
-
     ; A copy of the visible instance variables, name -> value (v1 x_ExportAllInstanceVars, WI-42). Empty in common.
     ExportInstance() {
         out := VarValues.NewMap()

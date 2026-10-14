@@ -41,8 +41,9 @@
 ;
 ; Variables (WI-40, doc/EXPRESSION-LANGUAGE.md section 18): every element run gets a VarAccess, its view on the loop
 ; and thread variables of its thread (ThreadState), the instance variables (Instance), the static variables of the flow
-; and the global variables (owner.vars, EngineVars). A worker gets copies of the visible loop, thread and instance
-; variables as imports.
+; and the global variables (owner.vars, EngineVars). A worker element reaches the same view through the variable
+; requests (VarRequests, WI-50): the job keeps the context of the element; the job carries no copies (M-45).
+; ContextOf makes such a view for a client that names an instance (and a thread).
 ;
 ; Parameters are passed as they are stored in the flow file (object with case-insensitive properties). An inline
 ; element evaluates them when it calls ctx.EvalParams (WI-42, as v1 x_AutoEvaluateParameters); for a worker element
@@ -347,7 +348,7 @@ class Executor {
     ; cancelled, see _StopRun). Without a usable worker the run ends with "exception" at once.
     _DispatchWorker(run, thread, ctx, cls, classId, def) {
         ; E26: the engine evaluates every parameter now, with its variables and the mode of the flow; the worker has no
-        ; access to them. The imports are taken afterwards, so an assignment in a parameter is part of them.
+        ; access to them. An assignment in a parameter has run before the job leaves, so the element sees its result.
         try {
             evaluated := Executor._EvalForWorker(cls, ctx, Executor._Params(def, thread.ElementId))
         } catch as e {
@@ -365,8 +366,10 @@ class Executor {
         prev := Critical("On")  ; reason: register, start and note the execId as one step (see above)
         try {
             run["active"][thread.Id] := act
-            execId := this._owner.workers.Run(classId, params, ctx.vars.Imports(), env
-                , ObjBindMethod(this, "_OnWorkerDone", ctx), cls.JobTimeoutMs, evaluated)
+            ; No copies of the variables (M-45, WI-50): the element asks the engine with the variable requests, which
+            ; find this context (ctx) through the job.
+            execId := this._owner.workers.Run(classId, params, Map(), env
+                , ObjBindMethod(this, "_OnWorkerDone", ctx), cls.JobTimeoutMs, evaluated, ctx)
             current := run["active"].Get(thread.Id, "")
             if (execId = "") {
                 run["active"].Delete(thread.Id)
@@ -393,7 +396,7 @@ class Executor {
             if (r["error"] != "")
                 entry["error"] := r["error"]
             else
-                entry["value"] := Executor._Wire(r["value"])
+                entry["value"] := Executor.ToWire(r["value"])
             list.Push(entry)
         }
         return list
@@ -401,12 +404,12 @@ class Executor {
 
     ; A value that JSON can carry: a Float that is not finite (inf, nan) becomes its text, a Map is copied with its
     ; values made fit too. JSON has no Integer keys: the worker turns keys of digits back into Integers.
-    static _Wire(value) {
+    static ToWire(value) {
         if (value is Map) {
             m := Map()
             m.CaseSense := "Off"
             for k, v in value
-                m[k] := Executor._Wire(v)
+                m[k] := Executor.ToWire(v)
             return m
         }
         if (Type(value) = "Float" && value - value != 0)
@@ -415,7 +418,7 @@ class Executor {
     }
 
     ; Called by WorkerBridge when the job ends (bound: ctx first). Exports become variables where their name says (an
-    ; A_ name a thread variable). Provisional until variables in the worker (S2, R4).
+    ; A_ name a thread variable). An element can also set variables during the run (SetVar through the engine, WI-50).
     _OnWorkerDone(ctx, result, message, exports) {
         if (!ExecContext.IsResult(result)) {
             message := "worker reported result '" result "'"
@@ -648,6 +651,32 @@ class Executor {
             , "elementName", IsObject(name) ? "" : String(name)
             , "workingDir", BuiltInVars.WorkingDirOf(def.Raw.Get("flowSettings", "")))
         return VarAccess(this._owner.vars, run["inst"], thread, env)
+    }
+
+    ; An element context for a variable request of a client (WI-50, VarRequests): the view of the instance and, with a
+    ; threadId, of that thread, with the type mode of the flow. Without a thread the context has no loop and thread
+    ; variables (an empty stand-in; ctx.noThread is true). Throws AhfError gone when the instance or the thread does not
+    ; exist (any more).
+    ContextOf(instId, threadId := "") {
+        run := this._runs.Get(instId, "")
+        if (!IsObject(run))
+            throw AhfError("instance '" instId "' does not exist (ended or never started)", ErrCode.GONE)
+        def := this._DefOf(run)
+        if (!IsObject(def))
+            throw AhfError("the flow of instance '" instId "' is not loaded any more", ErrCode.GONE)
+        if (threadId != "") {
+            thread := run["inst"].Threads.Get(threadId, "")
+            if (!IsObject(thread) || thread.State = "removed")
+                throw AhfError("thread '" threadId "' of instance '" instId "' does not exist", ErrCode.GONE)
+            elementId := thread.ElementId
+        } else {
+            thread := ThreadState("-", instId, "")      ; stand-in: no thread variables, no loops
+            elementId := ""
+        }
+        ctx := ExecContext(run["flowId"], elementId, instId, threadId, "", this._VarAccess(run, thread, def, elementId))
+        ctx.strictTypes := def.StrictTypes
+        ctx.noThread := (threadId = "")
+        return ctx
     }
 
     static _IsWorkerElement(def, thread) {

@@ -166,14 +166,15 @@ class WorkerBridge {
     ; jobTimeoutMs > 0: the job ends with "worker timeout" after that long (class property JobTimeoutMs).
     ; evaluated: the parameters evaluated by the engine (E26, WI-42), an Array of Maps {id, value} or {id, error} in the
     ; order of Parameters(); sent as the field "evaluated" (PROTOCOL 4.5).
-    Run(classId, params, imports, env, onDone, jobTimeoutMs := 0, evaluated := "") {
+    ; ctx: the engine context of the element (ExecContext); the variable requests of the job use it (JobOf, WI-50).
+    Run(classId, params, imports, env, onDone, jobTimeoutMs := 0, evaluated := "", ctx := "") {
         slot := this._IdleSlot()
         if (!IsObject(slot))
             return ""
         execId := Ids.Next("exec-")
         slot["state"] := "busy"
         slot["execId"] := execId
-        job := Map("onDone", onDone, "slot", slot["name"], "deadline", "")
+        job := Map("onDone", onDone, "slot", slot["name"], "deadline", "", "ctx", ctx)
         this._jobs[execId] := job
         if (jobTimeoutMs > 0) {
             job["deadline"] := ObjBindMethod(this, "_JobExpired", execId)
@@ -199,6 +200,14 @@ class WorkerBridge {
                 best := slot
         }
         return best
+    }
+
+    ; The running job execId for a variable request (WI-50, VarRequests): Map("ctx", engine context of the element,
+    ; "slot", name of the worker that runs it), or "" when the job is not running: finished, cancelled (Cancel forgets
+    ; the job before cmd.worker.cancel leaves), ended by its deadline or by the loss of its worker.
+    JobOf(execId) {
+        job := this._jobs.Get(execId, "")
+        return IsObject(job) ? Map("ctx", job["ctx"], "slot", job["slot"]) : ""
     }
 
     ; Stops a job (the element is stopped by the worker). Returns false if the job is unknown.
