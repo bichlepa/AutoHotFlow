@@ -20,7 +20,7 @@ Cases: `functions.round.int`, `functions.round.half`, `functions.round.frac`, `f
 
 Source suspicion: `:718` compares with the empty variable name. **Verdict: confirmed.**
 
-The escape character (backtick) is dropped and the next character is kept: `"a`nb"` gives `anb` (no line feed), ``"a``b"`` gives `ab`. An escaped quote ends in the error `Linefeed inside a string`. A doubled quote `"a""b"` gives `ab`, not `a"b`.
+The escape character (backtick) is dropped and the next character is kept: `` "a`nb" `` gives `anb` (no line feed), `` "a`b" `` gives `ab`. An escaped quote ends in the error `Linefeed inside a string`. A doubled quote `"a""b"` gives `ab`, not `a"b`.
 
 Cases: `strings.escape.n`, `strings.escape.t`, `strings.escape.r`, `strings.escape.backtick`, `strings.escape.unknown`, `strings.escape.quote`, `strings.doubled.quote`, `strings.doubled.quote.only`
 
