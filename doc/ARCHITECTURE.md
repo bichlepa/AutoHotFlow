@@ -122,6 +122,7 @@ The supervisor is the smallest and simplest process. It is a hub, because a rest
 | Variables `instance`/`thread`/`loop` (each with a hidden table) | engine: `Instance.Vars`, `ThreadState.Vars`, `ThreadState.Loops` (WI-40, doc/EXPRESSION-LANGUAGE.md section 18) | – (a worker receives copies of the visible loop, thread and instance variables) |
 | Variables `global`/`static` (working copy) | engine: `EngineVars` (WI-40); `VarLoader` loads, `VarWriter` writes through `storage` (WI-41) | the files `Variables/` (storage) |
 | Variable files on disk | storage | – (write-behind from the engine) |
+| Parse cache of expression trees (`src/expr/`, up to 2000 texts, doc/EXPRESSION-LANGUAGE.md section 12) | the process that evaluates (engine, worker): a local cache of immutable trees, no state that anyone else reads | – |
 | Flow files, backups | storage | – |
 | Settings (runtime) | engine | everyone as read-only copy via `evt.settings.changed` |
 | Settings (file) | storage | – |
@@ -322,7 +323,7 @@ Unknown items in files (keys that v2 does not know) are **kept when loading and 
 - The conversion of a flow is idempotent: loading a file that was saved by v2 changes no text. This is the version marker that E8 announced; apart from the two keys (and `flowSettings.strictTypes`, below) the format is the v1 format.
 - **Flow option `strictTypes` (E34, WI-42):** `flowSettings.strictTypes` (JSON `true`/`false`) says how a type error of an evaluation is handled (a comparison or calculation with a text that is not a number, doc/EXPRESSION-LANGUAGE.md section 17). `false` is the compatibility mode: the result is the empty text plus an `f1` warning (E25), as in v1. `true` is the strict mode: the element ends with `exception` (ELEMENT-API-V2 section 3.1). A flow without the key is a migrated one (a v1 file, or a file that v2 saved before the option existed) and gets `false`; a flow that v2 creates gets `true` (`FlowDefinition.NEW_FLOW_STRICT_TYPES`, for `cmd.flow.create` in S4). The engine keeps the mode in `FlowDefinition.StrictTypes` (Raw is not changed, so `cmd.flow.get` shows the key only when the file has it); a save always writes the key, so the mode of a flow never changes by itself. Showing the warnings in the editor: S4/S5.
 
-**Decision E8 (2026-10-11):** Truth values go as real JSON booleans over the wire in v2 (WI-26). The flow file format may in future differ from the v1 format in v2. The requirement remains that old flows and variables load. In Phase 2b the **write format of the flows does not change**. A new write format is a separate decision in Phase 3, with a version marker in the file. Until then v2 writes the v1 format. A flow in a new format is no longer readable for v1.
+**Decision E8 (2026-10-11):** Truth values go as real JSON booleans over the wire in v2 (WI-26). The flow file format may in future differ from the v1 format in v2. The requirement remains that old flows and variables load. In Phase 2b the **write format of the flows does not change**. A new write format is a separate decision in Phase 3, with a version marker in the file. **Update (E21, WI-39):** v2 writes the v1 format plus the two keys of the version marker (`formatVersion`, `v1Text`) and the option `flowSettings.strictTypes` (section 7); how v2 saves is otherwise free (E21). A flow saved by v2 is no longer guaranteed to load in v1.
 
 ---
 
@@ -341,7 +342,8 @@ AutoHotFlow/
 │  ├─ core/                 # cross-process building blocks, no GUI
 │  │  ├─ Json.ahk  Ids.ahk  Errors.ahk  Log.ahk  Args.ahk
 │  │  └─ ipc/               # Pipe, Frame, Wake, Message, Dispatcher, Peer
-│  ├─ supervisor/  engine/  storage/  triggerhost/  worker/
+│  ├─ supervisor/  storage/  triggerhost/  worker/
+│  ├─ engine/               # Engine, Executor, WorkerBridge; core/ (flow model, state machines, FlowExprConvert); vars/ (variable model, WI-40/41)
 │  ├─ ui_common/            # GUI helpers (Lang() is in core/, E28)
 │  ├─ manager/  editor/     # editor/render/ = Renderer interface (D4)
 │  ├─ expr/                 # library: expression language (tokenizer, parser, syntax tree, parse cache), doc/EXPRESSION-LANGUAGE.md
@@ -358,8 +360,8 @@ AutoHotFlow/
 
 - **Decision E6 (2026-10-11):** The triggerhost (WI-14) is built early in Phase 3 with the real triggers, not in Phase 2b.
 - Present: `src/AutoHotFlow.ahk`, `src/AhfBoot.ahk`, `core/` (additionally `Role.ahk`, `RoleRegistry.ahk`, `Time.ahk`; `ipc/` additionally `Deferred.ahk`, `PipeConnection.ahk`, `PipeListener.ahk`, `FrameReader.ahk`, `FrameWriter.ahk`), `supervisor/`, `engine/` (with `core/` for state machines, flow model, scheduler), `storage/`, `worker/`, `manager/` (only `StubManager.ahk` and `StubGui.ahk`), `debugview/` (WI-28, `DebugView.ahk`, `DebugGui.ahk`), `elements/base/`. Since WI-28, `core/` additionally has `AhfVersion.ahk`, `ProcInfo.ahk`, `Snapshot.ahk` and `Debug.ahk`; `supervisor/` has `DiagReport.ahk`.
-- **Not present (Phase 3 or later):** `triggerhost/` (WI-14 optional, not built; the role is a placeholder in `RoleRegistry.ahk`), `editor/` (placeholder role), `ui_common/`, `assets/`, `elements/default/{actions,conditions,loops,triggers}/`. Instead of `elements/default/` there is `elements/skeleton/` with eight demo and test elements (`Trigger_Manual`, `Action_Sleep`, `Action_Do_nothing`, `Action_Test*`).
-- `tools/` so far contains only `ahkrun.py` and `ahf_dialogwatch.py` (watchdog), no converters.
+- **Not present (Phase 3 or later):** `triggerhost/` (WI-14 optional, not built; the role is a placeholder in `RoleRegistry.ahk`), `editor/` (placeholder role), `ui_common/`, `elements/default/{actions,conditions,loops,triggers}/` (`assets/` exists since WI-42 and holds only `language/`). Instead of `elements/default/` there is `elements/skeleton/` with eight demo and test elements (`Trigger_Manual`, `Action_Sleep`, `Action_Do_nothing`, `Action_Test*`).
+- `tools/` contains `ahkrun.py` and `ahf_dialogwatch.py` (watchdog), `ahf_dump.py`, `arch_check.py`, `run_suite.py`, `new_workspace.py` and, since S1, the golden data tools `golden_v1.py`, `golden_corpus.py`, `golden_compare.py` and `golden_classes.py` (doc/TEST-STRATEGY.md section 7). The converter for elements (`tools/convert_element.py`) comes in S2.
 - **Test entry point (WI-29):** The product entry point `src/AutoHotFlow.ahk` includes only `src/AhfBoot.ahk` (the entire boot code and role registration) and calls `AhfMain()`. The test roles (`EchoRole`, `CrasherRole`, `HangerRole`, `SlowShutdownRole`, `RegisterFailure`) are in `tests/integration/helpers/`; the test entry point `tests/integration/helpers/AutoHotFlowTest.ahk` includes `AhfBoot.ahk` and these roles and sets `AhfTestRolesFn`. The supervisor starts children with `A_ScriptFullPath`, so they inherit the entry point. With `--test-roles` at the product entry point nothing happens (the roles are not compiled in there, their name is unknown). `src/` includes nothing from `tests/` (guard rule `include-tests`, no exception any more).
 - Each file under `src/` has at most one class (WI-29): `core/Errors.ahk` now includes only `ErrCode.ahk`, `AhfError.ahk`, `ProtocolError.ahk`, `AhfTimeoutError.ahk`, `ElementError.ahk`, `JsonError.ahk`; `PlaceholderRole` has `core/PlaceholderRole.ahk`; `engine/core/Loops.ahk` is called `LoopStack.ahk`.
 - `manager` is registered in the entry point, not in `core/RoleRegistry.ahk` (like `engine`, `storage`, `worker`), so that `core/` does not include any role folders.

@@ -2,7 +2,7 @@
 
 Specification of the language that parameters and scripts are written in, and of the library `src/expr/` that reads it.
 
-Status: tokenizer, parser, evaluator and converter are implemented and tested (`tests/ahk/expr_*.test.ahk`). Section 17 describes the evaluator; section 14 lists the differences from AutoHotkey v2; section 15 is the deviation catalog and the converter of old expressions (WI-39). The variables (scopes, objects, built-in variables, `%var%` substitution) are not part of this library: they belong to the engine (`src/engine/vars/`, WI-40) and are described in section 18. The use in the parameters of elements (content types, the flow option `strictTypes`) is described in doc/ELEMENT-API-V2.md section 3.1 (WI-42).
+Status: complete for step S1 (WI-43 checked the document against the code). Tokenizer, parser, evaluator and converter are implemented and tested (`tests/ahk/expr_*.test.ahk`). Section 17 describes the evaluator; section 14 lists the differences from AutoHotkey v2; section 15 is the deviation catalog and the converter of old expressions (WI-39). The variables (scopes, objects, built-in variables, `%var%` substitution) are not part of this library: they belong to the engine (`src/engine/vars/`, WI-40) and are described in section 18. The use in the parameters of elements (content types, the flow option `strictTypes`) is described in doc/ELEMENT-API-V2.md section 3.1 (WI-42).
 
 The language follows AutoHotkey v2 (decision E22) as far as that makes sense in AutoHotFlow. Where it deviates, section 14 says so.
 
@@ -223,14 +223,14 @@ Average 554 us uncached, 1.6 us cached (about 300 times faster). Filling the cac
 
 | Missing | Why / note |
 |---|---|
-| `%` as modulo | `%` delimits dynamic names; a `Mod()` function may come with WI-38 |
+| `%` as modulo | `%` delimits dynamic names; `mod(a, b)` is the replacement (section 7) |
 | `**` power, bitwise `& \| ^ ~ << >> >>>`, `~=`, `??`, `?:` ternary | not used by v1 flows |
 | `++`, `--`, unary `+` | write `x += 1` |
 | `x ^= 2`, `x %= 2` and other compound assignments beyond section 5 | `^=` was accepted by the v1 tokenizer only |
 | comma operator, several expressions in one statement | |
-| `[ ]` array literals, `{ }` object literals, `=>` functions | objects come from `Object()` (WI-38) |
+| `[ ]` array literals, `{ }` object literals, `=>` functions | objects come from `object()` (section 7) |
 | `is`, `in`, `contains` | |
-| `loop`, `while`, `for`, `return`, `break`, `try`, `throw`, `switch`, `class`, `global`/`local`/`static` declarations | the script form is `if`/`else`, blocks and assignments only; variable scope comes from the name prefix (WI-40) |
+| `loop`, `while`, `for`, `return`, `break`, `try`, `throw`, `switch`, `class`, `global`/`local`/`static` declarations | the script form is `if`/`else`, blocks and assignments only; variable scope comes from the name prefix (section 18.2) |
 | block comments `/* */`, line continuation sections `( ... )` | |
 | `<>` for not equal | write `!=` |
 
@@ -242,6 +242,7 @@ Decided by the project owner (2026-10-13) and implemented by the evaluator (WI-3
 - **E30: `<` `>` `<=` `>=` follow AutoHotkey v2.** A comparison with a text that is not a number throws a `TypeError` in AutoHotkey (`"a" < "B"`); in AutoHotFlow the evaluator catches it (E25): the result is the empty text (false) plus an `f1` log entry. A text comparison that v1 did alphabetically is therefore false. `"10" < "9"` compares numbers (false). `=` and `==` compare as in AutoHotkey.
 - **E31: `&&` and `||` return the operand** as AutoHotkey v2 does (`"a" || 0` is `"a"`, `0 && "x"` is `0`), not 1/0 as in v1. Evaluation is short-circuit (`0 and (x := 5)` does not assign). As a condition both behave the same.
 - **E32: text form of floats** is the AutoHotkey v2 form, without own formatting (`0.1+0.2` is `0.30000000000000004`, `1/3` is `0.33333333333333331`).
+- **E34: type errors per flow.** E25 is the behavior of the *compatibility mode* (`flowSettings.strictTypes` false, the mode of every migrated flow). In the *strict mode* (`strictTypes` true, new flows) the evaluator reports the same cases as before, but the caller turns every warning into an error of the element (section 17, doc/ELEMENT-API-V2.md section 3.1, MIGRATION M-47). The language itself is the same in both modes.
 - **E25: type errors** while calculating (`"" + 1`, `"abc" + 1`) are caught; the result is the empty text and an `f1` log entry (in AutoHotkey v2 they throw a `TypeError`). The same holds for a division by zero (`1/0`, `1//0`, `mod(1, 0)`; `ZeroDivisionError` in AutoHotkey) and for any other calculation or function that fails. The entry is also a warning in the result (section 17).
 
 Smaller points of the evaluator that follow from these rules or from v1:
@@ -353,7 +354,7 @@ A text that uses one of these forms keeps its text and gets the status `unsuppor
 | `<>` | one unknown operator, the right operand is ignored: `1<>2` is `1` | error with the hint to write `!=` | `comparison.not.equal.sql*` |
 | `"a""b"` | two strings that touch: `ab`; the doubled quote was never an escape | error with the hint to write a quote as `` `" `` | `strings.doubled.*`, `strings.two.strings.touching` |
 
-**Decision needed (project owner, `doc/OPEN-ITEMS.md`, open actions, item 2):** whether these forms stay unsupported. None of them occurs in the expressions of the example flows (the corpus has only `%a_windowID%`, a text of unclear content type that the golden corpus also ran as an expression). Possible answers for the forms where v1 gave a value: convert to the v2 form that does what the author meant (`x ^= 2` and `x %= 2` do not exist in the language; `<>` to `!=`; `"a""b"` to `` "a`"b" ``), or convert to what v1 really did (`"a" "b"`, which is `ab`). Until the answer is there, all five are reported and left alone.
+**Decided (project owner, 2026-10-14, WI-39):** these forms stay unsupported. None of them occurs in the expressions of the example flows (the corpus has only `%a_windowID%`, a text of unclear content type that the golden corpus also ran as an expression). All five are reported (`f1`) and left alone; they fail at the first use with an error that names the place. Possible later answers, if a real flow needs one: convert to the v2 form that does what the author meant (`<>` to `!=`; `"a""b"` to `` "a`"b" ``), or to what v1 really did (`"a" "b"`, which is `ab`).
 
 ## 16. Tokens (for implementers)
 

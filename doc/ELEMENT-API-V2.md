@@ -80,7 +80,7 @@ class Action_Example extends AhfElement {
 | `ctx.SetVar(name, value, scope := "", hidden := false)` | `x_SetVariable` | The name decides the scope as in v1 (WI-40, doc/EXPRESSION-LANGUAGE.md section 18.2): `A_` names are loop or thread variables and need `scope` `"thread"` or `"loop"`; `global_` and `static_` names are global and static; any other name is an instance variable. Returns 1, or 0 if refused (logged `f0` with the v1 text). The value is copied; an Array becomes a `Map` with the keys 1..n. Worker: not available (use `ctx.Export`; R4, S2). |
 | `ctx.GetVar(name, default := "", hidden := false)` | `x_GetVariable` | Reads a variable or a member (`"list.1"`) where its name says (an `A_` name: loop, thread, then built-in). Returns a copy, or `default` if it does not exist (no log). Worker: reads the copy of the visible loop, thread and instance variables that came with the job (`imports`); global, static, hidden and built-in variables come with `ctx.Request` (R4, S2). |
 | `ctx.DeleteVar(name, hidden := false)` | `x_DeleteVariable` | Deletes a variable or a member; 1 if it existed. Built-in variables cannot be deleted. Worker: R4 (S2). |
-| `ctx.GetVarLocation(name, hidden := false)` | `x_GetVariableLocation` | `"loop"`, `"thread"`, `"builtin"`, `"instance"`, `"static"`, `"global"` or `""`. `ctx.VarLocation` is the same (name of WI-40). Worker: R4 (S2). |
+| `ctx.GetVarLocation(name, hidden := false)` (alias `ctx.VarLocation`, WI-40) | `x_GetVariableLocation` | `"loop"`, `"thread"`, `"builtin"`, `"instance"`, `"static"`, `"global"` or `""`. `ctx.VarLocation` is the same (name of WI-40). Worker: R4 (S2). |
 | `ctx.GetVarType(name, hidden := false)` | `x_getVariableType` | `"object"`, `"normal"`, or `""` if the variable does not exist. Worker: from the copy (as `GetVar`). |
 | `ctx.ListVars(scope := "")` | `x_GetListOf*Vars` | names of the visible variables of one scope, or of all scopes (`""`) in the order loop, thread, instance, static, global. Worker: R4 (S2). |
 | `ctx.ReplaceVariables(text, convertObjects := false)` | `x_replaceVariables` | `%name%` substitution (doc/EXPRESSION-LANGUAGE.md section 18.5); `convertObjects` is the v1 option `ConvertObjectToString`. Worker: R4 (S2). |
@@ -355,6 +355,6 @@ A converter (`tools/convert_element.py`, Phase 3) applies the rows of this table
 
 ## 8. Still to be clarified (Phase 3)
 
-- Exact form of `ctx.Request` and the import list for workers (`imports`) for elements that read arbitrary variables.
+- Exact form of `ctx.Request` and the import list for workers (`imports`) for elements that read arbitrary variables (R4, S2). Until then a worker reads and writes only the copies it was sent (section 3, `GetVar`/`GetVarType`) and exports by name.
 - Whether metadata and runtime code must be separated per role (ARCHITECTURE R3).
 - Handling of element packages from third parties (`package`, `packageVersion`): the Chrome package is dropped, but the structure of the package information stays so that old flows can be loaded.

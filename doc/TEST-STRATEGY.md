@@ -77,7 +77,8 @@ tests/
 ├─ ahk/
 │  ├─ lib/Assert.ahk
 │  └─ *.test.ahk
-├─ integration/  e2e/  fault/  stress/  golden/
+├─ integration/  e2e/  fault/  stress/
+├─ golden/                    # golden data of v1 (section 7): cases, expected, harness for v1 and v2, FINDINGS.md
 └─ data/                      # flows/v1_examples, flows/personal, variables (synthetic), skeleton_flow.json
 ```
 
@@ -160,4 +161,4 @@ What v1 actually returns for expressions, scripts, variable substitution and var
 
 **Private data (E27).** `python tools/golden_corpus.py --flows <folder> --out tests/golden/private/cases/corpus_private.json`, then `python tools/golden_v1.py --private` (tasks `Testdata: golden data of the private flows ...`). The folder is in `.gitignore`. Only counts may leave the machine (WI-39, WI-43).
 
-**Comparison with v2** is part of WI-39. Volatile cases and the `uncaught_error`/`timeout` outcomes are not expected to match.
+**Comparison with v2 (WI-39, WI-40).** `tests/golden/v2/harness.ahk` runs every case with the new language and the variable model of the engine; `tools/golden_compare.py` compares the result with v1 and gives each deviation one class of `tools/golden_classes.py` (the deviation catalog, `doc/EXPRESSION-LANGUAGE.md` section 15.1); `tests/golden/test_golden_v2.py` (fast tier) fails for a case without a class, for a class without a case, for a case that is still in a `rewrite` class after the conversion, and when the converter is not idempotent. Volatile cases and the `uncaught_error`/`timeout` outcomes are not expected to match (a failing or hanging v1 case is the class "v1 error"; a volatile case only needs a value in v2). State at the end of S1 (WI-43): of 2161 cases 1600 agree, 553 have an accepted class, 8 are syntax that is reported and not converted (decided by the project owner), none is open. `python tools/golden_v1.py --check` (about 2 minutes) reproduces the results of v1 byte for byte.
