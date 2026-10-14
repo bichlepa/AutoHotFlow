@@ -113,8 +113,8 @@ Hunter run 1 (2026-10-13) worked on two entries and stopped. Candidates not look
 | F-29 | accepted: low impact, the 10 s stay (option (b)); ARCHITECTURE 6.3 still to be written | CLOSED-ITEMS, status `accepted` |
 | F-36 | closed | CLOSED-ITEMS, closed |
 | F-43 | decided: implement the recommendation (a child in state `starting` does not hold its shutdown group) | implemented in 03c5ee6, closed in 1d62e4a; verifier green: fast run 20261013-191224-1d62e4ab (336), slow run 20261013-191306-1d62e4ab (86), foundation run 20261013-191456-1d62e4ab (439, 1 skipped = the deliberate skip of the runner self-check) |
-| WI-39 (2026-10-14) | catalog reviewed and accepted; the unsupported forms (`%`, `^=`, `%=`, `<>`, `"a""b"`) stay unsupported; the implementer's decisions (M-27 to M-37, number literals as strings, `formatVersion`/`v1Text`, `cmd.flow.save`, statuses) are accepted; F-105 (E30, empty or missing variable in comparisons) stays open for a later decision | EXPRESSION-LANGUAGE 15.1 to 15.3, MIGRATION M-27 to M-37; open action 2 of OPEN-ITEMS closed |
-| Open action 1 of OPEN-ITEMS (hello timeout, F-29 follow-up) (2026-10-14) | done, owner says it is resolved | OPEN-ITEMS open actions |
+| WI-39 (2026-10-14) | catalog reviewed and accepted; the unsupported forms (`%`, `^=`, `%=`, `<>`, `"a""b"`) stay unsupported; the implementer's decisions (M-27 to M-37, number literals as strings, `formatVersion`/`v1Text`, `cmd.flow.save`, statuses) are accepted; F-105 (E30, empty or missing variable in comparisons) stays open for a later decision | EXPRESSION-LANGUAGE 15.1 to 15.3, MIGRATION M-27 to M-37; open actions removed from OPEN-ITEMS |
+| Open actions 1 and 2 of OPEN-ITEMS (2026-10-14) | deleted from the list (rule: finished actions are removed, not marked); the hello follow-up is under review, see the hunter round 3 entry | OPEN-ITEMS open actions |
 
 ## Decisions taken by the orchestrator
 
