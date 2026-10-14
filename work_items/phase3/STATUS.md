@@ -48,7 +48,8 @@ Session 2 start: 2026-10-14, work-item mode, HEAD `f0793ce` on `v2-port`, main c
 | 2b | Bug hunter | sonnet | (removed) | (deleted) | F-125: test precondition fixed (waits for the log burst, skip otherwise), 11 runs without XPASS; integrated as d354ff5, 107bb65. Tested tree equals v2-port tree (tests `bb0f06e`); slow run 20261014-063319-444 (86 passed, 2 xfailed), fast run 20261014-063423-24212 (482 passed) | done |
 | 3 | Verifier | sonnet | (removed) | (deleted) | verification of `1e444c2` (WI-39): fast green (run 20261014-064547-1e444c2d, 514 passed), foundation green (run 20261014-064848-1e444c2d, 439 passed, 1 skipped), slow red by the F-17 strict XPASS again (F-165*, run 20261014-064633-1e444c2d), arch 0 violations; finding integrated as 87b17de | done |
 | 4 | Fix (drop strict on the F-17 test, per the F-125 action) | haiku | (removed) | (deleted) | F-125, F-165: strict dropped (e843ebb), notes (a7dc7dd, F-165 action line); tests: file with -m slow run 20261014-065332-17556 (2 xfailed, exit 0), fast run 20261014-065448-19324 (514 passed, exit 0) | done |
-| 2 | Bug hunter round 3 | sonnet | `hunt-8` | `wip/hunt-8` | OPEN-ITEMS round 3 | running (started 2026-10-14) |
+| 2 | Bug hunter round 3 | sonnet | (removed) | (deleted) | F-29 follow-up (hello never answered): fix in `src/core/ipc/Peer.ahk` accepted by the owner, integrated as e5542f0, aa81047 (ARCHITECTURE 6.3 sentence); verification running | done, verification pending |
+| 3 | Verifier F-29 fix | sonnet | `verify-4` | `wip/verify-4` | verification of `aa81047` (fast, foundation, slow, arch) | running (started 2026-10-14) |
 
 ## ID blocks (OPEN-ITEMS)
 
