@@ -36,6 +36,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-105* | A comparison with an empty or missing variable is true in v1 and false in v2 | verified in the golden data; decided 2026-10-14 (E34): per-flow option `strictTypes`, to implement in WI-42 | yes |
 | F-165* | The F-17 xfail test passes again (strict XPASS) in the slow tier, after the F-125 fix | fixed by dropping strict on the F-17 test; watch | |
 | F-235* | `VarWriter.FlushAll` loses the variables beyond the limit of the peer (1000 waiting requests) | verified in a probe with a stand-in peer, open, low | |
+| F-236* | `test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted[0]` got no `evt.process.crashed` for `worker:1` in the slow tier | observed once, not investigated, open | |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
 
@@ -220,6 +221,13 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** verified in a probe (AHK unit level, stand-in peer that refuses after 1000 requests): 1100 marked variables, 1000 sent, 100 errors. Not reproduced with the real engine. It needs more than 1000 variables changed within the write delay of 200 ms, or more than 1000 variables marked again after a long storage outage; both are unlikely for the v1 scope (flows with some dozens of variables).
 **Proposal:** if it ever matters, send the remainder in one request that carries several variables (a protocol change in `cmd.storage.var.set`), or report one summary line instead of one error per variable. No change made.
 **Evidence:** probe described above; code `src/engine/vars/VarWriter.ahk` (`FlushAll`, `_Send`), `src/core/ipc/Peer.ahk` (`Request`).
+
+### F-236*: Killed worker: no `evt.process.crashed` within the budget (slow tier)
+
+**What:** `tests/fault/test_process_crash.py::test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted[0]` failed in the slow tier: after `kill_role(chain, "worker:1")` no `evt.process.crashed` for `worker:1` arrived within `CRASH_BUDGET_S + 5` (`tests/fault/test_process_crash.py:37`). The supervisor text in the assertion message was empty.
+**Status:** observed once, not repeated, not investigated (rule: no re-run to chase a failure). Open.
+**Evidence:** run ID `20261014-170456-2d573956`, commit `2d57395`, command `python tools/run_suite.py --ref HEAD -- tests -q --all -m slow` (4 workers), exit code 1, `1 failed, 85 passed, 2 xfailed in 121.75s`, no INTERNALERROR. The fast tier (run ID `20261014-170405-2d573956`, `tests -q`) was green, 568 passed.
+**Suspicion (assumed):** The changes under verification (`VarAccess.ahk`, `Engine.OnShutdown`, unit tests) do not touch the supervisor, the worker pool start or the crash report, so they are probably not the cause. More likely a timing or load problem in the chain (worker killed while the engine was just starting the element; the supervisor text being empty suggests the log was not yet flushed) or an earlier hint of F-50/F-51 class flakiness. Not checked.
 
 ## Watch list (E7)
 
