@@ -267,17 +267,59 @@ Differences in the **syntax** (implemented and tested):
 
 ## 15. Differences from v1 and conversion
 
-Filled by WI-39 (converter of old expressions). Known syntax differences the parser already reports as errors, as input for the converter:
+What the new language does with the expressions of v1, checked against the golden data of v1 (WI-36: the result of the unchanged v1 code, run in the v1 interpreter). The language follows AutoHotkey v2 (E22); the converter rewrites an old text only where that is needed for the same result, and the rest is a known, documented deviation.
 
-| v1 text | v2 parser | Conversion |
-|---|---|---|
-| `"a""b"` (quote inside a string) | error: touching strings | rewrite as `` "a`"b" `` |
-| `"a"."b"` | error: dot needs spaces | add spaces |
-| `1 <> 2` | error | `!=` |
-| `x ^= 2`, `x %= 2`, `7 % 3` | error | not in the language (section 13); WI-39 decides |
-| `1x := 1` | error: invalid name | - |
-| strings with `` ` `` followed by an unknown character | error | v1 dropped the backtick; rewrite |
-| `;` inside a string after whitespace (v1 cut the string) | text | the v1 behaviour was a bug |
+### 15.1 Deviation catalog
+
+Reproduce with `python tools/golden_compare.py --plain` (list of the classes; `--list CLASS` shows the cases of one class). The check is `tests/golden/test_golden_v2.py`: every case of the groups `expression` and `script` in `tests/golden/cases/` (1418 cases) is evaluated by the new evaluator with the unchanged text, and the result and the variables afterwards are compared with v1. A case either agrees with v1 (`same`; numbers are compared as numbers, so `2.000000` and `2` agree) or gets exactly one class. A case without a class fails the test.
+
+Handling: **accept** = decided, the converter does not rewrite it (entry in `doc/MIGRATION.md`); **rewrite** = the converter rewrites the text so that the result agrees (section 15.2); **unsupported** = syntax that the converter reports and does not convert (section 15.3); **later** = not part of the language, the cases are compared when the variable model exists (WI-40, WI-42). The column "After conversion" is the number of cases that still have the class when the converted text is evaluated.
+
+| Class | Cases | After conversion | Example | v1 | v2 | Handling |
+|---|---|---|---|---|---|---|
+| assignment to a path | 28 | 28 | `a.b := 5` | (empty) | `5` | accept: v1 cannot assign to a path (a.b := 1 only logs an error); v2 can |
+| assignment value | 33 | 33 | `x := 5` | (empty) | `5` | accept: an assignment has a value in v2; in v1 it has none (the empty text) |
+| escape sequence | 11 | 11 | ``"a`nb"`` | `anb` | `a\nb` | accept: v1 drops the backtick in a string, v2 reads the escape (E22) |
+| integer division with float | 3 | 3 | `7.0//2` | `3.000000` | (empty) | accept: // with a float operand is a type error in AutoHotkey v2 (E25); v1 divided |
+| integer overflow | 1 | 1 | `12345678901234567890+1` | `-9223372036854775808` | `1.2345678901234567e+19` | accept: v1 wraps integers at 64 bit; v2 continues with a float |
+| keyword as name | 8 | 8 | `if` | (empty) | error: 'if' is only valid at the start of a line of a script | accept: if, else, and, or, not cannot be variable names in v2 |
+| no short circuit | 2 | 2 | `1 or (x := 5)` | `1` | `1` | accept: v1 evaluates both sides of and/or, v2 stops at the first that decides (E31) |
+| not | 16 | 16 | `not 0` | `0` | `1` | accept: not and ! do not negate at the start of an expression in v1 (bug); v2 negates |
+| number format | 19 | 19 | `x` | `0.500000` | `0.5` | accept: the same number in the text form of v2 (E24, E32) |
+| number literal forms | 9 | 9 | `1e3` | `1` | `1000.0` | accept: v1 reads only digits (0x10 is 0, 1e3 is 1); v2 reads hexadecimal and exponent |
+| number-like texts | 3 | 3 | `"1.0"="1"` | `1` | `0` | accept: v1 compares two texts that look like numbers as numbers, v2 as texts |
+| operand as result | 23 | 23 | `5 && 6` | `1` | `6` | accept: and/or return an operand in v2, 1 or 0 in v1; the same as a condition (E31) |
+| script result value | 71 | 71 | `x := 5` | (empty) | `5` | accept: the value of a script is the value of its last statement (v1: unspecific) |
+| text comparison | 16 | 16 | `"a"<"B"` | `1` | (empty) | accept: comparison with a text that is not a number: false in v2, alphabetical in v1 (E30, E25) |
+| true and false | 2 | 2 | `true` | (empty) | `1` | accept: keywords with the values 1 and 0 in v2; ordinary (missing) variables in v1 |
+| v1 error | 189 | 189 | `round(2.5)` | error: Expecting punctuation: ")" | `3` | accept: v1 reports an error or hangs; nothing to reproduce (E22) |
+| v1 ignores text | 57 | 57 | `2*-3` | `2` | `-6` | accept: v1 stops at a token it cannot use and ignores the rest (glued operators like *-, a stray ), unknown operators, a second line) |
+| built-in variable | 147 | 147 | `a_b` | (empty) | `u` | later: A_ names are provided by the variable model (WI-40) |
+| object model | 23 | 23 | `o` | an object | an object | later: keys of objects (integer keys, order, copies) belong to the variable model (WI-40) |
+| scope prefix | 24 | 24 | `global_i` | (empty) | `in instance store` | later: global_ and static_ names are provided by the variable model (WI-40, WI-41) |
+| backtick | 3 | 3 | ``"a`xb"`` | `axb` | error: unknown escape sequence `x | rewrite: a backtick in front of a character that v2 does not know as an escape |
+| concatenation dot | 3 | 3 | `"a"."b"` | `ab` | error: the concatenation operator '.' needs a space before and after it | rewrite: v1 reads "a"."b" as concatenation; v2 needs spaces around the dot |
+| number literal spelling | 3 | 3 | `1.50` | `1.50` | `1.5` | rewrite: v1 passes a number literal on as text (1.50, 007); v2 reads it as a number |
+| unsupported syntax | 8 | 8 | `1<>2` | `1` | error: '<>' is not valid; write '!=' for not equal | unsupported: % as modulo, ^=, %=, <> and "a""b": reported, not converted |
+
+
+Notes on the classes:
+
+- **v1 error** also contains the calls of functions (`round(2.5)` never worked in v1, S1 of the findings), `%` as modulo, `!` at the start, unary minus in front of a variable or a parenthesis, and every script that hangs the v1 parser. v2 evaluates these texts as written (`round(2.5)` is `3`); nothing is reproduced.
+- **v1 ignores text** are cases where v1 stops reading at a token it cannot use and returns what it had until then (`2*-3` is `2` because `*-` is read as one unknown operator). The text was never meant to work that way; v2 reads it as written (`-6`). Not rewritten, because reproducing it would mean to cut off the text.
+- **text comparison**, **operand as result**, **no short circuit**, **not**, **true and false**, **number format**, **integer division with float** are the decisions E30, E31, E25, E32 and E29 (section 14); **number-like texts** is the consequence of E30 for `=` with two texts that look like numbers.
+- **escape sequence**: in v1 a backtick in a string is dropped (S2); v2 reads `` `n `` as a line feed. Only escapes that v2 does not know (`` `x ``, `` `1 ``) are rewritten (the backtick is dropped, as v1 did), because without that the text would not load.
+- **assignment value**, **script result value**: an assignment has a value in v2 (`(x := 3) + 1` is `4`). The value of a script is only used by tests; the variables afterwards agree in all these cases.
+- **assignment to a path**: `a.b := 5` only logged an error in v1 (variable names must not contain a dot); v2 sets the member.
+- **later**: built-in variables (`A_`), the prefixes `global_` and `static_`, and objects depend on the variable model. The golden harness of v2 has one flat table of variables, so these cases are not compared here.
+
+### 15.2 Conversion
+
+The rewrite rules for the classes with the handling "rewrite" are built after the project owner has reviewed the catalog above.
+
+### 15.3 Syntax that is not converted
+
+The five syntax forms of the table (`%` as modulo, `^=`, `%=`, `<>`, `"a""b"`) are reported and left unchanged until the project owner decides (`doc/OPEN-ITEMS.md`, open actions, item 2).
 
 ## 16. Tokens (for implementers)
 
