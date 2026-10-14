@@ -104,6 +104,8 @@ Decisions taken by the WI-41 implementer (listed in its report, to be objected t
 
 Known limits of WI-41 (from the report): a flow started before `evt.engine.ready` can see a variable as missing; static variables of flows that are not loaded are not read; no test with the owner's real data folder.
 
+Step S2 planning (2026-10-14): integrated as 62d518c and 407a050 (the rebase of the planning branch resolved four document conflicts with WI-43 and kept both sides; no code, trees unchanged). Step S2 is detailed (WI-44 to WI-58, decisions E35 to E39). Its work is not started; the owner decides the start.
+
 Owner's decisions (2026-10-14, after WI-43): the migration entries M-38 to M-48 are confirmed ("Die Migrationseinträge passen"); the stress finding F-268* is watched, not repeated now. The change in `doc/PARALLEL-WORK.md` (other agents only when the owner directs them) is the owner's and is committed (9682478).
 
 Owner's manual checks (2026-10-14, `doc/MANUAL-CHECKS.md`, not yet committed by the orchestrator; the owner's file): stub steps 1 to 6 pass; debug window steps 1, 2, 4 to 9 pass, step 3 fails (snapshot text jumps to the top on every refresh; the time "Stand ..." is in the same text). Fix in progress (implementer row 7). Open from the owner's notes: the step 1 debug task opens the debug window next to the stub window (doc does not say so); the step 5 exit code comes from the `ahkrun.py` log, not from the VS Code task; step 8 is not fully clear which debug window ended (one "debug gone" entry in the hub log). #Warn dialog from the variable loader: F-255*, open.
