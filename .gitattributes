@@ -19,3 +19,6 @@
 # Test data is compared byte for byte (BOM, CRLF as written by AHF v1): no line-ending conversion
 tests/data/flows/**/*.json -text
 tests/data/variables/** -text
+
+# Language files are the v1 files, byte for byte (UTF-16 and CRLF as written by v1): no line-ending conversion
+assets/language/** -text

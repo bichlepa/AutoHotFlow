@@ -130,7 +130,7 @@ The supervisor is the smallest and simplest process. It is a hub, because a rest
 | Diagnostic data of a process (ring buffer of log, last unhandled errors, counters of peer and connection) | the process itself; others receive a copy via `cmd.diag.snapshot` (section 6.2, PROTOCOL 4.9) | `debug`, crash report |
 | Output buffer of the children (stdout/stderr, also of ended ones), ring of `evt.diag.error`, events of the topic `process`, reports not yet written | supervisor | crash report |
 | Report folder `Reports/` | storage (sole writer; the supervisor only supplies the content) | – |
-| Language texts | each role loads `language/*.ini` itself, read-only | – |
+| Language texts | each role loads `assets/language/<folder>/<code>.ini` itself, read-only (`LangTable`, WI-42) | – |
 
 ### 4.1 State changes are events
 
@@ -341,14 +341,14 @@ AutoHotFlow/
 │  │  ├─ Json.ahk  Ids.ahk  Errors.ahk  Log.ahk  Args.ahk
 │  │  └─ ipc/               # Pipe, Frame, Wake, Message, Dispatcher, Peer
 │  ├─ supervisor/  engine/  storage/  triggerhost/  worker/
-│  ├─ ui_common/            # Lang(), GUI helpers
+│  ├─ ui_common/            # GUI helpers (Lang() is in core/, E28)
 │  ├─ manager/  editor/     # editor/render/ = Renderer interface (D4)
 │  ├─ expr/                 # library: expression language (tokenizer, parser, syntax tree, parse cache), doc/EXPRESSION-LANGUAGE.md
 │  ├─ debugview/            # role debug (WI-28): DebugView.ahk, DebugGui.ahk
 │  └─ elements/
 │     ├─ base/              # AhfElement, Registry, Context
 │     └─ default/{actions,conditions,loops,triggers}/
-├─ assets/                  # icons, language/*.ini, help (taken over from v1 once needed)
+├─ assets/                  # icons, language/<folder>/<code>.ini (the v1 files, WI-42), help (taken over from v1 once needed)
 ├─ tests/                   # see TEST-STRATEGY.md
 └─ tools/                   # converters, translation tools, audit scripts
 ```
@@ -362,6 +362,7 @@ AutoHotFlow/
 - **Test entry point (WI-29):** The product entry point `src/AutoHotFlow.ahk` includes only `src/AhfBoot.ahk` (the entire boot code and role registration) and calls `AhfMain()`. The test roles (`EchoRole`, `CrasherRole`, `HangerRole`, `SlowShutdownRole`, `RegisterFailure`) are in `tests/integration/helpers/`; the test entry point `tests/integration/helpers/AutoHotFlowTest.ahk` includes `AhfBoot.ahk` and these roles and sets `AhfTestRolesFn`. The supervisor starts children with `A_ScriptFullPath`, so they inherit the entry point. With `--test-roles` at the product entry point nothing happens (the roles are not compiled in there, their name is unknown). `src/` includes nothing from `tests/` (guard rule `include-tests`, no exception any more).
 - Each file under `src/` has at most one class (WI-29): `core/Errors.ahk` now includes only `ErrCode.ahk`, `AhfError.ahk`, `ProtocolError.ahk`, `AhfTimeoutError.ahk`, `ElementError.ahk`, `JsonError.ahk`; `PlaceholderRole` has `core/PlaceholderRole.ahk`; `engine/core/Loops.ahk` is called `LoopStack.ahk`.
 - `manager` is registered in the entry point, not in `core/RoleRegistry.ahk` (like `engine`, `storage`, `worker`), so that `core/` does not include any role folders.
+- `core/Lang.ahk` and `core/LangTable.ahk` (WI-42, E28): `Lang(key, args*)` for every role; the texts are the v1 language files in `assets/language/basic/` (copied unchanged from `v1/language/basic/`), read once at the first call.
 - `engine/vars/` (WI-40): the variable model of the engine (scopes, built-in variables, `%var%` substitution, the resolver of the evaluator), doc/EXPRESSION-LANGUAGE.md section 18. It replaces `elements/base/VarStore.ahk` of Phase 2; `ExecContext` gets the access object from the engine. `VarLoader` and `VarWriter` (WI-41) load the global and static variables through `storage` at the start and write the changes back, PROTOCOL 4.6.
 
 Rule: a folder under `src/` is a process role or library module. `core/` may not include anything from role folders. Role folders include only `core/`, `expr/` (library, includes only `core/`), `ui_common/` (UI roles only) and `elements/`, never each other.
