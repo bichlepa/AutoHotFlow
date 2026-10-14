@@ -44,8 +44,9 @@ RunCase(c, convert) {
     rec := Map("id", c["id"])
     if (convert) {
         conv := V1ExprConverter.Convert(text, kind)
+        again := V1ExprConverter.Convert(conv["text"], kind)
         rec["conv"] := Map("status", conv["status"], "text", conv["text"], "changes", conv["changes"],
-            "messages", conv["messages"])
+            "messages", conv["messages"], "idempotent", (again["text"] == conv["text"]) ? 1 : 0)
         text := conv["text"]
     }
     vars := Map()

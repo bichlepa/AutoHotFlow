@@ -294,6 +294,12 @@ def main(argv=None):
     for verdict in sorted(counts, key=lambda v: (v != "same", v == "open", v)):
         handling = golden_classes.CLASSES.get(verdict, ("", ""))[0]
         print("  %-40s %5d  %s" % (verdict, counts[verdict], handling))
+    if rows and rows[0]["conv"]:
+        stats = {}
+        for r in rows:
+            stats[r["conv"]["status"]] = stats.get(r["conv"]["status"], 0) + 1
+        print("conversion: " + ", ".join("%s %d" % kv for kv in sorted(stats.items())))
+        print("not idempotent: %d" % sum(1 for r in rows if not r["conv"]["idempotent"]))
     if args.list and not args.private:
         for r in rows:
             if r["verdict"] == args.list:
