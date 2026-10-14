@@ -11,8 +11,8 @@ Session start: 2026-10-13, work-item mode (no wishes). Main checkout clean, on `
 | WI-36 | Golden data from v1 | done | sonnet (implementer), haiku (line-ending fix) | integrated: 786a688 to 9ccf5b3; fix 829ce0f | 829ce0f | fast run 20261013-185858-829ce0f4 (336 passed), golden `--check` exit 0 on the main checkout | 2026-10-13 | 2161 cases, 18 groups; `evalparam` not implemented (optional in the work item); findings in `tests/golden/FINDINGS.md` |
 | WI-37 | Expression language v2: spec, tokenizer, parser | done | sonnet (implementer) | integrated: 0a24b4c to 6023cde | 6023cde | fast run 20261013-192532-6023cded (434 passed, exit 0), arch check 0 violations (live tree) | 2026-10-13 | `src/expr/`, `doc/EXPRESSION-LANGUAGE.md` (renamed from the German file name), L1 tests. Decisions to confirm: unsupported syntax (spec section 15: `%` modulo, `^=`, `%=`, `<>`, `"a""b"`), tree height limit 200. One flaky failure of `test_worker_reports_not_busy_after_a_cancel_too` in an implementer run, not reproduced on the integrated state. |
 | WI-38 | Evaluator | done | sonnet (implementer) | integrated: ebcb01e to 0506198 (rebased once onto v2-port) | 0506198 | fast run 20261014-061523-4784 (482 passed, exit 0, on the rebased branch); verifier pending | 2026-10-14 | `src/expr/` evaluator, 31 us per typical expression (parse cache hit); decisions to confirm: `missing` field in the result, failed `+=` leaves `""`, text that looks like an integer counts as integer for E29, `mod` added, MIGRATION M-24 to M-26 |
-| WI-39 | Converter v1 expressions | open | | | | | 2026-10-13 | depends on WI-36, WI-37, WI-38 |
-| WI-40 | Variable model in the engine | open | | | | | 2026-10-13 | depends on WI-38 |
+| WI-39 | Converter v1 expressions | done, owner review of the catalog open | sonnet (implementer) | integrated: 2201ad8..? (7 commits, rebased onto v2-port, see git log) | 1e444c2 (first commit 7732b8e) | fast run 20261014-064430-17980 (514 passed, exit 0, rebased branch); verifier pending | 2026-10-14 | 1418 expression/script cases against the golden data: 726 agree after conversion, 490 accepted deviations, 194 depend on the WIP variable model (WI-40), 8 unsupported; open: owner review of the catalog (EXPRESSION-LANGUAGE 15.1), the five unsupported forms, F-105 (E30) decision; private golden cases not checked (no data on the machine) |
+| WI-40 | Variable model in the engine | in progress | opus (implementer) | `wip/wi-40` | - | - | 2026-10-14 | depends on WI-38 (done) |
 | WI-41 | global/static permanent, data folder | open | | | | | 2026-10-13 | depends on WI-40; E33 (default data folder) is done in `9eb84e0`, the owner's commit, verified: fast run 20261013-182355-9eb84e08 (301 passed), foundation run 20261013-182435-9eb84e08 (437 passed, 1 skipped, not identified), exit 0 both |
 | WI-42 | Parameter evaluation and ctx API | open | | | | | 2026-10-13 | depends on WI-38, WI-39, WI-40 |
 | WI-43 | Acceptance S1 | open | | | | | 2026-10-13 | depends on all |
@@ -43,10 +43,11 @@ Session 2 start: 2026-10-14, work-item mode, HEAD `f0793ce` on `v2-port`, main c
 
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
-| 1 | Implementer | sonnet | `wi-39` | `wip/wi-39` | WI-39 | running (started 2026-10-14) |
+| 1 | Implementer | opus | `wi-40` | `wip/wi-40` | WI-40 | running (started 2026-10-14) |
 | 2 | Bug hunter | sonnet | (removed) | (deleted) | OPEN-ITEMS round 2: F-73 analysed (decision needed, cause plausible: external close), integrated as 5251c04 | done |
 | 2b | Bug hunter | sonnet | (removed) | (deleted) | F-125: test precondition fixed (waits for the log burst, skip otherwise), 11 runs without XPASS; integrated as d354ff5, 107bb65. Tested tree equals v2-port tree (tests `bb0f06e`); slow run 20261014-063319-444 (86 passed, 2 xfailed), fast run 20261014-063423-24212 (482 passed) | done |
-| 3 | Verifier | sonnet | (removed) | (deleted) | verification of `0506198`: fast green (run 20261014-061637-0506198e, 482 passed), slow red by one strict XPASS (F-125*, run 20261014-061730-0506198e), arch check 0 violations; finding integrated as 77c38b7 | done |
+| 3 | Verifier | sonnet | `verify-3` | `wip/verify-3` | verification of `1e444c2` (WI-39: fast, slow, foundation, arch) | running (started 2026-10-14) |
+| 2 | Bug hunter round 3 | sonnet | `hunt-8` | `wip/hunt-8` | OPEN-ITEMS round 3 | running (started 2026-10-14) |
 | 4 | Resumed agent | - | - | - | - | none |
 
 ## ID blocks (OPEN-ITEMS)
@@ -64,7 +65,10 @@ Highest F-nn at session 2 start: F-74 (provisional F-73*, F-74*). F-44 was never
 | G | Implementer WI-39 | F-105 to F-114 |
 | H | Bug hunter round 2 | F-115 to F-124 |
 | I | Verifier `0506198` | F-125 to F-134 (F-125* used) |
-| J | Bug hunter F-125 | F-135 to F-144 |
+| J | Bug hunter F-125 | F-135 to F-144 (used: F-125 fix) |
+| K | Implementer WI-40 | F-145 to F-154 |
+| L | Bug hunter round 3 | F-155 to F-164 |
+| M | Verifier WI-39 (`1e444c2`) | F-165 to F-174 |
 
 ## Bug hunter log
 
