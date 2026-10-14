@@ -52,7 +52,7 @@ python tools/new_workspace.py --remove <name>                     # worktree awa
 | `doc/PROTOCOL.md` | one commit per interface change, early; the same message type is never added by two branches |
 | `.vscode/tasks.json` | new tasks at the end of their group |
 | `tests/conftest.py`, `tests/support/` | changes are small and separate; the foundation tier runs before the merge |
-| `AGENTS.md`, `doc/TEST-STRATEGY.md` | only the integrator or the project owner |
+| `AGENTS.md`, `doc/TEST-STRATEGY.md` | only the project owner or the integrator. Other agents only if directed by the user |
 
 ## 5. Load and limits
 
