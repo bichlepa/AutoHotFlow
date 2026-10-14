@@ -205,6 +205,23 @@ CaseVarAccessMarksOnlyGlobalAndStaticChanges() {
     Assert.Equal(seen.Length, 4)
 }
 
+; A refused assignment must not leave a half-made object behind: the working copy and the file would disagree.
+CaseARefusedMemberAssignmentCreatesNothing() {
+    store := EngineVars()
+    seen := []
+    store.OnChange := (scope, flowId, name) => seen.Push(name)
+    access := VarAccess(store, "", "", Map("flowId", "F1"))
+    refused := false
+    try {
+        access.Set(["global_o", VarValues.NewMap(), "x"], 3)
+    } catch ExprResolveError {
+        refused := true
+    }
+    Assert.True(refused)
+    Assert.True(!store.Global.Has("global_o"))
+    Assert.Equal(seen.Length, 0)
+}
+
 ; --- VarLoader ---------------------------------------------------------------------------------------------
 
 CaseLoaderListsThenReadsTwoAtATimeAndParsesObjects() {
@@ -304,6 +321,7 @@ TestRun.Case("a refused name is reported and not retried", CaseARefusedNameIsRep
 TestRun.Case("a full send queue marks the variable again", CaseAFullSendQueueMarksTheVariableAgain)
 TestRun.Case("FlushAll sends everything with the deadline and stops the writer", CaseFlushAllSendsEverythingWithTheDeadlineAndStopsTheWriter)
 TestRun.Case("VarAccess marks only global and static changes", CaseVarAccessMarksOnlyGlobalAndStaticChanges)
+TestRun.Case("a refused member assignment creates nothing", CaseARefusedMemberAssignmentCreatesNothing)
 TestRun.Case("the loader lists, reads two at a time and parses objects", CaseLoaderListsThenReadsTwoAtATimeAndParsesObjects)
 TestRun.Case("the loader stops when storage is gone and continues with what is left", CaseLoaderStopsWhenStorageIsGoneAndContinuesWithWhatIsLeft)
 TestRun.Case("the loader reports an unreadable variable and goes on", CaseLoaderReportsAnUnreadableVariableAndGoesOn)

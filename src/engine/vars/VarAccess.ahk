@@ -188,6 +188,12 @@ class VarAccess {
         } catch ValueError as e {
             throw ExprResolveError(e.Message)
         }
+        ; Refuse before anything is created: the loop below makes the missing objects on the way, and one that a
+        ; refused assignment leaves behind would exist in memory but never be written (nothing marks it).
+        loop path.Length - 1 {
+            if (IsObject(path[A_Index + 1]))
+                throw ExprResolveError("an object cannot be the key of a member")
+        }
         holder := this._Table(dest, false)
         key := root
         loop path.Length - 1 {
