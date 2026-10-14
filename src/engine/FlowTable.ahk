@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\core\Errors.ahk
 #Include core\FlowDefinition.ahk
+#Include core\FlowExprConvert.ahk
 #Include FlowRecord.ahk
 
 ; The loaded flows of the engine, keyed by flow ID (the file name without ".json"). Keys are case
@@ -44,12 +45,19 @@ class FlowTable {
         return true
     }
 
-    ; Parses the text of a flow file and adds it as revision 1. Throws AhfError for invalid JSON,
-    ; a wrong structure or a flow ID that is loaded already.
+    ; Parses the text of a flow file, converts the expression texts of v1 (FlowExprConvert) and adds it as
+    ; revision 1. Throws AhfError for invalid JSON, a wrong structure or a flow ID that is loaded already.
     Load(flowId, text) {
         if (this._records.Has(flowId))
             throw AhfError("flow '" flowId "' is loaded already", ErrCode.CONFLICT)
         def := FlowDefinition.FromText(flowId, text, 1)
+        try {
+            FlowExprConvert.Run(def)   ; expression texts of v1 into the new language (WI-39)
+        } catch as e {
+            ; The flow stays usable with the texts as they are; element code never takes the engine down.
+            Log.Write("f1", "flow load", "converting the expression texts failed (" Type(e) ": " e.Message "); "
+                . "the flow is loaded unconverted", flowId)
+        }
         this._records[flowId] := FlowRecord(flowId, def, 1)
     }
 }

@@ -18,6 +18,13 @@
 ;
 ; Maps keyed by ID use CaseSense "Off", as the v1 object keys do.
 class FlowDefinition {
+    ; Written files (WI-39, doc/ARCHITECTURE.md section 7): the root key "formatVersion" says that the file was saved by
+    ; v2 (a file without it comes from v1); an element whose expression texts are still in v1 syntax carries the key
+    ; "v1Text". Neither key is kept in Raw: Pending names the elements, ToFileText writes the keys.
+    static FORMAT_KEY := "formatVersion"
+    static FORMAT_VERSION := 2
+    static MARKER_KEY := "v1Text"
+
     ; Builds the model from the text of a flow file. Errors are AhfError with a readable
     ; message, never a crash. rev is the committed revision (see ARCHITECTURE 4.2).
     static FromText(flowId, text, rev := 1) {
@@ -40,6 +47,9 @@ class FlowDefinition {
         this.Name := FlowDefinition.TextOf(flowId, raw, "name", "")
         this.Category := FlowDefinition.TextOf(flowId, raw, "category", "")
         this.Dangling := []
+        ; Elements (ID -> true) whose expression texts are still in v1 syntax because their class is not known
+        ; (FlowExprConvert).
+        this.Pending := Map()
 
         this._elements := FlowDefinition.NewIndex()
         this._kinds := FlowDefinition.NewIndex()
@@ -74,6 +84,25 @@ class FlowDefinition {
             else
                 this.Dangling.Push(id)
         }
+    }
+
+    ; The text of the flow file: Raw with the format version at the root and the marker "v1Text" at the elements in
+    ; Pending. Raw itself is not changed. Json.Stringify sorts the keys; the storage role writes the line breaks.
+    ToFileText() {
+        root := this.Raw.Clone()
+        root[FlowDefinition.FORMAT_KEY] := FlowDefinition.FORMAT_VERSION
+        if (this.Pending.Count) {
+            elements := root["allElements"].Clone()
+            for id in this.Pending {
+                if (!elements.Has(id))
+                    continue
+                el := elements[id].Clone()
+                el[FlowDefinition.MARKER_KEY] := Json.True
+                elements[id] := el
+            }
+            root["allElements"] := elements
+        }
+        return Json.Stringify(root, 2)
     }
 
     ; True if an element with this ID exists.

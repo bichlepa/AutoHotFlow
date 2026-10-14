@@ -46,6 +46,8 @@ class Engine extends Role {
     static LOAD_PARALLEL := 2
     ; Safety net for the dispatcher: a tick every 100 ms in case a kick was lost (ARCHITECTURE 2.3).
     static SAFETY_MS := 100
+    ; cmd.flow.save waits this long for the answer of storage (one write with a backup, WI-39).
+    static SAVE_TIMEOUT_MS := 30000
 
     __New(args) {
         super.__New(args)
@@ -78,6 +80,7 @@ class Engine extends Role {
         this.On("cmd.flow.enable", (msg) => this._CmdFlowEnable(msg, true))
         this.On("cmd.flow.disable", (msg) => this._CmdFlowEnable(msg, false))
         this.On("cmd.flow.patch", (msg) => this._CmdFlowPatch(msg))
+        this.On("cmd.flow.save", (msg) => this._CmdFlowSave(msg))
         this.On("evt.worker.done", (msg) => this.workers.OnDone(msg))
         ; The topic "process" tells the engine when storage is ready (start, WI-31) and, with a pool, which worker
         ; crashed (the supervisor owns the process handles).
@@ -417,6 +420,37 @@ class Engine extends Role {
             throw AhfError("patch operation '" name "' is not applied before phase 3", ErrCode.BAD_PAYLOAD)
         }
         return Map("rev", rec.Rev)
+    }
+
+    ; cmd.flow.save (PROTOCOL 4.2, WI-39): writes the committed definition through storage and answers when storage has
+    ; written it. The file carries the format version and the markers of the elements whose expression texts wait for
+    ; their class (FlowDefinition.ToFileText). The revision is the one that was written, even if a patch commits
+    ; another one while storage works.
+    _CmdFlowSave(msg) {
+        flowId := Engine.Text(msg, "flowId")
+        rec := this.flows.Require(flowId)
+        savedRev := rec.Rev
+        text := rec.Def.ToFileText()
+        this.peer.Request(Engine.STORAGE, "cmd.storage.flow.write"
+            , Map("path", "Flows/" flowId ".json", "text", text, "backup", Json.True)
+            , (res) => this._OnFlowSaved(msg, flowId, savedRev, res), Engine.SAVE_TIMEOUT_MS)
+        return Deferred.Marker()
+    }
+
+    _OnFlowSaved(request, flowId, savedRev, res) {
+        try {
+            if (res.payload.Get("ok", false)) {
+                this.Emit("topic:flow:" flowId, "evt.flow.saved", Map("flowId", flowId, "savedRev", savedRev))
+                this.peer.Reply(request, Map("savedRev", savedRev))
+                return
+            }
+            this._Log("a0", "engine", "saving flow '" flowId "' failed: " Engine._ErrorText(res))
+            err := res.payload.Get("error", "")
+            this.peer.Reply(request, Map("ok", false, "error", (err is Map) ? err
+                : Map("code", ErrCode.INTERNAL, "message", "storage did not write the flow")))
+        } catch as e {
+            this._Log("a0", "engine", "answering cmd.flow.save failed: " Type(e) ": " e.Message)
+        }
     }
 
     ; --- helpers -------------------------------------------------------------------------------

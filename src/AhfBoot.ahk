@@ -45,6 +45,7 @@ OnError(AhfLoadError)
 #Include elements\skeleton\Action_TestLongBlockWorker.ahk
 #Include elements\skeleton\Action_TestFreezeWorker.ahk
 #Include elements\skeleton\Action_TestFreezeTimeoutWorker.ahk
+#Include elements\skeleton\Action_TestExprParams.ahk
 ; The test entry (tests/integration/helpers/AutoHotFlowTest.ahk) sets this to a function that registers the test roles.
 ; The product entry leaves it empty, so --test-roles does nothing there.
 global AhfTestRolesFn := ""
