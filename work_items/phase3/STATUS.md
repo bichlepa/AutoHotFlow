@@ -45,7 +45,7 @@ Session 3 start: 2026-10-14, work-item mode, HEAD `26211f2` on `v2-port`, main c
 |---|---|---|---|---|---|---|
 | 1 | Implementer | sonnet | wi-41 | wip/wi-41 | WI-41 | running |
 | 2 | Bug hunter | sonnet | hunt-6 (removed) | (deleted) | F-18 (pipe DACL restricted to owner and system): fixed and closed, integrated as 9e4aa08, fe00e33, bc30f80 (rebased once onto v2-port, cleanup commit for a run folder name in CLOSED-ITEMS); workspace removed | done, verifier running |
-| 3 | Verifier F-18 | sonnet | verify-6 | wip/verify-6 | fast, slow, foundation and arch on bc30f80 | running |
+| 3 | Verifier F-18 | sonnet | verify-6 (removed) | (deleted) | verification of `bc30f80`: fast run 20261014-164350-bc30f804 (548 passed, exit 0), slow run 20261014-164436-bc30f804 (86 passed, 2 xfailed, exit 0), foundation run 20261014-164640-bc30f804 (443 passed, 1 skipped, exit 0), no INTERNALERROR, arch 0 violations, no findings; tree hashes src `b07a425b`, tests `24710c35`, tools `dd542ea8` | done |
 
 ID blocks (session 3): implementer WI-41 F-195 to F-204; bug hunter hunt-6 F-205 to F-214 (none used, F-18 was already open); verifier verify-6 F-215 to F-224. 
 
@@ -83,6 +83,8 @@ Highest F-nn at session 2 start: F-74 (provisional F-73*, F-74*). F-44 was never
 | N | Verifier WI-40 (`84a3912`) | F-185 to F-194 |
 | L | Bug hunter round 3 | F-155 to F-164 |
 | M | Verifier WI-39 (`1e444c2`) | F-165 to F-174 |
+
+Open point (assumed, not tested, from the F-18 review): for an elevated process whose default owner is the Administrators group, a non-elevated client of the same user might be denied by the owner ACE. Not covered by any test. Check when the supervisor runs elevated.
 
 ## Bug hunter log
 
