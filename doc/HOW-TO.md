@@ -223,6 +223,30 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Status:** verified
 - **Source:** `src/expr/ExprTokenizer.ahk`
 
+### `MinInt // -1` and `Mod(MinInt, -1)` end the whole process
+
+- **Problem:** `(-9223372036854775807-1) // -1` and `Mod(-9223372036854775807-1, -1)` do not throw. AutoHotkey shows "Critical Error: System exception 0xC0000095" (integer division overflow) and ends the process; a `try`/`catch` does not help. An expression language that passes user numbers to `//`, `Mod` or an integer division check would be killed by one text.
+- **Wrong:** `try result := a // b catch ...` (also `Mod(a, b)` for the exactness test of `/`).
+- **Right:** Check before the calculation: if both operands are integers, the divisor is -1 and the dividend is the smallest Integer, refuse (the evaluator throws a `ValueError` that it catches itself) or take another way (`-a`). `MinInt / -1` with the `/` operator is fine (gives a Float), and so are `MinInt // 1`, `-MinInt` and `MinInt * -1` (they wrap around).
+- **Status:** verified (the cases above run with `ahkrun.py`; the dialog was caught)
+- **Source:** `src/expr/ExprEvaluator.ahk` (`FloorDivide`, `Divide`), `src/expr/ExprFunctions.ahk` (`_Mod`)
+
+### A property and a method that differ only in case are the same name
+
+- **Problem:** `static _table := ""` and `static _Table() {...}` in one class: the load of the script fails with "Property is read-only. Specifically: _table" at the initializer, because the method of the same (case-insensitive) name replaced the property.
+- **Wrong:** a field `_table` and a method `_Table()` in one class.
+- **Right:** Names of members are case-insensitive; give the field and the accessor different names (`_entries` / `_Table()`).
+- **Status:** verified
+- **Source:** `src/expr/ExprFunctions.ahk`
+
+### A semicolon after whitespace starts a comment even inside a string in the source
+
+- **Problem:** `Assert.Equal(EvalCheck.Value("  ; comment"), "")` fails to load with `Missing """`: the text from ` ;` on was cut off as a comment.
+- **Wrong:** `"  ; comment"` in a double-quoted string in a script file.
+- **Right:** Build the text: `"  " Chr(59) " comment"` (or escape the semicolon with a backtick). A `;` directly behind the opening quote (`"; comment"`) is fine.
+- **Status:** verified (load error and fix in `tests/ahk/expr_eval_vars.test.ahk`)
+
+
 ## Objects, Maps, Arrays
 
 ### Map with `CaseSense "Off"` keeps the spelling of the first insertion
@@ -892,3 +916,10 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Problem:** `(cmd > file; echo done >> file) &` in the Bash tool returned at once and the output file stayed empty, which looked as if nothing had started. The job was in fact running; starting the same command again with `run_in_background` produced two runs that wrote the same result files.
 - **Right:** Start a long command once with the tool's `run_in_background`, and look at the process list (`Get-CimInstance Win32_Process`) before starting it again. This contradicts the note in `doc/PARALLEL-WORK.md` section 7 ("a shell loop started with `&` ended with the command that started it") for this one observation.
 - **Status:** observed once; cause not investigated
+
+### `Json.Parse` refuses a repeated key; the golden case files have some
+
+- **Problem:** `Json.Parse` throws a `JsonError` ("duplicate key") for an object with the same key twice. 21 case lines in `tests/golden/cases/*.json` have a repeated key in `vars` (the file is not valid for a strict parser, though Python reads it).
+- **Right:** A test that only needs the text of each case cuts `kind` and `text` out of the line with a regular expression and decodes the string with `Json.Parse` (`tests/ahk/expr_eval_vars.test.ahk`). The regular expression sits in a single-quoted AHK string, where a backslash is literal and is not doubled.
+- **Status:** verified
+
