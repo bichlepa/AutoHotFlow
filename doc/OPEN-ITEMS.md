@@ -19,7 +19,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-02 | Pipe not ready within 2 s under load | open, observed | |
 | F-13 | Unprotected check-then-act spots in the engine | open (counts guarded in ad6ac7d; rest read and found protected) | |
 | F-14 | `Ids.Next` and `ExecContext.Finish` not atomic | open, low | yes |
-| F-17 | Chatty child gives up during a long supervisor stall | open, low | |
+| F-17 | Chatty child gives up during a long supervisor stall | open, reproduced, decision needed (`src/core/`) | |
 | F-18 | Hub pipe not restricted to the user | open, low | |
 | F-20 | Supervisor messages after `storage` is gone go only to stderr | open, low | |
 | F-23 | Flow file parsed twice in the engine | open, not implemented | yes |
@@ -32,6 +32,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-51* | Log line lost while other processes hold the files (`readers-allow-read`) | observed once at `-n 12`, open (stall hypothesis fixed in 2675105, not proven) | |
 | F-73* | Closing the debug window is reported as a crash; the supervisor stays up | observed by manual check, open (manager part decided by E14) | |
 | F-74* | Manual-check guide and start tasks do not match | verified, open (owner's agent) | |
+| F-85* | A burst of log lines closes the hub's link to `storage` and loses the lines | reproduced, open, decision needed (same fix as F-17) | yes |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
 
@@ -69,10 +70,11 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 ### F-17: Chatty child gives up during a long supervisor stall
 
 **What:** A child with high log load can give up during a long stall of the supervisor. The limits are the pipe queue (1000 frames) and the orphan deadline.
-**Status:** Open, low priority. Read in code, not tested.
-**Why deferred:** Low priority; no test exists.
+**Status:** Open, reproduced, `decision needed` (the fix is in `src/core/`). Priority raised: not only a stall causes it (see F-85).
+**Update 2026-10-14 (bug hunter):** Reproduced (verified). Test role `echo`, `cmd.test.log` with 100000 lines in a tight loop, the supervisor suspended with `psutil` 0.2 s after the start of the loop. The role's send queue to the hub reaches 1000 frames, `PipeConnection.SendFrame` closes the connection with `queue_overflow` (`src/core/ipc/PipeConnection.ahk:146-149`), the `Peer` goes to `reconnecting` and cannot reconnect while the hub stands still. Result by the length of the stand-still: 1.5 s: the role reconnects by itself, but its pending request is answered `peer_gone` and most lines are lost (1511 of 100000 logged); 6 s: the guard ends the role after `Role.ORPHAN_MS` (exit 4, "hub not reachable for 3000 ms"), the supervisor logs "ended unexpectedly", writes a crash report and restarts it. A quiet role survives the same 6 s (the existing test `test_supervisor_stand_still_does_not_make_healthy_children_hung`). The cause is that log entries are sent one frame each with no limit in `Role._Enqueue` (`src/core/Role.ahk:213-227`) and an overflow of the queue is fatal for the whole connection, not only for the log line.
+**Why it needs a decision:** Options: (a) log entries are droppable: `Role._Enqueue` drops (and counts, as it already does for the offline queue) when the connection's queue is above a soft limit, for example 500 frames, so the queue never reaches the hard limit because of logging; (b) the entries of a burst travel in one frame (`evt.log.append` with a list, a protocol change); (c) a larger `maxQueueFrames` (moves the limit only). Recommended: (a), the smallest change; it needs the owner's agreement because it is in `src/core/`. (a) must also count the loss and write one line "n log lines dropped" when there is room again, as storage does.
 **Sign that it matters:** A child exits or restarts after a long freeze of the supervisor while it logs a lot.
-**Action:** Test a stall with a logging child. Fix it if the case is reproduced.
+**Action:** Decision on (a) to (c). The test `tests/fault/test_log_burst.py::test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor` (slow tier) is `xfail(strict=True)` and fails as expected in 3 of 3 runs on the base commit f0793ce plus the test file (run IDs `20261014-060840-21784`, `20261014-060923-1844`, `20261014-061005-6576`, `-n 0`, machine loaded by other agents). Remove the mark with the fix.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-22-supervisor-robustheit.md`.
 
 ### F-18: Hub pipe not restricted to the user
@@ -178,6 +180,15 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** Verified by reading `doc/MANUAL-CHECKS.md:13-21` and `.vscode/tasks.json` (the manager stub task, lines 533-546). Not checked: the VS Code UI behaviour.
 **Action:** The project owner has another agent fix the task and the guide.
 **Evidence:** manual check of the project owner, step 2 and step 5.
+
+### F-85*: A burst of log lines closes the hub's link to `storage` and loses the lines (phase 3)
+
+**What:** A role that writes thousands of log lines in a short time (the test role `echo`, `cmd.test.log`, no stand-still involved) overflows the hub's send queue to `storage` (`maxQueueFrames` 1000 frames, `src/core/ipc/PipeConnection.ahk:146-149`). The hub then drops the messages ("'storage' does not accept the message"), the overflow closes the link to storage ("client 'storage' gone (queue_overflow)"), storage is judged hung, a `hung-storage` report is written, and storage is restarted. Pending requests to storage in that time fail, and the log lines of the burst are lost.
+**Status:** Reproduced (verified), `decision needed`. Measured with `cmd.test.log` and a tight loop, one run per size: 500, 1000, 1500 and 2000 lines: all lines in `Log.txt`, the link intact. 3000 lines: link closed with `queue_overflow` in 3 of 3 runs, 0 to 979 of 3000 lines in `Log.txt`; 20000 lines: link closed, 0 lines. The threshold lies between 2000 and 3000 lines in a burst; it is not a rate limit (not measured: the sustained rate that overflows). Storage itself already writes in bundles (WI-25), so the file writes are not the bottleneck; storage reads and parses one frame per line, and the hub reads faster than storage consumes (assumed, not measured).
+**Why it matters:** phase 3 elements (loops, the engine at level `a1`/`a2`) can log at this rate, and a log burst should never cost the connection of the process that owns the data.
+**Options:** (a) the hub treats `evt.log.append` as droppable: when the queue to the target is above a soft limit (for example 800 frames) the message is dropped and counted, with one summary line when there is room again, instead of driving the queue into the hard limit (in `src/supervisor/Hub.ahk`, no core change); (b) the sender batches lines (`evt.log.append` with a list, a protocol change); (c) a larger `maxQueueFrames` for the storage link (moves the limit). Recommended: (a) here and the same idea in `Role._Enqueue` for F-17.
+**Action:** Decision. The test `tests/fault/test_log_burst.py::test_a_burst_of_log_lines_does_not_cost_the_storage_link_or_the_lines` (slow tier, 5000 lines) is `xfail(strict=True)` and failed as expected in 3 of 3 runs (run IDs `20261014-060840-21784`, `20261014-060923-1844`, `20261014-061005-6576`, base commit f0793ce plus the test file; with `--runxfail` the failing assert is the `queue_overflow` check). Remove the mark with the fix.
+**Evidence:** the runs above; supervisor log of the 3000-line run: 155 "does not accept" lines, `queue_overflow`, "storage ended unexpectedly (hung)".
 
 ## Watch list (E7)
 
