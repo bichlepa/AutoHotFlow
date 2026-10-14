@@ -2,7 +2,7 @@
 
 Specification of the language that parameters and scripts are written in, and of the library `src/expr/` that reads it.
 
-Status: tokenizer, parser, evaluator and converter are implemented and tested (`tests/ahk/expr_*.test.ahk`). Section 17 describes the evaluator; section 14 lists the differences from AutoHotkey v2; section 15 is the deviation catalog and the converter of old expressions (WI-39). The variables (scopes, objects, built-in variables, `%var%` substitution) are not part of this library: they belong to the engine (`src/engine/vars/`, WI-40) and are described in section 18. The use in parameters (WI-42) is not part of this document yet.
+Status: tokenizer, parser, evaluator and converter are implemented and tested (`tests/ahk/expr_*.test.ahk`). Section 17 describes the evaluator; section 14 lists the differences from AutoHotkey v2; section 15 is the deviation catalog and the converter of old expressions (WI-39). The variables (scopes, objects, built-in variables, `%var%` substitution) are not part of this library: they belong to the engine (`src/engine/vars/`, WI-40) and are described in section 18. The use in the parameters of elements (content types, the flow option `strictTypes`) is described in doc/ELEMENT-API-V2.md section 3.1 (WI-42).
 
 The language follows AutoHotkey v2 (decision E22) as far as that makes sense in AutoHotFlow. Where it deviates, section 14 says so.
 
@@ -381,7 +381,7 @@ res["missing"]     ; Array of records for variables that were read and do not ex
 | error | unknown function, wrong number of arguments, method call, a name built by `%...%` that is not a valid variable name, a member of a value that has none, assignment to something that is not a variable, a refusal by the resolver | `f1`, `Expression error: <message> (line L, column C)` |
 | missing | a read of a variable that does not exist | `f0`, `Retrieving variable 'x' failed. It does not exist` (a member of a path: the dotted path as name) |
 
-Whether a warning or a missing variable matters is decided by the caller (WI-42).
+Whether a warning or a missing variable matters is decided by the caller. For parameters and `ctx.EvaluateExpression` (WI-42, doc/ELEMENT-API-V2.md section 3.1): an error is always an error of the element; a warning is one only in the strict mode of a flow (`strictTypes`, E34), in compatibility mode it stays the empty text plus the `f1` entry (E25); a missing variable is never one.
 
 **Resolver.** The evaluator knows nothing about scopes. `resolver` is any object with
 

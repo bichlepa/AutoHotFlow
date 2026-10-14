@@ -285,6 +285,13 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Status:** verified (probe with `ahkrun.py`)
 - **Source:** `src/engine/vars/VarAccess.ahk` (`_Find`)
 
+### `IsNumber` of AutoHotkey v2 is not v1 `is number`: `"1e3"`
+
+- **Problem:** The number checks of the parameter evaluation port v1 `if x is number` / `is integer`. It was unclear whether `IsNumber`/`IsInteger` give the same answers.
+- **Right:** For 14 texts (`"5"`, `" 5 "`, `"5."`, `".5"`, `"0x10"`, `"1e3"`, `"abc"`, `"-3"`, `"+3"`, `"1.5"`, `"007"`, `"-abc"`, `"1,5"`, `"5 x"`) the answers are the same, spaces around a number included, except `"1e3"`: a number in v2 (`IsFloat`), not in v1. A Float such as `4.0` is no integer (`IsInteger(4.0)` is 0). v1 `x >= 1` with a text that is not a number compares alphabetically (`"abc" >= 1` is true, `"-abc" >= 1` false); `StrCompare(text, "1") >= 0` gives the same.
+- **Status:** verified (probe scripts in the v1 interpreter and in v2 with `ahkrun.py`); MIGRATION M-48
+- **Source:** `src/elements/base/ParamEvaluator.ahk` (`V1AtLeast`)
+
 ## Objects, Maps, Arrays
 
 ### Map with `CaseSense "Off"` keeps the spelling of the first insertion
@@ -374,6 +381,14 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Right:** Normalize keys when storing and looking up (`VarValues.NormKey`: a text of decimal digits becomes the Integer). A `Map` enumerates its Integer keys in ascending order first, then its text keys sorted (with `CaseSense "Off"` without case: `_` before `A` before `b`). That is the order of v1 objects, so no own sort is needed.
 - **Status:** verified (probe with `ahkrun.py`: `-3, 2, 10, "1.5", "1x", "_", "A", "b", "Z"`; golden case `objects.dict.whole`)
 - **Source:** `src/engine/vars/VarValues.ahk`
+
+### A function stored in an object that it holds is a reference cycle
+
+- **Problem:** The source of the parameter evaluation (`ExecContext.EvalSource`) needs a log function that knows the current parameter. The first version stored `ObjBindMethod(this, "_EvalLog", src)` in `src` itself: `src` holds the function, the function holds `src`, and both are never freed (one leak per `EvalParams` call).
+- **Wrong:** `src.logFn := ObjBindMethod(this, "_EvalLog", src)` (the same with a closure that captures `src`).
+- **Right:** Bind a small separate object that holds only the changing data (`at := {param: ""}`; `src.at := at`; `ObjBindMethod(this, "_EvalLog", at)`). `at` does not hold `src`, so there is no cycle. See also "Reference cycle via `ObjBindMethod(this, ...)` in a field".
+- **Status:** assumed (seen in review before it ran; the leak itself was not measured)
+- **Source:** `src/elements/base/ExecContext.ahk` (`EvalSource`)
 
 ## Error handling
 
@@ -987,3 +1002,18 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Right:** Build the role in a small test script and print `e.Message`, `e.File`, `e.Line` and `e.Stack` of the exception: `#Include src\AhfBoot.ahk`, then `try { Engine(Map("session", "x", "hub", "h", "data", "d")) } catch as e { FileAppend(e.Stack, "**") }`, run with `tools/ahkrun.py`. The stack names the line of the failed assignment.
 - **Status:** verified (WI-41)
 - **Source:** `src/AhfBoot.ahk`
+
+### `FileRead(path, "UTF-8")` still reads a UTF-16 file with BOM
+
+- **Problem:** The v1 language files are UTF-8 without BOM (`en.ini`) and UTF-16 LE with BOM (`de.ini`, `ko.ini`, `ru.ini`). One read for both was wanted.
+- **Right:** `FileRead(path, "UTF-8")`: a BOM decides over the encoding option, so the UTF-16 file is read correctly and the UTF-8 file without BOM as UTF-8 (not as ANSI). `IniRead` was not used: it reads UTF-16 files and ANSI files only.
+- **Status:** verified (probe: `Abbrechen` found in `de.ini` with and without the option; `tests/ahk/core_lang.test.ahk`)
+- **Source:** `src/core/LangTable.ahk`
+
+### The flows of the engine are loaded before its variables: wait for `evt.engine.ready`
+
+- **Problem:** An end-to-end test waited with `Chain.wait_flows` (the flows appear in `cmd.engine.snapshot`) and started them at once. The expressions found no global variable: "Retrieving variable 'global_n' failed", and the log said "ready with 11 flow(s) and 3 variable(s)" only afterwards.
+- **Wrong:** Starting a flow that reads global or static variables as soon as the snapshot lists it.
+- **Right:** Wait for `evt.engine.ready` (it comes after the variables are loaded, WI-41) before such a flow starts, as `tests/fault/test_var_persistence.py` does.
+- **Status:** verified (red before, green after the wait)
+- **Source:** `tests/fault/test_param_eval.py`
