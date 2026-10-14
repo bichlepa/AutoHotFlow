@@ -275,6 +275,36 @@ def test_hub_gone_role_ends_within_orphan_budget_and_leaves_no_process(procs, da
     print("\nhub stopped -> role ended with exit 4 after %.2f s" % elapsed)
 
 
+class SilentHub(RoleHub):
+    """Accepts every connection and reads the frames, but never answers (no sys.welcome): a hub that is stuck."""
+
+    def _handle(self, link, msg):
+        with self._cond:
+            self.received.append(msg)
+            self._cond.notify_all()
+
+
+def test_hub_that_never_answers_hello_ends_the_role_with_exit_4(procs, datadir, runs, session_id, pipe):
+    # F-29 follow-up: every failed hello restarted the 10 s budget and the orphan guard, so the role lived for ever
+    limit_s = scaled(25.0)
+    hub = SilentHub(pipe).start()
+    try:
+        run = launch(procs, datadir, runs, pipe, session_id, "echo")
+        pid = wait_hello(hub, "echo")
+        ahk = ahk_process(pid)
+        started = time.perf_counter()
+        try:
+            code = ahk.wait(timeout=limit_s)
+        except psutil.TimeoutExpired:
+            code = None
+        elapsed = time.perf_counter() - started
+        hellos = len([m for m in hub.received if m.get("type") == "sys.hello"])
+    finally:
+        hub.stop()
+    assert code == EXIT_HUB_LOST, "role still alive after %.1f s, %d hellos sent" % (elapsed, hellos)
+    print("\nsilent hub -> role ended with exit 4 after %.2f s, %d hellos" % (elapsed, hellos))
+
+
 # --- base class behavior -------------------------------------------------------------------------
 
 def test_error_in_a_timer_is_logged_and_the_role_keeps_running(procs, datadir, runs, session_id, pipe):

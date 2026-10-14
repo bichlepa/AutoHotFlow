@@ -311,8 +311,12 @@ class Peer {
     _BeginReconnect() {
         if (this.status = "closed")
             return
+        ; A connection that ends before the welcome (hub accepts the pipe but does not answer sys.hello, F-29)
+        ; continues the outage: the budget is not restarted, or a stuck hub would keep the peer alive for ever.
+        failedHandshake := (this.status = "handshake")
         this.status := "reconnecting"
-        this._budgetStart := Time.NowMs()
+        if (!failedHandshake)
+            this._budgetStart := Time.NowMs()
         this._backoff := Peer.RECONNECT_FIRST_MS
         this._ScheduleRetry()
     }
