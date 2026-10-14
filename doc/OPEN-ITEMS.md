@@ -38,6 +38,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-235* | `VarWriter.FlushAll` loses the variables beyond the limit of the peer (1000 waiting requests) | verified in a probe with a stand-in peer, open, low | |
 | F-236* | `test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted[0]` got no `evt.process.crashed` for `worker:1` in the slow tier | observed once, not reproducible in 8 runs, diagnostics added, open | |
 | F-255* | `#Warn` dialog for `Engine` in `VarLoader.ahk:101` seen in a manual unit test run | observed once, not analysed, open | |
+| F-268* | The stress test with 200 big flows fails its snapshot budget (largest snapshot answer during loading 2326 ms, budget 1000 ms) | observed once at the S1 acceptance (WI-43), not repeated, not analysed, open | yes |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
 
@@ -241,6 +242,14 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Evidence:** dialog report of the unit test file `tests/ahk/engine_var_files.test.ahk` run by hand, 2026-10-14 16:42, workspace of the WI-41 implementer, commit `2c20eff` (the same code is on `v2-port`). The automated runs (fast and slow tier) were green, so the warning does not show up there.
 **Suspicion (assumed):** the class `Engine` is not known in the include list of that unit test file, so `#Warn` treats the name as an unset local. If so, it is a test-harness include problem, not a product bug. Not checked: whether the product entry point loads the same name without a warning.
 **Next step:** check which include list the unit test loads (`tests/ahk/`), confirm it is a harness problem, and fix the include. If the product shows the warning too, it is a product bug.
+
+### F-268*: Stress test with 200 big flows: a snapshot answer during the load takes 2.3 s (budget 1 s)
+
+**What:** `tests/stress/test_big_flows.py::test_many_big_flows_load_without_hung_and_with_a_responsive_engine[200]` failed in the stress run of the S1 acceptance (WI-43). Everything else in the test held (all 200 flows loaded, no `hung`, `crashed` or `restarted`, no storage error, no snapshot timeout); only the latency check failed: `n=251 median=148.45 p95=543.45 p99=1351.00 max=2325.93` ms against the budget of 1000 ms (`SNAPSHOT_BUDGET_S`, serial run, no scaling). The time until `evt.engine.ready` was 59.35 s.
+**Status:** observed once, not repeated (rule of the acceptance run), not analysed. Open.
+**Evidence:** stress run on the code of WI-36 to WI-42 plus the WI-43 test (commit of the test `1783e67`); 14 other stress tests passed. Earlier measurement of the same test (MEASUREMENTS M-19, WI-24, before phase 3): ready after 45.3 s, largest snapshot answer 506 ms (p99 495 ms, median 194 ms, n=199). So the median is about the same, the tail and the time to ready are worse (+14 s, max about 4.6 times).
+**Suspicion (assumed, not checked):** the engine does more work per flow while it loads since S1: `FlowExprConvert` reads every element of a v1 flow when it loads (the big flows have no `formatVersion`; most classes are not registered, so the elements get the marker `v1Text`), and the variable loader runs before `evt.engine.ready` (WI-41). Another load on the machine during the run (a parallel bug hunter workspace was possible) is not excluded.
+**Next step:** repeat the single test on an idle machine a few times to separate load from regression; if it is real, measure the load phase per flow (conversion, `cmd.storage.var.list`) and let the conversion run staggered or only for registered classes. The budget is the strict reference (E17), so do not relax it before the cause is known.
 
 ## Watch list (E7)
 
