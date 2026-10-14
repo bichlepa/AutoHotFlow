@@ -248,6 +248,22 @@ def show_status(base):
     return 0
 
 
+def new_run_dir(base, stem):
+    """Creates the folder of a new run and returns (run id, folder). Two runs of the same commit started in the same
+    second would get the same id; the second then found the worktree of the first, failed, and removed that worktree
+    in its cleanup, so the first ran no tests. The folder is created exclusively; a taken id gets a suffix -2, -3..."""
+    base.mkdir(parents=True, exist_ok=True)
+    n = 1
+    while True:
+        run_id = stem if n == 1 else "%s-%d" % (stem, n)
+        run_dir = base / run_id
+        try:
+            run_dir.mkdir()
+            return run_id, run_dir
+        except FileExistsError:
+            n += 1
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0], add_help=True)
     parser.add_argument("--ref", default="HEAD", help="commit, branch or tag to test (default HEAD)")
@@ -275,12 +291,11 @@ def main(argv=None):
         print("tool error: %s" % e, file=sys.stderr)
         return EXIT_TOOL_FAILED
 
-    run_id = "%s-%s%s" % (time.strftime("%Y%m%d-%H%M%S"), sha[:8], "-wc" if args.with_changes else "")
-    run_dir = base / run_id
+    run_id, run_dir = new_run_dir(base, "%s-%s%s" % (time.strftime("%Y%m%d-%H%M%S"), sha[:8],
+                                                     "-wc" if args.with_changes else ""))
     tree = run_dir / "tree"
     log_dir = run_dir / "pytest-log"
     output = run_dir / "output.txt"
-    run_dir.mkdir(parents=True, exist_ok=True)
     exclusive = is_exclusive(pytest_args)
 
     def say(text):

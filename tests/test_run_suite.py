@@ -29,6 +29,17 @@ def test_exclusive_runs_are_recognized(args, expected):
     assert run_suite.is_exclusive(args) is expected
 
 
+def test_two_runs_of_the_same_commit_in_the_same_second_get_their_own_folder(tmp_path):
+    """Two runs started in the same second shared one folder and one worktree: the second removed the worktree of the
+    first (seen in WI-42: the first ran no tests, the second failed with 'already exists')."""
+    first = run_suite.new_run_dir(tmp_path, "20261014-172526-782586e3")
+    second = run_suite.new_run_dir(tmp_path, "20261014-172526-782586e3")
+    third = run_suite.new_run_dir(tmp_path, "20261014-172526-782586e3")
+    assert [first[0], second[0], third[0]] == ["20261014-172526-782586e3", "20261014-172526-782586e3-2",
+                                               "20261014-172526-782586e3-3"]
+    assert all(d.is_dir() for _, d in (first, second, third))
+
+
 @pytest.mark.slow
 def test_run_in_a_worktree_leaves_no_worktree_and_a_result(tmp_path):
     """End to end on HEAD with a tiny test file; the runs folder is private to this test."""
