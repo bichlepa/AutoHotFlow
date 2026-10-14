@@ -248,6 +248,137 @@ class Action_NotYetPorted extends AhfElement {
     static Parameters(ctx) => [{type: "Edit", id: "Expr", content: "Expression"}, {type: "Edit", id: "Other", content: "Expression"}]
 }
 
+; --- migration markers (WI-45) ----------------------------------------------------------------------------------
+
+; The entry of a parameter in the key "migration" of an element, "" if there is none.
+MigrationEntry(def, id, par) {
+    el := def.Element(id)
+    if (!el.Has("migration"))
+        return ""
+    for entry in el["migration"] {
+        if (entry["par"] = par)
+            return entry
+    }
+    return ""
+}
+
+Joined(arr) {
+    out := ""
+    for i, v in arr
+        out .= (i > 1 ? "," : "") v
+    return out
+}
+
+MigrationFlow() {
+    return Lines(
+        '{"name":"mig","allElements":{',
+        '"e1":{"ID":"e1","type":"Action","class":"Action_TestExprParams","pars":{',
+        '"Expr":"x < \"abc\"","Num":"7 % 3","PosInt":"1 +","Condition":"a < \"b\" and \"a\".\"b\"","Script":"x := 1"}},',
+        '"e2":{"ID":"e2","type":"Action","class":"Action_NotYetPorted","pars":{"Expr":"x < \"abc\""}}},',
+        '"allConnections":{}}'
+    )
+}
+
+CheckAcceptedDeviationIsMarkedWithTheV1Text() {
+    table := FlowTable()
+    table.Load("f", MigrationFlow())
+    def := table.Get("f").Def
+    entry := MigrationEntry(def, "e1", "Expr")
+    Assert.True(IsObject(entry), "a marker for Expr")
+    Assert.Equal(Joined(entry["ids"]), "M-25")
+    Assert.Equal(entry["v1"], 'x < "abc"')
+    ; the text itself is not changed: the converter does not rewrite this class
+    Assert.Equal(Pars(def, "e1")["Expr"], 'x < "abc"')
+    ; a text that is converted and also marked: the v1 original is the text before the conversion
+    cond := MigrationEntry(def, "e1", "Condition")
+    Assert.Equal(Joined(cond["ids"]), "M-25")
+    Assert.Equal(cond["v1"], 'a < "b" and "a"."b"')
+    Assert.Equal(Pars(def, "e1")["Condition"], 'a < "b" and "a" . "b"')
+    ; a text without a deviation has no marker
+    Assert.Equal(MigrationEntry(def, "e1", "Script"), "")
+}
+
+CheckUnsupportedSyntaxAndUnreadableTextAreMarked() {
+    table := FlowTable()
+    table.Load("f", MigrationFlow())
+    def := table.Get("f").Def
+    unsupported := MigrationEntry(def, "e1", "Num")
+    Assert.Equal(Joined(unsupported["ids"]), "M-37")
+    Assert.Equal(unsupported["v1"], "7 % 3")
+    Assert.Equal(Pars(def, "e1")["Num"], "7 % 3")
+    unreadable := MigrationEntry(def, "e1", "PosInt")
+    Assert.Equal(Joined(unreadable["ids"]), "M-50")
+    Assert.Equal(unreadable["v1"], "1 +")
+}
+
+CheckUnknownClassHasNoMigrationMarker() {
+    table := FlowTable()
+    table.Load("f", MigrationFlow())
+    def := table.Get("f").Def
+    ; the class is unknown: the texts could not be checked, the element keeps v1Text and has no list of places
+    Assert.True(def.Pending.Has("e2"))
+    Assert.True(!def.Element("e2").Has("migration"))
+    Assert.True(Json.Parse(def.ToFileText())["allElements"]["e2"]["v1Text"] == 1)
+}
+
+CheckMarkersSurviveSaveAndLoadUnchanged() {
+    first := FlowTable()
+    first.Load("f", MigrationFlow())
+    saved := first.Get("f").Def.ToFileText()
+    root := Json.Parse(saved)
+    list := root["allElements"]["e1"]["migration"]
+    Assert.Equal(list.Length, 4)
+    ; second load: the markers are the same, the v1 originals are unchanged, nothing is converted again
+    second := FlowTable()
+    second.Load("f", saved)
+    def := second.Get("f").Def
+    Assert.Equal(MigrationEntry(def, "e1", "Condition")["v1"], 'a < "b" and "a"."b"')
+    Assert.Equal(Pars(def, "e1")["Condition"], 'a < "b" and "a" . "b"')
+    Assert.Equal(Joined(MigrationEntry(def, "e1", "Num")["ids"]), "M-37")
+    Assert.Equal(def.Element("e1")["migration"].Length, 4)
+    ; and the next save is the same file
+    Assert.Equal(def.ToFileText(), saved)
+}
+
+CheckAClassThatAppearsLaterAddsItsMarkers() {
+    first := FlowTable()
+    first.Load("f", MigrationFlow())
+    saved := first.Get("f").Def.ToFileText()
+    ElementRegistry.Register(Action_NotYetPorted)
+    try {
+        second := FlowTable()
+        second.Load("f", saved)
+        def := second.Get("f").Def
+        entry := MigrationEntry(def, "e2", "Expr")
+        Assert.Equal(Joined(entry["ids"]), "M-25")
+        Assert.Equal(entry["v1"], 'x < "abc"')
+        ; the next round trip keeps exactly one entry
+        third := FlowTable()
+        third.Load("f", def.ToFileText())
+        Assert.Equal(third.Get("f").Def.Element("e2")["migration"].Length, 1)
+    } finally {
+        ElementRegistry.classes.Delete("Action_NotYetPorted")
+    }
+}
+
+CheckUnknownKeysOfAnElementAreKept() {
+    ; a marker list written by hand (or by a later version) is kept as it is and is not marked a second time
+    text := Lines(
+        '{"name":"k","formatVersion":2,"allElements":{',
+        '"e1":{"ID":"e1","type":"Action","class":"Action_TestExprParams","v1Text":true,"future":{"a":1},',
+        '"migration":[{"par":"Expr","ids":["M-99"],"v1":"orig"}],"pars":{"Expr":"x < \"abc\""}}},',
+        '"allConnections":{}}'
+    )
+    table := FlowTable()
+    table.Load("f", text)
+    def := table.Get("f").Def
+    entry := MigrationEntry(def, "e1", "Expr")
+    Assert.Equal(Joined(entry["ids"]), "M-99")
+    Assert.Equal(entry["v1"], "orig")
+    Assert.Equal(def.Element("e1")["migration"].Length, 1)
+    Assert.Equal(Json.Parse(def.ToFileText())["allElements"]["e1"]["future"]["a"], 1)
+}
+
 TestRun.Init()
 
 TestRun.Case("a v1 flow: expression parameters and V1Syntax are converted, the rest stays", CheckV1FlowIsConverted)
@@ -261,5 +392,11 @@ TestRun.Case("every conversion is in the log", CheckEveryConversionIsLogged)
 TestRun.Case("Parameters() that fails keeps the element waiting", CheckBrokenParametersDoNotStopTheLoad)
 TestRun.Case("spellings of the marker", CheckMarkerSpellings)
 TestRun.Case("a flow without expressions keeps its definition", CheckFlowsWithoutExpressionsKeepTheirDefinition)
+TestRun.Case("migration: an accepted deviation is marked, the v1 original is kept", CheckAcceptedDeviationIsMarkedWithTheV1Text)
+TestRun.Case("migration: unsupported syntax and unreadable text are marked", CheckUnsupportedSyntaxAndUnreadableTextAreMarked)
+TestRun.Case("migration: an unknown class has no marker list", CheckUnknownClassHasNoMigrationMarker)
+TestRun.Case("migration: markers are stable over save and load", CheckMarkersSurviveSaveAndLoadUnchanged)
+TestRun.Case("migration: a class that appears later adds its markers once", CheckAClassThatAppearsLaterAddsItsMarkers)
+TestRun.Case("migration: existing markers and unknown keys are kept", CheckUnknownKeysOfAnElementAreKept)
 
 TestRun.Finish()

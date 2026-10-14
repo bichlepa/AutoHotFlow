@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\core\Log.ahk
 #Include ..\..\expr\V1ExprConverter.ahk
+#Include ..\..\expr\MigrationClasses.ahk
 #Include ..\..\elements\base\ElementRegistry.ahk
 #Include FlowDefinition.ahk
 
@@ -21,6 +22,12 @@
 ; x_EvaluateScript on a RawString) are named by the class in `static V1Syntax := Map("Script", "script", ...)`.
 ;
 ; Every conversion is in the log (level f2), every text that cannot be converted at level f1.
+;
+; Migration markers (WI-45, E35): a text that the converter leaves unchanged or only partly converts, and whose
+; behaviour differs from v1 in a way the text shows (V1ExprDetect), is recorded at the element in the key "migration":
+; a list of {par, ids, v1}: the parameter ID, the MIGRATION IDs (doc/MIGRATION.md) and the v1 text as it was before the
+; conversion. The key is part of the element (unknown keys are kept and written back), it stays until the place is
+; resolved, and a place that is marked already is not marked again, so load, save, load is stable.
 class FlowExprConvert {
     static EXPRESSION_CONTENT := Map("expression", 1, "number", 1, "positivenumber", 1, "integer", 1
         , "positiveinteger", 1, "positiveintegerorzero", 1)
@@ -28,7 +35,7 @@ class FlowExprConvert {
     ; Converts the flow in place. Returns a Map with the counts: converted (texts), unchanged (texts that need no
     ; change), unsupported, failed, pending (elements that wait for their class).
     static Run(def) {
-        counts := Map("converted", 0, "unchanged", 0, "unsupported", 0, "failed", 0, "pending", 0)
+        counts := Map("converted", 0, "unchanged", 0, "unsupported", 0, "failed", 0, "pending", 0, "marked", 0)
         raw := def.Raw
         versioned := raw.Has(FlowDefinition.FORMAT_KEY)
         elements := raw["allElements"]
@@ -57,7 +64,7 @@ class FlowExprConvert {
             if (!(pars is Map))
                 continue
             for parId, kind in specs
-                FlowExprConvert._ConvertOne(def, id, pars, parId, kind, counts)
+                FlowExprConvert._ConvertOne(def, id, el, pars, parId, kind, counts)
         }
         total := counts["converted"] + counts["unsupported"] + counts["failed"] + counts["pending"]
         if (total > 0)
@@ -111,12 +118,15 @@ class FlowExprConvert {
         return (IsObject(p) && p.HasProp(name)) ? p.%name% : ""
     }
 
-    static _ConvertOne(def, elementId, pars, parId, kind, counts) {
+    static _ConvertOne(def, elementId, el, pars, parId, kind, counts) {
         if (!pars.Has(parId) || IsObject(pars[parId]))
             return
         old := String(pars[parId])
         conv := V1ExprConverter.Convert(old, kind)
         where := "element '" elementId "' parameter '" parId "'"
+        ids := MigrationClasses.IdsOf(conv["classes"])
+        if (ids.Length && FlowExprConvert.Mark(el, parId, ids, old))
+            counts["marked"] += 1
         switch conv["status"] {
             case "converted":
                 pars[parId] := conv["text"]
@@ -130,6 +140,20 @@ class FlowExprConvert {
             default:
                 counts["unchanged"] += 1
         }
+    }
+
+    ; Records the place in el["migration"] unless the parameter is listed already (the first v1 text stays).
+    ; Returns true if an entry was added.
+    static Mark(el, parId, ids, v1Text) {
+        key := FlowDefinition.MIGRATION_KEY
+        list := (el.Has(key) && el[key] is Array) ? el[key] : []
+        for entry in list {
+            if (entry is Map && entry.Has("par") && entry["par"] == parId)
+                return false
+        }
+        list.Push(Map("par", parId, "ids", ids, "v1", v1Text))
+        el[key] := list
+        return true
     }
 
     static OneLine(text) {

@@ -1,5 +1,6 @@
 #Requires AutoHotkey v2.0
 #Include Expr.ahk
+#Include V1ExprDetect.ahk
 
 ; Converter of v1 expressions and scripts into the new language (WI-39, doc/EXPRESSION-LANGUAGE.md section 15).
 ;
@@ -8,6 +9,9 @@
 ;   conv["text"]       the text to use; the input itself unless the status is "converted"
 ;   conv["changes"]    Array of Map("rule", name, "old", text, "new", text) in the order of the text
 ;   conv["messages"]   Array of texts for the log (why a text is "unsupported" or "failed")
+;   conv["classes"]    Array of the deviation classes (doc/EXPRESSION-LANGUAGE.md 15.1, handling "accept" or
+;                      "unsupported") that the text shows (V1ExprDetect); "unreadable text" for a "failed" text that
+;                      no other class explains. MigrationClasses maps them to MIGRATION IDs (WI-45).
 ;
 ; The text is rewritten only where the result of v1 cannot be had otherwise; the rest stays as the user wrote it.
 ; The rewrite rules (each one is a class of the deviation catalog with the handling "rewrite"):
@@ -31,7 +35,7 @@ class V1ExprConverter {
     static Convert(text, kind := "expression") {
         if (kind != "expression" && kind != "script")
             throw ValueError("V1ExprConverter.Convert: unknown kind '" kind "'")
-        result := Map("status", "unchanged", "text", text, "changes", [], "messages", [])
+        result := Map("status", "unchanged", "text", text, "changes", [], "messages", [], "classes", [])
         if (Trim(text, " `t`r`n") = "")
             return result
 
@@ -47,9 +51,17 @@ class V1ExprConverter {
             result["status"] := unsupported ? "unsupported" : "failed"
             prefix := unsupported ? "unsupported syntax: " : "not valid in the new language: "
             result["messages"].Push(prefix msg " (line " err["line"] ", column " err["col"] ")")
+            if (unsupported) {
+                result["classes"] := ["unsupported syntax"]
+            } else {
+                result["classes"] := V1ExprDetect.Classes(text, "", kind)
+                if (result["classes"].Length = 0)
+                    result["classes"].Push("unreadable text")
+            }
             return result
         }
 
+        result["classes"] := V1ExprDetect.Classes(step1, parsed["ast"], kind)
         literals := []
         V1ExprConverter._WalkLiterals(parsed["ast"], true, literals)
         final := V1ExprConverter._Apply(step1, literals)

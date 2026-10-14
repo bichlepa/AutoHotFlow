@@ -24,6 +24,10 @@ class FlowDefinition {
     static FORMAT_KEY := "formatVersion"
     static FORMAT_VERSION := 2
     static MARKER_KEY := "v1Text"
+    ; Key of an element (WI-45, E35): the places of its parameters that behave differently in v2, with MIGRATION IDs and
+    ; the v1 text. Unlike v1Text it is an ordinary key of the element: it stays in Raw, so it is written back and
+    ; clients see it (FlowExprConvert.Mark).
+    static MIGRATION_KEY := "migration"
     ; The flow option "strictTypes" in flowSettings (E34, WI-42): in strict mode a type error of an evaluation (a
     ; comparison or a calculation with a text that is not a number, doc/EXPRESSION-LANGUAGE.md section 17) ends the
     ; element with "exception"; in compatibility mode the result is the empty text plus a warning (E25), as v1 had it.
