@@ -46,9 +46,9 @@ Session 2 start: 2026-10-14, work-item mode, HEAD `f0793ce` on `v2-port`, main c
 | 1 | Implementer | opus | `wi-40` | `wip/wi-40` | WI-40 | running (started 2026-10-14) |
 | 2 | Bug hunter | sonnet | (removed) | (deleted) | OPEN-ITEMS round 2: F-73 analysed (decision needed, cause plausible: external close), integrated as 5251c04 | done |
 | 2b | Bug hunter | sonnet | (removed) | (deleted) | F-125: test precondition fixed (waits for the log burst, skip otherwise), 11 runs without XPASS; integrated as d354ff5, 107bb65. Tested tree equals v2-port tree (tests `bb0f06e`); slow run 20261014-063319-444 (86 passed, 2 xfailed), fast run 20261014-063423-24212 (482 passed) | done |
-| 3 | Verifier | sonnet | `verify-3` | `wip/verify-3` | verification of `1e444c2` (WI-39: fast, slow, foundation, arch) | running (started 2026-10-14) |
+| 3 | Verifier | sonnet | (removed) | (deleted) | verification of `1e444c2` (WI-39): fast green (run 20261014-064547-1e444c2d, 514 passed), foundation green (run 20261014-064848-1e444c2d, 439 passed, 1 skipped), slow red by the F-17 strict XPASS again (F-165*, run 20261014-064633-1e444c2d), arch 0 violations; finding integrated as 87b17de | done |
+| 4 | Fix (drop strict on the F-17 test, per the F-125 action) | haiku | `fix-1` | `wip/fix-1` | F-125, F-165 | running (started 2026-10-14) |
 | 2 | Bug hunter round 3 | sonnet | `hunt-8` | `wip/hunt-8` | OPEN-ITEMS round 3 | running (started 2026-10-14) |
-| 4 | Resumed agent | - | - | - | - | none |
 
 ## ID blocks (OPEN-ITEMS)
 
