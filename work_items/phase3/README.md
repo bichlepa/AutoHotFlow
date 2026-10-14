@@ -14,6 +14,7 @@ AutoHotFlow v2 can do everything v1 can: load flows (including old v1 flows), ed
 2. **Test early.** The element scope stays small until the editor is finished. This way the project owner can try things out by hand early. The remaining elements come in S8.
 3. **Measure risky things early** (R3 in S2, R2 in S5), before much code relies on them.
 4. **v1 stays in everyday use until v2 is finished.** v2 only needs to be able to **read** old flows and variables. What v2 writes is free (E21). v2 works in its own data folder; old data comes in through an import (S4).
+5. **v1 is not the yardstick (E35).** A loaded v1 flow may need small fixes; every such place is marked with its MIGRATION ID. Tests take their expected values from AHK v2 and the v1 help texts, not from the v1 code.
 
 ## Procedure per step
 
@@ -24,13 +25,13 @@ Each step is worked through individually: **detail** (package files WI-xx with t
 | # | Step | Content (rough) | Acceptance | Status |
 |---|---|---|---|---|
 | **S1** | Expressions and variables | new expression language (AHK v2 semantics), conversion of old expressions, golden data from v1, variable model, `global`/`static` permanent, parameter evaluation | see below, packages WI-36 to WI-43 | implemented, acceptance open (F-268) |
-| S2 | Element foundation and core set | `elements/default/`, generated include block per role, R3 measurement (parse time, memory), converter `tools/convert_element.py`, R4 (`ctx.Request`, variables in the worker), L1 smoke test per element (`Parameters`, `GenerateName`). Core set: few elements per kind, enough to try things out (e.g. set variable, condition, loops, sleep, message, start flow) | core set runs headless, smoke tests green | rough |
+| **S2** | Element foundation and core set | oracle of the expression language (native AHK v2, E35), migration markers, R3 measurement, element layout per package (E37), L1 smoke test, flow builder for tests, R4 (`ctx.Request`), dialog test seam (E38), core set of 29 elements, test corpus from the "Automatic tests" flows | see below, packages WI-44 to WI-58 | **detailed** |
 | S3 | Trigger host and a few triggers | role `triggerhost` (WI-14), `cmd.trigger.arm/disarm`, `evt.trigger.fired/error`, re-arming after engine restart, activate/deactivate flow. Triggers: Manual, Hotkey, Periodic_Timer, Start_up | trigger e2e and fault tests | rough |
 | S4 | UI foundation and manager | `ui_common/`, manager (category tree, start/stop/activate, new/rename/delete/duplicate, settings, log display, hints), **import from v1** (flows, variables), `.ahf` export/import, engine commands `cmd.flow.create/delete/meta.update`, `cmd.category.*`, `cmd.settings.*`. Closing the window only hides it (E14) | operation by hand, e2e of the commands | rough |
 | S5 | Editor I: display | `Renderer`/`Scene`, GDI+ in v2, zoom, panning the view, live states, resync | R2 measurement (300 elements, under 16 ms per frame), memory with 5 editors | rough |
 | S6 | Editor II: editing | selection, moving, connecting, copy/paste, undo/redo, patch operations, `baseRev` conflict, saving, prompt when quitting | e2e: editing during execution (E1) | rough |
 | S7 | Editor III: settings dialogs | parameter schema to GUI, `form` API for `CheckSettings`, flow settings, wizards (window info, color, mouse), help | every element of the core set editable | rough |
-| S8 | Remaining elements | in groups: dialogs/worker, file/drive/process/internet/power/sound, window/user simulation/image, unsafe elements (AHK script, DllCall, TTS, Eject, Monitor, screen, input block), remaining triggers | the v1 flows of the category "Automatic tests" run green | rough |
+| S8 | Remaining elements | first the converter `tools/convert_element.py` (E36, tested with the core set of S2 as before/after cases), then the elements in groups: dialogs/worker, file/drive/process/internet/power/sound, window/user simulation/image, unsafe elements (AHK script with v2 code only, E39; DllCall, TTS, Eject, Monitor, screen, input block), remaining triggers | the "Automatic tests" flows of the test corpus (WI-57, adapted to v2 where needed) run green | rough |
 | S9 | Phase 3 completion | overall acceptance, equality list with v1, performance budgets, documents, scope of Phase 4 | serial, parallel, stress green | rough |
 
 Not in Phase 3 (E19): debugger (do not block the execution gate, ARCHITECTURE 4.3), compilation and installer (R7), Chrome package (dropped).
@@ -43,8 +44,8 @@ Not in Phase 3 (E19): debugger (do not block the execution gate, ARCHITECTURE 4.
 | E19 | Debugger, compilation and installer are not part of Phase 3. | Plan |
 | E20 | Element scope stays small (core set) until the editor is finished; the remaining elements come in S8. | S2, S8 |
 | E21 | **File format:** v2 must be able to load old flows and variables; how v2 saves is free. v2 works in its own data folder, old data comes in via import (later possibly also an automatic backup at the switchover). Replaces the requirement "format stays" from D11/E8 for writing. | S1, S4 |
-| E22 | **No reproduction of the v1 expression evaluation.** The new expression language follows AHK v2. Old expressions are converted on load (converter in S1). Goal: a formula that works in v1 returns the same result after conversion in v2; exceptions are documented (number format, `/` returns an integer when the division is exact). Bugs of v1 that probably do not occur in any production flow (e.g. function calls that always fail in v1) are not reproduced. | S1 |
-| E23 | **Golden data** is generated with the v1 code and the v1 interpreter (`v1/` is only read and executed in the process). | S1 |
+| E22 | **No reproduction of the v1 expression evaluation.** The new expression language follows AHK v2. Old expressions are converted on load (converter in S1). Goal: a formula that works in v1 returns the same result after conversion in v2; exceptions are documented (number format, `/` returns an integer when the division is exact). Bugs of v1 that probably do not occur in any production flow (e.g. function calls that always fail in v1) are not reproduced. **Narrowed by E35:** a deviation must be known and marked; v1 is not the yardstick of new tests. | S1 |
+| E23 | ~~**Golden data** is generated with the v1 code and the v1 interpreter (`v1/` is only read and executed in the process).~~ **Superseded by E35:** the v1 golden data is frozen; nothing new is generated against v1. | S1 |
 | E24 | Numbers are output as text in the v2 representation (`0.75`), not as in v1 (`0.750000`). | S1 |
 | E25 | Type errors when calculating (`"" + 1`): catch, `f1` log, result as in v1 (empty text). | S1 |
 | E26 | The engine evaluates parameters of worker elements in advance, with an error per parameter; `ctx.EvalParams` throws at the first error that is not skipped. Consequence: an assignment in a skipped parameter still runs (MIGRATION). Inline elements evaluate on call, as in v1. | S1 |
@@ -63,9 +64,19 @@ Answers of the project owner to the open questions (2026-10-13):
 | E14 | **Closing the manager window** only closes (hides) the window; AutoHotFlow keeps running. Only the "Exit" button of the manager and the "Exit" entry of the tray menu end the application. Same as v1 (verified by reading: the v1 manager has no `GuiClose` handler, so closing hides the window; `Button_manager_Exit` in `Manager GUI.ahk:1026` and the tray entry call the exit). | S4 |
 | E34 | **Type errors per flow (F-105, decided by the project owner, 2026-10-14).** Each flow has an option `strictTypes`. Migrated flows (recognised by `formatVersion` and the `v1Text` marker of WI-39) get `false`, which is the v1 behaviour: E25 stays as it is (empty text and `f1` warning). New flows get `true`: in strict mode a type error in a comparison or a calculation becomes an element error (`exception`). Independent of the mode, the `f1` warnings of the evaluator are shown in the editor (log display, S4/S5). | WI-42 (evaluator call from `ctx.EvalParams`, mode from the flow), flow format (WI-39 keys), MIGRATION M-24 and M-25 (text for the compatibility mode), S4/S5 (display) |
 
+Decisions of the project owner while S2 was detailed (2026-10-14):
+
+| # | Decision | Affects |
+|---|---|---|
+| E35 | **v1 is no longer the yardstick.** Full v1 compatibility is not essential (niche product, v1 hardly in use because of its bugs); small manual fixes after the import are acceptable. (1) The v1 golden data of WI-36 is **frozen**: it stays as a regression test of the converter, nothing new is generated against v1. (2) The **oracle of the expression language is native AHK v2**: generated expressions run as AHK v2 code and in the evaluator and may differ only by a fixed list of deliberate deviations (E25, E29, E34). (3) The specification of an element is the underlying AHK v2 command plus the **v1 help texts** (`v1/Source_Elements/Default/help/`), not the v1 code. (4) Every place that the loader cannot convert or that behaves differently is **marked with its MIGRATION ID, with the v1 original kept**, so that a later AI-assisted import can get the description of the changes and adapt the flow. The AI connection is not part of phase 3. Supersedes E23, narrows E22. | WI-44, WI-45, WI-57, TEST-STRATEGY 7 and 8 |
+| E36 | The element converter `tools/convert_element.py` moves to the **start of S8**. The core set of S2 is ported by hand; these elements are the before/after test cases of the converter. | S2, S8 |
+| E37 | Element files are organised **per package** (`src/elements/<package>/`), the include block is generated per package. In phase 3 the only package is `Default`; the package information in flows stays. | WI-47 |
+| E38 | **Dialogs of elements go through an indirection.** The test entry point registers a provider with scripted answers, so dialog elements are tested headless, without the `gui` tier. | WI-51, WI-56 |
+| E39 | **v1 AHK code** in `Action_AutoHotkey_script` and `Trigger_AutoHotkey_Script` is not run with a v1 interpreter (E4 stays). The v2 elements run AHK v2 code; an imported v1 script is kept as text and marked (E35); porting it is a manual or AI-assisted step. Documented break (MIGRATION M-49). | S8 |
+
 ## Open questions for the project owner
 
-None at the moment (all answered on 2026-10-13, see above).
+None at the moment (E35 to E39 answered on 2026-10-14).
 
 ## Required reading for every package
 
@@ -130,3 +141,69 @@ WI-36 and WI-37 can run in parallel. WI-36 starts only after WI-34 (it changes `
 ### Progress S1
 
 - [x] WI-36  - [x] WI-37  - [x] WI-38  - [x] WI-39  - [x] WI-40  - [x] WI-41  - [x] WI-42  - [ ] WI-43 (serial and parallel run green, one stress test red: F-268)
+
+## S2: Element foundation and core set
+
+**Goal:** Real elements run in the new architecture. A core set of 29 elements is enough to run synthetic test flows and three "Automatic tests" flows of v1 headless and green. The expression language has an independent oracle (native AHK v2, E35). Every place of a loaded v1 flow that needs a fix carries its MIGRATION ID.
+
+**Not part of S2:** trigger host and `Set_Flow_Status` (S3), import UI (S4), settings dialogs and `CheckSettings` in the GUI (S7), `tools/convert_element.py` (S8, E36), `AutoHotkey_script` (S8, E39), the AI connection (after phase 3, E35).
+
+### Findings for S2 (2026-10-14)
+
+- **Verified (read):** one entry point for all roles (D12). `src/AhfBoot.ahk` includes every role and every element, so every process parses everything. "An include block per role" (ELEMENT-API 2, ARCHITECTURE R3) is therefore only possible with separate entry scripts; WI-46 measures whether that is needed at all.
+- **Verified (read):** the test elements (`Action_Test*`) are in `src/elements/skeleton/` and are included by the product entry.
+- **Verified (read):** a worker element already gets copies of the visible loop, thread and instance variables with the job (WI-40, MIGRATION M-45). R4 is what is left: global, static, hidden and built-in variables, writing variables, and `ReplaceVariables`/`EvaluateExpression` in the worker (ELEMENT-API 3, "Worker: R4 (S2)").
+- **Verified (counted):** element use in 46 flows (v1 examples plus the owner's private flows): `Condition_Expression` 128, `New_Variable` 123, `Variable_content_is` 101, `Trigger_Manual` 77, `Set_Flow_Status` 65, `Do_nothing` 56, `Execute_Flow` 44, `NumberIs` 32, `Sleep` 32, `Debug_dialog` 30, `Message_Box` 30, `Add_to_list` 29, `Tooltip` 27.
+- **Verified (counted):** of the 16 "Automatic tests" flows in `tests/data/flows/v1_examples/`, the core set below covers three completely: "variable test", "List test", "Loop test". The others need elements of S3 (`Set_Flow_Status`, triggers) or S8. The main load of the S2 tests is therefore on synthetic flows (WI-49, WI-57).
+- **Verified (listed):** the v1 help texts of the elements are in `v1/Source_Elements/Default/help/en/<Kind>/<Name>.html` (E35: specification of an element).
+
+### Core set
+
+| Group | Elements (v1 class IDs) | Package |
+|---|---|---|
+| Variables, conditions, trace points | `Action_New_variable`, `Condition_Expression`, `Condition_Variable_content_is`, `Condition_NumberIs`, `Condition_Variable_Is_Empty`, `Action_Do_nothing`, `Condition_Do_nothing`, `Action_Trace_Point`, `Action_Trace_Point_Check` | WI-52 |
+| Lists | `Action_New_List`, `Action_Add_To_List`, `Action_Get_List_Info`, `Condition_List_Contains_Element`, `Action_Delete_from_list`, `Action_Get_index_of_element_in_list`, `Action_Shuffle_list` | WI-53 |
+| Loops | `Loop_SimpleLoop`, `Loop_Condition`, `Loop_Work_through_a_list`, `Loop_Parse_A_String` | WI-54 |
+| Flow control | `Action_Execute_Flow`, `Action_Stop_Flow`, `Condition_Flow_Running` | WI-55 |
+| Dialogs and worker | `Action_Message_Box`, `Condition_Confirmation_Dialog`, `Condition_Debug_Dialog`, `Action_Tooltip` | WI-56 |
+| Already there, completed | `Action_Sleep`, `Trigger_Manual` (from `skeleton/` to `Default`, parameters as in v1) | WI-47 |
+
+The trace points are in the first group on purpose: they record the path through a flow and serve as instrumentation for every later e2e test.
+
+### Packages
+
+| ID | Title | Size | Depends on |
+|---|---|---|---|
+| [WI-44](WI-44-expression-oracle-ahk-v2.md) | Oracle of the expression language: native AHK v2; v1 golden data frozen | M | WI-38 |
+| [WI-45](WI-45-migration-markers.md) | Migration markers with MIGRATION ID and v1 original, import report | S | WI-39 |
+| [WI-46](WI-46-r3-measurement.md) | R3 measurement: parse time and memory with many elements | S | – |
+| [WI-47](WI-47-element-layout-packages.md) | Element layout per package, generated include block, test elements out of `src/` | M | WI-46, WI-42 |
+| [WI-48](WI-48-element-smoke-tests.md) | L1 smoke test of every registered element | S | WI-47 |
+| [WI-49](WI-49-flow-builder.md) | Flow builder and headless flow runner for tests | M | – |
+| [WI-50](WI-50-r4-ctx-request.md) | R4: `ctx.Request` and variable access in the worker | M | WI-42 |
+| [WI-51](WI-51-dialog-test-seam.md) | Dialog indirection and test provider | S | WI-47 |
+| [WI-52](WI-52-core-variables-conditions.md) | Core set A: variables, conditions, trace points | M | WI-48, WI-49 |
+| [WI-53](WI-53-core-lists.md) | Core set B: lists | M | WI-48, WI-49 |
+| [WI-54](WI-54-core-loops.md) | Core set C: loops | M | WI-48, WI-49, WI-52 (trace points) |
+| [WI-55](WI-55-core-flow-control.md) | Core set D: flow control and the engine commands it needs | L | WI-50, WI-52 |
+| [WI-56](WI-56-core-dialogs.md) | Core set E: dialogs and worker elements | M | WI-50, WI-51 |
+| [WI-57](WI-57-test-corpus.md) | Test corpus: three v1 test flows adapted, synthetic flows | M | WI-45, WI-49, WI-52 to WI-56 |
+| [WI-58](WI-58-acceptance-s2.md) | Acceptance S2 | S | all |
+
+**Order.** The orchestrator runs one implementation at a time (bug fixes and test runs in parallel). Proposed order: WI-44, WI-45, WI-46, WI-49 (they need no `ctx` and can start before WI-43 is finished), then WI-47, WI-48, WI-50, WI-51, then WI-52 to WI-56, then WI-57, WI-58. The column "Depends on" is binding, the order is not: if a package is blocked, any package whose dependencies are done may come first.
+
+**Files with conflict risk in S2:** `doc/ELEMENT-API-V2.md` (WI-47, WI-50, WI-51, WI-55, WI-56), `doc/PROTOCOL.md` (WI-50, WI-55), `doc/MIGRATION.md` (every element package). The generated include block is never merged by hand: it is generated again.
+
+### Acceptance S2
+
+- The smoke test (WI-48) is green for every registered element.
+- The oracle (WI-44) shows no deviation from AHK v2 that is not in the list of deliberate deviations; the fixed corpus runs in the fast tier.
+- Every core element has e2e tests through the flow builder; worker elements are tested with the dialog test seam.
+- The v1 flows "variable test", "List test" and "Loop test" and the synthetic flows of WI-57 run headless and green; every fix of a v1 flow is documented with its MIGRATION ID.
+- The values of R3 (WI-46) and R4 (WI-50) are in `doc/MEASUREMENTS.md`.
+- Serial, parallel and `-m stress` runs are green.
+
+### Progress S2
+
+- [ ] WI-44  - [ ] WI-45  - [ ] WI-46  - [ ] WI-47  - [ ] WI-48  - [ ] WI-49  - [ ] WI-50  - [ ] WI-51
+- [ ] WI-52  - [ ] WI-53  - [ ] WI-54  - [ ] WI-55  - [ ] WI-56  - [ ] WI-57  - [ ] WI-58
