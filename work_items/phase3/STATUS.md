@@ -44,7 +44,7 @@ Session 2 start: 2026-10-14, work-item mode, HEAD `f0793ce` on `v2-port`, main c
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
 | 1 | Implementer | sonnet | `wi-38` | `wip/wi-38` | WI-38 | running |
-| 2 | Bug hunter | sonnet | `hunt-5` | `wip/hunt-5` | OPEN-ITEMS mode | running |
+| 2 | Bug hunter | sonnet | (removed) | (deleted) | OPEN-ITEMS: F-17 (xfail, decision needed), F-85 new; integrated as 28f131a, 1127f66 | done, next hunter pending |
 | 3 | Verifier | sonnet | (removed) | (deleted) | baseline `f0793ce`: done, see "Last verified state" | done |
 | 4 | Resumed agent | - | - | - | - | none |
 
@@ -72,6 +72,8 @@ Highest F-nn at session 2 start: F-74 (provisional F-73*, F-74*). F-44 was never
 
 | F-28 | worker log target | closed: the worker now sets `storage` as its log target; test fails before, passes after | 58e48d2 (fix), integrated as c0ecec5 | run 20261013-181219-14824 (before), 20261013-181230-15192 (after) |
 | F-13 | unprotected check-then-act in the engine | open: one real spot (`_counts` in `Executor`) put under `Critical`, no test possible; `WorkerBridge` and `src/core/` parts left alone | ad6ac7d, integrated as b53185a | run 20261013-181310-15232 (engine tests, 52 passed) |
+
+Hunter run 4 (session 2, 2026-10-14): F-17 reproduced (chatty role during a 6 s supervisor stall: queue overflow closes the connection, then exit 4 after ORPHAN_MS); new F-85 (a burst of about 3000 log lines closes the link to storage, lines lost). Only xfail tests committed (`tests/fault/test_log_burst.py`, slow tier, integrated as 28f131a); both entries `decision needed` (options: drop and count above a soft limit, batch lines, raise the queue limit). Fast tier green (436 passed, run 20261014-061217-15880). Integrated as 1127f66. **Verifier pending** for 28f131a (tests only, slow tier) together with the next integration.
 
 Hunter run 3 (2026-10-13) worked on two entries (F-28, F-13) and stopped. Candidates not looked at: F-02, F-17, F-18, F-20, F-23, F-29, F-30, F-35, F-36, F-45, F-47, F-48*, F-49*, F-50*.
 
