@@ -24,6 +24,14 @@ class FlowDefinition {
     static FORMAT_KEY := "formatVersion"
     static FORMAT_VERSION := 2
     static MARKER_KEY := "v1Text"
+    ; The flow option "strictTypes" in flowSettings (E34, WI-42): in strict mode a type error of an evaluation (a
+    ; comparison or a calculation with a text that is not a number, doc/EXPRESSION-LANGUAGE.md section 17) ends the
+    ; element with "exception"; in compatibility mode the result is the empty text plus a warning (E25), as v1 had it.
+    ; A flow without the key is a migrated flow (a v1 file, or a file that v2 saved before the option existed; no flow
+    ; is created by v2 before S4): compatibility mode. A flow that v2 creates gets NEW_FLOW_STRICT_TYPES. Saving
+    ; writes the key always (ToFileText), so the mode of a flow never changes by itself.
+    static STRICT_KEY := "strictTypes"
+    static NEW_FLOW_STRICT_TYPES := 1
 
     ; Builds the model from the text of a flow file. Errors are AhfError with a readable
     ; message, never a crash. rev is the committed revision (see ARCHITECTURE 4.2).
@@ -47,6 +55,7 @@ class FlowDefinition {
         this.Name := FlowDefinition.TextOf(flowId, raw, "name", "")
         this.Category := FlowDefinition.TextOf(flowId, raw, "category", "")
         this.Dangling := []
+        this.StrictTypes := FlowDefinition.ReadStrictTypes(raw.Has("flowSettings") ? raw["flowSettings"] : "")
         ; Elements (ID -> true) whose expression texts are still in v1 syntax because their class is not known
         ; (FlowExprConvert).
         this.Pending := Map()
@@ -86,11 +95,15 @@ class FlowDefinition {
         }
     }
 
-    ; The text of the flow file: Raw with the format version at the root and the marker "v1Text" at the elements in
-    ; Pending. Raw itself is not changed. Json.Stringify sorts the keys; the storage role writes the line breaks.
+    ; The text of the flow file: Raw with the format version at the root, the marker "v1Text" at the elements in
+    ; Pending and flowSettings.strictTypes (StrictTypes). Raw itself is not changed. Json.Stringify sorts the keys; the storage role writes the line breaks.
     ToFileText() {
         root := this.Raw.Clone()
         root[FlowDefinition.FORMAT_KEY] := FlowDefinition.FORMAT_VERSION
+        settings := (root.Has("flowSettings") && root["flowSettings"] is Map) ? root["flowSettings"].Clone()
+            : FlowDefinition.NewIndex()
+        settings[FlowDefinition.STRICT_KEY] := Json.Bool(this.StrictTypes)
+        root["flowSettings"] := settings
         if (this.Pending.Count) {
             elements := root["allElements"].Clone()
             for id in this.Pending {
@@ -103,6 +116,14 @@ class FlowDefinition {
             root["allElements"] := elements
         }
         return Json.Stringify(root, 2)
+    }
+
+    ; 1 if flowSettings holds strictTypes true (also 1, "1" or "true", as a file edited by hand may have it), else 0.
+    static ReadStrictTypes(settings) {
+        if (!(settings is Map) || !settings.Has(FlowDefinition.STRICT_KEY))
+            return 0
+        v := settings[FlowDefinition.STRICT_KEY]
+        return (v == Json.True || (!IsObject(v) && (v = 1 || v = "1" || v = "true"))) ? 1 : 0
     }
 
     ; True if an element with this ID exists.
