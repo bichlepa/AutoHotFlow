@@ -1,0 +1,98 @@
+{
+  "name": "S1 acceptance",
+  "category": "Automatic tests",
+  "ElementIDCounter": "7",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "0.000000",
+    "Offsety": "0.000000",
+    "WorkingDir": "",
+    "zoomFactor": "1.000000"
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "ID": "element0000000001",
+      "name": "Manual - S1 acceptance",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "S1 acceptance"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "0",
+      "y": "0",
+      "DefaultTrigger": "1",
+      "enabled": "1"
+    },
+    "element0000000002": {
+      "class": "Action_TestSetVar",
+      "ID": "element0000000002",
+      "name": "Set variables",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Steps": "[{\"op\": \"set\", \"name\": \"inst_value\", \"value\": 7}, {\"op\": \"set\", \"name\": \"A_thread_value\", \"value\": \"thread text\", \"location\": \"thread\"}, {\"op\": \"set\", \"name\": \"global_acc\", \"value\": \"global text\"}, {\"op\": \"set\", \"name\": \"static_acc\", \"value\": {\"k\": [1, 2]}}]"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "175"
+    },
+    "element0000000003": {
+      "class": "Action_TestSetVar",
+      "ID": "element0000000003",
+      "name": "Probe variables",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Steps": "[{\"op\": \"probe\", \"name\": \"inst_value\"}, {\"op\": \"probe\", \"name\": \"A_thread_value\"}, {\"op\": \"probe\", \"name\": \"global_acc\"}, {\"op\": \"probe\", \"name\": \"static_acc\"}, {\"op\": \"probe\", \"name\": \"global_synthetic_text\"}, {\"op\": \"probe\", \"name\": \"static_synthetic_map\"}, {\"op\": \"probe\", \"name\": \"A_AhfVersion\"}]"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "350"
+    },
+    "element0000000004": {
+      "class": "Action_TestExprParams",
+      "ID": "element0000000004",
+      "name": "Converted expression",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expr": "x := 1.50",
+        "Tag": "s1",
+        "Condition": "x = 1.50 and \"a\".\"b\""
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "525"
+    }
+  },
+  "allConnections": {
+    "connection0000000005": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000005",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000006": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000006",
+      "to": "element0000000003",
+      "type": "Connection"
+    },
+    "connection0000000007": {
+      "ConnectionType": "normal",
+      "from": "element0000000003",
+      "ID": "connection0000000007",
+      "to": "element0000000004",
+      "type": "Connection"
+    }
+  }
+}

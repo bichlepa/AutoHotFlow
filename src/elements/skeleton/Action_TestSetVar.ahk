@@ -8,10 +8,12 @@
 ;   Steps  JSON text of an array of steps, run in this order. A step is an object with
 ;          op     "set" (store the JSON value as it is: text, number or object), "delete", or "probe"
 ;          name   the variable; its name decides the scope (global_, static_, or an instance variable)
+;          location  optional, only for "set": "thread" or "loop" for a name that starts with A_ (WI-43)
 ;          value  the value of "set"
 ;          "probe" copies the text form of the variable to the global variable global_probe_<name> and its type
-;          ("String", "Integer", "Float", "Map", or "<missing>") to global_probetype_<name>; with this the tests read
-;          what the engine loaded from the files, through the files the probe variables are written to.
+;          ("String", "Integer", "Float", "Map", or "<missing>") to global_probetype_<name> and its location
+;          ("instance", "thread", "global", "static", "builtin", or "<missing>") to global_probeloc_<name>; with this
+;          the tests read what the engine loaded from the files, through the files the probe variables are written to.
 class Action_TestSetVar extends AhfElement {
     static Mode := "inline"
     static Level := "Programmer"
@@ -27,7 +29,7 @@ class Action_TestSetVar extends AhfElement {
             name := step.Get("name", "")
             switch op {
                 case "set":
-                    result := ctx.SetVar(name, step.Get("value", ""))
+                    result := ctx.SetVar(name, step.Get("value", ""), step.Get("location", ""))
                 case "delete":
                     result := ctx.DeleteVar(name)
                 case "probe":
@@ -63,9 +65,11 @@ class Action_TestSetVar extends AhfElement {
     static Probe(ctx, name) {
         if (!ctx.VarLocation(name)) {
             ctx.SetVar("global_probe_" name, "<missing>")
+            ctx.SetVar("global_probeloc_" name, "<missing>")
             return ctx.SetVar("global_probetype_" name, "<missing>")
         }
         value := ctx.GetVar(name)
+        ctx.SetVar("global_probeloc_" name, ctx.VarLocation(name))
         ctx.SetVar("global_probe_" name, (value is Map) ? Json.Stringify(Action_TestSetVar.Plain(value)) : String(value))
         return ctx.SetVar("global_probetype_" name, (value is Map) ? "Map" : Type(value))
     }
