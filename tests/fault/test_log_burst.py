@@ -48,7 +48,7 @@ def test_a_burst_of_log_lines_does_not_cost_the_storage_link_or_the_lines(chains
 
 
 @pytest.mark.xfail(strict=True, reason="F-17: a chatty role gives up during a long stand-still of the supervisor")
-def test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor(chains):
+def test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor(chains, datadir):
     chain = chains("storage,echo:a", ["--test-roles"])
     pids = chain.wait_ready(["storage", "echo:a"])
     request_ok(chain.obs, "echo:a", "cmd.test.setlogtarget", {"to": "storage"})
@@ -62,7 +62,14 @@ def test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor(chains):
 
     thread = threading.Thread(target=ask)
     thread.start()
-    time.sleep(0.2)                 # the role is inside its loop
+    # Precondition: the role is inside its loop. A fixed sleep was not enough (F-125): on a loaded machine the request
+    # may reach the role after the suspension began, the role then stays quiet and the test passes by accident.
+    # The first lines in the log file prove that the loop is running; 100000 lines last far longer than the suspension.
+    deadline = time.monotonic() + scaled(20)
+    while "~echo~ entry " not in log_text(datadir):
+        if time.monotonic() > deadline:     # not an assert: xfail would swallow it and hide the broken precondition
+            pytest.skip("the role did not start logging, the precondition of the test is not met")
+        time.sleep(0.02)
     sup = psutil.Process(chain.sup.ahk_pid())
     sup.suspend()
     try:
