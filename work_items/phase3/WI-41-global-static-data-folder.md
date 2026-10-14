@@ -33,3 +33,12 @@ README of this phase (E21, E28, E33), ARCHITECTURE 6.1 (staggered loading, waiti
 ## Not part of this
 
 Import of the v1 data via the UI (S4).
+
+## Result
+
+- **Code:** `src/engine/vars/VarLoader.ahk` (list and get through storage, 2 requests at a time, continues after an abort), `VarWriter.ahk` (delayed write of the latest state per variable, retry, flush at shutdown), `EngineVars.Touch`/`OnChange` and `VarAccess._Touch` (every change of a global or static variable is reported), `Engine` (loading between the flow files and `evt.engine.ready`, `OnShutdown`, options `--var-write-delay-ms` and `--var-write-timeout-ms`, passed on by the supervisor). Test element `Action_TestSetVar` (set, delete, probe).
+- **Decisions taken here:** the existing messages `cmd.storage.var.get/set/delete/list` are used (no new type; the work item named them read/write). Texts from the files stay texts, numbers are written as their text (M-39). v2 writes without BOM. No wait for acknowledgements at shutdown: the frames precede `sys.bye` and storage ends last; the rest of `deadlineMs` is the limit of each request. A flow that starts before `evt.engine.ready` can see missing variables (the manager waits for ready; not changed). Statics of a flow that is not loaded are not read.
+- **Tests:** `tests/ahk/engine_var_files.test.ahk` (13 cases, stand-in engine), `tests/fault/test_var_persistence.py` (round trip of the v1 files over two sessions, delayed write and kill of the engine, write at shutdown and loss after a kill, frozen storage). `tests/integration/test_engine.py` stand-in storage answers `var.list`.
+- **Data folder (task 1):** checked by reading: the variable files go below the resolved data folder (`VarFiles` and `StoragePaths` take `dataDir` of storage, which gets `--data`). No change to the default folder; existing `Flows/`, `Log/` and `Reports/` in `%APPDATA%\AutoHotFlow` were not touched.
+- **Not checked:** a real data folder of the project owner (private data), the start of the product by hand, a very large number of variables (hundreds) under load, the GUI.
+
