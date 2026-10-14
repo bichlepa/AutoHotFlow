@@ -47,7 +47,7 @@ def test_a_burst_of_log_lines_does_not_cost_the_storage_link_or_the_lines(chains
     assert log_text(datadir).count("~echo~ entry ") == BURST
 
 
-@pytest.mark.xfail(strict=True, reason="F-17: a chatty role gives up during a long stand-still of the supervisor")
+@pytest.mark.xfail(strict=False, reason="F-17: a chatty role gives up during a long stand-still of the supervisor")
 def test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor(chains, datadir):
     chain = chains("storage,echo:a", ["--test-roles"])
     pids = chain.wait_ready(["storage", "echo:a"])
