@@ -247,10 +247,9 @@ Editor, real manager, real elements, trigger host (WI-14, decision E6: built ear
 
 Work that is open but is not a finding with an entry:
 
-1. **ARCHITECTURE 6.3, F-29.** Write down the orphan rule for a child that never connected: it keeps the 10 s budget of the peer. The project owner accepted F-29 on 2026-10-13 (option (b)); the description is still missing.
-2. **Syntax list of the expression language (WI-37).** The owner confirms that `%` as modulo, `^=`, `%=`, `<>` and `"a""b"` stay unsupported (section 15 of `doc/EXPRESSION-LANGUAGE.md`). WI-39 depends on the answer.
-3. **`evalparam` in the golden data.** Decision for WI-42: a copy of the function in the harness, or stubs for all callees (see `tests/golden/FINDINGS.md`, "Not covered").
-4. **Three `uncaught/timeout` cases** in the groups `assignment` and `script` of the golden check (reported by the verifier, not investigated). Check whether they are the known hangs of the v1 parser.
+1. **Syntax list of the expression language (WI-37).** The owner confirms that `%` as modulo, `^=`, `%=`, `<>` and `"a""b"` stay unsupported (section 15 of `doc/EXPRESSION-LANGUAGE.md`). WI-39 depends on the answer.
+2. **`evalparam` in the golden data.** Decision for WI-42: a copy of the function in the harness, or stubs for all callees (see `tests/golden/FINDINGS.md`, "Not covered").
+3. **Three `uncaught/timeout` cases** in the groups `assignment` and `script` of the golden check (reported by the verifier, not investigated). Check whether they are the known hangs of the v1 parser.
 
 ## Open decisions
 
