@@ -60,11 +60,18 @@ class VarWriter {
         SetTimer(this._runFn, 0)
         timeoutMs := Max(500, Integer(deadlineMs))
         sent := 0
+        lost := 0
         for key, entry in this._dirty {
             if (this._Send(key, entry, timeoutMs, true))
                 sent += 1
+            else
+                lost += 1
         }
         this._dirty := Map()
+        ; The peer refuses requests beyond its limit of waiting ones and the process ends at once, so the rest is lost
+        ; (F-279). One summary line instead of one error per variable.
+        if (lost > 0)
+            this._engine._Log("a0", "engine", "shutdown: " lost " of " (sent + lost) " variables not written (storage refused the requests)")
         return sent
     }
 
@@ -134,7 +141,10 @@ class VarWriter {
             this._inflight += 1
             return true
         } catch as e {
-            ; Not sent (too many unanswered requests, a payload that cannot be serialized).
+            ; Not sent (too many unanswered requests, a payload that cannot be serialized). At shutdown FlushAll
+            ; counts these and reports one summary line.
+            if (closing)
+                return false
             this._Failed(key, entry, msgType, Type(e) ": " e.Message, !closing)
             return false
         }

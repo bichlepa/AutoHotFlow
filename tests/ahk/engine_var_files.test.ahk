@@ -17,11 +17,12 @@ class FakePeer {
     __New() {
         this.sent := []            ; Map(type, payload, cb, timeoutMs)
         this.refuse := ""          ; when set, Request throws an AhfError with this code
+        this.limit := 0            ; when > 0, Request refuses with "busy" once this many requests wait
     }
 
     Request(to, type, payload, cb, timeoutMs := 5000) {
-        if (this.refuse != "")
-            throw AhfError("refused", this.refuse)
+        if (this.refuse != "" || (this.limit > 0 && this.sent.Length >= this.limit))
+            throw AhfError("refused", this.refuse != "" ? this.refuse : "busy")
         this.sent.Push(Map("to", to, "type", type, "payload", payload, "cb", cb, "timeoutMs", timeoutMs))
     }
 
@@ -186,6 +187,21 @@ CaseFlushAllSendsEverythingWithTheDeadlineAndStopsTheWriter() {
     Assert.Equal(w.Pending, 0)
 }
 
+CaseFlushAllBeyondThePeerLimitReportsOneSummaryLine() {
+    eng := FakeEngine(), store := EngineVars()
+    w := VarWriter(eng, store, 60000, 4000)
+    eng.peer.limit := 10
+    Loop 25 {
+        store.Global["v" A_Index] := "x"
+        w.Touch("global", "", "v" A_Index)
+    }
+    Assert.Equal(w.FlushAll(3000), 10)
+    Assert.Equal(eng.peer.sent.Length, 10)
+    Assert.Equal(eng.errors.Length, 0)               ; no error per variable
+    Assert.Equal(eng.logs.Length, 1)
+    Assert.True(InStr(eng.logs[1], "15 of 25 variables not written"))
+}
+
 CaseVarAccessMarksOnlyGlobalAndStaticChanges() {
     store := EngineVars()
     seen := []
@@ -344,6 +360,7 @@ TestRun.Case("a silent storage is reported once and the write is retried", CaseA
 TestRun.Case("a refused name is reported and not retried", CaseARefusedNameIsReportedAndNotRetried)
 TestRun.Case("a full send queue marks the variable again", CaseAFullSendQueueMarksTheVariableAgain)
 TestRun.Case("FlushAll sends everything with the deadline and stops the writer", CaseFlushAllSendsEverythingWithTheDeadlineAndStopsTheWriter)
+TestRun.Case("FlushAll beyond the limit of the peer reports one summary line", CaseFlushAllBeyondThePeerLimitReportsOneSummaryLine)
 TestRun.Case("VarAccess marks only global and static changes", CaseVarAccessMarksOnlyGlobalAndStaticChanges)
 TestRun.Case("a refused member assignment creates nothing", CaseARefusedMemberAssignmentCreatesNothing)
 TestRun.Case("a shutdown flushes the variables although stopping the instances fails", CaseShutdownFlushesTheVariablesEvenWhenStoppingTheInstancesFails)
