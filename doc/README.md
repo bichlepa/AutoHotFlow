@@ -4,6 +4,7 @@ Lasting documents. The working papers of the port up to phase 2b and the fix blo
 
 | Document | Content |
 |---|---|
+| [REQUIREMENTS.md](REQUIREMENTS.md) | Features and quality requirements: what v1 can do, what v2 must do, what comes later, with the status of each; overview in [REQUIREMENTS-INDEX.md](REQUIREMENTS-INDEX.md) (generated) |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Processes, decisions, data ownership, state machines, start/stop, error handling, file compatibility, folder layout |
 | [PROTOCOL.md](PROTOCOL.md) | IPC: transport, envelope, message catalogue |
 | [ELEMENT-API-V2.md](ELEMENT-API-V2.md) | Class contract of elements, context, examples, implementation rules |

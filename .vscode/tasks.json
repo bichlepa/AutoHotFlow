@@ -392,6 +392,16 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: requirements index (req_index.py)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/req_index.py"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: expression parser benchmark (parse cache; result in %TEMP%/ahf_expr_bench.txt)",
             "type": "shell",
             "command": "python",
