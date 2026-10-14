@@ -4,7 +4,7 @@ This document lists the important features and quality requirements of AutoHotFl
 
 **Overview:** [REQUIREMENTS-INDEX.md](REQUIREMENTS-INDEX.md) has one table row per requirement with its status and a link to its section here. Read the index for an overview; read a section here for the details.
 
-A requirement says **what** AutoHotFlow does, not how. The how is in the other documents (`ARCHITECTURE.md`, `PROTOCOL.md`, `ELEMENT-API-V2.md`, the decisions in `DECISIONS.md`); a requirement links to them instead of repeating them. Other documents refer to a requirement by its ID (`REQ-EXE-010`), not by a link to its heading, because the ID is stable and the heading anchor changes with the title.
+A requirement says **what** AutoHotFlow does, not how: what the user sees or experiences. Internal parts (engine, worker, storage, processes) appear only where a quality requirement is about them, or as a reference for the details. The how is in the other documents (`ARCHITECTURE.md`, `PROTOCOL.md`, `ELEMENT-API-V2.md`, the decisions in `DECISIONS.md`); a requirement links to them instead of repeating them. Other documents refer to a requirement by its ID (`REQ-EXE-010`), not by a link to its heading, because the ID is stable and the heading anchor changes with the title.
 
 **Sources of the first inventory (2026-10-14).** v1: the element manifest of the Default package (`v1/Source_Elements/Default/manifest.json`: 114 actions, 17 conditions, 5 loops, 16 triggers), the user interface texts of manager, editor, settings and tray, the settings defaults (`v1/Source_Common/Settings/Settings.ahk`), the changelog and the help folder; read, not run. v2: the code, the tests and the documents on `v2-port` at commit `9df8693` (WI-45 verified). A step `S1` to `S9` is a step of the phase 3 plan (`work_items/phase3/README.md`).
 
@@ -33,6 +33,7 @@ A flow decides what happens when it is triggered while an instance is still runn
 | `Scope` | `port`, `later` | `port`: needed so that v2 replaces v1 (phases 3 and 4). `later`: after the port. |
 | `Plan` | free text | Where the work is planned: a step (`S4`), `phase 4`, a work item (`WI-52`), or `-` when nothing is planned. |
 | `Evidence` | free text, optional | Tests, measurements (`MEASUREMENTS.md` M-nn), manual checks. Mandatory for `done`. A path in backticks, relative to the repository root, must exist: a file, a folder (`tests/fault/`), a glob (`tests/ahk/expr_*.test.ahk`) or a Python test (`tests/x.py::test_name`). |
+| `Doubt` | free text, optional | The requirement is in doubt: the project owner may still change or drop it, also when it is implemented. The text says what is in doubt. The index marks it "(in doubt)" and counts it. |
 
 After the first word, a field may carry a short note in parentheses: `partial (wait broken, M-11)`. The index shows only the first word.
 
@@ -55,7 +56,7 @@ Rules:
 - **Plan:** -
 - **Evidence:** `tests/ahk/engine_flow.test.ahk`, `tests/ahk/engine_scheduler.test.ahk`, `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`
 
-A flow consists of elements of four kinds (trigger, action, condition, loop) and connections between them. A trigger starts the flow; actions do something; conditions decide between two ways; loops repeat a part of the flow. Each element has a class (what it does), parameters and a name. The file format is in `ARCHITECTURE.md` section 7.
+A flow consists of elements of four kinds (trigger, action, condition, loop) and connections between them. A trigger starts the flow; actions do something; conditions decide between two ways; loops repeat a part of the flow. Each element has a class (what it does), parameters and a name. The file format is in `ARCHITECTURE.md` section 7. The editor checks a flow for mistakes (REQ-EDT-160).
 
 ### REQ-EXE-020 Connection types and parallel branches
 
@@ -66,12 +67,12 @@ A flow consists of elements of four kinds (trigger, action, condition, loop) and
 - **Plan:** -
 - **Evidence:** `tests/ahk/engine_scheduler.test.ahk` (`ResolveNext`, `Advance` cases)
 
-A connection has a type: `normal` (after an action), `yes` and `no` (after a condition), `exception` (after an element that failed). When several connections match the result of an element, the flow continues on all of them in parallel (the thread is cloned). An `exception` without a matching connection ends the thread and is reported as unhandled. Connections whose end is missing are ignored and logged (MIGRATION M-13).
+A connection has a type: `normal` (after an action), `yes` and `no` (after a condition), `exception` (after an element that failed, REQ-EXE-090). When several connections match the result of an element, the flow continues on all of them at the same time, in parallel branches. Connections whose end is missing are ignored and logged (MIGRATION M-13). Extended by REQ-EXE-150 (any number of named outputs).
 
 ### REQ-EXE-030 Loops with head, tail and break
 
 - **v1:** yes
-- **v2:** partial (the loop stack of the engine works; the loop elements and the break entry are missing)
+- **v2:** partial (the loop mechanics work; the loop elements and the break entry are missing)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S2 (WI-54)
@@ -79,7 +80,7 @@ A connection has a type: `normal` (after an action), `yes` and `no` (after a con
 
 A loop element has connection points: the head starts an iteration, a connection back to the tail starts the next one, a connection to the break point ends the loop. The loop variables (`A_Index` and the variables of the loop element) are visible inside the loop and restored when it is left, also with nested loops and when it is left through `exception` (MIGRATION M-19).
 
-### REQ-EXE-040 Instances and threads
+### REQ-EXE-040 Instances and parallel branches
 
 - **v1:** yes
 - **v2:** done
@@ -88,7 +89,7 @@ A loop element has connection points: the head starts an iteration, a connection
 - **Plan:** -
 - **Evidence:** `tests/ahk/engine_states.test.ahk`
 
-Each start of a flow creates an instance with its own instance variables. An instance has one or more threads (one per parallel branch); it ends when its last thread ends. Instances and threads have state machines (`ARCHITECTURE.md` section 5).
+Each start of a flow creates an **instance**: one run of the flow, with its own instance variables. Several instances of the same flow may run at the same time (REQ-EXE-050). Inside an instance, every parallel branch (REQ-EXE-020) is a **thread** with its own thread and loop variables; all threads of an instance share its instance variables (REQ-VAR-040). An instance ends when its last thread has ended or when it is stopped. Manager and editor show the running instances (REQ-EXE-140). The states of instances and threads and their transitions: `ARCHITECTURE.md` section 5.
 
 ### REQ-EXE-050 Execution policy per flow
 
@@ -109,29 +110,29 @@ A flow decides what happens when it is triggered while an instance of it is stil
 | `stop` | stop the running instances, then start a new one |
 | `default` | use the global setting (v1 default: `parallel`) |
 
-Missing in v2: the global setting itself (settings come in S4). Until then `default` resolves to `parallel` (`src/engine/core/ExecutionPolicy.ahk`).
+Missing in v2: the global setting itself (settings come in S4). Until then `default` means `parallel`.
 
-### REQ-EXE-060 Start and stop a flow
+### REQ-EXE-060 Start and stop a flow by hand
 
 - **v1:** yes
-- **v2:** partial (the engine commands work; the buttons in manager, editor and tray are missing)
+- **v2:** partial (the commands work; the buttons in manager and editor are missing)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S4 (manager), S6 (editor)
 - **Evidence:** `tests/integration/test_engine.py` (`test_start_*`, `test_stop_*`, `test_toggle_starts_and_stops_a_flow`)
 
-The user starts a flow by hand (through its default manual trigger or a chosen one) and stops it. Stop ends all running and waiting instances of the flow. "Toggle" starts a flow that is idle and stops one that runs.
+The user starts a flow from the manager or the editor, through its default manual trigger or a chosen one, and stops it there. Stopping ends all running and waiting instances of the flow. Starting and stopping from inside a flow is REQ-EXE-120 and REQ-ELM-260; starting by an event is TRG.
 
 ### REQ-EXE-070 Enable and disable a flow
 
 - **v1:** yes
-- **v2:** partial (the flag and its events work; triggers are not armed yet; that the state survives a restart of AutoHotFlow is not checked)
+- **v2:** partial (the state can be switched and is reported; triggers do not react yet; that the state survives a restart of AutoHotFlow is not checked)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S3
 - **Evidence:** `tests/integration/test_engine.py::test_enable_and_disable_set_the_flag_and_report_it`
 
-Enabling a flow arms all its enabled triggers; disabling disarms them. Running instances are not affected. Flows that were enabled when AutoHotFlow ended are enabled again at the next start (v1 changelog 0.02.14 fixed a bug in exactly this).
+Enabling a flow activates all its enabled triggers; disabling deactivates them. Running instances are not affected. Flows that were enabled when AutoHotFlow ended are enabled again at the next start.
 
 ### REQ-EXE-080 Change a flow while it runs
 
@@ -142,31 +143,32 @@ Enabling a flow arms all its enabled triggers; disabling disarms them. Running i
 - **Plan:** -
 - **Evidence:** `tests/ahk/engine_revision.test.ahk`
 
-A change in the editor applies to running instances at their next step: each step uses the newest committed revision of the flow (decision E1, `ARCHITECTURE.md` section 4.2). Deleted elements and changed classes are handled as in MIGRATION M-17 and M-18.
+A change in the editor applies to running instances at their next step: the next element and the next connection are taken from the changed flow (decision E1). An element that runs while it is deleted runs to its end; a waiting branch whose element was deleted ends with `exception` (MIGRATION M-17, M-18).
 
-### REQ-EXE-090 A failing element ends with `exception` and never stops the engine
+### REQ-EXE-090 A failing element ends with `exception`
 
 - **v1:** partial (six elements never ended on an error, MIGRATION M-04)
 - **v2:** done
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/integration/test_engine.py::test_element_exception_is_reported_and_the_engine_keeps_running`, `tests/ahk/element_runner.test.ahk`, `tests/integration/test_worker.py::test_throwing_element_is_reported_as_exception_and_the_worker_keeps_running`
+- **Evidence:** `tests/integration/test_engine.py::test_element_exception_is_reported_and_the_engine_keeps_running`, `tests/ahk/element_runner.test.ahk`, `tests/ahk/engine_scheduler.test.ahk` (`Advance: exception` cases)
+- **Doubt:** Should an `exception` without a connection stop the whole instance? Today, as in v1, only the branch ends and the other parallel branches of the instance go on.
 
-Every call into element code is guarded. An error becomes the result `exception` with a message; the flow continues on the `exception` connection if there is one. Other flows and the engine keep running.
+An element that fails ends with the result `exception` and writes the reason to the log. If it has an `exception` connection, the flow continues there. Otherwise the branch ends and the log notes an unhandled exception. Other flows and other instances of the same flow are not affected.
 
-### REQ-EXE-100 Blocking elements do not stall other flows
+### REQ-EXE-100 Waiting elements do not delay other flows
 
-- **v1:** partial (read: only elements that call `x_ExecuteInNewAHKThread` run in their own thread)
+- **v1:** partial (read: only elements that call `x_ExecuteInNewAHKThread` run separately)
 - **v2:** done
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
 - **Evidence:** `tests/integration/test_worker.py`, `tests/fault/test_worker_lifecycle.py`, `tests/integration/test_worker_pool.py`
 
-Elements that block (dialogs, `RunWait`, downloads, COM, `DllCall`) run in worker processes, not in the engine. Up to four of them run at the same time by default; further jobs wait for a free worker. A worker that is busy for a long time is not taken for hung. An inline element whose call takes longer than 250 ms is reported (watchdog), so that a wrong classification is noticed. Details: `ARCHITECTURE.md` sections 2.3 and 6.4.
+An element that waits (a dialog, a program started with "wait", a download) does not delay other flows or other branches. By default up to four such elements wait at the same time; further ones wait for their turn. An element that blocks although it is declared as quick is reported in the log, so that the mistake is noticed. How: worker processes, `ARCHITECTURE.md` sections 2.3 and 6.4.
 
-### REQ-EXE-110 Stopping ends running elements quickly
+### REQ-EXE-110 Stopping ends waiting elements quickly
 
 - **v1:** partial (instances stop without a deadline; how a blocked call ends was not checked, MIGRATION M-12, M-20)
 - **v2:** done
@@ -175,7 +177,7 @@ Elements that block (dialogs, `RunWait`, downloads, COM, `DllCall`) run in worke
 - **Plan:** -
 - **Evidence:** `tests/integration/test_engine.py::test_stop_during_sleep_ends_the_instance_within_500_ms`, `tests/fault/test_worker_lifecycle.py::test_cancel_of_a_frozen_worker_ends_the_instance_at_once_and_the_process_is_killed_and_replaced`
 
-A stopped instance ends at once. An inline element is stopped through its `Stop` method; a worker element is cancelled, and a worker that does not confirm within 2 s is ended hard and replaced. An element class may set a job deadline (`JobTimeoutMs`).
+A stopped instance ends at once, also while one of its elements waits for a dialog or a download. An element that does not react is ended forcibly after 2 s. An element class may limit how long it may run.
 
 ### REQ-EXE-120 Run another flow from a flow
 
@@ -190,23 +192,35 @@ The action `Execute_Flow` starts a flow (this one or another) through its defaul
 ### REQ-EXE-130 Working directory of a flow
 
 - **v1:** yes
-- **v2:** partial (the rule for `A_WorkingDir` and the file parameters works with a fixed default; the settings are missing)
+- **v2:** partial (`A_WorkingDir` and the file parameters use a fixed default; the settings are missing)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S4 (global), S7 (flow settings)
 
 Relative paths in file and folder parameters refer to the working directory. Each flow uses the global working directory (v1 default `A_MyDocuments "\AutoHotFlow"`) or its own (flow setting). Decision E28.
 
-### REQ-EXE-140 Live state of elements and instances
+### REQ-EXE-140 Every element and flow shows its state
 
 - **v1:** yes
-- **v2:** done (events of the engine; the display is EDT and MGR)
+- **v2:** partial (the states are reported; manager and editor do not show them yet)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** -
-- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/e2e/test_ui_stub.py::test_headless_stub_logs_every_skeleton_event_in_order`
+- **Plan:** S4 (manager), S5 (editor)
+- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/e2e/test_ui_stub.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_stub`
 
-The engine reports the state of each element (idle, running, finished, exception, number of runs), of each instance (queued, started, ended) and of each flow (enabled, executing). A user interface that connects late or after a restart of the engine fetches the full state and then follows the events.
+Each element has a state (idle, running, finished, exception) and counts its runs. Each flow shows whether it is enabled and whether it runs, and its running and queued instances. Manager and editor show these states live, also a window that was opened later or that reconnected after a fault.
+
+### REQ-EXE-150 Elements with any number of named outputs
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+An element can have any number of outputs, for example a switch with one output per case. The element and its configuration decide which outputs exist; the result of a run names the output (or several) to continue on. `yes`/`no` of a condition are the special case with two fixed outputs; `exception` stays a separate output of every element. Extends REQ-EXE-020.
+
+Open points: a connection whose output disappears after a change of the configuration (a warning of the flow check, REQ-EDT-160, or refused by the editor); how the editor draws a variable number of connection points; the file format of the connection type (today a fixed set).
 
 ## Expressions and variables (VAR)
 
@@ -219,7 +233,11 @@ The engine reports the state of each element (idle, running, finished, exception
 - **Plan:** -
 - **Evidence:** `tests/oracle/test_expr_oracle.py`, `tests/ahk/expr_*.test.ahk`
 
-Expressions follow AutoHotkey v2 (E22, E35): operators and precedence, assignments, paths into objects (`a.b[1]`), dynamic names (`%name%`), the functions `round`, `object`, `print` and `mod`. A fixed list of deliberate deviations from native AutoHotkey v2 is checked by an oracle (E25, E29, E34; `EXPRESSION-LANGUAGE.md` section 19). Syntax: `EXPRESSION-LANGUAGE.md`.
+Expressions follow AutoHotkey v2 (E22, E35): operators and precedence, assignments, paths into objects (`a.b[1]`), dynamic names (`%name%`), the functions `round`, `object`, `print` and `mod`. Syntax: `EXPRESSION-LANGUAGE.md`.
+
+Where AutoHotFlow deliberately differs from AutoHotkey v2, the difference is on a short fixed list (E25, E29, E34). A test checks this automatically: it generates many expressions, runs each one as native AutoHotkey v2 code and in AutoHotFlow, and accepts a different result only when the list explains it. Such an independent reference for the expected results is called an "oracle" (`EXPRESSION-LANGUAGE.md` section 19).
+
+Expressions are checked while the user edits them: REQ-EDT-200.
 
 ### REQ-VAR-020 Script form for several statements
 
@@ -240,6 +258,7 @@ One statement per line: assignments, function calls, `if`/`else` and blocks (`EX
 - **Scope:** port
 - **Plan:** -
 - **Evidence:** `tests/golden/test_golden_v2.py::test_variable_access_and_substitution_are_compared`
+- **Doubt:** Keep `%var%`, allow a whole expression between the percent signs (`%a + 1%`), or choose a better syntax? The feature is isolated; it can be decided at the end of the port, although it is implemented now.
 
 A text parameter replaces `%name%` by the value of the variable. An object can be written as JSON text where the element allows it (MIGRATION M-42).
 
@@ -252,7 +271,18 @@ A text parameter replaces `%name%` by the value of the variable. An object can b
 - **Plan:** -
 - **Evidence:** `tests/ahk/vars_model.test.ahk`, `tests/ahk/engine_vars.test.ahk`
 
-Scopes: loop, thread, instance, static (per flow, permanent), global (permanent), built-in (read only). The name decides the scope (`A_`, `static_`, `global_`, other). Elements can also keep hidden variables that the user cannot reach. Details: `EXPRESSION-LANGUAGE.md` section 18.
+The name of a variable decides where it lives:
+
+| Scope | Name | Visible in | Lives | Written by |
+|---|---|---|---|---|
+| loop | `A_...` (`A_Index`, ...) | the body of the loop, in the branch that runs it | while the loop runs; leaving the loop restores the values from before | the loop element |
+| thread | `A_...` (`A_TriggerTime`, ...) | one branch of an instance; a new branch starts with a copy | as long as the branch | the trigger and elements |
+| instance | no prefix (`count`) | all branches of one instance | as long as the instance, one run of the flow | the user (for example with `New_Variable`) and elements |
+| static | `static_...` | all instances of one flow | permanently (REQ-VAR-050) | the user and elements |
+| global | `global_...` | all flows | permanently (REQ-VAR-050) | the user and elements |
+| built-in | `A_...` | everywhere, read only | - | AutoHotFlow (REQ-VAR-070) |
+
+Loop and thread variables are alike: both belong to a branch; loop variables also belong to the level of the loop. Every `A_` name is a loop, thread or built-in variable; it is looked up in this order. Therefore the user cannot create a variable whose name starts with `A_`: an element refuses to write such a name, an assignment in an expression is an error (MIGRATION M-38), and the element settings warn about it (S7). Elements can also keep hidden variables that the user cannot reach. Details: `EXPRESSION-LANGUAGE.md` section 18.
 
 ### REQ-VAR-050 Permanent global and static variables
 
@@ -263,7 +293,7 @@ Scopes: loop, thread, instance, static (per flow, permanent), global (permanent)
 - **Plan:** -
 - **Evidence:** `tests/fault/test_var_persistence.py`, `tests/fault/test_s1_acceptance.py`
 
-Global and static variables survive a restart of AutoHotFlow. They are written in the background shortly after a change and at the latest at shutdown; a frozen storage does not block the engine. A change younger than the write delay is lost when the engine is killed (MIGRATION M-06).
+Global and static variables keep their values when AutoHotFlow ends. A change is saved shortly after it was made and at the latest when AutoHotFlow ends; when AutoHotFlow is killed, a change of the last moments can be lost (MIGRATION M-06). Hints for the user: REQ-VAR-130; protection against concurrent changes: REQ-VAR-140.
 
 ### REQ-VAR-060 Objects and lists in variables
 
@@ -285,12 +315,12 @@ A variable holds a text, a number or an object. A list is an object with the key
 - **Plan:** -
 - **Evidence:** `tests/ahk/vars_model.test.ahk`
 
-55 variables of AutoHotkey (time, folders, system) and 13 of AutoHotFlow (`A_FlowName`, `A_FlowID`, `A_ElementName`, `A_ElementID`, `A_WorkingDir`, `A_AhfVersion`, `A_NowString`, ...). List and deviations: `EXPRESSION-LANGUAGE.md` section 18.4.
+Ready-made values that a flow needs often, without an extra element: the current date and time and its parts (for file names and time conditions), the standard folders (desktop, documents, temp, ...), facts about the computer and the user, and facts about the running flow (`A_FlowName`, `A_ElementName`, `A_WorkingDir`, `A_AhfVersion`, ...) for messages and logs. 55 variables of AutoHotkey and 13 of AutoHotFlow; list and deviations: `EXPRESSION-LANGUAGE.md` section 18.4.
 
 ### REQ-VAR-080 Values of the trigger reach the instance
 
 - **v1:** yes
-- **v2:** partial (`A_TriggerTime` and `A_TriggerID` are set; the values of the real triggers need the trigger host)
+- **v2:** partial (`A_TriggerTime` and `A_TriggerID` are set; the values of the real triggers are missing)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S3
@@ -307,7 +337,7 @@ A new instance gets the thread variables `A_TriggerTime` and `A_TriggerID`, and 
 - **Plan:** -
 - **Evidence:** `tests/ahk/element_evalparams.test.ahk`, `tests/fault/test_param_eval.py`
 
-The engine evaluates each parameter by its content type: `String` (with `%var%`), `RawString`, `Expression`, `number`, `positiveNumber`, `integer`, `positiveInteger`, `positiveIntegerOrZero`, `VariableName`. File and folder parameters become full paths. The user can choose the content type of a field where the element allows it. Inline and worker elements get the same results. Details: `ELEMENT-API-V2.md` section 3.1, MIGRATION M-48.
+Each parameter is evaluated by its content type: `String` (with `%var%`), `RawString`, `Expression`, `number`, `positiveNumber`, `integer`, `positiveInteger`, `positiveIntegerOrZero`, `VariableName`. File and folder parameters become full paths. The user can choose the content type of a field where the element allows it. A parameter gives the same result whether its element waits (REQ-EXE-100) or not. Details: `ELEMENT-API-V2.md` section 3.1, MIGRATION M-48.
 
 ### REQ-VAR-100 Type errors: compatible or strict per flow
 
@@ -320,15 +350,15 @@ The engine evaluates each parameter by its content type: `String` (with `%var%`)
 
 Each flow has the option `strictTypes` (E34). Migrated flows use the compatibility mode (a type error gives the empty text and a warning, as in v1); new flows use the strict mode (a type error ends the element with `exception`). In both modes the warnings are shown to the user in the editor.
 
-### REQ-VAR-110 Worker elements read and write all variables
+### REQ-VAR-110 Waiting elements can use all variables
 
 - **v1:** yes
-- **v2:** partial (a worker gets copies of the loop, thread and instance variables and returns exports; global, static, hidden and built-in variables and calls back to the engine are missing)
+- **v2:** partial (they get the loop, thread and instance variables and can set variables; global, static, hidden and built-in variables and expressions are missing)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S2 (WI-50)
 
-A worker element can read every visible variable, set variables and evaluate expressions, as an inline element can (`ctx.Request`, risk R4 in `ARCHITECTURE.md` section 10). MIGRATION M-45.
+An element that waits (REQ-EXE-100) can read every visible variable, set variables and evaluate expressions, like every other element. Today it works on copies that are written back when it ends (MIGRATION M-45). How: `ctx.Request`, risk R4 in `ARCHITECTURE.md` section 10.
 
 ### REQ-VAR-120 Rounding option for decimal numbers
 
@@ -339,6 +369,31 @@ A worker element can read every visible variable, set variables and evaluate exp
 - **Plan:** -
 
 Floats are written in the AutoHotkey v2 form (`0.1+0.2` gives `0.30000000000000004`, E32). An element parameter may later round the result.
+
+### REQ-VAR-130 Hints on global and static variables
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+The help and the element settings point out what global and static variables cost: every change is saved to disk, and several flows or instances may change the same variable at the same time (REQ-VAR-140). A variable should be global or static only when it must outlive the run or be shared.
+
+Note: the cost in time is lower in v2 than in v1. v1 read the file at every access; v2 keeps the values in memory and saves changes in the background. The hint is therefore mainly about concurrent changes.
+
+### REQ-VAR-140 Protect variables against concurrent changes
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+- **Doubt:** The benefit may not be worth the complexity (locks across flows, deadlocks, timeouts, what happens when a flow is stopped while it holds a lock).
+
+When two flows or branches read, change and write the same variable through two elements, one change can be lost. A mechanism protects a variable for a short time, so that such a sequence is atomic: for example elements that change a value in one step (increment, append to a list), or a lock that other elements wait for.
+
+Note: an element that waits (REQ-EXE-100) works on copies and writes its changes back when it ends (REQ-VAR-110), so the window for a lost change is as long as the element runs.
 
 ## Elements (ELM)
 
@@ -589,7 +644,7 @@ The specification of an element is the underlying AutoHotkey v2 command plus its
 
 ## Triggers (TRG)
 
-### REQ-TRG-010 Triggers run in their own process
+### REQ-TRG-010 Triggers react at once, whatever the load
 
 - **v1:** no (triggers live in the execution thread)
 - **v2:** open
@@ -598,7 +653,7 @@ The specification of an element is the underlying AutoHotkey v2 command plus its
 - **Plan:** S3
 - **Evidence:** -
 
-A trigger host holds hotkeys, hooks and timers, so that they respond no matter how busy the engine is (Windows removes slow low-level hooks). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. `ARCHITECTURE.md` D8.
+Hotkeys, hooks and timers react at once, no matter how busy the running flows are (Windows removes a low-level hook that answers too slowly). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. How: a trigger host process, `ARCHITECTURE.md` D8.
 
 ### REQ-TRG-020 Triggers follow the enabled state, also after a restart
 
@@ -608,7 +663,7 @@ A trigger host holds hotkeys, hooks and timers, so that they respond no matter h
 - **Scope:** port
 - **Plan:** S3
 
-The triggers of enabled flows are armed at the start of AutoHotFlow and after a restart of the engine or of the trigger host; disabling a flow disarms them.
+The triggers of enabled flows are active from the start of AutoHotFlow on, and again after an internal restart (REQ-ROB-040); disabling a flow deactivates them.
 
 ### REQ-TRG-030 Several triggers per flow
 
@@ -623,7 +678,7 @@ A flow can have several triggers. Each trigger can be enabled and disabled on it
 ### REQ-TRG-100 Manual trigger
 
 - **v1:** yes
-- **v2:** partial (a skeleton `Trigger_Manual` and the start through the engine work)
+- **v2:** partial (a skeleton `Trigger_Manual` exists, and a flow can be started through it)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S2 (WI-47)
@@ -741,7 +796,7 @@ The manager shows all flows in a tree of categories, with their state (enabled, 
 - **Scope:** port
 - **Plan:** S4
 
-Names are checked: no forbidden characters, no second flow with the same name. Deleting asks for confirmation. Engine commands `cmd.flow.create`, `cmd.flow.delete`, `cmd.flow.meta.update` (`PROTOCOL.md` 4.2) are not built yet. Deleting a running flow stops its instances at once (E9).
+Names are checked: no forbidden characters, no second flow with the same name. Deleting asks for confirmation. The commands behind it (`cmd.flow.create`, `cmd.flow.delete`, `cmd.flow.meta.update`, `PROTOCOL.md` 4.2) are not built yet. Deleting a running flow stops its instances at once (E9).
 
 ### REQ-MGR-030 Manage categories
 
@@ -812,7 +867,7 @@ Closing the manager window only hides it. Flows and triggers keep running; the t
 - **Scope:** port
 - **Plan:** S4 (assumed; the plan does not name the tray)
 
-The tray icon shows the manager (default action) and ends the application. Notices of the engine and the storage (`evt.ui.notice`) appear as tray notices. `ARCHITECTURE.md` 6.1 puts the tray icon in the supervisor; finding F-273 waits for a decision on it.
+The tray icon shows the manager (default action) and ends the application. Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030). `ARCHITECTURE.md` 6.1 puts the tray icon in the supervisor; finding F-273 waits for a decision on it.
 
 ### REQ-MGR-100 About window
 
@@ -859,12 +914,12 @@ Zoom, and move the view by dragging with the right (or left) mouse button. Zoom 
 ### REQ-EDT-040 Live execution state in the editor
 
 - **v1:** yes
-- **v2:** open (the engine events exist, REQ-EXE-140)
+- **v2:** open (the states are reported, REQ-EXE-140)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S5
 
-Running elements and connections are highlighted while the flow runs; the editor resynchronises after a restart of the engine.
+Running elements and connections are highlighted while the flow runs; the editor shows the current state again after an internal restart (REQ-ROB-040).
 
 ### REQ-EDT-050 Add elements
 
@@ -919,13 +974,13 @@ Ctrl+Z and Ctrl+Y and menu entries. A cancelled action (a move cancelled with Es
 ### REQ-EDT-100 Save, and changes during execution
 
 - **v1:** yes (unsaved flows are saved automatically at exit)
-- **v2:** partial (the engine side: revisions, conflict detection and save command; the patch operations are refused until the editor exists)
+- **v2:** partial (revisions, conflict detection and saving work internally; edit operations are refused until the editor exists)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S6
 - **Evidence:** `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`
 
-Every completed edit goes to the engine at once and applies to running instances (REQ-EXE-080). Saving (Ctrl+S, menu) writes the flow to disk. When the editor or the application is closed with unsaved changes, the user is asked and can cancel (two-phase exit, `ARCHITECTURE.md` 6.3). A rename by the manager while the editor is open is merged.
+Every completed edit takes effect at once, also for running instances (REQ-EXE-080). Saving (Ctrl+S, menu) writes the flow to disk. When the editor or the application is closed with unsaved changes, the user is asked and can cancel (two-phase exit, `ARCHITECTURE.md` 6.3). A rename by the manager while the editor is open is merged.
 
 ### REQ-EDT-110 Run, stop and enable from the editor
 
@@ -977,6 +1032,74 @@ Execution policy (REQ-EXE-050), working directory (REQ-EXE-130), the type mode (
 
 The `f1` warnings of an element (for example a type error in compatibility mode) are shown at the element in the editor (E34). Also the places of a migrated flow that carry a MIGRATION ID (REQ-MIG-040).
 
+### REQ-EDT-160 Flow check with warnings
+
+- **v1:** no (only the rules of REQ-EDT-070 while drawing a connection)
+- **v2:** open (connections whose end is missing are logged when a flow is loaded, MIGRATION M-13)
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+The editor checks the whole flow against rules and shows a warning at the place of each violation. Examples of rules:
+
+- The same connection with the same type joins the same two elements more than once.
+- A ring of connections (not a loop element) makes more parallel branches on every pass.
+- The inner path of a loop element is not closed: at least one way out of the inner path must lead back to the loop element (other ways may end). A connection to a connection point of another loop element is a warning too.
+- A connection has no element at one of its ends.
+- A connection leaves from an output that the element does not have (REQ-EXE-150).
+
+Related: REQ-EDT-170 (refuse an invalid edit), REQ-EDT-180 (quick fixes), REQ-EDT-190 (help with variables from the same analysis).
+
+### REQ-EDT-170 Refuse invalid edits
+
+- **v1:** partial (the rules of REQ-EDT-070)
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+Some rules of the flow check (REQ-EDT-160) are applied during each edit, and the editor refuses the action instead of warning afterwards, for example a connection to a connection point of the wrong loop element.
+
+### REQ-EDT-180 Quick fixes for warnings
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+A warning of the flow check offers a fix in one click where the fix is clear, for example remove the duplicate connection, or remove the connection to the wrong loop element. A quick fix is one undo step.
+
+### REQ-EDT-190 Help with variables from the flow analysis
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+The analysis of the flow (REQ-EDT-160) knows which variables can exist at an element. The element settings offer them for a quick choice, and mark in red a variable that is used but cannot have been set on any way to the element (for example never initialised).
+
+### REQ-EDT-200 Expressions are checked while editing
+
+- **v1:** no
+- **v2:** open (the parser reports errors with their position, `EXPRESSION-LANGUAGE.md` section 10)
+- **Prio:** should
+- **Scope:** later
+- **Plan:** - (could fit into S7)
+
+The element settings check every expression field and every script field (REQ-VAR-010, REQ-VAR-020) while the user types, and show a warning with the position of the error.
+
+### REQ-EDT-210 Syntax highlighting and auto-completion
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+Expression and script fields colour their syntax and complete names of variables and functions, as an IDE does.
+
 ## Settings (SET)
 
 ### REQ-SET-010 Global settings dialog
@@ -987,7 +1110,7 @@ The `f1` warnings of an element (for example a type error in compatibility mode)
 - **Scope:** port
 - **Plan:** S4
 
-Settings are stored in the data folder and take effect at once where possible; a setting that needs a restart says so and offers it. Engine commands `cmd.settings.get/set` are not built yet.
+Settings are stored in the data folder and take effect at once where possible; a setting that needs a restart says so and offers it. The commands behind it (`cmd.settings.get/set`) are not built yet.
 
 ### REQ-SET-020 Defaults for execution policy and working directory
 
@@ -1114,7 +1237,7 @@ The user imports the flows and variables of v1 into the v2 data folder through t
 - **Scope:** port
 - **Plan:** S4
 
-When a flow uses a package that is not installed, the user is asked through the manager whether the file shall be deleted; the engine never shows a dialog (MIGRATION M-08).
+When a flow uses a package that is not installed, the manager asks the user whether the file shall be deleted; no dialog blocks the running flows (MIGRATION M-08).
 
 ### REQ-MIG-080 AI-assisted adaptation of imported flows
 
@@ -1407,7 +1530,7 @@ Processes exchange messages; there is no shared memory and no global lock, and e
 
 No blocking call on the message path. Every request has a timeout; a late answer is dropped. When the target of a request goes away, the caller gets `peer_gone` at once.
 
-### REQ-ROB-040 The engine restarts and the clients resynchronise
+### REQ-ROB-040 Recovery after a crash of the flow execution
 
 - **v1:** no
 - **v2:** partial (restart and resync work; re-arming the triggers needs the trigger host)
@@ -1415,6 +1538,8 @@ No blocking call on the message path. Every request has a timeout; a late answer
 - **Scope:** port
 - **Plan:** S3 (triggers)
 - **Evidence:** `tests/e2e/test_ui_stub.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_stub`, `tests/fault/test_worker_lifecycle.py::test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs`
+
+When the part that runs the flows (the engine) crashes, it starts again by itself. Open windows stay open and show the current state again; the triggers of enabled flows are active again. Instances that were running are lost (MIGRATION M-01).
 
 ### REQ-ROB-050 Restart limits
 
@@ -1785,7 +1910,7 @@ An experimental element is marked in the list and in its settings ("This element
 - **Scope:** port
 - **Plan:** S4
 
-Errors and warnings of the engine and the storage reach the user as notices in the tray or the manager. Only user interfaces and workers show dialogs.
+Errors and warnings that have no window of their own (for example a flow file that cannot be saved) reach the user as notices in the tray or the manager, never as a dialog that blocks the running flows.
 
 ### REQ-USE-040 The user interface stays responsive
 

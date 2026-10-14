@@ -5,28 +5,28 @@ run the tool. The legend of the columns is at the top of the source.
 
 ## Summary
 
-| Area | Total | done | implemented | partial | open | dropped |
-|---|---:|---:|---:|---:|---:|---:|
-| [Flows and execution (EXE)](#flows-and-execution-exe) | 14 | 8 | 0 | 5 | 1 | 0 |
-| [Expressions and variables (VAR)](#expressions-and-variables-var) | 12 | 7 | 0 | 4 | 1 | 0 |
-| [Elements (ELM)](#elements-elm) | 24 | 0 | 0 | 2 | 22 | 0 |
-| [Triggers (TRG)](#triggers-trg) | 13 | 0 | 0 | 1 | 12 | 0 |
-| [Manager (MGR)](#manager-mgr) | 10 | 0 | 0 | 0 | 10 | 0 |
-| [Editor (EDT)](#editor-edt) | 15 | 0 | 0 | 1 | 14 | 0 |
-| [Settings (SET)](#settings-set) | 6 | 1 | 0 | 1 | 4 | 0 |
-| [Import and migration (MIG)](#import-and-migration-mig) | 8 | 5 | 0 | 0 | 3 | 0 |
-| [Languages and help (LNG)](#languages-and-help-lng) | 5 | 0 | 0 | 1 | 4 | 0 |
-| [Element packages (PKG)](#element-packages-pkg) | 3 | 0 | 0 | 0 | 2 | 1 |
-| [Logging and diagnostics (DIA)](#logging-and-diagnostics-dia) | 5 | 4 | 0 | 1 | 0 | 0 |
-| [Debugger (DBG)](#debugger-dbg) | 5 | 0 | 0 | 0 | 5 | 0 |
-| [Distribution (DST)](#distribution-dst) | 5 | 1 | 0 | 2 | 2 | 0 |
-| [Robustness (ROB)](#robustness-rob) | 11 | 10 | 0 | 1 | 0 | 0 |
-| [Performance and resources (PRF)](#performance-and-resources-prf) | 10 | 6 | 0 | 2 | 2 | 0 |
-| [Security (SEC)](#security-sec) | 3 | 2 | 0 | 0 | 0 | 1 |
-| [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 1 | 2 | 0 |
-| [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 |
-| [Usability (USE)](#usability-use) | 4 | 0 | 0 | 1 | 3 | 0 |
-| **All** | **164** | **51** | **0** | **23** | **88** | **2** |
+| Area | Total | done | implemented | partial | open | dropped | in doubt |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| [Flows and execution (EXE)](#flows-and-execution-exe) | 15 | 7 | 0 | 6 | 2 | 0 | 1 |
+| [Expressions and variables (VAR)](#expressions-and-variables-var) | 14 | 7 | 0 | 4 | 3 | 0 | 2 |
+| [Elements (ELM)](#elements-elm) | 24 | 0 | 0 | 2 | 22 | 0 | 0 |
+| [Triggers (TRG)](#triggers-trg) | 13 | 0 | 0 | 1 | 12 | 0 | 0 |
+| [Manager (MGR)](#manager-mgr) | 10 | 0 | 0 | 0 | 10 | 0 | 0 |
+| [Editor (EDT)](#editor-edt) | 21 | 0 | 0 | 1 | 20 | 0 | 0 |
+| [Settings (SET)](#settings-set) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
+| [Import and migration (MIG)](#import-and-migration-mig) | 8 | 5 | 0 | 0 | 3 | 0 | 0 |
+| [Languages and help (LNG)](#languages-and-help-lng) | 5 | 0 | 0 | 1 | 4 | 0 | 0 |
+| [Element packages (PKG)](#element-packages-pkg) | 3 | 0 | 0 | 0 | 2 | 1 | 0 |
+| [Logging and diagnostics (DIA)](#logging-and-diagnostics-dia) | 5 | 4 | 0 | 1 | 0 | 0 | 0 |
+| [Debugger (DBG)](#debugger-dbg) | 5 | 0 | 0 | 0 | 5 | 0 | 0 |
+| [Distribution (DST)](#distribution-dst) | 5 | 1 | 0 | 2 | 2 | 0 | 0 |
+| [Robustness (ROB)](#robustness-rob) | 11 | 10 | 0 | 1 | 0 | 0 | 0 |
+| [Performance and resources (PRF)](#performance-and-resources-prf) | 10 | 6 | 0 | 2 | 2 | 0 | 0 |
+| [Security (SEC)](#security-sec) | 3 | 2 | 0 | 0 | 0 | 1 | 0 |
+| [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 1 | 2 | 0 | 0 |
+| [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
+| [Usability (USE)](#usability-use) | 4 | 0 | 0 | 1 | 3 | 0 | 0 |
+| **All** | **173** | **50** | **0** | **24** | **97** | **2** | **3** |
 
 ## Flows and execution (EXE)
 
@@ -35,17 +35,18 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-EXE-010](REQUIREMENTS.md#req-exe-010-a-flow-is-a-graph-of-triggers-actions-conditions-and-loops) | A flow is a graph of triggers, actions, conditions and loops | yes | done | must | port | - |
 | [REQ-EXE-020](REQUIREMENTS.md#req-exe-020-connection-types-and-parallel-branches) | Connection types and parallel branches | yes | done | must | port | - |
 | [REQ-EXE-030](REQUIREMENTS.md#req-exe-030-loops-with-head-tail-and-break) | Loops with head, tail and break | yes | partial | must | port | S2 (WI-54) |
-| [REQ-EXE-040](REQUIREMENTS.md#req-exe-040-instances-and-threads) | Instances and threads | yes | done | must | port | - |
+| [REQ-EXE-040](REQUIREMENTS.md#req-exe-040-instances-and-parallel-branches) | Instances and parallel branches | yes | done | must | port | - |
 | [REQ-EXE-050](REQUIREMENTS.md#req-exe-050-execution-policy-per-flow) | Execution policy per flow | partial | partial | must | port | S4 (global setting) |
-| [REQ-EXE-060](REQUIREMENTS.md#req-exe-060-start-and-stop-a-flow) | Start and stop a flow | yes | partial | must | port | S4 (manager), S6 (editor) |
+| [REQ-EXE-060](REQUIREMENTS.md#req-exe-060-start-and-stop-a-flow-by-hand) | Start and stop a flow by hand | yes | partial | must | port | S4 (manager), S6 (editor) |
 | [REQ-EXE-070](REQUIREMENTS.md#req-exe-070-enable-and-disable-a-flow) | Enable and disable a flow | yes | partial | must | port | S3 |
 | [REQ-EXE-080](REQUIREMENTS.md#req-exe-080-change-a-flow-while-it-runs) | Change a flow while it runs | yes | done | must | port | - |
-| [REQ-EXE-090](REQUIREMENTS.md#req-exe-090-a-failing-element-ends-with-exception-and-never-stops-the-engine) | A failing element ends with `exception` and never stops the engine | partial | done | must | port | - |
-| [REQ-EXE-100](REQUIREMENTS.md#req-exe-100-blocking-elements-do-not-stall-other-flows) | Blocking elements do not stall other flows | partial | done | must | port | - |
-| [REQ-EXE-110](REQUIREMENTS.md#req-exe-110-stopping-ends-running-elements-quickly) | Stopping ends running elements quickly | partial | done | must | port | - |
+| [REQ-EXE-090](REQUIREMENTS.md#req-exe-090-a-failing-element-ends-with-exception) | A failing element ends with `exception` *(in doubt)* | partial | done | must | port | - |
+| [REQ-EXE-100](REQUIREMENTS.md#req-exe-100-waiting-elements-do-not-delay-other-flows) | Waiting elements do not delay other flows | partial | done | must | port | - |
+| [REQ-EXE-110](REQUIREMENTS.md#req-exe-110-stopping-ends-waiting-elements-quickly) | Stopping ends waiting elements quickly | partial | done | must | port | - |
 | [REQ-EXE-120](REQUIREMENTS.md#req-exe-120-run-another-flow-from-a-flow) | Run another flow from a flow | yes | open | must | port | S2 (WI-55) |
 | [REQ-EXE-130](REQUIREMENTS.md#req-exe-130-working-directory-of-a-flow) | Working directory of a flow | yes | partial | must | port | S4 (global), S7 (flow settings) |
-| [REQ-EXE-140](REQUIREMENTS.md#req-exe-140-live-state-of-elements-and-instances) | Live state of elements and instances | yes | done | must | port | - |
+| [REQ-EXE-140](REQUIREMENTS.md#req-exe-140-every-element-and-flow-shows-its-state) | Every element and flow shows its state | yes | partial | must | port | S4 (manager), S5 (editor) |
+| [REQ-EXE-150](REQUIREMENTS.md#req-exe-150-elements-with-any-number-of-named-outputs) | Elements with any number of named outputs | no | open | could | later | - |
 
 ## Expressions and variables (VAR)
 
@@ -53,7 +54,7 @@ run the tool. The legend of the columns is at the top of the source.
 |---|---|---|---|---|---|---|
 | [REQ-VAR-010](REQUIREMENTS.md#req-var-010-expression-language-with-autohotkey-v2-semantics) | Expression language with AutoHotkey v2 semantics | partial | done | must | port | - |
 | [REQ-VAR-020](REQUIREMENTS.md#req-var-020-script-form-for-several-statements) | Script form for several statements | yes | partial | should | port | S8 (element) |
-| [REQ-VAR-030](REQUIREMENTS.md#req-var-030-var-substitution-in-text-parameters) | `%var%` substitution in text parameters | yes | done | must | port | - |
+| [REQ-VAR-030](REQUIREMENTS.md#req-var-030-var-substitution-in-text-parameters) | `%var%` substitution in text parameters *(in doubt)* | yes | done | must | port | - |
 | [REQ-VAR-040](REQUIREMENTS.md#req-var-040-variable-scopes) | Variable scopes | yes | done | must | port | - |
 | [REQ-VAR-050](REQUIREMENTS.md#req-var-050-permanent-global-and-static-variables) | Permanent global and static variables | yes | done | must | port | - |
 | [REQ-VAR-060](REQUIREMENTS.md#req-var-060-objects-and-lists-in-variables) | Objects and lists in variables | yes | done | must | port | - |
@@ -61,8 +62,10 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-VAR-080](REQUIREMENTS.md#req-var-080-values-of-the-trigger-reach-the-instance) | Values of the trigger reach the instance | yes | partial | must | port | S3 |
 | [REQ-VAR-090](REQUIREMENTS.md#req-var-090-parameter-evaluation-by-content-type) | Parameter evaluation by content type | yes | done | must | port | - |
 | [REQ-VAR-100](REQUIREMENTS.md#req-var-100-type-errors-compatible-or-strict-per-flow) | Type errors: compatible or strict per flow | no | partial | must | port | S4/S5 (display of the warnings) |
-| [REQ-VAR-110](REQUIREMENTS.md#req-var-110-worker-elements-read-and-write-all-variables) | Worker elements read and write all variables | yes | partial | must | port | S2 (WI-50) |
+| [REQ-VAR-110](REQUIREMENTS.md#req-var-110-waiting-elements-can-use-all-variables) | Waiting elements can use all variables | yes | partial | must | port | S2 (WI-50) |
 | [REQ-VAR-120](REQUIREMENTS.md#req-var-120-rounding-option-for-decimal-numbers) | Rounding option for decimal numbers | no | open | could | later | - |
+| [REQ-VAR-130](REQUIREMENTS.md#req-var-130-hints-on-global-and-static-variables) | Hints on global and static variables | no | open | could | later | - |
+| [REQ-VAR-140](REQUIREMENTS.md#req-var-140-protect-variables-against-concurrent-changes) | Protect variables against concurrent changes *(in doubt)* | no | open | could | later | - |
 
 ## Elements (ELM)
 
@@ -97,7 +100,7 @@ run the tool. The legend of the columns is at the top of the source.
 
 | ID | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|
-| [REQ-TRG-010](REQUIREMENTS.md#req-trg-010-triggers-run-in-their-own-process) | Triggers run in their own process | no | open | must | port | S3 |
+| [REQ-TRG-010](REQUIREMENTS.md#req-trg-010-triggers-react-at-once-whatever-the-load) | Triggers react at once, whatever the load | no | open | must | port | S3 |
 | [REQ-TRG-020](REQUIREMENTS.md#req-trg-020-triggers-follow-the-enabled-state-also-after-a-restart) | Triggers follow the enabled state, also after a restart | yes | open | must | port | S3 |
 | [REQ-TRG-030](REQUIREMENTS.md#req-trg-030-several-triggers-per-flow) | Several triggers per flow | yes | open | must | port | S3, S6 |
 | [REQ-TRG-100](REQUIREMENTS.md#req-trg-100-manual-trigger) | Manual trigger | yes | partial | must | port | S2 (WI-47) |
@@ -145,6 +148,12 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-EDT-130](REQUIREMENTS.md#req-edt-130-assistants-in-the-element-settings) | Assistants in the element settings | yes | open | should | port | S7 |
 | [REQ-EDT-140](REQUIREMENTS.md#req-edt-140-flow-settings-dialog) | Flow settings dialog | yes | open | must | port | S7 |
 | [REQ-EDT-150](REQUIREMENTS.md#req-edt-150-warnings-of-the-evaluation-are-visible-in-the-editor) | Warnings of the evaluation are visible in the editor | no | open | must | port | S4/S5 |
+| [REQ-EDT-160](REQUIREMENTS.md#req-edt-160-flow-check-with-warnings) | Flow check with warnings | no | open | should | later | - |
+| [REQ-EDT-170](REQUIREMENTS.md#req-edt-170-refuse-invalid-edits) | Refuse invalid edits | partial | open | could | later | - |
+| [REQ-EDT-180](REQUIREMENTS.md#req-edt-180-quick-fixes-for-warnings) | Quick fixes for warnings | no | open | could | later | - |
+| [REQ-EDT-190](REQUIREMENTS.md#req-edt-190-help-with-variables-from-the-flow-analysis) | Help with variables from the flow analysis | no | open | could | later | - |
+| [REQ-EDT-200](REQUIREMENTS.md#req-edt-200-expressions-are-checked-while-editing) | Expressions are checked while editing | no | open | should | later | - (could fit into S7) |
+| [REQ-EDT-210](REQUIREMENTS.md#req-edt-210-syntax-highlighting-and-auto-completion) | Syntax highlighting and auto-completion | no | open | could | later | - |
 
 ## Settings (SET)
 
@@ -225,7 +234,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-ROB-010](REQUIREMENTS.md#req-rob-010-a-crashing-or-hanging-process-does-not-take-the-others-with-it) | A crashing or hanging process does not take the others with it | no | done | must | port | - |
 | [REQ-ROB-020](REQUIREMENTS.md#req-rob-020-no-deadlocks-and-no-races-by-design) | No deadlocks and no races by design | no | done | must | port | - |
 | [REQ-ROB-030](REQUIREMENTS.md#req-rob-030-nothing-waits-without-a-deadline) | Nothing waits without a deadline | no | done | must | port | - |
-| [REQ-ROB-040](REQUIREMENTS.md#req-rob-040-the-engine-restarts-and-the-clients-resynchronise) | The engine restarts and the clients resynchronise | no | partial | must | port | S3 (triggers) |
+| [REQ-ROB-040](REQUIREMENTS.md#req-rob-040-recovery-after-a-crash-of-the-flow-execution) | Recovery after a crash of the flow execution | no | partial | must | port | S3 (triggers) |
 | [REQ-ROB-050](REQUIREMENTS.md#req-rob-050-restart-limits) | Restart limits | n/a | done | must | port | - |
 | [REQ-ROB-060](REQUIREMENTS.md#req-rob-060-files-are-never-half-written) | Files are never half written | no | done | must | port | - |
 | [REQ-ROB-070](REQUIREMENTS.md#req-rob-070-clean-exit-within-a-deadline) | Clean exit within a deadline | partial | done | must | port | - |
