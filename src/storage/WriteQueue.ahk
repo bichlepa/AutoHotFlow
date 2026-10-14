@@ -81,7 +81,7 @@ class WriteQueue {
                 } else if (now - op["lastTry"] > WriteQueue.STALL_MS) {
                     ; Longer than any retry delay since the last attempt: the process was stalled (or busy
                     ; with requests). That time did not give the other process a chance to let go, so it
-                    ; does not count against the retry time (F-25, F-51).
+                    ; does not count against the retry time (F-25, F-272).
                     op["retryUntil"] += now - op["lastTry"]
                 }
                 op["lastTry"] := now

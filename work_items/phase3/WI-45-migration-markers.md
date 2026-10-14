@@ -20,7 +20,7 @@ README of this phase (E21, E35), `doc/ARCHITECTURE.md` 7 (format version, `v1Tex
 
 ## Acceptance criteria
 
-- **Load path (F-268, README S2):** `tests/stress/test_big_flows.py` was run at the end; the time to `evt.engine.ready` and the largest snapshot answer are in the result and within the budget.
+- **Load path (F-282, README S2):** `tests/stress/test_big_flows.py` was run at the end; the time to `evt.engine.ready` and the largest snapshot answer are in the result and within the budget.
 - For every example flow in `tests/data/flows/` the report runs without error; counts in the result (not the private flows, only their counts, E27).
 - Load, save, load: the markers are stable, a converted text is not converted twice, the v1 original is unchanged.
 - A test per marker kind (unknown class, accepted deviation, unsupported syntax).

@@ -56,7 +56,7 @@ Start agents in the background and wait for their notifications. Do not poll and
 - No volatile names in documents, OPEN-ITEMS entries and commit messages: no branch or workspace names, no run folders; write what happened, or name the commit.
 - Private data of the project owner (`%APPDATA%\AutoHotFlow`, his flows and variables) is never copied into the repository without his check; see `tests/data/README.md`.
 
-**ID blocks.** At the start of the session find the highest `F-nn` in OPEN-ITEMS. Give every agent its own block of 10 numbers so that entries from parallel branches do not collide. Keep the list of blocks you gave (also in `STATUS.md`, section 10).
+**ID blocks.** At the start of the session find the highest `F-nn` in OPEN-ITEMS. Give every agent its own block of 10 numbers so that entries from parallel branches do not collide. Keep the list of blocks you gave (also in `STATUS.md`, section 10). **Final IDs (owner's rule, 2026-10-14).** Agents write provisional IDs (`F-nn*`). Before the orchestrator commits an entry, it replaces each provisional ID by a final one: the next free number (check with `git grep -n -E "F-<n>([^0-9]|$)"` that it is not used anywhere), changes every reference to it in the same commit (documents, code comments, tests, work items, STATUS), and removes the `*`. If an ID that was already referenced elsewhere changes, the old-to-new mapping goes into the note below the table in OPEN-ITEMS.
 
 ## 3. Work
 
@@ -91,7 +91,7 @@ After a completed task whose commits are on `v2-port` **really changed source co
 
 1. Runs the tests that the change needs (section 4) with `python tools/run_suite.py --ref HEAD` (frozen state), once per test selection.
 2. Looks briefly at the reports and at the source of the change. If something is conspicuous, it writes down a **suspicion** (marked assumed). It does no deep root-cause research and does not fix anything.
-3. Documents every finding in `doc/OPEN-ITEMS.md` (provisional ID from its block, run ID, command, failure text, suspicion, which task or agent probably caused it) and commits that on its branch.
+3. Documents every finding in `doc/OPEN-ITEMS.md` (provisional ID from its block, which the orchestrator renumbers before its commit, run ID, command, failure text, suspicion, which task or agent probably caused it) and commits that on its branch.
 4. Reports the result: counts, run IDs, findings.
 
 The running of the commands may be given to a `haiku` agent when it is only "run this and report"; the review stays with a `sonnet` agent.

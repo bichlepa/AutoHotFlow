@@ -19,7 +19,7 @@ README of this phase (E20, E34, E35), `doc/ELEMENT-API-V2.md` (all), the v1 file
 
 ## Acceptance criteria
 
-- **Load path (F-268, README S2):** `tests/stress/test_big_flows.py` was run at the end; the time to `evt.engine.ready` and the largest snapshot answer are in the result and within the budget.
+- **Load path (F-282, README S2):** `tests/stress/test_big_flows.py` was run at the end; the time to `evt.engine.ready` and the largest snapshot answer are in the result and within the budget.
 - The smoke test (WI-48) is green for the new elements; the e2e tests are green inline.
 - The v1 flow "variable test" (`tests/data/flows/v1_examples/Flow 1010290492.json`) runs; if it needs a fix, it is documented in WI-57.
 

@@ -1,9 +1,9 @@
-"""F-17 and F-85: a burst of log lines.
+"""F-17 and F-275: a burst of log lines.
 
 Both tests show a defect that is known and not fixed yet; they are marked xfail(strict=True) and turn loud when the
 defect is fixed (remove the mark then).
 
-* F-85: a role logs thousands of lines in a tight loop. The hub's send queue to "storage" holds 1000 frames; the
+* F-275: a role logs thousands of lines in a tight loop. The hub's send queue to "storage" holds 1000 frames; the
   overflow closes the link to storage (queue_overflow), storage is judged hung and restarted, and the lines are lost.
 * F-17: the same burst while the supervisor stands still. The role's own send queue overflows, the role loses its
   connection and ends after the orphan deadline ("hub not reachable"), although it did nothing wrong.
@@ -32,7 +32,7 @@ def log_text(datadir):
     return path.read_bytes().decode("utf-8", "replace") if path.exists() else ""
 
 
-@pytest.mark.xfail(strict=True, reason="F-85: a log burst overflows the hub's send queue to storage and closes the link")
+@pytest.mark.xfail(strict=True, reason="F-275: a log burst overflows the hub's send queue to storage and closes the link")
 def test_a_burst_of_log_lines_does_not_cost_the_storage_link_or_the_lines(chains, datadir):
     chain = chains("storage,echo:a", ["--test-roles"])
     pids = chain.wait_ready(["storage", "echo:a"])
@@ -62,7 +62,7 @@ def test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor(chains, dat
 
     thread = threading.Thread(target=ask)
     thread.start()
-    # Precondition: the role is inside its loop. A fixed sleep was not enough (F-125): on a loaded machine the request
+    # Precondition: the role is inside its loop. A fixed sleep was not enough (F-276): on a loaded machine the request
     # may reach the role after the suspension began, the role then stays quiet and the test passes by accident.
     # The first lines in the log file prove that the loop is running; 100000 lines last far longer than the suspension.
     deadline = time.monotonic() + scaled(20)

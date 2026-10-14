@@ -18,7 +18,7 @@ As WI-52, plus `doc/ELEMENT-API-V2.md` 7 (loop entry points, `ctx.entryPoint`, l
 
 ## Acceptance criteria
 
-- **Load path (F-268, README S2):** `tests/stress/test_big_flows.py` was run at the end; the time to `evt.engine.ready` and the largest snapshot answer are in the result and within the budget.
+- **Load path (F-282, README S2):** `tests/stress/test_big_flows.py` was run at the end; the time to `evt.engine.ready` and the largest snapshot answer are in the result and within the budget.
 - Smoke test and e2e tests green; the v1 flow "Loop test" (`Flow 634320780.json`) runs (fixes documented in WI-57).
 - Time per pass of `Loop_SimpleLoop` with an empty body in `doc/MEASUREMENTS.md`.
 

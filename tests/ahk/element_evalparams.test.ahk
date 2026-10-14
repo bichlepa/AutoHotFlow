@@ -332,7 +332,7 @@ CheckTypeErrorInCompatibilityMode() {
     r := Eval(P("Expr", "global_t + 1", "Num", "global_missing < 3"))
     Ok(r)
     Assert.Equal(Val(r, "Expr"), "")             ; E25: the empty text and a warning
-    Assert.Equal(Val(r, "Num"), "")              ; F-105: false in v2, without the counter set
+    Assert.Equal(Val(r, "Num"), "")              ; F-277: false in v2, without the counter set
     ; the f1 warning names the flow, the element and the parameter
     Assert.True(HasLogLine("f1", "element a1", "parameter 'Expr'", "Expression warning", "e"), "f1 warning of Expr")
     Assert.True(HasLogLine("f1", "element a1", "parameter 'Num'", "Expression warning"), "f1 warning of Num")

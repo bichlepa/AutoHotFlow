@@ -270,7 +270,7 @@ class Supervisor {
         return Map("command", "debug", "started", Json.Bool(started))
     }
 
-    ; A plain second start (no --command, F-72, the v1 behaviour): the manager shows its window. A running manager is
+    ; A plain second start (no --command, F-283, the v1 behaviour): the manager shows its window. A running manager is
     ; asked (cmd.manager.show, PROTOCOL 4.8); one that is not running is started like at the first start and shows its
     ; window on its own. Never throws: the second start must end with exit 0, a failure is only logged.
     _ShowManager() {
