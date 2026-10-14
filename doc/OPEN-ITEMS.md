@@ -247,9 +247,10 @@ Editor, real manager, real elements, trigger host (WI-14, decision E6: built ear
 
 Work that is open but is not a finding with an entry:
 
-1. **Syntax list of the expression language (WI-37).** The owner confirms that `%` as modulo, `^=`, `%=`, `<>` and `"a""b"` stay unsupported (section 15 of `doc/EXPRESSION-LANGUAGE.md`). WI-39 depends on the answer.
-2. **`evalparam` in the golden data.** Decision for WI-42: a copy of the function in the harness, or stubs for all callees (see `tests/golden/FINDINGS.md`, "Not covered").
-3. **Three `uncaught/timeout` cases** in the groups `assignment` and `script` of the golden check (reported by the verifier, not investigated). Check whether they are the known hangs of the v1 parser.
+1. **Hub accepts the pipe but does not answer `sys.hello` (F-29 follow-up).** Read in code, not checked: the `sys.hello` timeout closes the connection, and `Peer._OnConnClose` then calls `_BeginReconnect`, which sets `_budgetStart` to now (`src/core/ipc/Peer.ahk`, around lines 311 to 316). So each failed hello gets a new 10 s budget, and the role may not end by the budget. The orphan guard counts only `reconnecting` and resets its clock in `handshake` (`src/core/Role.ahk`, `_Guard`). So neither may end the role. *Action:* measure with a pipe that accepts and never answers. If the role does not end, decide the fix with the owner (budget counted from the first `Connect`, or a total cap).
+2. **Syntax list of the expression language (WI-37).** The owner confirms that `%` as modulo, `^=`, `%=`, `<>` and `"a""b"` stay unsupported (section 15 of `doc/EXPRESSION-LANGUAGE.md`). WI-39 depends on the answer.
+3. **`evalparam` in the golden data.** Decision for WI-42: a copy of the function in the harness, or stubs for all callees (see `tests/golden/FINDINGS.md`, "Not covered").
+4. **Three `uncaught/timeout` cases** in the groups `assignment` and `script` of the golden check (reported by the verifier, not investigated). Check whether they are the known hangs of the v1 parser.
 
 ## Open decisions
 
