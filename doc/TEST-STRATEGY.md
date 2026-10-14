@@ -112,6 +112,8 @@ python -m pytest tests -q -m stress              # long, on request only (-m soa
 - `FOUNDATION_FILES` is the one place to change when a test belongs to the base or no longer does. New test files of a topic that is not in the list are fast by default.
 - Several tests exist as a smoke variant (`slow`) and a full variant (`stress`), e.g. the handle count of the supervisor over 12 restarts (smoke) and over 50 (full, `tests/fault/test_diagnose.py`).
 - The strict reference run (`-n 0`, below) uses `--all`.
+- **`--all` includes the `gui` tier** (3 tests that open windows). An agent never runs them, so an acceptance run by an agent is `--all -m "not gui"` (`-m` with a negation keeps the other tiers on). Stress and soak are never part of `--all`.
+- **Acceptance of step S1 (WI-43), runtime of the full run.** On the code state of the end of S1 (1123 tests selected without gui and stress, 16 stress tests, 3 gui tests), measured with `tools/run_suite.py` on the development PC (8 logical CPUs, nothing else running except a planning agent): serial (`-n 0 --all -m "not gui"`) 1120 passed, 1 skipped, 2 xfailed in 772 s (12:52); parallel (`--all -m "not gui"`, 4 workers as the load budget of `run_suite.py` says) 1120 passed, 1 skipped, 2 xfailed in 200 s (3:19); `-m stress` 14 passed and 1 failed in 268 s (the 200-flow test, OPEN-ITEMS F-268). The serial run measured earlier in this document took about 640 s with 752 tests; the suite has grown by about 390 tests and the serial run by about 130 s since then (assumed: mostly the tests of S1 and the fixes of phase 2b, not broken down). The 2 xfailed are the known F-17 and F-85 marks, the 1 skipped is the deliberate skip of the runner self-check.
 
 **Parallel (default since WI-18).** `pytest.ini` sets `addopts = -n auto --dist loadgroup` (pytest-xdist, 8 workers on this machine). `python -m pytest tests -q` (fast tier) thus runs in about 16 s with 8 workers (about 12 s with `-n 16`; the work adds up to about 100 s of test time). `--foundation` takes about 55 s, `--all` about 90 s (serial about 640 s). Serial: `-n 0`. Rules for this:
 
@@ -135,6 +137,18 @@ clean comparison use `--max-runs 1`. The run needs everything in the commit: a d
 ignored file shows up as a failure here (this is how the `v1/AppData/Variables` dependency was found).
 
 Environment variables: `AHF_AHK2_EXE` (path to the interpreter), `AHF_TEST_KEEP=1` (keep data directories after the test). `AHF_DATA_DIR` is set by `conftest.py` to the guard directory (product variable: data directory when `--data` is missing).
+
+**Tests of step S1 (expressions and variables).** Where to look when a rule changes:
+
+| Subject | Tests |
+|---|---|
+| Parser, evaluator, converter | `tests/ahk/expr_*.test.ahk` (tokenizer and literals, operators, script form, errors, cache, evaluation of operators and variables, `expr_v1convert`) |
+| Golden data against v1 | `tests/golden/` (section 7); fast tier |
+| Variable model | `tests/ahk/vars_model.test.ahk` (one case per rule), `engine_vars.test.ahk` (the Executor with real flows) |
+| Global and static variables on disk | `tests/ahk/engine_var_files.test.ahk` (stand-in engine), `tests/fault/test_var_persistence.py` (real supervisor: round trip of v1 files, delayed write, kill of the engine, frozen storage) |
+| Parameter evaluation and `ctx` | `tests/ahk/element_evalparams.test.ahk` (every content type, inline and worker, both modes), `core_lang.test.ahk`, `engine_flow_strict.test.ahk`, `tests/integration/test_worker.py`, `tests/fault/test_param_eval.py` |
+| Loading and converting v1 flows | `tests/ahk/engine_flow_convert.test.ahk`, `tests/integration/test_flow_convert.py` |
+| Acceptance of S1 | `tests/fault/test_s1_acceptance.py` (slow): a v1 flow from a copy of a v1 working directory (`tests/data/flows/s1_acceptance/`), converted on load, a variable of each kind, restart of the engine and of the session, and the copy of the v1 folder compared by file list and hashes before and after |
 
 ## 7. Golden data from v1 (L6, WI-36)
 
