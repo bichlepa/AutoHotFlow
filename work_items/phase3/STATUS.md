@@ -44,7 +44,7 @@ Session 2 start: 2026-10-14, work-item mode, HEAD `f0793ce` on `v2-port`, main c
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
 | 1 | Implementer | sonnet | `wi-39` | `wip/wi-39` | WI-39 | running (started 2026-10-14) |
-| 2 | Bug hunter | sonnet | `hunt-6` | `wip/hunt-6` | OPEN-ITEMS, round 2 | running (started 2026-10-14) |
+| 2 | Bug hunter | sonnet | (removed) | (deleted) | OPEN-ITEMS round 2: F-73 analysed (decision needed, cause plausible: external close), integrated as 5251c04 | done |
 | 3 | Verifier | sonnet | `verify-2` | `wip/verify-2` | verification of `0506198` (fast, slow, arch check) | running (started 2026-10-14) |
 | 4 | Resumed agent | - | - | - | - | none |
 
