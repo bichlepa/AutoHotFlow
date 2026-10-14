@@ -39,6 +39,15 @@ Later commits on `v2-port` after `6f4241c` that did not change these trees: none
 
 ## Agents
 
+Session 4 start: 2026-10-14, work-item mode, HEAD `1c37bce` on `v2-port`, main checkout clean, no workspaces left over. WI-43 stays open: the owner's decision on F-282 (scheduled in S2) is recorded, the acceptance itself (stress green) is not met; the owner closes S1. S2 started with the packages that have no open dependency: WI-44 (depends on WI-38, done), in parallel the owner-decided fix F-17 and F-275 (option (a)).
+
+| Slot | Role | Model | Workspace | Branch | Task | State |
+|---|---|---|---|---|---|---|
+| 1 | Implementer WI-44 | sonnet | wi-44 | wip/wi-44 | WI-44 oracle of the expression language | running |
+| 2 | Bug hunter (owner-decided entry) | sonnet | hunt-9 | wip/hunt-9 | F-17 and F-275, option (a) | running |
+
+ID blocks (session 4, provisional IDs as `F-nn*`, renumbered by the orchestrator): implementer WI-44 F-284 to F-293; bug hunter hunt-9 F-294 to F-303. Highest final ID at session 4 start: F-283.
+
 Session 3 start: 2026-10-14, work-item mode, HEAD `26211f2` on `v2-port`, main checkout clean, no workspaces left over. WI-40 is verified (`fb50629`). WI-38 has no separate verifier run; its code is covered by the WI-40 verifier runs (`84a3912`, which contains it). Next: WI-41 (implementer, sonnet, workspace `wi-41`) in parallel with one bug hunter (sonnet, workspace `hunt-6`, excluded: F-17, F-275, storage, engine loading/shutdown, variable model).
 
 | Slot | Role | Model | Workspace | Branch | Task | State |
