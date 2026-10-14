@@ -49,7 +49,7 @@ VOCAB = {
     "Scope": ("port", "later"),
 }
 REQUIRED = ("v1", "v2", "Prio", "Scope", "Plan")
-KEYS = REQUIRED + ("Evidence",)
+KEYS = REQUIRED + ("Evidence", "Doubt")
 V2_ORDER = VOCAB["v2"]
 
 
@@ -198,12 +198,13 @@ def render(areas, source_name=SOURCE.name):
         "",
         "## Summary",
         "",
-        "| Area | Total | " + " | ".join(V2_ORDER) + " |",
-        "|---|---:|" + "---:|" * len(V2_ORDER),
+        "| Area | Total | " + " | ".join(V2_ORDER) + " | in doubt |",
+        "|---|---:|" + "---:|" * (len(V2_ORDER) + 1),
     ]
-    totals = [0] * (len(V2_ORDER) + 1)
+    totals = [0] * (len(V2_ORDER) + 2)
     for a in areas:
-        counts = [len(a.reqs)] + [sum(1 for r in a.reqs if r.word("v2") == w) for w in V2_ORDER]
+        counts = ([len(a.reqs)] + [sum(1 for r in a.reqs if r.word("v2") == w) for w in V2_ORDER]
+                  + [sum(1 for r in a.reqs if r.meta.get("Doubt"))])
         totals = [t + c for t, c in zip(totals, counts)]
         out.append("| [%s](#%s) | %s |" % (cell(a.heading), slug(a.heading), " | ".join(str(c) for c in counts)))
     out.append("| **All** | " + " | ".join("**%d**" % t for t in totals) + " |")
@@ -215,8 +216,9 @@ def render(areas, source_name=SOURCE.name):
         out += ["| ID | Requirement | v1 | v2 | Prio | Scope | Plan |", "|---|---|---|---|---|---|---|"]
         for r in a.reqs:
             link = "[%s](%s#%s)" % (r.id, source_name, slug("%s %s" % (r.id, r.title)))
+            title = cell(r.title) + (" *(in doubt)*" if r.meta.get("Doubt") else "")
             out.append("| %s | %s | %s | %s | %s | %s | %s |" % (
-                link, cell(r.title), r.word("v1"), r.word("v2"), r.word("Prio"), r.word("Scope"), cell(r.meta.get("Plan", ""))))
+                link, title, r.word("v1"), r.word("v2"), r.word("Prio"), r.word("Scope"), cell(r.meta.get("Plan", ""))))
     return "\n".join(out) + "\n"
 
 

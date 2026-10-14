@@ -92,8 +92,16 @@ def test_slug_matches_the_github_anchor():
 def test_index_has_summary_counts_links_and_escaped_cells():
     areas, _ = req_index.parse(doc(req(title="A | B"), req(rid="REQ-EXE-020", meta=GOOD.replace("done", "open"))))
     text = req_index.render(areas)
-    assert "| [Flows (EXE)](#flows-exe) | 2 | 1 | 0 | 0 | 1 | 0 |" in text
+    assert "| [Flows (EXE)](#flows-exe) | 2 | 1 | 0 | 0 | 1 | 0 | 0 |" in text
     assert "[REQ-EXE-010](REQUIREMENTS.md#req-exe-010-a--b) | A \\| B | yes | done |" in text
+
+
+def test_a_requirement_in_doubt_is_marked_and_counted():
+    areas, errs = req_index.parse(doc(req(meta=GOOD + "- **Doubt:** keep this syntax?\n")))
+    assert errs == []
+    text = req_index.render(areas)
+    assert "| [Flows (EXE)](#flows-exe) | 1 | 1 | 0 | 0 | 0 | 0 | 1 |" in text
+    assert "| Something *(in doubt)* | yes | done |" in text
 
 
 def evidence_errors(tmp_path, evidence):
