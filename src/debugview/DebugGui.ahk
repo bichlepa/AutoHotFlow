@@ -212,7 +212,32 @@ class DebugGui {
         text := StrReplace(text, "`n", "`r`n")
         if (text != this.snapText) {
             this.snapText := text
-            this.snapEdit.Value := text
+            this._SetEditKeepView(this.snapEdit, text)
+        }
+    }
+
+    ; Replaces the text of a multiline Edit and keeps the vertical scroll position and the selection. Setting
+    ; Value resets both (F-256). The snapshot JSON changes at every refresh (uptimeMs, rssBytes), but the lines stay
+    ; the same, so the first visible line index is still meaningful. Redraw is off meanwhile, so nothing flickers.
+    _SetEditKeepView(edit, text) {
+        static EM_GETSEL := 0x00B0, EM_SETSEL := 0x00B1, EM_GETFIRSTVISIBLELINE := 0x00CE, EM_LINESCROLL := 0x00B6
+        hwnd := edit.Hwnd
+        first := SendMessage(EM_GETFIRSTVISIBLELINE, 0, 0, hwnd)
+        selStart := Buffer(4, 0)
+        selEnd := Buffer(4, 0)
+        SendMessage(EM_GETSEL, selStart, selEnd, hwnd)
+        a := NumGet(selStart, "UInt")
+        b := NumGet(selEnd, "UInt")
+        edit.Opt("-Redraw")
+        try {
+            edit.Value := text
+            len := StrLen(text)
+            SendMessage(EM_SETSEL, Min(a, len), Min(b, len), hwnd)   ; does not scroll (no EM_SCROLLCARET)
+            now := SendMessage(EM_GETFIRSTVISIBLELINE, 0, 0, hwnd)
+            if (first != now)
+                SendMessage(EM_LINESCROLL, 0, first - now, hwnd)     ; relative; Windows clamps at the last line
+        } finally {
+            edit.Opt("+Redraw")
         }
     }
 
