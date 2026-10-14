@@ -1,5 +1,9 @@
 """Generates the golden data of the v1 expression and variable code (work item WI-36, doc/TEST-STRATEGY.md L6).
 
+FROZEN since E35 (2026-10-14): v1 is no longer the yardstick. The golden data stays as a regression test of the
+converter; no new groups and no new cases are generated against v1. The oracle of the expression language is native
+AutoHotkey v2 (tools/expr_oracle.py, doc/TEST-STRATEGY.md section 8).
+
 Usage:
     python tools/golden_v1.py [--check] [--private] [--group NAME ...] [--keep-temp]
 

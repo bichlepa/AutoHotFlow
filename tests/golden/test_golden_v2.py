@@ -1,4 +1,7 @@
-"""Compares the golden data of v1 with v2: the new expression language (WI-39, doc/EXPRESSION-LANGUAGE.md section 15)
+"""FROZEN since E35 (2026-10-14): regression test of the converter; no new cases against v1 (the oracle of the
+expression language is native AutoHotkey v2, tests/oracle/).
+
+Compares the golden data of v1 with v2: the new expression language (WI-39, doc/EXPRESSION-LANGUAGE.md section 15)
 and the variable model of the engine (WI-40, section 18).
 
 `plain`: the unchanged v1 text is evaluated by the new evaluator. Every case that does not give the v1 result must have
