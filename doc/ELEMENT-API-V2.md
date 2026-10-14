@@ -77,23 +77,24 @@ class Action_Example extends AhfElement {
 | `ctx.EvalParams(params, skipList := "")` | `x_AutoEvaluateParameters` (with `p_skipList`) | Returns the evaluated parameters as an object with case-insensitive properties; throws `ElementError` with the v1 text at the first error (no `_error`). Rules: section 3.1. `skipList`: an Array of ids or a text with commas; skipped parameters are not in the result. In a worker: the values that the engine evaluated before the job (E26). |
 | `ctx.EvalMoreParams(evaluated, params, names)` | `x_AutoEvaluateAdditionalParameters` | Evaluates the parameters `names` (Array or text with commas) into `evaluated` and returns it (a new object if `evaluated` is not one). Errors as `EvalParams`. |
 | `ctx.Finish(result, msg := "")` | `x_finish` | `result`: `normal`, `yes`, `no`, `exception`, `head`, `tail` |
-| `ctx.SetVar(name, value, scope := "", hidden := false)` | `x_SetVariable` | The name decides the scope as in v1 (WI-40, doc/EXPRESSION-LANGUAGE.md section 18.2): `A_` names are loop or thread variables and need `scope` `"thread"` or `"loop"`; `global_` and `static_` names are global and static; any other name is an instance variable. Returns 1, or 0 if refused (logged `f0` with the v1 text). The value is copied; an Array becomes a `Map` with the keys 1..n. Worker: not available (use `ctx.Export`; R4, S2). |
-| `ctx.GetVar(name, default := "", hidden := false)` | `x_GetVariable` | Reads a variable or a member (`"list.1"`) where its name says (an `A_` name: loop, thread, then built-in). Returns a copy, or `default` if it does not exist (no log). Worker: reads the copy of the visible loop, thread and instance variables that came with the job (`imports`); global, static, hidden and built-in variables come with `ctx.Request` (R4, S2). |
-| `ctx.DeleteVar(name, hidden := false)` | `x_DeleteVariable` | Deletes a variable or a member; 1 if it existed. Built-in variables cannot be deleted. Worker: R4 (S2). |
-| `ctx.GetVarLocation(name, hidden := false)` (alias `ctx.VarLocation`, WI-40) | `x_GetVariableLocation` | `"loop"`, `"thread"`, `"builtin"`, `"instance"`, `"static"`, `"global"` or `""`. `ctx.VarLocation` is the same (name of WI-40). Worker: R4 (S2). |
-| `ctx.GetVarType(name, hidden := false)` | `x_getVariableType` | `"object"`, `"normal"`, or `""` if the variable does not exist. Worker: from the copy (as `GetVar`). |
-| `ctx.ListVars(scope := "")` | `x_GetListOf*Vars` | names of the visible variables of one scope, or of all scopes (`""`) in the order loop, thread, instance, static, global. Worker: R4 (S2). |
-| `ctx.ReplaceVariables(text, convertObjects := false)` | `x_replaceVariables` | `%name%` substitution (doc/EXPRESSION-LANGUAGE.md section 18.5); `convertObjects` is the v1 option `ConvertObjectToString`. Worker: R4 (S2). |
-| `ctx.EvaluateExpression(text)` | `x_EvaluateExpression` + `if (res.error)` | Returns the value. Throws `ElementError` with the errors of the evaluator (line, column, marked line), as v1 finished with `res.error`. In strict mode (flow option `strictTypes`, E34) a warning (type error, division by zero) throws too; in compatibility mode the failed part is the empty text and an `f1` entry (E25). Worker: R4 (S2). |
-| `ctx.EvaluateScript(text)` | `x_EvaluateScript` + `if (res.errors)` | The value of the last statement; errors as `EvaluateExpression`. Worker: R4 (S2). |
+| `ctx.SetVar(name, value, scope := "", hidden := false)` | `x_SetVariable` | The name decides the scope as in v1 (WI-40, doc/EXPRESSION-LANGUAGE.md section 18.2): `A_` names are loop or thread variables and need `scope` `"thread"` or `"loop"`; `global_` and `static_` names are global and static; any other name is an instance variable. Returns 1, or 0 if refused (logged `f0` with the v1 text). The value is copied; an Array becomes a `Map` with the keys 1..n. Worker: through the engine (section 3.2). |
+| `ctx.GetVar(name, default := "", hidden := false)` | `x_GetVariable` | Reads a variable or a member (`"list.1"`) where its name says (an `A_` name: loop, thread, then built-in). Returns a copy, or `default` if it does not exist (no log). Worker: through the engine (section 3.2), every kind of variable. |
+| `ctx.DeleteVar(name, hidden := false)` | `x_DeleteVariable` | Deletes a variable or a member; 1 if it existed. Built-in variables cannot be deleted. |
+| `ctx.GetVarLocation(name, hidden := false)` (alias `ctx.VarLocation`, WI-40) | `x_GetVariableLocation` | `"loop"`, `"thread"`, `"builtin"`, `"instance"`, `"static"`, `"global"` or `""`. `ctx.VarLocation` is the same (name of WI-40). |
+| `ctx.GetVarType(name, hidden := false)` | `x_getVariableType` | `"object"`, `"normal"`, or `""` if the variable does not exist. |
+| `ctx.ListVars(scope := "")` | `x_GetListOf*Vars` | names of the visible variables of one scope, or of all scopes (`""`) in the order loop, thread, instance, static, global. |
+| `ctx.ReplaceVariables(text, convertObjects := false)` | `x_replaceVariables` | `%name%` substitution (doc/EXPRESSION-LANGUAGE.md section 18.5); `convertObjects` is the v1 option `ConvertObjectToString`. |
+| `ctx.EvaluateExpression(text)` | `x_EvaluateExpression` + `if (res.error)` | Returns the value. Throws `ElementError` with the errors of the evaluator (line, column, marked line), as v1 finished with `res.error`. In strict mode (flow option `strictTypes`, E34) a warning (type error, division by zero) throws too; in compatibility mode the failed part is the empty text and an `f1` entry (E25). |
+| `ctx.EvaluateScript(text)` | `x_EvaluateScript` + `if (res.errors)` | The value of the last statement; errors as `EvaluateExpression`. |
 | `ctx.CheckVarName(name)` | `x_CheckVariableName` | 1 if valid (not empty, no digit at the start, no forbidden character), else 0. Also in a worker. |
-| `ctx.ExportInstanceVars()` | `x_ExportAllInstanceVars` | A copy (`Map` name → value) of the visible instance variables; v1 returned the object itself. Worker: R4 (S2). |
-| `ctx.ImportInstanceVars(vars)` | `x_ImportInstanceVars` | Sets every entry of the `Map` as an instance variable, whatever the prefix of the name (as v1); an empty name or one with a forbidden character is skipped (`f0`). Worker: R4 (S2). |
+| `ctx.ExportInstanceVars()` | `x_ExportAllInstanceVars` | A copy (`Map` name → value) of the visible instance variables; v1 returned the object itself. |
+| `ctx.ImportInstanceVars(vars)` | `x_ImportInstanceVars` | Sets every entry of the `Map` as an instance variable, whatever the prefix of the name (as v1); an empty name or one with a forbidden character is skipped (`f0`). |
 | `ctx.After(ms, fn)` | `x_NewFunctionObject` + `SetTimer` | timer belongs to the execution and is cancelled automatically on stop/end |
 | `ctx.State` | `x_SetExecutionValue`/`x_GetExecutionValue`, `x_SetTriggerValue`/`x_getTriggerValue` | object per execution (Run) or per armed trigger |
 | `ctx.Fire(data := "")` | `x_trigger` | triggers only. Sends `evt.trigger.fired` |
 | `ctx.Log(level, text)` | `x_log` | levels `f0` to `f3` |
-| `ctx.Request(type, payload, callback, timeoutMs)` | – (new) | request to the engine with callback. Workers/triggers only. |
+| `ctx.GetImport(name, default := "")`, `ctx.Export(name, value)` | `p_VarsToImport`, `p_VarsToExport` of `x_ExecuteInNewAHKThread` | worker only: an explicit import list (empty from the engine since WI-50, for `ctx.RunScript`, S8) and values that the engine sets where their name says when the job ends (texts and numbers) |
+| `ctx.Request(type, payload, callback, timeoutMs := 5000)` | – (new) | A `cmd.*` request to the engine with callback, `execId` added to the payload (WI-50). Returns at once; `callback(answerPayload)` runs later on a thread of its own (it may call the variable functions), not at all when the element has ended or was stopped. An exception in the callback ends the element with `exception`. Workers only (triggers: S3); inline it throws. |
 | `ctx.RunScript(code, imports, exports)` | `x_ExecuteInNewAHKThread` | for AHK code elements. Always runs as a worker. |
 | `Lang(key, args*)` | `x_lang` | global function, language files unchanged |
 | `form.Disable(id, cond)`, `form.Enable(id, cond)` | `x_Par_Disable`/`x_Par_Enable` | only in `CheckSettings` |
@@ -119,6 +120,16 @@ The number of v1 helpers (`x_*`) actually used is 88. The most frequent: `x_lang
 - **Log:** every entry of the evaluator goes to the log of the element with the parameter: `f1` for errors and warnings (`parameter 'X': Expression warning: ...`), `f0` for a missing variable (as v1), with the flow ID. The editor shows the `f1` warnings later (S4/S5). The `f0` entry of a missing variable in a `%var%` substitution comes from the variable model (doc/EXPRESSION-LANGUAGE.md section 18.5).
 - **Worker elements (E26):** the engine evaluates all parameters before it sends the job, with the variables and the mode of the engine, and sends one entry per parameter: the value or the error (`cmd.worker.run`, field `evaluated`, PROTOCOL 4.5). `ctx.EvalParams` in the worker returns these values and throws at the first error of a parameter that is not skipped; `EvalMoreParams` reads the same entries. An assignment in a parameter that the element skips has therefore run already (MIGRATION M-48).
 - **Runtime:** measured in WI-42 (`tests/ahk/helpers/evalparams_bench.ahk`); see the result of the work item.
+
+### 3.2 Variables in a worker element (WI-50, ARCHITECTURE R4)
+
+A worker element has the same variable functions as an inline element: `GetVar`, `SetVar`, `DeleteVar`, `GetVarType`, `GetVarLocation`/`VarLocation`, `ListVars`, `ReplaceVariables`, `EvaluateExpression`, `EvaluateScript`, `ExportInstanceVars`, `ImportInstanceVars` (`CheckVarName` needs no engine).
+
+- **Every call asks the engine** (`cmd.engine.var.*`, PROTOCOL 4.5) and waits for the answer; the worker may wait (its own process), the engine answers at once and never waits. The engine runs the same function with the context of the element, so the result is the one the element gets inline: every kind of variable (loop, thread, instance, static, global, hidden, built-in), the type mode of the flow, the same log entries, the same error texts. Measured round trip: about 1 ms (`doc/MEASUREMENTS.md` M-31).
+- **No copies:** the job carries no copies of the variables, and nothing is cached in the worker. A variable that another thread changes meanwhile is seen at the next call; an element reads what it has written (MIGRATION M-45).
+- **Errors:** an error of the operation throws `ElementError` with the inline text. Without an answer within 5 s, or when the engine went away, the function throws `ElementError` "engine did not answer ...". After a stop of the instance (or the end of the job by its deadline) the engine answers `gone`, and the function throws: the element ends; its result is discarded.
+- **Rules for element code:** do not call the variable functions while the thread is `Critical` (the answer cannot be handled then; the call ends with "engine did not answer" after the timeout). From the element's `Run`, from `ctx.After` timers and from `ctx.Request` callbacks they work.
+- **Values:** as in variables (texts, numbers, `Map` objects; an `Array` becomes a `Map` with the keys 1..n). A Float that is not finite (`inf`, `nan`) becomes its text on the way to the engine (JSON has no such number); any other object is refused with the error of the variable model.
 
 ---
 
@@ -355,7 +366,7 @@ A converter (`tools/convert_element.py`, at the start of S8, E36; the core set o
 
 ## 8. Still to be clarified (Phase 3)
 
-- Exact form of `ctx.Request` and the variable functions in the worker (ARCHITECTURE R4): S2, WI-50. Until then a worker reads and writes only the copies it was sent (section 3, `GetVar`/`GetVarType`) and exports by name.
+- Exact form of `ctx.Request` and the variable functions in the worker (ARCHITECTURE R4): decided and built in WI-50, section 3.2.
 - Whether metadata and runtime code must be separated per role (ARCHITECTURE R3): measured in S2, WI-46.
 - Element packages (`package`, `packageVersion`): decided (E37). Files and include block per package, in phase 3 only `Default`; the Chrome package is dropped, the package information in flows stays; an element of an unknown package loads, is marked and ends with `exception` when it runs (WI-47).
 - Dialogs: decided (E38). Elements show dialogs only through an indirection, so that tests can answer them (WI-51).

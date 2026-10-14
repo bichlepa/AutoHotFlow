@@ -99,8 +99,10 @@ class Worker extends Role {
         job["started"] := true
         execId := job["execId"]
         env := job["env"]
+        ; The variable functions of the element ask the engine through the peer (WI-50, PROTOCOL 4.5).
         ctx := WorkerContext(env.Get("flowId", ""), env.Get("elementId", ""), env.Get("instanceId", "")
-            , env.Get("threadId", ""), job["imports"], ObjBindMethod(this, "_OnFinish", execId), job["evaluated"])
+            , env.Get("threadId", ""), job["imports"], ObjBindMethod(this, "_OnFinish", execId), job["evaluated"]
+            , execId, ObjBindMethod(this.peer, "Request"))
         job["ctx"] := ctx
         cls := ElementRegistry.Get(job["classId"])
         if (!IsObject(cls)) {
@@ -134,6 +136,8 @@ class Worker extends Role {
             return
         this._job := ""
         ctx := job["ctx"]
+        if (IsObject(ctx))
+            ctx.stopped := true         ; no ctx.Request callback runs any more (WI-50)
         if (job["started"] && IsObject(job["cls"]) && IsObject(ctx))
             ElementRunner.Stop(job["cls"], ctx, Worker._Params(job["params"]))
         execId := job["execId"]

@@ -152,6 +152,12 @@ class ExecContext {
         this._Vars().ImportInstance(vars)
     }
 
+    ; A request to the engine with a callback (ELEMENT-API-V2 section 3): only for worker elements (WorkerContext) and
+    ; later triggers. An inline element runs in the engine and calls it directly.
+    Request(type, payload, callback, timeoutMs := 5000) {
+        throw ElementError("Request is only available in a worker element")
+    }
+
     ; ---- parameters (WI-42, doc/ELEMENT-API-V2.md section 3.1) ------------------------------------------------------
 
     ; The evaluated parameters of the element (v1 x_AutoEvaluateParameters), as an object with case-insensitive

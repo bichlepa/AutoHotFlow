@@ -452,15 +452,10 @@ CheckAMapValueKeepsItsIntegerKeysInTheWorker() {
     Assert.Equal(p.Expr["K"][2], 3)
     err := Assert.Throws(() => ctx.EvalParams({}), ElementError)
     Assert.Equal(err.Message, "boom")
-    ; GetVar and GetVarType read the imported copy
-    Assert.Equal(ctx.GetVar("list.1"), "a")
-    Assert.Equal(ctx.GetVar("LIST.2.x"), "y")
-    Assert.Equal(ctx.GetVar("list.3", "none"), "none")
-    Assert.Equal(ctx.GetVarType("list"), "object")
-    Assert.Equal(ctx.GetVarType("list.1"), "normal")
-    Assert.Equal(ctx.GetVarType("nothing"), "")
-    Assert.Equal(ctx.GetVar("list", "", true), "", "hidden variables are not in the copy")
-    ; the rest needs the engine (R4)
+    ; an explicit import list is read with GetImport, keys as the engine stores them
+    Assert.Equal(ctx.GetImport("list")[2]["x"], "y")
+    ; the variable functions ask the engine (WI-50); this context has no connection to it
+    Assert.Throws(() => ctx.GetVar("list"), ElementError)
     Assert.Throws(() => ctx.ReplaceVariables("%x%"), ElementError)
     Assert.Throws(() => ctx.EvaluateExpression("1"), ElementError)
     Assert.Throws(() => ctx.ListVars(), ElementError)
@@ -523,7 +518,7 @@ TestRun.Case("worker: the first error is reported; every parameter was evaluated
 TestRun.Case("worker: compatibility mode", InWorker(CheckTypeErrorInCompatibilityMode))
 TestRun.Case("worker: strict mode", InWorker(CheckTypeErrorInStrictMode))
 TestRun.Case("worker: the engine sends every parameter evaluated, values and errors in order", CheckTheEngineSendsEveryParameterEvaluated)
-TestRun.Case("worker: a Map value keeps its Integer keys; GetVar reads the imported copy; the rest needs R4", CheckAMapValueKeepsItsIntegerKeysInTheWorker)
+TestRun.Case("worker: a Map value keeps its Integer keys; variables need the engine", CheckAMapValueKeepsItsIntegerKeysInTheWorker)
 TestRun.Case("worker: Parameters() that throws ends the element, no job is sent", CheckParametersThatThrowEndTheWorkerElement)
 
 TestRun.Finish()
