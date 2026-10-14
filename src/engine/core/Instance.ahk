@@ -2,6 +2,7 @@
 #Include ..\..\core\Errors.ahk
 #Include ..\..\core\Log.ahk
 #Include ThreadState.ahk
+#Include ..\vars\VarValues.ahk
 
 ; Instance state machine (WI-08, ARCHITECTURE 5.1, normative).
 ;
@@ -40,6 +41,9 @@ class Instance {
         this.State := "new"
         this.OnInvalid := onInvalid
         this.Threads := Map()
+        ; Instance variables (WI-40): every name without a prefix. Shared by all threads of the instance.
+        this.Vars := VarValues.NewMap()
+        this.HiddenVars := VarValues.NewMap()
     }
 
     ; new or waiting -> running. Creates the trigger thread (threadId, triggerElementId) in state finished

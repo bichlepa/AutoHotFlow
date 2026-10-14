@@ -1,5 +1,6 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\core\Errors.ahk
+#Include ..\vars\VarValues.ahk
 
 ; Stack of loop variables per thread (WI-08, ARCHITECTURE 5.2).
 ;
@@ -63,11 +64,12 @@ class LoopStack {
     }
 
     ; Copies the entries into a new map with the same case rule. Map.Clone() is not used:
-    ; its CaseSense handling is not part of the verified behavior.
+    ; its CaseSense handling is not part of the verified behavior. An object value is copied as well (WI-40): every
+    ; level of the stack and every thread owns its values.
     static CopyMap(source) {
         m := LoopStack.NewMap()
         for name, value in source
-            m[name] := value
+            m[name] := VarValues.Copy(value)
         return m
     }
 }

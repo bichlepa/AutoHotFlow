@@ -2,6 +2,7 @@
 #Include ..\..\core\Errors.ahk
 #Include ..\..\core\Log.ahk
 #Include LoopStack.ahk
+#Include ..\vars\VarValues.ahk
 
 ; Thread state machine (WI-08, ARCHITECTURE 5.2, normative).
 ;
@@ -49,6 +50,9 @@ class ThreadState {
         this.Result := result
         this.Message := ""
         this.Loops := LoopStack()
+        ; Thread variables (WI-40): names with A_, set with the location "thread". Owned by this thread.
+        this.Vars := VarValues.NewMap()
+        this.HiddenVars := VarValues.NewMap()
         this.OnInvalid := onInvalid
     }
 
@@ -95,12 +99,15 @@ class ThreadState {
         }
     }
 
-    ; Copy with a new ID. Keeps state, element, entry point, result and loop stacks (deep copy).
+    ; Copy with a new ID. Keeps state, element, entry point, result, loop stacks and thread variables (deep copy,
+    ; as v1 newThread with ToCloneFromThreadID copies the whole thread).
     Clone(newId) {
         copy := ThreadState(newId, this.InstanceId, this.ElementId, this.State, this.Result, this.OnInvalid)
         copy.EntryPoint := this.EntryPoint
         copy.Message := this.Message
         copy.Loops := this.Loops.Clone()
+        copy.Vars := VarValues.Copy(this.Vars)
+        copy.HiddenVars := VarValues.Copy(this.HiddenVars)
         return copy
     }
 
