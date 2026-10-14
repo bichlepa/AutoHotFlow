@@ -32,3 +32,10 @@ README of this phase (E21, E35), `doc/ARCHITECTURE.md` 7 (format version, `v1Tex
 ## Not part of this
 
 Resolving a marker (editor, AI), the import UI (S4).
+
+## Result
+
+- Key `migration` at the element (`{par, ids, v1}`), written by `FlowExprConvert.Mark`; detection `V1ExprDetect`, mapping `MigrationClasses` (checked by `tests/test_migration_classes.py`); new entry M-50 for texts that the new language cannot read. Report: `tools/migration_report.py` with the worker `tools/migration_report.ahk`.
+- Marker kinds and their tests: unknown class (no `migration` key, `v1Text` stays), accepted deviation, unsupported syntax, unreadable text (`tests/ahk/engine_flow_convert.test.ahk`, `tests/ahk/expr_v1detect.test.ahk`, `tests/test_migration_report.py`).
+- Report over `tests/data/flows` (32 flows): 1077 elements, 929 of unknown class, 0 marked places. The places are 0 because the classes of the examples are not ported yet (only the class knows which parameters are expressions); they appear as the classes of S2 are registered.
+- Load path (stress, 200 big flows, `-m stress`, serial): ready after 48.4 s; largest snapshot answer during the load 488 ms (budget 1000 ms); no timeout, no storage error. The work added at load is one detection walk per converted text; the examples have almost no registered class yet, so the measurement does not yet show its cost.
