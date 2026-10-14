@@ -96,10 +96,30 @@ def test_index_has_summary_counts_links_and_escaped_cells():
     assert "[REQ-EXE-010](REQUIREMENTS.md#req-exe-010-a--b) | A \\| B | yes | done |" in text
 
 
+def evidence_errors(tmp_path, evidence):
+    (tmp_path / "tests").mkdir(exist_ok=True)
+    (tmp_path / "tests" / "x.py").write_text("def test_a():\n    pass\n", encoding="utf-8")
+    (tmp_path / "tests" / "y_1.test.ahk").write_text("", encoding="utf-8")
+    meta = GOOD.replace("`tests/x.py`", evidence)
+    areas, errs = req_index.parse(doc(req(meta=meta)))
+    assert errs == []
+    return req_index.check_evidence(areas, tmp_path)
+
+
+def test_evidence_paths_and_test_names_must_exist(tmp_path):
+    assert evidence_errors(tmp_path, "`tests/x.py`, `tests/x.py::test_a`, `tests/y_*.test.ahk`, `tests/`") == []
+    assert evidence_errors(tmp_path, "the `*_policy_*` tests, measurement M-01") == []   # not a path: not checked
+    assert any("'tests/z.py' does not exist" in e for e in evidence_errors(tmp_path, "`tests/z.py`"))
+    assert any("'tests/q_*.ahk' does not exist" in e for e in evidence_errors(tmp_path, "`tests/q_*.ahk`"))
+    assert any("'test_b' not found" in e for e in evidence_errors(tmp_path, "`tests/x.py::test_b`"))
+
+
 def test_command_line_writes_checks_and_rejects(tmp_path):
     source, index = tmp_path / "REQUIREMENTS.md", tmp_path / "REQUIREMENTS-INDEX.md"
     source.write_text(doc(req()), encoding="utf-8")
-    args = ["--source", str(source), "--index", str(index)]
+    (tmp_path / "tests").mkdir()
+    (tmp_path / "tests" / "x.py").write_text("", encoding="utf-8")
+    args = ["--source", str(source), "--index", str(index), "--repo", str(tmp_path)]
     assert req_index.main(args + ["--check"]) == 1          # no index yet
     assert req_index.main(args) == 0 and index.exists()
     assert req_index.main(args + ["--check"]) == 0
@@ -109,3 +129,5 @@ def test_command_line_writes_checks_and_rejects(tmp_path):
     assert req_index.main(args + ["--check"]) == 1          # source changed, index outdated
     source.write_text(doc(req(rid="REQ-XYZ-010")), encoding="utf-8")
     assert req_index.main(args) == 1                        # format error: nothing written
+    source.write_text(doc(req(meta=GOOD.replace("tests/x.py", "tests/gone.py"))), encoding="utf-8")
+    assert req_index.main(args) == 1                        # missing evidence

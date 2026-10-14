@@ -18,8 +18,9 @@ doc/REQUIREMENTS.md is the source. Every requirement is a heading with a fixed l
     Free text, tables, lists ...
 
 The index is a summary plus one table per area, with links to the sections. It is never edited by hand.
+Evidence references in backticks that look like paths (`tests/x.py`, `tests/x.py::test_name`, globs) must exist.
 
-Usage:  python tools/req_index.py            check the source and write the index (exit 1 on format errors)
+Usage:  python tools/req_index.py            check the source and write the index (exit 1 on errors)
         python tools/req_index.py --check    check the source and that the index is up to date (exit 1 if not)
 """
 
@@ -163,6 +164,27 @@ def check_req(req):
     return errors
 
 
+EVIDENCE_REF = re.compile(r"`([^`\s]+)`")
+PATH_LIKE = re.compile(r"^[\w.\-*/]+(\.(py|ahk|md|json|txt)|/)(::\w+)?$")
+
+
+def check_evidence(areas, repo):
+    """Errors for Evidence references that do not exist: a path (globs allowed) or path::test_name."""
+    errors = []
+    for a in areas:
+        for r in a.reqs:
+            for ref in EVIDENCE_REF.findall(r.meta.get("Evidence", "")):
+                if not PATH_LIKE.match(ref):
+                    continue
+                path, _, test = ref.partition("::")
+                files = sorted(repo.glob(path)) if "*" in path else [repo / path]
+                if not files or not all(f.exists() for f in files):
+                    errors.append("line %d: %s: evidence '%s' does not exist" % (r.line, r.id, path))
+                elif test and not re.search(r"^\s*def %s\(" % re.escape(test), files[0].read_text(encoding="utf-8"), re.M):
+                    errors.append("line %d: %s: evidence test '%s' not found in %s" % (r.line, r.id, test, path))
+    return errors
+
+
 def cell(text):
     return text.replace("|", "\\|")
 
@@ -198,9 +220,10 @@ def render(areas, source_name=SOURCE.name):
     return "\n".join(out) + "\n"
 
 
-def run(source=SOURCE, index=INDEX, check=False, out=sys.stdout):
-    """0 when fine, 1 on format errors or (with check) an outdated index."""
+def run(source=SOURCE, index=INDEX, check=False, out=sys.stdout, repo=REPO):
+    """0 when fine, 1 on format errors, missing evidence or (with check) an outdated index."""
     areas, errors = parse(source.read_text(encoding="utf-8"))
+    errors += check_evidence(areas, repo)
     for e in errors:
         print("%s: %s" % (source.name, e), file=out)
     if errors:
@@ -227,8 +250,9 @@ def main(argv=None):
     ap.add_argument("--check", action="store_true", help="only check; exit 1 if the index is out of date")
     ap.add_argument("--source", type=Path, default=SOURCE)
     ap.add_argument("--index", type=Path, default=INDEX)
+    ap.add_argument("--repo", type=Path, default=REPO, help="root that evidence paths are relative to")
     args = ap.parse_args(argv)
-    return run(args.source, args.index, args.check)
+    return run(args.source, args.index, args.check, repo=args.repo)
 
 
 if __name__ == "__main__":
