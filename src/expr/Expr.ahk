@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ExprParser.ahk
 #Include ExprCache.ahk
+#Include ExprEvaluator.ahk
 
 ; Entry point of the expression library (doc/EXPRESSION-LANGUAGE.md).
 ;
@@ -33,6 +34,15 @@ class Expr {
     static ParseExpression(text, useCache := true) => Expr.Parse(text, "expression", useCache)
 
     static ParseScript(text, useCache := true) => Expr.Parse(text, "script", useCache)
+
+    ; Parses (with the cache) and evaluates. resolver gives access to the variables and logFn(level, text) receives
+    ; the log entries, see ExprEvaluator. Returns the result Map: value, errors, warnings, missing. Never throws
+    ; because of the text.
+    static Evaluate(text, resolver, logFn := "", kind := "expression") {
+        return ExprEvaluator(resolver, logFn).Run(Expr.Parse(text, kind), text)
+    }
+
+    static EvaluateScript(text, resolver, logFn := "") => Expr.Evaluate(text, resolver, logFn, "script")
 
     ; Text of all errors of a parse result: "line 1, column 5: message" and the marked line, per error.
     static FormatErrors(res) => ExprDiag.FormatAll(res["errors"])
