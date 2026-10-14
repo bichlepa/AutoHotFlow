@@ -37,7 +37,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-281 | `#Warn` dialog for `Engine` in `VarLoader.ahk:101` seen in a manual unit test run | cause established: `VarLoader.ahk` needs `Engine.ahk` in the same script; not reproduced in product or unit test; decision needed | |
 | F-282 | The stress test with 200 big flows fails its snapshot budget (largest snapshot answer during loading 2326 ms, budget 1000 ms) | observed once at the S1 acceptance (WI-43); measured in WI-46: the conversion is not the cause (worst case 8 % of the load time), largest snapshot answer 0.56 to 0.79 s in 6 of 7 runs, once 1.5 s; guarded by a stress run at the end of every S2 package on the load path | yes |
 | F-284 | A numeric text outside the range of Float (`1e-3001`) is true in a boolean test of AutoHotkey when it is a concatenation result, and false in the evaluator | verified by the expression oracle (one case in 40,000 random cases), open, low, AutoHotkey quirk | |
-| F-364* | `cmd.flow.get` returns `flowSettings.strictTypes` as `1`/`0` instead of JSON `true`/`false` | verified (WI-49 test, a file with `true` came back as `1`), open, low | |
+| F-364 | `cmd.flow.get` returns `flowSettings.strictTypes` as `1`/`0` instead of JSON `true`/`false` | verified (WI-49 test, a file with `true` came back as `1`), open, low | |
 
 * Provisional IDs (with `*`) were renumbered to final IDs on 2026-10-14, at the owner's request. Mapping, old to new: F-48 to F-269, F-49 to F-270, F-50 to F-271, F-51 to F-272, F-73 to F-273, F-74 to F-274, F-85 to F-275, F-125 to F-276, F-105 to F-277, F-165 to F-278, F-235 to F-279, F-236 to F-280, F-255 to F-281, F-268 to F-282, F-72 to F-283 (closed). From now on the orchestrator assigns the final ID before the commit.
 
@@ -231,7 +231,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Handling:** the generator of the oracle does not use the Floats `1e-300` and `1e300` as an operand of the concatenation or of a boolean operator, so a random run does not stop at it (`tools/expr_oracle.py`, `pick_var`). A deviation class is not made for it.
 **Action:** none unless a real flow shows it. If the evaluator is ever made to follow AutoHotkey for it, the oracle starts to see it again with `ftiny` or `fhuge` in the pool of every operand.
 
-### F-364*: `cmd.flow.get` returns `strictTypes` as a number
+### F-364: `cmd.flow.get` returns `strictTypes` as a number
 
 **What:** A flow file with `"strictTypes": true` is loaded, and `cmd.flow.get` answers with `"strictTypes": 1` (the parser maps `true` to the AutoHotkey number 1 and the definition is sent as it is in `Raw`). The file written by `cmd.flow.save` has `true`/`false` (`ToFileText`), and the protocol rule for truth values (E8) says real JSON booleans on the wire. Other keys of the flow, such as `enabled` of a trigger, are strings in v1 files, so only this key is affected as far as read.
 **Status:** verified by the test `tests/integration/test_flowrun.py` (WI-49), which compares the definition with the file it wrote. Open, low: no client reads the key yet. Not checked: whether the wire check of booleans (WI-26) knows this field.
