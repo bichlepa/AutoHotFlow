@@ -36,6 +36,12 @@
             "default": "1"
         },
         {
+            "id": "flowPath",
+            "type": "promptString",
+            "description": "Flow file or folder of flow files (v1 format)",
+            "default": "tests/data/flows"
+        },
+        {
             "id": "oracleCount",
             "type": "promptString",
             "description": "Number of generated cases of the expression oracle",
@@ -321,6 +327,17 @@
                 "tools/arch_check.py"
             ],
             "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: migration report of a flow folder (unknown classes, places with MIGRATION IDs)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/migration_report.py",
+                "${input:flowPath}"
+            ],
+            "group": "test",
             "problemMatcher": []
         },
         {
