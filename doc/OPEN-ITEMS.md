@@ -294,8 +294,7 @@ Editor, real manager, real elements, trigger host (WI-14, decision E6: built ear
 
 Work that is open but is not a finding with an entry. Rule: a finished action is deleted from this list, not marked as done; its history is in the git log.
 
-1. **`evalparam` in the golden data.** Decision for WI-42: a copy of the function in the harness, or stubs for all callees (see `tests/golden/FINDINGS.md`, "Not covered").
-2. **Three `uncaught/timeout` cases** in the groups `assignment` and `script` of the golden check (reported by the verifier, not investigated). Check whether they are the known hangs of the v1 parser.
+1. **Three `uncaught/timeout` cases** in the groups `assignment` and `script` of the golden check (reported by the verifier, not investigated). Check whether they are the known hangs of the v1 parser.
 
 ## Open decisions
 
