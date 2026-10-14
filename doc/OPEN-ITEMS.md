@@ -33,6 +33,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-73* | Closing the debug window is reported as a crash; the supervisor stays up | observed by manual check, open; window-close path works in the test, cause is probably an external close of the role (tray or main window), decision needed on the tray icon | |
 | F-74* | Manual-check guide and start tasks do not match | verified, open (owner's agent) | |
 | F-85* | A burst of log lines closes the hub's link to `storage` and loses the lines | reproduced, open, decision needed (same fix as F-17) | yes |
+| F-125* | The F-17 xfail test passes (strict XPASS) in the slow tier | observed once, open, cause not investigated | |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
 
@@ -191,6 +192,14 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Options:** (a) the hub treats `evt.log.append` as droppable: when the queue to the target is above a soft limit (for example 800 frames) the message is dropped and counted, with one summary line when there is room again, instead of driving the queue into the hard limit (in `src/supervisor/Hub.ahk`, no core change); (b) the sender batches lines (`evt.log.append` with a list, a protocol change); (c) a larger `maxQueueFrames` for the storage link (moves the limit). Recommended: (a) here and the same idea in `Role._Enqueue` for F-17.
 **Action:** Decision. The test `tests/fault/test_log_burst.py::test_a_burst_of_log_lines_does_not_cost_the_storage_link_or_the_lines` (slow tier, 5000 lines) is `xfail(strict=True)` and failed as expected in 3 of 3 runs (run IDs `20261014-060840-21784`, `20261014-060923-1844`, `20261014-061005-6576`, base commit f0793ce plus the test file; with `--runxfail` the failing assert is the `queue_overflow` check). Remove the mark with the fix.
 **Evidence:** the runs above; supervisor log of the 3000-line run: 155 "does not accept" lines, `queue_overflow`, "storage ended unexpectedly (hung)".
+
+### F-125*: The F-17 xfail test passes (strict XPASS) in the slow tier
+
+**What:** `tests/fault/test_log_burst.py::test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor` is marked `xfail(strict=True)` (F-17). In the verification run it passed, so the strict mark turned the result into `FAILED` with `[XPASS(strict)] F-17: a chatty role gives up during a long stand-still of the supervisor`. The other test of the file (F-85) was `xfailed` as expected.
+**Status:** Observed in 1 of 1 runs, `open`; not repeated and not investigated (verified: the result; assumed: the cause).
+**Evidence:** run ID `20261014-061730-0506198e`, commit `0506198`, command `python tools/run_suite.py --ref HEAD -- tests -q --all -m slow` (4 workers), exit code 1, `1 failed, 86 passed, 1 xfailed in 144.71s`, no INTERNALERROR. The test took about 22 s. The fast tier of the same commit is green (run ID `20261014-061637-0506198e`, 482 passed).
+**Suspicion (assumed):** The test depends on timing: it suspends the supervisor for 6 s while the role logs 100000 lines in a tight loop, and the failure needs the role's send queue to reach 1000 frames before the suspension ends. With 4 parallel workers the role may have finished or be slower than in the serial runs in which the bug hunter reproduced F-17, so the defect does not show. The change under verification (`src/expr/`, `tests/ahk/expr_*`) does not touch `src/core/` or `src/supervisor/`, so it is probably not the cause; the test file itself (commit `28f131a`) is the more likely origin.
+**Action:** Repeat the test alone and in the slow tier several times (serial and parallel) to see whether the XPASS is stable. If it is flaky, make the test deterministic (for example, wait until the role has logged a minimum number of lines before the suspension, or lengthen the suspension) or drop `strict` for this test.
 
 ## Watch list (E7)
 
