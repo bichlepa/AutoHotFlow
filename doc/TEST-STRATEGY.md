@@ -62,7 +62,7 @@ Note: The v1 hangs were never reliably reproducible. A comparison test against v
 - For every file in `tests/data/flows/v1_examples/` and `tests/data/flows/personal/`: load, save, load again. The parsed structures must be equal **including types** (`"1"` stays a string). Unknown keys are preserved.
 - Variables: read and write `.ahfvd`/`.ahfvar` pairs, identical content. The pairs in `tests/data/variables/` are synthetic and cover the formats (with and without BOM, CRLF, object content with mixed types). More are added when a feature needs them.
 - `.ahf` export/import: round trip via ZIP.
-- Existing test flows (category "Automatic tests" in `tests/data/flows/v1_examples/`) will later serve as acceptance flows for the engine (run them, check the result).
+- Existing test flows (category "Automatic tests" in `tests/data/flows/v1_examples/`) serve as acceptance flows for the engine (run them, check the result), from S2 on (WI-57) as far as their elements exist. They are not a v1 oracle (E35): a flow that needs a fix is adapted on a copy, and every fix is listed with its MIGRATION ID. Synthetic flows (flow builder, WI-49) carry the main load of the element tests.
 
 ## 5. Structure of the directory `tests/`
 
@@ -152,7 +152,9 @@ Environment variables: `AHF_AHK2_EXE` (path to the interpreter), `AHF_TEST_KEEP=
 
 ## 7. Golden data from v1 (L6, WI-36)
 
-What v1 actually returns for expressions, scripts, variable substitution and variable access. The data comes from the v1 code itself, run with the v1 interpreter (`v1/AutoHotKey/AutoHotFlow.exe`, AutoHotkey_H 1.1.32, 32 bit), not from reading the code. It is the yardstick of the converter (WI-39): a converted expression must return in v2 what v1 returned.
+**Frozen since E35 (2026-10-14).** v1 is no longer the yardstick. The data below stays as it is and remains a regression test of the converter (WI-39); no new groups or cases are generated against v1. The oracle of the expression language is native AHK v2 (section 8, WI-44); the specification of an element is the AHK v2 behaviour and the v1 help text.
+
+What v1 actually returns for expressions, scripts, variable substitution and variable access. The data comes from the v1 code itself, run with the v1 interpreter (`v1/AutoHotKey/AutoHotFlow.exe`, AutoHotkey_H 1.1.32, 32 bit), not from reading the code. It was the yardstick of the converter (WI-39): a converted expression returns in v2 what v1 returned, or its deviation is in the catalog.
 
 | Path | Content |
 |---|---|
@@ -176,3 +178,7 @@ What v1 actually returns for expressions, scripts, variable substitution and var
 **Private data (E27).** `python tools/golden_corpus.py --flows <folder> --out tests/golden/private/cases/corpus_private.json`, then `python tools/golden_v1.py --private` (tasks `Testdata: golden data of the private flows ...`). The folder is in `.gitignore`. Only counts may leave the machine (WI-39, WI-43).
 
 **Comparison with v2 (WI-39, WI-40).** `tests/golden/v2/harness.ahk` runs every case with the new language and the variable model of the engine; `tools/golden_compare.py` compares the result with v1 and gives each deviation one class of `tools/golden_classes.py` (the deviation catalog, `doc/EXPRESSION-LANGUAGE.md` section 15.1); `tests/golden/test_golden_v2.py` (fast tier) fails for a case without a class, for a class without a case, for a case that is still in a `rewrite` class after the conversion, and when the converter is not idempotent. Volatile cases and the `uncaught_error`/`timeout` outcomes are not expected to match (a failing or hanging v1 case is the class "v1 error"; a volatile case only needs a value in v2). State at the end of S1 (WI-43): of 2161 cases 1600 agree, 553 have an accepted class, 8 are syntax that is reported and not converted (decided by the project owner), none is open. `python tools/golden_v1.py --check` (about 2 minutes) reproduces the results of v1 byte for byte.
+
+## 8. Oracle of the expression language: native AHK v2 (E35, WI-44)
+
+Planned in S2 (WI-44); this section is completed by the work item. The expression language follows AHK v2 (E22), so AHK v2 itself is the yardstick: generated expressions (grammar based, reproducible with a seed) run once as real AHK v2 code and once in the evaluator, and the results may differ only by a fixed, named list of deliberate deviations (E25, E29, E34). Parts of the language that are not AHK v2 code (dot paths into variables, built-in variables of AutoHotFlow, the script form) keep their specification tests. A fixed corpus runs in the fast tier, longer random runs are `slow` or a tool.

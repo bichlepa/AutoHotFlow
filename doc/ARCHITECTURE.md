@@ -13,7 +13,7 @@ Labeling: **[M]** = measured or confirmed in a spike, **[V1]** = verified in the
 1. Deadlocks and race conditions **can no longer arise by construction**: no shared memory, no global lock, every datum has exactly one writing owner.
 2. No blocking call in the message path. File I/O and dialogs never run in the engine.
 3. A hanging or crashing process does not take any other process with it. The system detects it and reacts in a defined way.
-4. Old flows (`.json`) and variables (`.ahfvd`/`.ahfvar`) load unchanged.
+4. Old flows (`.json`) and variables (`.ahfvd`/`.ahfvar`) load as they are (no conversion of the files beforehand). How v2 writes is free (E21). A loaded v1 flow may need small fixes; every such place is marked with its MIGRATION ID and keeps the v1 original (E35).
 5. The element format of the 114 actions plus conditions, loops and triggers can be ported largely mechanically.
 
 Non-goals: new features, a new flow file format, a plugin sandbox against malicious element code.
@@ -34,7 +34,7 @@ Non-goals: new features, a new flow file format, a plugin sandbox against malici
 | D8 | **One `triggerhost` process holds OS hooks, hotkeys and trigger timers.** | Low-level hooks must respond quickly, or Windows removes them. This must not depend on engine load. Trigger types can later be distributed across several hosts. |
 | D9 | **Elements run in a hybrid way: `inline` in the engine or `worker` in their own process.** | See 2.3. Blocking, risky or UI-showing elements run in workers. This corresponds to the v1 pattern "own thread for AHK code". |
 | D10 | **The editor holds a draft, the engine owns the committed definition.** Changes are applied as patches with a revision number. | See 4.2. One editor per flow, so there are no multi-writer conflicts. |
-| D11 | **Flow file format stays unchanged** (JSON, `ElementIDCounter` etc.). | Requirement 4. See 7. |
+| D11 | **Flow file format stays unchanged** (JSON, `ElementIDCounter` etc.). **Narrowed by E21:** v2 must read the v1 format; how it writes is free (so far: the v1 format plus `formatVersion`, `v1Text`, `strictTypes`, see 7). | Requirement 4. See 7. |
 | D12 | **One entry point, roles via parameter**: `AutoHotFlow.ahk --role=<name>`. | One compiled artifact instead of many. The supervisor starts itself with a different role. |
 | D13 | **Tests with pytest as the e2e driver plus small AHK unit tests.** | See [TEST-STRATEGY.md](TEST-STRATEGY.md). |
 
@@ -389,8 +389,8 @@ Rule: a folder under `src/` is a process role or library module. `core/` may not
 |---|---|---|
 | R1 | Overlapped named pipes in AHK v2 are error-prone (OVERLAPPED structure, handle lifetime). | In Phase 2 as a tested library `core/ipc` with a Python counterpart, fault-injection tests. Spike exists. |
 | R2 | Drawing in the editor process could stutter with very large flows. | `Renderer` interface, measurement in Phase 3, separation criterion in 2.1. |
-| R3 | Including all element classes in every role costs parse time and memory (v1: 29,000 lines). | Measure. If too large: metadata and runtime code per role in separate files. |
-| R4 | Elements with a need for callbacks to the engine (`GetVariable` in the worker) need request/response without `await`. | Callback API `ctx.Request(...)` with timeout. Workers may wait blocking (own process), the engine never. |
+| R3 | Including all element classes in every role costs parse time and memory (v1: 29,000 lines). With one entry point (D12) every process parses all elements; a split per role needs separate entry scripts. | Measure (S2, WI-46). If too large: a decision of the project owner between separate entry scripts per role and metadata and runtime code in separate files (effect on D12 and R7). |
+| R4 | Elements with a need for callbacks to the engine (`GetVariable` in the worker) need request/response without `await`. | Callback API `ctx.Request(...)` with timeout (S2, WI-50). Workers may wait blocking (own process), the engine never. |
 | R5 | Execution policies (`default`, `parallel`, `skip`, `wait`, `stop`): exact semantics must be taken over from `newInstance` and `executionTask`. | Characterization tests against v1 before the port (Phase 3). |
 | R6 | Behavioral deviation: engine crash loses running instances. | Documented in [MIGRATION.md](MIGRATION.md). v1 had the same effect when the whole process crashed. |
 | R7 | Installer/compilation (Ahk2Exe v2, one artifact with role parameter). | Later phase, entry point is already prepared for it (D12). |

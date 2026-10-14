@@ -61,7 +61,7 @@ class Action_Example extends AhfElement {
 
 **Class ID:** Do not read it via `cls.Name`. A class with `static Name()` hides the built-in property, so `cls.Name` is then a function. The ID is provided by `ElementRegistry.IdOf(cls)` (internally `Type(cls())`). Verified in WI-09.
 
-**Registration:** At the end of the file: `ElementRegistry.Register(Action_Example)`. This is the only code allowed at file level. It runs at load time, before `AhfMain`. So that an error there (duplicate class, invalid `Mode`) does not show a dialog, the entry point `src/AutoHotFlow.ahk` sets `OnError` as its first executable statement, **before** the `#Include` lines (handler `AhfLoadError`: message to stderr, exit 1). An element file needs nothing for this. (Decision WI-22: the registration is not moved into a function, because that would change hundreds of element files in Phase 3 without catching more: the handler also covers any other code at file level.) The registry is a `Map` with `CaseSense := "Off"`. A generated include block per role (engine, editor, worker, trigger host) includes the files; no text substitution at run time.
+**Registration:** At the end of the file: `ElementRegistry.Register(Action_Example)`. This is the only code allowed at file level. It runs at load time, before `AhfMain`. So that an error there (duplicate class, invalid `Mode`) does not show a dialog, the entry point `src/AutoHotFlow.ahk` sets `OnError` as its first executable statement, **before** the `#Include` lines (handler `AhfLoadError`: message to stderr, exit 1). An element file needs nothing for this. (Decision WI-22: the registration is not moved into a function, because that would change hundreds of element files in Phase 3 without catching more: the handler also covers any other code at file level.) The registry is a `Map` with `CaseSense := "Off"`. A generated include block per package (E37, WI-47; files under `src/elements/<package>/`, in phase 3 only `Default`) includes the files; no text substitution at run time. Every process parses all elements, because there is one entry point (D12); whether a split per role is needed is measured in WI-46 (ARCHITECTURE R3).
 
 **Parameters that the element evaluates itself (WI-39):** the loader of flows converts the texts of all parameters with an expression content type from v1 syntax into the new language (`content` is `Expression`, `number`, `positiveNumber`, `integer`, `positiveInteger` or `positiveIntegerOrZero`, or `content` is a list and the parameter named by `contentID` holds one of these). A parameter that the element itself evaluates as an expression or script (v1: `x_EvaluateExpression` or `x_EvaluateScript` on a `RawString`, e.g. `Action_Script`) has no such content type; the class names it in `static V1Syntax := Map("Script", "script", "Condition", "expression")`. The loader calls `Parameters("")` in the engine, so `Parameters()` must not need the editor (`ctx`) for the ids and content types; if it throws, the element's texts stay in v1 syntax and the element is marked (ARCHITECTURE 7). `Action_TestExprParams` (`src/elements/skeleton/`) has one parameter of each kind.
 
@@ -338,7 +338,7 @@ Additionally: in v1, in the error case of the window parameter in `Element_enabl
 | `Return %x%` | `return x` |
 | `global` declaration in functions | explicit parameters or `static` |
 
-A converter (`tools/convert_element.py`, Phase 3) applies the rows of this table automatically, sets `Mode` by heuristic, and marks every place that cannot be converted unambiguously with `; TODO(v2-review): <reason>`.
+A converter (`tools/convert_element.py`, at the start of S8, E36; the core set of S2 is ported by hand and serves as its before/after test cases) applies the rows of this table automatically, sets `Mode` by heuristic, and marks every place that cannot be converted unambiguously with `; TODO(v2-review): <reason>`.
 
 **Heuristic for `Mode`:** `worker` if the source contains one of `RunWait`, `WinWait*`, `MsgBox`, `InputBox`, `FileSelect*`, `URLDownloadToFile`, `HTTPRequest`, `DllCall`, `ComObject`, `Gui`, `Sleep` (outside of timers), `x_ExecuteInNewAHKThread`. Otherwise `inline`. Trigger classes are always `trigger`. The result is checked by hand.
 
@@ -355,6 +355,9 @@ A converter (`tools/convert_element.py`, Phase 3) applies the rows of this table
 
 ## 8. Still to be clarified (Phase 3)
 
-- Exact form of `ctx.Request` and the import list for workers (`imports`) for elements that read arbitrary variables (R4, S2). Until then a worker reads and writes only the copies it was sent (section 3, `GetVar`/`GetVarType`) and exports by name.
-- Whether metadata and runtime code must be separated per role (ARCHITECTURE R3).
-- Handling of element packages from third parties (`package`, `packageVersion`): the Chrome package is dropped, but the structure of the package information stays so that old flows can be loaded.
+- Exact form of `ctx.Request` and the variable functions in the worker (ARCHITECTURE R4): S2, WI-50. Until then a worker reads and writes only the copies it was sent (section 3, `GetVar`/`GetVarType`) and exports by name.
+- Whether metadata and runtime code must be separated per role (ARCHITECTURE R3): measured in S2, WI-46.
+- Element packages (`package`, `packageVersion`): decided (E37). Files and include block per package, in phase 3 only `Default`; the Chrome package is dropped, the package information in flows stays; an element of an unknown package loads, is marked and ends with `exception` when it runs (WI-47).
+- Dialogs: decided (E38). Elements show dialogs only through an indirection, so that tests can answer them (WI-51).
+- AHK code elements: decided (E39). They run AHK v2 code; an imported v1 script is kept as text and marked (MIGRATION M-49, S8).
+- Specification of a ported element (E35): the v1 help text (`v1/Source_Elements/Default/help/en/`) and the AHK v2 behaviour, not the v1 code. A deliberate difference to v1 goes into MIGRATION.

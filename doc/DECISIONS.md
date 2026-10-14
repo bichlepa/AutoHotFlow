@@ -43,6 +43,12 @@ Where the detailed wording is in a repository document, the table names that doc
 | E31 | 2026-10-13 | `&&`/`\|\|` return the operand as in AHK v2, not `1`/`0` as in v1. | WI-38, MIGRATION. | `work_items/phase3/README.md` |
 | E32 | 2026-10-13 | Floats keep the AHK v2 text form without own formatting (`0.1+0.2` gives `0.30000000000000004`). A rounding option as an element parameter may come later. | WI-38. | `work_items/phase3/README.md` |
 | E33 | 2026-10-13 | The default data folder of v2 is `%APPDATA%\AutoHotFlow v2`, separate from the folder of the productive v1 (`%APPDATA%\AutoHotFlow`). Order: `--data`, `AHF_DATA_DIR`, default. | `Supervisor.DEFAULT_DATA_SUBDIR`. | `doc/MIGRATION.md` M-22 |
+| E34 | 2026-10-14 | Type errors per flow (F-105): each flow has the option `strictTypes`. Migrated flows get `false` (v1 behaviour, E25 unchanged), new flows get `true` (a type error in a comparison or calculation is an element error). The `f1` warnings are shown in the editor in both modes. | WI-42. | `doc/ARCHITECTURE.md` 7, `doc/MIGRATION.md` M-47, `work_items/phase3/README.md` |
+| E35 | 2026-10-14 | **v1 is no longer the yardstick.** Full v1 compatibility is not essential: AutoHotFlow is a niche product, and v1 is hardly in use because of its bugs. Old flows and variables still load; small manual fixes after the import are acceptable. (1) The v1 golden data (WI-36) is frozen: it stays as a regression test of the converter, nothing new is generated against v1. (2) The oracle of the expression language is native AHK v2: generated expressions run as AHK v2 code and in the evaluator, and may differ only by a fixed list of deliberate deviations (E25, E29, E34). (3) The specification of an element is the underlying AHK v2 command plus the v1 help texts (`v1/Source_Elements/Default/help/`), not the v1 code. (4) Every place that the loader cannot convert or that behaves differently is marked with the ID of its MIGRATION entry, and the v1 original is kept with it, so that a later AI-assisted import can get a description of the changes and adapt the flow. The AI connection itself is not part of phase 3. | Supersedes E23, narrows E22. S2: WI-44, WI-45, WI-57. | `work_items/phase3/README.md`, `doc/TEST-STRATEGY.md` 7 and 8 |
+| E36 | 2026-10-14 | The element converter `tools/convert_element.py` moves from S2 to the start of S8. The core set of S2 is ported by hand; these elements are the before/after test cases of the converter. | Plan of phase 3. | `work_items/phase3/README.md`, `doc/ELEMENT-API-V2.md` 6 |
+| E37 | 2026-10-14 | Element packages: the element files are organised per package (`src/elements/<package>/`) and the include block is generated per package. In phase 3 the only package is `Default`; the package information in flows (`package`, `packageVersion`) stays. | S2: WI-47. | `doc/ELEMENT-API-V2.md` 2 and 8 |
+| E38 | 2026-10-14 | Dialogs of elements go through an indirection. The test entry point registers a provider with scripted answers, so dialog elements are tested headless, without the `gui` tier. | S2: WI-51. | `doc/ELEMENT-API-V2.md` 8, `doc/TEST-STRATEGY.md` |
+| E39 | 2026-10-14 | v1 AHK code in `Action_AutoHotkey_script` and `Trigger_AutoHotkey_Script` is not run with a v1 interpreter (E4 stays). The v2 elements run AHK v2 code. An imported v1 script is kept as text and marked (E35); porting it to v2 is a manual or AI-assisted step. Documented break. | S8. | `doc/MIGRATION.md` M-49 |
 
 ## Open
 
@@ -52,7 +58,12 @@ Not E-numbered, but still waiting for the project owner: finding F-43 (see the f
 
 ## Superseded
 
-None. No entry in the sources replaces another entry.
+| Entry | Replaced by | What changed |
+|---|---|---|
+| E23 | E35 (2026-10-14) | No new golden data is generated with v1. The existing v1 golden data is frozen and stays as a regression test of the converter. |
+| E22 (in part) | E35 (2026-10-14) | The language and the conversion stay. "A converted formula returns the v1 result except for documented deviations" is narrowed: a deviation must be known (catalog, MIGRATION ID, marker in the flow); v1 is not the yardstick of new tests. |
+| E8 (write format) | E21 (2026-10-12) | How v2 writes flows is free; old flows must load. |
+| Item 5 below | E21, E35 | Old flows and variables load (the files are read as they are). v2 may write another format (E21), and a loaded flow may need small fixes; such places are marked (E35). |
 
 ## Earlier decisions without ID
 
@@ -62,7 +73,7 @@ The Phase 0 and Phase 1 release by the project owner has nine items. The sources
 2. Drawing happens in the editor process behind the `Renderer` interface, separable later. Risk not measured; measurement in phase 3.
 3. Worker processes for blocking and AHK script elements.
 4. Target version AHK v2.
-5. Old flows and variables must load unchanged.
+5. Old flows and variables must load unchanged. (Narrowed by E21 and E35, see "Superseded".)
 6. Own branch `v2-port`; temporary `v1/` folder.
 7. The Chrome package is dropped.
 8. Tests with pytest (end-to-end, fault injection, stress) plus AHK unit tests.
@@ -72,4 +83,4 @@ The Phase 0 and Phase 1 release by the project owner has nine items. The sources
 
 - E17 is worded differently in two places. `v2-phase2-final:work_items/phase2b/README.md` says the serial run and `-m stress` run "regelmäßig" (regularly). `v2-phase2-final:work_items/STATUS.md` and the test strategy give the rule above (end of each timing-relevant package and end of each block). This file uses the wording of the test strategy. Not checked: which wording the project owner meant.
 - E16 appears under the same ID in every source that mentions it. No other numbering was found.
-- E18 to E28 were decided on 2026-10-12 while the phase 3 plan was drafted, E29 to E33 on 2026-10-13 as answers to its open questions. Their wording is in `work_items/phase3/README.md`; this table gives a short form.
+- E18 to E28 were decided on 2026-10-12 while the phase 3 plan was drafted, E29 to E33 on 2026-10-13 as answers to its open questions, E34 on 2026-10-14 (F-105), E35 to E39 on 2026-10-14 while S2 was detailed. Their wording is in `work_items/phase3/README.md`; this table gives a short form.
