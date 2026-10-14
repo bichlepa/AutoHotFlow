@@ -11,13 +11,14 @@ import threading
 # Payload fields that are truth values by the protocol (any depth, matched by key name).
 BOOL_FIELDS = frozenset({
     "ok", "cancel", "started", "clean", "restart", "enabled", "executing", "exists", "existed",
-    "waiting", "byMeta", "delete", "busy", "truncated",
+    "waiting", "byMeta", "delete", "busy", "truncated", "hidden", "accepted", "withValues", "convertObjects",
 })
 
 # Payload fields that carry user data (flow definitions, element parameters, variable values). Their content
 # keeps its own format (E8: flow files do not change, "enabled": "0" is an element parameter), so the
 # check does not look inside.
-OPAQUE_FIELDS = frozenset({"definition", "params", "imports", "exports", "settings", "content", "env"})
+OPAQUE_FIELDS = frozenset({"definition", "params", "imports", "exports", "settings", "content", "env",
+                           "value", "values", "vars", "evaluated"})
 
 _lock = threading.Lock()
 _violations = []
