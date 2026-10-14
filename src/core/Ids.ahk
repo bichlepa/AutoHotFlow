@@ -19,8 +19,10 @@ class Ids {
     static Next(prefix := "") {
         if (this.processName = "")
             throw AhfError("Ids.Next: Ids.Configure was not called", ErrCode.INTERNAL)
-        this.counter += 1
+        prev := Critical("On")  ; reason: incrementing and reading the counter is one step (an interrupting timer or message handler would get the same id)
+        n := ++this.counter
+        Critical(prev)
         head := (prefix = "") ? this.processName "#" : prefix
-        return head this.counter
+        return head n
     }
 }

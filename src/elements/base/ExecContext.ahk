@@ -38,13 +38,16 @@ class ExecContext {
     Finish(result, msg := "") {
         if (!ExecContext.IsResult(result))
             throw ElementError("Finish: unknown result '" result "'")
+        prev := Critical("On")  ; reason: only one of two racing Finish calls may win; onFinish runs after Critical is restored
         if (this.finished) {
+            Critical(prev)
             Log.Write("a0", "element " this.elementId, "second Finish('" result "') ignored, first was '" this.result "'", this.flowId)
             return false
         }
         this.finished := true
         this.result := result
         this.message := msg
+        Critical(prev)
         this.CancelTimers()
         onFinish := this.onFinish
         if (IsObject(onFinish))

@@ -51,6 +51,39 @@ CheckManyIds() {
     Assert.Equal(last, 100000)
 }
 
+; F-14: an interrupting timer must not get the same id as the interrupted call.
+; The timer and the main loop both take ids; all ids must be different.
+global raceSeen := Map()
+global raceDup := ""
+
+RaceTick() {
+    global raceSeen, raceDup
+    loop 20 {
+        id := Ids.Next()
+        if (raceSeen.Has(id) && raceDup = "")
+            raceDup := id
+        raceSeen[id] := true
+    }
+}
+
+CheckInterruptingTimer() {
+    global raceSeen, raceDup
+    Ids.Configure("race")
+    raceSeen := Map()
+    raceDup := ""
+    SetTimer(RaceTick, 1)
+    stop := A_TickCount + 1500
+    while (A_TickCount < stop) {
+        id := Ids.Next()
+        if (raceSeen.Has(id) && raceDup = "")
+            raceDup := id
+        raceSeen[id] := true
+    }
+    SetTimer(RaceTick, 0)
+    if (raceDup != "")
+        throw AssertFailed("duplicate id " raceDup " after " raceSeen.Count " ids")
+}
+
 CheckUnconfigured() {
     err := Assert.Throws(NextWithoutConfigure, AhfError)
     Assert.Equal(err.code, "internal")
@@ -67,6 +100,7 @@ TestRun.Case("Next returns processName#n counting from 1", CheckCountsFromOne)
 TestRun.Case("Configure resets the counter", CheckConfigureResets)
 TestRun.Case("Next with prefix returns prefix followed by n", CheckPrefix)
 TestRun.Case("100000 ids are unique and strictly ascending", CheckManyIds)
+TestRun.Case("an interrupting timer never gets the same id", CheckInterruptingTimer)
 TestRun.Case("Next without Configure throws AhfError with code internal", CheckUnconfigured)
 TestRun.Case("Configure rejects an empty process name", CheckEmptyName)
 
