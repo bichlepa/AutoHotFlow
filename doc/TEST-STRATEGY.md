@@ -73,6 +73,8 @@ tests/
 ├─ support/
 │  ├─ ahfclient.py            # framing, hello, wake, request/response with timeout
 │  ├─ procs.py                # start/kill/suspend helpers, process tree cleanup
+│  ├─ flowbuilder.py          # builds flow files in Python (section 9)
+│  ├─ flowrun.py              # runs a flow headless and returns steps, log, probes (section 9)
 │  └─ ahk.py                  # search for the AHK interpreter (environment variable AHF_AHK2_EXE, default path)
 ├─ ahk/
 │  ├─ lib/Assert.ahk
@@ -202,3 +204,24 @@ The expression language follows AHK v2 (E22), so AHK v2 itself is the yardstick:
 **Adding a deviation.** Only for a deviation that is decided (an `E` decision or a documented rule): an entry in `CLASSES` (text as in `doc/EXPRESSION-LANGUAGE.md` 19.2), a model if the value changes, and at least one case in the corpus (`test_every_deviation_class_has_a_case`). An unexplained difference is a finding: fix the evaluator, or write it into `doc/OPEN-ITEMS.md` and keep it out of the generator until it is decided (F-284 is an example).
 
 **Does it see an error?** Checked once by hand (not a permanent test): with `<=` changed to `<` in `ExprEvaluator.Apply`, the fixed corpus reports 7 cases as `OPEN`. `test_the_oracle_notices_a_wrong_evaluator_result` checks the classification itself.
+
+## 9. Flow builder and headless runner (WI-49)
+
+How an e2e test of an element is written: the flow in Python, one call to run it, the result as data. `tests/support/flowbuilder.py` builds the flow file, `tests/support/flowrun.py` runs it in a real session (supervisor, storage, engine, entry point with the test elements); both have docstrings with the full API. Tests: `tests/support/test_flowbuilder.py` (no process), `tests/integration/test_flowrun.py` (one fast smoke test, three `slow`).
+
+```python
+from support.flowbuilder import FlowBuilder
+from support.flowrun import flows  # noqa: F401  (fixture)
+
+def test_an_exception_takes_the_exception_connection(flows):
+    fb = FlowBuilder("exc")
+    els = fb.linear("Trigger_Manual -> Action_TestThrow exception-> Action_Do_nothing")
+    run = flows.run(fb)
+    assert run.reason == "finished" and run.path == [e.id for e in els]
+    assert run.state_of(els[1]) == ["exception"]
+```
+
+- **Builder.** `trigger`, `action`, `condition`, `loop` add an element (class and parameters; IDs, positions, package and defaults are generated), `connect(a, b, result, into)` a connection with the result `normal`, `yes`, `no`, `exception`, for a loop the parts `head`, `tail` (leaving) and `into="head"|"tail"|"break"` (entering). `chain` and the text form `linear("Class(par=value) -> Class yes-> Class")` build linear flows. `probe(names)` adds the test element that copies variables into global variables for the runner. Output: `v2=True` (default) is the v2 file (`formatVersion` 2, `strictTypes` as a boolean, no conversion on load); `v2=False` is the v1 format for conversion tests. Parameters keep their Python type.
+- **Runner.** The fixture `flows` (import it into the test module) writes flows into the data folder, starts one session when the first flow runs (a flow added later restarts it), and ends it at teardown; a process of the session that is left behind fails the test. `flows.run(fb, timeout=10)` starts an instance and waits (`scaled()`) for `evt.instance.ended`. The `FlowRun` has `reason`, `steps` (`path`, `names`, `state_of`, `exceptions`: one entry per started execution, so a loop shows its body once per round), `log` (entries of the flow up to the end) and `probe(name)` (text, type and location of a variable at the place of a probe element). `flows.add_file(path)` takes a ready flow file, `flows.request_ok(to, type, payload)` sends a request to a role.
+- **Variables.** `flows.preset_var(name, value, flow_id=None)` (before the first run; `flow_id` makes it static), `flows.read_var` and `flows.wait_var` read the pair files (the engine writes 200 ms after a change). Module functions `write_var`, `read_var`, `var_value`, `delete_var` work on any data folder.
+- **Limits (verified).** The result of a condition (`yes`, `no`) is not an event (`evt.connection.state` is not sent yet), so a test reads the branch from the path. Events of several instances of one flow that run at the same time are not told apart (the element event has no instance ID). Instance and thread variables cannot be read after the end of an instance, because there is no engine request for them before WI-50: use `probe`. The runner waits for the engine to have loaded the flows and the variable files (counted, as `evt.engine.ready` can be missed by a late observer).
