@@ -13,13 +13,16 @@ What it does:
     tree and copies the untracked files that are not ignored), runs pytest there and removes the worktree again.
     A file that is neither in the commit nor in the changes is not there: a test that needs it fails here, not
     only on someone else's machine,
-  * limits the load: pytest gets --workers N (default 4) worker processes, at most --max-runs (default 2) runs go at
-    the same time, a run that asks for stress or soak tests (-m stress / -m soak) waits until no other run is active
-    and blocks the start of others while it measures,
+  * limits the load through the machine-wide admission (tests/support/admission.py, shared with direct pytest runs):
+    pytest gets --workers N (default 4) worker processes, fewer when the other runs hold the free worker slots
+    (AHF_MAX_WORKERS), at most --max-runs (default 2) runs of run_suite go at the same time, a run that asks for
+    stress or soak tests (-m stress / -m soak) waits until no other run is active and blocks the start of others
+    while it measures. The pytest run inside registers no second time (AHF_ADMITTED),
   * keeps the result in <temp>\\ahf_runs\\<id>\\: output.txt (everything pytest printed), result.json, and
     pytest-log\\ (the run log of tests/conftest.py: summary, failures, data of failed tests). The last 20 runs are kept.
 
-Exit code: the one of pytest (0 = all passed), 70 = the tool itself failed (git, worktree, patch).
+Exit code: the one of pytest (0 = all passed), 70 = the tool itself failed (git, worktree, patch), 75 = the admission
+gave up (AHF_ADMISSION_TIMEOUT).
 Not covered: runs of different checkouts share the machine (pipe names, CPU), and timing tests (scaled()) can
 become flaky when the machine is loaded; use --max-runs 1 for a clean comparison.
 """
@@ -31,16 +34,20 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
 import time
 from pathlib import Path
 
 import psutil
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "tests"))
+
+from support.admission import (Admission, AdmissionError, AdmissionTimeout, EXIT_ADMISSION_TIMEOUT,  # noqa: E402,F401
+                               _alive, active_runs, admission_timeout, admit, is_exclusive, read_status,
+                               runs_dir, write_status)
+
 KEEP_RUNS = 20
 EXIT_TOOL_FAILED = 70
-EXCLUSIVE_MARKERS = ("stress", "soak")
 
 
 class ToolError(Exception):
@@ -53,113 +60,6 @@ def git(*args, cwd=REPO, check=True, input_bytes=None):
         raise ToolError("git %s failed (%d): %s" % (" ".join(args), proc.returncode,
                                                   proc.stderr.decode("utf-8", "replace").strip()))
     return proc.stdout
-
-
-def runs_dir():
-    return Path(os.environ.get("AHF_RUNS_DIR") or Path(tempfile.gettempdir()) / "ahf_runs")
-
-
-def is_exclusive(pytest_args):
-    """True when the run asks for stress or soak tests with -m (measurements need an idle machine)."""
-    args = list(pytest_args)
-    for i, arg in enumerate(args):
-        expr = None
-        if arg == "-m" and i + 1 < len(args):
-            expr = args[i + 1]
-        elif arg.startswith("-m") and len(arg) > 2:
-            expr = arg[2:]
-        if expr and any(re.search(r"\b%s\b" % m, expr) for m in EXCLUSIVE_MARKERS):
-            return True
-    return False
-
-
-# --- registry of the runs (status.json per run folder) ------------------------------------------------
-
-def _alive(info):
-    try:
-        proc = psutil.Process(info["pid"])
-        return abs(proc.create_time() - info["pidCreated"]) < 1.0
-    except (psutil.Error, KeyError, TypeError):
-        return False
-
-
-def active_runs(base, exclude=None):
-    found = []
-    for status in base.glob("*/status.json"):
-        if exclude is not None and status.parent == exclude:
-            continue
-        try:
-            info = json.loads(status.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            continue
-        if info.get("state") == "running" and _alive(info):
-            info["dir"] = str(status.parent)
-            found.append(info)
-    return found
-
-
-def write_status(run_dir, **fields):
-    path = run_dir / "status.json"
-    try:
-        info = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        info = {}
-    info.update(fields)
-    path.write_text(json.dumps(info, indent=2), encoding="utf-8")
-
-
-class Admission:
-    """Check-and-register under a short lock file, so two starts cannot both pass the check."""
-
-    def __init__(self, base):
-        self.path = base / "admission.lock"
-
-    def __enter__(self):
-        deadline = time.time() + 15
-        while True:
-            try:
-                self.fd = os.open(str(self.path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-                return self
-            except FileExistsError:
-                try:
-                    if time.time() - self.path.stat().st_mtime > 30:     # left behind by a crashed tool
-                        self.path.unlink()
-                        continue
-                except OSError:
-                    pass
-                if time.time() > deadline:
-                    raise ToolError("admission lock %s is held" % self.path)
-                time.sleep(0.1)
-
-    def __exit__(self, *exc):
-        os.close(self.fd)
-        try:
-            self.path.unlink()
-        except OSError:
-            pass
-
-
-def admit(base, run_dir, exclusive, max_runs, info, wait_log):
-    """Waits until the run may start, then registers it as running."""
-    last_msg = 0.0
-    while True:
-        with Admission(base):
-            others = active_runs(base, exclude=run_dir)
-            blocked = None
-            if any(o.get("exclusive") for o in others):
-                blocked = "a measurement run is active"
-            elif exclusive and others:
-                blocked = "%d other run(s) are active (a measurement needs an idle machine)" % len(others)
-            elif len(others) >= max_runs:
-                blocked = "%d run(s) are active (limit --max-runs %d)" % (len(others), max_runs)
-            if blocked is None:
-                write_status(run_dir, **info, state="running", pid=os.getpid(),
-                             pidCreated=psutil.Process().create_time())
-                return
-        if time.time() - last_msg > 30:
-            wait_log("waiting: " + blocked)
-            last_msg = time.time()
-        time.sleep(1.0)
 
 
 # --- worktree -----------------------------------------------------------------------------------------
@@ -301,19 +201,21 @@ def main(argv=None):
     def say(text):
         print("[run_suite] " + text, flush=True)
 
-    info = {"id": run_id, "ref": args.ref, "sha": sha, "withChanges": args.with_changes, "exclusive": exclusive,
-            "pytestArgs": pytest_args, "workers": args.workers, "started": time.strftime("%Y-%m-%d %H:%M:%S")}
+    info = {"id": run_id, "tool": "run_suite", "ref": args.ref, "sha": sha, "withChanges": args.with_changes,
+            "pytestArgs": pytest_args, "started": time.strftime("%Y-%m-%d %H:%M:%S")}
     say("%s%s  (%s)" % (label, " + uncommitted changes" if args.with_changes else "", run_id))
     exit_code = EXIT_TOOL_FAILED
     child = None
     try:
-        admit(base, run_dir, exclusive, args.max_runs, info, say)
+        workers, _ = admit(base, run_dir, info, requested=args.workers, exclusive=exclusive, say=say,
+                           max_runs=args.max_runs, timeout=admission_timeout())
         make_worktree(tree, sha, args.with_changes)
         env = dict(os.environ)
         env["AHF_TEST_LOGS"] = str(log_dir)
         env["PYTHONUNBUFFERED"] = "1"
-        cmd = [sys.executable, "-m", "pytest", "-n", str(args.workers), *pytest_args]
-        say("pytest %s  (workers %d, cwd %s)" % (" ".join(cmd[3:]), args.workers, tree))
+        env["AHF_ADMITTED"] = run_id            # the conftest inside registers no second time
+        cmd = [sys.executable, "-m", "pytest", "-n", str(workers), *pytest_args]
+        say("pytest %s  (workers %d, cwd %s)" % (" ".join(cmd[3:]), workers, tree))
         with open(output, "wb") as out:
             child = subprocess.Popen(cmd, cwd=str(tree), env=env, stdin=subprocess.DEVNULL,
                                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -328,7 +230,10 @@ def main(argv=None):
         if child is not None:
             kill_tree(child.pid)
         exit_code = 130
-    except ToolError as e:
+    except AdmissionTimeout as e:
+        say("admission: %s" % e)
+        exit_code = EXIT_ADMISSION_TIMEOUT
+    except (ToolError, AdmissionError) as e:
         say("tool error: %s" % e)
         exit_code = EXIT_TOOL_FAILED
     finally:
@@ -346,6 +251,9 @@ def main(argv=None):
     say("output: %s" % output)
     if log_dir.exists():
         say("run log (summary, failures, data of failed tests): %s" % log_dir)
+    history_file = read_status(run_dir).get("historyFile")
+    if history_file:
+        say("history: %s" % history_file)
     if tree.exists():
         say("worktree kept: %s%s" % (tree, "" if args.keep else "  (could not be removed, remove it by hand)"))
     return exit_code
