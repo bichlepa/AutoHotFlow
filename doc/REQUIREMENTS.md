@@ -1049,6 +1049,16 @@ Hotkeys, hooks and timers react at once, no matter how busy the running flows ar
 
 The triggers of enabled flows are active from the start of AutoHotFlow on, and again after an internal restart (REQ-ROB-040); disabling a flow deactivates them.
 
+### REQ-TRG-040 Conflicting hotkeys are reported
+
+- **v1:** no (not checked)
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S0003, S0007
+
+When two enabled flows, or two triggers of one flow, use the same hotkey or hotstring in the same context, AutoHotFlow warns: in the trigger settings when the hotkey is chosen, and in the manager when the second flow is enabled. A hotkey that cannot be registered because another program uses it is reported as well (REQ-TRG-010).
+
 ### REQ-TRG-030 Several triggers per flow
 
 - **v1:** yes
@@ -1089,7 +1099,7 @@ Started by the user, by another flow (REQ-EXE-120) or through the command line (
 | `Trigger_Periodic_Timer` | yes | open | S0003 |
 | `Trigger_Time_of_Day` (with week days) | yes | open | S0008 |
 
-### REQ-TRG-220 Start-up trigger
+### REQ-TRG-220 Start-up and system triggers
 
 - **v1:** yes
 - **v2:** open
@@ -1100,6 +1110,10 @@ Started by the user, by another flow (REQ-EXE-120) or through the command line (
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
 | `Trigger_Start_up` | yes | open | S0003 |
+| Windows resumes from standby or hibernation | no | open | later |
+| Windows shuts down or the user logs off (the flow runs before) | no | open | later |
+| A USB device or a drive is connected or removed | no | open | later |
+| A network connection is established or lost | no | open | later |
 
 Fires when AutoHotFlow starts; it can tell a start with Windows (REQ-SET-030) from a start by hand.
 
@@ -1144,6 +1158,7 @@ Creates a shortcut file (default on the desktop) that starts the flow through th
 |---|---|---|---|
 | `Trigger_User_Idle_Time` | yes | open | S0008 |
 | `Trigger_Clipboard_Changes` | yes | open | S0008 |
+| The session is locked or unlocked | no | open | later |
 
 ### REQ-TRG-260 Window triggers
 
