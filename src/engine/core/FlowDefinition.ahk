@@ -122,6 +122,20 @@ class FlowDefinition {
         return Json.Stringify(root, 2)
     }
 
+    ; The definition for the wire (cmd.flow.get and the conflict answer): Raw, but flowSettings.strictTypes, if the flow
+    ; has the key, as a JSON boolean (the parser reads true as 1, and the wire rule E0008 wants true/false; F-0285).
+    ; Raw itself is not changed; a flow without the key stays without it (compatibility mode, no invented key).
+    WireDefinition() {
+        settings := this.Raw.Get("flowSettings", "")
+        if (!(settings is Map) || !settings.Has(FlowDefinition.STRICT_KEY))
+            return this.Raw
+        root := this.Raw.Clone()
+        settings := settings.Clone()
+        settings[FlowDefinition.STRICT_KEY] := Json.Bool(this.StrictTypes)
+        root["flowSettings"] := settings
+        return root
+    }
+
     ; 1 if flowSettings holds strictTypes true (also 1, "1" or "true", as a file edited by hand may have it), else 0.
     static ReadStrictTypes(settings) {
         if (!(settings is Map) || !settings.Has(FlowDefinition.STRICT_KEY))

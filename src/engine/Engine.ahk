@@ -400,7 +400,7 @@ class Engine extends Role {
 
     _CmdFlowGet(msg) {
         rec := this.flows.Require(Engine.Text(msg, "flowId"))
-        return Map("rev", rec.Rev, "definition", rec.Def.Raw)
+        return Map("rev", rec.Rev, "definition", rec.Def.WireDefinition())
     }
 
     _CmdFlowStart(msg) {
@@ -453,7 +453,7 @@ class Engine extends Role {
         if (Integer(base) != rec.Rev)
             return Map("ok", false, "error", Map("code", ErrCode.CONFLICT
                 , "message", "flow '" flowId "' is at rev " rec.Rev ", baseRev was " base)
-                , "rev", rec.Rev, "definition", rec.Def.Raw)
+                , "rev", rec.Rev, "definition", rec.Def.WireDefinition())
         for op in ops {
             if (!(op is Map) || !op.Has("op") || IsObject(op["op"]))
                 throw AhfError("each operation needs an 'op' field", ErrCode.BAD_PAYLOAD)

@@ -49,7 +49,7 @@ def test_the_engine_loads_the_flow_of_the_builder_unchanged_with_a_condition_and
     flows.start()
     sent = fb.to_dict()
     got = flows.request_ok("engine", "cmd.flow.get", {"flowId": "shape"})["definition"]
-    assert got["flowSettings"]["strictTypes"] in (True, 1)      # the engine sends 1 (F-0285)
+    assert got["flowSettings"]["strictTypes"] is True      # a JSON boolean on the wire (F-0285)
     for key in ("allElements", "allConnections"):
         assert json.loads(json.dumps(got[key])) == sent[key], key      # ids, classes, parts and parameter types
 
