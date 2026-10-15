@@ -1048,3 +1048,12 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Right:** Name the local after what it holds (`reqType`, `msgType`, `roleName`, `idList`); never a name of a built-in function or of a class, whatever the spelling. State in the header of a helper file which class it needs and through which file it is included. For a script of your own: `#Warn VarUnset, StdOut` (and `Unreachable`), so a warning is a text line in the output, not a dialog.
 - **Status:** verified (2026-10-15: probe script with a local `type` and `Type(e)`; the test `worker: a request that cannot be sent gives an ElementError` was red before and green after the rename in `WorkerContext._Ask`)
 - **Source:** `src/worker/WorkerContext.ahk`, `src/engine/vars/VarLoader.ahk`, `doc/OPEN-ITEMS.md` F-0287
+
+### A role that holds element classes needs `Lang()`, and a relative `#Include` is relative to the including file
+
+- **Problem:** The element files call `Lang()` in `Name()` and `Parameters()`. The engine and the worker got `core/Lang.ahk` by chance through the parameter evaluation. The first process that held element classes without it (the trigger host stand-in of the memory measurement, WI-0047-PREP) showed a `#Warn` dialog "Specifically: Lang" at the start, which `ahkrun.py` caught as exit 97. A second trap with the role entries: a relative `#Include` is relative to the folder of the file that contains it, not to the main script, so a copy of an entry script in another folder has to make the paths absolute (`tools/measure_r3.py`, `rewrite_entry`).
+- **Wrong:** An element base class that includes only `Errors.ahk` while the element files use `Lang()`; a copy of `src/entry/engine.ahk` in a temporary folder with the includes unchanged.
+- **Right:** `elements/base/AhfElement.ahk` includes `core/Lang.ahk`, so every role with element classes has it. Copies of entry scripts get absolute include paths. The file-level code of an element (`ElementRegistry.Register`) runs when the file is included, also when a class file includes another class file, so such an include registers the class in every role that includes the first file (F-0376*).
+- **Status:** verified (WI-0047-PREP: the warning dialog before the change, the measurement and `tests/test_element_includes.py` after it)
+- **Source:** `src/elements/base/AhfElement.ahk`, `tools/measure_r3.py`
+
