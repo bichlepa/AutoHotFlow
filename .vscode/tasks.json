@@ -354,6 +354,21 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: R0003 measurement, memory per role with 0 and 150 classes (run alone, about 4 min)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/measure_r3.py",
+                "roles",
+                "--runs",
+                "7",
+                "--out",
+                "${env:TEMP}/ahf_r3_roles.jsonl"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: R0003 measurement, load phase of the engine with 200 big flows (run alone, about 10 min)",
             "type": "shell",
             "command": "python",

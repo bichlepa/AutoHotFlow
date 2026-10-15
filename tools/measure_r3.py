@@ -1,6 +1,6 @@
 """WI-0046: R0003 measurement (cost of parsing many element classes in every process) and the load-phase baseline (F-0282).
 
-Two modes. Both run on the real chain with an entry script that is generated in a temporary folder (nothing is
+Three modes (parse, load, roles). They run on the real chain with an entry script that is generated in a temporary folder (nothing is
 written into src/): the entry includes src/AhfBoot.ahk and, after it, the generated element files.
 
   python tools/measure_r3.py parse [--counts 0,50,150,300] [--runs 7] [--out FILE]
@@ -17,6 +17,14 @@ written into src/): the entry includes src/AhfBoot.ahk and, after it, the genera
       variant `stubs` additionally registers a stub class for every class that occurs in the big flows, and every
       parameter of such a class counts as an expression (the worst case after S0002 and S0008). The timings come from
       tools/measure_r3_hooks.ahk, which wraps methods of the engine at run time (src/ stays unchanged).
+
+  python tools/measure_r3.py roles [--counts 0,150] [--runs 5] [--layout auto|legacy|entries] [--out FILE]
+      (WI-0047-PREP, M-0032/M-0033) Private bytes of each role process in a normal session: supervisor, storage,
+      engine, manager (stub, headless), debug (headless), one worker, and a triggerhost stand-in (the role is a
+      placeholder that ends at once, so a process with the same includes that idles is measured). The classes are
+      synthetic with a mode mix (synthetic_mode). `legacy` is the entry before WI-0047-PREP (every process parses
+      everything), `entries` copies the real role entries and inserts the classes by Mode. The output has the sums
+      (supervisor, storage, engine, manager, triggerhost plus 1, 3 and 16 workers) as the sum of the medians.
 
 Run it alone on the machine (no other tests, no other agents): the numbers are timings. Results are printed as
 JSON lines (`R0003 {...}`) and, with --out, appended to FILE. `summary` below each mode prints median/min/max.
@@ -54,15 +62,15 @@ SETTLE_S = 1.5
 
 # --- generated sources -------------------------------------------------------------------------------------------
 
-def synthetic_element(n):
+def synthetic_element(n, mode="inline"):
     """AHK source of one element class of realistic size: about 160 lines, 10 parameters, GenerateName,
-    CheckSettings, a Run with some logic and language keys."""
+    CheckSettings, a Run with some logic and language keys. `mode` is the literal static Mode."""
     name = "Action_Synth_%04d" % n
     out = ["#Requires AutoHotkey v2.0", "#Include %s" % (ROOT / "src" / "elements" / "base" / "AhfElement.ahk"),
            "#Include %s" % (ROOT / "src" / "elements" / "base" / "ElementRegistry.ahk"), "",
            "; Synthetic element for the R0003 measurement (WI-0046). Not part of the product.",
            "class %s extends AhfElement {" % name,
-           '    static Mode := "inline"', '    static Level := "Beginner"', '    static Stability := "Stable"',
+           '    static Mode := "%s"' % mode, '    static Level := "Beginner"', '    static Stability := "Stable"',
            '    static Icon := "synth.ico"', "",
            '    static Name() => Lang("Synthetic action %d")' % n,
            '    static Category() => Lang("Synthetic")', "",
@@ -133,14 +141,27 @@ def synthetic_element(n):
     return name, "\n".join(out)
 
 
-def write_synthetic(folder, count):
-    """Writes `count` element files and returns the #Include lines."""
+def synthetic_mode(n):
+    """Mode mix of the synthetic classes for the role measurement (WI-0047-PREP): v1 has 16 triggers in 152
+    classes, so every 10th class is a trigger; the share of worker classes (about one third) is a guess, because
+    the modes of the ported elements are not decided yet (ELEMENT-API-V2 section 7, heuristic). At 150 classes:
+    15 triggers, 45 workers, 90 inline."""
+    if n % 10 == 0:
+        return "trigger"
+    return "worker" if n % 3 == 1 else "inline"
+
+
+def write_synthetic(folder, count, mixed=False):
+    """Writes `count` element files and returns the #Include lines. With mixed=True the classes get the modes of
+    synthetic_mode and the result is a list of (mode, #Include line)."""
     includes = []
     for n in range(count):
-        name, text = synthetic_element(n)
+        mode = synthetic_mode(n) if mixed else "inline"
+        name, text = synthetic_element(n, mode)
         path = Path(folder) / (name + ".ahk")
         path.write_text(text, encoding="utf-8", newline="\n")
-        includes.append("#Include %s" % path)
+        line = "#Include %s" % path
+        includes.append((mode, line) if mixed else line)
     return includes
 
 
@@ -439,6 +460,149 @@ def mode_load(args):
         emit(args.out, summary)
 
 
+# --- mode roles --------------------------------------------------------------------------------------------------
+
+SRC_ENTRY_DIR = ROOT / "src" / "entry"
+SRC_PRODUCT_ENTRY = ROOT / "src" / "AutoHotFlow.ahk"
+
+
+def layout_of(requested):
+    """`entries` when src/entry exists (WI-0047-PREP and later), else `legacy` (one entry, every process parses
+    everything)."""
+    if requested != "auto":
+        return requested
+    return "entries" if SRC_ENTRY_DIR.is_dir() else "legacy"
+
+
+def rewrite_entry(src, dest, includes, replace_main=None):
+    """Copies the entry script `src` to `dest`: relative #Include paths become absolute (they are relative to the
+    folder of the including file) and `includes` (lines) are inserted before the call AhfMain(). With
+    `replace_main` that call is replaced by this text (a stand-in for a role that cannot be measured at rest)."""
+    out = []
+    done = False
+    for line in Path(src).read_text(encoding="utf-8").splitlines():
+        m = re.match(r"#Include\s+(.+?)\s*$", line)
+        if m and not os.path.isabs(m.group(1)):
+            line = "#Include %s" % (Path(src).parent / m.group(1)).resolve()
+        if line.strip().startswith("AhfMain("):
+            out += includes
+            out.append(replace_main if replace_main is not None else line)
+            done = True
+            continue
+        out.append(line)
+    if not done:
+        raise RuntimeError("%s has no AhfMain() line" % src)
+    Path(dest).parent.mkdir(parents=True, exist_ok=True)
+    Path(dest).write_text("\n".join(out) + "\n", encoding="utf-8", newline="\n")
+
+
+def role_modes(role):
+    """The modes of the element classes a role includes (tools/gen_element_includes.py, E0041)."""
+    sys.path.insert(0, str(ROOT / "tools"))
+    import gen_element_includes
+    return gen_element_includes.ROLE_MODES.get(role, ())
+
+
+def build_role_entries(folder, count, layout):
+    """Builds the entry scripts for one element count in `folder` and returns (supervisor entry, triggerhost
+    stand-in or None).
+    legacy: one entry (src/AhfBoot.ahk plus all synthetic classes), as before WI-0047-PREP.
+    entries: copies of the real entries (src/AutoHotFlow.ahk and src/entry/<role>.ahk) with the synthetic classes
+    inserted according to the Mode of each class and the table of the role. The supervisor starts the other roles
+    from entry/ next to its own script, so the copy folder is a complete installation."""
+    folder = Path(folder)
+    folder.mkdir(parents=True, exist_ok=True)
+    synth_dir = folder / "elements"
+    synth_dir.mkdir(exist_ok=True)
+    mixed = write_synthetic(synth_dir, count, mixed=True)
+    if layout == "legacy":
+        return write_entry(folder, [line for _, line in mixed]), None
+    sup = folder / "MeasureEntry.ahk"
+    rewrite_entry(SRC_PRODUCT_ENTRY, sup, [])
+    for path in sorted(SRC_ENTRY_DIR.glob("*.ahk")):
+        modes = role_modes(path.stem)
+        rewrite_entry(path, folder / "entry" / path.name, [line for mode, line in mixed if mode in modes])
+    standin = folder / "entry" / "triggerhost_standin.ahk"
+    rewrite_entry(SRC_ENTRY_DIR / "triggerhost.ahk", standin,
+                  [line for mode, line in mixed if mode in role_modes("triggerhost")], replace_main="Persistent()")
+    return sup, standin
+
+
+def standin_mem(entry, procs):
+    """Private bytes of a process that parses the entry and then idles (for a role that is a placeholder and ends
+    at once). Started through ahkrun like every test process; ended by killing the tree."""
+    proc = procs.start([sys.executable, str(AHKRUN), "--timeout", "30", str(entry)], stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL, cwd=str(ROOT))
+    try:
+        # wait until an AutoHotkey child exists and has been up for the settle time; the biggest one counts (a
+        # child that is still being created shows a few hundred KB)
+        deadline = time.monotonic() + 15
+        best = None
+        while time.monotonic() < deadline:
+            time.sleep(SETTLE_S + 0.5)
+            kids = [c for c in psutil.Process(proc.pid).children(recursive=False) if "autohotkey" in c.name().lower()]
+            if kids:
+                best = max((mem(c.pid) for c in kids), key=lambda m: m["private_mb"])
+                if best["private_mb"] > 3:
+                    return best
+        raise RuntimeError("stand-in process not measurable: %s" % best)
+    finally:
+        procs.kill(proc)
+
+
+def roles_chain(entry, procs, datadir):
+    """Supervisor with storage, engine (one warm worker), manager (stub, headless) and debug (headless). Returns
+    the memory of each process."""
+    faultkit.ENTRY = Path(entry)
+    chain = Chain(procs, datadir, new_session(), "storage,engine,manager,debug", ["--ui=stub", "--headless"],
+                  run_timeout=90)
+    try:
+        chain.wait_ready(["storage", "engine", "manager", "debug", "worker:1"], timeout=40)
+        time.sleep(SETTLE_S)
+        st = chain.states()
+        result = {n.replace(":1", ""): mem(st[n]["pid"]) for n in ["storage", "engine", "manager", "debug", "worker:1"]}
+        result["supervisor"] = mem(chain.sup.ahk_pid())
+    finally:
+        chain.close()
+    return result
+
+
+def mode_roles(args):
+    counts = [int(c) for c in args.counts.split(",")]
+    layout = layout_of(args.layout)
+    work = tempfile.mkdtemp(prefix="ahf-r3r-")
+    entries = {n: build_role_entries(Path(work) / ("n%d" % n), n, layout) for n in counts}
+    print("layout %s, entry scripts in %s" % (layout, work), flush=True)
+    print("machine load before: %.1f %%" % machine_load(), flush=True)
+    procs = ProcessTracker()
+    rows = {n: {} for n in counts}
+    try:
+        for rnd in range(args.runs):
+            for n in (counts if rnd % 2 == 0 else list(reversed(counts))):
+                entry, standin = entries[n]
+                datadir = Path(tempfile.mkdtemp(prefix="ahf-r3d-"))
+                result = roles_chain(entry, procs, datadir)
+                if standin is None:      # legacy: the same entry, a process that idles after the parse
+                    standin = Path(entry).parent / "standin.ahk"
+                    text = Path(entry).read_text(encoding="utf-8").replace("AhfMain()", "Persistent()")
+                    standin.write_text(text, encoding="utf-8", newline="\n")
+                result["triggerhost"] = standin_mem(standin, procs)
+                for proc, m in result.items():
+                    rows[n].setdefault(proc, []).append(m["private_mb"])
+                print("round %d N=%d done" % (rnd + 1, n), flush=True)
+    finally:
+        procs.close()
+    print("machine load after: %.1f %%" % machine_load(), flush=True)
+    for n in counts:
+        med = {p: statistics.median(v) for p, v in rows[n].items()}
+        background = sum(med[p] for p in ("supervisor", "storage", "engine", "manager", "triggerhost"))
+        sums = {"w%d" % k: round(background + k * med["worker"], 1) for k in (1, 3, 16)}
+        summary = {"mode": "roles", "layout": layout, "elements": n, "runs": args.runs,
+                   "private_mb": {p: stats(v) for p, v in rows[n].items()},
+                   "background_without_workers_mb": round(background, 1), "sum_private_mb": sums}
+        emit(args.out, summary)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="mode", required=True)
@@ -451,6 +615,11 @@ def main():
     p.add_argument("--flows", type=int, default=200)
     p.add_argument("--variants", default="plain,stubs")
     p.add_argument("--out", default="")
+    p = sub.add_parser("roles")
+    p.add_argument("--counts", default="0,150")
+    p.add_argument("--runs", type=int, default=5)
+    p.add_argument("--layout", default="auto", choices=["auto", "legacy", "entries"])
+    p.add_argument("--out", default="")
     p = sub.add_parser("gen")
     p.add_argument("folder")
     p.add_argument("--count", type=int, default=3)
@@ -459,6 +628,8 @@ def main():
         mode_parse(args)
     elif args.mode == "load":
         mode_load(args)
+    elif args.mode == "roles":
+        mode_roles(args)
     else:
         Path(args.folder).mkdir(parents=True, exist_ok=True)
         inc = write_synthetic(args.folder, args.count)
