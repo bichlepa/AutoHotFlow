@@ -455,11 +455,11 @@ Open point (assumed, not checked): AutoHotkey reads all `#Include` files when a 
 ### REQ-PKG-060 The package name is part of the identity of an element
 
 - **v1:** partial (the flow files store the package of each element, but the class name alone identifies it)
-- **v2:** implemented (registry, flow lookup, worker jobs and logs use `<package>.<class>`; not yet tested with a run of two packages)
+- **v2:** done (registry, flow lookup, worker jobs and logs use `<package>.<class>`; two packages with a class of the same name run in one session)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0002 (WI-0047, decision E0045)
-- **Evidence:** `tests/ahk/element_registry.test.ahk`, `tests/test_element_includes.py::test_two_packages_with_a_class_of_the_same_name_load_in_one_process`
+- **Evidence:** `tests/integration/test_packages.py`, `tests/ahk/element_registry.test.ahk`, `tests/ahk/engine_flow_convert.test.ahk`, `tests/test_element_includes.py::test_two_packages_with_a_class_of_the_same_name_load_in_one_process`
 
 Every element is identified by its package and its class, also the elements of v1. So elements of different packages may have the same class name.
 

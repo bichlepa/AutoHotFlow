@@ -9,7 +9,7 @@ run the tool. The legend of the columns is at the top of the source.
 |---|---:|---:|---:|---:|---:|---:|---:|
 | [Flows and execution (EXE)](#flows-and-execution-exe) | 15 | 7 | 0 | 6 | 2 | 0 | 1 |
 | [Expressions and variables (VAR)](#expressions-and-variables-var) | 14 | 8 | 0 | 3 | 3 | 0 | 2 |
-| [Element packages (PKG)](#element-packages-pkg) | 6 | 0 | 1 | 1 | 4 | 0 | 0 |
+| [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
 | [Elements (ELM)](#elements-elm) | 24 | 0 | 0 | 2 | 22 | 0 | 0 |
 | [Triggers (TRG)](#triggers-trg) | 12 | 0 | 0 | 1 | 11 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 10 | 0 | 0 | 0 | 10 | 0 | 0 |
@@ -27,7 +27,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 2 | 1 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 7 | 0 | 0 | 1 | 6 | 0 | 0 |
-| **All** | **184** | **53** | **1** | **26** | **103** | **1** | **3** |
+| **All** | **184** | **54** | **0** | **26** | **103** | **1** | **3** |
 
 ## Flows and execution (EXE)
 
@@ -77,7 +77,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-PKG-030](REQUIREMENTS.md#req-pkg-030-the-included-elements-are-split-into-a-basic-and-special-packages) | The included elements are split into a basic and special packages | no | open | should | later | - |
 | [REQ-PKG-040](REQUIREMENTS.md#req-pkg-040-users-create-their-own-packages-and-elements) | Users create their own packages and elements | no | open | should | later | - |
 | [REQ-PKG-050](REQUIREMENTS.md#req-pkg-050-a-broken-element-or-package-does-not-stop-autohotflow) | A broken element or package does not stop AutoHotFlow | no | open | must | later | - |
-| [REQ-PKG-060](REQUIREMENTS.md#req-pkg-060-the-package-name-is-part-of-the-identity-of-an-element) | The package name is part of the identity of an element | partial | implemented | should | port | S0002 (WI-0047, decision E0045) |
+| [REQ-PKG-060](REQUIREMENTS.md#req-pkg-060-the-package-name-is-part-of-the-identity-of-an-element) | The package name is part of the identity of an element | partial | done | should | port | S0002 (WI-0047, decision E0045) |
 
 ## Elements (ELM)
 

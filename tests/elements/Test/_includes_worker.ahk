@@ -19,6 +19,7 @@ class Test {
     #Include Actions\Action_TestFreezeWorker.ahk
     #Include Actions\Action_TestHangWorker.ahk
     #Include Actions\Action_TestLongBlockWorker.ahk
+    #Include Actions\Action_TestPackageNameWorker.ahk
     #Include Actions\Action_TestThrowWorker.ahk
     #Include Actions\Action_TestVarBenchWorker.ahk
     #Include Actions\Action_TestVarFunctionsWorker.ahk
@@ -33,6 +34,7 @@ ElementRegistry.Register(Test.Action_TestFreezeTimeoutWorker)
 ElementRegistry.Register(Test.Action_TestFreezeWorker)
 ElementRegistry.Register(Test.Action_TestHangWorker)
 ElementRegistry.Register(Test.Action_TestLongBlockWorker)
+ElementRegistry.Register(Test.Action_TestPackageNameWorker)
 ElementRegistry.Register(Test.Action_TestThrowWorker)
 ElementRegistry.Register(Test.Action_TestVarBenchWorker)
 ElementRegistry.Register(Test.Action_TestVarFunctionsWorker)

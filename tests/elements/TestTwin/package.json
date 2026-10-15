@@ -1,0 +1,6 @@
+{
+    "name": "TestTwin",
+    "description": "A second test package with classes of the same names as in the package Test (E0045). Only the test entries include it.",
+    "license": "Unlicense",
+    "version": "1.0.0"
+}
