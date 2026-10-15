@@ -64,7 +64,7 @@ Answers of the project owner to the open questions (2026-10-13):
 | E0014 | **Closing the manager window** only closes (hides) the window; AutoHotFlow keeps running. Only the "Exit" button of the manager and the "Exit" entry of the tray menu end the application. Same as v1 (verified by reading: the v1 manager has no `GuiClose` handler, so closing hides the window; `Button_manager_Exit` in `Manager GUI.ahk:1026` and the tray entry call the exit). | S0004 |
 | E0034 | **Type errors per flow (F-0068, decided by the project owner, 2026-10-14).** Each flow has an option `strictTypes`. Migrated flows (recognised by `formatVersion` and the `v1Text` marker of WI-0039) get `false`, which is the v1 behaviour: E0025 stays as it is (empty text and `f1` warning). New flows get `true`: in strict mode a type error in a comparison or a calculation becomes an element error (`exception`). Independent of the mode, the `f1` warnings of the evaluator are shown in the editor (log display, S0004/S0005). | WI-0042 (evaluator call from `ctx.EvalParams`, mode from the flow), flow format (WI-0039 keys), MIGRATION M-0024 and M-0025 (text for the compatibility mode), S0004/S0005 (display) |
 
-Decisions of the project owner while S0002 was detailed (2026-10-14; E0040 and E0041 on 2026-10-15):
+Decisions of the project owner while S0002 was detailed (2026-10-14; E0040, E0041 and E0045 on 2026-10-15):
 
 | # | Decision | Affects |
 |---|---|---|
@@ -75,6 +75,7 @@ Decisions of the project owner while S0002 was detailed (2026-10-14; E0040 and E
 | E0039 | **v1 AHK code** in `Action_AutoHotkey_script` and `Trigger_AutoHotkey_Script` is not run with a v1 interpreter (E0004 stays). The v2 elements run AHK v2 code; an imported v1 script is kept as text and marked (E0035); porting it is a manual or AI-assisted step. Documented break (MIGRATION M-0049). | S0008 |
 | E0040 | **Memory budget applies to the background processes only.** Supervisor, storage, engine, triggerhost, manager and the workers are counted (below 100 MB private bytes with one worker and about 150 elements); editors are not counted. The number of workers is the setting `workerLimit`; its default is an owner decision (default 16, owner decision: normal state with about 3 active workers, peaks may exceed the budget). | WI-0047-PREP |
 | E0041 | **Role entry scripts (R0003 option A without B).** Each role's entry script includes only the element classes it needs, selected by the literal `static Mode` (engine: all; triggerhost: trigger; worker: worker; supervisor, storage and debug: none; manager: all if it needs them, accepted). Metadata and runtime code are not split. Supersedes D0012 in part. | WI-0047-PREP, WI-0047 |
+| E0045 | **The package name is part of the identity of an element**, also for the elements of v1 (REQ-PKG-060). Each package is an AHK class that includes its element files; the type name (`Default.Action_Sleep`) is the qualified ID used by registry, worker jobs, trigger arming and logs. Flow files stay as they are (`package` plus `class`; missing `package` means `Default`, case ignored). (2026-10-15) | WI-0047 |
 
 ## Open questions for the project owner
 

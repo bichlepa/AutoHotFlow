@@ -8,7 +8,7 @@ Real elements have their place: `src/elements/<package>/` (E0037), an include bl
 
 ## Read first
 
-README of this phase (E0035, E0037), result of WI-0046, `doc/ELEMENT-API-V2.md` 1, 2, 7 and 8, `doc/ARCHITECTURE.md` 8, `src/AhfBoot.ahk`, `tests/integration/helpers/AutoHotFlowTest.ahk`, `src/elements/`, `v1/Source_Elements/Default/` (folders `language`, `Icons`, `help`), `tools/arch_check.py`.
+README of this phase (E0035, E0037, E0045), `doc/REQUIREMENTS.md` REQ-PKG-060, result of WI-0046, `doc/ELEMENT-API-V2.md` 1, 2, 7 and 8, `doc/ARCHITECTURE.md` 8, `src/AhfBoot.ahk`, `tests/integration/helpers/AutoHotFlowTest.ahk`, `src/elements/`, `v1/Source_Elements/Default/` (folders `language`, `Icons`, `help`), `tools/arch_check.py`.
 
 ## Tasks
 
@@ -19,6 +19,7 @@ README of this phase (E0035, E0037), result of WI-0046, `doc/ELEMENT-API-V2.md` 
 5. **`Action_Sleep` and `Trigger_Manual`** to `Default`, with the parameters, `GenerateName` and language keys of v1 (`Sleep` as in ELEMENT-API 4). Old flows with these classes load and run as before.
 6. **Elements of unknown packages:** a flow with an element of another package (for example an extension package that is not installed) loads; the element is marked as unknown (as `v1Text`), runs into `exception` with a clear message, and is written back unchanged.
 7. VS Code task `Tool: generate element include blocks`.
+8. **Package name in the identity of an element (E0045, REQ-PKG-060).** Each package is an AHK class whose body includes the element files of the package (`class Default { #Include ... }`, written by the generator of task 2 together with the include block; an element file stays one class). The type name of an element is then the qualified ID, for example `Default.Action_Sleep` (verified 2026-10-15: a nested class has this type name, and `#Include` works inside a class body). The registry is keyed by the qualified ID (case-insensitive). A flow element is looked up by its `package` and `class`: a missing `package` means `Default`, the comparison ignores case (8 elements of the test flows write `default`). Worker jobs (`cmd.worker.run`), trigger arming (`cmd.trigger.arm`) and log texts carry the qualified ID. Decide and document how a package name becomes a safe AHK class name (no collision with other global classes or built-in names, allowed characters). Pitfall: `#Include` includes a file only once per script (verified); the same file can therefore not be included into two package classes.
 
 ## Acceptance criteria
 
@@ -26,10 +27,11 @@ README of this phase (E0035, E0037), result of WI-0046, `doc/ELEMENT-API-V2.md` 
 - All tests green, including those that use the test elements (now from `tests/`).
 - A stale include block fails the check.
 - `Lang()` returns the texts of the element language files (test with a key of `Default`).
+- Two test packages with an element of the same class name load in one process and are told apart (registry, run, worker job); a v1 flow whose elements write `package: default` loads and runs (E0045).
 
 ## Docs
 
-`doc/ELEMENT-API-V2.md` 2 (registration, include block per package) and 8, `doc/ARCHITECTURE.md` 8, `doc/CONVENTIONS.md`, `.vscode/tasks.json`.
+`doc/ELEMENT-API-V2.md` 2 (registration, include block per package, qualified ID) and 8, `doc/ARCHITECTURE.md` 7 and 8, `doc/PROTOCOL.md` 4.4 and 4.5 (qualified ID in `class`), `doc/CONVENTIONS.md`, `doc/REQUIREMENTS.md` (REQ-PKG-010, REQ-PKG-060), `.vscode/tasks.json`.
 
 ## Not part of this
 

@@ -77,7 +77,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-PKG-030](REQUIREMENTS.md#req-pkg-030-the-included-elements-are-split-into-a-basic-and-special-packages) | The included elements are split into a basic and special packages | no | open | should | later | - |
 | [REQ-PKG-040](REQUIREMENTS.md#req-pkg-040-users-create-their-own-packages-and-elements) | Users create their own packages and elements | no | open | should | later | - |
 | [REQ-PKG-050](REQUIREMENTS.md#req-pkg-050-a-broken-element-or-package-does-not-stop-autohotflow) | A broken element or package does not stop AutoHotFlow | no | open | must | later | - |
-| [REQ-PKG-060](REQUIREMENTS.md#req-pkg-060-the-package-name-is-part-of-the-identity-of-an-element) | The package name is part of the identity of an element | partial | open | should | port | S0002 (WI-0047), proposed |
+| [REQ-PKG-060](REQUIREMENTS.md#req-pkg-060-the-package-name-is-part-of-the-identity-of-an-element) | The package name is part of the identity of an element | partial | open | should | port | S0002 (WI-0047, decision E0045) |
 
 ## Elements (ELM)
 
