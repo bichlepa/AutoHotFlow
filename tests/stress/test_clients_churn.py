@@ -105,7 +105,11 @@ def test_clients_connecting_and_leaving_do_not_disturb_the_engine_or_leak(stress
 
     # warm up the connection path, then take the baseline
     sc.new_client("warm").close()
-    time.sleep(1.0)
+    # the engine opens a fixed set of handles on its first instances (19 of them); that is not a leak per
+    # connection, so the baseline is taken after one instance has run and ended (F-0092)
+    answer = loader_client.request("engine", "cmd.flow.start", {"flowId": FLOW}, timeout=5)
+    assert answer["payload"].get("ok"), answer
+    time.sleep(1.0)       # the instance ends after 300 ms
     before = {"supervisor": metrics.proc_snapshot(sup_pid), "engine": metrics.proc_snapshot(engine_pid)}
     pids_before = {n: p["pid"] for n, p in sc.process_list().items()}
 
