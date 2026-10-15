@@ -259,14 +259,24 @@ class Storage extends Role {
 
     ; Adds the item to the pending lines of the file. One queue operation per file at a time writes the
     ; pending lines in one go (a bundle), so a file is opened once per bundle, not once per line.
+    ; Critical: _FinishLogBundle runs in another thread (queue timer) and removes the buffer of a file from
+    ; logBuffers. Without Critical it could do that between the check and the read of the buffer, the read threw
+    ; "Item has no value", and the handler of evt.log.append lost the line without a count (F-0088).
     _LogToFile(fileName, item) {
-        if (!this.logBuffers.Has(fileName))
-            this.logBuffers[fileName] := Map("items", [], "scheduled", false)
-        buf := this.logBuffers[fileName]
-        buf["items"].Push(item)
-        if (!buf["scheduled"]) {
-            buf["scheduled"] := true
-            this.queue.AddLow(this._LogFileOp(fileName, buf))
+        prev := Critical("On")  ; reason: flag, check and removal of the buffer must not be interleaved with _LogToFile  ; reason: check, read and push of the buffer must not be interleaved with the removal in _FinishLogBundle
+        try {
+            buf := this.logBuffers.Get(fileName, "")
+            if (!IsObject(buf)) {
+                buf := Map("items", [], "scheduled", false)
+                this.logBuffers[fileName] := buf
+            }
+            buf["items"].Push(item)
+            if (!buf["scheduled"]) {
+                buf["scheduled"] := true
+                this.queue.AddLow(this._LogFileOp(fileName, buf))
+            }
+        } finally {
+            Critical(prev)
         }
     }
 
@@ -314,7 +324,6 @@ class Storage extends Role {
             done.Push(items[A_Index])
         if (n > 0)
             items.RemoveAt(1, n)
-        buf["scheduled"] := false
         reported := 0
         for item in done {
             rec := item["rec"]
@@ -336,11 +345,19 @@ class Storage extends Role {
         if (reported > Storage.LOG_LOST_REPORT_MAX)
             this._SelfLog("a0", "storage", "log line lost: " fileName ", " (reported - Storage.LOG_LOST_REPORT_MAX)
                 " more lines not listed, " this.logLinesLost " lost in total. " payload["error"]["message"])
-        if (items.Length > 0 && !neverRan) {
-            buf["scheduled"] := true
-            this.queue.AddLow(this._LogFileOp(fileName, buf))
-        } else if (items.Length = 0 && this.logBuffers.Get(fileName, "") == buf) {
-            this.logBuffers.Delete(fileName)
+        ; One step with _LogToFile (Critical): the flag, the check for waiting lines and the removal of the buffer must
+        ; not be interleaved with a line that arrives (F-0088).
+        prev := Critical("On")
+        try {
+            buf["scheduled"] := false
+            if (items.Length > 0 && !neverRan) {
+                buf["scheduled"] := true
+                this.queue.AddLow(this._LogFileOp(fileName, buf))
+            } else if (items.Length = 0 && this.logBuffers.Get(fileName, "") == buf) {
+                this.logBuffers.Delete(fileName)
+            }
+        } finally {
+            Critical(prev)
         }
         ; announce dropped lines when the queue is at most half full again (also without new lines)
         if (this.logDropPending > 0 && this.logQueuedEntries * 2 <= this.logQueueMaxLines)
