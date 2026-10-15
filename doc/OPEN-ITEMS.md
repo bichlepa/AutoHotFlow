@@ -1,10 +1,8 @@
 # Open Points
 
-Status: 2026-10-12, branch `v2-port`, after the fix block WI-0030 to WI-0035 (acceptance run green, WI-0035 cycle 1, code state `2f2e6e5`).
+Status: 2026-10-15, branch `v2-port`. Findings are carried in the summary table below; closed ones are in `doc/CLOSED-ITEMS.md`.
 
-This document lists everything that is still open, observed, or deferred. Of the 45 finding IDs used in the work items (F-0001 to F-0043; F-0030 and F-0040 were never assigned), 27 are closed and are not carried over here. Their history is in the tag `v2-phase2-final`, table "Funde" in `v2-phase2-final:work_items/STATUS.md`. The work-item files that this document cites were removed from the working tree; they can be read with `git show v2-phase2-final:<path>`.
-
-The open findings that are observed but not closed are F-0041, F-0043 and F-0060 to F-0063 (2026-10-13, from the test tiers and the manual check). F-0032 is closed by the project owner (2026-10-13).
+This document lists everything that is still open, observed, or deferred. History of the early findings (F-0001 to F-0043): tag `v2-phase2-final`, table "Funde" in `v2-phase2-final:work_items/STATUS.md`. The work-item files that this document cites were removed from the working tree; they can be read with `git show v2-phase2-final:<path>`.
 
 Entries marked **(phase 3)** matter for the phase 3 plan.
 
@@ -25,14 +23,10 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0041 | `refreshed` 2 instead of 3 in the debug role test | observed, open | |
 | F-0043 | `cmd.worker.cancel` unanswered in the hang test | observed, open | |
 | F-0060 | `cmd.worker.run` unanswered for 5 s in `test_worker_busy.py` | observed once, open | |
-| F-0061 | `flow 'wecho' is not loaded` after an engine restart during a worker job | test problem (wait missing), test fixed; product contract note below | yes |
 | F-0062 | `storage` not ready within 45 s after a freeze in the hang test | observed once under load, open | |
 | F-0063 | Log line lost while other processes hold the files (`readers-allow-read`) | observed once at `-n 12`, open (stall hypothesis fixed in 2675105, not proven) | |
-| F-0067 | The F-0016 xfail test passes (strict XPASS) in the slow tier | strict mark dropped after a second XPASS (F-0069); watch | |
-| F-0068 | A comparison with an empty or missing variable is true in v1 and false in v2 | verified in the golden data; decided 2026-10-14 (E0034): per-flow option `strictTypes`, to implement in WI-0042 | yes |
-| F-0069 | The F-0016 xfail test passes again (strict XPASS) in the slow tier, after the F-0067 fix | fixed by dropping strict on the F-0016 test; watch | |
 | F-0071 | `test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted[0]` got no `evt.process.crashed` for `worker:1` in the slow tier | observed once, not reproducible in 8 runs, diagnostics added, open | |
-| F-0073 | The stress test with 200 big flows fails its snapshot budget (largest snapshot answer during loading 2326 ms, budget 1000 ms) | observed once at the S0001 acceptance (WI-0043); measured in WI-0046: the conversion is not the cause (worst case 8 % of the load time), largest snapshot answer 0.56 to 0.79 s in 6 of 7 runs, once 1.5 s; guarded by a stress run at the end of every S0002 package on the load path | yes |
+| F-0073 | The stress test with 200 big flows fails its snapshot budget (largest snapshot answer during loading 2326 ms, budget 1000 ms) | budget raised to 3 s (E0042, owner 2026-10-15); stays open as an optimization after the port (pre-filter for inactive flows); measurements in WI-0046 | yes |
 | F-0075 | A numeric text outside the range of Float (`1e-3001`) is true in a boolean test of AutoHotkey when it is a concatenation result, and false in the evaluator | verified by the expression oracle (one case in 40,000 random cases), open, low, AutoHotkey quirk | |
 | F-0077 | `test_cancel_stops_the_running_element_and_reports_stopped_within_500_ms` did not see the job in the snapshot of the worker | observed once in a slow-tier run next to another suite run, 5 of 5 green alone, open | |
 | F-0079 | Foundation tier: `test_suspend_and_resume` leaves two processes behind (cleanup of the process tracker) | observed once on `b92d800` (run 20261015-153715-b92d8005), open | |
@@ -69,7 +63,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 ### F-0013: `Ids.Next` and `ExecContext.Finish` not atomic (phase 3)
 
 **What:** `Ids.Next` increments and reads the counter in separate lines. `ExecContext.Finish` checks and sets its state in separate steps.
-**Status:** Open, low priority. Read in code (`src/core/` and `src/elements/`), not changed.
+**Status:** Fixed (see the update of 2026-10-14), verifier pending. Original finding: read in code (`src/core/` and `src/elements/`).
 **Why deferred:** Low risk so far. A change in `src/core/` needs the project owner's agreement.
 **Sign that it matters:** Duplicate IDs, or an element that finishes twice.
 **Action:** In phase 3, guard both spots with `Critical`, with the agreement of the project owner.
@@ -131,15 +125,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Action:** On the next failure read `diagnosis/snapshot_supervisor.json` (children output, log ring) in the run log. Compare with F-0043.
 **Evidence:** saved run log `%TEMP%/ahf_testruns_keep/20261013-145541-19344` (failure text only, no diagnosis yet).
 
-### F-0061: `flow 'wecho' is not loaded` after an engine restart during a worker job (phase 3)
-
-**What:** `test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs` (`tests/fault/test_worker_lifecycle.py`): after the engine restart, starting the flow was answered with `not_found`, "flow 'wecho' is not loaded".
-**Status:** Analysed 2026-10-13 (bug hunter). **Test problem, verified by code and a deterministic test; product race ruled out as far as read.** The supervisor sets a child to `ready` at its `sys.hello` (`src/supervisor/Children.ahk:299-308`), which the engine sends at the handshake, before `Role.OnReady` -> `Engine.OnReady` (`src/engine/Engine.ahk:89-94`) starts to wait for storage and load the flows. `evt.engine.ready` is emitted only in `Engine._Loaded` after every file has a result (`src/engine/Engine.ahk:319-334`; PROTOCOL 4.3 line "only after loading the flow list"). Until then `cmd.flow.start` goes to `FlowTable.Require` and is answered `not_found`, "flow 'x' is not loaded" (`src/engine/FlowTable.ahk:23-27`). The test waits for the restart with `chain.wait_restarted_ready` (`tests/fault/faultkit.py:315-323`), which only checks the supervisor state `ready`, then for orphan and warm worker, then starts the flow. The warm worker is started in `OnReady` in parallel with the flow load, so under load the worker can be ready before the flows are loaded. The missing wait is `chain.wait_flows(["wecho"])` (`faultkit.py:325`, snapshot based) after the restart. Not reproduced in 17 serial runs of the test on `702ad61` (0 of 17, machine loaded by other agents), so the original failure itself is not observed again; the window is shown deterministically by `test_f49_restarted_engine_is_ready_for_the_supervisor_before_it_has_loaded_its_flows` (storage frozen, 3 of 3). Test fix: `wait_flows` added in the test and in its sibling `test_engine_killed_during_a_hanging_job...`. Not checked: the saved run log of the original failure (`ahf_testruns_keep` is gone), so that the failure was in fact this window is assumed, not proven.
-**Contract note (not a bug):** a client that starts a flow right after an engine restart must wait for `evt.engine.ready` or poll `cmd.engine.snapshot`; the supervisor state `ready` of the engine does not mean "flows loaded". The manager of phase 3 must follow the resync rule in PROTOCOL 4.8 (snapshot after `evt.engine.ready` / `evt.process.restarted`). Open design point: `not_found` during loading is not distinguishable from a real unknown flow; a distinct code (for example `not_ready`) would be clearer. Not decided.
-**Sign that it matters:** `not_found` for a flow right after an engine restart in a real session.
-**Action:** Read the saved run log (`Log/`, `Reports/`, supervisor snapshot) and the engine start sequence in `Engine.ahk`; decide test or product. Do this before phase 3 builds on the restart behavior.
-**Evidence:** saved run log `%TEMP%/ahf_testruns_keep/20261013-151836-20516`.
-
 ### F-0062: `storage` not ready within 45 s after a freeze in the hang test
 
 **What:** `test_frozen_storage_is_hung_ended_and_restarted_and_answers_again[0]`: "storage not ready again within 45.0 s".
@@ -157,37 +142,10 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Action:** On the next failure read the failure text and `Log/` in the run log.
 **Evidence:** none kept.
 
-### F-0067: The F-0016 xfail test passes (strict XPASS) in the slow tier
-
-**What:** `tests/fault/test_log_burst.py::test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor` is marked `xfail(strict=True)` (F-0016). In the verification run it passed, so the strict mark turned the result into `FAILED` with `[XPASS(strict)] F-0016: a chatty role gives up during a long stand-still of the supervisor`. The other test of the file (F-0066) was `xfailed` as expected.
-**Status:** Fixed in the test (commit `e6bcfdd`), to be watched. The strict XPASS appeared again (F-0069), so the strict mark was dropped (commit of this change). The XPASS was seen once and could not be reproduced (verified: 0 XPASS in 12 serial runs and 6 parallel slow-tier runs before the fix, 0 in the runs after it). The cause is assumed.
-**Evidence:** run ID `20261014-061730-0506198e`, commit `0506198`, command `python tools/run_suite.py --ref HEAD -- tests -q --all -m slow` (4 workers), exit code 1, `1 failed, 86 passed, 1 xfailed in 144.71s`, no INTERNALERROR. The test took about 22 s. The fast tier of the same commit is green (run ID `20261014-061637-0506198e`, 482 passed).
-**Suspicion (assumed):** The test depends on timing: it suspends the supervisor for 6 s while the role logs 100000 lines in a tight loop, and the failure needs the role's send queue to reach 1000 frames before the suspension ends. With 4 parallel workers the role may have finished or be slower than in the serial runs in which the bug hunter reproduced F-0016, so the defect does not show. The change under verification (`src/expr/`, `tests/ahk/expr_*`) does not touch `src/core/` or `src/supervisor/`, so it is probably not the cause; the test file itself (commit `28f131a`) is the more likely origin.
-**Measurement (bug hunter, base commit `77c38b7`, test file as of `28f131a`):** serial `-n 0 --all -m slow -k stand_still`, 6 runs, all `xfailed`, exit 0 (12 to 21 s each; the last five 12 to 13 s). Slow tier in parallel: 2 runs from the working tree (run logs `20261014-062325-14528`, `20261014-062430-8272`) and 3 frozen runs with `run_suite --with-changes` (`20261014-062546-77c38b72-wc`, `20261014-062748-77c38b72-wc`, `20261014-062946-77c38b72-wc`): all exit 0, `86 passed, 2 xfailed`. So 0 XPASS in 11 runs; the rate is below about 1 in 10, one observation in 12.
-**Cause (assumed, not reproduced):** The test waited a fixed 0.2 s after sending the request and assumed the role was inside its loop. If the request reaches the role late (loaded machine, hub busy), the supervisor is suspended before the loop starts; the role then stays quiet during the 6 s, behaves like the healthy children of the existing stand-still test and survives. The product side is consistent with this: `Role._Enqueue` sends each line at once, and `PipeConnection.SendFrame` closes the connection at 1000 queued frames or 8 MB, so once the loop runs against a stopped hub the overflow is certain within milliseconds (verified for the failing case by the F-0016 runs, assumed for the timing).
-**Fix:** The test waits until the first lines of the burst are in the log file (proof that the loop runs) before it suspends the supervisor, and skips if they do not appear within `scaled(20)` s (no `assert`: xfail would swallow it and hide the missing precondition). After the fix: 6 serial runs `xfailed` (exit 0), slow tier in parallel `86 passed, 2 xfailed` exit 0 (run log `20261014-063319-444`, commit `e6bcfdd`), fast tier `482 passed` exit 0 (`20261014-063423-24212`).
-**Action:** Watch. If a strict XPASS appears again, drop `strict` for this test and note the rate in F-0016.
-### F-0068: A comparison with an empty or missing variable is true in v1 and false in v2 (phase 3)
-
-**What:** In v1 `<`, `>`, `<=` and `>=` compare two texts alphabetically when they are not both numbers. An empty text is smaller than every number, so `count < 3` is **true** in v1 while `count` does not exist or is empty. In v2 (E0030, AutoHotkey rule) the comparison with a text that is not a number is a type error; by E0025 the result is the empty text (false) and a warning. A condition that was true because a counter variable was not set yet is therefore false.
-**Status:** Verified in the golden data (`python tools/golden_compare.py --list "text comparison"`): the cases `corpus.expression.1534a539.missing` (`countShuffleTries < 3`, `Condition_Expression`, flow 1210127300, element 54) and `corpus.expression.d4c51cf2.missing` (`myIndex <= 5`, flow 634320780, element 51) give 1 in v1 and the empty text in v2. These are two of 227 distinct expressions of the 22 example flows, both conditions on a counter variable. Not checked: whether the counter is set before the condition in these flows (the golden variants set no variable or a text).
-**Why it matters:** E0030 accepted the deviation "because it is unlikely in real flows". It does occur in the example flows, in the form "variable not set yet".
-**Options:** (a) keep E0030: a flow that relies on it must initialise its counters (MIGRATION M-0025 says so); (b) the evaluator treats the empty text as 0 in a comparison with a number (a small deviation from AutoHotkey, in `ExprEvaluator`), which gives the v1 result for the empty and the missing variable, though not for a non-numeric text such as `"abc"`.
-**Decision (project owner, 2026-10-14, E0034):** a per-flow option `strictTypes`. Migrated flows (formatVersion and v1Text marker) get `false`: v1 behaviour, E0025 unchanged. New flows get `true`: a type error in a comparison or a calculation becomes an element error (`exception`). The `f1` warnings are shown in the editor in both modes. **Action:** implement in WI-0042 (task 7) and in the editor (S0004/S0005). WI-0039 does not change the evaluator.
-**Evidence:** the two case IDs above; deviation catalog in `doc/EXPRESSION-LANGUAGE.md` section 15.1 (class "text comparison").
-
-### F-0069: The F-0016 xfail test passes again (strict XPASS) in the slow tier, after the F-0067 fix
-
-**What:** `tests/fault/test_log_burst.py::test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor` is marked `xfail(strict=True)` (F-0016). In the slow tier it passed, so the strict mark turned the result into `FAILED` with `[XPASS(strict)] F-0016: a chatty role gives up during a long stand-still of the supervisor`. The other test of the file (F-0066) was `xfailed` as expected.
-**Status:** Fixed by dropping strict on the F-0016 test; watch. The same symptom as F-0067. The commit under verification already contains the F-0067 fix (the test waits for the first lines of the burst, commit `d354ff5`), so that fix did not remove the XPASS, or this is the same rare timing outcome. Not reproduced again, not investigated.
-**Evidence:** run ID `20261014-064633-1e444c2d`, commit `1e444c2`, command `python tools/run_suite.py --ref HEAD -- tests -q --all -m slow` (4 workers), exit code 1, `1 failed, 86 passed, 1 xfailed in 130.43s`, no INTERNALERROR. The fast tier (run ID `20261014-064547-1e444c2d`, 514 passed, exit 0) and the foundation tier (run ID `20261014-064848-1e444c2d`, 439 passed, 1 skipped, exit 0) of the same commit are green. The architecture check reports 0 violations.
-**Suspicion (assumed):** The change under verification (WI-0039: `src/engine/`, `src/expr/`, `src/elements/skeleton/`) does not touch `src/core/` or `src/supervisor/`, so it is probably not the cause. Either the F-0067 fix is not enough (the loop runs, but the role's queue still does not reach the limit during the 6 s suspension, for example because the machine is fast), or the F-0016 defect depends on timing in a way the test does not control. No second sample, so the rate is unknown.
-**Action:** Done: `strict` is dropped for this test (see F-0067 and F-0016). Watch the result; an XPASS is now reported, not an error. Note the rate in F-0016.
-
 ### F-0071: Killed worker: no `evt.process.crashed` within the budget (slow tier)
 
 **What:** `tests/fault/test_process_crash.py::test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted[0]` failed in the slow tier: after `kill_role(chain, "worker:1")` no `evt.process.crashed` for `worker:1` arrived within `CRASH_BUDGET_S + 5` (`tests/fault/test_process_crash.py:37`). The supervisor text in the assertion message was empty.
-**Status:** observed once, **not reproducible** (0 failures in 8 runs on commit `505aceb`, see below). Cause unknown, open (watch list). Test diagnostics improved so the next occurrence can be read.
+**Status:** observed once, **not reproducible** (0 failures in 8 runs on commit `505aceb`, see below). Cause unknown, open (watch list). Second occurrence under load: F-0089. Test diagnostics improved so the next occurrence can be read.
 **Evidence:** commit `2d57395`, command `python tools/run_suite.py --ref HEAD -- tests -q --all -m slow` (4 workers), exit code 1, `1 failed, 85 passed, 2 xfailed in 121.75s`, no INTERNALERROR. The fast tier (`tests -q`) was green, 568 passed.
 **Reproduction (verified):** the test is marked `slow`, so it needs `--all -m slow`. 5 serial runs (`run_suite.py --ref 505aceb -- tests/fault/test_process_crash.py -q -n 0 --all -m slow -k killed_worker`): 5 of 5 passed (2.4 to 4.1 s each). 3 runs of the complete slow tier with 4 workers (`run_suite.py --ref 505aceb --workers 4 -- tests -q --all -m slow`): 3 of 3 green (86 passed, 2 xfailed, 111 to 118 s). Failure rate 0 of 8; too few to measure a rare flake.
 **Where the chain stops (not known):** the log of the original run is not available, and the assertion text held only the supervisor stderr, which is empty in every healthy run too. So it is not known whether the kill worked, whether the supervisor saw the death, or whether the report was lost.
@@ -263,8 +221,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 
 **What:** in the same slow run: `test_process_crash.py::test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted[0]` ("no evt.process.crashed for worker:1", the watcher saw the death, state `exited`, event list ends with `evt.process.exited`), `test_shutdown.py::test_two_sessions_in_a_row_both_exit_within_2_seconds[0]` (`6.15 s <= 6.0`), `test_supervisor_stall.py::test_supervisor_stand_still_does_not_make_healthy_children_hung[0]` (assertion at line 55; the log shows "supervisor stood still for 7861 ms").
 **Status:** observed once, together with the second observation of F-0088; serial rerun of the four fault files: 12 passed. These tests are not on the known list (F-0086 to F-0088). Suspicion (assumed): load of the run (4 workers plus other agents' runs), not WI-0047; the missing `evt.process.crashed` is the only one that is not a plain time limit. Not checked.
-**Action:** if the crash event returns on an idle machine, check whether `evt.process.exited` can replace `evt.process.crashed` for a killed worker under a stalled supervisor.
-
+**Action:** if the crash event returns on an idle machine, check whether `evt.process.exited` can replace `evt.process.crashed` for a killed worker under a stalled supervisor. Same family as F-0071 (killed worker without `evt.process.crashed`): a second occurrence of F-0071 under load.
 
 **Update 2026-10-15 (verifier of `7e046ff`):** more load-dependent failures of the same kind, each seen once and green when repeated: `test_worker_lifecycle.py` (killed worker before it answers: crash reported after 4.82 s, limit 3.25 s; run 20261015-205409-52f7923a), `test_engine.py::test_engine_reads_at_most_two_flow_files_at_a_time_while_loading` (no request in flight within the wait; run 20261015-205409-52f7923a), `test_storage.py::test_shutdown_finishes_the_queued_writes_then_says_bye_and_exits_0` (storage alive 3 s after `sys.bye`; run 20261015-210132-7e046ff7, green alone in run 20261015-210947-7e046ff7). Assumed: load of parallel agent runs. Not checked: whether the storage shutdown wait is a real race under load.
 ## Watch list (E0007)
@@ -311,6 +268,8 @@ Work that is open but is not a finding with an entry. Rule: a finished action is
 
 1. **Three `uncaught/timeout` cases** in the groups `assignment` and `script` of the golden check (reported by the verifier, not investigated). Check whether they are the known hangs of the v1 parser.
 2. **Small test gaps of WI-0048 (verifier, `7007f78`).** (a) `Action_Do_nothing` with `executionResult` set to `Exception` has no test; the result `exception` is new behaviour. (b) `ProductRegistersElements` asserts only `Length >= 3`; a test should compare the registry with the element files of `src/elements/*/` (or check that `tools/gen_element_includes.py --check` covers it, not checked). Do it with the next element work, in one small commit.
+
+3. **Distinct code for "flow not loaded yet".** Right after an engine restart `cmd.flow.start` is answered `not_found` while the flows are still loading (from F-0061, closed). A code such as `not_ready` would be clearer. Not decided; the manager of phase 3 follows the resync rule in PROTOCOL 4.8 meanwhile.
 
 ## Open decisions
 
