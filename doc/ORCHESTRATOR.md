@@ -178,9 +178,9 @@ The project owner wants to see at a glance what waits for him. Keep `NEEDS-ATTEN
 - Agents report such items to you in their report. You decide whether they go into the file.
 - The file is English like the rest of the repository.
 
-## 12. Wrap-up on request ("round up", "finish soon")
+## 12. Wrap-up on request ("wrap up", "round off", "finish soon")
 
-When the project owner writes something like "round up" or "finish soon", the orchestrator changes its mode:
+When the project owner writes something like "wrap up", "round off" or "finish soon", the orchestrator changes its mode:
 
 - Running agents finish their current task. Do not start new implementers or bug hunters.
 - Verifiers are still started for every completed task that needs one (section 3d), so that nothing reaches `v2-port` unverified.
