@@ -46,6 +46,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0085 | Foundation tier: the crasher restarts 4 times (`evt.process.started`), 3 expected | observed once, run 20261015-173445-99e2c044 on `1aceedd`, open | |
 | F-9000* | Foundation tier: `child_launcher.test.ahk` case "stdin of the child is NUL": `findstr` did not end within 10 s | observed once under load, run 20261015-201039-acc9907a on `acc9907`, green alone, open | |
 | F-9001* | Slow tier: `test_clients_churn.py` smoke variant got 13 snapshot probes during the churn, 20 required | observed once under load, run 20261015-201045-acc9907a on `acc9907`, green alone, open | |
+| F-9002* | Slow tier: a burst of 5000 log lines ends with 4999 lines written or counted as dropped; one line is lost without a count | observed once, run 20261015-202736-c08757b9 on `c08757b`, green alone, open | |
 
 
 ## Findings
@@ -286,6 +287,12 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **What:** `tests/stress/test_clients_churn.py::test_clients_connecting_and_leaving_do_not_disturb_the_engine_or_leak[smoke]` failed with `assert len(latencies) >= 20`: 13 probe requests (answers 45 to 153 ms) during the churn. No error, no restart, no leak was reported before that assertion.
 **Status:** observed once, run 20261015-201045-acc9907a on `acc9907` (slow tier, next to a foundation-tier run and another agent). Green alone right after. Suspicion (assumed): load; the number of probes depends on how fast the churn ends. Not checked.
 **Action:** if it returns on an idle machine, count probes per second instead of an absolute number.
+
+### F-9002*: one log line of a burst is neither written nor counted as dropped
+
+**What:** `tests/fault/test_log_burst.py::test_a_burst_of_log_lines_does_not_cost_the_storage_link` failed with `assert written + dropped == BURST, (written, dropped)`: `(2768, 2231)`, 4999 of 5000. The test promises that no line is lost silently: every line is in `Log.txt` or `Log_old.txt`, or counted in a "n log lines dropped" line. One line is neither.
+**Status:** observed once, run 20261015-202736-c08757b9 on `c08757b` (slow tier through `tools/run_suite.py`, the only suite on the machine; other agents may have run tests). Green alone right after (2 passed). The change under test (WI-0047, element packages) does not touch the log path (`src/core/Log.ahk`, `src/storage/`, `src/supervisor/DiagLog.ahk`). Suspicion (assumed): a line at the rotation from `Log.txt` to `Log_old.txt`, or a drop that is not counted; related to F-0063 (a line lost while other processes hold the files)? Not checked.
+**Action:** read the `pytest-log` of the run (the data folder of the failed test is kept there) and compare the sequence numbers of the lines around the rotation and the "dropped" lines; run the test in a loop.
 
 ## Watch list (E0007)
 
