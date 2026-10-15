@@ -20,8 +20,8 @@ AutoHotFlow (AHF) is being ported from AutoHotkey v1 (AutoHotkey_H with `AhkThre
 
 ## Entry points
 
-- Product: `src/AutoHotFlow.ahk` (includes `src/AhfBoot.ahk`).
-- Test roles (`echo`, `crasher`, `hanger`, `slow_shutdown`) exist only in the test entry point `tests/integration/helpers/AutoHotFlowTest.ahk` with `--test-roles`. Nothing in `src/` includes anything from `tests/`.
+- Product: `src/AutoHotFlow.ahk` (the supervisor; includes `src/AhfBoot.ahk`). Every other role has its own entry script `src/entry/<role>.ahk` with only its element classes (`src/entry/generated/`, written by `tools/gen_element_includes.py` from the literal `static Mode` of each class; E0041). The supervisor starts the roles from there.
+- Test roles (`echo`, `crasher`, `hanger`, `slow_shutdown`) exist only in the test entries (`tests/integration/helpers/AutoHotFlowTest.ahk` and `tests/integration/helpers/entry/`) with `--test-roles`. Nothing in `src/` includes anything from `tests/`.
 - Layout of the v2 code: `doc/ARCHITECTURE.md`, section 8.
 - The v1 code lives unchanged in `v1/` (temporary, reference only, **do not change**).
 

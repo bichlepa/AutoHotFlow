@@ -127,7 +127,9 @@ All payloads are objects. `flowId`, `elementId`, `connectionId` are the identifi
 | `cmd.topic.subscribe` / `cmd.topic.unsubscribe` | role → supervisor | `{ topic }` | `res: { ok }` |
 | `evt.app.exitCancelled` | supervisor → topic `process` | `{ by }` (role that cancelled) | – (exit cancelled, nothing was stopped) |
 
-**Exit codes of the supervisor** (`AutoHotFlow.ahk --role=supervisor`, default without `--role`):
+**Starting a role (D0012, E0041):** the supervisor starts a child with `AutoHotkey64.exe /ErrorStdOut=UTF-8 "<entry folder>\<role>.ahk" --role=<name> --session=<id> --hub=<pipe> --data="<dir>" --hubHwnd=<n> [--flow=<id>] [--test-roles] [--restarted=<n>] <role options>`. The entry folder is `entry\` next to the script of the supervisor; with `--test-roles` a role is also looked up in `entry\test\`. No entry file for the role (or a name that is not a plain identifier): `Spawn` fails with `bad_args`, "unknown role". The entry script of a role registers only that role, so `--role=<other>` ends with exit 2 and "unknown role". The options and messages are unchanged; only the script that carries them is a different file per role.
+
+**Exit codes of the supervisor** (`AutoHotFlow.ahk`, `--role=supervisor` or no `--role`):
 0 clean (every child has terminated itself), 1 start failed (e.g. mutex, invalid options), 5 at least one child was terminated after deadline or hang (`TerminateProcess`). The same numbers appear in the entry point (`src/AutoHotFlow.ahk`). The second instance uses 0 and 1 (see `cmd.app.command`).
 
 **Exit codes of a running role** (`Role`): 0 clean end after `sys.shutdown`, 3 role not implemented, 4 hub lost (orphan guard or peer closed), 6 too many unhandled errors (4.1c). The supervisor writes the meaning of known codes into the log line of the crash (`Children.EXIT_TEXT`).
@@ -155,7 +157,7 @@ Restart policy: at most 3 restarts in 60 s, otherwise the process remains `crash
 
 ### 4.1b Test roles (only with `--test-roles`)
 
-The roles `echo`, `crasher`, `hanger`, `slow_shutdown` (sources in `tests/integration/helpers/`) are compiled only into the test entry point `tests/integration/helpers/AutoHotFlowTest.ahk` (WI-0029), and are registered there only with `--test-roles`. In the product entry point and without the flag, their name is unknown (exit 2). Additional messages of the test roles:
+The roles `echo`, `crasher`, `hanger`, `slow_shutdown` (sources in `tests/integration/helpers/`) are compiled only into the test entries (WI-0029, WI-0047-PREP): `tests/integration/helpers/AutoHotFlowTest.ahk` (supervisor, and every role in one process for a direct start) and `tests/integration/helpers/entry/test/<role>.ahk` (the entry of each test role, which the supervisor of the test entry starts with `--test-roles`). They are registered there only with `--test-roles`. In the product entry scripts and without the flag, their name is unknown (exit 2). Additional messages of the test roles:
 - `cmd.test.arm` to `crasher` (`{}`, `res: { ok }`): starts a timer (300 ms), after which `crasher` terminates itself with `TerminateProcess` (exit 7), without `sys.bye`. The arm step allows the test to observe the process before it dies (test scenario for `evt.process.crashed`). Without arm, `crasher` does nothing.
 - `cmd.test.echo`, `cmd.test.log`, `cmd.test.logstate`, `cmd.test.setlogtarget`, `cmd.test.throwlater` (`echo`): see `tests/integration/helpers/EchoRole.ahk`.
 - Option `--prepare-limit=<ms>` (only with `--test-roles`, 100 to 600000): lowers the deadline of `cmd.app.prepareExit`, so that the timeout test runs in seconds. Without the flag the constant applies.
