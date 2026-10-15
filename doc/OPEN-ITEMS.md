@@ -18,7 +18,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 |---|---|---|---|
 | F-0002 | Pipe not ready within 2 s under load | open, observed | |
 | F-0013 | Unprotected check-then-act spots in the engine | open (counts guarded in ad6ac7d; rest read and found protected) | |
-| F-0014 | `Ids.Next` and `ExecContext.Finish` not atomic | open, low | yes |
+| F-0014 | `Ids.Next` and `ExecContext.Finish` not atomic | fixed (owner agreed on 2026-10-15), verifier pending | yes |
 | F-0020 | Supervisor messages after `storage` is gone go only to stderr | open, low | |
 | F-0023 | Flow file parsed twice in the engine | open, not implemented | yes |
 | F-0035 | Hub connection deadlines ignore supervisor stalls | open, low | |
@@ -70,6 +70,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Sign that it matters:** Duplicate IDs, or an element that finishes twice.
 **Action:** In phase 3, guard both spots with `Critical`, with the agreement of the project owner.
 **Update 2026-10-13 (bug hunter):** Re-read, both races are real in principle: AHK v2 may interrupt a thread between lines (timer or message handler), so `Ids.Next` (`src/core/Ids.ahk:22-24`: increment, then read `this.counter`) can return the same number twice if an interrupting call runs in between, and `ExecContext.Finish` (`src/elements/base/ExecContext.ahk:36-40`) can run `onFinish` twice. `Executor._Advance` already uses `Critical` for the same reason (WI-0016 seen 2 of about 50 runs). Not reproduced. Smallest fix for `Ids.Next`: read into a local and use `Critical "On"`/restore, or compute `n := ++this.counter` in one expression (still not formally atomic). Not done because it changes `src/core/`; waiting for the owner's agreement.
+**Update 2026-10-14 (bug hunter), fixed:** The `Ids.Next` race is reproduced: a test with a 1 ms timer taking ids while the main thread takes ids (`tests/ahk/core_ids.test.ahk`, "an interrupting timer never gets the same id") failed 3 of 3 runs with a duplicate id after about 118,000 ids. `Ids.Next` now takes the number under `Critical` (`n := ++this.counter`), and the test passes 3 of 3 runs. `ExecContext.Finish` now checks and sets `finished` under `Critical` and calls `onFinish` after restoring it; this half has no test (the interruption between the two lines cannot be forced), it follows the pattern of `ThreadState.Finish`. The project owner agreed to the change on 2026-10-15 and had it integrated. Not checked: stress runs.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-0021-engine-korrektheit.md`.
 
 ### F-0020: Supervisor messages after `storage` is gone go only to stderr
