@@ -76,6 +76,12 @@ def test_id_rules():
     assert any("area code EXE used twice" in e for e in errors(doc(req()) + "\n## Again (EXE)\n"))
 
 
+def test_references_to_unknown_ids_are_reported():
+    assert errors(doc(req(body="See REQ-EXE-010.\n"))) == []
+    assert any("reference to REQ-EXE-990" in e for e in errors(doc(req(body="See REQ-EXE-990.\n"))))
+    assert errors(doc(req(), "```\nREQ-EXE-990 in an example\n```\n")) == []
+
+
 def test_requirement_headings_in_code_blocks_are_ignored():
     example = "```markdown\n### REQ-EXE-010 Example\n\n- **v2:** whatever\n```\n"
     text = "# R\n\n## Format\n\n" + example + "\n## Flows (EXE)\n\n" + req()

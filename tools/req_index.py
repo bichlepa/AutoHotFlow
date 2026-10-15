@@ -18,7 +18,8 @@ doc/REQUIREMENTS.md is the source. Every requirement is a heading with a fixed l
     Free text, tables, lists ...
 
 The index is a summary plus one table per area, with links to the sections. It is never edited by hand.
-Evidence references in backticks that look like paths (`tests/x.py`, `tests/x.py::test_name`, globs) must exist.
+Evidence references in backticks that look like paths (`tests/x.py`, `tests/x.py::test_name`, globs) must exist,
+and every requirement ID mentioned in the text (outside code blocks) must exist.
 
 Usage:  python tools/req_index.py            check the source and write the index (exit 1 on errors)
         python tools/req_index.py --check    check the source and that the index is up to date (exit 1 if not)
@@ -38,6 +39,7 @@ AREA = re.compile(r"^## (?P<title>.+?) \((?P<code>[A-Z]{2,4})\)\s*$")
 OTHER_H2 = re.compile(r"^## ")
 REQ = re.compile(r"^### (?P<id>REQ-(?P<code>[A-Z]{2,4})-(?P<num>\d{3})) (?P<title>\S.*?)\s*$")
 REQ_LIKE = re.compile(r"^#{1,6} +REQ-")
+REF = re.compile(r"\bREQ-[A-Z]{2,4}-\d{3}\b")
 FENCE = re.compile(r"^\s*(```+|~~~+)")
 META = re.compile(r"^- \*\*(?P<key>[^*]+):\*\* *(?P<value>.*?)\s*$")
 
@@ -148,6 +150,11 @@ def parse(text):
                 req.meta[key] = value
             i += 1
         errors.extend("line %d: %s" % (req.line, e) for e in check_req(req))
+    # every mentioned ID must exist (format examples in code blocks are blanked out above)
+    for n, line in enumerate(lines, 1):
+        for ref in REF.findall(line):
+            if ref not in ids:
+                errors.append("line %d: reference to %s, which does not exist" % (n, ref))
     return areas, errors
 
 
