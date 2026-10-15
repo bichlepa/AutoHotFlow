@@ -22,6 +22,7 @@ This document lists findings that are closed or accepted. Moved from doc/OPEN-IT
 | F-0275 | A burst of log lines closes the hub's link to `storage` and loses the lines | closed (fixed with option (a), verified 2026-10-14 on 8ec62dc) | yes |
 | F-0279 | `VarWriter.FlushAll` loses the variables beyond the limit of the peer (1000 waiting requests) | closed (option (b), accepted by the project owner 2026-10-14; verified 2026-10-14 on 53063dc) |  |
 | F-0281 | `#Warn` dialog for `Engine` in `VarLoader.ahk:101` seen in a manual unit test run | closed (option (a), 2026-10-15, E0043: comment in the file header) | |
+| F-0285 | `cmd.flow.get` returns `flowSettings.strictTypes` as `1`/`0` instead of JSON `true`/`false` | closed (fixed in 841ecbd) | |
 
 * Renumbered on 2026-10-14 (F-0072 is now F-0283). The mapping of all renumbered IDs is in `doc/OPEN-ITEMS.md`.
 
@@ -181,3 +182,10 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 **Status:** Closed (2026-10-15, E0043), no code change. Cause (verified by runs through `tools/ahkrun.py`, commit `6589718`): `VarLoader.ahk` uses the class `Engine` and works only in a script that also includes `Engine.ahk`; that holds for the product and for the unit test (`engine_var_files.test.ahk`: 16 passed, no dialog). A probe that includes only `VarLoader.ahk` shows exactly the reported dialog, because a script without a `#Warn` directive shows warnings by MsgBox, and the unknown name `Engine` is taken for an unset local. The original dialog was not reproduced; assumed: that run used a script without `Engine.ahk`.
 **Decision:** option (a) (close without a change) plus a comment in the header of `VarLoader.ahk`. Alternatives rejected: an `#Include` of `Engine.ahk` from the helper (circular, pulls the whole engine into a helper), and moving the two static helpers out of `Engine` (six call sites on the load path for a warning that only a wrong use shows).
 **Follow-up:** the measurement for this entry found `LocalSameAsGlobal` at 152 sites and one real defect: F-0287.
+
+### F-0285: `cmd.flow.get` returns `strictTypes` as a number
+
+**What:** A flow file with `"strictTypes": true` is loaded, and `cmd.flow.get` answers with `"strictTypes": 1` (the parser maps `true` to the AutoHotkey number 1 and the definition is sent as it is in `Raw`). The file written by `cmd.flow.save` has `true`/`false` (`ToFileText`), and the protocol rule for truth values (E0008) says real JSON booleans on the wire. Other keys of the flow, such as `enabled` of a trigger, are strings in v1 files, so only this key is affected as far as read.
+**Status:** verified by the test `tests/integration/test_flowrun.py` (WI-0049), which compares the definition with the file it wrote. Open, low: no client reads the key yet. Not checked: whether the wire check of booleans (WI-0026) knows this field.
+**Action:** decide whether `cmd.flow.get` converts the key back to a boolean (like `ToFileText`), then tighten the test (it accepts `1` now).
+**Update 2026-10-15 (closed):** Cause as described. Fix: `FlowDefinition.WireDefinition()` returns Raw with `flowSettings.strictTypes` as a JSON boolean (on a copy, only if the flow has the key); `cmd.flow.get` and the conflict answer of `cmd.flow.edit` use it. The test now requires `is True` (failed before, passes after). Other boolean values inside a v1 flow (read as 1/0 by the parser) are not converted; not checked whether any exist.

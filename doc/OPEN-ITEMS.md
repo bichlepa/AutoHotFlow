@@ -36,7 +36,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0280 | `test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted[0]` got no `evt.process.crashed` for `worker:1` in the slow tier | observed once, not reproducible in 8 runs, diagnostics added, open | |
 | F-0282 | The stress test with 200 big flows fails its snapshot budget (largest snapshot answer during loading 2326 ms, budget 1000 ms) | observed once at the S0001 acceptance (WI-0043); measured in WI-0046: the conversion is not the cause (worst case 8 % of the load time), largest snapshot answer 0.56 to 0.79 s in 6 of 7 runs, once 1.5 s; guarded by a stress run at the end of every S0002 package on the load path | yes |
 | F-0284 | A numeric text outside the range of Float (`1e-3001`) is true in a boolean test of AutoHotkey when it is a concatenation result, and false in the evaluator | verified by the expression oracle (one case in 40,000 random cases), open, low, AutoHotkey quirk | |
-| F-0285 | `cmd.flow.get` returns `flowSettings.strictTypes` as `1`/`0` instead of JSON `true`/`false` | verified (WI-0049 test, a file with `true` came back as `1`), open, low | |
 | F-0286 | `test_cancel_stops_the_running_element_and_reports_stopped_within_500_ms` did not see the job in the snapshot of the worker | observed once in a slow-tier run next to another suite run, 5 of 5 green alone, open | |
 | F-0287 | 152 sites with `LocalSameAsGlobal` (a local named like a class or a built-in function); one was a real defect | verified by a measurement (2026-10-15); one defect fixed, the rest open, a work item | |
 
@@ -230,12 +229,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** verified (run of `python tools/expr_oracle.py --seed 100 --count 40000`, the only deviation without an entry in 40,207 cases; the three probes above). Open, low: it needs a number text with an exponent beyond about 308, which only a concatenation of a tiny or huge Float with more digits makes. Not fixable inside the evaluator without keeping the temporary value out of a variable, which AutoHotkey code cannot do for a value that comes from a recursive call.
 **Handling:** the generator of the oracle does not use the Floats `1e-300` and `1e300` as an operand of the concatenation or of a boolean operator, so a random run does not stop at it (`tools/expr_oracle.py`, `pick_var`). A deviation class is not made for it.
 **Action:** none unless a real flow shows it. If the evaluator is ever made to follow AutoHotkey for it, the oracle starts to see it again with `ftiny` or `fhuge` in the pool of every operand.
-
-### F-0285: `cmd.flow.get` returns `strictTypes` as a number
-
-**What:** A flow file with `"strictTypes": true` is loaded, and `cmd.flow.get` answers with `"strictTypes": 1` (the parser maps `true` to the AutoHotkey number 1 and the definition is sent as it is in `Raw`). The file written by `cmd.flow.save` has `true`/`false` (`ToFileText`), and the protocol rule for truth values (E0008) says real JSON booleans on the wire. Other keys of the flow, such as `enabled` of a trigger, are strings in v1 files, so only this key is affected as far as read.
-**Status:** verified by the test `tests/integration/test_flowrun.py` (WI-0049), which compares the definition with the file it wrote. Open, low: no client reads the key yet. Not checked: whether the wire check of booleans (WI-0026) knows this field.
-**Action:** decide whether `cmd.flow.get` converts the key back to a boolean (like `ToFileText`), then tighten the test (it accepts `1` now).
 
 ### F-0286: the cancel test of the worker did not see the job in the snapshot
 
