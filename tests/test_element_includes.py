@@ -124,6 +124,21 @@ def test_a_mode_in_a_comment_does_not_count(small_tree, capsys):
     assert "Action_B.ahk" in capsys.readouterr().err
 
 
+def test_generator_refuses_a_class_file_that_includes_a_class_file(small_tree, capsys):
+    # F-0398: the include runs the Register line of the included class in every role that holds this file
+    (small_tree / "Action_B.ahk").write_text('#Include Action_A.ahk\nclass Action_B {\n    static Mode := "worker"\n}\n')
+    assert gen.main([]) == 1
+    err = capsys.readouterr().err
+    assert "Action_B.ahk" in err and "Action_A.ahk" in err, err
+
+
+def test_generator_allows_an_include_of_base_code(small_tree):
+    # base/ holds shared code without element classes; the generator does not look into it for Mode lines
+    (small_tree / "Action_B.ahk").write_text(
+        '#Include base\\AhfElement.ahk  ; comment\nclass Action_B {\n    static Mode := "worker"\n}\n')
+    assert gen.main([]) == 0
+
+
 # --- the entry scripts ----------------------------------------------------------------------------------------
 
 ROLE_FILE = {"storage": r"storage\Storage.ahk", "engine": r"engine\Engine.ahk", "worker": r"worker\Worker.ahk",
@@ -173,6 +188,33 @@ for cls in ElementRegistry.All()
     ids .= ElementRegistry.IdOf(cls) ":" cls.Mode "`n"
 FileAppend(ids, "*", "UTF-8-RAW")
 """
+
+
+def expected_test_classes():
+    """{class name: mode} of the test elements: Action_Test* files outside base/ in src/elements and tests/elements."""
+    found = {}
+    for folder in (ELEMENTS, ROOT / "tests" / "elements"):
+        for path in folder.rglob("*.ahk"):
+            if "base" in path.relative_to(folder).parts[:-1] or not path.name.lower().startswith("action_test"):
+                continue
+            m = re.search(r'^\s*static\s+Mode\s*:=\s*"(\w+)"', path.read_text(encoding="utf-8"), re.M)
+            assert m, path
+            found[path.stem] = m.group(1)
+    return found
+
+
+@pytest.mark.parametrize("role", [r for r, m in TABLE.items() if m])
+def test_a_test_block_registers_only_the_test_classes_of_its_modes(role, datadir, run_ahk):
+    # F-0398: the text check of the blocks does not see a class that comes in through an include, this probe does
+    script = datadir / "probe_test.ahk"
+    script.write_text(PROBE.format(registry=ELEMENTS / "base" / "ElementRegistry.ahk",
+                                   block=TEST_ENTRY_DIR / "generated" / ("TestElements_%s.ahk" % role)),
+                      encoding="utf-8")
+    res = run_ahk(script)
+    assert res.returncode == 0, res.stderr
+    got = sorted(line for line in res.stdout.splitlines() if line)
+    expected = sorted("%s:%s" % (n, m) for n, m in expected_test_classes().items() if m in TABLE[role])
+    assert got == expected
 
 
 @pytest.mark.parametrize("role", [r for r, m in TABLE.items() if m])

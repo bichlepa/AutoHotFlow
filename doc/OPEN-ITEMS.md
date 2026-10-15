@@ -40,7 +40,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0287 | 152 sites with `LocalSameAsGlobal` (a local named like a class or a built-in function); one was a real defect | verified by a measurement (2026-10-15); one defect fixed, the rest open, a work item | |
 | F-0396 | Foundation tier: `test_suspend_and_resume` leaves two processes behind (cleanup of the process tracker) | observed once on `b92d800` (run 20261015-153715-b92d8005), open | |
 | F-0397 | Foundation tier, timing under load: frozen-process tests exceed their budgets, one teardown leaves processes behind | observed once on `88be7fe` (run 20261015-153151-b481440a), not seen on `b92d800` in one run, open | |
-| F-0398 | The test element `Action_TestExprParamsWorker` includes the inline class `Action_TestExprParams`, so a worker of the test entry registers an inline class too | verified (read), open, low, test classes only | |
 | F-0399 | No setting for the user limits the number of workers; `--worker-limit` exists only with `--test-roles`, the pool size `--workers` only as an option of the engine | verified (read), decided (E0044), implemented in S0004 | yes |
 | F-0400 | Fast tier: the expression oracle's time budget of the fixed corpus (`assert seconds < 15`) measured 16.6 s | observed once, run 20261015-172551-99e2c044 on `1aceedd`, open | |
 | F-0401 | Slow tier: a frozen child is terminated 5.08 s after the hang (budget 4.0 s) | observed once, run 20261015-172954-99e2c044 on `1aceedd`, open | |
@@ -325,13 +324,6 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 
 1. **Hand check of the GUI.** The owner checks the stub and the debug window by hand, using the guides in the "Not checked" section. The phase 2 checkbox for WI-0013 stays open until then.
 2. **Default working directory of flows (S0004).** v2 reads no `settings.json` yet. The v1 default of `FlowWorkingDir` is `A_MyDocuments\AutoHotFlow`; v2 takes it over only if decided in S0004. The test profile of a data directory will carry a `settings.json` with `FlowWorkingDir` below the data directory and `UILanguage` `en`. The auxiliary files of the v1 "Automatic tests" become fixtures in `tests/data/workdir/`; WI-0043 does not depend on the owner's Documents folder.
-
-### F-0398: A worker of the test entry registers an inline test class
-
-**What:** `src/elements/skeleton/Action_TestExprParamsWorker.ahk` (mode `worker`) includes `Action_TestExprParams.ahk` (mode `inline`) to call its static helpers (`Parameters`, `Evaluate`, `ResultName`, `Report`). The include also runs `ElementRegistry.Register(Action_TestExprParams)` at file level, so the worker process of the test entry holds an inline class, which E0041 says a worker must not hold.
-**Status:** verified (read; the generated block `tests/integration/helpers/entry/generated/TestElements_worker.ahk` names only worker files, the extra class comes through the include in the class file). Open, low: only test classes, no product code. `tests/test_element_includes.py` checks the product blocks at run time and the test blocks as text, so it does not see this.
-**Action:** move the shared helpers into a file without `Register` (a plain helper class, for example `TestExprParamsKit`) that both test classes use, and let the generator (or the test) refuse a class file that includes another class file.
-**Evidence:** WI-0047-PREP (`tools/gen_element_includes.py`, `tests/test_element_includes.py`).
 
 ### F-0399: The user has no setting that limits the workers
 

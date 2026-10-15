@@ -8,6 +8,10 @@ file name.
   python tools/gen_element_includes.py            write the blocks
   python tools/gen_element_includes.py --check    write nothing, exit 1 when a block is missing or out of date
 
+A class file must not #Include another class file: the include runs the file-level code of that file too (the
+Register line), so the class would land in every role that includes the first file (F-0398). Shared code of such
+classes goes into a file without a Mode line (`src/elements/base/`, or next to the test elements in `tests/elements/`).
+
 Classes (ROLE_MODES): supervisor, storage, debug and manager get no block (the manager loads all classes later if
 it needs them); engine and editor get all classes, triggerhost the `trigger` classes, worker the `worker` classes.
 
@@ -44,6 +48,7 @@ TEST_OUT = ROOT / "tests" / "integration" / "helpers" / "entry" / "generated"
 
 _MODE_LINE = re.compile(r"^\s*static\s+Mode\s*:=", re.I)
 _MODE_LITERAL = re.compile(r'^\s*static\s+Mode\s*:=\s*"([^"]*)"\s*(;.*)?$', re.I)
+_INCLUDE = re.compile(r"^\s*#Include\s+(.+?)\s*$", re.I | re.M)
 
 
 class GenError(Exception):
@@ -65,6 +70,19 @@ def read_mode(path):
     if m.group(1) not in MODES:
         raise GenError("%s: Mode \"%s\" is not one of %s" % (name, m.group(1), ", ".join(MODES)))
     return m.group(1)
+
+
+def check_includes(path):
+    """GenError when the class file includes another class file (a file with a Mode line outside base/)."""
+    path = Path(path)
+    for m in _INCLUDE.finditer(path.read_text(encoding="utf-8")):
+        target = re.split(r"\s+;", m.group(1))[0].strip()
+        if not target or target[0] in "<*":
+            continue
+        other = (path.parent / target.replace("\\", "/")).resolve()
+        if other.is_file() and other.parent.name != "base" and any(_MODE_LINE.match(line) for line in other.read_text(encoding="utf-8").splitlines()):
+            raise GenError("%s: includes the class file %s; move the shared code into a file without a Mode line"
+                           % (path.as_posix(), other.name))
 
 
 def _is_test_class(path):
@@ -104,6 +122,8 @@ def generate():
     """Returns {output path: text} of all blocks. Raises GenError."""
     result = {}
     for kind, out_dir, prefix in (("product", PRODUCT_OUT, "Elements_"), ("test", TEST_OUT, "TestElements_")):
+        for p in find_classes(kind):
+            check_includes(p)
         classes = [(p, read_mode(p)) for p in find_classes(kind)]
         for role in ROLE_MODES:
             result[out_dir / (prefix + role + ".ahk")] = block_text(kind, role, classes, out_dir)
