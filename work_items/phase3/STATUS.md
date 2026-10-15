@@ -48,7 +48,9 @@ Session 6 start: 2026-10-15 (evening), work-item mode, HEAD `8c09337` on `v2-por
 | 5 | Bug hunter F-0088 (log burst loss) | sonnet | hunt-16 | wip/hunt-16 | cause of the lost log line, branch from 188c570 | running |
 | 4 | Implementer rename of the F-0078 locals (owner's wish) | sonnet | wi-rename (removed) | (deleted) | 156 locals renamed (scan 153 sites before, 0 after), `#Warn All, StdOut` in the test scripts and entries, arch rule; integrated as a6f2b95 to 7e046ff; F-0078 closed (CLOSED-ITEMS); fast tier at HEAD red under load in tests that pass alone (to verify) | done, verifier running on 7e046ff |
 | 6 | Verifier F-0078 rename | sonnet | ver-78 (not needed) | - | fast 798 passed (second run; first run 3 load failures, not reproduced), foundation 444, slow 98, arch and req 0; F-0089 updated with the new load observations (3d05060) | done |
-| 7 | Implementer WI-0048 (L0001 smoke test) | sonnet | wi-48 | wip/wi-48 | smoke test of every registered element, from 3d05060 | running |
+| 7 | Implementer WI-0048 (L0001 smoke test) | sonnet | wi-48 (removed) | (deleted) | smoke test of every registered element, `Action_Do_nothing` gets v1 metadata; integrated as a7c469a, 7007f78; fast 806 passed 1 skipped (skip not from this work) | done, verifier running on 7007f78 |
+| 8 | Verifier WI-0048 | sonnet | ver-48 (findings only) | - | fast, foundation, arch, req on 7007f78 | running |
+| 9 | Implementer WI-0051 (dialog test seam, S2) | sonnet | wi-51 | wip/wi-51 | dialog indirection and test provider, from 7007f78 | running |
 | 2 | Bug hunter (OPEN-ITEMS mode) | sonnet | hunt-15 | wip/hunt-15 | not in the area of WI-0047 | running |
 
 Owner's wish (2026-10-15, session 6): rename the 151 locals of F-0078 (action step 1) before the next work item starts, that is before WI-0048 (WI-0047 is still running; the rename waits for it to keep one implementer slot). Steps 2 and 3 of the action follow in the same task or after it. Hunter commit `406513b` (F-0078 measurement, doc only) integrated, hunt-15 workspace removed.
