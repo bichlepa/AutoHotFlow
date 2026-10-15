@@ -48,7 +48,7 @@ python tools/new_workspace.py --remove <name>                     # worktree awa
 
 | File | Rule |
 |---|---|
-| `doc/OPEN-ITEMS.md`, `doc/HOW-TO.md` | new entries at the end of their section; new findings get provisional IDs from `F-9000*` and the orchestrator renames them before the commit (ORCHESTRATOR.md section 2) |
+| `doc/OPEN-ITEMS.md`, `doc/HOW-TO.md` | new entries at the end of their section; new findings get provisional IDs from `F-9000*`; the integrator gives them the next free final number of the dense series before the commit (ORCHESTRATOR.md section 2) |
 | `doc/PROTOCOL.md` | one commit per interface change, early; the same message type is never added by two branches |
 | `.vscode/tasks.json` | new tasks at the end of their group |
 | `doc/REQUIREMENTS.md`, `doc/REQUIREMENTS-INDEX.md` | change only the requirements of the own task. The index is generated: never resolve a conflict in it by hand; resolve the source, then run `python tools/req_index.py` |
