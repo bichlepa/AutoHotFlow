@@ -56,4 +56,5 @@ The patterns with fixed wording are **checked automatically**: `python tools/arc
 - Every change to `core/`, state machines or the protocol comes with a test.
 - New message types are added to `PROTOCOL.md`.
 - Deliberate behavior changes compared to v1 are recorded in `MIGRATION.md` (ID, area, v1, v2, reason).
+- A feature that is implemented, verified or dropped updates its requirement in `REQUIREMENTS.md` (AGENTS.md rule 12).
 - Commits are small and descriptive, one change per commit.

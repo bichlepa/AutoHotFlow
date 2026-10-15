@@ -19,4 +19,4 @@ Lasting documents. The working papers of the port up to phase 2b and the fix blo
 | [MANUAL-CHECKS.md](MANUAL-CHECKS.md) | Manual checks for the project owner (GUI of the stub, debug window) |
 | [HISTORY.md](HISTORY.md) | Work packages mapped to commits |
 
-Reading order for new contributors: ARCHITECTURE (sections 1 to 5), CONVENTIONS, then the document for your own task.
+Reading order for new contributors: REQUIREMENTS-INDEX (what AutoHotFlow does and how far v2 is), ARCHITECTURE (sections 1 to 5), CONVENTIONS, then the document for your own task.

@@ -2,7 +2,7 @@
 
 Status: Draft, approved as the basis for Phase 2 (walking skeleton), extended in Phase 2b (WI-0020, decisions E0001 to E0008 in `doc/DECISIONS.md`). As of 2026-10-11.
 Target platform: AutoHotkey v2, **64-bit only** (E0004, 2026-10-11). 32-bit is not supported and is rejected at startup (implementation in WI-0022). Reason: structures and DllCalls are only tested for 64-bit. Stock interpreter, no AHK_H extensions.
-Related documents: [PROTOCOL.md](PROTOCOL.md), [ELEMENT-API-V2.md](ELEMENT-API-V2.md), [TEST-STRATEGY.md](TEST-STRATEGY.md), [CONVENTIONS.md](CONVENTIONS.md), [MIGRATION.md](MIGRATION.md).
+Related documents: [REQUIREMENTS.md](REQUIREMENTS.md) (what AutoHotFlow must do), [PROTOCOL.md](PROTOCOL.md), [ELEMENT-API-V2.md](ELEMENT-API-V2.md), [TEST-STRATEGY.md](TEST-STRATEGY.md), [CONVENTIONS.md](CONVENTIONS.md), [MIGRATION.md](MIGRATION.md).
 
 Labeling: **[M]** = measured or confirmed in a spike, **[V1]** = verified in the v1 code, **[A]** = assumption to be checked in Phase 2.
 
@@ -16,7 +16,7 @@ Labeling: **[M]** = measured or confirmed in a spike, **[V1]** = verified in the
 4. Old flows (`.json`) and variables (`.ahfvd`/`.ahfvar`) load as they are (no conversion of the files beforehand). How v2 writes is free (E0021). A loaded v1 flow may need small fixes; every such place is marked with its MIGRATION ID and keeps the v1 original (E0035).
 5. The element format of the 114 actions plus conditions, loops and triggers can be ported largely mechanically.
 
-Non-goals: new features, a new flow file format, a plugin sandbox against malicious element code.
+Non-goals of the port: new features beyond the scope of v1, except those decided for the port (`doc/REQUIREMENTS.md`, scope `port`; ideas for after the port have the scope `later` there); a new flow file format; a plugin sandbox against malicious element code (REQ-SEC-030).
 
 ---
 
@@ -377,10 +377,12 @@ Rule: a folder under `src/` is a process role or library module. `core/` may not
 
 ## 9. Performance budgets (targets, measured in Phase 2)
 
-- Message latency locally (engine ↔ client via hub): median below 5 ms, 99 % below 50 ms.
-- Engine state change until editor redraw: below 50 ms with a non-blocked editor.
-- Idle CPU of the overall system without running flows: below 1 %.
-- Memory (E0040, 2026-10-15): **private bytes** (`psutil` `private`, not the working set, which counts shared pages in every process) of the background processes below 100 MB in total: supervisor, storage, engine, triggerhost, manager and the workers. This is the **normal state**: small flows running now and then, up to about 3 workers active (idle workers stay 60 s). Editors are not counted. Peaks with more active workers may exceed it; performance comes first there. Users who need less memory limit the workers: the engine never has more than N workers (`--workers=<n>`, default 4, 0 to 8, section 6.4; the supervisor passes the option on to the engine), and the supervisor additionally refuses more than `workerLimit` living workers (`Children.WORKER_LIMIT`, default 16, a guard against a faulty engine). A settings entry for the user does not exist yet; the option is on the command line of `AutoHotFlow.ahk` (`--worker-limit` exists only with `--test-roles`). **Measured (MS-0033, WI-0047-PREP, 150 synthetic classes with a guessed mode mix):** 49.0 MB with one worker, 67.7 MB with three, 77.0 MB with four (the default maximum N); before the role entries (MS-0032) 129.0 and 171.9 MB for one and three. Each additional worker costs about 9.4 MB, so the 16 workers of `workerLimit` would be about 189 MB (information, not a failure; reachable only with `--workers=8` at most, because N is limited to 8).
+The budgets are requirements in `doc/REQUIREMENTS.md` (REQ-PRF-010 to REQ-PRF-060), which also keep their status and evidence. This section defines them in detail. A change of a budget changes both documents in the same commit.
+
+- Message latency locally (engine ↔ client via hub, REQ-PRF-010): median below 5 ms, 99 % below 50 ms.
+- Engine state change until editor redraw (REQ-PRF-060): below 50 ms with a non-blocked editor.
+- Idle CPU of the overall system without running flows (REQ-PRF-020): below 1 %.
+- Memory (E0040, 2026-10-15, REQ-PRF-030): **private bytes** (`psutil` `private`, not the working set, which counts shared pages in every process) of the background processes below 100 MB in total: supervisor, storage, engine, triggerhost, manager and the workers. This is the **normal state**: small flows running now and then, up to about 3 workers active (idle workers stay 60 s). Editors are not counted. Peaks with more active workers may exceed it; performance comes first there. Users who need less memory limit the workers: the engine never has more than N workers (`--workers=<n>`, default 4, 0 to 8, section 6.4; the supervisor passes the option on to the engine), and the supervisor additionally refuses more than `workerLimit` living workers (`Children.WORKER_LIMIT`, default 16, a guard against a faulty engine). A settings entry for the user does not exist yet; the option is on the command line of `AutoHotFlow.ahk` (`--worker-limit` exists only with `--test-roles`). **Measured (MS-0033, WI-0047-PREP, 150 synthetic classes with a guessed mode mix):** 49.0 MB with one worker, 67.7 MB with three, 77.0 MB with four (the default maximum N); before the role entries (MS-0032) 129.0 and 171.9 MB for one and three. Each additional worker costs about 9.4 MB, so the 16 workers of `workerLimit` would be about 189 MB (information, not a failure; reachable only with `--workers=8` at most, because N is limited to 8).
 
 **Decision E0005 (2026-10-11):** The target for idle CPU applies to the **overall system**. Measured 0.23 % (8 CPUs, WI-0016), fulfilled. The reading "sum in percent of one core" (1.8 %) is therefore no longer the yardstick. An optimization is not a requirement and is listed as an observation point in `doc/OPEN-ITEMS.md`.
 

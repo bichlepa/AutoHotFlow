@@ -87,10 +87,11 @@ None at the moment (E0035 to E0039 answered on 2026-10-14).
 2. `doc/ARCHITECTURE.md` sections 1 to 6 and 8, `doc/CONVENTIONS.md`, `doc/HOW-TO.md`
 3. `doc/PROTOCOL.md` (packages with messages), `doc/ELEMENT-API-V2.md` (packages with elements)
 4. This file and the file of the own package
+5. `doc/REQUIREMENTS-INDEX.md`, and the sections of `doc/REQUIREMENTS.md` that the package changes
 
 ## Common definition of done
 
-As in Phase 2b (`work_items/phase2b/README.md`): first a test that shows what is missing; overall run green (parallel, and serial if the package changes timing behavior); interfaces in `doc/` in the same commit; deviations from v1 in `doc/MIGRATION.md`; AHK difficulties in `doc/HOW-TO.md`; section "Result" in the package file; VS Code tasks according to rule 10 in `AGENTS.md`; commits with prefix `WI-xx:`. New findings start at **F-0040**.
+As in Phase 2b (`work_items/phase2b/README.md`): first a test that shows what is missing; overall run green (parallel, and serial if the package changes timing behavior); interfaces in `doc/` in the same commit; deviations from v1 in `doc/MIGRATION.md`; AHK difficulties in `doc/HOW-TO.md`; section "Result" in the package file; VS Code tasks according to rule 10 in `AGENTS.md`; the requirements the package touches updated according to rule 12 in `AGENTS.md`; commits with prefix `WI-xx:`. New findings start at **F-0040**.
 
 ## S0001: Expressions and variables
 
