@@ -43,7 +43,9 @@ Session 6 start: 2026-10-15 (evening), work-item mode, HEAD `8c09337` on `v2-por
 
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
-| 1 | Implementer WI-0047 | opus | wi-47 | wip/wi-47 | element layout per package, qualified IDs (E0045) | running |
+| 1 | Implementer WI-0047 | opus | wi-47 (removed) | (deleted) | element layout per package, qualified IDs (E0045); 10 commits, rebased on v2-port, integrated as 862f392 to d179825 (renumbered F-9000* to F-0400, F-9001* to F-0402 by `e125b71`/`462a853`, see OPEN-ITEMS); stress 200 big flows: ready 52 to 62 s, largest snapshot 0.6 s (budget 3 s) | done, verifier running on d179825 |
+| 3 | Verifier WI-0047 | sonnet | (main checkout, `run_suite --ref HEAD`) | - | fast, foundation, slow, stress, arch and req checks on d179825 | running |
+| 4 | Implementer rename of the F-0078 locals (owner's wish) | sonnet | wi-rename | wip/wi-rename | rename 151 locals, `#Warn All` in test scripts, arch rule; base d179825 | running |
 | 2 | Bug hunter (OPEN-ITEMS mode) | sonnet | hunt-15 | wip/hunt-15 | not in the area of WI-0047 | running |
 
 Owner's wish (2026-10-15, session 6): rename the 151 locals of F-0078 (action step 1) before the next work item starts, that is before WI-0048 (WI-0047 is still running; the rename waits for it to keep one implementer slot). Steps 2 and 3 of the action follow in the same task or after it. Hunter commit `406513b` (F-0078 measurement, doc only) integrated, hunt-15 workspace removed.
