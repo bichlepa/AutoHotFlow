@@ -44,9 +44,9 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0083 | Fast tier: the expression oracle's time budget of the fixed corpus (`assert seconds < 15`) measured 16.6 s | observed once, run 20261015-172551-99e2c044 on `1aceedd`, open | |
 | F-0084 | Slow tier: a frozen child is terminated 5.08 s after the hang (budget 4.0 s) | observed once, run 20261015-172954-99e2c044 on `1aceedd`, open | |
 | F-0085 | Foundation tier: the crasher restarts 4 times (`evt.process.started`), 3 expected | observed once, run 20261015-173445-99e2c044 on `1aceedd`, open | |
-| F-9000* | Foundation tier: `child_launcher.test.ahk` case "stdin of the child is NUL": `findstr` did not end within 10 s | observed once under load, run 20261015-201039-acc9907a on `acc9907`, green alone, open | |
-| F-9001* | Slow tier: `test_clients_churn.py` smoke variant got 13 snapshot probes during the churn, 20 required | observed once under load, run 20261015-201045-acc9907a on `acc9907`, green alone, open | |
-| F-9002* | Slow tier: a burst of 5000 log lines ends with 4999 lines written or counted as dropped; one line is lost without a count | observed once, run 20261015-202736-c08757b9 on `c08757b`, green alone, open | |
+| F-0400 | Foundation tier: `child_launcher.test.ahk` case "stdin of the child is NUL": `findstr` did not end within 10 s | observed once under load, run 20261015-201039-acc9907a on `acc9907`, green alone, open | |
+| F-0401 | Slow tier: `test_clients_churn.py` smoke variant got 13 snapshot probes during the churn, 20 required | observed once under load, run 20261015-201045-acc9907a on `acc9907`, green alone, open | |
+| F-0402 | Slow tier: a burst of 5000 log lines ends with 4999 lines written or counted as dropped; one line is lost without a count | observed once, run 20261015-202736-c08757b9 on `c08757b`, green alone, open | |
 
 
 ## Findings
@@ -276,19 +276,19 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** observed once, run 20261015-173445-99e2c044 on `1aceedd` (foundation tier, one run). An earlier slow run of the same test family had a similar count (on `0022025`, the implementer's run: 4 instead of 3, passed 3 of 3 alone). Suspicion (assumed): a race between the subscription and the first start event in the supervisor test helper. Not checked in the run log.
 **Action:** read the `pytest-log` of run 20261015-173445-99e2c044 for the `evt.process.started` lines before the subscription; if the first start is replayed, the test's assumption is wrong.
 
-### F-9000*: a child of ChildLauncher did not end within 10 s although its stdin is NUL
+### F-0400: a child of ChildLauncher did not end within 10 s although its stdin is NUL
 
 **What:** `tests/ahk/child_launcher.test.ahk`, case "stdin of the child is NUL, it does not wait for input" (`CheckStdinIsNul`): `findstr x`, started with `ChildLauncher.Start`, had not ended after 10 s (`EndedWithin(..., 10000)`), message "the child waits for input".
 **Status:** observed once, run 20261015-201039-acc9907a on `acc9907` (foundation tier through `tools/run_suite.py`, at the same time as a slow-tier run of the same machine and the test runs of another agent). Green alone right after (`-n 0 -k child_launcher`, 11 passed). The change under test (WI-0047, element packages) does not touch `src/supervisor/` or `ChildLauncher`. Suspicion (assumed): load; but 10 s is long for a process start and an end of input, so a stdin that is sometimes not NUL is not excluded. Not checked.
 **Action:** run the case in a loop under load (two suites at once); if it fails again, log the handles of the child (stdin type) at the failure.
 
-### F-9001*: the client churn smoke test gets too few snapshot probes under load
+### F-0401: the client churn smoke test gets too few snapshot probes under load
 
 **What:** `tests/stress/test_clients_churn.py::test_clients_connecting_and_leaving_do_not_disturb_the_engine_or_leak[smoke]` failed with `assert len(latencies) >= 20`: 13 probe requests (answers 45 to 153 ms) during the churn. No error, no restart, no leak was reported before that assertion.
 **Status:** observed once, run 20261015-201045-acc9907a on `acc9907` (slow tier, next to a foundation-tier run and another agent). Green alone right after. Suspicion (assumed): load; the number of probes depends on how fast the churn ends. Not checked.
 **Action:** if it returns on an idle machine, count probes per second instead of an absolute number.
 
-### F-9002*: one log line of a burst is neither written nor counted as dropped
+### F-0402: one log line of a burst is neither written nor counted as dropped
 
 **What:** `tests/fault/test_log_burst.py::test_a_burst_of_log_lines_does_not_cost_the_storage_link` failed with `assert written + dropped == BURST, (written, dropped)`: `(2768, 2231)`, 4999 of 5000. The test promises that no line is lost silently: every line is in `Log.txt` or `Log_old.txt`, or counted in a "n log lines dropped" line. One line is neither.
 **Status:** observed once, run 20261015-202736-c08757b9 on `c08757b` (slow tier through `tools/run_suite.py`, the only suite on the machine; other agents may have run tests). Green alone right after (2 passed). The change under test (WI-0047, element packages) does not touch the log path (`src/core/Log.ahk`, `src/storage/`, `src/supervisor/DiagLog.ahk`). Suspicion (assumed): a line at the rotation from `Log.txt` to `Log_old.txt`, or a drop that is not counted; related to F-0063 (a line lost while other processes hold the files)? Not checked.
