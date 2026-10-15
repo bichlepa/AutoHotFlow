@@ -198,7 +198,7 @@ The action `Execute_Flow` starts a flow (this one or another) through its defaul
 - **Scope:** port
 - **Plan:** S0004 (global), S0007 (flow settings)
 
-Relative paths in file and folder parameters refer to the working directory. Each flow uses the global working directory (v1 default `A_MyDocuments "\AutoHotFlow"`) or its own (flow setting). Decision E0028.
+Relative paths in file and folder parameters refer to the working directory. Each flow uses the global working directory (default `A_MyDocuments "\AutoHotFlow"`, the same as in v1, so imported flows find their files) or its own (flow setting). Decision E0028.
 
 ### REQ-EXE-140 Every element and flow shows its state
 
@@ -1367,7 +1367,7 @@ Closing the manager window only hides it. Flows and triggers keep running; the t
 - **Scope:** port
 - **Plan:** S0004
 
-The tray icon shows the manager (default action) and ends the application. Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030).
+AutoHotFlow shows exactly one tray icon, however many of its processes run. The tray icon shows the manager (default action) and ends the application. Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030).
 
 ### REQ-MGR-100 About window
 
@@ -1660,7 +1660,7 @@ Settings are stored in the data folder and take effect at once where possible; a
 - **Scope:** port
 - **Plan:** S0004
 
-The global execution policy (REQ-EXE-050) and the global working directory (REQ-EXE-130).
+The global execution policy (REQ-EXE-050) and the global working directory (REQ-EXE-130). The import of v1 takes over a working directory that the user changed in v1.
 
 ### REQ-SET-030 Start with Windows
 
@@ -1781,13 +1781,13 @@ The user imports the flows and variables of v1 into the v2 data folder through t
 
 ### REQ-MIG-070 Flows with missing element packages
 
-- **v1:** yes (a dialog under the global lock; on "Yes" the file is deleted)
-- **v2:** open
+- **v1:** yes (the flow is not loaded; a dialog under the global lock asks, on "Yes" the file is deleted)
+- **v2:** partial (the flow loads, the element is kept and fails with `exception` when run, WI-0047; manager and editor are missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0004
+- **Plan:** S0004 (manager), S0003 (triggers), S0005 to S0007 (editor)
 
-When a flow uses a package that is not installed, the manager asks the user whether the file shall be deleted; no dialog blocks the running flows (MIGRATION M-0008).
+When a flow uses a package that is not installed, the flow still loads and nothing is deleted, because the package may be installed later (a flow synced from another computer). Nobody is asked whether to delete anything. The manager shows at the flow which packages are missing, without a dialog. The editor shows such an element as a placeholder with its parameters; the user can delete it like any other element. Running the element ends with `exception` and names the missing package. A trigger of a missing package does not stay off silently: enabling the flow tells the user that this trigger is not available. Saving keeps the element unchanged. (Decision of the owner 2026-10-15, MIGRATION M-0008.)
 
 ### REQ-MIG-080 Files of a newer version are not destroyed
 
