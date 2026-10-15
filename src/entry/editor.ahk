@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
+; No tray icon (E0046): only the product manager (src/entry/manager.ahk) keeps its icon.
+#NoTrayIcon
 
 ; Entry script of the role editor (doc/ARCHITECTURE.md D0012, E0041). Placeholder until the editor is written. Parses all element classes (not budgeted, E0041).
 ; The supervisor starts it with --role=editor ... (src/AhfBoot.ahk describes the command line).

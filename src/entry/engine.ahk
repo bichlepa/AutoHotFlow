@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
+; No tray icon (E0046): only the product manager (src/entry/manager.ahk) keeps its icon.
+#NoTrayIcon
 
 ; Entry script of the role engine (doc/ARCHITECTURE.md D0012, E0041). Runs the flows. All element classes: the conversion of the parameters needs the metadata of every class, `Run`/`Stop` are used for `inline` (E0041).
 ; The supervisor starts it with --role=engine ... (src/AhfBoot.ahk describes the command line).

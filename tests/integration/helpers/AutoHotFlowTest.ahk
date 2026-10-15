@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
+; No tray icon (E0046): only the product manager (src/entry/manager.ahk) keeps its icon.
+#NoTrayIcon
 
 ; Test entry point (WI-0029, changed by WI-0047-PREP): the supervisor with the test roles, and every product role in one
 ; process, so that a test can start a role directly (--role=engine ...). The supervisor started from this file starts its

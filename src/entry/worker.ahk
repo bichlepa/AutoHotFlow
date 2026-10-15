@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
+; No tray icon (E0046): only the product manager (src/entry/manager.ahk) keeps its icon.
+#NoTrayIcon
 
 ; Entry script of the role worker (doc/ARCHITECTURE.md D0012, E0041). Runs the elements of mode `worker` in a process of its own (WI-0011).
 ; The supervisor starts it with --role=worker ... (src/AhfBoot.ahk describes the command line).

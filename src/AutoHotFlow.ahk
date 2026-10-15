@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
+; No tray icon (E0046): only the product manager (src/entry/manager.ahk) keeps its icon.
+#NoTrayIcon
 
 ; Entry of the supervisor, the file the user starts (doc/ARCHITECTURE.md D0012, E0041). The other roles have an entry script
 ; of their own in src\entry\<role>.ahk; the supervisor starts them from there (Children.EntryScript). This file

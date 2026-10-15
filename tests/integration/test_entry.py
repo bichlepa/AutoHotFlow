@@ -47,25 +47,44 @@ def test_a_start_without_the_test_option_is_not_affected_by_the_helper(procs, da
     assert "unknown role" in err, err
 
 
-def test_the_boot_file_hides_the_tray_icon(procs, datadir):
-    # E0046. Proves: a script that includes AhfBoot.ahk has A_IconHidden set. It cannot show the real icon.
-    code, out, err = run_entry(procs, datadir, [], entry=ROOT / "tests" / "integration" / "helpers" / "IconProbe.ahk")
+HELPERS = ROOT / "tests" / "integration" / "helpers"
+
+
+def test_a_probe_with_the_directive_has_the_icon_hidden(procs, datadir):
+    # E0046. Proves: #NoTrayIcon in the entry (with the boot file included) sets A_IconHidden. It cannot show the real icon.
+    code, out, err = run_entry(procs, datadir, [], entry=HELPERS / "IconProbe.ahk")
     assert code == 0, (code, out, err)
     assert "A_IconHidden=1" in out, (out, err)
 
 
-def test_every_entry_script_includes_the_boot_file():
-    # E0046. Proves: no process entry of the product or of the tests starts without the boot file (and so without
-    # #NoTrayIcon). A new entry that forgets the include fails here.
-    helpers = ROOT / "tests" / "integration" / "helpers"
-    entries = [ENTRY, helpers / "AutoHotFlowTest.ahk", *(ROOT / "src" / "entry").glob("*.ahk"),
-               *(helpers / "entry").rglob("*.ahk")]
+def test_the_boot_file_does_not_hide_the_icon_of_the_product_manager(procs, datadir):
+    # E0046 (correction 2026-10-15). Proves: an entry without the directive, like src/entry/manager.ahk, keeps its icon:
+    # the boot file does not hide it.
+    code, out, err = run_entry(procs, datadir, [], entry=HELPERS / "IconProbeShown.ahk")
+    assert code == 0, (code, out, err)
+    assert "A_IconHidden=0" in out, (out, err)
+
+
+def _has_directive(path):
+    return any(line.strip().lower() == "#notrayicon" for line in path.read_text(encoding="utf-8").splitlines())
+
+
+def test_every_entry_script_includes_the_boot_file_and_only_the_product_manager_shows_an_icon():
+    # E0046. Proves: every entry of the product or of the tests includes the boot file; every one of them carries
+    # #NoTrayIcon except src/entry/manager.ahk (the product manager). A new entry that forgets either fails here.
+    product_manager = ROOT / "src" / "entry" / "manager.ahk"
+    entries = [ENTRY, HELPERS / "AutoHotFlowTest.ahk", *(ROOT / "src" / "entry").glob("*.ahk"),
+               *(HELPERS / "entry").rglob("*.ahk")]
     entries = [p for p in entries if "generated" not in p.parts]
     assert len(entries) >= 15
     for p in entries:
         assert "AhfBoot.ahk" in p.read_text(encoding="utf-8"), p
+        if p == product_manager:
+            assert not _has_directive(p), p
+        else:
+            assert _has_directive(p), p
     boot = (ROOT / "src" / "AhfBoot.ahk").read_text(encoding="utf-8")
-    assert any(line.strip().lower() == "#notrayicon" for line in boot.splitlines())
+    assert not any(line.strip().lower() == "#notrayicon" for line in boot.splitlines())
 
 
 @pytest.mark.skipif(not AHK32.exists(), reason="AutoHotkey32.exe is not installed")
