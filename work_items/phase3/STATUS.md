@@ -51,7 +51,8 @@ Session 6 start: 2026-10-15 (evening), work-item mode, HEAD `8c09337` on `v2-por
 | 6 | Verifier F-0078 rename | sonnet | ver-78 (not needed) | - | fast 798 passed (second run; first run 3 load failures, not reproduced), foundation 444, slow 98, arch and req 0; F-0089 updated with the new load observations (3d05060) | done |
 | 7 | Implementer WI-0048 (L0001 smoke test) | sonnet | wi-48 (removed) | (deleted) | smoke test of every registered element, `Action_Do_nothing` gets v1 metadata; integrated as a7c469a, 7007f78; fast 806 passed 1 skipped (skip not from this work) | done, verifier running on 7007f78 |
 | 8 | Verifier WI-0048 | sonnet | (no workspace needed) | - | fast 806 passed 1 skipped (not from WI-0048), foundation 444 passed, arch 0, req 0 on 7007f78; two test gaps as open action 2 in OPEN-ITEMS | done |
-| 9 | Implementer WI-0051 (dialog test seam, S2) | sonnet | wi-51 | wip/wi-51 | dialog indirection and test provider, from 7007f78 | running |
+| 9 | Implementer WI-0051 (dialog test seam, S2) | sonnet | wi-51 (removed) | (deleted) | dialog indirection `Dialogs.*`, test provider, arch rule `dialog-seam`; integrated as b09ca61, 3d553b7 | done |
+| 11 | Verifier WI-0051 | sonnet | (no workspace needed) | - | fast 817 passed 1 skipped, foundation 444 passed, arch, req, include check 0 on 3d553b7; no findings | done |
 | 2 | Bug hunter (OPEN-ITEMS mode) | sonnet | hunt-15 | wip/hunt-15 | not in the area of WI-0047 | running |
 
 Owner's wish (2026-10-15, session 6): rename the 151 locals of F-0078 (action step 1) before the next work item starts, that is before WI-0048 (WI-0047 is still running; the rename waits for it to keep one implementer slot). Steps 2 and 3 of the action follow in the same task or after it. Hunter commit `406513b` (F-0078 measurement, doc only) integrated, hunt-15 workspace removed.
