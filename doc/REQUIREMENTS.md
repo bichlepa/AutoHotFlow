@@ -461,16 +461,7 @@ Open point (assumed, not checked): AutoHotkey reads all `#Include` files when a 
 - **Plan:** S0002 (WI-0047, decision E0045)
 - **Evidence:** `tests/integration/test_packages.py`, `tests/ahk/element_registry.test.ahk`, `tests/ahk/engine_flow_convert.test.ahk`, `tests/test_element_includes.py::test_two_packages_with_a_class_of_the_same_name_load_in_one_process`
 
-Every element is identified by its package and its class, also the elements of v1. So elements of different packages may have the same class name.
-
-The flow files need nothing new: v1 already writes `package` for every element (verified: 1077 of 1077 elements in the test flows; 8 of them write `default` in lower case, so the comparison ignores case). The import fills in `Default` where the key is missing.
-
-What is more than a file question:
-
-- **AutoHotkey class names are global.** Two classes with the same name in one script are a load error ("This class declaration conflicts with an existing Class", verified). The class of an element therefore needs the package in its name. Nested classes do this: `class Default { class Action_Sleep ... }` has the type name `Default.Action_Sleep` (verified), which is the qualified ID at the same time. The package class includes the element files in its body, so an element file stays one class (verified).
-- **Every place that names a class carries the qualified ID:** the element registry (`src/elements/base/ElementRegistry.ahk`, keyed by the qualified ID since WI-0047), the worker jobs and the trigger arming (`PROTOCOL.md` 4.4 and 4.5), logs, and elements that look up other elements by class (v1 `x_getAllElementIDsOfClass`, `Action_Set_element_parameter`; they come in S0008 and must use the qualified ID).
-
-Doing this together with the package layout of WI-0047 is cheaper than changing it later, when many element classes exist.
+Every element is identified by its package and its class, also the elements of v1. So elements of different packages may have the same class name. The flow files of v1 already store the package of each element; where it is missing, it is `Default`. How: decision E0045.
 
 ## Elements (ELM)
 
