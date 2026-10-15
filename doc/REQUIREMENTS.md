@@ -1104,7 +1104,7 @@ Export selected flows to an `.ahf` file (a ZIP archive); import from such a file
 - **v2:** open
 - **Prio:** should
 - **Scope:** port
-- **Plan:** - (not in the phase 3 plan)
+- **Plan:** S0008
 
 AutoHotFlow ships demo flows in their own category. They cannot be deleted or renamed, but the user can hide them (setting "Hide demonstration flows").
 
@@ -1135,7 +1135,7 @@ Closing the manager window only hides it. Flows and triggers keep running; the t
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (assumed; the plan does not name the tray)
+- **Plan:** S0004
 
 The tray icon shows the manager (default action) and ends the application. Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030).
 
@@ -1145,7 +1145,7 @@ The tray icon shows the manager (default action) and ends the application. Error
 - **v2:** open
 - **Prio:** could
 - **Scope:** port
-- **Plan:** -
+- **Plan:** S0004
 
 Shows the version of AutoHotFlow and of AutoHotkey, the license and the project site.
 
@@ -1398,7 +1398,7 @@ The global execution policy (REQ-EXE-050) and the global working directory (REQ-
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** - (not in the phase 3 plan)
+- **Plan:** S0004
 
 AutoHotFlow starts when the user logs on to Windows, in the background. The start-up trigger knows that it was a start with Windows (REQ-TRG-220).
 
@@ -1408,7 +1408,7 @@ AutoHotFlow starts when the user logs on to Windows, in the background. The star
 - **v2:** open
 - **Prio:** should
 - **Scope:** port
-- **Plan:** - (not in the phase 3 plan)
+- **Plan:** S0004
 
 AutoHotFlow restarts itself with administrator rights, so that flows can control windows of elevated programs. To check: all processes of a session must run with the same rights, or the pipes and wake-up messages fail (UIPI).
 
@@ -1569,7 +1569,7 @@ A help window with general pages (welcome, variables, key list, color chart) and
 - **v2:** open
 - **Prio:** could
 - **Scope:** port
-- **Plan:** -
+- **Plan:** S0009
 
 A tool finds the texts in the code and helps to add the translations.
 
@@ -2182,7 +2182,7 @@ Every deliberate behaviour change compared to v1 has a MIGRATION ID; no silent c
 - **v2:** open
 - **Prio:** should
 - **Scope:** port
-- **Plan:** - (not in the phase 3 plan; assumed S0007)
+- **Plan:** S0004 (setting), S0007 (element list)
 
 Each element has a level; the setting "Shown elements" hides the elements above the user's level, so beginners are not overwhelmed. The first start proposes a level (REQ-USE-050).
 

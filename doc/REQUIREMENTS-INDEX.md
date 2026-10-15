@@ -134,11 +134,11 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-MGR-030](REQUIREMENTS.md#req-mgr-030-manage-categories) | Manage categories | yes | open | must | port | S0004 |
 | [REQ-MGR-040](REQUIREMENTS.md#req-mgr-040-operate-flows-from-the-manager) | Operate flows from the manager | yes | open | must | port | S0004 |
 | [REQ-MGR-050](REQUIREMENTS.md#req-mgr-050-import-and-export-flows) | Import and export flows | yes | open | must | port | S0004 |
-| [REQ-MGR-060](REQUIREMENTS.md#req-mgr-060-demonstration-flows) | Demonstration flows | yes | open | should | port | - (not in the phase 3 plan) |
+| [REQ-MGR-060](REQUIREMENTS.md#req-mgr-060-demonstration-flows) | Demonstration flows | yes | open | should | port | S0008 |
 | [REQ-MGR-070](REQUIREMENTS.md#req-mgr-070-show-the-log) | Show the log | yes | open | must | port | S0004 |
 | [REQ-MGR-080](REQUIREMENTS.md#req-mgr-080-closing-the-manager-window-keeps-autohotflow-running) | Closing the manager window keeps AutoHotFlow running | yes | open | must | port | S0004 |
-| [REQ-MGR-090](REQUIREMENTS.md#req-mgr-090-tray-icon) | Tray icon | yes | open | must | port | S0004 (assumed; the plan does not name the tray) |
-| [REQ-MGR-100](REQUIREMENTS.md#req-mgr-100-about-window) | About window | yes | open | could | port | - |
+| [REQ-MGR-090](REQUIREMENTS.md#req-mgr-090-tray-icon) | Tray icon | yes | open | must | port | S0004 |
+| [REQ-MGR-100](REQUIREMENTS.md#req-mgr-100-about-window) | About window | yes | open | could | port | S0004 |
 
 ## Editor (EDT)
 
@@ -172,8 +172,8 @@ run the tool. The legend of the columns is at the top of the source.
 |---|---|---|---|---|---|---|
 | [REQ-SET-010](REQUIREMENTS.md#req-set-010-global-settings-dialog) | Global settings dialog | yes | open | must | port | S0004 |
 | [REQ-SET-020](REQUIREMENTS.md#req-set-020-defaults-for-execution-policy-and-working-directory) | Defaults for execution policy and working directory | yes | open | must | port | S0004 |
-| [REQ-SET-030](REQUIREMENTS.md#req-set-030-start-with-windows) | Start with Windows | yes | open | must | port | - (not in the phase 3 plan) |
-| [REQ-SET-040](REQUIREMENTS.md#req-set-040-run-as-administrator) | Run as administrator | yes | open | should | port | - (not in the phase 3 plan) |
+| [REQ-SET-030](REQUIREMENTS.md#req-set-030-start-with-windows) | Start with Windows | yes | open | must | port | S0004 |
+| [REQ-SET-040](REQUIREMENTS.md#req-set-040-run-as-administrator) | Run as administrator | yes | open | should | port | S0004 |
 | [REQ-SET-050](REQUIREMENTS.md#req-set-050-logging-settings) | Logging settings | yes | partial | must | port | S0004 |
 | [REQ-SET-060](REQUIREMENTS.md#req-set-060-own-data-folder) | Own data folder | partial | done | must | port | - |
 | [REQ-SET-070](REQUIREMENTS.md#req-set-070-number-of-workers) | Number of workers | n/a | partial | must | port | S0004 (E0044) |
@@ -198,7 +198,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-LNG-020](REQUIREMENTS.md#req-lng-020-choice-of-the-language) | Choice of the language | yes | open | must | port | S0004 |
 | [REQ-LNG-030](REQUIREMENTS.md#req-lng-030-translated-element-texts) | Translated element texts | yes | partial | must | port | S0002 (WI-0047), S0008 |
 | [REQ-LNG-040](REQUIREMENTS.md#req-lng-040-help-pages) | Help pages | yes | open | must | port | S0007 |
-| [REQ-LNG-050](REQUIREMENTS.md#req-lng-050-translation-tools-for-contributors) | Translation tools for contributors | yes | open | could | port | - |
+| [REQ-LNG-050](REQUIREMENTS.md#req-lng-050-translation-tools-for-contributors) | Translation tools for contributors | yes | open | could | port | S0009 |
 
 ## Logging and diagnostics (DIA)
 
@@ -305,7 +305,7 @@ run the tool. The legend of the columns is at the top of the source.
 
 | ID | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|
-| [REQ-USE-010](REQUIREMENTS.md#req-use-010-user-level-hides-advanced-elements) | User level hides advanced elements | yes | open | should | port | - (not in the phase 3 plan; assumed S0007) |
+| [REQ-USE-010](REQUIREMENTS.md#req-use-010-user-level-hides-advanced-elements) | User level hides advanced elements | yes | open | should | port | S0004 (setting), S0007 (element list) |
 | [REQ-USE-020](REQUIREMENTS.md#req-use-020-experimental-elements-are-marked) | Experimental elements are marked | yes | open | could | port | S0007 |
 | [REQ-USE-030](REQUIREMENTS.md#req-use-030-messages-reach-the-user-without-blocking-dialogs) | Messages reach the user without blocking dialogs | partial | open | must | port | S0004 |
 | [REQ-USE-040](REQUIREMENTS.md#req-use-040-the-user-interface-stays-responsive) | The user interface stays responsive | no | partial | must | port | S0004 to S0007 |
