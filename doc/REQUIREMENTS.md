@@ -6,7 +6,7 @@ This document lists the important features and quality requirements of AutoHotFl
 
 A requirement says **what** AutoHotFlow does, not how: what the user sees or experiences. Internal parts (engine, worker, storage, processes) appear only where a quality requirement is about them, or as a reference for the details. The how is in the other documents (`ARCHITECTURE.md`, `PROTOCOL.md`, `ELEMENT-API-V2.md`, the decisions in `DECISIONS.md`); a requirement links to them instead of repeating them. Other documents refer to a requirement by its ID (`REQ-EXE-010`), not by a link to its heading, because the ID is stable and the heading anchor changes with the title.
 
-**Sources of the first inventory (2026-10-14).** v1: the element manifest of the Default package (`v1/Source_Elements/Default/manifest.json`: 114 actions, 17 conditions, 5 loops, 16 triggers), the user interface texts of manager, editor, settings and tray, the settings defaults (`v1/Source_Common/Settings/Settings.ahk`), the changelog and the help folder; read, not run. v2: the code, the tests and the documents on `v2-port` at commit `9df8693` (WI-0045 verified). A step `S0001` to `S0009` is a step of the phase 3 plan (`work_items/phase3/README.md`).
+**Sources of the first inventory (2026-10-14).** v1: the element manifest of the Default package (`v1/Source_Elements/Default/manifest.json`: 114 actions, 17 conditions, 5 loops, 16 triggers), the user interface texts of manager, editor, settings and tray, the settings defaults (`v1/Source_Common/Settings/Settings.ahk`), the changelog and the help folder; read, not run. v2: the code, the tests and the documents on `v2-port` at commit `9df8693` (WI-0045 verified); updated on 2026-10-15 for WI-0046, WI-0047-PREP, WI-0049, WI-0050 and the decisions E0040 to E0045. A step `S0001` to `S0009` is a step of the phase 3 plan (`work_items/phase3/README.md`).
 
 ## Format
 
@@ -354,12 +354,13 @@ Each flow has the option `strictTypes` (E0034). Migrated flows use the compatibi
 ### REQ-VAR-110 Waiting elements can use all variables
 
 - **v1:** yes
-- **v2:** partial (they get the loop, thread and instance variables and can set variables; global, static, hidden and built-in variables and expressions are missing)
+- **v2:** done
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0050)
+- **Plan:** -
+- **Evidence:** `tests/integration/test_worker_vars.py::test_every_variable_function_gives_the_same_result_in_a_worker_as_inline`, `tests/integration/test_worker_vars.py::test_round_trip_of_a_variable_request_from_a_worker` (MEASUREMENTS MS-0031)
 
-An element that waits (REQ-EXE-100) can read every visible variable, set variables and evaluate expressions, like every other element. Today it works on copies that are written back when it ends (MIGRATION M-0045). How: `ctx.Request`, risk R0004 in `ARCHITECTURE.md` section 10.
+An element that waits (REQ-EXE-100) reads every visible variable, sets variables and evaluates expressions like every other element, with the same results. It always sees the current value: a change by another branch while it waits is visible at its next access (MIGRATION M-0045). How: requests to the engine, `ELEMENT-API-V2.md` section 3.
 
 ### REQ-VAR-120 Rounding option for decimal numbers
 
@@ -394,7 +395,7 @@ Note: the cost in time is lower in v2 than in v1. v1 read the file at every acce
 
 When two flows or branches read, change and write the same variable through two elements, one change can be lost. A mechanism protects a variable for a short time, so that such a sequence is atomic: for example elements that change a value in one step (increment, append to a list), or a lock that other elements wait for.
 
-Note: an element that waits (REQ-EXE-100) works on copies and writes its changes back when it ends (REQ-VAR-110), so the window for a lost change is as long as the element runs.
+Note: an element that waits (REQ-EXE-100) may read a value, wait a long time (for example for a dialog) and write afterwards; the window for a lost change is then as long as it waits.
 
 ## Element packages (PKG)
 
@@ -1429,6 +1430,16 @@ AutoHotFlow restarts itself with administrator rights, so that flows can control
 
 v2 keeps its data in `%APPDATA%\AutoHotFlow v2`, or in the folder given by `--data` or `AHF_DATA_DIR` (E0033). It never writes into the folder of v1, so v1 and v2 can be used side by side.
 
+### REQ-SET-070 Number of workers
+
+- **v1:** n/a
+- **v2:** partial (a command-line option `--workers`)
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0004 (E0044)
+
+A global setting limits how many waiting elements run at the same time (REQ-EXE-100), and with it the memory of AutoHotFlow (REQ-PRF-030). Which limit exactly (the pool size or the guard of the supervisor) is detailed in S0004.
+
 ## Import and migration (MIG)
 
 ### REQ-MIG-010 v1 flows load as they are
@@ -1733,16 +1744,16 @@ Elements for other AI services, for example speech output or image generation.
 
 Installs AutoHotFlow with start menu entry and uninstaller.
 
-### REQ-DST-020 One compiled program
+### REQ-DST-020 Compiled program
 
 - **v1:** yes (`AutoHotFlow.exe`)
-- **v2:** partial (one entry point starts every role with `--role`; compiling is open)
+- **v2:** partial (the supervisor and one entry script per role run with the installed interpreter; compiling is open)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** phase 4 (R0007)
-- **Evidence:** `tests/integration/test_entry.py`
+- **Evidence:** `tests/integration/test_entry.py`, `tests/fault/test_role_entries.py`
 
-The user does not need an installed AutoHotkey. All processes are started from the same program with a role parameter (D0012).
+The user does not need an installed AutoHotkey. Today the supervisor starts every other role from its own entry script (D0012, E0041); how the role scripts are compiled (one program or one per role) is decided in phase 4.
 
 ### REQ-DST-030 64 bit only
 
@@ -1924,13 +1935,13 @@ Below 1 % of the whole system without running flows (E0005).
 ### REQ-PRF-030 Memory
 
 - **v1:** n/a (not measured)
-- **v2:** partial (68 MB for the chain without editor; with editors not measured)
+- **v2:** partial (measured with 150 synthetic element classes, the manager stub and without trigger host: 49 MB with one worker, 68 MB with three; the real manager, the trigger host and the real elements are missing)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0005
-- **Evidence:** `tests/stress/test_measurements.py::test_idle_cpu_and_memory_of_the_chain_without_a_flow` (MS-0005)
+- **Plan:** S0003, S0004, S0008 (measure again)
+- **Evidence:** `doc/MEASUREMENTS.md` (MS-0032, MS-0033), `tools/measure_r3.py`
 
-Below 100 MB in total with 5 open editors.
+The background processes (supervisor, storage, engine, trigger host, manager and the workers) need below 100 MB private bytes together in the normal state: small flows that run now and then, up to about three active workers. Editors are not counted; peaks with more workers may exceed the budget. The user can limit the number of workers (REQ-SET-070). Decision E0040, details `ARCHITECTURE.md` section 9.
 
 ### REQ-PRF-040 Start time
 
@@ -1946,13 +1957,13 @@ From the start until all processes are ready: below 3 s (with few flows).
 ### REQ-PRF-050 Many big flows load without blocking
 
 - **v1:** n/a
-- **v2:** partial (200 big flows load without a hang, but the engine answers too slowly during the load, F-0073)
+- **v2:** done
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (F-0073)
-- **Evidence:** `tests/stress/test_big_flows.py`
+- **Plan:** -
+- **Evidence:** `tests/stress/test_big_flows.py`, `doc/MEASUREMENTS.md` (MS-0030)
 
-While 200 big flows load, the engine answers a snapshot within 1 s and no process is taken for hung.
+While 200 big flows load, AutoHotFlow stays responsive: the engine answers a snapshot within 3 s and no process is taken for hung (E0042; the budget was 1 s, finding F-0073 keeps the measurements). Loading flows only when they are needed is an optimization after the port (REQ-PRF-110).
 
 ### REQ-PRF-060 Editor redraw
 
@@ -1997,15 +2008,26 @@ More than 1000 log lines per second; other requests to the storage are answered 
 
 Memory, handles and the number of processes stay flat over long runs.
 
-### REQ-PRF-100 Cost of the element code in every process
+### REQ-PRF-100 Each process parses only the element code it needs
 
 - **v1:** n/a
-- **v2:** open
+- **v2:** done
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0046)
+- **Plan:** -
+- **Evidence:** `tests/test_element_includes.py`, `tests/fault/test_role_entries.py`, `doc/MEASUREMENTS.md` (MS-0027 to MS-0029, MS-0032, MS-0033)
 
-Every process parses all elements (one entry point). Parse time and memory with all elements must stay acceptable; otherwise there are entry scripts per role (risk R0003).
+Every role has its own entry script that includes only the element classes it needs, selected by their execution mode: the engine all, the trigger host the triggers, a worker the worker elements, the other roles none (E0041, risk R0003). With 150 element classes this lowered the memory of the background processes from 129 MB to 49 MB (one worker).
+
+### REQ-PRF-110 Load flows only when they are needed
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** - (after the port, E0042)
+
+The engine reads the list of flows at the start and loads a flow completely only when it is enabled, started or opened. This shortens the start with many big flows.
 
 ## Security (SEC)
 
@@ -2066,12 +2088,13 @@ Processes are killed, frozen and cut off on purpose; the system stays usable and
 ### REQ-TST-030 Every element is tested headless
 
 - **v1:** no
-- **v2:** open
+- **v2:** partial (the flow builder and the headless flow runner exist; the smoke test of every element and the dialog test provider are missing)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0048, WI-0049, WI-0051)
+- **Plan:** S0002 (WI-0048, WI-0051)
+- **Evidence:** `tests/support/test_flowbuilder.py`, `tests/integration/test_flowrun.py`
 
-A smoke test covers every registered element; each element has end-to-end tests built with the flow builder; dialog elements are answered by a test provider (E0038).
+A smoke test covers every registered element; each element has end-to-end tests built with the flow builder and run by the headless flow runner; dialog elements are answered by a test provider (E0038).
 
 ### REQ-TST-040 The v1 test flows run green
 

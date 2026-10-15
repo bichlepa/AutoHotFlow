@@ -8,13 +8,13 @@ run the tool. The legend of the columns is at the top of the source.
 | Area | Total | done | implemented | partial | open | dropped | in doubt |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | [Flows and execution (EXE)](#flows-and-execution-exe) | 15 | 7 | 0 | 6 | 2 | 0 | 1 |
-| [Expressions and variables (VAR)](#expressions-and-variables-var) | 14 | 7 | 0 | 4 | 3 | 0 | 2 |
+| [Expressions and variables (VAR)](#expressions-and-variables-var) | 14 | 8 | 0 | 3 | 3 | 0 | 2 |
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 0 | 0 | 0 | 6 | 0 | 0 |
 | [Elements (ELM)](#elements-elm) | 24 | 0 | 0 | 2 | 22 | 0 | 0 |
 | [Triggers (TRG)](#triggers-trg) | 12 | 0 | 0 | 1 | 11 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 10 | 0 | 0 | 0 | 10 | 0 | 0 |
 | [Editor (EDT)](#editor-edt) | 21 | 0 | 0 | 1 | 20 | 0 | 0 |
-| [Settings (SET)](#settings-set) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
+| [Settings (SET)](#settings-set) | 7 | 1 | 0 | 2 | 4 | 0 | 0 |
 | [Import and migration (MIG)](#import-and-migration-mig) | 7 | 5 | 0 | 0 | 2 | 0 | 0 |
 | [Languages and help (LNG)](#languages-and-help-lng) | 5 | 0 | 0 | 1 | 4 | 0 | 0 |
 | [Logging and diagnostics (DIA)](#logging-and-diagnostics-dia) | 5 | 4 | 0 | 1 | 0 | 0 | 0 |
@@ -22,12 +22,12 @@ run the tool. The legend of the columns is at the top of the source.
 | [AI integration (AI)](#ai-integration-ai) | 5 | 0 | 0 | 0 | 5 | 0 | 0 |
 | [Distribution (DST)](#distribution-dst) | 5 | 1 | 0 | 2 | 2 | 0 | 0 |
 | [Robustness (ROB)](#robustness-rob) | 11 | 10 | 0 | 1 | 0 | 0 | 0 |
-| [Performance and resources (PRF)](#performance-and-resources-prf) | 10 | 6 | 0 | 2 | 2 | 0 | 0 |
+| [Performance and resources (PRF)](#performance-and-resources-prf) | 11 | 8 | 0 | 1 | 2 | 0 | 0 |
 | [Security (SEC)](#security-sec) | 3 | 2 | 0 | 0 | 0 | 1 | 0 |
-| [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 1 | 2 | 0 | 0 |
+| [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 2 | 1 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 7 | 0 | 0 | 1 | 6 | 0 | 0 |
-| **All** | **182** | **50** | **0** | **24** | **107** | **1** | **3** |
+| **All** | **184** | **53** | **0** | **24** | **106** | **1** | **3** |
 
 ## Flows and execution (EXE)
 
@@ -63,7 +63,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-VAR-080](REQUIREMENTS.md#req-var-080-values-of-the-trigger-reach-the-instance) | Values of the trigger reach the instance | yes | partial | must | port | S0003 |
 | [REQ-VAR-090](REQUIREMENTS.md#req-var-090-parameter-evaluation-by-content-type) | Parameter evaluation by content type | yes | done | must | port | - |
 | [REQ-VAR-100](REQUIREMENTS.md#req-var-100-type-errors-compatible-or-strict-per-flow) | Type errors: compatible or strict per flow | no | partial | must | port | S0004/S0005 (display of the warnings) |
-| [REQ-VAR-110](REQUIREMENTS.md#req-var-110-waiting-elements-can-use-all-variables) | Waiting elements can use all variables | yes | partial | must | port | S0002 (WI-0050) |
+| [REQ-VAR-110](REQUIREMENTS.md#req-var-110-waiting-elements-can-use-all-variables) | Waiting elements can use all variables | yes | done | must | port | - |
 | [REQ-VAR-120](REQUIREMENTS.md#req-var-120-rounding-option-for-decimal-numbers) | Rounding option for decimal numbers | no | open | could | later | - |
 | [REQ-VAR-130](REQUIREMENTS.md#req-var-130-hints-on-global-and-static-variables) | Hints on global and static variables | no | open | could | later | - |
 | [REQ-VAR-140](REQUIREMENTS.md#req-var-140-protect-variables-against-concurrent-changes) | Protect variables against concurrent changes *(in doubt)* | no | open | could | later | - |
@@ -176,6 +176,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-SET-040](REQUIREMENTS.md#req-set-040-run-as-administrator) | Run as administrator | yes | open | should | port | - (not in the phase 3 plan) |
 | [REQ-SET-050](REQUIREMENTS.md#req-set-050-logging-settings) | Logging settings | yes | partial | must | port | S0004 |
 | [REQ-SET-060](REQUIREMENTS.md#req-set-060-own-data-folder) | Own data folder | partial | done | must | port | - |
+| [REQ-SET-070](REQUIREMENTS.md#req-set-070-number-of-workers) | Number of workers | n/a | partial | must | port | S0004 (E0044) |
 
 ## Import and migration (MIG)
 
@@ -234,7 +235,7 @@ run the tool. The legend of the columns is at the top of the source.
 | ID | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|
 | [REQ-DST-010](REQUIREMENTS.md#req-dst-010-installer) | Installer | yes | open | must | port | phase 4 (R0007) |
-| [REQ-DST-020](REQUIREMENTS.md#req-dst-020-one-compiled-program) | One compiled program | yes | partial | must | port | phase 4 (R0007) |
+| [REQ-DST-020](REQUIREMENTS.md#req-dst-020-compiled-program) | Compiled program | yes | partial | must | port | phase 4 (R0007) |
 | [REQ-DST-030](REQUIREMENTS.md#req-dst-030-64-bit-only) | 64 bit only | n/a | done | must | port | - |
 | [REQ-DST-040](REQUIREMENTS.md#req-dst-040-single-instance-and-command-line) | Single instance and command line | partial | partial | must | port | S0008 (commands of the shortcut trigger) |
 | [REQ-DST-050](REQUIREMENTS.md#req-dst-050-release-checklist) | Release checklist | yes | open | should | port | phase 4 |
@@ -261,14 +262,15 @@ run the tool. The legend of the columns is at the top of the source.
 |---|---|---|---|---|---|---|
 | [REQ-PRF-010](REQUIREMENTS.md#req-prf-010-message-latency) | Message latency | n/a | done | must | port | - |
 | [REQ-PRF-020](REQUIREMENTS.md#req-prf-020-idle-cpu) | Idle CPU | n/a | done | must | port | - |
-| [REQ-PRF-030](REQUIREMENTS.md#req-prf-030-memory) | Memory | n/a | partial | must | port | S0005 |
+| [REQ-PRF-030](REQUIREMENTS.md#req-prf-030-memory) | Memory | n/a | partial | must | port | S0003, S0004, S0008 (measure again) |
 | [REQ-PRF-040](REQUIREMENTS.md#req-prf-040-start-time) | Start time | n/a | done | must | port | - |
-| [REQ-PRF-050](REQUIREMENTS.md#req-prf-050-many-big-flows-load-without-blocking) | Many big flows load without blocking | n/a | partial | must | port | S0002 (F-0073) |
+| [REQ-PRF-050](REQUIREMENTS.md#req-prf-050-many-big-flows-load-without-blocking) | Many big flows load without blocking | n/a | done | must | port | - |
 | [REQ-PRF-060](REQUIREMENTS.md#req-prf-060-editor-redraw) | Editor redraw | n/a | open | must | port | S0005 |
 | [REQ-PRF-070](REQUIREMENTS.md#req-prf-070-many-instances-and-fast-start-and-stop) | Many instances and fast start and stop | n/a | done | must | port | - |
 | [REQ-PRF-080](REQUIREMENTS.md#req-prf-080-log-throughput) | Log throughput | no | done | must | port | - |
 | [REQ-PRF-090](REQUIREMENTS.md#req-prf-090-stable-over-long-runs) | Stable over long runs | n/a | done | must | port | - |
-| [REQ-PRF-100](REQUIREMENTS.md#req-prf-100-cost-of-the-element-code-in-every-process) | Cost of the element code in every process | n/a | open | must | port | S0002 (WI-0046) |
+| [REQ-PRF-100](REQUIREMENTS.md#req-prf-100-each-process-parses-only-the-element-code-it-needs) | Each process parses only the element code it needs | n/a | done | must | port | - |
+| [REQ-PRF-110](REQUIREMENTS.md#req-prf-110-load-flows-only-when-they-are-needed) | Load flows only when they are needed | no | open | could | later | - (after the port, E0042) |
 
 ## Security (SEC)
 
@@ -284,7 +286,7 @@ run the tool. The legend of the columns is at the top of the source.
 |---|---|---|---|---|---|---|
 | [REQ-TST-010](REQUIREMENTS.md#req-tst-010-automatic-tests-at-several-levels) | Automatic tests at several levels | partial | done | must | port | - |
 | [REQ-TST-020](REQUIREMENTS.md#req-tst-020-fault-injection-and-stress) | Fault injection and stress | no | done | must | port | - |
-| [REQ-TST-030](REQUIREMENTS.md#req-tst-030-every-element-is-tested-headless) | Every element is tested headless | no | open | must | port | S0002 (WI-0048, WI-0049, WI-0051) |
+| [REQ-TST-030](REQUIREMENTS.md#req-tst-030-every-element-is-tested-headless) | Every element is tested headless | no | partial | must | port | S0002 (WI-0048, WI-0051) |
 | [REQ-TST-040](REQUIREMENTS.md#req-tst-040-the-v1-test-flows-run-green) | The v1 test flows run green | yes | open | must | port | S0002 (three flows, WI-0057), S0008 (all) |
 | [REQ-TST-050](REQUIREMENTS.md#req-tst-050-independent-oracle-for-the-expression-language) | Independent oracle for the expression language | n/a | done | must | port | - |
 | [REQ-TST-060](REQUIREMENTS.md#req-tst-060-manual-checks-of-the-user-interfaces) | Manual checks of the user interfaces | n/a | partial | must | port | S0004 to S0007 |
