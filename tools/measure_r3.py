@@ -1,7 +1,9 @@
 """WI-0046: R0003 measurement (cost of parsing many element classes in every process) and the load-phase baseline (F-0073).
 
 Three modes (parse, load, roles). They run on the real chain with an entry script that is generated in a temporary folder (nothing is
-written into src/): the entry includes src/AhfBoot.ahk and, after it, the generated element files.
+written into src/): the entry includes src/AhfBoot.ahk and, after it, the generated element files. Since WI-0047 an element class
+must be in a package (E0045): the synthetic classes are in the package class R3Synth (one block per entry, as
+tools/gen_element_includes.py writes them), the stub classes of the load mode in a class Default.
 
   python tools/measure_r3.py parse [--counts 0,50,150,300] [--runs 7] [--out FILE]
       Per element count N and per run: (a) parse time of one process (a process with an unknown role: it parses
@@ -137,7 +139,7 @@ def synthetic_element(n, mode="inline"):
                 "        return StrLen(c) > %d ? SubStr(c, 1, %d) : c" % (10 + k, 10 + k),
                 "    }", ""]
         k += 1
-    out += ["}", "", "ElementRegistry.Register(%s)" % name, ""]
+    out += ["}", ""]
     return name, "\n".join(out)
 
 
@@ -152,17 +154,36 @@ def synthetic_mode(n):
 
 
 def write_synthetic(folder, count, mixed=False):
-    """Writes `count` element files and returns the #Include lines. With mixed=True the classes get the modes of
-    synthetic_mode and the result is a list of (mode, #Include line)."""
-    includes = []
+    """Writes `count` element files and returns their paths. With mixed=True the classes get the modes of
+    synthetic_mode and the result is a list of (mode, path)."""
+    files = []
     for n in range(count):
         mode = synthetic_mode(n) if mixed else "inline"
         name, text = synthetic_element(n, mode)
         path = Path(folder) / (name + ".ahk")
         path.write_text(text, encoding="utf-8", newline="\n")
-        line = "#Include %s" % path
-        includes.append((mode, line) if mixed else line)
-    return includes
+        files.append((mode, path) if mixed else path)
+    return files
+
+
+SYNTH_PACKAGE = "R3Synth"
+
+
+def synthetic_includes(folder, files, tag="all"):
+    """Writes the block of the package R3Synth with the element files `files` (as the generator of the element
+    packages does it: the base files, the package class that includes the files, the Register lines) and returns its
+    #Include line, or no line without files."""
+    if not files:
+        return []
+    base = ROOT / "src" / "elements" / "base"
+    lines = ["#Requires AutoHotkey v2.0", "#Include %s" % (base / "AhfElement.ahk"),
+             "#Include %s" % (base / "ElementRegistry.ahk"), "class %s {" % SYNTH_PACKAGE]
+    lines += ["    #Include %s" % f for f in files]
+    lines += ["}", 'ElementRegistry.RegisterPackage("%s", "1.0")' % SYNTH_PACKAGE]
+    lines += ["ElementRegistry.Register(%s.%s)" % (SYNTH_PACKAGE, Path(f).stem) for f in files]
+    block = Path(folder) / ("%s_%s.ahk" % (SYNTH_PACKAGE, tag))
+    block.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+    return ["#Include %s" % block]
 
 
 def registered_ids():
@@ -196,7 +217,10 @@ def write_stubs(path):
             pars.update(k for k in (el.get("pars") or {}) if re.fullmatch(r"\w+", k))
     have = registered_ids()
     lines = ["#Requires AutoHotkey v2.0", "#Include %s" % (ROOT / "src" / "elements" / "base" / "AhfElement.ahk"),
-             "#Include %s" % (ROOT / "src" / "elements" / "base" / "ElementRegistry.ahk"), ""]
+             "#Include %s" % (ROOT / "src" / "elements" / "base" / "ElementRegistry.ahk"), "",
+             "; the stubs stand for classes of the package Default (E0045): the flows name them without package",
+             "class Default {"]
+    registers = []
     n_cls = n_par = 0
     for low, (cls, pars) in sorted(classes.items()):
         if low in have:
@@ -205,8 +229,10 @@ def write_stubs(path):
         n_par += len(pars)
         mode = "trigger" if low.startswith("trigger_") else "inline"
         entries = ", ".join('Map("id", "%s", "content", "Expression")' % p for p in sorted(pars))
-        lines += ["class %s extends AhfElement {" % cls, '    static Mode := "%s"' % mode,
-                  "    static Parameters(ctx) => [%s]" % entries, "}", "ElementRegistry.Register(%s)" % cls, ""]
+        lines += ["    class %s extends AhfElement {" % cls, '        static Mode := "%s"' % mode,
+                  "        static Parameters(ctx) => [%s]" % entries, "    }"]
+        registers.append("ElementRegistry.Register(Default.%s)" % cls)
+    lines += ["}"] + registers + [""]
     Path(path).write_text("\n".join(lines), encoding="utf-8", newline="\n")
     return n_cls, n_par
 
@@ -338,7 +364,7 @@ def mode_parse(args):
     for n in counts:
         folder = Path(work) / ("n%d" % n)
         folder.mkdir()
-        entries[n] = write_entry(folder, write_synthetic(folder, n))
+        entries[n] = write_entry(folder, synthetic_includes(folder, write_synthetic(folder, n)))
     print("synthetic element files in %s" % work, flush=True)
     print("machine load before: %.1f %%" % machine_load(), flush=True)
     rows = {n: {"bare_ms": [], "hub_up_ms": [], "storage_ready_ms": [], "engine_ready_ms": [], "worker1_ready_ms": [],
@@ -516,15 +542,17 @@ def build_role_entries(folder, count, layout):
     synth_dir.mkdir(exist_ok=True)
     mixed = write_synthetic(synth_dir, count, mixed=True)
     if layout == "legacy":
-        return write_entry(folder, [line for _, line in mixed]), None
+        return write_entry(folder, synthetic_includes(synth_dir, [f for _, f in mixed])), None
     sup = folder / "MeasureEntry.ahk"
     rewrite_entry(SRC_PRODUCT_ENTRY, sup, [])
     for path in sorted(SRC_ENTRY_DIR.glob("*.ahk")):
         modes = role_modes(path.stem)
-        rewrite_entry(path, folder / "entry" / path.name, [line for mode, line in mixed if mode in modes])
+        rewrite_entry(path, folder / "entry" / path.name,
+                      synthetic_includes(synth_dir, [f for mode, f in mixed if mode in modes], path.stem))
     standin = folder / "entry" / "triggerhost_standin.ahk"
     rewrite_entry(SRC_ENTRY_DIR / "triggerhost.ahk", standin,
-                  [line for mode, line in mixed if mode in role_modes("triggerhost")], replace_main="Persistent()")
+                  synthetic_includes(synth_dir, [f for mode, f in mixed if mode in role_modes("triggerhost")], "standin"),
+                  replace_main="Persistent()")
     return sup, standin
 
 
@@ -632,7 +660,7 @@ def main():
         mode_roles(args)
     else:
         Path(args.folder).mkdir(parents=True, exist_ok=True)
-        inc = write_synthetic(args.folder, args.count)
+        inc = synthetic_includes(args.folder, write_synthetic(args.folder, args.count))
         print(write_entry(args.folder, inc))
 
 
