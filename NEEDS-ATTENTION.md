@@ -4,8 +4,6 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-1. **Manual check of the tray icon (E0046 as corrected, F-0064).** After the correction is integrated: start `src/AutoHotFlow.ahk` by hand (VS Code task `Start:`). Only the manager shows a tray icon; the debug window and the other roles show none, and test runs show none. Tell the orchestrator whether this is right; F-0064 closes on your answer.
-
 Other decisions of 2026-10-15 are in `doc/DECISIONS.md` (E0046 to E0051).
 
 ## To know

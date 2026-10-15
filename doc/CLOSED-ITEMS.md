@@ -25,6 +25,7 @@ This document lists findings that are closed or accepted. Moved from doc/OPEN-IT
 | F-0072 | `#Warn` dialog for `Engine` in `VarLoader.ahk:101` seen in a manual unit test run | closed (option (a), 2026-10-15, E0043: comment in the file header) | |
 | F-0076 | `cmd.flow.get` returns `flowSettings.strictTypes` as `1`/`0` instead of JSON `true`/`false` | closed (fixed in 841ecbd) | |
 | F-0078 | 156 sites with `LocalSameAsGlobal` (a local named like a class or a built-in function); one was a real defect | closed (2026-10-15: all locals renamed, test scripts and test entries warn with `#Warn All, StdOut`, rule `warn` of the architecture check refuses `LocalSameAsGlobal, Off` in `src/`) | |
+| F-0064 | Closing a role window is reported as a crash; no tray icon besides the manager | closed 2026-10-15: decision E0046 (tray icons hidden per entry script, manager keeps its icon; correction 2026-10-15), verified by `ed80347`, `9a9968d` and the owner's check of the icon | |
 | F-0088 | Slow tier: a burst of 5000 log lines ends with 4999 lines written or counted as dropped; one line is lost without a count | cause found (race in the log buffers of storage), fixed in 8bd2293, verified under load; verifier pending | |
 
 
@@ -227,3 +228,7 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 - **Next step:** the verifier runs the slow tier; if one line is missing again, look for `handler for evt.log.append failed` in the log of the run first.
 
 **Closed 2026-10-15:** fixed in `dd7c7ad` (Storage log buffers under `Critical`, one `Get`), verified on `c51d6c9`: slow tier green (98 passed), burst loop 3 of 3 runs with `written + dropped = 5000`. Whether F-0063 has the same cause is not checked.
+
+### F-0064: Closing a role window is reported as a crash
+
+**Closed 2026-10-15.** Decision E0046 (owner, 2026-10-15): the crash report for a window closed from outside stays correct (option c). The tray icons of the roles are hidden through the `#NoTrayIcon` directive of each entry script; the product manager keeps its icon (correction of the same day). Implemented in `3e3da65`, corrected in `ed80347` and `9a9968d`. Verified by the verifier of `9a9968d` (fast 834 passed, foundation 444 passed, arch and requirements checks 0) and by the owner's check of the icon (one icon, the manager's). The original text of the entry is in commit `52f7923` (`git show 52f7923:doc/OPEN-ITEMS.md`).
