@@ -20,7 +20,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0019 | Supervisor messages after `storage` is gone go only to stderr | open, low | |
 | F-0020 | Flow file parsed twice in the engine | open, not implemented | yes |
 | F-0031 | Hub connection deadlines ignore supervisor stalls | open, low | |
-| F-0041 | `refreshed` 2 instead of 3 in the debug role test | observed, open | |
+| F-0041 | `refreshed` 2 instead of 3 in the debug role test | observed, open (0 of 33 in repetition on `dec432b`) | |
 | F-0043 | `cmd.worker.cancel` unanswered in the hang test | observed, open | |
 | F-0060 | `cmd.worker.run` unanswered for 5 s in `test_worker_busy.py` | observed once, open | |
 | F-0062 | `storage` not ready within 45 s after a freeze in the hang test | observed once under load, open | |
@@ -105,6 +105,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Why deferred:** Not reproduced. The source suspects (assumed) that `DebugView.RefreshSnapshots` asks only the processes the window already sees as `ready`, the same pattern as F-0034. The other possibility is that an answer missed `DebugView.SNAPSHOT_MS`.
 **Sign that it matters:** `assert 2 == 3` in the test under parallel load.
 **Update 2026-10-13:** It failed again in 1 of about 10 `--all` runs (8 workers). The report fetched at the moment of the failure shows supervisor, `storage` and `debug` as `ready` with the late child `starting`, so the process side was in the expected state. Assumed (not proven) cause: the window's own table still showed `storage` or `debug` as not ready, the same lag as in `test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor` (2 of 4 runs, `4 >= 6`). Both tests now wait until the window's table shows the roles as `ready`; 12 further `--all` runs did not show it again. Status: mitigated in the test, cause not proven. If it returns, the lag is in `DebugView` and not in the test.
+**Update 2026-10-15 (bug hunter):** Repetition on `dec432b` (serial results of the whole file `tests/fault/test_debug_role.py`, 7 tests, `--all -m slow`): 9 runs with `-n 6` on an otherwise idle machine and 24 runs with `-n 8` while 4 such loops ran at the same time (about 32 busy workers): 33 of 33 green, the target test never failed (0 of 33). Not reproduced. Read in code: `RefreshSnapshots` counts an answer only when `ok` and a snapshot map arrive; a role that does not answer within `DebugView.SNAPSHOT_MS` (3 s) is stored as `no snapshot` and is not counted, so `refreshed` 2 would need one of supervisor, `storage`, `debug` to miss 3 s (extreme load or a stall) or the window's table to lag (mitigated in the test). The failing assertion prints `answer` with `snapshots`, so the next failure shows which entry says `no snapshot`. Assumed, not proven. Next step: none until it fails again.
 **Action:** On the next failure, read the run log (`doc/TEST-STRATEGY.md` section 6): `diagnosis/`, `Reports/`, `Log/`.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-0035-bugfix-schleife.md` (section "Analyse Zyklus 1"); `v2-phase2-final:work_items/STATUS.md`, "Abnahmelauf WI-0034 (2026-10-12, zweiter)" and "Abnahmelauf WI-0035, Zyklus 1".
 
