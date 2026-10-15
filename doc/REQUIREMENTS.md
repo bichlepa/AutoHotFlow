@@ -6,7 +6,7 @@ This document lists the important features and quality requirements of AutoHotFl
 
 A requirement says **what** AutoHotFlow does, not how: what the user sees or experiences. Internal parts (engine, worker, storage, processes) appear only where a quality requirement is about them, or as a reference for the details. The how is in the other documents (`ARCHITECTURE.md`, `PROTOCOL.md`, `ELEMENT-API-V2.md`, the decisions in `DECISIONS.md`); a requirement links to them instead of repeating them. Other documents refer to a requirement by its ID (`REQ-EXE-010`), not by a link to its heading, because the ID is stable and the heading anchor changes with the title.
 
-**Sources of the first inventory (2026-10-14).** v1: the element manifest of the Default package (`v1/Source_Elements/Default/manifest.json`: 114 actions, 17 conditions, 5 loops, 16 triggers), the user interface texts of manager, editor, settings and tray, the settings defaults (`v1/Source_Common/Settings/Settings.ahk`), the changelog and the help folder; read, not run. v2: the code, the tests and the documents on `v2-port` at commit `9df8693` (WI-0045 verified); updated on 2026-10-15 for WI-0046, WI-0047-PREP, WI-0049, WI-0050 and the decisions E0040 to E0045. A step `S0001` to `S0009` is a step of the phase 3 plan (`work_items/phase3/README.md`).
+**Sources of the first inventory (2026-10-14).** v1: the element manifest of the Default package (`v1/Source_Elements/Default/manifest.json`: 114 actions, 17 conditions, 5 loops, 16 triggers), the user interface texts of manager, editor, settings and tray, the settings defaults (`v1/Source_Common/Settings/Settings.ahk`), the changelog and the help folder; read, not run. v2: the code, the tests and the documents on `v2-port` at commit `9df8693` (WI-0045 verified); updated on 2026-10-15 for WI-0046, WI-0047-PREP, WI-0049, WI-0050 and the decisions E0040 to E0045. A step `S0001` to `S0010` is a step of the phase 3 plan (`work_items/phase3/README.md`).
 
 ## Format
 
@@ -1743,7 +1743,7 @@ Elements for other AI services, for example speech output or image generation.
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** phase 4 (R0007)
+- **Plan:** S0009 (R0007)
 
 Installs AutoHotFlow with start menu entry and uninstaller.
 
@@ -1753,10 +1753,10 @@ Installs AutoHotFlow with start menu entry and uninstaller.
 - **v2:** partial (the supervisor and one entry script per role run with the installed interpreter; compiling is open)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** phase 4 (R0007)
+- **Plan:** S0009 (R0007)
 - **Evidence:** `tests/integration/test_entry.py`, `tests/fault/test_role_entries.py`
 
-The user does not need an installed AutoHotkey. Today the supervisor starts every other role from its own entry script (D0012, E0041); how the role scripts are compiled (one program or one per role) is decided in phase 4.
+The user does not need an installed AutoHotkey. Today the supervisor starts every other role from its own entry script (D0012, E0041); how the role scripts are compiled (one program or one per role) is decided in S0009.
 
 ### REQ-DST-030 64 bit only
 
@@ -1786,7 +1786,7 @@ A second start of AutoHotFlow does not start a second application: it passes its
 - **v2:** open
 - **Prio:** should
 - **Scope:** port
-- **Plan:** phase 4
+- **Plan:** S0009
 
 ## Robustness (ROB)
 

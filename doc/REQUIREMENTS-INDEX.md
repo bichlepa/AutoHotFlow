@@ -234,11 +234,11 @@ run the tool. The legend of the columns is at the top of the source.
 
 | ID | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|
-| [REQ-DST-010](REQUIREMENTS.md#req-dst-010-installer) | Installer | yes | open | must | port | phase 4 (R0007) |
-| [REQ-DST-020](REQUIREMENTS.md#req-dst-020-compiled-program) | Compiled program | yes | partial | must | port | phase 4 (R0007) |
+| [REQ-DST-010](REQUIREMENTS.md#req-dst-010-installer) | Installer | yes | open | must | port | S0009 (R0007) |
+| [REQ-DST-020](REQUIREMENTS.md#req-dst-020-compiled-program) | Compiled program | yes | partial | must | port | S0009 (R0007) |
 | [REQ-DST-030](REQUIREMENTS.md#req-dst-030-64-bit-only) | 64 bit only | n/a | done | must | port | - |
 | [REQ-DST-040](REQUIREMENTS.md#req-dst-040-single-instance-and-command-line) | Single instance and command line | partial | partial | must | port | S0008 (commands of the shortcut trigger) |
-| [REQ-DST-050](REQUIREMENTS.md#req-dst-050-release-checklist) | Release checklist | yes | open | should | port | phase 4 |
+| [REQ-DST-050](REQUIREMENTS.md#req-dst-050-release-checklist) | Release checklist | yes | open | should | port | S0009 |
 
 ## Robustness (ROB)
 
