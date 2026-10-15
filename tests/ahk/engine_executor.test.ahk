@@ -44,10 +44,21 @@ WorkerJobEndedAtOnceLeavesNoActiveEntry() {
     Assert.Equal(owner.workers.runs, 1)
 }
 
+; E0041: a worker element is sent to the pool; its Run never runs in the engine process (the engine has the class for the
+; metadata only).
+WorkerElementIsNeverRunInTheEngine() {
+    owner := NewOwner(FlowText([El("w", "Test_Wk")], [Conn("c1", "t0", "w")]))
+    owner.executor.StartFlow(owner.flows.Get("f"))
+    owner.Drive()
+    Assert.Equal(owner.workers.runs, 1, "worker jobs started")
+    Assert.Equal(Probe.Count("w"), 0, "Run of the worker element called in the engine")
+}
+
 TestRun.Init()
 
 TestRun.Case("Tick: a tick that interrupts before the dispatch does not start an element twice", InterruptedTickStartsAnElementOnce)
 TestRun.Case("Tick: an element that calls Tick in Run does not lose or repeat other elements", TickInsideRunStartsEveryElementOnce)
+TestRun.Case("Worker: the engine never calls Run of a worker element (E0041)", WorkerElementIsNeverRunInTheEngine)
 TestRun.Case("Worker: a job that ends at once leaves no active entry", WorkerJobEndedAtOnceLeavesNoActiveEntry)
 
 TestRun.Finish()

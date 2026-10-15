@@ -59,9 +59,13 @@ class Test_Hold extends AhfElement {
     }
 }
 
-; Runs in the worker pool (FakeWorkers).
+; Runs in the worker pool (FakeWorkers). A call of Run here means the engine ran a worker element itself.
 class Test_Wk extends AhfElement {
     static Mode := "worker"
+    static Run(ctx, params) {
+        Probe.runs.Push(ctx.elementId)
+        ctx.Finish("normal")
+    }
 }
 
 ElementRegistry.Register(Test_Count)
