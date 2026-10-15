@@ -39,6 +39,13 @@ Later commits on `v2-port` after `6f4241c` that did not change these trees: none
 
 ## Agents
 
+Session 6 start: 2026-10-15 (evening), work-item mode, HEAD `8c09337` on `v2-port`, main checkout clean, no workspaces left over. The state of S2 was taken from the commit history, not from the README checkboxes (not updated since S2 started): WI-44, WI-45, WI-46, WI-49, WI-50 integrated and verified; WI-47-PREP done (session 5). Next open work item with all dependencies done: WI-47 (E0045 is part of it). WI-48, WI-51 wait for WI-47. Workspaces this session: `wip/wi-47` (implementer), `wip/hunt-15` (bug hunter, OPEN-ITEMS mode).
+
+| Slot | Role | Model | Workspace | Branch | Task | State |
+|---|---|---|---|---|---|---|
+| 1 | Implementer WI-0047 | opus | wi-47 | wip/wi-47 | element layout per package, qualified IDs (E0045) | running |
+| 2 | Bug hunter (OPEN-ITEMS mode) | sonnet | hunt-15 | wip/hunt-15 | not in the area of WI-0047 | running |
+
 Session 5 start: 2026-10-15, work-item mode, HEAD `b92d800` on `v2-port`, main checkout clean. Highest final ID at start: F-0375; ID blocks F-0376 to F-0385 (implementer WI-0047-PREP), F-0386 to F-0395 (bug hunter round 7). Next open work item: WI-0047-PREP (depends on WI-0046 and WI-0042, both done). Leftover workspace not created by this session: `wip/requirements` (5 commits plus an untracked file `doc/Untitled-1.txt` in its workspace), left alone, to be decided by the owner. `wip/chrome-cleanup` integrated as a672b74 and 92c4f59 (owner's go, 2026-10-15; renumbering of the Chrome-branch text done in the same integration), workspace removed. `wip/hunt-13` (F-0014 fix) integrated as 02910a7 and 88be7fe on the owner's go, workspace removed.
 
 | Slot | Role | Model | Workspace | Branch | Task | State |
