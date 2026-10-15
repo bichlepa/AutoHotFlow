@@ -407,6 +407,18 @@ When two flows or branches read, change and write the same variable through two 
 
 Note: an element that waits (REQ-EXE-100) may read a value, wait a long time (for example for a dialog) and write afterwards; the window for a lost change is then as long as it waits.
 
+### REQ-VAR-150 Several variables can refer to the same object
+
+- **v1:** no (not checked)
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+Assigning an object copies it (REQ-VAR-060), so two variables never share an object and a change through one is not seen through the other. Later a flow may let several variables refer to the same object: for example through a parameter of the elements that work on objects (copy or reference), or in scripts as in AutoHotkey (REQ-SCR-020).
+
+Open points: a reference into another instance or into a permanent variable (REQ-VAR-050); what is saved for an object that several permanent variables share.
+
 ## Script language (SCR)
 
 The expression language (REQ-VAR-010) and its script form (REQ-VAR-020) grow into a full script language: what a beginner builds from a chain of simple elements, an experienced user writes in a few lines. The language stays AutoHotkey v2 wherever it can (E0022, E0035), so that AutoHotkey users need to learn nothing new and the oracle (REQ-TST-050) checks every new part automatically. Elements stay the way for beginners; scripts are a second way, not a replacement.
@@ -449,7 +461,7 @@ Lists and objects are changed inside an expression, with the methods and propert
 Open points:
 
 - A list is an object with the keys 1..n (REQ-VAR-060), not an AutoHotkey `Array`. The methods of `Array` must work on it; the oracle needs a rule for the differences (a gap in the keys, negative indexes).
-- Assigning an object copies it (REQ-VAR-060), so `a := b` followed by `a.Push(1)` leaves `b` unchanged, unlike AutoHotkey. This must be decided and documented before methods exist.
+- Assigning an object copies it (REQ-VAR-060), so `a := b` followed by `a.Push(1)` leaves `b` unchanged, unlike AutoHotkey. This must be decided and documented before methods exist; references to the same object are REQ-VAR-150.
 
 ### REQ-SCR-030 Loops and error handling in scripts
 
@@ -469,10 +481,15 @@ As in AutoHotkey v2: `Loop n`, `Loop` with `until`, `while`, `for key, value in 
 - **Scope:** later
 - **Plan:** -
 
-The user defines functions in a script and calls them from every expression of the same flow, and in a library of functions that all flows share. Variables inside a function are local to it.
+The user defines own functions and calls them from expressions. Three ways, which can exist side by side:
 
-Open points: where the shared library is stored (a file in the data folder, a package, REQ-PKG-040); what happens to running instances when a shared function changes (REQ-EXE-080).
+| Way | How it works |
+|---|---|
+| In a script | A function defined in a script can be called from every expression of the same flow. Variables inside the function are local to it. |
+| A flow as a function | A flow with the trigger "Function call" (REQ-TRG-200) declares its parameters. Calling it from an expression starts the flow with the arguments, waits until it ends (as `Action_Execute_Flow` with waiting, REQ-EXE-120) and returns its result. A beginner builds a function from elements, and an experienced user calls it in one line. |
+| A library | A file of functions that all flows share, written in the script language or as AutoHotkey v2 code (REQ-ELM-110). |
 
+Open points: where a library is stored and how a change reaches running instances (REQ-EXE-080); a flow called as a function waits, so the expression that calls it waits too (as in REQ-SCR-090); AutoHotkey code runs in a process of its own, so a call of its functions is slow.
 ### REQ-SCR-050 A script cannot hang AutoHotFlow
 
 - **v1:** n/a
@@ -1054,8 +1071,8 @@ The triggers of enabled flows are active from the start of AutoHotFlow on, and a
 - **v1:** no (not checked)
 - **v2:** open
 - **Prio:** should
-- **Scope:** port
-- **Plan:** S0003, S0007
+- **Scope:** later
+- **Plan:** -
 
 When two enabled flows, or two triggers of one flow, use the same hotkey or hotstring in the same context, AutoHotFlow warns: in the trigger settings when the hotkey is chosen, and in the manager when the second flow is enabled. A hotkey that cannot be registered because another program uses it is reported as well (REQ-TRG-010).
 
@@ -1083,6 +1100,7 @@ The trigger groups below follow the same rule as the element groups in ELM: one 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
 | `Trigger_Manual` | yes | partial (skeleton) | S0002 (WI-0047) |
+| Function call: declares parameters, gets the arguments and returns a result (REQ-SCR-040) | no | open | later |
 
 Started by the user, by another flow (REQ-EXE-120) or through the command line (REQ-DST-040).
 
@@ -1584,7 +1602,7 @@ The global execution policy (REQ-EXE-050) and the global working directory (REQ-
 - **Scope:** port
 - **Plan:** S0004
 
-AutoHotFlow starts when the user logs on to Windows, in the background. The start-up trigger knows that it was a start with Windows (REQ-TRG-220).
+If the user wants it, AutoHotFlow starts in the background when the user logs on to Windows. It is an option in the settings; the setup assistant (REQ-USE-100) proposes it switched on, and the user can switch it off there. The start-up trigger knows that it was a start with Windows (REQ-TRG-220).
 
 ### REQ-SET-040 Run as administrator
 
@@ -2470,7 +2488,7 @@ Errors and warnings that have no window of their own (for example a flow file th
 
 Manager and editors never freeze while flows run, because they are processes of their own.
 
-### REQ-USE-050 The first start asks for the user's experience
+### REQ-USE-100 Setup assistant at the first start
 
 - **v1:** no
 - **v2:** open
@@ -2478,7 +2496,24 @@ Manager and editors never freeze while flows run, because they are processes of 
 - **Scope:** later
 - **Plan:** -
 
-At the first start AutoHotFlow asks how experienced the user is and preselects the options from the answer:
+At the first start a short assistant leads the user through the basic choices. Every choice has a preselection and can be changed later in the settings. The steps:
+
+- language (REQ-LNG-020)
+- experience level and what follows from it (REQ-USE-050)
+- start with Windows, preselected (REQ-SET-030)
+- import of the flows and variables of v1, when a v1 data folder exists (REQ-MIG-060)
+
+The user can skip the assistant and start it again from the settings.
+
+### REQ-USE-050 The setup assistant asks for the user's experience
+
+- **v1:** no
+- **v2:** open
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+The setup assistant (REQ-USE-100) asks how experienced the user is and preselects the options from the answer:
 
 | Level | Hints (REQ-USE-060) | Packages (REQ-PKG-030) | Complex elements (REQ-USE-010) |
 |---|---|---|---|
@@ -2510,13 +2545,13 @@ Every hint that is not critical (for example "take care with global variables", 
 
 ### REQ-USE-080 Unhandled errors of a flow are noticed
 
-- **v1:** no (not checked)
+- **v1:** yes (read: a window with the message that does not block; a new error replaces the window shown)
 - **v2:** open
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0004
 
-When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the user learns it without reading the log: a notice in the tray, and a mark at the flow in the manager until the user has looked at it. Many errors in a short time give one notice. The notice can be switched off per flow and globally (REQ-USE-070).
+When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the user learns it without reading the log: a notice (a window as in v1, or in the tray) that never blocks the flows, and a mark at the flow in the manager until the user has looked at it. Many errors in a short time give one notice. The notice can be switched off per flow and globally (REQ-USE-070).
 
 ### REQ-USE-090 Sharp and correctly sized on high-resolution displays
 
