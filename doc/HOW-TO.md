@@ -1079,3 +1079,11 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Status:** verified (WI-0047-PREP: the warning dialog before the change, the measurement and `tests/test_element_includes.py` after it)
 - **Source:** `src/elements/base/AhfElement.ahk`, `tools/measure_r3.py`
 
+### A timer thread can run between "check" and "use" of a shared Map entry
+
+- **Problem:** AutoHotkey runs a timer or a message handler between two lines of another thread unless `Critical` is on. `if (!m.Has(k)) ...` followed by `m[k]` on the next line is not atomic: when the timer deletes `k` in between, `m[k]` throws `UnsetItemError`. In storage this was a log line that vanished without a count (F-0088: `_LogToFile` against `_FinishLogBundle`). The error is easy to miss: a handler that throws is only a log line.
+- **Wrong:** `if (!this.logBuffers.Has(f)) this.logBuffers[f] := Map(...)` and then `buf := this.logBuffers[f]`; and a flag, a check and a `Delete` of the same entry in another thread without `Critical`.
+- **Right:** Read once (`buf := m.Get(k, "")`, create if not an object) and run every change of the shared state (flag, check, removal, scheduling) in one `Critical` section in both threads (`prev := Critical("On")` ... `finally Critical(prev)`).
+- **Status:** verified (burst test red about 1 in 3 under load before, 0 of 30 after; `tests/ahk/storage_logbuf.test.ahk` red before, green after)
+- **Source:** `src/storage/Storage.ahk` (`_LogToFile`, `_FinishLogBundle`), `doc/OPEN-ITEMS.md` F-0088
+
