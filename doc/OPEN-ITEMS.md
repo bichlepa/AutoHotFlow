@@ -282,6 +282,8 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** observed once, together with the second observation of F-0088; serial rerun of the four fault files: 12 passed. These tests are not on the known list (F-0086 to F-0088). Suspicion (assumed): load of the run (4 workers plus other agents' runs), not WI-0047; the missing `evt.process.crashed` is the only one that is not a plain time limit. Not checked.
 **Action:** if the crash event returns on an idle machine, check whether `evt.process.exited` can replace `evt.process.crashed` for a killed worker under a stalled supervisor.
 
+
+**Update 2026-10-15 (verifier of `7e046ff`):** more load-dependent failures of the same kind, each seen once and green when repeated: `test_worker_lifecycle.py` (killed worker before it answers: crash reported after 4.82 s, limit 3.25 s; run 20261015-205409-52f7923a), `test_engine.py::test_engine_reads_at_most_two_flow_files_at_a_time_while_loading` (no request in flight within the wait; run 20261015-205409-52f7923a), `test_storage.py::test_shutdown_finishes_the_queued_writes_then_says_bye_and_exits_0` (storage alive 3 s after `sys.bye`; run 20261015-210132-7e046ff7, green alone in run 20261015-210947-7e046ff7). Assumed: load of parallel agent runs. Not checked: whether the storage shutdown wait is a real race under load.
 ## Watch list (E0007)
 
 These items were deliberately not fixed in phase 2b. Closed items (F-0004, F-0006, F-0010, F-0015, F-0018 and others) are not listed. The findings above are not repeated here.
