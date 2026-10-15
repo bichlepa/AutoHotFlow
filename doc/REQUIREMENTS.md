@@ -1966,7 +1966,7 @@ From the start until all processes are ready: below 3 s (with few flows).
 - **Plan:** -
 - **Evidence:** `tests/stress/test_big_flows.py`, `doc/MEASUREMENTS.md` (MS-0030)
 
-While 200 big flows load, AutoHotFlow stays responsive: the engine answers a snapshot within 3 s and no process is taken for hung (E0042; the budget was 1 s, finding F-0073 keeps the measurements). Loading flows only when they are needed is an optimization after the port (REQ-PRF-110).
+While 200 big flows load, AutoHotFlow stays responsive: the engine answers a snapshot within 3 s and no process is taken for hung (E0042; the budget was 1 s, finding F-0073 keeps the measurements). Loading flows only when they are needed is an optimization after the port (REQ-PRF-100).
 
 ### REQ-PRF-060 Editor redraw
 
@@ -2011,18 +2011,7 @@ More than 1000 log lines per second; other requests to the storage are answered 
 
 Memory, handles and the number of processes stay flat over long runs.
 
-### REQ-PRF-100 Each process parses only the element code it needs
-
-- **v1:** n/a
-- **v2:** done
-- **Prio:** must
-- **Scope:** port
-- **Plan:** -
-- **Evidence:** `tests/test_element_includes.py`, `tests/fault/test_role_entries.py`, `doc/MEASUREMENTS.md` (MS-0027 to MS-0029, MS-0032, MS-0033)
-
-Every role has its own entry script that includes only the element classes it needs, selected by their execution mode: the engine all, the trigger host the triggers, a worker the worker elements, the other roles none (E0041, risk R0003). With 150 element classes this lowered the memory of the background processes from 129 MB to 49 MB (one worker).
-
-### REQ-PRF-110 Load flows only when they are needed
+### REQ-PRF-100 Load flows only when they are needed
 
 - **v1:** no
 - **v2:** open
