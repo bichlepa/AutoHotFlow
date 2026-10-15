@@ -321,6 +321,14 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Status:** verified (load error in the session, 2026-10-15)
 - **Source:** `src/elements/base/Dialogs.ahk`
 
+### `IsDigit`, `IsAlpha` and the like need a String: an Integer is a TypeError
+
+- **Problem:** `IsDigit(5)`, `IsAlnum(5.0)` end with "Parameter #1 of IsDigit requires a String, but received an Integer". `IsInteger`, `IsFloat`, `IsNumber` and `IsTime` accept any value. A variable of v2 holds numbers as numbers (`Integer 5`), so a type test of a variable's value must not pass the value as it is.
+- **Wrong:** `IsDigit(ctx.GetVar("n"))`.
+- **Right:** `IsDigit(String(value))` for `IsDigit`, `IsXDigit`, `IsAlnum`, `IsAlpha`, `IsUpper`, `IsLower`, `IsSpace` (an Integer `5` is then the text `"5"`, a Float `5.0` the text `"5.0"`). All of them give true for the empty text in the installed v2 interpreter, as v1 `is digit` does; the element does not rely on it and tests the empty text itself.
+- **Status:** verified (probe script with `ahkrun.py`, 2026-10-15; the v1 interpreter compared for 22 texts, MIGRATION M-0053)
+- **Source:** `src/elements/Default/Conditions/Condition_Variable_content_is.ahk`
+
 ## Objects, Maps, Arrays
 
 ### Map with `CaseSense "Off"` keeps the spelling of the first insertion
@@ -1094,3 +1102,10 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Status:** verified (burst test red about 1 in 3 under load before, 0 of 30 after; `tests/ahk/storage_logbuf.test.ahk` red before, green after)
 - **Source:** `src/storage/Storage.ahk` (`_LogToFile`, `_FinishLogBundle`), `doc/OPEN-ITEMS.md` F-0088
 
+### `FlowRun.probe` reads the files when it is called: the next run clears them
+
+- **Problem:** A test that runs several flows one after the other and calls `run.probe("x")` at the end reads the probe files of the LAST run (`flows.begin` clears `global_probe*` before every run), or `None`, and a test of the first flow fails for no visible reason.
+- **Wrong:** `runs = [flows.run(i) for i in ids]` and then `runs[0].probe("x")`.
+- **Right:** read the probes right after the run, before the next one starts (`tests/integration/test_core_a_elements.py::run_all` stores them in `run.seen`). A run that ended with an exception has no probe: `probe` then waits for its timeout, so read it only for a flow that finished.
+- **Status:** verified (WI-0052)
+- **Source:** `tests/support/flowrun.py`, `tests/integration/test_core_a_elements.py`

@@ -120,7 +120,10 @@ AllListsTheBlocks() {
         if (InStr(id, "Default.") = 1)
             product += 1
     }
-    Assert.Equal(product, 3, "Default has Action_Do_nothing, Action_Sleep and Trigger_Manual")
+    ; the package grows with every ported element (S0002): the skeleton classes must be there, the count is not fixed
+    Assert.True(product >= 3, "Default has at least Action_Do_nothing, Action_Sleep and Trigger_Manual")
+    for id in ["Default.Action_Do_nothing", "Default.Action_Sleep", "Default.Trigger_Manual"]
+        Assert.True(IsObject(ElementRegistry.Get(id)), id " is registered")
 }
 
 IdOfIgnoresNameMethod() {
@@ -148,11 +151,18 @@ MissingTextNamesThePackage() {
 }
 
 ElementsUseNoV1Helpers() {
-    files := ["src\elements\Default\Actions\Action_Sleep.ahk", "src\elements\Default\Actions\Action_Do_nothing.ahk"
-        , "src\elements\Default\Triggers\Trigger_Manual.ahk", "tests\elements\Test\Actions\Action_TestThrow.ahk"
-        , "tests\elements\Test\Actions\Action_TestBlockWorker.ahk", "tests\elements\Test\Actions\Action_TestHangWorker.ahk"]
+    files := []
+    for path in ["tests\elements\Test\Actions\Action_TestThrow.ahk", "tests\elements\Test\Actions\Action_TestBlockWorker.ahk"
+        , "tests\elements\Test\Actions\Action_TestHangWorker.ahk"]
+        files.Push(A_ScriptDir "\..\..\" path)
+    ; every element class of the package Default (Actions, Conditions, Loops, Triggers), not the generated blocks
+    loop files A_ScriptDir "\..\..\src\elements\Default\*.ahk", "R" {
+        if (!InStr(A_LoopFileName, "_includes_"))
+            files.Push(A_LoopFileFullPath)
+    }
+    Assert.True(files.Length >= 3 + 3, "the element files of the package Default were found")
     for path in files {
-        text := ReadSource(path)
+        text := FileRead(path, "UTF-8")
         Assert.Equal(RegExMatch(text, "\bx_[A-Za-z]"), 0, path ": uses an x_ helper")
         Assert.Equal(RegExMatch(text, "im)^\s*global\s"), 0, path ": declares a global")
     }

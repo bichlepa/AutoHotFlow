@@ -9,11 +9,23 @@
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Default {
     #Include Actions\Action_Do_nothing.ahk
+    #Include Actions\Action_New_variable.ahk
     #Include Actions\Action_Sleep.ahk
+    #Include Conditions\Condition_Do_nothing.ahk
+    #Include Conditions\Condition_Expression.ahk
+    #Include Conditions\Condition_NumberIs.ahk
+    #Include Conditions\Condition_Variable_content_is.ahk
+    #Include Conditions\Condition_Variable_Is_Empty.ahk
     #Include Triggers\Trigger_Manual.ahk
 }
 
 ElementRegistry.RegisterPackage("Default", "1.2.1")
 ElementRegistry.Register(Default.Action_Do_nothing)
+ElementRegistry.Register(Default.Action_New_variable)
 ElementRegistry.Register(Default.Action_Sleep)
+ElementRegistry.Register(Default.Condition_Do_nothing)
+ElementRegistry.Register(Default.Condition_Expression)
+ElementRegistry.Register(Default.Condition_NumberIs)
+ElementRegistry.Register(Default.Condition_Variable_content_is)
+ElementRegistry.Register(Default.Condition_Variable_Is_Empty)
 ElementRegistry.Register(Default.Trigger_Manual)

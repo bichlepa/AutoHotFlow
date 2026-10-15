@@ -11,7 +11,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [Expressions and variables (VAR)](#expressions-and-variables-var) | 15 | 8 | 0 | 3 | 4 | 0 | 2 |
 | [Script language (SCR)](#script-language-scr) | 15 | 0 | 0 | 3 | 12 | 0 | 1 |
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
-| [Elements (ELM)](#elements-elm) | 24 | 0 | 0 | 2 | 22 | 0 | 0 |
+| [Elements (ELM)](#elements-elm) | 24 | 1 | 0 | 3 | 20 | 0 | 0 |
 | [Triggers (TRG)](#triggers-trg) | 13 | 0 | 0 | 1 | 12 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 14 | 0 | 0 | 2 | 12 | 0 | 0 |
 | [Editor (EDT)](#editor-edt) | 23 | 0 | 0 | 1 | 22 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 2 | 1 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 0 | 0 | 1 | 9 | 0 | 0 |
-| **All** | **217** | **53** | **1** | **32** | **130** | **1** | **6** |
+| **All** | **217** | **54** | **1** | **33** | **128** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -109,8 +109,8 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-ELM-010](REQUIREMENTS.md#req-elm-010-element-contract-and-registry) | Element contract and registry | yes | partial | must | port | S0002 (WI-0047), S0007 (editor) |
 | [REQ-ELM-020](REQUIREMENTS.md#req-elm-020-every-element-is-documented-by-its-help-text) | Every element is documented by its help text | yes | open | must | port | S0007 |
 | [REQ-ELM-110](REQUIREMENTS.md#req-elm-110-autohotkey-scripts-in-flows) | AutoHotkey scripts in flows | yes | open | must | port | S0008 |
-| [REQ-ELM-200](REQUIREMENTS.md#req-elm-200-variables-and-calculations) | Variables and calculations | yes | open | must | port | S0002 (WI-0052), S0008 |
-| [REQ-ELM-210](REQUIREMENTS.md#req-elm-210-conditions-on-values) | Conditions on values | yes | open | must | port | S0002 (WI-0052) |
+| [REQ-ELM-200](REQUIREMENTS.md#req-elm-200-variables-and-calculations) | Variables and calculations | yes | partial | must | port | S0002 (WI-0052), S0008 |
+| [REQ-ELM-210](REQUIREMENTS.md#req-elm-210-conditions-on-values) | Conditions on values | yes | done | must | port | S0002 (WI-0052) |
 | [REQ-ELM-220](REQUIREMENTS.md#req-elm-220-strings) | Strings | yes | open | must | port | S0008 |
 | [REQ-ELM-230](REQUIREMENTS.md#req-elm-230-lists) | Lists | yes | open | must | port | S0002 (WI-0053), S0008 |
 | [REQ-ELM-240](REQUIREMENTS.md#req-elm-240-loops) | Loops | yes | open | must | port | S0002 (WI-0054), S0008 |

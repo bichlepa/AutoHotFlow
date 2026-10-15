@@ -721,14 +721,15 @@ The action and the trigger run AutoHotkey v2 code, separately from the flows (E0
 ### REQ-ELM-200 Variables and calculations
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (`Action_New_Variable` is done in S0002; the calculations and `Action_Script` are S0008)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0052), S0008
+- **Evidence:** `tests/integration/test_core_a_elements.py::test_new_variable_sets_texts_numbers_and_lists`, `tests/integration/test_core_a_elements.py::test_new_variable_only_if_not_exist`, `tests/integration/test_core_a_elements.py::test_new_variable_scopes_and_invalid_names`, `tests/integration/test_core_a_elements.py::test_the_v1_flow_variable_test_runs_up_to_the_list_elements`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_New_Variable` | yes | open | S0002 (WI-0052) |
+| `Action_New_Variable` | yes | done | S0002 (WI-0052) |
 | `Action_Random_Number` | yes | open | S0008 |
 | `Action_Absolute_Number` | yes | open | S0008 |
 | `Action_Square_Root` | yes | open | S0008 |
@@ -740,17 +741,18 @@ The action and the trigger run AutoHotkey v2 code, separately from the flows (E0
 ### REQ-ELM-210 Conditions on values
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (strict and compatibility mode; MIGRATION M-0052 to M-0054)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0052)
+- **Evidence:** `tests/integration/test_core_a_elements.py::test_condition_expression_decides_yes_or_no`, `tests/integration/test_core_a_elements.py::test_variable_content_is_every_type_for_every_value`, `tests/integration/test_core_a_elements.py::test_number_is_with_absolute_and_relative_difference`, `tests/integration/test_core_a_elements.py::test_variable_is_empty`, `tests/integration/test_core_a_elements.py::test_the_v1_flow_numbers_runs_its_number_is_checks`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Condition_Expression` | yes | open | S0002 (WI-0052) |
-| `Condition_Variable_Is_Empty` | yes | open | S0002 (WI-0052) |
-| `Condition_Variable_content_is` | yes | open | S0002 (WI-0052) |
-| `Condition_NumberIs` | yes | open | S0002 (WI-0052) |
+| `Condition_Expression` | yes | done | S0002 (WI-0052) |
+| `Condition_Variable_Is_Empty` | yes | done | S0002 (WI-0052) |
+| `Condition_Variable_content_is` | yes | done | S0002 (WI-0052) |
+| `Condition_NumberIs` | yes | done | S0002 (WI-0052) |
 
 ### REQ-ELM-220 Strings
 
@@ -815,17 +817,17 @@ Connection points and loop variables: REQ-EXE-030.
 ### REQ-ELM-250 Flow control
 
 - **v1:** yes
-- **v2:** partial (`Action_Sleep` and `Action_Do_nothing` exist as skeleton elements)
+- **v2:** partial (`Action_Sleep`, `Action_Do_nothing` and `Condition_Do_nothing` exist; the rest is open)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0047, WI-0052, WI-0055), S0003, S0008
-- **Evidence:** `tests/ahk/element_sleep.test.ahk`
+- **Evidence:** `tests/ahk/element_sleep.test.ahk`, `tests/integration/test_core_a_elements.py::test_action_do_nothing_finishes_with_normal_or_exception`, `tests/integration/test_core_a_elements.py::test_condition_do_nothing_finishes_with_the_chosen_result`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
 | `Action_Sleep` | yes | partial (skeleton) | S0002 (WI-0047) |
-| `Action_Do_nothing` | yes | partial (skeleton) | S0002 (WI-0052) |
-| `Condition_Do_nothing` | yes | open | S0002 (WI-0052) |
+| `Action_Do_nothing` | yes | done | S0002 (WI-0052) |
+| `Condition_Do_nothing` | yes | done | S0002 (WI-0052) |
 | `Action_Execute_Flow` (REQ-EXE-120) | yes | open | S0002 (WI-0055) |
 | `Action_Stop_Flow` | yes | open | S0002 (WI-0055) |
 | `Condition_Flow_Running` | yes | open | S0002 (WI-0055) |
