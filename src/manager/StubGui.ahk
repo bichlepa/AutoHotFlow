@@ -21,7 +21,7 @@ class StubGui {
         this.elemList := this.win.AddListView("xm w600 h190", ["Element", "Zustand", "Laeufe", "Letzter Lauf", "Meldung"])
         this.btnStart := this.win.AddButton("xm w100", "Start")
         this.btnStop := this.win.AddButton("x+8 yp w100", "Stop")
-        this.btnExit := this.win.AddButton("x+8 yp w100", "Beenden")
+        this.btnExit := this.win.AddButton("x+8 yp w100", StubManager.EXIT_LABEL)
         this.btnStart.OnEvent("Click", (*) => this.manager.UserStart(this.manager.selectedFlow))
         this.btnStop.OnEvent("Click", (*) => this.manager.UserStop(this.manager.selectedFlow))
         this.btnExit.OnEvent("Click", (*) => this.manager.UserExit())

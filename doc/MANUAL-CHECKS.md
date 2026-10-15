@@ -30,6 +30,7 @@ Note: the task and the command line differ. The task also starts the debug role 
 | 4 | During a run, move the window and click Start several times. | The window stays usable. Moving and clicking do not freeze it. | pass |
 | 5 | Quit the application (button Beenden, or close the window). | The process ends with exit code 0. The exit code is read from the `ahkrun.py` log (`shutdown: finished with exit code 0`), because the VS Code task terminal does not show it. | pass (exit code 0 from the `ahkrun.py` start) |
 | 6 | Watch for dialogs during the whole check. | No dialog (window class `#32770`) appears. The dialog guard would store one under `%TEMP%\ahf_dialogs\`. | pass |
+| 7 | Right-click the tray icon of the manager (the only icon), choose `Beenden`. Start again, double-click the icon. | The menu has exactly one entry, `Beenden` (no AutoHotkey standard items such as Exit or Reload). It ends the application like the button (exit code 0, supervisor shutdown). The double click does nothing. | not checked yet (owner) |
 
 **Not covered by these checks** (listed as not checked in the source): the GUI clicks of steps 3 and 4 are not covered by automated tests, so these steps are the only check of them. The labels are ASCII on purpose, so the display of umlauts is not checked. An engine restart while an instance runs is not checked.
 

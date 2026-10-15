@@ -1366,7 +1366,7 @@ Closing the manager window only hides it. Flows and triggers keep running; the t
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** - (the manager keeps its tray icon, every other process and every test-run process hides its own, E0046; tests/integration/test_entry.py::test_every_entry_script_includes_the_boot_file_and_only_the_product_manager_shows_an_icon and ::test_the_boot_file_does_not_hide_the_icon_of_the_product_manager only check the mechanism; the exactly-one icon with its menu comes with S0004)
+- **Evidence:** - (the manager keeps its tray icon, every other process and every test-run process hides its own, E0046; tests/integration/test_entry.py::test_every_entry_script_includes_the_boot_file_and_only_the_product_manager_shows_an_icon and ::test_the_boot_file_does_not_hide_the_icon_of_the_product_manager only check the mechanism; the tray menu of the stub manager has the one entry `Beenden`, which calls the same method as the button, and no AutoHotkey standard items: tests/integration/test_manager_tray.py, static source checks, the real menu is not checked by a test (doc/MANUAL-CHECKS.md step 7); the real manager with its default action "show the manager" comes with S0004)
 
 AutoHotFlow shows exactly one tray icon, however many of its processes run. The tray icon shows the manager (default action) and ends the application. Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030).
 
