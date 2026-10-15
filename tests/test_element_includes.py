@@ -323,6 +323,8 @@ def test_a_test_role_entry_adds_only_the_test_block_of_its_role(role):
     if TABLE[role]:
         expected += [r"..\..\..\..\src\entry\generated\Elements_%s.ahk" % role,
                      r"generated\TestElements_%s.ahk" % role]
+        if role in ("engine", "worker"):
+            expected.append(r"..\TestDialogProvider.ahk")      # answers the dialogs of elements (E0038, WI-0051)
     assert includes_of(TEST_ENTRY_DIR / (role + ".ahk")) == expected
 
 

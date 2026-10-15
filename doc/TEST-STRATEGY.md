@@ -209,6 +209,27 @@ The expression language follows AHK v2 (E0022), so AHK v2 itself is the yardstic
 
 `tests/ahk/element_smoke.test.ahk` (L0001, fast tier) walks over `ElementRegistry` of the product (the engine block `src/entry/generated/Elements_engine.ahk`) and checks every class with `tests/ahk/lib/ElementSmoke.ahk`, without test code of the element: metadata (`Mode`, `Level`, `Stability`, `Name()`, `Category()`, `Icon`, `JobTimeoutMs`), `Parameters("")` without the editor (unique ids, known `type` and `content`, `enum`/`choices`, `contentID`), `V1Syntax`, `GenerateName("", defaults)`, the language keys (no `f3` entry), the methods of the mode, and the parameters that v1 evaluates itself (`x_EvaluateExpression`/`x_EvaluateScript` in the v1 file; as long as `v1/` exists). A failure reads `Package.Class [rule] text`. What the test cannot assign to a parameter with certainty is reported as a skip, "check by hand". The same file checks deliberately broken classes (test of the test). A new element is covered as soon as its block registers it; a rule that an element must not break is added to `ElementSmoke`.
 
+## 9a. Dialog tests (E0038, WI-0051)
+
+Dialog elements run headless: the elements call `Dialogs.*` (`doc/ELEMENT-API-V2.md` section 3.3), the test entries (`tests/integration/helpers/AutoHotFlowTest.ahk`, `helpers/entry/engine.ahk`, `helpers/entry/worker.ahk`) register `TestDialogProvider`, which answers from a script. No window opens, so these tests belong to the fast or slow tier, not to `gui`.
+
+```python
+from support.dialogs import DialogScript, answer, no_answer
+
+def test_a_message_box(flows):
+    dialogs = DialogScript(flows.datadir)
+    dialogs.script(answer("Yes"), no_answer())      # 1st dialog: "Yes"; 2nd: nobody answers (its T option decides)
+    ...build and run the flow...
+    assert dialogs.requests()[0]["args"]["text"] == "Really?"
+```
+
+- **Script.** `answer(value, delay_ms=0, kind=None)`: a string (MsgBox button, path, empty = cancelled), a list (FileSelect multi-select) or for an InputBox `{"result": "OK", "value": "text"}`. `no_answer()`: the dialog returns `Timeout` after its `T<seconds>` option, without the option it waits for ever (a stop of the flow ends it). The n-th answered dialog of the session takes the n-th entry, whichever process shows it. `kind` makes the script strict (a wrong function fails the element).
+- **Log.** `dialogs.requests()` lists every request with `kind`, `args` (text, title, options, ...), `scripted` (false for a ToolTip or a dialog without an entry), `pid` and `role` (`worker` or `engine`).
+- **A dialog without an entry** throws in the element, which ends with `exception` and the message "no answer scripted": an unexpected dialog fails the test instead of blocking it.
+- **How the answers reach the process.** The script and the log are files in `<data folder>/TestDialogs/`, the same for the engine and every worker of the session; a pooled worker cannot be addressed by a message. Decision of WI-0051.
+- **Test element** `Action_TestDialogWorker` (package Test): parameters `Kind`, `Text`, `Title`, `Options`, `Tag`; the answer is exported as the global variables `global_dialog_<Tag>_result` and `..._value`. Examples: `tests/integration/test_dialogs.py`; unit test of the indirection: `tests/ahk/element_dialogs.test.ahk`.
+- **The real dialog.** One `gui` test (`test_the_product_path_opens_the_real_dialog`, only the project owner runs it) shows that without a provider the real `MsgBox` opens.
+
 ## 9. Flow builder and headless runner (WI-0049)
 
 How an e2e test of an element is written: the flow in Python, one call to run it, the result as data. `tests/support/flowbuilder.py` builds the flow file, `tests/support/flowrun.py` runs it in a real session (supervisor, storage, engine, entry point with the test elements); both have docstrings with the full API. Tests: `tests/support/test_flowbuilder.py` (no process), `tests/integration/test_flowrun.py` (one fast smoke test, three `slow`).

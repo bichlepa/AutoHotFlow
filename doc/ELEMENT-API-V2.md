@@ -150,6 +150,12 @@ A worker element has the same variable functions as an inline element: `GetVar`,
 
 ---
 
+### 3.3 Dialogs (E0038, WI-0051)
+
+An element never calls `MsgBox`, `InputBox`, `ToolTip`, `TrayTip`, `FileSelect` or `DirSelect` itself. It calls `Dialogs.MsgBox(text, title, options)`, `Dialogs.InputBox(prompt, title, options, defaultText)`, `Dialogs.ToolTip(text, x?, y?, which)`, `Dialogs.FileSelect(options, root, title, filter)` and `Dialogs.DirSelect(root, options, prompt)` (`src/elements/base/Dialogs.ahk`, included by `AhfElement.ahk`). They take the arguments and give the return value of the AutoHotkey function of the same name (`InputBox`: an object with `Value` and `Result`). The product shows the real dialogs. Where an element may call them does not change: only a `worker` element may block on a dialog (section 1), never the engine. More functions are added when an element needs them (S0008).
+
+A test entry registers a provider (`Dialogs.UseProvider`) that answers from a script instead of opening a window: `tests/integration/helpers/TestDialogProvider.ahk`, how a test writes the script: `doc/TEST-STRATEGY.md` section 9a. The product entries cannot register one: they do not include the provider, and the architecture check (rule `dialog-seam`, `doc/CONVENTIONS.md` section 3) forbids `Dialogs.UseProvider` in `src/` and a direct dialog call in `src/elements/`. An element that is used in a test with a dialog must therefore not keep its own dialog code.
+
 ## 4. Example 1: `Action_Sleep` (inline, with timer)
 
 **v1** (`v1/Source_Elements/Default/Actions/Sleep.ahk`, abridged):
@@ -383,6 +389,6 @@ A converter (`tools/convert_element.py`, at the start of S0008, E0036; the core 
 - Exact form of `ctx.Request` and the variable functions in the worker (ARCHITECTURE R0004): decided and built in WI-0050, section 3.2.
 - Whether metadata and runtime code must be separated per role (ARCHITECTURE R0003): measured in S0002, WI-0046.
 - Element packages (`package`, `packageVersion`): decided (E0037, E0045), built in WI-0047: files and include block per package (section 2), in phase 3 only `Default` (and the test packages); the package information in flows stays; the package is part of the identity of an element; an element of an unknown package loads, is marked and ends with `exception` when it runs.
-- Dialogs: decided (E0038). Elements show dialogs only through an indirection, so that tests can answer them (WI-0051).
+- Dialogs: decided (E0038), built in WI-0051, see section 3.3.
 - AHK code elements: decided (E0039). They run AHK v2 code; an imported v1 script is kept as text and marked (MIGRATION M-0049, S0008).
 - Specification of a ported element (E0035): the v1 help text (`v1/Source_Elements/Default/help/en/`) and the AHK v2 behaviour, not the v1 code. A deliberate difference to v1 goes into MIGRATION.

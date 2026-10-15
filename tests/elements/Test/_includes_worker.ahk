@@ -13,6 +13,7 @@
 class Test {
     #Include Actions\Action_TestAskAfterStopWorker.ahk
     #Include Actions\Action_TestBlockWorker.ahk
+    #Include Actions\Action_TestDialogWorker.ahk
     #Include Actions\Action_TestEchoWorker.ahk
     #Include Actions\Action_TestExprParamsWorker.ahk
     #Include Actions\Action_TestFreezeTimeoutWorker.ahk
@@ -28,6 +29,7 @@ class Test {
 ElementRegistry.RegisterPackage("Test", "1.0.0")
 ElementRegistry.Register(Test.Action_TestAskAfterStopWorker)
 ElementRegistry.Register(Test.Action_TestBlockWorker)
+ElementRegistry.Register(Test.Action_TestDialogWorker)
 ElementRegistry.Register(Test.Action_TestEchoWorker)
 ElementRegistry.Register(Test.Action_TestExprParamsWorker)
 ElementRegistry.Register(Test.Action_TestFreezeTimeoutWorker)

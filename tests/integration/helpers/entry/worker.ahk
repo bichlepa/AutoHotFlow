@@ -9,6 +9,8 @@
 #Include ..\..\..\..\src\worker\Worker.ahk
 #Include ..\..\..\..\src\entry\generated\Elements_worker.ahk
 #Include generated\TestElements_worker.ahk
+#Include ..\TestDialogProvider.ahk
 
+TestDialogProvider.Register()   ; dialogs of elements are answered from the script of the test (E0038)
 RoleRegistry.Register("worker", Worker)
 AhfMain()

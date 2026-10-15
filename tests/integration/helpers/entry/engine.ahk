@@ -9,6 +9,8 @@
 #Include ..\..\..\..\src\engine\Engine.ahk
 #Include ..\..\..\..\src\entry\generated\Elements_engine.ahk
 #Include generated\TestElements_engine.ahk
+#Include ..\TestDialogProvider.ahk
 
+TestDialogProvider.Register()   ; dialogs of elements are answered from the script of the test (E0038)
 RoleRegistry.Register("engine", Engine)
 AhfMain()
