@@ -17,7 +17,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0002 | Pipe not ready within 2 s under load | open, observed | |
 | F-0012 | Unprotected check-then-act spots in the engine | open (counts guarded in ad6ac7d; rest read and found protected) | |
 | F-0013 | `Ids.Next` and `ExecContext.Finish` not atomic | fixed (owner agreed on 2026-10-15), verifier pending | yes |
-| F-0019 | Supervisor messages after `storage` is gone go only to stderr | open, low | |
+| F-0019 | Supervisor messages after `storage` is gone go only to stderr (narrowed: only the part that is never delivered, see the update) | decision needed, low | |
 | F-0020 | Flow file parsed twice in the engine | open, not implemented | yes |
 | F-0041 | `refreshed` 2 instead of 3 in the debug role test | observed, open (0 of 33 in repetition on `dec432b`) | |
 | F-0043 | `cmd.worker.cancel` unanswered in the hang test | observed, open | |
@@ -77,6 +77,8 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Why deferred:** Partly covered already.
 **Sign that it matters:** A gap in the log after `storage` has exited.
 **Action:** Route these messages to a fallback log, or accept the gap.
+**Update 2026-10-15 (bug hunter), narrowed:** The title is wider than the behavior. Verified by reading `src/supervisor/DiagLog.ahk` and `tests/ahk/diag_log.test.ahk` (queue cases at lines 41 to 87, not run in this round): while `storage` is not connected (start, crash, planned restart) the supervisor queues its entries (up to `Role.LOG_QUEUE_MAX`, the oldest are dropped and counted) and `Flush()` delivers them on the next `sys.hello` of `storage` (`Supervisor.ahk:189-190`). So a restart of `storage` loses nothing but an overflow of the queue. What is never delivered: (1) the entries the supervisor writes after `storage` has left for good, that is the last lines of a session (`shutdown: finished with exit code`, `supervisor: ends with exit`, `Supervisor.ahk:424`, `Shutdown.ahk:190`), (2) the queue content when the supervisor ends while `storage` is down, (3) the queue overflow. In a product start nobody reads stderr (the supervisor has no console), so these lines are lost. The effect is a log that ends without the closing lines of a session; the diagnosis report (WI-0028) is the other trail. Not checked: whether a test reads those closing lines from the log (grep over `tests/` and `doc/` finds none).
+**Options:** (a) accept and describe it in `doc/ARCHITECTURE.md` 6.2 (stderr is the only trail for the end of a session); (b) at the end of the supervisor write the remaining queue and the closing lines to a fallback file in the session folder (`supervisor-tail.log`), synchronously, once, outside the message path; (c) shut `storage` down after the closing lines are sent (needs the order of the shutdown changed; larger). Recommendation: (a) now, (b) if a session end without closing lines ever hampers a diagnosis. Not a safe call for an agent: it is a product decision about log files, so no change made.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-0023-diagnose-logpfade.md`.
 
 ### F-0020: Flow file parsed twice in the engine (phase 3)
