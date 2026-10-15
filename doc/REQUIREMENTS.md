@@ -2091,11 +2091,11 @@ Processes are killed, frozen and cut off on purpose; the system stays usable and
 ### REQ-TST-030 Every element is tested headless
 
 - **v1:** no
-- **v2:** partial (the flow builder and the headless flow runner exist; the smoke test of every element and the dialog test provider are missing)
+- **v2:** partial (the flow builder, the headless flow runner and the smoke test of every registered element exist; the dialog test provider is missing)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0048, WI-0051)
-- **Evidence:** `tests/support/test_flowbuilder.py`, `tests/integration/test_flowrun.py`
+- **Plan:** S0002 (WI-0051)
+- **Evidence:** `tests/support/test_flowbuilder.py`, `tests/integration/test_flowrun.py`, `tests/ahk/element_smoke.test.ahk`
 
 A smoke test covers every registered element; each element has end-to-end tests built with the flow builder and run by the headless flow runner; dialog elements are answered by a test provider (E0038).
 

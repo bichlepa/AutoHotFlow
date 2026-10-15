@@ -18,6 +18,10 @@
 class AssertFailed extends Error {
 }
 
+; Thrown by a case that finds nothing wrong but needs a person to look (Case reports it as a skip with the message).
+class AssertSkipped extends Error {
+}
+
 class Assert {
     ; Compares type and value. Strings are compared case-sensitively.
     static Equal(actual, expected, msg := "") {
@@ -93,6 +97,9 @@ class TestRun {
             fn()
             this.passed++
             this.Write("case", name, "pass", "")
+        } catch AssertSkipped as e {
+            this.skipped++
+            this.Write("case", name, "skip", e.Message)
         } catch AssertFailed as e {
             this.failed++
             this.Write("case", name, "fail", e.Message)

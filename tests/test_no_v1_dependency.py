@@ -16,7 +16,10 @@ V1_PATH = re.compile(r'''(?:^|[\s"'\\/(=])v1[\\/]|["']v1["']\s*/''')
 SCANNED = [("src", "*.ahk"), ("tests", "*.py"), ("tests", "*.ahk"), ("tools", "*.py"), ("tools", "*.ahk")]
 EXEMPT_PREFIXES = ("tests/golden/",)
 # the two tools of the golden data read v1 on purpose (WI-0036); their results are checked in
-EXEMPT_FILES = {"tests/test_no_v1_dependency.py", "tools/golden_v1.py", "tools/golden_corpus.py"}
+# the smoke test of the elements (WI-0048) looks at the v1 file of a class for parameters that v1 evaluates itself; it
+# skips that rule when v1/ is gone, so the test does not depend on it
+EXEMPT_FILES = {"tests/test_no_v1_dependency.py", "tools/golden_v1.py", "tools/golden_corpus.py"
+                , "tests/ahk/element_smoke.test.ahk"}
 
 
 def is_comment(line):

@@ -286,7 +286,7 @@ run the tool. The legend of the columns is at the top of the source.
 |---|---|---|---|---|---|---|
 | [REQ-TST-010](REQUIREMENTS.md#req-tst-010-automatic-tests-at-several-levels) | Automatic tests at several levels | partial | done | must | port | - |
 | [REQ-TST-020](REQUIREMENTS.md#req-tst-020-fault-injection-and-stress) | Fault injection and stress | no | done | must | port | - |
-| [REQ-TST-030](REQUIREMENTS.md#req-tst-030-every-element-is-tested-headless) | Every element is tested headless | no | partial | must | port | S0002 (WI-0048, WI-0051) |
+| [REQ-TST-030](REQUIREMENTS.md#req-tst-030-every-element-is-tested-headless) | Every element is tested headless | no | partial | must | port | S0002 (WI-0051) |
 | [REQ-TST-040](REQUIREMENTS.md#req-tst-040-the-v1-test-flows-run-green) | The v1 test flows run green | yes | open | must | port | S0002 (three flows, WI-0057), S0008 (all) |
 | [REQ-TST-050](REQUIREMENTS.md#req-tst-050-independent-oracle-for-the-expression-language) | Independent oracle for the expression language | n/a | done | must | port | - |
 | [REQ-TST-060](REQUIREMENTS.md#req-tst-060-manual-checks-of-the-user-interfaces) | Manual checks of the user interfaces | n/a | partial | must | port | S0004 to S0007 |

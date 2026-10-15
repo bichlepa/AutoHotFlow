@@ -205,6 +205,10 @@ The expression language follows AHK v2 (E0022), so AHK v2 itself is the yardstic
 
 **Does it see an error?** Checked once by hand (not a permanent test): with `<=` changed to `<` in `ExprEvaluator.Apply`, the fixed corpus reports 7 cases as `OPEN`. `test_the_oracle_notices_a_wrong_evaluator_result` checks the classification itself.
 
+## 8a. Smoke test of every element (WI-0048)
+
+`tests/ahk/element_smoke.test.ahk` (L0001, fast tier) walks over `ElementRegistry` of the product (the engine block `src/entry/generated/Elements_engine.ahk`) and checks every class with `tests/ahk/lib/ElementSmoke.ahk`, without test code of the element: metadata (`Mode`, `Level`, `Stability`, `Name()`, `Category()`, `Icon`, `JobTimeoutMs`), `Parameters("")` without the editor (unique ids, known `type` and `content`, `enum`/`choices`, `contentID`), `V1Syntax`, `GenerateName("", defaults)`, the language keys (no `f3` entry), the methods of the mode, and the parameters that v1 evaluates itself (`x_EvaluateExpression`/`x_EvaluateScript` in the v1 file; as long as `v1/` exists). A failure reads `Package.Class [rule] text`. What the test cannot assign to a parameter with certainty is reported as a skip, "check by hand". The same file checks deliberately broken classes (test of the test). A new element is covered as soon as its block registers it; a rule that an element must not break is added to `ElementSmoke`.
+
 ## 9. Flow builder and headless runner (WI-0049)
 
 How an e2e test of an element is written: the flow in Python, one call to run it, the result as data. `tests/support/flowbuilder.py` builds the flow file, `tests/support/flowrun.py` runs it in a real session (supervisor, storage, engine, entry point with the test elements); both have docstrings with the full API. Tests: `tests/support/test_flowbuilder.py` (no process), `tests/integration/test_flowrun.py` (one fast smoke test, three `slow`).
