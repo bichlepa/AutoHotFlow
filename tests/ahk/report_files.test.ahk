@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for src/storage/ReportFiles.ahk (WI-0028): the Reports/ folder written by storage.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\storage\ReportFiles.ahk
 

@@ -2,6 +2,8 @@
 ; The variable requests cmd.engine.var.* of the engine (WI-0050, doc/PROTOCOL.md 4.5): VarRequests with a real Executor
 ; and the stand-in pool of EngineOwner (no processes). A flow sets an instance and a thread variable and then waits in
 ; a worker element (Test_Wk, its job stays open), so the requests can name the job (execId) or the instance.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include helpers\ExecutorKit.ahk
 #Include ..\..\src\engine\VarRequests.ahk
 #Include ..\..\src\core\ipc\Message.ahk

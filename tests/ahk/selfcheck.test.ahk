@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 ; Self check of the assert library (tests/ahk/lib/Assert.ahk). Must stay green.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 
 TestRun.Init()

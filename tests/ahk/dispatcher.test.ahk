@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for src/core/ipc/Dispatcher.ahk (WI-0005): prefix routing, unknown types, error answers.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\core\ipc\Dispatcher.ahk
 

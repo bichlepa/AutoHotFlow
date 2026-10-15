@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for operators, precedence, paths and calls of the expression language (WI-0037, doc/EXPRESSION-LANGUAGE.md sections 4 to 7).
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\ExprCheck.ahk
 
 CheckArithmeticPrecedence() {

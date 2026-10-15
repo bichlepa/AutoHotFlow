@@ -2,6 +2,8 @@
 ; Unit tests for the order of work in Supervisor._Tick and the heartbeat rules (WI-0022, F-0005, F-0010,
 ; doc/ARCHITECTURE.md 6.2). No process of the roles is started: Children works on hand-made records,
 ; the hub is a fake whose Pump() delivers what "has already arrived".
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\supervisor\Supervisor.ahk
 

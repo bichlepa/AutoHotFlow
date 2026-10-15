@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for src/core/Debug.ahk (WI-0028): Debug.Dump never blocks and never throws, and Render makes readable,
 ; bounded JSON of anything. The send path through a ready peer is covered by tests/fault/test_debug_dump.py.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\core\Role.ahk
 

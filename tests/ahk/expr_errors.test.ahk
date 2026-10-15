@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for error records, collecting errors, empty and very long input, limits and robustness
 ; of the expression parser (WI-0037, doc/EXPRESSION-LANGUAGE.md sections 10 and 11).
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\ExprCheck.ahk
 
 Repeat(s, n) {

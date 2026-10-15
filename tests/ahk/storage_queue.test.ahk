@@ -2,6 +2,8 @@
 ; Unit tests for src/storage/WriteQueue.ahk (WI-0012, ARCHITECTURE 6.3): order, one answer per operation,
 ; deadlines, error codes, a failing answer does not stop the queue, FailAll at shutdown.
 ; No files and no timers are needed: RunOne is called directly.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\storage\WriteQueue.ahk
 

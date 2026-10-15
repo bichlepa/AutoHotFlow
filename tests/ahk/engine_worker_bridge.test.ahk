@@ -3,6 +3,8 @@
 ; workers, idle end, failures and the storm limit, cancel that is not confirmed, job deadline, orphans at the start.
 ; No process is started: the owner is a stand-in whose peer records every request. The tests answer them by hand.
 ; Timers run while Sleep() pumps messages.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\WorkerBridge.ahk
 

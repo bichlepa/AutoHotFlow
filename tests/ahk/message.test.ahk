@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for src/core/ipc/Message.ahk (WI-0005): envelope serialization, parsing, ReadTo.
 ; Cases are named functions with statement bodies (a lambda cannot contain throw, doc/HOW-TO.md).
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\core\ipc\Message.ahk
 

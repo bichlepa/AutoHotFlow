@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for the operators of the evaluator and the rules E0025, E0029 to E0032 (WI-0038, doc/EXPRESSION-LANGUAGE.md
 ; sections 5 and 14). The values of the table "Behavior of AHK v2" of the phase 3 plan are the cross-check.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\EvalCheck.ahk
 
 CheckArithmetic() {

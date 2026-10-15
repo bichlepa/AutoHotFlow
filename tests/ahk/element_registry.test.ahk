@@ -2,6 +2,8 @@
 ; Unit tests for src/elements/base/ElementRegistry.ahk and the element packages (WI-0009, WI-0047, E0045,
 ; doc/ELEMENT-API-V2.md sections 2 and 6). The classes come from the generated blocks of the packages Default (product)
 ; and Test (test elements), as a role entry includes them.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\elements\Default\_includes_engine.ahk
 #Include ..\elements\Test\_includes_engine.ahk

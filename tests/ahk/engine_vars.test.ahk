@@ -2,6 +2,8 @@
 ; Integration of the variable model with the Executor (WI-0040): real flows, instances, threads, loop stack and
 ; VarAccess, driven by EngineOwner (no processes). Instance and thread variables are separated per instance and
 ; per thread, static variables per flow, global variables are shared, nested loops keep their loop variables.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include helpers\ExecutorKit.ahk
 
 ; What Test_Vars read: "instanceId|elementId|value" in the order of the reads.

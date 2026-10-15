@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for src/elements/base/ExecContext.ahk and ElementRunner.ahk (WI-0009,
 ; doc/ELEMENT-API-V2.md section 3). Timer cases use the message loop: Sleep() runs timers.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\elements\base\ElementRunner.ahk
 #Include ..\..\src\elements\Default\_includes_engine.ahk

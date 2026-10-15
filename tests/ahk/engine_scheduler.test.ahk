@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for src/engine/core/Scheduler.ahk (WI-0008, ARCHITECTURE 5.2, v1 Execution Task.ahk 98-170).
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\core\Scheduler.ahk
 #Include ..\..\src\engine\core\FlowDefinition.ahk

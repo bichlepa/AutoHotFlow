@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for src/core/Args.ahk (WI-0003).
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\core\Args.ahk
 #Include ..\..\src\core\Log.ahk

@@ -2,6 +2,8 @@
 ; Unit tests for src/engine/Executor.ahk (WI-0021): re-entrant ticks
 ; and the job bookkeeping of worker elements.
 ; Executor runs against EngineOwner (helpers/), a stand-in for Engine that records the events.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include helpers\ExecutorKit.ahk
 
 ; --- re-entrant Tick (point 2) ---------------------------------------------------------------------

@@ -4,6 +4,8 @@
 ; are evaluated as in the engine (ctx.EvalParams). The flows are in the v1 format: the loader converts the expression
 ; texts first, as for an old flow. The timing cases pump messages (Sleep() runs timers) and use wide tolerances: the
 ; timer is never early by design, but a loaded machine can delay it.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include helpers\ExecutorKit.ahk
 #Include ..\..\src\elements\Default\_includes_engine.ahk
 

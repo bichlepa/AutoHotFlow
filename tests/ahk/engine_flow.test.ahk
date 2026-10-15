@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for src/engine/core/FlowDefinition.ahk (WI-0008, ARCHITECTURE 7).
 ; The example flows are read at run time from tests/data/flows/v1_examples (read only).
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\core\FlowDefinition.ahk
 

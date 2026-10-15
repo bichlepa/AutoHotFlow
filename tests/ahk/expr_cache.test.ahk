@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for the parse cache of the expression library (WI-0037 task 4, src/expr/ExprCache.ahk and Expr.Parse).
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\ExprCheck.ahk
 
 Fresh() {

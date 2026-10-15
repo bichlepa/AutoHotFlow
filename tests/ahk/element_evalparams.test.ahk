@@ -8,6 +8,8 @@
 ; the real Executor (it evaluates the parameters and hands them to the stand-in pool, FakeWorkers); the worker side is
 ; the real WorkerContext, fed with what cmd.worker.run would carry (a JSON round trip of params, imports and
 ; evaluated). The cases expect the same results in both modes, except where E0026 differs on purpose.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include helpers\ExecutorKit.ahk
 #Include ..\..\src\worker\WorkerContext.ahk
 #Include ..\elements\Test\_includes_engine.ahk

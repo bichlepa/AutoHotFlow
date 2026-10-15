@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for the conversion of expression texts when a flow is loaded (WI-0039): src/engine/core/FlowExprConvert.ahk,
 ; the format version and the marker in FlowDefinition.ToFileText, FlowTable.Load.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\FlowTable.ahk
 #Include ..\..\src\elements\Default\_includes_engine.ahk

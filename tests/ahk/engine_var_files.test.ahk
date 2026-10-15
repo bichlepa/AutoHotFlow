@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for VarWriter and VarLoader (WI-0041): the working copy of the global and static variables and its files
 ; through storage. A stand-in for the engine records the requests and lets the test answer them (no process, no files).
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\Engine.ahk
 

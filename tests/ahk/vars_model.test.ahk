@@ -2,6 +2,8 @@
 ; Unit tests for the variable model of the engine (WI-0040, src/engine/vars, doc/EXPRESSION-LANGUAGE.md section 18):
 ; location by name, built-in variables, values and paths, %var% substitution, the resolver of the evaluator,
 ; lists, imports of a worker, hidden variables, the common place, loop variables on the loop stack.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\expr\Expr.ahk
 #Include ..\..\src\engine\core\Instance.ahk

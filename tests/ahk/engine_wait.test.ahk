@@ -1,5 +1,7 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for the execution policy "wait" in src/engine/Executor.ahk (WI-0021, ARCHITECTURE 5.1, E0002, M-0011).
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include helpers\ExecutorKit.ahk
 
 WaitFlow() {

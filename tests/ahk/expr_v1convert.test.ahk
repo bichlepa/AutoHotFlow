@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for the converter of v1 expressions (WI-0039, doc/EXPRESSION-LANGUAGE.md section 15).
 ; The comparison with the golden data of v1 is tests/golden/test_golden_v2.py.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\expr\V1ExprConverter.ahk
 

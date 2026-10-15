@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for variables, assignment, functions, the script form, the result object and robustness of the
 ; evaluator (WI-0038, doc/EXPRESSION-LANGUAGE.md sections 4, 7, 8 and 14).
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\EvalCheck.ahk
 #Include ..\..\src\core\Json.ahk
 

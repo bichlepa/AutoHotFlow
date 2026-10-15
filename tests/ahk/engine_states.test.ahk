@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for src/engine/core/ThreadState.ahk and Instance.ahk (WI-0008, ARCHITECTURE 5.1, 5.2).
 ; The expected transitions below are copied from the tables in doc/ARCHITECTURE.md, not from the code.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\core\Instance.ahk
 #Include ..\..\src\core\Log.ahk

@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for src/supervisor/DiagReport.ahk and ReportText.ahk (WI-0028): collecting the snapshots with a deadline per
 ; role, the wait for storage, the automatic triggers and their rate limit. Hub and children are fakes that record calls.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\supervisor\DiagReport.ahk
 #Include ..\..\src\core\Role.ahk

@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for the detection of deviation classes in v1 expression texts (WI-0045, src/expr/V1ExprDetect.ahk,
 ; src/expr/MigrationClasses.ahk). The list of classes against the golden data: tests/test_migration_classes.py.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\expr\V1ExprConverter.ahk
 #Include ..\..\src\expr\MigrationClasses.ahk

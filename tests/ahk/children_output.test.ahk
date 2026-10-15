@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for the output handling of src/supervisor/Children.ahk (WI-0023): log lines of the child output,
 ; the per-tick limit and the ring that survives the process.
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include lib\Assert.ahk
 #Include ..\..\src\supervisor\Children.ahk
 
