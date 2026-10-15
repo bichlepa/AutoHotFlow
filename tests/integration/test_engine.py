@@ -162,6 +162,7 @@ def test_engine_loads_flow_announces_ready_and_answers_snapshot(procs, datadir, 
         assert flow["name"] == "Skeleton" and flow["rev"] == 1
         assert flow["enabled"] is False and flow["executing"] is False   # real JSON booleans (PROTOCOL 2)
         assert snap["settings"] == {}
+        assert snap["ready"] is True                                    # a late client reads it here (F-0090)
 
         hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
         assert run.wait_exit(timeout=10) == 0, run.stderr_text()

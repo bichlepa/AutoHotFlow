@@ -395,7 +395,10 @@ class Engine extends Role {
                 , "enabled", Json.Bool(rec.Enabled), "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))
                 , "rev", rec.Rev))
         }
-        return Map("epoch", this.epoch, "seq", this.seq, "flows", list, "settings", Map())
+        ; "ready": the start is complete (evt.engine.ready was sent). A client that subscribed late cannot know it from the
+        ; event (F-0090).
+        return Map("epoch", this.epoch, "seq", this.seq, "flows", list, "settings", Map()
+            , "ready", Json.Bool(this._flowsLoaded))
     }
 
     _CmdFlowGet(msg) {

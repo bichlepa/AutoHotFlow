@@ -73,8 +73,16 @@ def ready_count(chain):
     return len(chain.rec.find(event("evt.engine.ready")))
 
 
+def engine_says_ready(chain):
+    try:
+        return chain.snapshot_ok()["ready"] is True
+    except Exception:
+        return False
+
+
 def wait_ready_count(chain, n, timeout=READY_S):
-    assert wait_until(lambda: ready_count(chain) >= n, timeout), "evt.engine.ready #%d missing:\n%s" % (n, chain.sup.text())
+    """The observer may subscribe after the first evt.engine.ready (a warm start is fast): then the snapshot tells."""
+    assert wait_until(lambda: ready_count(chain) >= n or (n == 1 and engine_says_ready(chain)), timeout), "evt.engine.ready #%d missing:\n%s" % (n, chain.sup.text())
 
 
 def run_flow(chain, flow, timeout=10.0):
