@@ -4,6 +4,7 @@ import time
 
 import pytest
 
+from support.elements import qid
 from support.timing import scaled
 
 from test_supervisor import alive, event, wait_ready, watch_for
@@ -11,7 +12,7 @@ from test_worker_pool import READY_S, ask, clients, started  # noqa: F401  (fixt
 
 
 def run_payload(exec_id, cls):
-    return {"execId": exec_id, "class": cls, "params": {}, "imports": {},
+    return {"execId": exec_id, "class": qid(cls), "params": {}, "imports": {},
             "env": {"flowId": "Flow 1", "elementId": "element0000000001", "instanceId": "inst-1", "threadId": "thr-1"},
             "timeoutMs": 5000}
 
