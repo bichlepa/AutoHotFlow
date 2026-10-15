@@ -1673,6 +1673,16 @@ The user imports the flows and variables of v1 into the v2 data folder through t
 
 When a flow uses a package that is not installed, the manager asks the user whether the file shall be deleted; no dialog blocks the running flows (MIGRATION M-0008).
 
+### REQ-MIG-080 Files of a newer version are not destroyed
+
+- **v1:** n/a
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0009
+
+When a flow, variable or settings file was written by a newer version of AutoHotFlow, an older version never overwrites it with a format it does not know: it refuses the file with a clear message, or loads it without the right to change it. So a user can go back to an older version without losing flows. Related: REQ-MIG-050.
+
 ## Languages and help (LNG)
 
 ### REQ-LNG-010 User interface in several languages
@@ -2062,6 +2072,17 @@ When the supervisor itself stood still (standby, heavy load), its deadlines are 
 - **Evidence:** `tests/integration/test_engine.py::test_broken_flow_file_is_reported_and_does_not_block_the_start`
 
 The broken file is reported; all other flows load.
+
+### REQ-ROB-120 A crashed editor or manager loses nothing
+
+- **v1:** no (one process; a crash ends everything)
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0004 (manager), S0006 (editor)
+- **Doubt:** The exact behaviour is open: whether AutoHotFlow opens the editor again by itself, and how the user sees that the flow has unsaved changes (in the manager, in the reopened editor, as a notice).
+
+When an editor crashes, no completed edit is lost: every edit is in effect at once (REQ-EDT-100), also before it is saved. The user learns that the editor has ended and that the flow has unsaved changes; the editor opened again shows the flow with all edits. Only an edit in progress at that moment (an open dialog, a move with the mouse) may be lost. A crashed manager can be opened again from the tray icon (REQ-MGR-090). Flows and triggers keep running in both cases (REQ-ROB-010).
 
 ## Performance and resources (PRF)
 
