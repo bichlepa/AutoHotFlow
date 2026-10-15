@@ -7,6 +7,8 @@
 ; --test-roles, from entry\test\ (the test roles). The roles are registered here without the selection by Mode of the
 ; product role entries: this entry parses all classes.
 ;   AutoHotkey64.exe tests\integration\helpers\AutoHotFlowTest.ahk --role=... --test-roles
+; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
+#Warn All, StdOut
 #Include ..\..\..\src\AhfBoot.ahk
 #Include ..\..\..\src\supervisor\Supervisor.ahk
 #Include ..\..\..\src\engine\Engine.ahk
