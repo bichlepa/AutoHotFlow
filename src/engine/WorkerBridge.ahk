@@ -59,7 +59,7 @@ class WorkerBridge {
         this._spawning := 0                    ; cmd.process.spawn requests on their way
         this._failures := []                   ; times (ms) of the abnormal ends in the storm window
         this._earlyReady := Map()              ; names whose evt.process.ready came before their spawn answer
-        this._earlyGone := Map()               ; names whose crash or exit came before their spawn answer (F-9010*)
+        this._earlyGone := Map()               ; names whose crash or exit came before their spawn answer (F-0093)
         this._started := false                 ; Start() was called
         this._ready := false                   ; the orphans are gone, the pool may grow
         this._stopped := false                 ; the engine shuts down
@@ -274,7 +274,7 @@ class WorkerBridge {
             if (this._earlyReady.Has(name))
                 this._earlyReady.Delete(name)
             if (!IsObject(slot)) {
-                ; Not ours, or one we ended ourselves, or one that ended before its spawn answer arrived (F-9010*):
+                ; Not ours, or one we ended ourselves, or one that ended before its spawn answer arrived (F-0093):
                 ; then the answer must not create a slot for it.
                 if (this._spawning > 0)
                     this._earlyGone[name] := msg.type
@@ -365,7 +365,7 @@ class WorkerBridge {
     }
 
     ; Early events (ready or ended before the spawn answer) are only kept while a spawn answer is on its way; a failed
-    ; spawn has no name to match them with (F-9010*).
+    ; spawn has no name to match them with (F-0093).
     _ForgetEarlyEvents() {
         if (this._spawning = 0) {
             this._earlyReady.Clear()

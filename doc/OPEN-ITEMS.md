@@ -40,8 +40,8 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 
 | F-0090 | Fast tier: `test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_kill` got no `evt.engine.ready` of the second chain within 20 s | observed once, run 20261015-230752-0bb0d843 on `0bb0d84`, open | |
 | F-0091 | Slow tier: `test_clients_churn.py` smoke variant: handles of the engine grew from 145 to 164 (slack 3) | observed once, run 20261015-230952-0bb0d843 on `0bb0d84`, open | |
-| F-9010* | `WorkerBridge`: leftovers of a failed spawn, no start timeout for a slot in "starting" | (a), (b) verified by unit test and fixed; (c) read in code, covered by the supervisor; verifier pending | |
-| F-9011* | Fast tier: `test_pings_are_answered_while_a_blocking_element_runs` third ping answered after 0.808 s (limit 0.8 s) | observed once under load, run 20261015-231712-bc27cbe5 on `bc27cbe` (the commit only touches `WorkerBridge`, not used by this test); green alone, run 20261015-231824-bc27cbe5, open | |
+| F-0093 | `WorkerBridge`: leftovers of a failed spawn, no start timeout for a slot in "starting" | (a), (b) verified by unit test and fixed; (c) read in code, covered by the supervisor; verifier pending | |
+| F-0094 | Fast tier: `test_pings_are_answered_while_a_blocking_element_runs` third ping answered after 0.808 s (limit 0.8 s) | observed once under load, run 20261015-231712-bc27cbe5 on `bc27cbe` (the commit only touches `WorkerBridge`, not used by this test); green alone, run 20261015-231824-bc27cbe5, open | |
 
 ## Findings
 
@@ -244,7 +244,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **What:** `tests/stress/test_clients_churn.py::test_clients_connecting_and_leaving_do_not_disturb_the_engine_or_leak` fails in both variants (`[smoke]` and `[20x8]`) at `assert after[name]["handles"] <= before[name]["handles"] + HANDLE_SLACK`: engine `{'handles': 145}` before, `{'handles': 164}` after (limit 145 + 3). The supervisor stays at 185. Everything before that assertion passes (no errors, latency median 1.1 to 1.3 ms, p99 7 to 8 ms, no restart).
 **Status:** verified, deterministic: the same numbers 145 and 164 in four runs. Run 20261015-230453-2c56ba86-2 (slow tier, `[smoke]`, code of WI-0052 at `2c56ba8`), run 20261015-230812-2c56ba86 (the churn file alone, both variants), and run 20261015-231030-dec432b0 on the base `dec432b` without any change of WI-0052 (both variants). So it is not caused by WI-0052. Suspicion (assumed): a fixed number of handles that the engine opens once on its first instances or its first client connections (the language table, a log file, the first timers), not a leak per connection, because the count does not grow with the number of connects (6 connects: 164, 160 connects: 164). Not checked which handles; the slack of 3 is probably older than a recent change that opens them.
 **Action:** list the handle types of the engine before and after (`handle64` or the Windows API), then either remove the cause or measure the handles after a warm-up round, as the leak test of the supervisor in the same file does (`LEAK_WARMUP`).
-### F-9010*: `WorkerBridge`: leftovers of a failed spawn, no start timeout for a slot in "starting"
+### F-0093: `WorkerBridge`: leftovers of a failed spawn, no start timeout for a slot in "starting"
 
 **What:** three read-only observations on `src/engine/WorkerBridge.ahk` from a read of the file; none was reproduced.
 (a) `_earlyReady` entries stay behind when a spawn fails: `OnProcessEvent` stores the name when `evt.process.ready` arrives before the spawn answer, and only `_OnSpawn` (success) or a crash/exit event removes it. If the spawn answer then says `ok: false` or times out, the name stays in the map for ever (small leak; a reused name could be taken for ready by mistake, assumed only).
@@ -254,7 +254,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Fix:** early ready/ended events are kept only while a spawn answer is on its way and are forgotten when the last one has arrived; a worker that ended before its answer gets no slot and counts as a failure.
 **Action:** close after a verifier run; correct the header comment (start failures come from the supervisor as crash events).
 
-### F-9011*: ping answered 8 ms over the limit while a blocking element runs
+### F-0094: ping answered 8 ms over the limit while a blocking element runs
 
 **What:** `tests/integration/test_worker.py::test_pings_are_answered_while_a_blocking_element_runs` (line 259): `answered[-1][2] < BLOCK_MS / 1000.0` was 0.808 against 0.8.
 **Status:** observed once in the fast tier (844 passed, 1 failed) next to other suites; green alone. The limit equals the block time, so any scheduling delay breaks it. Assumed: load. Not checked: whether the limit is scaled (`scaled()`).

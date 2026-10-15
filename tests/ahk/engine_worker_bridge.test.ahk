@@ -202,7 +202,7 @@ ReadyEventBeforeTheSpawnAnswerStillMakesTheSlotIdle() {
 }
 
 AWorkerThatCrashesBeforeItsSpawnAnswerGetsNoSlot() {
-    ; F-9010*: the slot would stay "starting" for ever and count against the size.
+    ; F-0093: the slot would stay "starting" for ever and count against the size.
     r := NewPool(2, 0)
     owner := r[1]
     bridge := r[2]
@@ -214,7 +214,7 @@ AWorkerThatCrashesBeforeItsSpawnAnswerGetsNoSlot() {
 }
 
 EarlyEventsAreForgottenWhenASpawnFails() {
-    ; F-9010*: a failed spawn has no name; the early ready of an unknown worker must not stay for a later one.
+    ; F-0093: a failed spawn has no name; the early ready of an unknown worker must not stay for a later one.
     r := NewPool(2, 0)
     owner := r[1]
     bridge := r[2]
@@ -518,8 +518,8 @@ TestRun.Case("Pool: size 0 is never usable and asks for nothing", NoPoolIsNeverU
 TestRun.Case("Pool: demand never goes above the limit", WantNeverGoesAboveTheLimit)
 TestRun.Case("Pool: demand counts workers that are already starting", WantCountsTheWorkersThatAreAlreadyStarting)
 TestRun.Case("Pool: ready before the spawn answer still gives an idle slot", ReadyEventBeforeTheSpawnAnswerStillMakesTheSlotIdle)
-TestRun.Case("Pool: a worker that crashes before its spawn answer gets no slot (F-9010*)", AWorkerThatCrashesBeforeItsSpawnAnswerGetsNoSlot)
-TestRun.Case("Pool: early events are forgotten when a spawn fails (F-9010*)", EarlyEventsAreForgottenWhenASpawnFails)
+TestRun.Case("Pool: a worker that crashes before its spawn answer gets no slot (F-0093)", AWorkerThatCrashesBeforeItsSpawnAnswerGetsNoSlot)
+TestRun.Case("Pool: early events are forgotten when a spawn fails (F-0093)", EarlyEventsAreForgottenWhenASpawnFails)
 TestRun.Case("Pool: Run takes the most recently idle worker", RunUsesTheMostRecentlyIdleWorkerSoTheOthersCanIdleOut)
 TestRun.Case("Pool: Run hands out idle slots only", RunHandsOutOnlyIdleSlots)
 TestRun.Case("Pool: idle workers beyond the warm ones are killed after the idle time", IdleWorkersBeyondTheWarmOnesAreKilledAfterTheIdleTime)
