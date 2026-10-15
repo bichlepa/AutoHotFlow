@@ -32,7 +32,7 @@ BIGGEST_FLOW = V1_EXAMPLES / "Flow 1010290492.json"
 HELPER = TESTS_DIR / "ahk" / "helpers" / "hub_frame_cost.ahk"
 
 HUB_FRAME_BUDGET_MS = 5.0
-SNAPSHOT_BUDGET_S = 1.0
+SNAPSHOT_BUDGET_S = 3.0     # E42 (was 1.0): guards against a blocked engine; F-282 has the measurements
 LOAD_NOTE_S = 30.0          # WI-24 point 6: above this, the load time is a finding for "native JSON parser"
 
 
