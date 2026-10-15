@@ -1710,7 +1710,7 @@ v2 keeps its data in `%APPDATA%\AutoHotFlow v2`, or in the folder given by `--da
 - **Scope:** port
 - **Plan:** S0004 (E0044)
 
-A global setting limits how many waiting elements (REQ-EXE-100) run at the same time. **Default: 8.** The memory is used only while elements wait, not for the limit itself. A lower number limits the memory when many elements wait at the same time (REQ-PRF-030); a higher number lets more of them run at the same time.
+A global setting limits how many waiting elements (REQ-EXE-100) run at the same time. **Default: 8, from 1 to 16.** The memory is used only while elements wait, not for the limit itself. A lower number limits the memory when many elements wait at the same time (REQ-PRF-030); a higher number lets more of them run at the same time.
 
 ## Import and migration (MIG)
 
