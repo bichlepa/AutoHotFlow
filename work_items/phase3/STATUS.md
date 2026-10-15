@@ -44,7 +44,8 @@ Session 7 start: 2026-10-15 (late), work-item mode (`/orchestrate`, no wishes), 
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
 | 1 | Implementer WI-0052 (core set A) | sonnet | wi-52 | wip/wi-52 | variables, conditions, trace points; stress run at the end (load path) | running |
-| 2 | Bug hunter (OPEN-ITEMS mode) | sonnet | hunt-17 | wip/hunt-17 | not in the area of WI-0052 | running |
+| 2 | Bug hunter round 1 (OPEN-ITEMS mode): F-0041, not reproduced in 33 runs on `dec432b` (7 tests per run, idle and under load); no fix, stays open | sonnet | hunt-17 (removed) | (deleted) | integrated as 1b0831d (doc only, no verifier needed) | done |
+| 3 | Bug hunter round 2 (OPEN-ITEMS mode) | sonnet | hunt-18 | wip/hunt-18 | not in the area of WI-0052; F-0041 excluded | running |
 
 Session 6 start: 2026-10-15 (evening), work-item mode, HEAD `8c09337` on `v2-port`, main checkout clean, no workspaces left over. The state of S2 was taken from the commit history, not from the README checkboxes (not updated since S2 started): WI-44, WI-45, WI-46, WI-49, WI-50 integrated and verified; WI-47-PREP done (session 5). Next open work item with all dependencies done: WI-47 (E0045 is part of it). WI-48, WI-51 wait for WI-47. Workspaces this session: `wip/wi-47` (implementer), `wip/hunt-15` (bug hunter, OPEN-ITEMS mode).
 
