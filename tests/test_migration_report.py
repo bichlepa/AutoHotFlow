@@ -40,11 +40,14 @@ def test_the_report_runs_for_every_example_flow(example_report):
 
 def test_a_flow_with_marked_places_is_reported_in_text_and_json(tmp_path):
     flow = {
-        "name": "Report", "category": "Tests", "ElementIDCounter": "3",
+        "name": "Report", "category": "Tests", "ElementIDCounter": "4",
         "allElements": {
-            "e1": {"ID": "e1", "type": "action", "package": "Test", "class": "Action_TestExprParams",
-                   "pars": {"Expr": 'x < "abc"', "Num": "7 % 3", "PosInt": "1 +"}},
+            "e1": {"ID": "e1", "type": "action", "package": "Default", "class": "Action_Sleep",
+                   "pars": {"Duration": 'x < "abc"', "Unit": "Seconds"}},
             "e2": {"ID": "e2", "type": "action", "class": "Action_NotThereYet", "pars": {"Expr": 'x < "abc"'}},
+            "e3": {"ID": "e3", "type": "action", "package": "default", "class": "Action_Sleep",
+                   "pars": {"Duration": "7 % 3"}},
+            "e4": {"ID": "e4", "type": "action", "class": "Action_Sleep", "pars": {"Duration": "1 +"}},
         },
         "allConnections": {},
     }
@@ -56,18 +59,18 @@ def test_a_flow_with_marked_places_is_reported_in_text_and_json(tmp_path):
     assert proc.returncode == 0, proc.stderr
     data = json.loads(proc.stdout)
     [f] = data["flows"]
-    assert f["elements"] == 2
+    assert f["elements"] == 4
     assert [u["element"] for u in f["unknownClass"]] == ["e2"]
     places = {(p["element"], p["par"]): p for p in f["places"]}
-    assert places[("e1", "Expr")]["ids"] == ["M-0025"] and places[("e1", "Expr")]["v1"] == 'x < "abc"'
-    assert places[("e1", "Num")]["ids"] == ["M-0037"]
-    assert places[("e1", "PosInt")]["ids"] == ["M-0050"]
+    assert places[("e1", "Duration")]["ids"] == ["M-0025"] and places[("e1", "Duration")]["v1"] == 'x < "abc"'
+    assert places[("e3", "Duration")]["ids"] == ["M-0037"]
+    assert places[("e4", "Duration")]["ids"] == ["M-0050"]
     assert not any(p["element"] == "e2" for p in f["places"])
     assert data["summary"]["places"] == 3 and data["summary"]["placesPerId"] == {"M-0025": 1, "M-0037": 1, "M-0050": 1}
 
     text = report(path).stdout
     assert "unknown class: 1 element(s): Default.Action_NotThereYet (1)" in text
-    assert "e1 (Test.Action_TestExprParams) parameter Expr [M-0025] v1: x < \"abc\"" in text
+    assert "e1 (Default.Action_Sleep) parameter Duration [M-0025] v1: x < \"abc\"" in text
     # the tool only reads
     assert path.read_text(encoding="utf-8") == before
 

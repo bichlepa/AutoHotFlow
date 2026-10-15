@@ -184,16 +184,17 @@ Action_Sleep_EndSleep(Environment, ElementParameters)
 }
 ```
 
-**v2:**
+**v2** (`src/elements/Default/Actions/Action_Sleep.ahk`, WI-0047, abridged; the class is `Default.Action_Sleep`):
 
 ```ahk
 #Requires AutoHotkey v2.0
+#Include ..\..\base\AhfElement.ahk
 
 class Action_Sleep extends AhfElement {
     static Mode      := "inline"
     static Level     := "Beginner"
     static Stability := "Stable"
-    static Icon      := "sleep.ico"
+    static Icon      := "Sleep.ico"                  ; in Icons/ of the package
 
     static Name()     => Lang("Sleep")
     static Category() => Lang("Flow_control")
@@ -207,7 +208,7 @@ class Action_Sleep extends AhfElement {
     ]
 
     static GenerateName(ctx, params) {
-        switch params.Unit {
+        switch this.UnitOf(params.Unit) {          ; the class is `this`: a nested class has no global name
             case "Milliseconds": d := params.Duration " " Lang("ms #Milliseconds")
             case "Seconds":      d := params.Duration " " Lang("s #Seconds")
             case "Minutes":      d := params.Duration " " Lang("m #Minutes")
@@ -215,24 +216,20 @@ class Action_Sleep extends AhfElement {
         return Lang("Sleep") ": " d
     }
 
-    static CheckSettings(form, params, staticValues) {
-    }
-
     static Run(ctx, params) {
-        p := ctx.EvalParams(params)          ; throws on error -> result "exception"
-        switch p.Unit {
-            case "Milliseconds": ms := p.Duration
-            case "Seconds":      ms := p.Duration * 1000
-            case "Minutes":      ms := p.Duration * 60000
-        }
-        ctx.After(ms, () => ctx.Finish("normal"))   ; timer is removed automatically on stop
+        p := ctx.EvalParams(params)                  ; throws on error -> result "exception"
+        ctx.After(this.ToMs(p.Duration, p.Unit), () => ctx.Finish("normal"))   ; timer is removed automatically on stop
     }
-}
 
-ElementRegistry.Register(Action_Sleep)
+    static ToMs(duration, unit) { ... }              ; milliseconds; throws ElementError for a bad duration or unit
+    static UnitOf(unit) { ... }                      ; "Seconds" for "seconds" or for the default index 2
+}
 ```
 
-What changes: no `Element_stop` needed any more (the context removes the timer), the error path is gone (exception), the callback is a lambda instead of a named function.
+The generated block of the package registers the class (`ElementRegistry.Register(Default.Action_Sleep)`); the file
+has no code at file level.
+
+What changes: no `Element_stop` needed any more (the context removes the timer), the error path is gone (exception), the callback is a lambda instead of a named function, a missing `Unit` (v1 stores the default index 2) means seconds, and a duration that is not a number of 0 or more ends with `exception` instead of a broken timer.
 What stays the same: class ID, parameter IDs and schema, language keys, result strings, name format.
 
 ---

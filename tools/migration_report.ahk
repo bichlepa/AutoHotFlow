@@ -8,11 +8,11 @@
 ; A_Args: 1 = result file (one JSON document), 2 = list file (one flow file path per line, UTF-8).
 ; Not started by hand: python tools/migration_report.py <flow file or folder> [--json]
 ;
-; The element classes are the generated blocks of the engine (all classes of the packages, WI-0047), so that the report
-; sees the registry of the engine process. "class" in the result is the qualified ID "<package>.<class>" (E0045).
+; The element classes are the generated block of the engine (all classes of the product packages, WI-0047), so that
+; the report sees the registry of the engine process; the test elements are not part of it. "class" in the result is
+; the qualified ID "<package>.<class>" (E0045).
 #Include ..\src\engine\FlowTable.ahk
 #Include ..\src\entry\generated\Elements_engine.ahk
-#Include ..\tests\integration\helpers\entry\generated\TestElements_engine.ahk
 
 ReportOne(path) {
     flow := Map("file", path)
