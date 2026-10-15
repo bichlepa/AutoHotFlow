@@ -4,6 +4,8 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
+1. **Check the tray menu entry "Beenden" by hand (MANUAL-CHECKS step 7).** Start `src/AutoHotFlow.ahk`, right-click the tray icon: exactly one entry "Beenden". It ends the application like the window button (exit code 0). A double-click does nothing. Tell the orchestrator whether this is right.
+
 Other decisions of 2026-10-15 are in `doc/DECISIONS.md` (E0046 to E0051).
 
 ## To know
