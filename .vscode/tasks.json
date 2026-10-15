@@ -664,6 +664,18 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: AHF processes",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/ahf_processes.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Test: deviation catalog of the new expression language against the golden data of v1",
             "type": "shell",
             "command": "python",
