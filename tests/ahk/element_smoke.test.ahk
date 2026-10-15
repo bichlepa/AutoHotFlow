@@ -82,7 +82,7 @@ class Broken {
     class BadContentId extends AhfElement {
         static Name() => "x"
         static Category() => "x"
-        static Parameters(ctx) => [{type: "Edit", id: "Text", content: ["String", "Expression"], contentID: "Kind"}]
+        static Parameters(ctx) => [{type: "Edit", id: "Text", content: ["String", "Expression"], contentID: ""}]
         static GenerateName(ctx, params) => "x"
         static Run(ctx, params) {
         }

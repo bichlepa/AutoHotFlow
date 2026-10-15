@@ -115,8 +115,11 @@ class ElementSmoke {
                 for c in content
                     ElementSmoke._CheckContent(c, what, errors)
                 cid := ParamEvaluator.Field(spec, "contentID")
-                if (cid = "" || IsObject(cid) || !ids.Has(cid))
-                    errors.Push("[param-contentid] " what " has a list of content types, but contentID '" ElementSmoke._Show(cid) "' is no parameter")
+                ; v1: contentID is a parameter of the form that the editor adds itself (the choice of the content type, stored
+                ; with the element, for example "expression" of Action_New_variable); a class may list it in Parameters(), but
+                ; need not (WI-0052). It has to be a name that is usable as a parameter id.
+                if (cid = "" || IsObject(cid) || !RegExMatch(cid, "^[A-Za-z_][A-Za-z0-9_]*$"))
+                    errors.Push("[param-contentid] " what " has a list of content types, but contentID '" ElementSmoke._Show(cid) "' is no usable parameter id")
                 cdef := ParamEvaluator.Field(spec, "contentDefault")
                 if (!IsObject(cdef) && !ElementSmoke._In(ElementSmoke.CONTENTS, StrLower(cdef)))
                     errors.Push("[param-content] " what " has the unknown contentDefault '" cdef "'")

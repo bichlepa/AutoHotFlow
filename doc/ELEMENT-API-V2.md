@@ -382,7 +382,7 @@ A converter (`tools/convert_element.py`, at the start of S0008, E0036; the core 
 
 ## 7. What stays
 
-- The parameter description format (`type`, `id`, `default`, `content: "Expression"`, `result: "enum"`, `choices`, `enum`, `WarnIfEmpty`, ...), so that the editor's settings dialog remains portable.
+- The parameter description format (`type`, `id`, `default`, `content: "Expression"`, `result: "enum"`, `choices`, `enum`, `WarnIfEmpty`, ...), so that the editor's settings dialog remains portable. `contentID` (the parameter that holds the content type the user selected) names a parameter that the editor adds itself and stores with the element (`expression` of `Action_New_variable`, `varnameContent` of `Condition_Variable_content_is`); the class need not list it in `Parameters()` (the smoke test requires only a usable id).
 - Class IDs, parameter IDs, result strings, language keys, package name and version in flow files.
 - The semantics of the loop entry points (`head`/`tail`; `x_getEntryPoint` becomes `ctx.entryPoint`).
 - Loop variables (`A_Index` etc.) via `ctx.SetVar(..., "loop")`.
