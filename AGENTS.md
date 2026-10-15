@@ -55,6 +55,7 @@ AutoHotFlow (AHF) is being ported from AutoHotkey v1 (AutoHotkey_H with `AhkThre
 8. Element code must never crash the engine: every call under `try/catch`, errors are reported as result `exception`.
 9. Difficulties and own mistakes in the AHK v2 implementation go into `doc/HOW-TO.md`: what was hard, what was wrong, what works (format in the file). Each entry carries a status (verified / assumed / not checked). This is not a bug tracker. Good: bugs that could easily come back. Bad: past bugs in a finished module.
 10. **VS Code tasks for the project owner:** every call the project owner may want to run by hand (tests, starting the app or a role, tools, manual checks from a guide) gets a task in `.vscode/tasks.json`. Whoever adds or changes such a call (new option, new role, new tool, new test group) updates the task in the same commit. Labels are in English with a prefix (`Test:`, `Start:`, `Tool:`, `Debug:`, `Testdata:`, `Setup:`). Exception to "never start AHK scripts directly": the `Start:` tasks start `AutoHotkey64.exe` directly, without `ahkrun.py` and without timeout, because the owner operates the app (a dialog then blocks until closed). Agents still use `ahkrun.py`.
+11. **Never merge.** Rebase or cherry-pick the changes of other branches onto the destination branch, so that the history stays linear and free of unnecessary branch lines. A request to "merge" usually means the user wants a rebase: in that case, rebase.
 
 ## Working in parallel
 
