@@ -4,7 +4,7 @@ Status: 2026-10-12, branch `v2-port`, after the fix block WI-0030 to WI-0035 (ac
 
 This document lists everything that is still open, observed, or deferred. Of the 45 finding IDs used in the work items (F-0001 to F-0043; F-0030 and F-0040 were never assigned), 27 are closed and are not carried over here. Their history is in the tag `v2-phase2-final`, table "Funde" in `v2-phase2-final:work_items/STATUS.md`. The work-item files that this document cites were removed from the working tree; they can be read with `git show v2-phase2-final:<path>`.
 
-The open findings that are observed but not closed are F-0041, F-0043, F-0060 to F-0063 and F-0065 (2026-10-13, from the test tiers and the manual check). F-0032 is closed by the project owner (2026-10-13).
+The open findings that are observed but not closed are F-0041, F-0043 and F-0060 to F-0063 (2026-10-13, from the test tiers and the manual check). F-0032 is closed by the project owner (2026-10-13).
 
 Entries marked **(phase 3)** matter for the phase 3 plan.
 
@@ -28,7 +28,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0061 | `flow 'wecho' is not loaded` after an engine restart during a worker job | test problem (wait missing), test fixed; product contract note below | yes |
 | F-0062 | `storage` not ready within 45 s after a freeze in the hang test | observed once under load, open | |
 | F-0063 | Log line lost while other processes hold the files (`readers-allow-read`) | observed once at `-n 12`, open (stall hypothesis fixed in 2675105, not proven) | |
-| F-0065 | Manual-check guide and start tasks do not match | verified, open (owner's agent) | |
 | F-0067 | The F-0016 xfail test passes (strict XPASS) in the slow tier | strict mark dropped after a second XPASS (F-0069); watch | |
 | F-0068 | A comparison with an empty or missing variable is true in v1 and false in v2 | verified in the golden data; decided 2026-10-14 (E0034): per-flow option `strictTypes`, to implement in WI-0042 | yes |
 | F-0069 | The F-0016 xfail test passes again (strict XPASS) in the slow tier, after the F-0067 fix | fixed by dropping strict on the F-0016 test; watch | |
@@ -157,13 +156,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Sign that it matters:** the failure at normal worker counts, or "lines lost" in a real session.
 **Action:** On the next failure read the failure text and `Log/` in the run log.
 **Evidence:** none kept.
-
-### F-0065: Manual-check guide and start tasks do not match
-
-**What:** The guide `doc/MANUAL-CHECKS.md` (section 1) asks for an empty data folder with `skeleton_flow.json` copied to `Flows\skeleton.json`. The VS Code start task passes no `--data` and no `--session`, so the product uses the default folder `%APPDATA%\AutoHotFlow v2`, which has no skeleton flow. Also, the process tasks print nothing when the application ends, so the end cannot be seen in the task.
-**Status:** Verified by reading `doc/MANUAL-CHECKS.md:13-21` and `.vscode/tasks.json` (the manager stub task, lines 533-546). Not checked: the VS Code UI behaviour.
-**Action:** The project owner has another agent fix the task and the guide.
-**Evidence:** manual check of the project owner, step 2 and step 5.
 
 ### F-0067: The F-0016 xfail test passes (strict XPASS) in the slow tier
 

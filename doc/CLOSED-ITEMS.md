@@ -27,6 +27,7 @@ This document lists findings that are closed or accepted. Moved from doc/OPEN-IT
 | F-0078 | 156 sites with `LocalSameAsGlobal` (a local named like a class or a built-in function); one was a real defect | closed (2026-10-15: all locals renamed, test scripts and test entries warn with `#Warn All, StdOut`, rule `warn` of the architecture check refuses `LocalSameAsGlobal, Off` in `src/`) | |
 | F-0064 | Closing a role window is reported as a crash; no tray icon besides the manager | closed 2026-10-15: decision E0046 (tray icons hidden per entry script, manager keeps its icon; correction 2026-10-15), verified by `ed80347`, `9a9968d` and the owner's check of the icon | |
 | F-0088 | Slow tier: a burst of 5000 log lines ends with 4999 lines written or counted as dropped; one line is lost without a count | cause found (race in the log buffers of storage), fixed in 8bd2293, verified under load; verifier pending | |
+| F-0065 | Manual-check guide and start tasks do not match | closed 2026-10-15: `tools/manual_check.py` (own data folder with the skeleton flow, session `manual`, prints the exit code), new `Start:`/`Setup:` tasks, guide rewritten | |
 
 
 ## Findings
@@ -232,3 +233,12 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 ### F-0064: Closing a role window is reported as a crash
 
 **Closed 2026-10-15.** Decision E0046 (owner, 2026-10-15): the crash report for a window closed from outside stays correct (option c). The tray icons of the roles are hidden through the `#NoTrayIcon` directive of each entry script; the product manager keeps its icon (correction of the same day). Implemented in `3e3da65`, corrected in `ed80347` and `9a9968d`. Verified by the verifier of `9a9968d` (fast 834 passed, foundation 444 passed, arch and requirements checks 0) and by the owner's check of the icon (one icon, the manager's). The original text of the entry is in commit `52f7923` (`git show 52f7923:doc/OPEN-ITEMS.md`).
+
+### F-0065: Manual-check guide and start tasks do not match
+
+**What:** The guide `doc/MANUAL-CHECKS.md` (section 1) asks for an empty data folder with `skeleton_flow.json` copied to `Flows\skeleton.json`. The VS Code start task passes no `--data` and no `--session`, so the product uses the default folder `%APPDATA%\AutoHotFlow v2`, which has no skeleton flow. Also, the process tasks print nothing when the application ends, so the end cannot be seen in the task.
+**Status:** Verified by reading `doc/MANUAL-CHECKS.md:13-21` and `.vscode/tasks.json` (the manager stub task, lines 533-546). Not checked: the VS Code UI behaviour.
+**Action:** The project owner has another agent fix the task and the guide.
+**Evidence:** manual check of the project owner, step 2 and step 5.
+
+**Closed 2026-10-15.** `tools/manual_check.py` prepares the data folder `%TEMP%\ahf_manual_check` with `Flows\skeleton.json` and starts the application in it with the session `manual`, without a timeout and without a dialog guard; when the application ends it prints `AutoHotFlow ended with exit code <n>` (the VS Code task terminal shows no exit code 0). It deletes only a folder it made itself (marker file) or an empty one. New tasks: "Start: manual check 1, manager stub in a fresh data folder", "Start: manual check 2, debug window in the manual-check data folder", "Start: manual check, debug window on the running manual-check session (--command=debug)", "Setup: fresh data folder for the manual checks". `doc/MANUAL-CHECKS.md` names only these tasks and the same calls for a terminal; AGENTS.md rule 10 allows the tool for `Start:` tasks. Verified: `tests/test_manual_check.py` (folder, refusal of a foreign folder, command line). Not checked: a start through the VS Code tasks (the owner's next manual check).

@@ -4,31 +4,28 @@ The automated tests do not cover the checks in this document. The project owner 
 
 The checks cover two interfaces: the manager stub (section 1) and the debug window (section 2). Use the "Result" template at the end to record a run.
 
-Where a step starts the application, the VS Code task is named by its label in `.vscode/tasks.json`. The command line from the original guide is kept as well.
+Where a step starts the application, the VS Code task is named by its label in `.vscode/tasks.json`, followed by the same call for a terminal.
+
+**Data folder and session.** The checks run with `tools/manual_check.py` in their own data folder `%TEMP%\ahf_manual_check` and their own session `manual`. The default folder `%APPDATA%\AutoHotFlow v2` stays untouched, and an instance that runs for something else (session `main`) is not met. The tool starts `AutoHotkey64.exe` without a timeout and without a dialog guard, waits until the application ends, and then prints `AutoHotFlow ended with exit code <n>` in the task terminal. The logs and reports of a check are in `%TEMP%\ahf_manual_check\Log` and `...\Reports`. A fresh folder (VS Code task "Setup: fresh data folder for the manual checks (manual_check.py prepare)", or `python tools/manual_check.py prepare`) holds only `Flows\skeleton.json`, a copy of `tests/data/skeleton_flow.json`.
 
 ## 1. Manager stub (GUI)
 
 Test on the stub GUI. Not automated; the stub has a headless variant that the tests use.
 
-**Preparation.** Use an empty data folder. Copy `tests/data/skeleton_flow.json` to `<data folder>\Flows\skeleton.json`.
+**Start.** VS Code task "Start: manual check 1, manager stub in a fresh data folder (manual_check.py)", or in a terminal:
+`python tools/manual_check.py start --fresh -- --ui=stub --start=storage,engine,manager,debug`
 
-**Start.** Use either:
-
-- VS Code task "Start: manager stub with debug window (--ui=stub --start=storage,engine,manager,debug)", or
-- in a second terminal (not with `--headless`):
-  `python tools/ahkrun.py --timeout 300 src/AutoHotFlow.ahk --session=gui1 --data=<empty folder> --start=storage,engine,manager --ui=stub`
-
-Note: the task and the command line differ. The task also starts the debug role and starts `AutoHotkey64.exe` directly, without a timeout. The command line runs through `ahkrun.py` with a 300 s timeout.
+The start prepares a fresh data folder first (see above), so no preparation by hand is needed. It also starts the debug window.
 
 ### Steps
 
 | # | Step | Expected result | Result |
 |---|---|---|---|
-| 1 | Start the application (see above). | The stub window opens. No dialog. With the debug task, the debug window "AutoHotFlow - debug" also opens next to it. | pass |
+| 1 | Start the application (see above). | The stub window opens. No dialog. The debug window "AutoHotFlow - debug" also opens next to it. | pass |
 | 2 | Check the window. | The list shows `skeleton`. The status line shows connection `ready`, `epoch` and `seq`. | pass |
 | 3 | Click `skeleton`, then click Start. | The element list shows the states `running` and `finished` for three elements. The status line shows a command latency. | pass |
 | 4 | During a run, move the window and click Start several times. | The window stays usable. Moving and clicking do not freeze it. | pass |
-| 5 | Quit the application (button Beenden, or close the window). | The process ends with exit code 0. The exit code is read from the `ahkrun.py` log (`shutdown: finished with exit code 0`), because the VS Code task terminal does not show it. | pass (exit code 0 from the `ahkrun.py` start) |
+| 5 | Quit the application (button Beenden, or close the window). | The application ends: the task terminal prints `AutoHotFlow ended with exit code 0`. | pass (exit code 0 from an `ahkrun.py` start, before `manual_check.py` existed) |
 | 6 | Watch for dialogs during the whole check. | No dialog (window class `#32770`) appears. The dialog guard would store one under `%TEMP%\ahf_dialogs\`. | pass |
 | 7 | Right-click the tray icon of the manager (the only icon), choose `Beenden`. Start again, double-click the icon. | The menu has exactly one entry, `Beenden` (no AutoHotkey standard items such as Exit or Reload). It ends the application like the button (exit code 0, supervisor shutdown). The double click does nothing. | pass (owner, 2026-10-15: the tray entry ends the application like the button) |
 
@@ -40,8 +37,10 @@ Test on the debug window (role `debug`). The source records that the window was 
 
 **Start.** Use either:
 
-- VS Code task "Start: product with debug window (--start=storage,engine,debug)", command line `AutoHotFlow.ahk --start=debug`, or
-- on a running system, VS Code task "Start: debug window on running instance (--command=debug)", command line `AutoHotFlow.ahk --command=debug`.
+- VS Code task "Start: manual check 2, debug window in the manual-check data folder (manual_check.py)", or in a terminal `python tools/manual_check.py start -- --start=storage,engine,debug`. It uses the data folder as it is (with the flow `skeleton` of section 1, or a fresh one if there is none).
+- When the application of section 1 still runs: VS Code task "Start: manual check, debug window on the running manual-check session (--command=debug)", or `python tools/manual_check.py start -- --command=debug`. This second start only forwards the command and ends at once with exit code 0. The same task is the second `--command=debug` of step 1.
+
+Step 6 uses the test role `echo:a`, which exists only in the test entry; its task "Start: test entry with test roles and debug window (echo:a, debug)" runs in the session `main`, outside the manual-check folder.
 
 ### Steps
 
