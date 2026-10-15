@@ -137,9 +137,9 @@ class WorkerBridge {
 
     _OnProcessList(res) {
         if (res.payload.Get("ok", false)) {
-            for p in res.payload.Get("processes", []) {
-                name := p.Get("name", "")
-                state := p.Get("state", "")
+            for proc in res.payload.Get("processes", []) {
+                name := proc.Get("name", "")
+                state := proc.Get("state", "")
                 if (!RegExMatch(name, "^worker:\d+$") || state = "exited" || state = "crashed")
                     continue
                 if (!IsObject(this._SlotNamed(name))) {
@@ -174,11 +174,11 @@ class WorkerBridge {
         execId := Ids.Next("exec-")
         slot["state"] := "busy"
         slot["execId"] := execId
-        job := Map("onDone", onDone, "slot", slot["name"], "deadline", "", "ctx", ctx)
-        this._jobs[execId] := job
+        jobRec := Map("onDone", onDone, "slot", slot["name"], "deadline", "", "ctx", ctx)
+        this._jobs[execId] := jobRec
         if (jobTimeoutMs > 0) {
-            job["deadline"] := ObjBindMethod(this, "_JobExpired", execId)
-            SetTimer(job["deadline"], -jobTimeoutMs)
+            jobRec["deadline"] := ObjBindMethod(this, "_JobExpired", execId)
+            SetTimer(jobRec["deadline"], -jobTimeoutMs)
         }
         payload := Map("execId", execId, "class", classId, "params", params, "imports", imports, "env", env
             , "evaluated", (evaluated is Array) ? evaluated : [], "timeoutMs", WorkerBridge.ACK_TIMEOUT_MS)
@@ -206,17 +206,17 @@ class WorkerBridge {
     ; "slot", name of the worker that runs it), or "" when the job is not running: finished, cancelled (Cancel forgets
     ; the job before cmd.worker.cancel leaves), ended by its deadline or by the loss of its worker.
     JobOf(execId) {
-        job := this._jobs.Get(execId, "")
-        return IsObject(job) ? Map("ctx", job["ctx"], "slot", job["slot"]) : ""
+        jobRec := this._jobs.Get(execId, "")
+        return IsObject(jobRec) ? Map("ctx", jobRec["ctx"], "slot", jobRec["slot"]) : ""
     }
 
     ; Stops a job (the element is stopped by the worker). Returns false if the job is unknown.
     Cancel(execId) {
-        job := this._jobs.Get(execId, "")
-        if (!IsObject(job))
+        jobRec := this._jobs.Get(execId, "")
+        if (!IsObject(jobRec))
             return false
         this._ForgetJob(execId)
-        this._CancelOnWorker(execId, job["slot"])
+        this._CancelOnWorker(execId, jobRec["slot"])
         return true
     }
 
@@ -235,7 +235,7 @@ class WorkerBridge {
     OnDone(msg) {
         execId := msg.payload.Get("execId", "")
         result := msg.payload.Get("result", "exception")
-        message := msg.payload.Get("message", "")
+        msgText := msg.payload.Get("message", "")
         exports := msg.payload.Get("exports", Map())
         if (!(exports is Map))
             exports := Map()
@@ -245,10 +245,10 @@ class WorkerBridge {
             if (slot["state"] = "busy")
                 this._SetIdle(slot)
         }
-        job := this._jobs.Get(execId, "")
-        if (IsObject(job)) {
+        jobRec := this._jobs.Get(execId, "")
+        if (IsObject(jobRec)) {
             this._ForgetJob(execId)
-            this._Call(job, result, message, exports, execId)
+            this._Call(jobRec, result, msgText, exports, execId)
         }
         this._owner.Kick()
     }
@@ -392,19 +392,19 @@ class WorkerBridge {
         err := res.payload.Get("error", "")
         if (err is Map)
             code := err.Get("code", code)
-        job := this._jobs.Get(execId, "")
-        if (!IsObject(job))
+        jobRec := this._jobs.Get(execId, "")
+        if (!IsObject(jobRec))
             return
-        slot := this._SlotNamed(job["slot"])
+        slot := this._SlotNamed(jobRec["slot"])
         if (IsObject(slot))
             this._Lose(slot, "run not accepted: " code)
         if (code = ErrCode.PEER_GONE) {
             ; The hub answers peer_gone as soon as the worker's connection ends, usually a tick before the supervisor
             ; reports the end of the process. The worker is lost, not refusing: same text as evt.process.crashed, so the
             ; order of the two messages does not matter (F-0042, WI-0035).
-            this._Finish(execId, "exception", "worker crashed (" job["slot"] ")")
+            this._Finish(execId, "exception", "worker crashed (" jobRec["slot"] ")")
         } else {
-            this._Finish(execId, "exception", "worker not available: " job["slot"] " (" code ")")
+            this._Finish(execId, "exception", "worker not available: " jobRec["slot"] " (" code ")")
         }
         this._owner.Kick()
     }
@@ -429,10 +429,10 @@ class WorkerBridge {
 
     ; The job deadline of the element passed: the thread ends now, the worker is cancelled like any other.
     _JobExpired(execId) {
-        job := this._jobs.Get(execId, "")
-        if (!IsObject(job))
+        jobRec := this._jobs.Get(execId, "")
+        if (!IsObject(jobRec))
             return
-        slotName := job["slot"]
+        slotName := jobRec["slot"]
         Log.Write("a0", "engine", "job " execId " on " slotName " passed its deadline")
         this._Finish(execId, "exception", "worker timeout")
         this._CancelOnWorker(execId, slotName)
@@ -440,22 +440,22 @@ class WorkerBridge {
 
     ; Ends a job that the engine decides on (answer error, crash, deadline). No exports.
     _Finish(execId, result, message) {
-        job := this._jobs.Get(execId, "")
-        if (!IsObject(job))
+        jobRec := this._jobs.Get(execId, "")
+        if (!IsObject(jobRec))
             return false
         this._ForgetJob(execId)
-        this._Call(job, result, message, Map(), execId)
+        this._Call(jobRec, result, message, Map(), execId)
         return true
     }
 
     ; Removes the job and stops its deadline timer.
     _ForgetJob(execId) {
-        job := this._jobs.Get(execId, "")
-        if (!IsObject(job))
+        jobRec := this._jobs.Get(execId, "")
+        if (!IsObject(jobRec))
             return
         this._jobs.Delete(execId)
-        if (IsObject(job["deadline"]))
-            SetTimer(job["deadline"], 0)
+        if (IsObject(jobRec["deadline"]))
+            SetTimer(jobRec["deadline"], 0)
     }
 
     _Call(job, result, message, exports, execId) {

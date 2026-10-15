@@ -58,21 +58,21 @@ class ThreadState {
 
     ; Checks the transition table. Returns true and changes State, or false and reports it.
     TryTransition(newState, reason := "") {
-        ok := false
+        okFlag := false
         prev := Critical("On")  ; reason: checking and changing the state is one step (an interrupting timer may race)
         try {
             allowed := ThreadState.Transitions.Get(this.State, [])
             for target in allowed {
                 if (target = newState) {
                     this.State := newState
-                    ok := true
+                    okFlag := true
                     break
                 }
             }
         } finally {
             Critical(prev)
         }
-        if (ok)
+        if (okFlag)
             return true
         ThreadState.ReportInvalid(this.OnInvalid, "thread " this.Id, this.State, newState, reason)
         return false

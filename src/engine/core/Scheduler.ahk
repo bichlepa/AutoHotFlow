@@ -29,9 +29,9 @@ class Scheduler {
         kind := flow.ElementKind(thread.ElementId)
         matches := []
         for connId in flow.FromConnections(thread.ElementId) {
-            conn := flow.Connection(connId)
-            if (Scheduler.Matches(kind, result, conn))
-                matches.Push(conn)
+            connRec := flow.Connection(connId)
+            if (Scheduler.Matches(kind, result, connRec))
+                matches.Push(connRec)
         }
         return matches
     }
@@ -88,16 +88,16 @@ class Scheduler {
             targets.Push(clone)
         }
 
-        ids := []
-        for i, conn in matches {
+        idList := []
+        for i, connRec in matches {
             target := targets[i]
-            target.ElementId := String(conn["to"])
-            target.EntryPoint := conn.Has("toPart") ? String(conn["toPart"]) : ""
+            target.ElementId := String(connRec["to"])
+            target.EntryPoint := connRec.Has("toPart") ? String(connRec["toPart"]) : ""
             if (flow.ElementKind(target.ElementId) = "loop" && StrLower(target.EntryPoint) = "head")
                 target.Loops.Push()
-            ids.Push(target.Id)
+            idList.Push(target.Id)
         }
-        return Scheduler.Outcome("next", false, ids)
+        return Scheduler.Outcome("next", false, idList)
     }
 
     static Outcome(outcome, unhandled, threadIds) {

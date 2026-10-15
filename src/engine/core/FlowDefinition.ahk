@@ -74,15 +74,15 @@ class FlowDefinition {
         elements := FlowDefinition.RequireMap(flowId, raw, "allElements")
         connections := FlowDefinition.RequireMap(flowId, raw, "allConnections")
 
-        for id, el in elements {
-            if (!(el is Map))
+        for id, elem in elements {
+            if (!(elem is Map))
                 throw AhfError("flow '" flowId "': element '" id "' is not an object", ErrCode.BAD_PAYLOAD)
-            if (!el.Has("type") || !el.Has("class"))
+            if (!elem.Has("type") || !elem.Has("class"))
                 throw AhfError("flow '" flowId "': element '" id "' has no type or class", ErrCode.BAD_PAYLOAD)
-            this._elements[id] := el
-            this._kinds[id] := StrLower(FlowDefinition.TextOf(flowId, el, "type", ""))
-            this._classes[id] := FlowDefinition.TextOf(flowId, el, "class", "")
-            this._packages[id] := FlowDefinition.TextOf(flowId, el, "package", "")
+            this._elements[id] := elem
+            this._kinds[id] := StrLower(FlowDefinition.TextOf(flowId, elem, "type", ""))
+            this._classes[id] := FlowDefinition.TextOf(flowId, elem, "class", "")
+            this._packages[id] := FlowDefinition.TextOf(flowId, elem, "package", "")
             this._from[id] := []
         }
 
@@ -115,9 +115,9 @@ class FlowDefinition {
             for id in this.Pending {
                 if (!elements.Has(id))
                     continue
-                el := elements[id].Clone()
-                el[FlowDefinition.MARKER_KEY] := Json.True
-                elements[id] := el
+                elem := elements[id].Clone()
+                elem[FlowDefinition.MARKER_KEY] := Json.True
+                elements[id] := elem
             }
             root["allElements"] := elements
         }
@@ -180,21 +180,21 @@ class FlowDefinition {
     ; IDs of valid connections that start at the element, in the enumeration order of the Map
     ; (sorted by ID). Dangling connections are not included. Empty array for unknown IDs.
     FromConnections(elementId) {
-        ids := []
+        idList := []
         for id in this._from.Get(elementId, []) {
-            ids.Push(id)
+            idList.Push(id)
         }
-        return ids
+        return idList
     }
 
     ; IDs of all elements of kind "trigger", in Map enumeration order (sorted by ID).
     Triggers() {
-        ids := []
+        idList := []
         for id, kind in this._kinds {
             if (kind = "trigger")
-                ids.Push(id)
+                idList.Push(id)
         }
-        return ids
+        return idList
     }
 
     ; Creates an index Map with case-insensitive keys, as v1 object keys are.

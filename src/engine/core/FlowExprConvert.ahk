@@ -39,22 +39,22 @@ class FlowExprConvert {
         raw := def.Raw
         versioned := raw.Has(FlowDefinition.FORMAT_KEY)
         elements := raw["allElements"]
-        for id, el in elements {
-            marked := FlowExprConvert.IsMarked(el)
-            if (el.Has(FlowDefinition.MARKER_KEY))
-                el.Delete(FlowDefinition.MARKER_KEY)         ; the state is in def.Pending from here on
+        for id, elem in elements {
+            marked := FlowExprConvert.IsMarked(elem)
+            if (elem.Has(FlowDefinition.MARKER_KEY))
+                elem.Delete(FlowDefinition.MARKER_KEY)         ; the state is in def.Pending from here on
             if (versioned && !marked)
                 continue
             ; the package and the class name the element (E0045); a missing package is Default
-            cls := ElementRegistry.Lookup(FlowDefinition.TextOf(def.FlowId, el, "package", "")
-                , FlowDefinition.TextOf(def.FlowId, el, "class", ""))
+            cls := ElementRegistry.Lookup(FlowDefinition.TextOf(def.FlowId, elem, "package", "")
+                , FlowDefinition.TextOf(def.FlowId, elem, "class", ""))
             if (!IsObject(cls)) {
                 def.Pending[id] := true
                 counts["pending"] += 1
                 continue
             }
             try {
-                specs := FlowExprConvert.Specs(cls, el)
+                specs := FlowExprConvert.Specs(cls, elem)
             } catch as e {
                 def.Pending[id] := true
                 counts["pending"] += 1
@@ -62,11 +62,11 @@ class FlowExprConvert {
                     . "' cannot be read (" Type(e) ": " e.Message "); its expression texts stay in v1 syntax", def.FlowId)
                 continue
             }
-            pars := el.Has("pars") ? el["pars"] : ""
-            if (!(pars is Map))
+            parMap := elem.Has("pars") ? elem["pars"] : ""
+            if (!(parMap is Map))
                 continue
             for parId, kind in specs
-                FlowExprConvert._ConvertOne(def, id, el, pars, parId, kind, counts)
+                FlowExprConvert._ConvertOne(def, id, elem, parMap, parId, kind, counts)
         }
         total := counts["converted"] + counts["unsupported"] + counts["failed"] + counts["pending"]
         if (total > 0)
@@ -87,22 +87,22 @@ class FlowExprConvert {
     static Specs(cls, el) {
         specs := Map()
         specs.CaseSense := "Off"
-        pars := el.Has("pars") ? el["pars"] : Map()
-        for p in cls.Parameters("") {
-            ids := FlowExprConvert.Field(p, "id")
-            if (ids == "")
+        parMap := el.Has("pars") ? el["pars"] : Map()
+        for par in cls.Parameters("") {
+            idList := FlowExprConvert.Field(par, "id")
+            if (idList == "")
                 continue
-            content := FlowExprConvert.Field(p, "content")
+            content := FlowExprConvert.Field(par, "content")
             if (content is Array) {
-                cid := FlowExprConvert.Field(p, "contentID")
+                cid := FlowExprConvert.Field(par, "contentID")
                 content := ""
                 if (cid != "") {
-                    content := (pars is Map && pars.Has(cid)) ? pars[cid] : FlowExprConvert.Field(p, "contentDefault")
+                    content := (parMap is Map && parMap.Has(cid)) ? parMap[cid] : FlowExprConvert.Field(par, "contentDefault")
                 }
             }
             if (IsObject(content) || !FlowExprConvert.EXPRESSION_CONTENT.Has(StrLower(content)))
                 continue
-            for parId in (ids is Array ? ids : [ids])
+            for parId in (idList is Array ? idList : [idList])
                 specs[parId] := "expression"
         }
         syntax := cls.V1Syntax
@@ -126,8 +126,8 @@ class FlowExprConvert {
         old := String(pars[parId])
         conv := V1ExprConverter.Convert(old, kind)
         where := "element '" elementId "' parameter '" parId "'"
-        ids := MigrationClasses.IdsOf(conv["classes"])
-        if (ids.Length && FlowExprConvert.Mark(el, parId, ids, old))
+        idList := MigrationClasses.IdsOf(conv["classes"])
+        if (idList.Length && FlowExprConvert.Mark(el, parId, idList, old))
             counts["marked"] += 1
         switch conv["status"] {
             case "converted":

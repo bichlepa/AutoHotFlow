@@ -52,9 +52,9 @@ class Instance {
     Start(threadId, triggerElementId) {
         if (!this.TryTransition("running", "start"))
             return ""
-        thread := ThreadState(threadId, this.Id, triggerElementId, "finished", "Normal", this.OnInvalid)
-        this.Threads[threadId] := thread
-        return thread
+        thr := ThreadState(threadId, this.Id, triggerElementId, "finished", "Normal", this.OnInvalid)
+        this.Threads[threadId] := thr
+        return thr
     }
 
     ; new -> waiting (policy wait). The instance has no thread until Start. Returns false if rejected.
@@ -74,10 +74,10 @@ class Instance {
     ; Moving a thread to removed is the caller's job (ThreadState.TryTransition), except here
     ; ReleaseThread does it in one call.
     ReleaseThread(threadId, reason := "released") {
-        thread := this.Threads.Get(threadId, "")
-        if (thread = "")
+        thr := this.Threads.Get(threadId, "")
+        if (thr = "")
             return false
-        if (!thread.TryTransition("removed", reason))
+        if (!thr.TryTransition("removed", reason))
             return false
         this.Threads.Delete(threadId)
         this._CheckEnded()
@@ -94,15 +94,15 @@ class Instance {
         }
         if (!this.TryTransition("stopping", reason))
             return false
-        ids := []
+        idList := []
         for id in this.Threads
-            ids.Push(id)
-        for id in ids {
-            thread := this.Threads.Get(id, "")
-            if (thread = "")
+            idList.Push(id)
+        for id in idList {
+            thr := this.Threads.Get(id, "")
+            if (thr = "")
                 continue
-            if (thread.State = "running")
-                thread.TryTransition("stopping", reason)
+            if (thr.State = "running")
+                thr.TryTransition("stopping", reason)
             else
                 this.ReleaseThread(id, reason)
         }
@@ -117,10 +117,10 @@ class Instance {
             Instance.ReportInvalid(this.OnInvalid, this.Id, this.State, "ended", "deadline: " reason)
             return false
         }
-        for id, thread in this.Threads {
-            if (thread.State = "running")
-                thread.TryTransition("stopping", reason)
-            thread.TryTransition("removed", reason)
+        for id, thr in this.Threads {
+            if (thr.State = "running")
+                thr.TryTransition("stopping", reason)
+            thr.TryTransition("removed", reason)
         }
         this.Threads.Clear()
         this.TryTransition("ended", reason)
@@ -139,21 +139,21 @@ class Instance {
 
     ; Checks the table. Returns true and changes State, or false and reports it.
     TryTransition(newState, reason := "") {
-        ok := false
+        okFlag := false
         prev := Critical("On")  ; reason: checking and changing the state is one step (an interrupting timer may race)
         try {
             allowed := Instance.Transitions.Get(this.State, [])
             for target in allowed {
                 if (target = newState) {
                     this.State := newState
-                    ok := true
+                    okFlag := true
                     break
                 }
             }
         } finally {
             Critical(prev)
         }
-        if (ok)
+        if (okFlag)
             return true
         Instance.ReportInvalid(this.OnInvalid, this.Id, this.State, newState, reason)
         return false

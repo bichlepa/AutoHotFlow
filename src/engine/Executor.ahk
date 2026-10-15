@@ -70,8 +70,8 @@ class Executor {
 
     ; True if an instance of the flow is running, stopping or waiting.
     IsExecuting(flowId) {
-        for _, run in this._runs {
-            if (run["flowId"] = flowId)
+        for _, runRec in this._runs {
+            if (runRec["flowId"] = flowId)
                 return true
         }
         return false
@@ -81,22 +81,22 @@ class Executor {
     ; No variables and no parameters. At most DIAG_INSTANCES instances (the rest is only counted by the caller).
     DiagInstances() {
         list := []
-        for instId, run in this._runs {
+        for instId, runRec in this._runs {
             if (list.Length >= Executor.DIAG_INSTANCES)
                 break
             threads := []
-            for threadId, thread in run["inst"].Threads
-                threads.Push(Map("threadId", threadId, "elementId", thread.ElementId, "state", thread.State
-                    , "result", String(thread.Result)))
-            list.Push(Map("instanceId", instId, "flowId", run["flowId"], "state", run["inst"].State, "threads", threads))
+            for threadId, thr in runRec["inst"].Threads
+                threads.Push(Map("threadId", threadId, "elementId", thr.ElementId, "state", thr.State
+                    , "result", String(thr.Result)))
+            list.Push(Map("instanceId", instId, "flowId", runRec["flowId"], "state", runRec["inst"].State, "threads", threads))
         }
         return list
     }
 
     ; True if the instance exists and waits for its turn (policy wait).
     IsWaiting(instId) {
-        run := this._runs.Get(instId, "")
-        return IsObject(run) && run["inst"].State = "waiting"
+        runRec := this._runs.Get(instId, "")
+        return IsObject(runRec) && runRec["inst"].State = "waiting"
     }
 
     ; Starts an instance of the flow at the given trigger (or the first trigger). Returns the instance ID.
@@ -125,8 +125,8 @@ class Executor {
 
         instId := Ids.Next("inst-")
         inst := Instance(instId, flowId)
-        run := Executor._NewRun(instId, flowId, inst, triggerId)
-        this._runs[instId] := run
+        runRec := Executor._NewRun(instId, flowId, inst, triggerId)
+        this._runs[instId] := runRec
         if (decision = "wait") {
             inst.Wait()
             if (!this._waiting.Has(flowId))
@@ -136,7 +136,7 @@ class Executor {
                 , Map("flowId", flowId, "instanceId", instId, "position", this._waiting[flowId].Length))
             return instId
         }
-        this._Launch(run, true)
+        this._Launch(runRec, true)
         this._owner.Kick()
         return instId
     }
@@ -176,10 +176,10 @@ class Executor {
 
     ; Stops one instance by ID (running or waiting). Returns false if it does not exist.
     StopInstance(instId, reason := "stop") {
-        run := this._runs.Get(instId, "")
-        if (!IsObject(run))
+        runRec := this._runs.Get(instId, "")
+        if (!IsObject(runRec))
             return false
-        this._StopRun(run, reason)
+        this._StopRun(runRec, reason)
         return true
     }
 
@@ -189,9 +189,9 @@ class Executor {
         n := 0
         for waitingPass in [true, false] {
             for instId in Executor._Keys(this._runs) {
-                run := this._runs.Get(instId, "")
-                if (IsObject(run) && run["flowId"] = flowId && (run["inst"].State = "waiting") = waitingPass) {
-                    this._StopRun(run, reason)
+                runRec := this._runs.Get(instId, "")
+                if (IsObject(runRec) && runRec["flowId"] = flowId && (runRec["inst"].State = "waiting") = waitingPass) {
+                    this._StopRun(runRec, reason)
                     n += 1
                 }
             }
@@ -208,9 +208,9 @@ class Executor {
     StopAll(reason) {
         for waitingPass in [true, false] {
             for instId in Executor._Keys(this._runs) {
-                run := this._runs.Get(instId, "")
-                if (IsObject(run) && (run["inst"].State = "waiting") = waitingPass)
-                    this._StopRun(run, reason)
+                runRec := this._runs.Get(instId, "")
+                if (IsObject(runRec) && (runRec["inst"].State = "waiting") = waitingPass)
+                    this._StopRun(runRec, reason)
             }
         }
     }
@@ -254,10 +254,10 @@ class Executor {
     _TickOnce() {
         budget := Executor.TICK_BATCH
         progress := true
-        waiting := 0
+        waitCount := 0
         while (progress) {
             progress := false
-            waiting := 0
+            waitCount := 0
             for flowId in Executor._Keys(this._wantPromote) {
                 this._wantPromote.Delete(flowId)
                 if (this._PromoteWaiting(flowId)) {
@@ -266,29 +266,29 @@ class Executor {
                 }
             }
             for instId in Executor._Keys(this._runs) {
-                run := this._runs.Get(instId, "")
-                if (!IsObject(run))
+                runRec := this._runs.Get(instId, "")
+                if (!IsObject(runRec))
                     continue
-                def := this._DefOf(run)
+                def := this._DefOf(runRec)
                 if (!IsObject(def)) {
-                    this._StopRun(run, "flow.deleted")
+                    this._StopRun(runRec, "flow.deleted")
                     continue
                 }
-                for threadId in Executor._Keys(run["inst"].Threads) {
-                    thread := run["inst"].Threads.Get(threadId, "")
-                    if (!IsObject(thread) || thread.State != "ready")
+                for threadId in Executor._Keys(runRec["inst"].Threads) {
+                    thr := runRec["inst"].Threads.Get(threadId, "")
+                    if (!IsObject(thr) || thr.State != "ready")
                         continue
                     ; The definition may have been replaced by a step run from inside this loop.
-                    def := this._DefOf(run)
+                    def := this._DefOf(runRec)
                     if (!IsObject(def))
                         break
                     ; A worker element waits while the pool is busy; it is dispatched when a worker reports done.
-                    if (Executor._IsWorkerElement(def, thread) && this._owner.workers.Usable()
+                    if (Executor._IsWorkerElement(def, thr) && this._owner.workers.Usable()
                         && !this._owner.workers.Free()) {
-                        waiting += 1
+                        waitCount += 1
                         continue
                     }
-                    this._Dispatch(run, thread, def)
+                    this._Dispatch(runRec, thr, def)
                     progress := true
                     budget -= 1
                     if (budget <= 0) {
@@ -299,8 +299,8 @@ class Executor {
             }
         }
         ; Threads that wait for a worker: the pool grows to meet the demand (WI-0027, ARCHITECTURE 6.4).
-        if (waiting > 0)
-            this._owner.workers.Want(waiting)
+        if (waitCount > 0)
+            this._owner.workers.Want(waitCount)
     }
 
     ; --- execution -----------------------------------------------------------------------------
@@ -433,25 +433,25 @@ class Executor {
 
     ; Called by ExecContext.Finish (bound arguments first, then ctx, result, msg).
     _OnFinish(instId, threadId, ctx, result, msg) {
-        run := this._runs.Get(instId, "")
-        if (!IsObject(run)) {
+        runRec := this._runs.Get(instId, "")
+        if (!IsObject(runRec)) {
             Log.Write("f2", "engine", "late finish '" result "' for ended instance " instId, "")
             return
         }
-        inst := run["inst"]
-        thread := inst.Threads.Get(threadId, "")
-        if (!IsObject(thread)) {
-            Log.Write("f2", "engine", "late finish '" result "' for removed thread " threadId, run["flowId"])
+        inst := runRec["inst"]
+        thr := inst.Threads.Get(threadId, "")
+        if (!IsObject(thr)) {
+            Log.Write("f2", "engine", "late finish '" result "' for removed thread " threadId, runRec["flowId"])
             return
         }
-        if (run["active"].Has(threadId))
-            run["active"].Delete(threadId)
-        if (thread.Finish(result, msg) = "late") {
-            Log.Write("f2", "engine", "late finish '" result "' for thread " threadId, run["flowId"])
+        if (runRec["active"].Has(threadId))
+            runRec["active"].Delete(threadId)
+        if (thr.Finish(result, msg) = "late") {
+            Log.Write("f2", "engine", "late finish '" result "' for thread " threadId, runRec["flowId"])
             return
         }
-        this._ElementStopped(run, thread.ElementId, result, msg)
-        this._Advance(run, thread)
+        this._ElementStopped(runRec, thr.ElementId, result, msg)
+        this._Advance(runRec, thr)
         this._owner.Kick()
     }
 
@@ -468,12 +468,12 @@ class Executor {
         }
         prev := Critical("On")  ; reason: advancing the thread must not be interrupted (see above)
         try {
-            outcome := Scheduler.Advance(run["inst"], def, thread, () => Ids.Next("thr-"))
-            if (outcome["unhandled"]) {
+            advOutcome := Scheduler.Advance(run["inst"], def, thread, () => Ids.Next("thr-"))
+            if (advOutcome["unhandled"]) {
                 Log.Write("f0", "engine", "unhandled exception in element " thread.ElementId ": " thread.Message
                     , run["flowId"])
             }
-            this._CheckEnded(run, outcome["unhandled"] ? "exception" : "finished")
+            this._CheckEnded(run, advOutcome["unhandled"] ? "exception" : "finished")
         } finally {
             Critical(prev)
         }
@@ -486,8 +486,8 @@ class Executor {
         if (!inst.Stop(reason))
             return
         for threadId in Executor._Keys(inst.Threads) {
-            thread := inst.Threads.Get(threadId, "")
-            if (!IsObject(thread) || thread.State != "stopping")
+            thr := inst.Threads.Get(threadId, "")
+            if (!IsObject(thr) || thr.State != "stopping")
                 continue
             if (run["active"].Has(threadId)) {
                 act := run["active"][threadId]
@@ -497,7 +497,7 @@ class Executor {
                 else
                     ElementRunner.Stop(act["cls"], act["ctx"], act["params"])
             }
-            this._ElementStopped(run, thread.ElementId, "stopped", "")
+            this._ElementStopped(run, thr.ElementId, "stopped", "")
             inst.ReleaseThread(threadId, reason)
         }
         this._CheckEnded(run, reason)
@@ -508,15 +508,15 @@ class Executor {
         queue := this._waiting.Get(flowId, "")
         if (!IsObject(queue) || queue.Length = 0)
             return false
-        for _, run in this._runs {
-            if (run["flowId"] = flowId && run["inst"].State != "waiting")
+        for _, runRec in this._runs {
+            if (runRec["flowId"] = flowId && runRec["inst"].State != "waiting")
                 return false
         }
         instId := queue.RemoveAt(1)
-        run := this._runs.Get(instId, "")
-        if (!IsObject(run))
+        runRec := this._runs.Get(instId, "")
+        if (!IsObject(runRec))
             return true
-        this._Launch(run, false)
+        this._Launch(runRec, false)
         return true
     }
 
@@ -601,9 +601,9 @@ class Executor {
     ; --- helpers -------------------------------------------------------------------------------
 
     static _NewRun(instId, flowId, inst, triggerId) {
-        run := Map("instanceId", instId, "flowId", flowId, "inst", inst, "triggerId", triggerId, "active", Map())
-        run["active"].CaseSense := "Off"
-        return run
+        runRec := Map("instanceId", instId, "flowId", flowId, "inst", inst, "triggerId", triggerId, "active", Map())
+        runRec["active"].CaseSense := "Off"
+        return runRec
     }
 
     ; The newest committed definition of the run's flow, or "" if the flow is not loaded any more.
@@ -623,17 +623,17 @@ class Executor {
     ; The parameters of an element as an object with case-insensitive property names (v1 params
     ; semantics). Objects and null values become "".
     static _Params(def, elementId) {
-        p := {}
+        params := {}
         for k, v in Executor._ParamMap(def, elementId)
-            p.%k% := v
-        return p
+            params.%k% := v
+        return params
     }
 
     ; The same parameters as a Map (sent to workers as JSON). Objects and null values become "".
     static _ParamMap(def, elementId) {
         m := Map()
-        el := def.Element(elementId)
-        pars := (el is Map) ? el.Get("pars", "") : ""
+        elem := def.Element(elementId)
+        pars := (elem is Map) ? elem.Get("pars", "") : ""
         if (pars is Map) {
             for k, v in pars {
                 if (IsObject(v))
@@ -647,8 +647,8 @@ class Executor {
     ; The view of one element run on the variables (WI-0040). The built-in variables a_flowName, a_elementName and
     ; a_workingdir come from the revision the element starts with.
     _VarAccess(run, thread, def, elementId) {
-        el := def.Element(elementId)
-        name := (el is Map) ? el.Get("name", "") : ""
+        elem := def.Element(elementId)
+        name := (elem is Map) ? elem.Get("name", "") : ""
         env := Map("flowId", run["flowId"], "elementId", elementId, "flowName", def.Name
             , "elementName", IsObject(name) ? "" : String(name)
             , "workingDir", BuiltInVars.WorkingDirOf(def.Raw.Get("flowSettings", "")))
@@ -660,22 +660,22 @@ class Executor {
     ; variables (an empty stand-in; ctx.noThread is true). Throws AhfError gone when the instance or the thread does not
     ; exist (any more).
     ContextOf(instId, threadId := "") {
-        run := this._runs.Get(instId, "")
-        if (!IsObject(run))
+        runRec := this._runs.Get(instId, "")
+        if (!IsObject(runRec))
             throw AhfError("instance '" instId "' does not exist (ended or never started)", ErrCode.GONE)
-        def := this._DefOf(run)
+        def := this._DefOf(runRec)
         if (!IsObject(def))
             throw AhfError("the flow of instance '" instId "' is not loaded any more", ErrCode.GONE)
         if (threadId != "") {
-            thread := run["inst"].Threads.Get(threadId, "")
-            if (!IsObject(thread) || thread.State = "removed")
+            thr := runRec["inst"].Threads.Get(threadId, "")
+            if (!IsObject(thr) || thr.State = "removed")
                 throw AhfError("thread '" threadId "' of instance '" instId "' does not exist", ErrCode.GONE)
-            elementId := thread.ElementId
+            elementId := thr.ElementId
         } else {
-            thread := ThreadState("-", instId, "")      ; stand-in: no thread variables, no loops
+            thr := ThreadState("-", instId, "")      ; stand-in: no thread variables, no loops
             elementId := ""
         }
-        ctx := ExecContext(run["flowId"], elementId, instId, threadId, "", this._VarAccess(run, thread, def, elementId))
+        ctx := ExecContext(runRec["flowId"], elementId, instId, threadId, "", this._VarAccess(runRec, thr, def, elementId))
         ctx.strictTypes := def.StrictTypes
         ctx.noThread := (threadId = "")
         return ctx

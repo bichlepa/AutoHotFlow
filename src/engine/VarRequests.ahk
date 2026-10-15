@@ -32,9 +32,9 @@ class VarRequests {
             throw AhfError("unknown variable request " msg.type, ErrCode.UNKNOWN_TYPE)
         p := msg.payload
         ctx := this._Target(msg)
-        args := this._Args(op, p, ctx)          ; field checks first: their errors are errors of the request
+        argList := this._Args(op, p, ctx)          ; field checks first: their errors are errors of the request
         try {
-            return this.%op%(ctx, args)
+            return this.%op%(ctx, argList)
         } catch as e {
             return Map("elementError", e.Message)
         }
@@ -48,12 +48,12 @@ class VarRequests {
         if ((execId = "") = (instId = ""))
             throw AhfError("a variable request needs either execId or instanceId", ErrCode.BAD_PAYLOAD)
         if (execId != "") {
-            job := this._owner.workers.JobOf(execId)
-            if (!IsObject(job) || !IsObject(job["ctx"]))
+            jobRec := this._owner.workers.JobOf(execId)
+            if (!IsObject(jobRec) || !IsObject(jobRec["ctx"]))
                 throw AhfError("execution '" execId "' is not running (ended or stopped)", ErrCode.GONE)
-            if (job["slot"] != msg.from)
-                throw AhfError("execution '" execId "' runs on " job["slot"] ", not on " msg.from, ErrCode.DENIED)
-            return job["ctx"]
+            if (jobRec["slot"] != msg.from)
+                throw AhfError("execution '" execId "' runs on " jobRec["slot"] ", not on " msg.from, ErrCode.DENIED)
+            return jobRec["ctx"]
         }
         return this._owner.executor.ContextOf(instId, VarRequests._Scalar(p, "threadId"))
     }
