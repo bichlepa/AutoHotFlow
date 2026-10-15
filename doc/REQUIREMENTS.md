@@ -167,7 +167,7 @@ An element that fails ends with the result `exception` and writes the reason to 
 - **Plan:** -
 - **Evidence:** `tests/integration/test_worker.py`, `tests/fault/test_worker_lifecycle.py`, `tests/integration/test_worker_pool.py`
 
-An element that waits (a dialog, a program started with "wait", a download) does not delay other flows or other branches. By default up to four such elements wait at the same time; further ones wait for their turn. An element that blocks although it is declared as quick is reported in the log, so that the mistake is noticed. How: worker processes, `ARCHITECTURE.md` sections 2.3 and 6.4.
+An element that waits (a dialog, a program started with "wait", a download) does not delay other flows or other branches. A setting limits how many such elements wait at the same time (REQ-SET-070); further ones wait for their turn. An element that blocks although it is declared as quick is reported in the log, so that the mistake is noticed. How: worker processes, `ARCHITECTURE.md` sections 2.3 and 6.4.
 
 ### REQ-EXE-110 Stopping ends waiting elements quickly
 
@@ -1435,12 +1435,12 @@ v2 keeps its data in `%APPDATA%\AutoHotFlow v2`, or in the folder given by `--da
 ### REQ-SET-070 Number of workers
 
 - **v1:** n/a
-- **v2:** partial (a command-line option `--workers`)
+- **v2:** partial (the number can only be set on the command line; the default is 4 there)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (E0044)
 
-A global setting limits how many waiting elements run at the same time (REQ-EXE-100), and with it the memory of AutoHotFlow (REQ-PRF-030). Which limit exactly (the pool size or the guard of the supervisor) is detailed in S0004.
+A global setting limits how many waiting elements (REQ-EXE-100) run at the same time. **Default: 8.** The memory is used only while elements wait, not for the limit itself. A lower number limits the memory when many elements wait at the same time (REQ-PRF-030); a higher number lets more of them run at the same time.
 
 ## Import and migration (MIG)
 
@@ -1938,13 +1938,13 @@ Below 1 % of the whole system without running flows (E0005).
 ### REQ-PRF-030 Memory
 
 - **v1:** n/a (not measured)
-- **v2:** partial (measured with 150 synthetic element classes, the manager stub and without trigger host: 49 MB with one worker, 68 MB with three; the real manager, the trigger host and the real elements are missing)
+- **v2:** partial (measured without the real manager, the trigger host and the real elements)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003, S0004, S0008 (measure again)
 - **Evidence:** `doc/MEASUREMENTS.md` (MS-0032, MS-0033), `tools/measure_r3.py`
 
-The background processes (supervisor, storage, engine, trigger host, manager and the workers) need below 100 MB private bytes together in the normal state: small flows that run now and then, up to about three active workers. Editors are not counted; peaks with more workers may exceed the budget. The user can limit the number of workers (REQ-SET-070). Decision E0040, details `ARCHITECTURE.md` section 9.
+The background processes (supervisor, storage, engine, trigger host, manager and the workers) need below 100 MB private bytes together in the normal state: small flows that run now and then, up to about three elements waiting at the same time (REQ-EXE-100). Editors are not counted. When more elements wait at the same time, the memory may exceed the budget: each one costs about 10 MB, so the default limit of 8 (REQ-SET-070) means about 115 MB (extrapolated from MS-0033, not measured). The user can lower the limit. Decision E0040, details `ARCHITECTURE.md` section 9.
 
 ### REQ-PRF-040 Start time
 
