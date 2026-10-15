@@ -34,7 +34,7 @@ At most **4 sub-agents run at the same time, normally 3**:
 
 Start agents in the background and wait for their notifications. Do not poll and do not sleep.
 
-**Workspaces.** Implementer and bug hunter each get their own workspace: `python tools/new_workspace.py <name>` before the agent starts (for example `wi-36`, `hunt-1`). The agent works only there. The verifier works in a workspace created from the current `v2-port` tip, or only reads.
+**Workspaces.** Implementer, bug hunter and verifier each get their own workspace: `python tools/new_workspace.py <name>` before the agent starts (for example `wi-36`, `hunt-1`). The agent works only there. The verifier always gets a workspace of its own, created from the `v2-port` tip it verifies (`python tools/new_workspace.py ver-<name>`). It does not move: new commits on `v2-port` do not disturb its runs, and the orchestrator removes the workspace when the verifier has reported.
 
 **Models** (`model` parameter of the Agent tool). Estimate the complexity of a task **from its description**, not from a size label: how many processes, modules or interfaces it touches, whether it involves protocol design, races, atomicity or a new language or parser, how much is unknown and has to be researched, how much existing behavior can break, how clearly the acceptance criteria are written.
 
@@ -90,7 +90,7 @@ Start it in parallel to the implementer, one hunter after the other. It works on
 
 After a completed task whose commits are on `v2-port` **really changed source code**, start a verifier on the integrated state. Source code here means files that run or are tested: `src/`, `tests/` (code and data), `tools/`, `.ahk` and `.py` files anywhere. **No verifier** when the task changed only documentation (`doc/`, `*.md`, `work_items/`), comments, prompts, `.vscode/` or `.claude/`, and none for a state that was verified already: compare `git rev-parse HEAD:src HEAD:tests HEAD:tools` with the tree hashes that `STATUS.md` records for the last verified state (record them when a verifier starts). Say in `STATUS.md` that the verification was skipped and why. The verifier:
 
-1. Runs the tests that the change needs (section 4) with `python tools/run_suite.py --ref HEAD` (frozen state), once per test selection.
+1. Runs the tests that the change needs (section 4) in its own workspace, with `python tools/run_suite.py --ref <commit of the workspace>` (frozen state; the verifier's commit is the one named in the report), once per test selection. It never runs in the main checkout, because the main checkout moves with every integration.
 2. Looks briefly at the reports and at the source of the change, and checks that every requirement the change marks `done` names evidence that ran green. If something is conspicuous, it writes down a **suspicion** (marked assumed). It does no deep root-cause research and does not fix anything.
 3. Documents every finding in `doc/OPEN-ITEMS.md` (provisional ID `F-9xxx*`, which the orchestrator renumbers before its commit, run ID, command, failure text, suspicion, which task or agent probably caused it) and commits that on its branch.
 4. Reports the result: counts, run IDs, findings.

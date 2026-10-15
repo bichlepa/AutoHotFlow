@@ -34,6 +34,8 @@ The tool works from the main checkout and from inside a workspace. VS Code tasks
 3. Find the introducing commit: in the own workspace `git bisect start <bad> <good>` and `git bisect run python -m pytest <test> -q -n 0` (the workspace is yours, bisect may move its HEAD).
 4. Report: symptom, repro command, failure rate, cause (verified / assumed), first bad commit, proposed fix. Appending the entry to `doc/OPEN-ITEMS.md` is part of the branch.
 
+**Verifier.** Verifies the integrated state of `v2-port` (ORCHESTRATOR section 3d). Gets its own workspace, created from the tip it verifies (`python tools/new_workspace.py ver-<name>`), and runs its suites there with `python tools/run_suite.py --ref <that commit>`. Other commits that land on `v2-port` while it runs do not change its state. Result: counts, run IDs, findings. Findings go to its branch and are integrated by the integrator; the verifier does not fix code.
+
 **Tester.** Runs suites on branches and on the base for comparison, with the same arguments: `python tools/run_suite.py --ref v2-port -- tests -q --all` and `... --ref wip/<name> ...`. A failed test is run again serially (`-n 0`) before it is reported, and a failure that also occurs on the base is not a regression of the branch. Report: commit, command, counts, the failures with the run log folder (`%TEMP%\ahf_runs\<id>\pytest-log`).
 
 **Integrator** (the project owner, or one agent that has been asked). The history of `v2-port` stays linear: no merge commits and no temporary branches in the graph. In the main checkout on `v2-port`:
