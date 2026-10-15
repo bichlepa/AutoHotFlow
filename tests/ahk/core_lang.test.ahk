@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/core/Lang.ahk and LangTable.ahk (WI-42, E28): the v1 language files in assets/language, read
+; Unit tests for src/core/Lang.ahk and LangTable.ahk (WI-0042, E0028): the v1 language files in assets/language, read
 ; as v1 lang() reads them.
 #Include lib\Assert.ahk
 #Include ..\..\src\core\Lang.ahk

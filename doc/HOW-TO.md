@@ -134,7 +134,7 @@ Append new entries at the end of the matching category. Correct or delete outdat
 
 - **Problem:** A class had a field and a method whose names differ only in capitalization (`_loaded` and `_Loaded()`). Access to the field failed with "Property is read-only", because identifiers are case-insensitive.
 - **Right:** Name fields and methods so that they differ in more than capitalization. Before naming a method `_X()`, check whether a field `_x` already exists.
-- **Status:** verified (role start failed with exit 2 and this message; green after renaming the field to `_flowsLoaded`). It came back in WI-41 (`_failed` in `VarWriter` against the method `_Failed()`): the engine then ended with exit 2 "bad arguments: Property is read-only" before any other test could say why; see the entry "An error in a constructor of a role shows only as exit 2" below.
+- **Status:** verified (role start failed with exit 2 and this message; green after renaming the field to `_flowsLoaded`). It came back in WI-0041 (`_failed` in `VarWriter` against the method `_Failed()`): the engine then ended with exit 2 "bad arguments: Property is read-only" before any other test could say why; see the entry "An error in a constructor of a role shows only as exit 2" below.
 - **Source:** `src/engine/Engine.ahk`
 
 ### `Json.False` is true in AHK
@@ -248,7 +248,7 @@ Append new entries at the end of the matching category. Correct or delete outdat
 
 ### Comparing two characters with `>=` or `<=` throws a TypeError
 
-- **Problem:** `c >= "0" && c <= "9"` to test for a digit works for a digit and throws `TypeError` for a letter: `>=`, `<=`, `<` and `>` need numbers, or texts that look like numbers. This is the same rule that E30 applies to flows. In the converter (`V1ExprConverter`) the whole conversion of a text ended in the harness with "Expected a Number but got a String".
+- **Problem:** `c >= "0" && c <= "9"` to test for a digit works for a digit and throws `TypeError` for a letter: `>=`, `<=`, `<` and `>` need numbers, or texts that look like numbers. This is the same rule that E0030 applies to flows. In the converter (`V1ExprConverter`) the whole conversion of a text ended in the harness with "Expected a Number but got a String".
 - **Wrong:** `if (c >= "0" && c <= "9")`
 - **Right:** `InStr("0123456789", c)` with `c != ""`, or `Ord(c)`. Equal (`=`) and `==` work on any texts.
 - **Status:** verified
@@ -267,7 +267,7 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Problem:** AutoHotkey v2 writes a Float with up to 17 significant digits. `String(Number("3.14"))` is `3.1400000000000001`, `String(Number("1.10"))` is `1.1000000000000001`; only values that a double holds exactly (`1.5`, `0.25`, `100.25`) come back as written. A check "does the text form of the number equal its spelling" is therefore true for few decimals. v1 passed a number literal on as text, so `x := 3.14` in a v1 flow must not become `3.1400000000000001`: the converter writes such a literal as a string where the text form counts.
 - **Right:** For the text of a decimal that the user typed, keep the string; for calculations the number is fine.
 - **Status:** verified (`String(Number(t))` for 9 spellings; golden cases)
-- **Source:** `src/expr/V1ExprConverter.ahk` (`_CheckLiteral`), E32
+- **Source:** `src/expr/V1ExprConverter.ahk` (`_CheckLiteral`), E0032
 
 ### A backtick before an apostrophe in a single-quoted AHK string is an escape
 
@@ -289,7 +289,7 @@ Append new entries at the end of the matching category. Correct or delete outdat
 
 - **Problem:** The number checks of the parameter evaluation port v1 `if x is number` / `is integer`. It was unclear whether `IsNumber`/`IsInteger` give the same answers.
 - **Right:** For 14 texts (`"5"`, `" 5 "`, `"5."`, `".5"`, `"0x10"`, `"1e3"`, `"abc"`, `"-3"`, `"+3"`, `"1.5"`, `"007"`, `"-abc"`, `"1,5"`, `"5 x"`) the answers are the same, spaces around a number included, except `"1e3"`: a number in v2 (`IsFloat`), not in v1. A Float such as `4.0` is no integer (`IsInteger(4.0)` is 0). v1 `x >= 1` with a text that is not a number compares alphabetically (`"abc" >= 1` is true, `"-abc" >= 1` false); `StrCompare(text, "1") >= 0` gives the same.
-- **Status:** verified (probe scripts in the v1 interpreter and in v2 with `ahkrun.py`); MIGRATION M-48
+- **Status:** verified (probe scripts in the v1 interpreter and in v2 with `ahkrun.py`); MIGRATION M-0048
 - **Source:** `src/elements/base/ParamEvaluator.ahk` (`V1AtLeast`)
 
 ## Objects, Maps, Arrays
@@ -730,7 +730,7 @@ Append new entries at the end of the matching category. Correct or delete outdat
 
 ### Waiting for a message: `Sleep(1)` returns only at the next tick of the system timer
 
-- **Problem:** A worker element waits blocking for the answer of the engine (WI-50). A loop of `Sleep(1)` until the answer is there gave a round trip of 15 ms (median of 300 calls), although the answer arrives after about 1 ms: the wake-up message runs its handler during the `Sleep`, but `Sleep` itself ends only with the next tick of the system timer (15.6 ms).
+- **Problem:** A worker element waits blocking for the answer of the engine (WI-0050). A loop of `Sleep(1)` until the answer is there gave a round trip of 15 ms (median of 300 calls), although the answer arrives after about 1 ms: the wake-up message runs its handler during the `Sleep`, but `Sleep` itself ends only with the next tick of the system timer (15.6 ms).
 - **Wrong:** `while (!done) Sleep(1)`.
 - **Right:** Wait for a message, then let AHK handle what is queued: `DllCall("MsgWaitForMultipleObjectsEx", "UInt", 0, "Ptr", 0, "UInt", 50, "UInt", 0x4FF, "UInt", 0x4, "UInt")` (QS_ALLINPUT, MWMO_INPUTAVAILABLE: it also returns for a message that is already in the queue), then `Sleep(-1)`. Round trip 1.0 ms (median). The 50 ms bound keeps the loop able to check its own deadline. Only in the worker (a role that may block).
 - **Status:** verified (both variants measured with `tests/integration/test_worker_vars.py`, round trip test). Not checked: a thread that is `Critical` (its messages stay in the queue, the loop would then spin until its deadline; ELEMENT-API-V2 3.2 forbids the call there).
@@ -1008,14 +1008,14 @@ Append new entries at the end of the matching category. Correct or delete outdat
 ### Patching files with a Python script: a backslash and an n in the replacement become a line break
 
 - **Problem:** A patch script written in a shell heredoc replaced text with a replacement that contained a backslash followed by n (meant as the two characters, for a JSON text inside an AHK string). The file got a real line break instead, and did not load. The doubled backslash of the script was halved on its way (the pitfall of AGENTS.md about heredocs, here with `\\n`). The same script silently did not match when the file had CRLF line ends.
-- **Right:** Use the editor tool for small changes. In a script, build the backslash with `chr(92)` and the line break with `chr(10)`, read and write with `newline=""`, and check with `print(old in s)` that the text was found. Better still, write the patch script itself with the editor tool and run the file: in WI-40 a quoted heredoc (`<<'EOF'`) with a Python script still lost one of two backslashes, so `engine\\vars` arrived as `engine\vars` and Python made `\v` a vertical tab (an `#Include` that could not be opened); `"\\r\\n"` became a broken string.
-- **Status:** verified (several failed patches in WI-39 and WI-40)
+- **Right:** Use the editor tool for small changes. In a script, build the backslash with `chr(92)` and the line break with `chr(10)`, read and write with `newline=""`, and check with `print(old in s)` that the text was found. Better still, write the patch script itself with the editor tool and run the file: in WI-0040 a quoted heredoc (`<<'EOF'`) with a Python script still lost one of two backslashes, so `engine\\vars` arrived as `engine\vars` and Python made `\v` a vertical tab (an `#Include` that could not be opened); `"\\r\\n"` became a broken string.
+- **Status:** verified (several failed patches in WI-0039 and WI-0040)
 
 ### An error in the constructor of a role shows only as exit 2 "bad arguments"
 
-- **Problem:** `AhfBoot` builds the role in a `try` and reports every exception as `bad arguments: <message>`, without the line. A mistake in a new class that the constructor creates (WI-41: a field and a method with the same name) looks like a wrong option, and the supervisor restarts the engine three times.
+- **Problem:** `AhfBoot` builds the role in a `try` and reports every exception as `bad arguments: <message>`, without the line. A mistake in a new class that the constructor creates (WI-0041: a field and a method with the same name) looks like a wrong option, and the supervisor restarts the engine three times.
 - **Right:** Build the role in a small test script and print `e.Message`, `e.File`, `e.Line` and `e.Stack` of the exception: `#Include src\AhfBoot.ahk`, then `try { Engine(Map("session", "x", "hub", "h", "data", "d")) } catch as e { FileAppend(e.Stack, "**") }`, run with `tools/ahkrun.py`. The stack names the line of the failed assignment.
-- **Status:** verified (WI-41)
+- **Status:** verified (WI-0041)
 - **Source:** `src/AhfBoot.ahk`
 
 ### `FileRead(path, "UTF-8")` still reads a UTF-16 file with BOM
@@ -1029,7 +1029,7 @@ Append new entries at the end of the matching category. Correct or delete outdat
 
 - **Problem:** An end-to-end test waited with `Chain.wait_flows` (the flows appear in `cmd.engine.snapshot`) and started them at once. The expressions found no global variable: "Retrieving variable 'global_n' failed", and the log said "ready with 11 flow(s) and 3 variable(s)" only afterwards.
 - **Wrong:** Starting a flow that reads global or static variables as soon as the snapshot lists it.
-- **Right:** Wait for `evt.engine.ready` (it comes after the variables are loaded, WI-41) before such a flow starts, as `tests/fault/test_var_persistence.py` does.
+- **Right:** Wait for `evt.engine.ready` (it comes after the variables are loaded, WI-0041) before such a flow starts, as `tests/fault/test_var_persistence.py` does.
 - **Status:** verified (red before, green after the wait)
 - **Source:** `tests/fault/test_param_eval.py`
 
@@ -1038,13 +1038,13 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Problem:** The expression oracle (`tools/expr_oracle.py`) writes one script with thousands of cases. A string literal in front of an arithmetic operator (`"a" + 1`, `"a" * x`, `!"a" * 2`) is a **load error** ("Unexpected operator following literal string"): the script does not start at all, not even for the other cases. `1 + "a"`, `-"a"`, `1 / 0` and `Mod(1, 0)` load fine and throw a `TypeError` or `ZeroDivisionError` when they run. An unassigned variable that is read gives a warning dialog at load time unless `#Warn All, Off` is set. `MinInt // -1` (and `Mod(MinInt, -1)`) ends the whole process, no `try` can catch it.
 - **Wrong:** Generating `"a" + 1` and expecting a catchable error; running all cases in one process and losing every result when one case ends the process.
 - **Right:** The generator never puts a string literal in front of an arithmetic operator (a variable that holds the text is fine), and keeps `//` and `Mod` away from operands near the limits of Integer. The runner works in batches and bisects a batch that ends without a result, so the offending case is reported by its ID (`NativeCrash`). Write a `Main()` and call it: a script whose `Main` is never called exits 0 without any output.
-- **Status:** verified (WI-44)
+- **Status:** verified (WI-0044)
 - **Source:** `tools/expr_oracle.py`
 
 ### A local variable named like a built-in function or a class hides it, and a script without `#Warn` shows warnings as a dialog
 
-- **Problem:** AutoHotkey v2 names are case-insensitive. A function that assigns a local `type` can no longer call `Type(e)`: the call fails with `This value of type "String" has no method named "Call"`. The same holds for a local `role` or `ids` against the classes `Role` and `Ids`. It shows only when the path that uses the hidden name runs, and the error handler is the usual such path (a `catch` block that builds a message with `Type(e)`). The warning type `LocalSameAsGlobal` finds it, but it is not part of the default; `#Warn All` switches it on. Second point, from F-281: a script without a `#Warn` directive shows its warnings (`VarUnset` is on by default) in a MsgBox, which blocks until the dialog guard closes it; a file that uses a class from another file and is included alone is reported as "local variable never assigned".
+- **Problem:** AutoHotkey v2 names are case-insensitive. A function that assigns a local `type` can no longer call `Type(e)`: the call fails with `This value of type "String" has no method named "Call"`. The same holds for a local `role` or `ids` against the classes `Role` and `Ids`. It shows only when the path that uses the hidden name runs, and the error handler is the usual such path (a `catch` block that builds a message with `Type(e)`). The warning type `LocalSameAsGlobal` finds it, but it is not part of the default; `#Warn All` switches it on. Second point, from F-0281: a script without a `#Warn` directive shows its warnings (`VarUnset` is on by default) in a MsgBox, which blocks until the dialog guard closes it; a file that uses a class from another file and is included alone is reported as "local variable never assigned".
 - **Wrong:** `type := "cmd.engine.var." op` and, in the same function, `catch as e` with `Type(e)` in the message. A helper file that uses `Engine._ErrorText` without a note that it needs `Engine.ahk`.
 - **Right:** Name the local after what it holds (`reqType`, `msgType`, `roleName`, `idList`); never a name of a built-in function or of a class, whatever the spelling. State in the header of a helper file which class it needs and through which file it is included. For a script of your own: `#Warn VarUnset, StdOut` (and `Unreachable`), so a warning is a text line in the output, not a dialog.
 - **Status:** verified (2026-10-15: probe script with a local `type` and `Type(e)`; the test `worker: a request that cannot be sent gives an ElementError` was red before and green after the rename in `WorkerContext._Ask`)
-- **Source:** `src/worker/WorkerContext.ahk`, `src/engine/vars/VarLoader.ahk`, `doc/OPEN-ITEMS.md` F-375
+- **Source:** `src/worker/WorkerContext.ahk`, `src/engine/vars/VarLoader.ahk`, `doc/OPEN-ITEMS.md` F-0287

@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; Evaluator side of the expression oracle (WI-44, doc/TEST-STRATEGY.md section 8, tools/expr_oracle.py).
+; Evaluator side of the expression oracle (WI-0044, doc/TEST-STRATEGY.md section 8, tools/expr_oracle.py).
 ;
 ;   AutoHotkey64.exe eval_harness.ahk <result file> <input file>
 ;

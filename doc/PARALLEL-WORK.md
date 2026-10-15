@@ -69,7 +69,7 @@ python tools/new_workspace.py --remove <name>                     # worktree awa
 
 ## 7. First trial (2026-10-13)
 
-One implementer (`bigflows` duplicates removed) and one bug hunter (F-270) worked in their own workspaces at the same time, the tester reviewed both branches, the integrator merged four branches in a throw-away workspace and ran the whole suite on the result (782 passed, 1 skipped, exit 0, 3 workers). No file conflicts: the branches touched different files.
+One implementer (`bigflows` duplicates removed) and one bug hunter (F-0270) worked in their own workspaces at the same time, the tester reviewed both branches, the integrator merged four branches in a throw-away workspace and ran the whole suite on the result (782 passed, 1 skipped, exit 0, 3 workers). No file conflicts: the branches touched different files.
 
 What the trial showed:
 
@@ -78,5 +78,5 @@ What the trial showed:
 - **Scripted edits.** Heredoc code and CRLF files: a replace string with `\n` does not match a file with `\r\n`. Use the editor tool, or read and write with `newline=""`.
 - **Loops in the background.** A shell loop started with `&` in the tool shell ended with the command that started it. Put repeated runs in a script file and run it in the foreground (with a timeout) or as a background task of its own.
 - **`-n`.** `run_suite.py` puts its own `-n 4` before the pytest arguments, so a later `-n 0` of the caller wins. This is intended; the printed command shows both.
-- **Load was too low to provoke the F-270 race.** The original failure needed heavy load; in the trial 3 to 4 s runs did not fail. A race is therefore shown with a deterministic test (freeze the dependency), not with load.
+- **Load was too low to provoke the F-0270 race.** The original failure needed heavy load; in the trial 3 to 4 s runs did not fail. A race is therefore shown with a deterministic test (freeze the dependency), not with load.
 - **The saved run log of a failure can disappear** (`%TEMP%\ahf_testruns_keep` was gone). Copy the evidence of a finding into the finding entry.

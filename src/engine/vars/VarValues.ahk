@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\core\Json.ahk
 
-; Values of variables (WI-40, decision E28, doc/EXPRESSION-LANGUAGE.md section 18).
+; Values of variables (WI-0040, decision E0028, doc/EXPRESSION-LANGUAGE.md section 18).
 ;
 ; A variable holds a text, a number (Integer or Float) or an object. An object is a Map with CaseSense "Off". There
 ; are no Arrays in variables: a list is a Map with the Integer keys 1..n, as in v1, where a list was an object with

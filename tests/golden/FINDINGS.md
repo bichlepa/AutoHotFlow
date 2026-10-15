@@ -1,6 +1,6 @@
 # Golden data: findings about the v1 expression code
 
-Result of work item WI-36, task 7 (`work_items/phase3/README.md`, section "Findings from the v1 code"). The suspected v1 bugs were confirmed or refuted by running the unchanged v1 code in the v1 interpreter. Every case ID names an entry in `tests/golden/expected/`. `tests/golden/test_golden_format.py` checks that all IDs exist.
+Result of work item WI-0036, task 7 (`work_items/phase3/README.md`, section "Findings from the v1 code"). The suspected v1 bugs were confirmed or refuted by running the unchanged v1 code in the v1 interpreter. Every case ID names an entry in `tests/golden/expected/`. `tests/golden/test_golden_format.py` checks that all IDs exist.
 
 Interpreter: AutoHotkey_H 1.1.32.00, 32 bit (`v1/AutoHotKey/AutoHotFlow.exe`).
 
@@ -8,7 +8,7 @@ Verdicts: **confirmed** = the suspicion is right; **refuted** = wrong; **not che
 
 ## Suspicions
 
-### S1: Function calls with arguments always fail
+### S0001: Function calls with arguments always fail
 
 Source suspicion: `Code parser.ahk:594`, inverted condition. **Verdict: confirmed.**
 
@@ -16,7 +16,7 @@ Every call with an argument gives the parse error `Expecting punctuation: ")"`. 
 
 Cases: `functions.round.int`, `functions.round.half`, `functions.round.frac`, `functions.print.arg`, `functions.unknown.arg`, `functions.round.empty`, `functions.object.noargs`, `functions.print.noargs`, `functions.unknown.noargs`, `assignment.script.func`, `functions.script.call.unknown`, `functions.script.call.object.assign`
 
-### S2: Escape sequences in strings are lost
+### S0002: Escape sequences in strings are lost
 
 Source suspicion: `:718` compares with the empty variable name. **Verdict: confirmed.**
 
@@ -24,13 +24,13 @@ The escape character (backtick) is dropped and the next character is kept: `` "a
 
 Cases: `strings.escape.n`, `strings.escape.t`, `strings.escape.r`, `strings.escape.backtick`, `strings.escape.unknown`, `strings.escape.quote`, `strings.doubled.quote`, `strings.doubled.quote.only`
 
-### S3: `%` (modulo) is not known to the evaluator
+### S0003: `%` (modulo) is not known to the evaluator
 
 **Verdict: confirmed.** Evaluation error `Can't apply operator %`. The parser knows `%` (precedence 20), the evaluator does not.
 
 Cases: `division.modulo`, `division.modulo.nospace`, `division.modulo.var`, `division.modulo.float`
 
-### S4: `!` and `not` at the start of an expression fail
+### S0004: `!` and `not` at the start of an expression fail
 
 **Verdict: confirmed, and wider.**
 
@@ -38,7 +38,7 @@ Cases: `division.modulo`, `division.modulo.nospace`, `division.modulo.var`, `div
 
 Cases: `logic.bang.0`, `logic.bang.paren`, `logic.var.bang`, `logic.bang.in.middle`, `logic.bang.after.or`, `logic.var.a.and.bang.b`, `logic.not.0`, `logic.not.1`, `logic.not.text`, `logic.var.not`, `logic.not.in.middle`, `logic.var.a.and.not.b`, `logic.not.not`, `script.var.if.not.var`
 
-### S5: ` ;` (space, semicolon) cuts off a string
+### S0005: ` ;` (space, semicolon) cuts off a string
 
 Source suspicion: `Code tokenizer.ahk:24`. **Verdict: confirmed.**
 
@@ -46,13 +46,13 @@ Source suspicion: `Code tokenizer.ahk:24`. **Verdict: confirmed.**
 
 Cases: `strings.semicolon.space`, `strings.semicolon.tab`, `strings.semicolon.nospace`, `strings.semicolon.end`
 
-### S6: `this.input.croak` does not exist; errors are swallowed
+### S0006: `this.input.croak` does not exist; errors are swallowed
 
 **Verdict: confirmed.** `else` without `if`: the parser records no error and skips the keyword. Only the evaluator reports the unspecific `Unexpected error during evaluation`, and the next statement still runs.
 
 Cases: `script.else.alone`
 
-### S7: The evaluator uses v1 operators
+### S0007: The evaluator uses v1 operators
 
 Suspicion: `"" + 1` is the empty text, `4/2` is `2.000000`, `<` compares text alphabetically. **Verdict: confirmed.**
 
@@ -60,7 +60,7 @@ Suspicion: `"" + 1` is the empty text, `4/2` is `2.000000`, `<` compares text al
 
 Cases: `arithmetic.text.empty.left`, `arithmetic.text.nonnumeric`, `division.exact`, `division.inexact`, `division.third`, `comparison.lt.text.upper`, `comparison.lt.text.alpha`, `comparison.lt.numstr`, `comparison.lt.numstr.alpha`, `comparison.eq.case`, `comparison.eqeq.case`, `comparison.eq.unicode`, `comparison.lt.unicode`
 
-### S8: The location of a variable follows from its name
+### S0008: The location of a variable follows from its name
 
 Source suspicion: `Variables.ahk:219`, `:253`. **Verdict: confirmed.**
 
@@ -68,13 +68,13 @@ Source suspicion: `Variables.ahk:219`, `:253`. **Verdict: confirmed.**
 
 Cases: `names.dest.plain`, `names.dest.a.none`, `names.dest.a.thread`, `names.dest.plain.thread`, `names.dest.global.case`, `variables.loop`, `variables.thread`, `variables.global`, `variables.static`, `variables.loop.and.thread.same.name`, `variables.global.name.in.instance.store`
 
-### S9: Hidden variables per scope; `global` and `static` are read from disk on every access
+### S0009: Hidden variables per scope; `global` and `static` are read from disk on every access
 
 **Verdict: not checked** (hidden variables); the disk access is visible only indirectly. The harness does not set hidden variables. Global values come back from the file as text (`5`, `0.500000`); objects come back as objects.
 
 Cases: `varaccess.get.global.number`, `varaccess.get.global.float`, `varaccess.get.global.object`
 
-### S10: Built-in variables: 55 from AHK and 14 of its own
+### S0010: Built-in variables: 55 from AHK and 14 of its own
 
 **Verdict: partly checked.** Fixed-value built-ins and 29 machine- or time-dependent ones (volatile, only the type is stored) are covered. `a_vt`, `A_VerticalTab`, `a_ff`, `A_Formfeed` are handled by `BuiltInVariable_Get`, but are in neither name list, so the variable does not exist and the value is empty.
 
@@ -182,7 +182,7 @@ Source: the 22 example flows of `v1/AppData/Saved Flows` (group `corpus_flows`).
 
 ## Not covered
 
-- `evalparam` (`x_AutoEvaluateOneParameter`) is not in the harness. It lives in the API file next to about a hundred functions that need the whole application, and `#Include` cannot take one function. Options if WI-42 wants golden data for the post-checks: a copy in the harness (no longer v1 code) or stubs for all callees. Decision needed then.
+- `evalparam` (`x_AutoEvaluateOneParameter`) is not in the harness. It lives in the API file next to about a hundred functions that need the whole application, and `#Include` cannot take one function. Options if WI-0042 wants golden data for the post-checks: a copy in the harness (no longer v1 code) or stubs for all callees. Decision needed then.
 - The editor and manager variants `xx_replaceVariables`, `xx_EvaluateExpression`, `xx_CheckVariableName` in `v1/Source_Common/Multithreading/API for Elements.ahk` pass the variables `String`, `pars`, `VarName` (empty there; the parameters are called `p_String` ...). Read from the source, not executed. The cases with `common=true` test the `_Common` functions themselves.
 - Hidden variables, the loop-variable stack, `Var_GetListOf*`, deleting variables.
 - `lang()` is a stand-in that fills in the numbered arguments; error texts read `line 1, col 4`. The real texts depend on the UI language.

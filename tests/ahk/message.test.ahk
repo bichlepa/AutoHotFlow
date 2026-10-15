@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/core/ipc/Message.ahk (WI-05): envelope serialization, parsing, ReadTo.
+; Unit tests for src/core/ipc/Message.ahk (WI-0005): envelope serialization, parsing, ReadTo.
 ; Cases are named functions with statement bodies (a lambda cannot contain throw, doc/HOW-TO.md).
 #Include lib\Assert.ahk
 #Include ..\..\src\core\ipc\Message.ahk
@@ -111,7 +111,7 @@ CaseReadToRejectsEmptyTo() {
     Assert.Throws(() => ReadToText('{"to":"","from":"x"}'), ProtocolError)
 }
 
-; --- ParseHead / WithFrom (WI-24): head fields without parsing the payload ---------------------------------
+; --- ParseHead / WithFrom (WI-0024): head fields without parsing the payload ---------------------------------
 
 CaseParseHeadReadsAllFields() {
     text := Message("engine", "editor:F1", "editor:F1#17", "cmd.flow.start", Map("flowId", "F1"), "", 5000).Serialize()

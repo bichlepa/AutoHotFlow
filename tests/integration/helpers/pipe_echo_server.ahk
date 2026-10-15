@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
 Persistent
-; Pipe server for tests/integration/test_pipe.py (WI-04).
+; Pipe server for tests/integration/test_pipe.py (WI-0004).
 ;   AutoHotkey64.exe pipe_echo_server.ahk <resultFile> <pipeName> [maxBytes=N] [maxFrames=N]
 ;
 ; Accepts any number of clients. Per connection:
@@ -12,9 +12,9 @@ Persistent
 ;   * "ctl:flood:S:C"    sends C frames of S bytes in a tight loop, stops when SendFrame fails,
 ;   * "ctl:farewell"     sends "bye" and closes at once (data must stay readable for the peer),
 ;   * "ctl:burstend:S:C:T"  sends C frames "<i>|" + S bytes and "last", then ends the connection after its send
-;                        queue is written, at most T ms (CloseWhenFlushed, WI-30); record "drained" {flushed},
+;                        queue is written, at most T ms (CloseWhenFlushed, WI-0030); record "drained" {flushed},
 ;   * "note:<text>"      is not echoed but recorded {type: note, id, text},
-;   * "ctl:poke:<id>"    sends "poke" to the client <id> at once; record "poke" {wasOpen, ok} (WI-30),
+;   * "ctl:poke:<id>"    sends "poke" to the client <id> at once; record "poke" {wasOpen, ok} (WI-0030),
 ;   * "ctl:close"        closes the connection,
 ;   * "ctl:exit"         ends the process.
 ; Result file: JSON lines {type: ready|connect|close|verified|gen_done|flood|error, ...}.
@@ -178,7 +178,7 @@ class EchoServer {
     }
 
     ; Sends count frames "<i>|xxx..." of about size bytes and a frame "last", then ends the connection
-    ; (WI-30, F-26 cause A). The frames that do not fit into the pipe wait in the send queue.
+    ; (WI-0030, F-0026 cause A). The frames that do not fit into the pipe wait in the send queue.
     static _BurstEnd(c, size, count, timeoutMs) {
         pad := Kit.Repeat("x", size)
         loop count
@@ -190,7 +190,7 @@ class EchoServer {
             , "id", c.id, "flushed", flushed ? 1 : 0, "elapsedMs", Round(Time.NowMs() - start, 1) + 0)))
     }
 
-    ; Sends "poke" to the client with this id, before its frames are read (WI-30). Records whether it was open.
+    ; Sends "poke" to the client with this id, before its frames are read (WI-0030). Records whether it was open.
     static _Poke(id) {
         for other in EchoServer.clients {
             if (other.id = id) {

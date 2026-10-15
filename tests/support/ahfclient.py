@@ -74,7 +74,7 @@ class FrameDecoder:
                 msg = json.loads(body.decode("utf-8"))
             except (UnicodeDecodeError, ValueError) as exc:
                 raise ProtocolError("invalid JSON frame: %s" % exc)
-            wirebool.record(msg)  # strict check of truth values (WI-26)
+            wirebool.record(msg)  # strict check of truth values (WI-0026)
             out.append(msg)
         return out
 

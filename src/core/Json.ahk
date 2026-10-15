@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include Errors.ahk
 
-; JSON reader and writer (WI-02, doc/ARCHITECTURE.md section 7, v2-phase2-final:work_items/phase2/README.md contract).
+; JSON reader and writer (WI-0002, doc/ARCHITECTURE.md section 7, v2-phase2-final:work_items/phase2/README.md contract).
 ;
 ; Types are kept: a JSON string becomes String, a JSON number without point or exponent becomes
 ; Integer, any other number becomes Float. So "zoomFactor": "0.700000" stays a String and "x": 7

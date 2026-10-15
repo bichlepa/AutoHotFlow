@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; Measurement for WI-42 (acceptance criterion): ctx.EvalParams of an element with 10 parameters of mixed content types
+; Measurement for WI-0042 (acceptance criterion): ctx.EvalParams of an element with 10 parameters of mixed content types
 ; (expressions with the parse cache, %var% substitution, a variable name, a path, a raw text), in an Executor with
 ; the stand-in owner, so the context, the variable access and the evaluator are the real ones. Not a unit test.
 ; A_Args[1] = result file. Usage: python tools/ahkrun.py tests/ahk/helpers/evalparams_bench.ahk <result file>

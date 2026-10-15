@@ -1,8 +1,8 @@
-"""FROZEN since E35 (2026-10-14): regression test of the converter; no new cases against v1 (the oracle of the
+"""FROZEN since E0035 (2026-10-14): regression test of the converter; no new cases against v1 (the oracle of the
 expression language is native AutoHotkey v2, tests/oracle/).
 
-Compares the golden data of v1 with v2: the new expression language (WI-39, doc/EXPRESSION-LANGUAGE.md section 15)
-and the variable model of the engine (WI-40, section 18).
+Compares the golden data of v1 with v2: the new expression language (WI-0039, doc/EXPRESSION-LANGUAGE.md section 15)
+and the variable model of the engine (WI-0040, section 18).
 
 `plain`: the unchanged v1 text is evaluated by the new evaluator. Every case that does not give the v1 result must have
 a class of the deviation catalog (tools/golden_classes.py). `convert`: the text is converted first
@@ -48,7 +48,7 @@ def test_the_catalog_covers_all_kinds_of_cases(plain_rows):
 
 
 def test_the_name_rules_agree_with_v1(plain_rows):
-    """checkname (Var_CheckName) and destination (Var_RetrieveDestination): no deviation at all (WI-40)."""
+    """checkname (Var_CheckName) and destination (Var_RetrieveDestination): no deviation at all (WI-0040)."""
     rows = [r for r in plain_rows if r["kind"] in ("checkname", "destination")]
     assert len(rows) > 150
     differ = [(r["id"], r["text"], r["detail"]) for r in rows if r["verdict"] != "same"]
@@ -56,7 +56,7 @@ def test_the_name_rules_agree_with_v1(plain_rows):
 
 
 def test_variable_access_and_substitution_are_compared(plain_rows):
-    """varget, varset and replace run through the variable model and agree with v1 or have a class (WI-40)."""
+    """varget, varset and replace run through the variable model and agree with v1 or have a class (WI-0040)."""
     rows = [r for r in plain_rows if r["kind"] in ("varget", "varset", "replace")]
     assert len(rows) > 500
     assert sum(1 for r in rows if r["verdict"] == "same") > 480

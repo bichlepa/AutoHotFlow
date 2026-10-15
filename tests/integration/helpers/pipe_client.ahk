@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
 Persistent
-; Pipe client for tests/integration/test_pipe.py (WI-04).
+; Pipe client for tests/integration/test_pipe.py (WI-0004).
 ;   AutoHotkey64.exe pipe_client.ahk <resultFile> <pipeName> mode=<mode> [n=N] [wake=0|1] [timeout=ms]
 ;
 ; Modes:

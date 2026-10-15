@@ -4,10 +4,10 @@
 #Include Executor.ahk
 #Include vars\VarNames.ahk
 
-; The variable requests cmd.engine.var.* (WI-50, ARCHITECTURE R4, doc/PROTOCOL.md 4.5 "Variable requests"). A worker
+; The variable requests cmd.engine.var.* (WI-0050, ARCHITECTURE R0004, doc/PROTOCOL.md 4.5 "Variable requests"). A worker
 ; element asks with the execId of its job, a client with an instanceId (and optionally a threadId). Every request is
 ; answered at once from the variable model of the engine: no waiting, no file I/O; a changed global or static variable
-; is written later by VarWriter (write-behind, WI-41).
+; is written later by VarWriter (write-behind, WI-0041).
 ;
 ; The operations are the functions of the element context (ExecContext): for an execId the context of the running
 ; element itself, so a worker element sees exactly what it would see inline; for an instanceId a context made for the

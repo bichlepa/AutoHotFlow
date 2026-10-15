@@ -5,7 +5,7 @@
 #Include VarValues.ahk
 #Include VarJson.ahk
 
-; Writes the global and static variables back through storage (WI-41, ARCHITECTURE 6.2, PROTOCOL 4.6, M-06). The
+; Writes the global and static variables back through storage (WI-0041, ARCHITECTURE 6.2, PROTOCOL 4.6, M-0006). The
 ; engine holds the working copy and never touches a file. A change is not sent at once: the variable is marked, and
 ; DELAY_MS after the first change since the last write the state of that moment goes out (cmd.storage.var.set, or
 ; cmd.storage.var.delete if the variable is gone). Many changes of one variable inside the delay cost one write.
@@ -69,7 +69,7 @@ class VarWriter {
         }
         this._dirty := Map()
         ; The peer refuses requests beyond its limit of waiting ones and the process ends at once, so the rest is lost
-        ; (F-279). One summary line instead of one error per variable.
+        ; (F-0279). One summary line instead of one error per variable.
         if (lost > 0)
             this._engine._Log("a0", "engine", "shutdown: " lost " of " (sent + lost) " variables not written (storage refused the requests)")
         return sent

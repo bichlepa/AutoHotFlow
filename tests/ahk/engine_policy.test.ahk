@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/engine/core/ExecutionPolicy.ahk (WI-08, v1 newInstance and Execution Task 31-48).
+; Unit tests for src/engine/core/ExecutionPolicy.ahk (WI-0008, v1 newInstance and Execution Task 31-48).
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\core\ExecutionPolicy.ahk
 

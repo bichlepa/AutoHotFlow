@@ -1,7 +1,7 @@
-"""WI-15: the supervisor is killed hard. Its children must not survive it (orphan guard, ARCHITECTURE 6.3).
+"""WI-0015: the supervisor is killed hard. Its children must not survive it (orphan guard, ARCHITECTURE 6.3).
 
 Each role keeps trying to reach the hub for ORPHAN_MS (3 s) and then ends with exit 4 (Role.EXIT_HUB_LOST).
-The budget of the test is ORPHAN_BUDGET_S (3 s plus 2 s of slack, WI-15). Nothing may be left behind.
+The budget of the test is ORPHAN_BUDGET_S (3 s plus 2 s of slack, WI-0015). Nothing may be left behind.
 """
 
 import time
@@ -21,7 +21,7 @@ pytestmark = pytest.mark.fault
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_children_end_within_the_orphan_budget_when_the_supervisor_is_killed(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)
-    # worker:1 is the warm worker of the engine (WI-27). A child that is still connecting when the supervisor dies
+    # worker:1 is the warm worker of the engine (WI-0027). A child that is still connecting when the supervisor dies
     # lives on until the retry budget of its peer (10 s) is used up: the orphan guard counts a lost connection only.
     pids = chain.wait_ready(["storage", "engine", "manager", "worker:1"])
     ahk = chain.sup.ahk_pid()

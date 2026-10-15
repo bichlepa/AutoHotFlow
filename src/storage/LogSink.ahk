@@ -2,7 +2,7 @@
 #Include StoragePaths.ahk
 #Include AtomicFile.ahk
 
-; Log files in Log/ (WI-12, v1 "Logger.ahk", PROTOCOL 4.6). Every entry is written to Log.txt and to
+; Log files in Log/ (WI-0012, v1 "Logger.ahk", PROTOCOL 4.6). Every entry is written to Log.txt and to
 ; Log_<source>.txt, in the v1 line format:
 ;   CRLF, "--- yyyy MM dd HH:mm:ss ~<thread>~<source>~ <text>"
 ; thread is the name of the sending role (v1 showed the AHK thread; v2 has one thread per process).
@@ -31,7 +31,7 @@ class LogSink {
 
     ; Appends the entry to one file in logDir (rotating first). Returns "" when written, or the text
     ; of the error when another process holds the file (sharing or lock violation, access denied by a
-    ; scanner): the caller retries later (F-04). Any other error is thrown.
+    ; scanner): the caller retries later (F-0004). Any other error is thrown.
     ; FileAppend is not used: it opens the file without sharing, so any other open handle (a viewer,
     ; a scanner) made it fail with error 32. FileOpen without the deny flags shares read and write.
     static AppendTo(logDir, fileName, line) {

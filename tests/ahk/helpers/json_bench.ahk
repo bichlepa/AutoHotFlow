@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; Benchmark for WI-02: 10,000 envelopes of about 300 bytes, parsed and written again.
+; Benchmark for WI-0002: 10,000 envelopes of about 300 bytes, parsed and written again.
 ; Not a unit test. A_Args[1] = result file (one JSON line of type "bench").
 ; Times are measured with A_TickCount (about 15 ms resolution), only recorded, no hard gate.
 #Include ..\..\..\src\core\Json.ahk

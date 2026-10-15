@@ -7,7 +7,7 @@
 #Include ..\elements\base\ElementRunner.ahk
 #Include WorkerContext.ahk
 
-; Worker role (WI-11, ARCHITECTURE 2.3, PROTOCOL 4.5). One worker process runs one element at a time.
+; Worker role (WI-0011, ARCHITECTURE 2.3, PROTOCOL 4.5). One worker process runs one element at a time.
 ; Blocking calls are allowed here, because this process is the only one that may block. The engine
 ; never waits for it: cmd.worker.run is answered at once with ok, the result comes later as
 ; evt.worker.done.
@@ -15,9 +15,9 @@
 ; Blocking and pings: AHK v2 has one thread per process. Between script lines AHK checks for
 ; window messages, so an element that waits in short slices (Sleep, or a loop of DllCall("Sleep", 100))
 ; still answers sys.ping and cancel. A single long blocking call (download, COM call, long DllCall) does not.
-; Since WI-27 (decision E3, ARCHITECTURE 6.4) that is allowed: the worker reports to the supervisor when a job
+; Since WI-0027 (decision E0003, ARCHITECTURE 6.4) that is allowed: the worker reports to the supervisor when a job
 ; begins and ends (sys.busy {busy}). The supervisor neither pings a busy worker nor judges its pongs, so a long
-; blocking call does not make it "hung". The decision of WI-11 ("no heartbeat tolerance") is replaced by this.
+; blocking call does not make it "hung". The decision of WI-0011 ("no heartbeat tolerance") is replaced by this.
 ; What stays: a busy worker whose process dies is seen at once (process handle). One that blocks for ever ends
 ; only by a cancel that is not confirmed in 2 s, or by the job deadline of the element: the engine then asks the
 ; supervisor to kill it (cmd.process.kill). The worker never decides that for itself.
@@ -50,9 +50,9 @@ class Worker extends Role {
     }
 
     ; After a reconnect to the hub the supervisor does not know whether a job is running: a sys.busy sent while the
-    ; link was down is dropped (Peer.Send), either direction. So the current state is always announced (F-30).
+    ; link was down is dropped (Peer.Send), either direction. So the current state is always announced (F-0030).
     OnReady() {
-        this.SetLogTarget("storage")    ; F-28: without a target the entries of the worker (and of its elements) were never written
+        this.SetLogTarget("storage")    ; F-0028: without a target the entries of the worker (and of its elements) were never written
         this._ReportBusy(this._job != "")
     }
 
@@ -99,7 +99,7 @@ class Worker extends Role {
         job["started"] := true
         execId := job["execId"]
         env := job["env"]
-        ; The variable functions of the element ask the engine through the peer (WI-50, PROTOCOL 4.5).
+        ; The variable functions of the element ask the engine through the peer (WI-0050, PROTOCOL 4.5).
         ctx := WorkerContext(env.Get("flowId", ""), env.Get("elementId", ""), env.Get("instanceId", "")
             , env.Get("threadId", ""), job["imports"], ObjBindMethod(this, "_OnFinish", execId), job["evaluated"]
             , execId, ObjBindMethod(this.peer, "Request"))
@@ -137,7 +137,7 @@ class Worker extends Role {
         this._job := ""
         ctx := job["ctx"]
         if (IsObject(ctx))
-            ctx.stopped := true         ; no ctx.Request callback runs any more (WI-50)
+            ctx.stopped := true         ; no ctx.Request callback runs any more (WI-0050)
         if (job["started"] && IsObject(job["cls"]) && IsObject(ctx))
             ElementRunner.Stop(job["cls"], ctx, Worker._Params(job["params"]))
         execId := job["execId"]
@@ -180,7 +180,7 @@ class Worker extends Role {
         return v
     }
 
-    ; An optional list field (Array), empty Array when missing. Each entry of "evaluated" (E26) must be an object with
+    ; An optional list field (Array), empty Array when missing. Each entry of "evaluated" (E0026) must be an object with
     ; an id; anything else is bad_payload.
     static _List(msg, key) {
         v := msg.payload.Get(key, "")

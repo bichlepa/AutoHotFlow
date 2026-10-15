@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the variable model of the engine (WI-40, src/engine/vars, doc/EXPRESSION-LANGUAGE.md section 18):
+; Unit tests for the variable model of the engine (WI-0040, src/engine/vars, doc/EXPRESSION-LANGUAGE.md section 18):
 ; location by name, built-in variables, values and paths, %var% substitution, the resolver of the evaluator,
 ; lists, imports of a worker, hidden variables, the common place, loop variables on the loop stack.
 #Include lib\Assert.ahk

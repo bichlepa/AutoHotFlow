@@ -1,4 +1,4 @@
-"""WI-07: supervisor (src/supervisor/): start, routing, crash, hang, shutdown, single instance.
+"""WI-0007: supervisor (src/supervisor/): start, routing, crash, hang, shutdown, single instance.
 
 The supervisor runs as a real process through tools/ahkrun.py (never the interpreter directly). Its
 children are real role processes: the test roles echo, crasher, hanger and slow_shutdown from
@@ -26,7 +26,7 @@ from support.ahfclient import AhfClient, dumps, make_envelope
 from support.timing import scaled
 
 ROOT = Path(__file__).resolve().parents[2]
-ENTRY = ROOT / "tests" / "integration" / "helpers" / "AutoHotFlowTest.ahk"   # product entry plus test roles (WI-29)
+ENTRY = ROOT / "tests" / "integration" / "helpers" / "AutoHotFlowTest.ahk"   # product entry plus test roles (WI-0029)
 AHKRUN = ROOT / "tools" / "ahkrun.py"
 
 EXIT_OK = 0
@@ -265,7 +265,7 @@ def test_message_is_routed_unchanged_and_from_cannot_be_forged(started, session_
 
 
 def test_frames_outside_the_canonical_form_are_routed_with_the_real_sender(started, session_id):
-    # WI-24: canonical frames are routed by their head only; everything else takes the full way. In both
+    # WI-0024: canonical frames are routed by their head only; everything else takes the full way. In both
     # ways the sender is the connection. A "from" written behind the payload must not win either.
     sup = started()
     a = connect(sup.pipe, "a")
@@ -304,12 +304,12 @@ def test_frames_outside_the_canonical_form_are_routed_with_the_real_sender(start
     assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
 
 
-PEER_GONE_BUDGET_S = scaled(1.0)      # F-40 (WI-34): an open request to a client that is gone ends within 1 s
+PEER_GONE_BUDGET_S = scaled(1.0)      # F-0040 (WI-0034): an open request to a client that is gone ends within 1 s
 OPEN_REQUEST_S = 10.0                 # the own deadline of these requests: far above the budget
 
 
 def test_open_request_to_a_client_that_goes_away_is_answered_with_peer_gone_at_once(started, session_id):
-    # F-40 (WI-34): the hub forwards a cmd.* and the target goes away before it answers. Before, nobody answered and
+    # F-0040 (WI-0034): the hub forwards a cmd.* and the target goes away before it answers. Before, nobody answered and
     # the sender waited for its own deadline (the engine: 30 s for storage). Now the hub answers with peer_gone when
     # the connection of the target ends. An answer that was given before is not followed by a second one.
     sup = started()
@@ -345,7 +345,7 @@ def test_open_request_to_a_client_that_goes_away_is_answered_with_peer_gone_at_o
 
 
 def test_open_request_to_a_child_whose_process_dies_is_answered_with_peer_gone_at_once(started, session_id):
-    # F-40 (WI-34): the target is a role process that cannot answer (frozen) and is then killed, as a crashing
+    # F-0040 (WI-0034): the target is a role process that cannot answer (frozen) and is then killed, as a crashing
     # storage or engine would be. The sender learns it from the hub within 1 s of the death, not at its deadline.
     sup = started("--start=echo:a", "--test-roles")
     py = connect(sup.pipe, "py")
@@ -396,7 +396,7 @@ def test_second_instance_forwards_the_command_and_creates_no_hub(started, sessio
     assert "command from command: hallo welt" in first.text(), first.text()
 
 
-# --- pipe and mutex names (WI-22 point 5) ----------------------------------------------------------
+# --- pipe and mutex names (WI-0022 point 5) ----------------------------------------------------------
 
 def test_hub_pipe_name_carries_the_windows_session_and_the_user(started, session_id):
     sup = started()
@@ -654,7 +654,7 @@ def test_a_manager_can_cancel_the_exit_in_the_prepare_phase(started, session_id)
         py.close()
 
 
-# --- Hub.Request deadline (WI-07 open point) -----------------------------------------------------------
+# --- Hub.Request deadline (WI-0007 open point) -----------------------------------------------------------
 
 @pytest.mark.slow
 def test_request_without_answer_times_out_and_late_answer_is_dropped(started, session_id):

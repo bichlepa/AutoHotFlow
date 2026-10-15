@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the operators of the evaluator and the rules E25, E29 to E32 (WI-38, doc/EXPRESSION-LANGUAGE.md
+; Unit tests for the operators of the evaluator and the rules E0025, E0029 to E0032 (WI-0038, doc/EXPRESSION-LANGUAGE.md
 ; sections 5 and 14). The values of the table "Behavior of AHK v2" of the phase 3 plan are the cross-check.
 #Include lib\EvalCheck.ahk
 
@@ -37,7 +37,7 @@ CheckNumericStrings() {
 }
 
 CheckTypeErrorsGiveEmptyText() {
-    ; E25: AutoHotkey throws a TypeError, the evaluator turns it into "", a warning and an f1 log entry
+    ; E0025: AutoHotkey throws a TypeError, the evaluator turns it into "", a warning and an f1 log entry
     EvalCheck.Warns('"" + 1', "'+' failed")
     EvalCheck.Warns('"abc" + 1', "'+' failed")
     EvalCheck.Warns('1 - "x"', "'-' failed")
@@ -160,7 +160,7 @@ CheckComparisonRuleE30() {
         ['"2" <= "10"', 1],
         ['"0x10" > 15', 1],
     ])
-    ; a text that is not a number: AutoHotkey throws a TypeError, the result is "" plus an f1 log (E30, E25)
+    ; a text that is not a number: AutoHotkey throws a TypeError, the result is "" plus an f1 log (E0030, E0025)
     EvalCheck.Warns('"a" < "B"', "'<' failed")
     EvalCheck.Warns('"abc" < "ABD"', "'<' failed")
     EvalCheck.Warns('"10" < "9a"', "'<' failed")
@@ -304,20 +304,20 @@ TestRun.Init()
 
 TestRun.Case("arithmetic with integers and floats", CheckArithmetic)
 TestRun.Case("numeric strings are numbers", CheckNumericStrings)
-TestRun.Case("E25 type errors give the empty text, a warning and an f1 log", CheckTypeErrorsGiveEmptyText)
+TestRun.Case("E0025 type errors give the empty text, a warning and an f1 log", CheckTypeErrorsGiveEmptyText)
 TestRun.Case("a warning carries line, column and the marked source", CheckWarningHasPosition)
 TestRun.Case("evaluation goes on after a warning", CheckEvaluationContinuesAfterWarning)
-TestRun.Case("E29 exact division of integers gives an integer", CheckDivisionRuleE29)
+TestRun.Case("E0029 exact division of integers gives an integer", CheckDivisionRuleE29)
 TestRun.Case("division by zero gives the empty text and a warning", CheckDivisionByZero)
 TestRun.Case("integer division as in AutoHotkey", CheckIntegerDivision)
 TestRun.Case("MinInt // -1 does not end the process", CheckMinIntIsNotFatal)
 TestRun.Case("comparisons of numbers", CheckComparisonsOfNumbers)
-TestRun.Case("E30 comparisons follow AutoHotkey, text operands give the empty text", CheckComparisonRuleE30)
+TestRun.Case("E0030 comparisons follow AutoHotkey, text operands give the empty text", CheckComparisonRuleE30)
 TestRun.Case("equality operators", CheckEquality)
-TestRun.Case("E31 logic operators return the operand and short-circuit", CheckLogicRuleE31)
+TestRun.Case("E0031 logic operators return the operand and short-circuit", CheckLogicRuleE31)
 TestRun.Case("not and the exclamation mark", CheckNot)
 TestRun.Case("concatenation", CheckConcatenation)
-TestRun.Case("E32 text form of floats", CheckFloatTextRuleE32)
+TestRun.Case("E0032 text form of floats", CheckFloatTextRuleE32)
 TestRun.Case("precedence and associativity in evaluation", CheckPrecedenceAndAssociativity)
 TestRun.Case("values of the AutoHotkey v2 table of the phase 3 plan", CheckValuesOfTheVersionTwoTable)
 

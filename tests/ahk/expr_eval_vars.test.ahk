@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for variables, assignment, functions, the script form, the result object and robustness of the
-; evaluator (WI-38, doc/EXPRESSION-LANGUAGE.md sections 4, 7, 8 and 14).
+; evaluator (WI-0038, doc/EXPRESSION-LANGUAGE.md sections 4, 7, 8 and 14).
 #Include lib\EvalCheck.ahk
 #Include ..\..\src\core\Json.ahk
 
@@ -49,7 +49,7 @@ CheckMissingVariable() {
     Assert.Equal(res["missing"][1]["col"], 1)
     Assert.Equal(res["log"].Length, 1)
     Assert.Equal(res["log"][1], "f0: Retrieving variable 'y' failed. It does not exist")
-    ; used in a calculation the empty text is a TypeError as for any empty text (E25)
+    ; used in a calculation the empty text is a TypeError as for any empty text (E0025)
     res := EvalCheck.Run("y + 1")
     Assert.Equal(res["value"], "")
     Assert.Equal(res["missing"].Length, 1)
@@ -129,7 +129,7 @@ CheckCompoundAssignment() {
     Assert.Equal(res["resolver"].vars["x"], 6)
     res := EvalCheck.Run("x *= 2", vars)
     Assert.Equal(res["resolver"].vars["x"], 16)
-    ; E29 applies to /=
+    ; E0029 applies to /=
     res := EvalCheck.Run("x /= 2", vars)
     Assert.Equal(res["resolver"].vars["x"], 4)
     res := EvalCheck.Run("x /= 3", vars)
@@ -305,7 +305,7 @@ CheckIfElse() {
     Assert.Equal(res["resolver"].vars.Has("x"), false)
     ; a statement instead of a block
     Assert.Equal(EvalCheck.Value("if 1`n x := 7", "", "script"), 7)
-    ; the condition is the value of the operand (E31) and uses the truth rules of AutoHotkey
+    ; the condition is the value of the operand (E0031) and uses the truth rules of AutoHotkey
     Assert.Equal(EvalCheck.Value('if "" || "a" {`n x := 1`n} else {`n x := 2`n}', "", "script"), 1)
     Assert.Equal(EvalCheck.Value('if "0" {`n x := 1`n} else {`n x := 2`n}', "", "script"), 2)
     Assert.Equal(EvalCheck.Value('if "abc" {`n x := 1`n} else {`n x := 2`n}', "", "script"), 1)

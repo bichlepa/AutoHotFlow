@@ -1,4 +1,4 @@
-"""Compares the golden data of v1 with the new expression language (work item WI-39, deviation catalog).
+"""Compares the golden data of v1 with the new expression language (work item WI-0039, deviation catalog).
 
 Usage:
     python tools/golden_compare.py [--plain] [--private] [--group NAME ...] [--list CLASS] [--unclassified]
@@ -7,7 +7,7 @@ For every case in tests/golden/cases the harness tests/golden/v2/harness.ahk (st
 the v2 code with the variable model of the engine and the result is compared with the stored result of v1
 (tests/golden/expected): expressions and scripts with the new evaluator, `replace` with the %var% substitution,
 `checkname` and `destination` with the name rules, `varget` and `varset` with the variable access of elements
-(WI-40). By default the text of an expression or script is converted first (V1ExprConverter); --plain evaluates the
+(WI-0040). By default the text of an expression or script is converted first (V1ExprConverter); --plain evaluates the
 unchanged text, which is the deviation catalog of doc/EXPRESSION-LANGUAGE.md section 15.
 
 Every case gets a verdict: `same` or a deviation class (see CLASSES). A class has a handling: `accept` (the

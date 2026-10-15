@@ -23,7 +23,7 @@
 ;
 ; Standard handlers: sys.ping/sys.pong live in Peer. sys.shutdown is handled here: OnShutdown,
 ; then sys.bye {clean:true} to the supervisor in the next timer tick, then Peer.CloseWhenFlushed and ExitApp(0)
-; once the send queue is written (at most the rest of the deadline, FLUSH_MAX_MS; WI-30, _EndProcess).
+; once the send queue is written (at most the rest of the deadline, FLUSH_MAX_MS; WI-0030, _EndProcess).
 ; Orphan guard: when the hub connection is lost and not restored within ORPHAN_MS, the role
 ; ends with EXIT_HUB_LOST. The peer's own retry budget (reconnectTotalMs) is the backstop.
 ;
@@ -39,17 +39,17 @@ class Role {
     static ORPHAN_MS := 3000
     static GUARD_MS := 200
     static LOG_QUEUE_MAX := 500
-    ; Log entries are droppable (F-17): above this many frames in the send queue to the hub an entry is dropped and
+    ; Log entries are droppable (F-0017): above this many frames in the send queue to the hub an entry is dropped and
     ; counted, so a log burst never drives the queue into the hard limit (PipeConnection.maxQueueFrames, 1000), which
     ; would close the connection. The count is reported as one line when there is room again.
     static LOG_SEND_SOFT := 500
-    ; More than ERROR_LIMIT unhandled errors within ERROR_WINDOW_MS end the role with EXIT_TOO_MANY_ERRORS (WI-23).
+    ; More than ERROR_LIMIT unhandled errors within ERROR_WINDOW_MS end the role with EXIT_TOO_MANY_ERRORS (WI-0023).
     ; 20 in a minute is generous: a healthy role has none, one broken element or timer may throw a few times in a
     ; row, but 21 means the state is broken and a restart (engine, storage: Children restart rule) is better than
     ; a zombie. The window keeps rare errors over a long life from adding up.
     static ERROR_LIMIT := 20
     static ERROR_WINDOW_MS := 60000
-    ; Ending (WI-30, F-26): the last frames (events, log lines, sys.bye) are written before the process ends
+    ; Ending (WI-0030, F-0026): the last frames (events, log lines, sys.bye) are written before the process ends
     ; (Peer.CloseWhenFlushed). The time for that is the rest of the shutdown deadline, but at most FLUSH_MAX_MS:
     ; a healthy hub empties a full pipe within one or two of its ticks (200 ms), one second also covers a hub that is
     ; busy with a burst of other clients, and the supervisor ends the process at its deadline anyway. FLUSH_MIN_MS
@@ -68,10 +68,10 @@ class Role {
     ; no file (the one exception to CONVENTIONS section 3, see doc/HOW-TO.md). Call it as
     ; Role.Console(...); ConsoleFn is only the function value for Log.Configure, because a
     ; function stored in a property receives the class as first argument when called as Role.ConsoleFn(...).
-    ; A role started by the supervisor has stdout and stderr in an anonymous pipe (WI-23, ChildLauncher): what
+    ; A role started by the supervisor has stdout and stderr in an anonymous pipe (WI-0023, ChildLauncher): what
     ; it writes here is read by the supervisor and ends up in the log. Without a usable stderr (a role started
     ; by hand without a console) FileAppend throws; the console is best effort and must never keep a role from
-    ; ending (orphan guard, WI-15, F-05).
+    ; ending (orphan guard, WI-0015, F-0005).
     static Console(level, source, text) {
         try {
             FileAppend(level " " source ": " text "`n", "**", "UTF-8-RAW")

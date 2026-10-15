@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; The window of the debug role (WI-28). Pure view: DebugView holds all state and calls Render at most 10 times per
+; The window of the debug role (WI-0028). Pure view: DebugView holds all state and calls Render at most 10 times per
 ; second and only after a change. The window has five tabs:
 ;   Prozesse    the process table (cmd.process.list)
 ;   Snapshots   a role chosen from a list, its snapshot as formatted JSON
@@ -217,7 +217,7 @@ class DebugGui {
     }
 
     ; Replaces the text of a multiline Edit and keeps the vertical scroll position and the selection. Setting
-    ; Value resets both (F-256). The snapshot JSON changes at every refresh (uptimeMs, rssBytes), but the lines stay
+    ; Value resets both (F-0256). The snapshot JSON changes at every refresh (uptimeMs, rssBytes), but the lines stay
     ; the same, so the first visible line index is still meaningful. Redraw is off meanwhile, so nothing flickers.
     _SetEditKeepView(edit, text) {
         static EM_GETSEL := 0x00B0, EM_SETSEL := 0x00B1, EM_GETFIRSTVISIBLELINE := 0x00CE, EM_LINESCROLL := 0x00B6

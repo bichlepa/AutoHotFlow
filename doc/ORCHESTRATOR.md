@@ -68,7 +68,7 @@ Split the wishes into tasks that can be worked one after the other (one task, on
 
 1. Take the work items from `work_items/phase3/` (the step table in `README.md`, the `Depends on` line of each `WI-*.md`). Keep the book in `work_items/phase3/STATUS.md` (create it if missing; table: work item, state `open`, `in progress`, `done`, `blocked`, commit, run ID, date). A work item is `done` when its acceptance criteria are met and the verifier found nothing that blocks it.
 2. Next work item: the first one in plan order that is `open` and whose dependencies are `done`. **Skip** a work item that depends on an unanswered question in "Open questions for the project owner" of the README (record it as `blocked`, name the question, move on). Do not decide such questions yourself; the project owner answers them in separate sessions. If the input or the README already contains the answer, use it.
-3. Give the implementer the work item file as its task, and the files it names under "Read first". Choose the model from the description (section 1). Work items run strictly one after the other. When no work item with a file is `open` and unblocked, end the work-item part and report; do not invent work items (a step without work item files, S2 and later, has to be detailed with the project owner first).
+3. Give the implementer the work item file as its task, and the files it names under "Read first". Choose the model from the description (section 1). Work items run strictly one after the other. When no work item with a file is `open` and unblocked, end the work-item part and report; do not invent work items (a step without work item files, S0002 and later, has to be detailed with the project owner first).
 
 ### 3c. Bug hunter
 

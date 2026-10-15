@@ -1,4 +1,4 @@
-"""Migration report of v1 flows (WI-45, E35): which elements have a class that v2 does not know yet, and which places of
+"""Migration report of v1 flows (WI-0045, E0035): which elements have a class that v2 does not know yet, and which places of
 the known classes behave differently in v2 and carry MIGRATION IDs (doc/MIGRATION.md) together with the v1 text.
 
     python tools/migration_report.py <flow file or folder> [--json]

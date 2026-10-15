@@ -1,4 +1,4 @@
-"""WI-15: a role process is killed hard (TerminateProcess). Engine, storage, manager stub and worker.
+"""WI-0015: a role process is killed hard (TerminateProcess). Engine, storage, manager stub and worker.
 
 Expected for each role (ARCHITECTURE 6.2, PROTOCOL 4.1a, 4.1 restart policy):
   - the supervisor reports evt.process.crashed (reason "exited") within CRASH_BUDGET_S of the death,
@@ -7,7 +7,7 @@ Expected for each role (ARCHITECTURE 6.2, PROTOCOL 4.1a, 4.1 restart policy):
   - a request to a role that is down is answered at once (not_found), it does not hang.
 
 Every test runs REPEATS times (AHF_FAULT_REPEAT, acceptance 20). Times are printed as MEASURE lines and
-recorded in v2-phase2-final:work_items/phase2/WI-15-fault-injection.md, section Ergebnis.
+recorded in v2-phase2-final:work_items/phase2/WI-0015-fault-injection.md, section Ergebnis.
 """
 
 import json
@@ -35,7 +35,7 @@ def kill_role(chain, name):
     psutil.Process(pid).kill()
     crashed = chain.rec.wait(event("evt.process.crashed", name=name), timeout=CRASH_BUDGET_S + 5)
     if crashed is None:
-        # F-280: the supervisor stderr is empty in a healthy run, so it says nothing. Show what the chain knows:
+        # F-0280: the supervisor stderr is empty in a healthy run, so it says nothing. Show what the chain knows:
         # was the killed process really gone, what the supervisor thinks of the role, which events arrived.
         try:
             states = chain.states()
@@ -122,7 +122,7 @@ def test_killed_manager_stub_is_not_restarted_and_requests_to_it_end_at_once(cha
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted(chains, datadir, round_no):
-    """Regression of WI-11 under the real supervisor. Since WI-27 the engine is a child and asks the supervisor for its
+    """Regression of WI-0011 under the real supervisor. Since WI-0027 the engine is a child and asks the supervisor for its
     warm worker (worker:1); the supervisor still never restarts a worker, the engine asks for a new one."""
     write_flow(datadir, "w8", element_class="Action_TestHangWorker")
     chain = chains(FULL_CHAIN, STUB_OPTS)

@@ -2,7 +2,7 @@
 #Include Expr.ahk
 #Include V1ExprDetect.ahk
 
-; Converter of v1 expressions and scripts into the new language (WI-39, doc/EXPRESSION-LANGUAGE.md section 15).
+; Converter of v1 expressions and scripts into the new language (WI-0039, doc/EXPRESSION-LANGUAGE.md section 15).
 ;
 ;   conv := V1ExprConverter.Convert(text, "expression")      ; or "script"
 ;   conv["status"]     "unchanged" | "converted" | "unsupported" | "failed"
@@ -11,7 +11,7 @@
 ;   conv["messages"]   Array of texts for the log (why a text is "unsupported" or "failed")
 ;   conv["classes"]    Array of the deviation classes (doc/EXPRESSION-LANGUAGE.md 15.1, handling "accept" or
 ;                      "unsupported") that the text shows (V1ExprDetect); "unreadable text" for a "failed" text that
-;                      no other class explains. MigrationClasses maps them to MIGRATION IDs (WI-45).
+;                      no other class explains. MigrationClasses maps them to MIGRATION IDs (WI-0045).
 ;
 ; The text is rewritten only where the result of v1 cannot be had otherwise; the rest stays as the user wrote it.
 ; The rewrite rules (each one is a class of the deviation catalog with the handling "rewrite"):

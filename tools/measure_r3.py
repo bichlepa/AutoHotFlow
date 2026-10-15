@@ -1,4 +1,4 @@
-"""WI-46: R3 measurement (cost of parsing many element classes in every process) and the load-phase baseline (F-282).
+"""WI-0046: R0003 measurement (cost of parsing many element classes in every process) and the load-phase baseline (F-0282).
 
 Two modes. Both run on the real chain with an entry script that is generated in a temporary folder (nothing is
 written into src/): the entry includes src/AhfBoot.ahk and, after it, the generated element files.
@@ -15,11 +15,11 @@ written into src/): the entry includes src/AhfBoot.ahk and, after it, the genera
       time from the first flow list to the last flow loaded, the variable phase until evt.engine.ready, and the
       latency of cmd.engine.snapshot during the load. Variant `plain` has the element classes of the product,
       variant `stubs` additionally registers a stub class for every class that occurs in the big flows, and every
-      parameter of such a class counts as an expression (the worst case after S2 and S8). The timings come from
+      parameter of such a class counts as an expression (the worst case after S0002 and S0008). The timings come from
       tools/measure_r3_hooks.ahk, which wraps methods of the engine at run time (src/ stays unchanged).
 
 Run it alone on the machine (no other tests, no other agents): the numbers are timings. Results are printed as
-JSON lines (`R3 {...}`) and, with --out, appended to FILE. `summary` below each mode prints median/min/max.
+JSON lines (`R0003 {...}`) and, with --out, appended to FILE. `summary` below each mode prints median/min/max.
 """
 
 import argparse
@@ -60,7 +60,7 @@ def synthetic_element(n):
     name = "Action_Synth_%04d" % n
     out = ["#Requires AutoHotkey v2.0", "#Include %s" % (ROOT / "src" / "elements" / "base" / "AhfElement.ahk"),
            "#Include %s" % (ROOT / "src" / "elements" / "base" / "ElementRegistry.ahk"), "",
-           "; Synthetic element for the R3 measurement (WI-46). Not part of the product.",
+           "; Synthetic element for the R0003 measurement (WI-0046). Not part of the product.",
            "class %s extends AhfElement {" % name,
            '    static Mode := "inline"', '    static Level := "Beginner"', '    static Stability := "Stable"',
            '    static Icon := "synth.ico"', "",
@@ -215,7 +215,7 @@ def stats(values):
 
 
 def emit(out, record):
-    line = "R3 " + json.dumps(record)
+    line = "R0003 " + json.dumps(record)
     print(line, flush=True)
     if out:
         with open(out, "a", encoding="utf-8") as f:

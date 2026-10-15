@@ -4,7 +4,7 @@
 #Include ProcInfo.ahk
 
 ; Builds the parts of a diagnostic snapshot that every process has in the same form (doc/PROTOCOL.md 4.9,
-; WI-28): the general part (Role.Snapshot and the supervisor use it), the log part and the errors part.
+; WI-0028): the general part (Role.Snapshot and the supervisor use it), the log part and the errors part.
 ; A snapshot holds names, ids, counters and states, never the content of variables or flows.
 ;
 ;   snap := Snapshot.General(name, role)               ; Map: schema, name, role, pid, startedAt, ... handles

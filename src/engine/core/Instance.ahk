@@ -4,7 +4,7 @@
 #Include ThreadState.ahk
 #Include ..\vars\VarValues.ahk
 
-; Instance state machine (WI-08, ARCHITECTURE 5.1, normative).
+; Instance state machine (WI-0008, ARCHITECTURE 5.1, normative).
 ;
 ; One instance = one run of a flow, started by a trigger. It holds its threads. The instance
 ; ends when its last thread is removed (v1 removeThread / removeInstance, Instances and
@@ -18,7 +18,7 @@
 class Instance {
     ; from state -> allowed target states.
     ; new -> running: flow.start or trigger accepted (v1 newInstance)
-    ; new -> waiting: policy wait and the flow is executing (E2, M-11)
+    ; new -> waiting: policy wait and the flow is executing (E0002, M-0011)
     ; waiting -> running: the instances before it ended (FIFO per flow)
     ; waiting -> ended: stopped while waiting (flow stop, flow deleted)
     ; running -> ended: last thread removed (v1 removeThread)
@@ -41,7 +41,7 @@ class Instance {
         this.State := "new"
         this.OnInvalid := onInvalid
         this.Threads := Map()
-        ; Instance variables (WI-40): every name without a prefix. Shared by all threads of the instance.
+        ; Instance variables (WI-0040): every name without a prefix. Shared by all threads of the instance.
         this.Vars := VarValues.NewMap()
         this.HiddenVars := VarValues.NewMap()
     }

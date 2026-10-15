@@ -6,11 +6,11 @@
 #Include FlowDefinition.ahk
 
 ; Conversion of the expression texts of a flow from v1 syntax into the new language when the flow is loaded
-; (WI-39, E22, doc/EXPRESSION-LANGUAGE.md section 15, doc/ARCHITECTURE.md section 7).
+; (WI-0039, E0022, doc/EXPRESSION-LANGUAGE.md section 15, doc/ARCHITECTURE.md section 7).
 ;
 ; Only the element class knows which parameters are expressions. Per element of the flow:
 ;   - its class is in the registry: the texts of its expression parameters are converted (V1ExprConverter);
-;   - its class is unknown (most of them in S1 to S7, E20): the v1 texts stay, the element is listed in
+;   - its class is unknown (most of them in S0001 to S0007, E0020): the v1 texts stay, the element is listed in
 ;     FlowDefinition.Pending. A save writes the element with the marker "v1Text", so the texts are converted as soon
 ;     as the class exists, even when v2 has saved the flow in the meantime.
 ; A file that was saved by v2 carries the root key "formatVersion"; there only the marked elements are converted. A
@@ -23,7 +23,7 @@
 ;
 ; Every conversion is in the log (level f2), every text that cannot be converted at level f1.
 ;
-; Migration markers (WI-45, E35): a text that the converter leaves unchanged or only partly converts, and whose
+; Migration markers (WI-0045, E0035): a text that the converter leaves unchanged or only partly converts, and whose
 ; behaviour differs from v1 in a way the text shows (V1ExprDetect), is recorded at the element in the key "migration":
 ; a list of {par, ids, v1}: the parameter ID, the MIGRATION IDs (doc/MIGRATION.md) and the v1 text as it was before the
 ; conversion. The key is part of the element (unknown keys are kept and written back), it stays until the place is

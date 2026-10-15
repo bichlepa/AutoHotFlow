@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
 Persistent
-; Peer probe for tests/integration/test_peer.py (WI-05). Not a test on its own.
+; Peer probe for tests/integration/test_peer.py (WI-0005). Not a test on its own.
 ;   AutoHotkey64.exe peer_probe.ahk <resultFile> <hubPipe> name=<peer> mode=serve|ask
 ;                    [hubHwnd=<n>] [target=<name>] [steps=a,b,...] [n=<count>]
 ;

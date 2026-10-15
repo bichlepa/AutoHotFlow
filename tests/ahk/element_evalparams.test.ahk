@@ -1,13 +1,13 @@
 #Requires AutoHotkey v2.0
-; Parameter evaluation and the variable functions of ctx (WI-42, doc/ELEMENT-API-V2.md section 3 and 3.1): the rules
-; of v1 x_AutoEvaluateParameters per content type, the flow option strictTypes (E34), the f1 entries of the evaluator.
+; Parameter evaluation and the variable functions of ctx (WI-0042, doc/ELEMENT-API-V2.md section 3 and 3.1): the rules
+; of v1 x_AutoEvaluateParameters per content type, the flow option strictTypes (E0034), the f1 entries of the evaluator.
 ; The test element Action_TestExprParams (src/elements/skeleton) evaluates its parameters with ctx.EvalParams and
 ; leaves the result in global_evalresult; it runs in an Executor with the stand-in owner (no processes).
 ;
-; Worker (E26): every case of the content types runs a second time with Action_TestExprParamsWorker. The engine side is
+; Worker (E0026): every case of the content types runs a second time with Action_TestExprParamsWorker. The engine side is
 ; the real Executor (it evaluates the parameters and hands them to the stand-in pool, FakeWorkers); the worker side is
 ; the real WorkerContext, fed with what cmd.worker.run would carry (a JSON round trip of params, imports and
-; evaluated). The cases expect the same results in both modes, except where E26 differs on purpose.
+; evaluated). The cases expect the same results in both modes, except where E0026 differs on purpose.
 #Include helpers\ExecutorKit.ahk
 #Include ..\..\src\worker\WorkerContext.ahk
 #Include ..\..\src\elements\skeleton\Action_TestExprParams.ahk
@@ -223,7 +223,7 @@ CheckNumber() {
 CheckInteger() {
     Fails(Eval(P("Int", "global_f")), "Result of expression 'global_f' is not an integer")
     Fails(Eval(P("Int", "1.5 * 2")), "Result of expression '1.5 * 2' is not an integer")   ; 3.0 is a Float
-    Ok(Eval(P("Int", "4 / 2")))                  ; E29: an exact division of integers is an Integer
+    Ok(Eval(P("Int", "4 / 2")))                  ; E0029: an exact division of integers is an Integer
     Ok(Eval(P("Int", '"0x10"')))
     Fails(Eval(P("PosInt", "0")), "Result of expression '0' is not a positive number")
     Fails(Eval(P("PosInt", "global_f")), "Result of expression 'global_f' is not an integer")
@@ -310,7 +310,7 @@ CheckSkipListAndMore() {
     Assert.Equal(Val(r, "Expr"), 5)
     Fails(Eval(P("Expr", "1 +", "Skip", "Expr", "More", "Expr")), "An error occured while parsing expression '1 +'")
     ; an assignment in a skipped parameter does not run inline; for a worker element the engine has evaluated every
-    ; parameter before the job (E26, MIGRATION M-48)
+    ; parameter before the job (E0026, MIGRATION M-0048)
     r := Eval(P("Expr", "global_side := 1", "Skip", "Expr"))
     Ok(r)
     Assert.Equal(r["owner"].vars.Global.Has("global_side"), EvalMode.worker ? 1 : 0, "assignment in a skipped parameter")
@@ -318,7 +318,7 @@ CheckSkipListAndMore() {
 
 CheckTheFirstErrorStops() {
     ; Expr comes before Num in Parameters(): its error is reported. Inline, Num is not evaluated (its assignment does not
-    ; run); a worker element got every parameter evaluated (E26)
+    ; run); a worker element got every parameter evaluated (E0026)
     r := Eval(P("Expr", "1 +", "Num", "global_after := 1"))
     Fails(r, "An error occured while parsing expression '1 +'")
     Assert.Equal(r["owner"].vars.Global.Has("global_after"), EvalMode.worker ? 1 : 0)
@@ -326,13 +326,13 @@ CheckTheFirstErrorStops() {
     Fails(Eval(P("Int", "2.5", "Expr", "1 +")), "An error occured while parsing expression '1 +'")
 }
 
-; ---- strict mode (E34) ------------------------------------------------------------------------------------------
+; ---- strict mode (E0034) ------------------------------------------------------------------------------------------
 
 CheckTypeErrorInCompatibilityMode() {
     r := Eval(P("Expr", "global_t + 1", "Num", "global_missing < 3"))
     Ok(r)
-    Assert.Equal(Val(r, "Expr"), "")             ; E25: the empty text and a warning
-    Assert.Equal(Val(r, "Num"), "")              ; F-277: false in v2, without the counter set
+    Assert.Equal(Val(r, "Expr"), "")             ; E0025: the empty text and a warning
+    Assert.Equal(Val(r, "Num"), "")              ; F-0277: false in v2, without the counter set
     ; the f1 warning names the flow, the element and the parameter
     Assert.True(HasLogLine("f1", "element a1", "parameter 'Expr'", "Expression warning", "e"), "f1 warning of Expr")
     Assert.True(HasLogLine("f1", "element a1", "parameter 'Num'", "Expression warning"), "f1 warning of Num")
@@ -417,7 +417,7 @@ CheckExportAndImportInstanceVars() {
     Assert.Equal(InElement(ExportImport), "1|two|3||")
 }
 
-; ---- worker (E26) -----------------------------------------------------------------------------------------------
+; ---- worker (E0026) -----------------------------------------------------------------------------------------------
 
 ; What the engine sends: one entry per parameter in the order of Parameters(), a value or an error, also for the
 ; parameters that the element will skip. Labels and buttons are not in it.
@@ -454,7 +454,7 @@ CheckAMapValueKeepsItsIntegerKeysInTheWorker() {
     Assert.Equal(err.Message, "boom")
     ; an explicit import list is read with GetImport, keys as the engine stores them
     Assert.Equal(ctx.GetImport("list")[2]["x"], "y")
-    ; the variable functions ask the engine (WI-50); this context has no connection to it
+    ; the variable functions ask the engine (WI-0050); this context has no connection to it
     Assert.Throws(() => ctx.GetVar("list"), ElementError)
     Assert.Throws(() => ctx.ReplaceVariables("%x%"), ElementError)
     Assert.Throws(() => ctx.EvaluateExpression("1"), ElementError)
@@ -526,8 +526,8 @@ TestRun.Case("worker: RawString", InWorker(CheckRawString))
 TestRun.Case("worker: file and folder", InWorker(CheckFileAndFolder))
 TestRun.Case("worker: contentID", InWorker(CheckSelectableContent))
 TestRun.Case("worker: labels, buttons, defaults", InWorker(CheckLabelsAndButtonsAreSkippedMissingParametersGetTheDefault))
-TestRun.Case("worker: skip list and EvalMoreParams; an assignment in a skipped parameter runs (E26)", InWorker(CheckSkipListAndMore))
-TestRun.Case("worker: the first error is reported; every parameter was evaluated (E26)", InWorker(CheckTheFirstErrorStops))
+TestRun.Case("worker: skip list and EvalMoreParams; an assignment in a skipped parameter runs (E0026)", InWorker(CheckSkipListAndMore))
+TestRun.Case("worker: the first error is reported; every parameter was evaluated (E0026)", InWorker(CheckTheFirstErrorStops))
 TestRun.Case("worker: compatibility mode", InWorker(CheckTypeErrorInCompatibilityMode))
 TestRun.Case("worker: strict mode", InWorker(CheckTypeErrorInStrictMode))
 TestRun.Case("worker: the engine sends every parameter evaluated, values and errors in order", CheckTheEngineSendsEveryParameterEvaluated)

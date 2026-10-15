@@ -2,7 +2,7 @@
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
 
-; Test element for WI-11: a worker-mode element that finishes at once. It exports the imported
+; Test element for WI-0011: a worker-mode element that finishes at once. It exports the imported
 ; value "in" as "out" and finishes "normal". Tests use it for imports, exports and the worker's
 ; plain round trip.
 class Action_TestEchoWorker extends AhfElement {

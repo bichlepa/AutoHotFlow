@@ -6,10 +6,10 @@
 #Include ..\core\Role.ahk
 #Include DebugGui.ahk
 
-; Role "debug": the debug window (WI-28, doc/ARCHITECTURE 3, doc/PROTOCOL 4.9). It shows the internals of the running
+; Role "debug": the debug window (WI-0028, doc/ARCHITECTURE 3, doc/PROTOCOL 4.9). It shows the internals of the running
 ; system: the process table, the snapshot of every role, the live log (level and source filter), the stream of engine and
 ; process events (with a pause), the values that code sends with Debug.Dump, and a button that writes a diagnostic
-; report. It reads and shows only; it changes nothing in the other roles (not a flow debugger, E1).
+; report. It reads and shows only; it changes nothing in the other roles (not a flow debugger, E0001).
 ;
 ;   AutoHotFlow.ahk --role=debug --session=<id> --hub=<pipe> --data=<dir> [--headless]
 ;   started by --start=debug or by a second instance:  AutoHotFlow.ahk --command=debug  (cmd.app.command)
@@ -231,7 +231,7 @@ class DebugView extends Role {
     ; Asks every ready process (and the supervisor) for its snapshot. onDone(count) is called once when all answers or
     ; deadlines are in; count = number of snapshots stored from answers. A process that is not ready (starting, gone, ...)
     ; is not asked, but it is not left out either: its entry says "not ready (<state>)", because the window is meant to
-    ; show exactly such states (WI-34, F-38).
+    ; show exactly such states (WI-0034, F-0038).
     RefreshSnapshots(onDone := "") {
         names := ["supervisor"]
         for name, p in this.processes {

@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Tests for the skeleton element Action_Sleep (WI-09, doc/ELEMENT-API-V2.md section 4).
+; Tests for the skeleton element Action_Sleep (WI-0009, doc/ELEMENT-API-V2.md section 4).
 ; The timing cases pump messages (Sleep() runs timers) and use wide tolerances: the timer is never
 ; early by design, but a loaded machine can delay it.
 #Include lib\Assert.ahk

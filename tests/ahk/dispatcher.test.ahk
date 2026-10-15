@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/core/ipc/Dispatcher.ahk (WI-05): prefix routing, unknown types, error answers.
+; Unit tests for src/core/ipc/Dispatcher.ahk (WI-0005): prefix routing, unknown types, error answers.
 #Include lib\Assert.ahk
 #Include ..\..\src\core\ipc\Dispatcher.ahk
 

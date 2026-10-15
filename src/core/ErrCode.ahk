@@ -12,7 +12,7 @@ class ErrCode {
     static INTERNAL := "internal"
     static PEER_GONE := "peer_gone"
     static SHUTTING_DOWN := "shutting_down"
-    static GONE := "gone"               ; the execution or instance of a request has ended (WI-50, PROTOCOL 4.5)
+    static GONE := "gone"               ; the execution or instance of a request has ended (WI-0050, PROTOCOL 4.5)
     ; Codes outside the protocol list, used for local errors only.
     static BAD_JSON := "bad_json"
     static BAD_ARGS := "bad_args"

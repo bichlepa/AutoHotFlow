@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; Benchmark for WI-24: what does the hub spend on routing one large frame (a res.storage.flow.read with
+; Benchmark for WI-0024: what does the hub spend on routing one large frame (a res.storage.flow.read with
 ; the text of a flow file)? Not a unit test. The hub is not started (no pipe): two fake connections stand
 ; in for storage (sender) and engine (target), the frame goes through Hub._OnFrame exactly as a pipe read
 ; would deliver it. Only the routing is measured, no I/O.

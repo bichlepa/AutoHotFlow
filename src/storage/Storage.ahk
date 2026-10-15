@@ -13,7 +13,7 @@
 #Include LogSink.ahk
 #Include ReportFiles.ahk
 
-; Storage role (WI-12, ARCHITECTURE D7 and 4, PROTOCOL 4.6). The only process that touches files
+; Storage role (WI-0012, ARCHITECTURE D0007 and 4, PROTOCOL 4.6). The only process that touches files
 ; under the data directory: flows, variables and logs. Requests are queued (WriteQueue) and answered
 ; when their operation has run, so a large write never stops the message pump.
 ;
@@ -31,7 +31,7 @@ class Storage extends Role {
     static LOG_RETRY_MS := 3000
     static LOG_RETRY_DELAY_MS := 20
     ; Log sink of this process: its own entries go straight into the queue (no evt.log.append to itself).
-    ; Log queue (WI-25): limit and bundle size. The limit is lowered by --log-queue-max-lines (tests).
+    ; Log queue (WI-0025): limit and bundle size. The limit is lowered by --log-queue-max-lines (tests).
     static LOG_QUEUE_MAX_LINES := 20000
     static LOG_QUEUE_MAX_CHARS := 8 * 1024 * 1024
     static LOG_BUNDLE_MAX_LINES := 500
@@ -44,11 +44,11 @@ class Storage extends Role {
         super.__New(args)
         this.queue := WriteQueue()
         this._shutdownUntil := 0
-        this.logLinesLost := 0   ; log lines that could not be written even after the retries (F-04)
+        this.logLinesLost := 0   ; log lines that could not be written even after the retries (F-0004)
         this.logBuffers := Map()           ; file name -> Map(items, scheduled): lines waiting for the file
         this.logQueuedEntries := 0         ; entries not yet written to all their files
         this.logQueuedChars := 0
-        this.logLinesDropped := 0          ; entries dropped because the log queue was full (WI-25)
+        this.logLinesDropped := 0          ; entries dropped because the log queue was full (WI-0025)
         this.logDropPending := 0           ; dropped entries not yet announced in the log
         this.logQueueMaxLines := Integer(args.Get("log-queue-max-lines", Storage.LOG_QUEUE_MAX_LINES))
         this.logQueueMaxChars := Integer(args.Get("log-queue-max-chars", Storage.LOG_QUEUE_MAX_CHARS))
@@ -153,7 +153,7 @@ class Storage extends Role {
         return this._Defer(msg, "var.list", flowId, () => VarFiles.List(this.dataDir, scope, flowId))
     }
 
-    ; cmd.storage.report.write (WI-28, PROTOCOL 4.9): only the supervisor builds reports. The contents are checked
+    ; cmd.storage.report.write (WI-0028, PROTOCOL 4.9): only the supervisor builds reports. The contents are checked
     ; again by ReportFiles (names), the write runs in the request queue like every other file operation.
     _CmdReportWrite(msg) {
         if (msg.from != "supervisor")
@@ -282,7 +282,7 @@ class Storage extends Role {
     }
 
     ; Writes up to LOG_BUNDLE_MAX_LINES / LOG_BUNDLE_MAX_CHARS of the pending lines of one file.
-    ; Returns the retry request of the queue while another process holds the file (F-04).
+    ; Returns the retry request of the queue while another process holds the file (F-0004).
     _RunLogBundle(logDir, fileName, buf, state) {
         text := ""
         n := 0

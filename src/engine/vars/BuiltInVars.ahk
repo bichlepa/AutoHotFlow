@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\core\AhfVersion.ahk
 
-; Built-in variables (WI-40, doc/EXPRESSION-LANGUAGE.md section 18.4): the 55 variables of v1 that come from
+; Built-in variables (WI-0040, doc/EXPRESSION-LANGUAGE.md section 18.4): the 55 variables of v1 that come from
 ; AutoHotkey and the 13 of AutoHotFlow itself (v1/Source_Common/Variables/Global variables.ahk:2 and :4, values in
 ; BuiltInVariable_Get, :164). Names ignore case. They are read-only and exist in every place, also in common.
 ;
@@ -10,7 +10,7 @@
 class BuiltInVars {
     static _getters := ""
 
-    ; The default working directory of flows until the settings exist (E28, v1 Settings.ahk:15).
+    ; The default working directory of flows until the settings exist (E0028, v1 Settings.ahk:15).
     static DefaultWorkingDir() => A_MyDocuments "\AutoHotFlow"
 
     ; The working directory of a flow (v1 xx_GetWorkingDir and the check in v1 Load.ahk:214): the flow's own
@@ -77,7 +77,7 @@ class BuiltInVars {
         t["A_Temp"] := (env) => A_Temp
         t["A_OSVersion"] := (env) => A_OSVersion
         t["A_Is64bitOS"] := (env) => A_Is64bitOS
-        t["A_PtrSize"] := (env) => A_PtrSize                ; 8: 64 bit only (E4); v1 was 4
+        t["A_PtrSize"] := (env) => A_PtrSize                ; 8: 64 bit only (E0004); v1 was 4
         t["A_Language"] := (env) => A_Language
         t["A_ComputerName"] := (env) => A_ComputerName
         t["A_UserName"] := (env) => A_UserName

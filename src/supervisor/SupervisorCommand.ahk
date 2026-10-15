@@ -4,7 +4,7 @@
 #Include ..\core\ipc\Peer.ahk
 
 ; The second instance: sends cmd.app.command {argv} to the running supervisor and ends
-; (doc/PROTOCOL 4.1; v2-phase2-final:v2-phase2-final:work_items/phase2/WI-07-supervisor.md-supervisor.md). It never creates a hub pipe.
+; (doc/PROTOCOL 4.1; v2-phase2-final:v2-phase2-final:work_items/phase2/WI-0007-supervisor.md-supervisor.md). It never creates a hub pipe.
 ; Exit 0: the running supervisor answered ok. Exit 1: no answer, or the answer was an error.
 ;
 ;   SupervisorCommand(pipeName, ["text"]).Start()

@@ -1,7 +1,7 @@
-"""WI-50: faults while a worker element asks the engine for variables (cmd.engine.var.*, PROTOCOL 4.5).
+"""WI-0050: faults while a worker element asks the engine for variables (cmd.engine.var.*, PROTOCOL 4.5).
 
 A worker element (Action_TestVarBenchWorker with a large Count) asks the engine all the time; the test kills the
-engine or the worker in the middle. Expected (acceptance of WI-50): no process hangs (the flow runner fails the test
+engine or the worker in the middle. Expected (acceptance of WI-0050): no process hangs (the flow runner fails the test
 for a process left behind), the engine has no unhandled error, and the next worker job runs.
 """
 
@@ -67,7 +67,7 @@ def test_engine_killed_while_a_worker_element_asks(flows):
     assert _wait_until(restarted, 20), _processes(flows)
     assert _wait_until(lambda: echo_id in {f["flowId"] for f in flows.request_ok(
         "engine", "cmd.engine.snapshot", {})["flows"]}, 20), "the new engine did not load the flows"
-    # the workers of the old engine are gone (E10, orphans of the new engine), the new pool takes the next job
+    # the workers of the old engine are gone (E0010, orphans of the new engine), the new pool takes the next job
     again = flows.run(echo_id, timeout=20)
     assert again.reason == "finished" and not again.exceptions, again.steps
     assert _engine_errors(flows)["count"] == 0, _engine_errors(flows)

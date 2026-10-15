@@ -5,18 +5,18 @@
 #Include ..\elements\base\ExecContext.ahk
 #Include ..\elements\base\ParamEvaluator.ahk
 
-; Context of one worker execution (WI-11, ELEMENT-API-V2 section 3). It is the ExecContext of the engine without the
+; Context of one worker execution (WI-0011, ELEMENT-API-V2 section 3). It is the ExecContext of the engine without the
 ; variables of the engine: the worker holds none. Finish, After, State, Log and CheckVarName work as in the engine.
 ;
-; Parameters (E26, WI-42): the engine evaluated them before it sent the job (evaluated: an Array of Maps {id, value}
+; Parameters (E0026, WI-0042): the engine evaluated them before it sent the job (evaluated: an Array of Maps {id, value}
 ; or {id, error} in the order of Parameters()). EvalParams and EvalMoreParams return these values and throw at the
 ; first error of a parameter that is asked for.
 ;
-; Variables (WI-50, ARCHITECTURE R4, doc/PROTOCOL.md 4.5 "Variable requests"): every variable function asks the engine
+; Variables (WI-0050, ARCHITECTURE R0004, doc/PROTOCOL.md 4.5 "Variable requests"): every variable function asks the engine
 ; (cmd.engine.var.*, with the execId of the job) and waits for the answer, blocking: the worker is its own process, it
 ; may wait; the engine answers at once and never waits for a worker. The engine runs the same function with the
 ; context of the element, so the result is the one the element would get inline. One request per call; nothing is
-; cached, so a variable that another thread changes is seen at the next call (M-45). Without an answer within
+; cached, so a variable that another thread changes is seen at the next call (M-0045). Without an answer within
 ; REQUEST_TIMEOUT_MS (or when the engine went away, peer_gone) the function throws ElementError "engine did not
 ; answer"; when the job has ended or was stopped (gone) it throws as well, which ends the element.
 ;
@@ -25,8 +25,8 @@
 ; inside the pump of the connection (its re-entry guard would hold the answer back): ctx.Request therefore calls its
 ; callback on a timer thread of its own, never from the pump (doc/HOW-TO.md).
 ;
-; imports and exports: imports are an explicit import list (empty from the engine since WI-50, reserved for
-; ctx.RunScript, S8) read with GetImport; Export sets a value that the engine stores when the job ends.
+; imports and exports: imports are an explicit import list (empty from the engine since WI-0050, reserved for
+; ctx.RunScript, S0008) read with GetImport; Export sets a value that the engine stores when the job ends.
 ;
 ; requestFn(to, type, payload, callback, timeoutMs) sends a request (Peer.Request of the worker). onFinish(ctx, result,
 ; msg) is set by Worker (see ExecContext).
@@ -57,7 +57,7 @@ class WorkerContext extends ExecContext {
         this.exports[name] := value
     }
 
-    ; The parameters that the engine evaluated (E26), without the ids in skipList. Throws ElementError at the first
+    ; The parameters that the engine evaluated (E0026), without the ids in skipList. Throws ElementError at the first
     ; parameter with an error that is not skipped.
     EvalParams(params, skipList := "") {
         return this._FromEvaluated({}, ParamEvaluator.NameSet(skipList), "")
@@ -82,7 +82,7 @@ class WorkerContext extends ExecContext {
         return out
     }
 
-    ; ---- variables through the engine (WI-50) ------------------------------------------------------------------------
+    ; ---- variables through the engine (WI-0050) ------------------------------------------------------------------------
 
     GetVar(name, default := "", hidden := false) {
         p := this._Ask("get", Map("name", String(name), "hidden", Json.Bool(hidden)))
@@ -217,7 +217,7 @@ class WorkerContext extends ExecContext {
 
     ; Waits until a message is in the queue of this thread (at most ms), then lets AHK handle every queued message
     ; (Sleep -1): the wake-up of the pipe runs the pump in a new thread, the timers of the peer run. A plain Sleep(1)
-    ; returned only at the next tick of the system timer, 15.6 ms (measured, WI-50).
+    ; returned only at the next tick of the system timer, 15.6 ms (measured, WI-0050).
     static _WaitForMessages(ms) {
         ; QS_ALLINPUT (0x4FF), MWMO_INPUTAVAILABLE (0x4): also return for a message that is already in the queue
         DllCall("MsgWaitForMultipleObjectsEx", "UInt", 0, "Ptr", 0, "UInt", ms, "UInt", 0x4FF, "UInt", 0x4, "UInt")

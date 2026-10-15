@@ -1,4 +1,4 @@
-"""WI-15: unanswered requests end at their limit, exactly once; a late answer is dropped.
+"""WI-0015: unanswered requests end at their limit, exactly once; a late answer is dropped.
 
 Two levels are covered:
   1. Hub.Request (the supervisor asks a UI for cmd.app.prepareExit, PROTOCOL 4.1). The UI is frozen, so

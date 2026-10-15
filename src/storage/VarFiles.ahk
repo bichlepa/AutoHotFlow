@@ -4,7 +4,7 @@
 #Include StoragePaths.ahk
 #Include AtomicFile.ahk
 
-; Variable files in v1 format (WI-12, ARCHITECTURE 7, v1 "Global variables.ahk"):
+; Variable files in v1 format (WI-0012, ARCHITECTURE 7, v1 "Global variables.ahk"):
 ;   global:  Variables/<name>.ahfvd (metadata) and Variables/<name>.ahfvar (content)
 ;   static:  Variables/<flowId>/<name>.ahfvd and .ahfvar
 ; Metadata is JSON {"name": ..., "type": "normal" | "object"}. Content of type "object" is JSON text,

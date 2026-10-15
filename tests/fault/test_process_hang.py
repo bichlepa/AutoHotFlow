@@ -1,4 +1,4 @@
-"""WI-15: a role process is frozen (psutil suspend). UI stub, engine and storage.
+"""WI-0015: a role process is frozen (psutil suspend). UI stub, engine and storage.
 
 Expected (ARCHITECTURE 6.2, PROTOCOL 4.1a): the supervisor misses three pongs (pings every 2 s, pong timeout
 6 s), reports evt.process.hung within HANG_BUDGET_S of the freeze, sends sys.shutdown, terminates the

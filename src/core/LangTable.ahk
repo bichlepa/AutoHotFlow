@@ -1,11 +1,11 @@
 #Requires AutoHotkey v2.0
 #Include Log.ahk
 
-; Translated texts (E28, WI-42): the port of v1 lang() (v1/language/language.ahk) for every role. Elements and the
+; Translated texts (E0028, WI-0042): the port of v1 lang() (v1/language/language.ahk) for every role. Elements and the
 ; engine call the global function Lang(key, args*) (Lang.ahk), which uses this table.
 ;
 ; The texts are the v1 files, unchanged: assets/language/<folder>/<code>.ini (basic: the texts of the program;
-; more folders, e.g. the element texts, come with S2). Each folder may have a file per language. A line
+; more folders, e.g. the element texts, come with S0002). Each folder may have a file per language. A line
 ; "key=text" defines a text; section lines ("[common]") are ignored, and so is the section [language_info].
 ;
 ; As in v1 (lang() with readAll):
@@ -13,13 +13,13 @@
 ;   - a key that is not in the language is looked up in the fallback language (English);
 ;   - a key that is in neither gives the key itself (with the spaces). v2 also writes an f3 log entry then.
 ;   - %1%, %2%, ... in the text are replaced by the arguments, every occurrence.
-; The language is fixed to English until the settings exist (S4); v1 read it from the setting UILanguage or the
+; The language is fixed to English until the settings exist (S0004); v1 read it from the setting UILanguage or the
 ; language of Windows.
 ;
 ; The files are read once, at the first call (one small file per folder and language). They are read-only assets of
 ; the program, which every role loads itself (ARCHITECTURE 4), not data of the user: storage does not own them.
 class LangTable {
-    static Code := "en"               ; the language (S4: setting UILanguage)
+    static Code := "en"               ; the language (S0004: setting UILanguage)
     static Fallback := "en"
     static Dir := ""                  ; folder with the language folders; "" = assets\language of the program
     static _texts := ""               ; Map key -> text of Code, or "" before the first load

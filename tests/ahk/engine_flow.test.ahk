@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/engine/core/FlowDefinition.ahk (WI-08, ARCHITECTURE 7).
+; Unit tests for src/engine/core/FlowDefinition.ahk (WI-0008, ARCHITECTURE 7).
 ; The example flows are read at run time from tests/data/flows/v1_examples (read only).
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\core\FlowDefinition.ahk

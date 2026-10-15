@@ -3,7 +3,7 @@
 #Include ..\core\Time.ahk
 #Include Children.ahk
 
-; Ending the session in two phases (doc/ARCHITECTURE 6.3, WI-07).
+; Ending the session in two phases (doc/ARCHITECTURE 6.3, WI-0007).
 ;
 ; Phase 1, prepare (cancellable, no deadline): cmd.app.prepareExit goes to every connected manager and
 ; editor. Any answer with cancel:true stops the exit (evt.app.exitCancelled, nothing is stopped). A
@@ -83,7 +83,7 @@ class Shutdown {
                 this._SendGroup(now)
             }
         } else if (this.phase = "kill") {
-            ; Whether the exit is forced is decided in _Done by Children.AnyKilled (F-33, WI-33): a process that ended by itself
+            ; Whether the exit is forced is decided in _Done by Children.AnyKilled (F-0033, WI-0033): a process that ended by itself
             ; at the deadline and is only judged now was not terminated, so it must not make the exit code 5.
             if (this.children.AllGone() || now >= this.killDeadline)
                 this._Done(Shutdown.EXIT_CLEAN)
@@ -91,7 +91,7 @@ class Shutdown {
     }
 
     ; A child said sys.hello (Supervisor._OnHello, after Children.OnHello). A child that was still starting when its group
-    ; got sys.shutdown (the warm worker, an editor, the debug window) could not be reached then (F-41, WI-34): without
+    ; got sys.shutdown (the warm worker, an editor, the debug window) could not be reached then (F-0041, WI-0034): without
     ; this its group would wait for a bye that never comes, the later groups (storage last) would never get sys.shutdown,
     ; and all of them would be terminated at the deadline. So in phase 2 a child whose group has had its turn (or is
     ; having it now) gets sys.shutdown at its hello, with the rest of the deadline. A child of a later group waits for the
@@ -120,7 +120,7 @@ class Shutdown {
         return 0
     }
 
-    ; The supervisor stood still for ms (Stall, WI-33, F-16): the deadline of the shutdown and the wait after the hard end
+    ; The supervisor stood still for ms (Stall, WI-0033, F-0016): the deadline of the shutdown and the wait after the hard end
     ; move by that time, so the children keep their rest of the time. (The answer limit of phase 1 is a Hub request and
     ; moves with the hub.)
     Shift(ms) {

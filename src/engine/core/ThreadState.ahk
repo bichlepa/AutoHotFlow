@@ -4,7 +4,7 @@
 #Include LoopStack.ahk
 #Include ..\vars\VarValues.ahk
 
-; Thread state machine (WI-08, ARCHITECTURE 5.2, normative).
+; Thread state machine (WI-0008, ARCHITECTURE 5.2, normative).
 ;
 ; States follow v1 with one rename: v1 "starting" is "ready" here (v1 Execution Task.ahk:57).
 ; Transitions are only allowed if listed in Transitions. Anything else returns false and is
@@ -27,7 +27,7 @@ class ThreadState {
     ; stopping -> removed: stop acknowledged or deadline
     ; ready -> removed: instance stop before dispatch
     ; finished -> removed: instance stop while the result waits for the dispatcher (not in the
-    ;   table of ARCHITECTURE 5.2, see WI-08 open question 4)
+    ;   table of ARCHITECTURE 5.2, see WI-0008 open question 4)
     static Transitions := Map(
         "ready", ["running", "removed"],
         "running", ["finished", "stopping"],
@@ -50,7 +50,7 @@ class ThreadState {
         this.Result := result
         this.Message := ""
         this.Loops := LoopStack()
-        ; Thread variables (WI-40): names with A_, set with the location "thread". Owned by this thread.
+        ; Thread variables (WI-0040): names with A_, set with the location "thread". Owned by this thread.
         this.Vars := VarValues.NewMap()
         this.HiddenVars := VarValues.NewMap()
         this.OnInvalid := onInvalid

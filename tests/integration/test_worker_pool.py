@@ -1,4 +1,4 @@
-"""WI-27: worker pool lifecycle. Supervisor side (cmd.process.spawn, cmd.process.kill, sys.busy), then the
+"""WI-0027: worker pool lifecycle. Supervisor side (cmd.process.spawn, cmd.process.kill, sys.busy), then the
 pool rules of the engine (src/engine/WorkerBridge.ahk).
 
 The supervisor runs as a real process (tools/ahkrun.py). A Python client named "engine" plays the engine and

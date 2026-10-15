@@ -2,7 +2,7 @@
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
 
-; Test element for WI-27: blocks in ONE call for 7.5 s (longer than the supervisor's pong timeout of 6 s), then
+; Test element for WI-0027: blocks in ONE call for 7.5 s (longer than the supervisor's pong timeout of 6 s), then
 ; finishes "normal". The worker answers no ping and no cancel meanwhile. It shows that a busy worker is not
 ; declared hung (ARCHITECTURE 6.4).
 class Action_TestLongBlockWorker extends AhfElement {

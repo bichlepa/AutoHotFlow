@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
 
-; Test entry point (WI-29): the product boot code (src/AhfBoot.ahk) plus the test roles, which are registered only with
+; Test entry point (WI-0029): the product boot code (src/AhfBoot.ahk) plus the test roles, which are registered only with
 ; --test-roles. The supervisor starts its children with A_ScriptFullPath, so they get this entry, too.
 ;   AutoHotkey64.exe tests\integration\helpers\AutoHotFlowTest.ahk --role=... --test-roles
 #Include ..\..\..\src\AhfBoot.ahk
@@ -10,7 +10,7 @@
 #Include HangerRole.ahk
 #Include SlowShutdownRole.ahk
 #Include RegisterFailure.ahk
-; Test elements that live in tests/ (WI-50), registered in every role of this entry
+; Test elements that live in tests/ (WI-0050), registered in every role of this entry
 #Include ..\..\elements\Action_TestVarFunctions.ahk
 #Include ..\..\elements\Action_TestVarFunctionsWorker.ahk
 #Include ..\..\elements\Action_TestVarBenchWorker.ahk

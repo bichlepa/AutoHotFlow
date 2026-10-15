@@ -16,7 +16,7 @@
 #Include Shutdown.ahk
 #Include SupervisorCommand.ahk
 
-; Role "supervisor" (doc/ARCHITECTURE 3, 6; v2-phase2-final:v2-phase2-final:work_items/phase2/WI-07-supervisor.md-supervisor.md). The supervisor is the hub of the
+; Role "supervisor" (doc/ARCHITECTURE 3, 6; v2-phase2-final:v2-phase2-final:work_items/phase2/WI-0007-supervisor.md-supervisor.md). The supervisor is the hub of the
 ; star topology, starts and watches the role processes, and ends the session in two phases. It does
 ; not inherit from Role (it has no peer of its own) and contains no business logic.
 ;
@@ -34,9 +34,9 @@
 ;   --restart-max  (only with --test-roles) restarts per RESTART_WINDOW_MS, default Children.RESTART_MAX (3);
 ;               lets the tests restart a child many times (handle leaks).
 ;   --worker-limit  (only with --test-roles) most workers alive at once, default Children.WORKER_LIMIT (16).
-;   --ui=<word>, --headless, --stub-cancel-exit  passed on to every role (WI-13: --ui=stub for the manager stub).
+;   --ui=<word>, --headless, --stub-cancel-exit  passed on to every role (WI-0013: --ui=stub for the manager stub).
 ;   --log-level=<0..3>  highest log level that is forwarded to storage (default 2; level 3 stays in the ring of
-;               Log only). Valid for the supervisor and passed on to every role (WI-23).
+;               Log only). Valid for the supervisor and passed on to every role (WI-0023).
 ;
 ; Single instance: a named mutex per session. A second supervisor with the same session sends
 ; cmd.app.command {argv} to the running one and exits (exit 0 = delivered, 1 = no answer).
@@ -46,7 +46,7 @@
 class Supervisor {
     static DEFAULT_SESSION := "main"
     static DEFAULT_DEADLINE_MS := 5000
-    static DEFAULT_DATA_SUBDIR := "AutoHotFlow v2"    ; not the folder of v1 (%APPDATA%\AutoHotFlow, E33)
+    static DEFAULT_DATA_SUBDIR := "AutoHotFlow v2"    ; not the folder of v1 (%APPDATA%\AutoHotFlow, E0033)
     static DATA_DIR_ENV := "AHF_DATA_DIR"
     static MIN_DEADLINE_MS := 100
     static MAX_DEADLINE_MS := 60000
@@ -147,7 +147,7 @@ class Supervisor {
             , "workerLimit", this.workerLimit)
         this.hub := Hub(this.pipe, this.session)
         this.diag := DiagLog(this.hub)
-        Log.Configure(this.diag.SinkFn)      ; to storage as soon as it is connected, else queued (WI-23)
+        Log.Configure(this.diag.SinkFn)      ; to storage as soon as it is connected, else queued (WI-0023)
         this.children := Children(config, this.hub)
         this.report := DiagReport(this.hub, this.children, () => this.Snapshot(), this.session)
         this.report.storageWaitMs := this.reportWaitMs
@@ -182,7 +182,7 @@ class Supervisor {
     }
 
     ; A client said sys.hello: the children learn about it; the log queue is delivered once storage is there. A child that
-    ; connects while the session ends gets sys.shutdown when its group has had its turn (Shutdown.OnHello, F-41, WI-34).
+    ; connects while the session ends gets sys.shutdown when its group has had its turn (Shutdown.OnHello, F-0041, WI-0034).
     _OnHello(link) {
         this.children.OnHello(link)
         if (link["name"] = DiagLog.STORAGE) {
@@ -192,7 +192,7 @@ class Supervisor {
         this.shutdown.OnHello(link["name"])
     }
 
-    ; evt.diag.error of a role: kept in the ring and logged; a burst of them starts an automatic report (WI-28).
+    ; evt.diag.error of a role: kept in the ring and logged; a burst of them starts an automatic report (WI-0028).
     _OnDiagError(msg) {
         this.diag.AddError(msg.from, msg.payload)
         this.report.NoteError(msg.from)
@@ -270,7 +270,7 @@ class Supervisor {
         return Map("command", "debug", "started", Json.Bool(started))
     }
 
-    ; A plain second start (no --command, F-283, the v1 behaviour): the manager shows its window. A running manager is
+    ; A plain second start (no --command, F-0283, the v1 behaviour): the manager shows its window. A running manager is
     ; asked (cmd.manager.show, PROTOCOL 4.8); one that is not running is started like at the first start and shows its
     ; window on its own. Never throws: the second start must end with exit 0, a failure is only logged.
     _ShowManager() {
@@ -367,7 +367,7 @@ class Supervisor {
         this._RunTick(Time.NowMs())
     }
 
-    ; One round of the timer at the time now. First the stand-still check (WI-33, F-16, E12): this is the only place that
+    ; One round of the timer at the time now. First the stand-still check (WI-0033, F-0016, E0012): this is the only place that
     ; measures a stand-still of the supervisor. If there was one, the holders of deadlines move them by its length, before
     ; anything is judged by the clock: the children (liveness, kill time, restart, grace), the hub (requests such as
     ; cmd.app.prepareExit, the hello time of new connections), the shutdown (deadline) and the report (wait for storage).
@@ -434,7 +434,7 @@ class Supervisor {
         return 1
     }
 
-    ; Options the supervisor passes on to every role process (WI-13): --ui=<word> selects the UI role
+    ; Options the supervisor passes on to every role process (WI-0013): --ui=<word> selects the UI role
     ; (manager: --ui=stub), --headless and --stub-cancel-exit are the stub's test options.
     _RoleOpts(opts) {
         text := ""
@@ -448,8 +448,8 @@ class Supervisor {
         }
         if (opts.Has("headless"))
             text .= " --headless"
-        ; Pool options of the engine (WI-27); the engine checks the values and exits with 2 on a bad one.
-        ; Options of the variable files (WI-41), same check.
+        ; Pool options of the engine (WI-0027); the engine checks the values and exits with 2 on a bad one.
+        ; Options of the variable files (WI-0041), same check.
         for key in ["workers", "warm-workers", "worker-idle-ms", "var-write-delay-ms", "var-write-timeout-ms"] {
             if (opts.Has(key)) {
                 value := String(opts[key])

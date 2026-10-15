@@ -1,8 +1,8 @@
-"""WI-22 points 3 and 4: what the entry point does before AhfMain runs.
+"""WI-0022 points 3 and 4: what the entry point does before AhfMain runs.
 
 3. An error while the files are loaded (file-level code of an element file, e.g. ElementRegistry.Register) must
    not show a dialog: tools/ahkrun.py would report exit 97 then. The message goes to stderr, exit code 1.
-4. Only the 64-bit interpreter is supported (decision E4): AutoHotkey32.exe gets exit 2 and a message.
+4. Only the 64-bit interpreter is supported (decision E0004): AutoHotkey32.exe gets exit 2 and a message.
 """
 
 import sys
@@ -12,7 +12,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 ENTRY = ROOT / "src" / "AutoHotFlow.ahk"
-TEST_ENTRY = ROOT / "tests" / "integration" / "helpers" / "AutoHotFlowTest.ahk"   # WI-29: product entry plus test roles
+TEST_ENTRY = ROOT / "tests" / "integration" / "helpers" / "AutoHotFlowTest.ahk"   # WI-0029: product entry plus test roles
 AHKRUN = ROOT / "tools" / "ahkrun.py"
 AHK32 = Path(r"C:\Program Files\AutoHotkey\v2\AutoHotkey32.exe")
 

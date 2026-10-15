@@ -1,4 +1,4 @@
-"""Strict check for boolean fields on the wire (WI-26, doc/PROTOCOL.md section 2).
+"""Strict check for boolean fields on the wire (WI-0026, doc/PROTOCOL.md section 2).
 
 AHK writes truth values as JSON true/false. Python decodes them to bool, so a field that falls back
 to 1/0 shows up as int. `is_bool` is the strict test for one value; every frame the Python test
@@ -15,7 +15,7 @@ BOOL_FIELDS = frozenset({
 })
 
 # Payload fields that carry user data (flow definitions, element parameters, variable values). Their content
-# keeps its own format (E8: flow files do not change, "enabled": "0" is an element parameter), so the
+# keeps its own format (E0008: flow files do not change, "enabled": "0" is an element parameter), so the
 # check does not look inside.
 OPAQUE_FIELDS = frozenset({"definition", "params", "imports", "exports", "settings", "content", "env",
                            "value", "values", "vars", "evaluated"})

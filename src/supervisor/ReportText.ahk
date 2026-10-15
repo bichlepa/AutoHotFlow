@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\core\Json.ahk
 
-; The readable summary (summary.txt) of a diagnostic report (WI-28, doc/PROTOCOL.md 4.9). A pure function of the
+; The readable summary (summary.txt) of a diagnostic report (WI-0028, doc/PROTOCOL.md 4.9). A pure function of the
 ; collected snapshots: no I/O, no messages. The full data is in report.json; this text is for the person who
 ; opens the folder first.
 ;

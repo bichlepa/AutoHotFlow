@@ -17,7 +17,7 @@ class AhfElement {
     static JobTimeoutMs := 0
     ; Parameters that the element evaluates itself as an expression or a script (v1: x_EvaluateExpression or
     ; x_EvaluateScript on a RawString), as Map("ParameterId", "expression" | "script"). The loader of flows converts
-    ; their texts from v1 syntax (WI-39). Parameters with an expression content type in Parameters() are found there.
+    ; their texts from v1 syntax (WI-0039). Parameters with an expression content type in Parameters() are found there.
     static V1Syntax := Map()
 
     ; Runtime entry point of inline and worker elements. The base class has no behavior: a class

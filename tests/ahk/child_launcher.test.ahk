@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/supervisor/ChildLauncher.ahk and ChildPipe.ahk (WI-23): a process started with its
+; Unit tests for src/supervisor/ChildLauncher.ahk and ChildPipe.ahk (WI-0023): a process started with its
 ; stdout/stderr in an anonymous pipe, the non-blocking line reader, and the handles that must not leak.
 #Include lib\Assert.ahk
 #Include ..\..\src\supervisor\ChildLauncher.ahk
@@ -116,7 +116,7 @@ CheckIncompleteLineWaitsForItsNewline() {
 
 CheckUtf8CharacterSplitAcrossReads() {
     p := OwnPipe()
-    ; U+00FC "u with diaeresis" = C3 BC, U+2713 check mark = E2 9C 93; each is cut between its bytes
+    ; U+00FC "u with diaeresis" = C3 BC, U+2713 check mark = E0002 9C 93; each is cut between its bytes
     WriteBytes(p[2], [97, 0xC3])
     Assert.Equal(p[1].ReadLines().Length, 0)
     WriteBytes(p[2], [0xBC, 0xE2, 0x9C])

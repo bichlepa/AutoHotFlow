@@ -1,4 +1,4 @@
-"""WI-16: fast start/stop sequences of a flow (L5, doc/TEST-STRATEGY.md 3, scenario 2).
+"""WI-0016: fast start/stop sequences of a flow (L5, doc/TEST-STRATEGY.md 3, scenario 2).
 
 One flow with a 5 s sleep element is started and stopped again and again (every third cycle with two
 instances at once). Afterwards the books must balance:

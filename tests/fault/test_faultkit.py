@@ -1,4 +1,4 @@
-"""WI-15 helper check: the chain starts, answers, and ends without leftovers.
+"""WI-0015 helper check: the chain starts, answers, and ends without leftovers.
 
 If this fails, the fault tests above it cannot be trusted: it checks the helpers themselves
 (ready detection, pid lookup, freeze/thaw, leftover detection), not the system under test.

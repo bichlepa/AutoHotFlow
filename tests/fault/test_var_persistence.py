@@ -1,4 +1,4 @@
-"""WI-41: global and static variables survive a restart of the engine and of the session.
+"""WI-0041: global and static variables survive a restart of the engine and of the session.
 
 Under the real supervisor (storage, engine, UI stub). A flow with the test element Action_TestSetVar changes or reads
 variables; the test looks at the files below Variables/ and, through the probe step of the element, at what the engine
@@ -121,7 +121,7 @@ def test_v1_variable_files_are_loaded_changed_written_and_loaded_again(chains, d
     wait_ready_count(first, 1)
     run_flow(first, STATIC_FLOW)
 
-    # What the engine loaded: the contents of the v1 files, texts stay texts (M-39).
+    # What the engine loaded: the contents of the v1 files, texts stay texts (M-0039).
     got = {n: probed(datadir, n) for n in names}
     assert json.loads(got["global_synthetic_list"][0]) == ["alpha", "beta", "gamma"]
     assert got["global_synthetic_list"][1] == "Map"
@@ -196,7 +196,7 @@ def test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_
     assert chain.sup.wait_exit(30) == 0, chain.sup.text()
     assert read_pair(datadir, "global_late") == ("normal", "written at exit")
 
-    # The same change with a kill of the engine instead of an orderly exit: it is lost (M-01, M-06).
+    # The same change with a kill of the engine instead of an orderly exit: it is lost (M-0001, M-0006).
     shutil.rmtree(datadir / "Variables")
     other = chains(FULL_CHAIN, slow, session=new_session())
     wait_ready_count(other, 1)

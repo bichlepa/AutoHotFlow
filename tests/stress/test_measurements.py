@@ -1,4 +1,4 @@
-"""WI-16: the performance budgets of ARCHITECTURE 9, measured on the real chain (storage, engine, manager stub).
+"""WI-0016: the performance budgets of ARCHITECTURE 9, measured on the real chain (storage, engine, manager stub).
 
  - message latency: answer time of `cmd.engine.snapshot` (client -> hub -> engine -> hub -> client), idle and
    under load (instances start continuously). Budget: median under 5 ms, p99 under 50 ms.

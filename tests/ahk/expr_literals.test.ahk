@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the literals, names and keywords of the expression language (WI-37, doc/EXPRESSION-LANGUAGE.md sections 2 and 3).
+; Unit tests for the literals, names and keywords of the expression language (WI-0037, doc/EXPRESSION-LANGUAGE.md sections 2 and 3).
 #Include lib\ExprCheck.ahk
 
 ; The first node of a parsed expression.

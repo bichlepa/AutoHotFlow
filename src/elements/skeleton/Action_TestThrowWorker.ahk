@@ -2,7 +2,7 @@
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
 
-; Test element for WI-11: a worker-mode element that always throws. The worker must report the run
+; Test element for WI-0011: a worker-mode element that always throws. The worker must report the run
 ; as "exception" with the message, through ElementRunner, and stay usable for the next job.
 class Action_TestThrowWorker extends AhfElement {
     static Mode := "worker"

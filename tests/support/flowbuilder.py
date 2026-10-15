@@ -1,4 +1,4 @@
-"""Builds flow files for tests (WI-49): elements, connections, loops and settings in a few lines.
+"""Builds flow files for tests (WI-0049): elements, connections, loops and settings in a few lines.
 
     fb = FlowBuilder("loop and condition", strict_types=True)
     trigger = fb.trigger()
@@ -72,7 +72,7 @@ def kind_of_class(cls):
 class FlowBuilder:
     def __init__(self, name="Test flow", category="Test", strict_types=True, v2=True, execution_policy="default",
                  flow_settings=None):
-        """strict_types: the type mode of the flow (E34); None leaves the key out (a migrated flow, loaded in the
+        """strict_types: the type mode of the flow (E0034); None leaves the key out (a migrated flow, loaded in the
         compatibility mode). Ignored with v2=False. flow_settings: further keys of `flowSettings`."""
         self.name = name
         self.category = category

@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Integration of the variable model with the Executor (WI-40): real flows, instances, threads, loop stack and
+; Integration of the variable model with the Executor (WI-0040): real flows, instances, threads, loop stack and
 ; VarAccess, driven by EngineOwner (no processes). Instance and thread variables are separated per instance and
 ; per thread, static variables per flow, global variables are shared, nested loops keep their loop variables.
 #Include helpers\ExecutorKit.ahk
@@ -180,7 +180,7 @@ CheckNestedLoops() {
     Assert.Equal(owner.LastEndReason(), "finished")
 }
 
-; A worker job carries no copies of the variables (M-45, WI-50); the job keeps the engine context of the element, which
+; A worker job carries no copies of the variables (M-0045, WI-0050); the job keeps the engine context of the element, which
 ; the variable requests use; its exports come back by name.
 CheckWorkerImportsAndExports() {
     VarLog.Reset()

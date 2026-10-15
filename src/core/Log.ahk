@@ -4,7 +4,7 @@
 ; Log client. Core writes nothing by itself: the role configures a sink (storage process, console, test).
 ; Levels as in v1: a0..a3 (general), f0..f3 (flow), t0..t3 (trigger). Smaller digit = less detail.
 ;
-; Two things happen to every entry (WI-23):
+; Two things happen to every entry (WI-0023):
 ;   - It is kept in a ring of the last RING_MAX entries (all levels, whatever the sink), for the crash report.
 ;   - It goes to the sink only if its digit is not above Log.level (default of a role: DEFAULT_LEVEL = 2, option
 ;     --log-level=<0..3>). Level 3 therefore stays in the ring only, unless the level is raised.

@@ -6,7 +6,7 @@ registered name of the sender, answers unknown cmd.* with a not_found error, and
 fans out topic messages to subscribers. It is deliberately simple and is not the
 production hub.
 
-Like the supervisor (Hub.ahk, F-40, WI-34) it remembers the cmd.* it forwards until the answer passes back; when the
+Like the supervisor (Hub.ahk, F-0040, WI-0034) it remembers the cmd.* it forwards until the answer passes back; when the
 connection of the target ends first, the sender gets {ok: false, error: {code: "peer_gone"}} from the hub. A cmd.*
 the target does not accept (write failed) is answered with peer_gone at once.
 """
@@ -252,7 +252,7 @@ class WakingHub(PyHub):
     """PyHub that wakes every peer window that has announced one, after each routed message.
 
     PROTOCOL 1 asks the sender to post the wake-up. Without it each message waits for the 250 ms
-    fallback timer of the receiver. Moved here from test_peer.py in WI-07.
+    fallback timer of the receiver. Moved here from test_peer.py in WI-0007.
     """
 
     def _handle(self, link, msg):

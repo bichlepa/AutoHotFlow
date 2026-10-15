@@ -1,7 +1,7 @@
-"""WI-49: the flow builder and the headless flow runner against a real session (supervisor, storage, engine).
+"""WI-0049: the flow builder and the headless flow runner against a real session (supervisor, storage, engine).
 
 Only the skeleton elements exist so far, so the flows use `Action_TestSetVar` (set, probe), `Action_Sleep`,
-`Action_Do_nothing` and `Action_TestThrow`. Condition and loop elements come with WI-52 and later; the builder already
+`Action_Do_nothing` and `Action_TestThrow`. Condition and loop elements come with WI-0052 and later; the builder already
 writes their connections, and the engine loads such a flow (second test).
 """
 
@@ -49,7 +49,7 @@ def test_the_engine_loads_the_flow_of_the_builder_unchanged_with_a_condition_and
     flows.start()
     sent = fb.to_dict()
     got = flows.request_ok("engine", "cmd.flow.get", {"flowId": "shape"})["definition"]
-    assert got["flowSettings"]["strictTypes"] in (True, 1)      # the engine sends 1 (F-364)
+    assert got["flowSettings"]["strictTypes"] in (True, 1)      # the engine sends 1 (F-0285)
     for key in ("allElements", "allConnections"):
         assert json.loads(json.dumps(got[key])) == sent[key], key      # ids, classes, parts and parameter types
 

@@ -2,7 +2,7 @@
 #Include ..\..\core\Errors.ahk
 #Include ..\..\core\Json.ahk
 
-; Flow model in the v1 file format (WI-08, ARCHITECTURE 7, v2-phase2-final:work_items/phase2/README.md).
+; Flow model in the v1 file format (WI-0008, ARCHITECTURE 7, v2-phase2-final:work_items/phase2/README.md).
 ;
 ; Reads the parsed v1 flow JSON (Json.Parse, types kept) and offers lookups by element and
 ; connection ID. Nothing is changed: Raw is the parsed Map, unknown keys stay in it.
@@ -14,25 +14,25 @@
 ;   - connection "ConnectionType" is "normal", "Normal", "Yes", "No", "Exception" (v1 compares
 ;     case-insensitively, see v1/Source_Execution/Execution Task/Execution Task.ahk:119).
 ;   - some flows contain dangling connections (empty or unknown from/to). They are listed in
-;     Dangling and never returned by FromConnections (open question 3 in WI-08).
+;     Dangling and never returned by FromConnections (open question 3 in WI-0008).
 ;
 ; Maps keyed by ID use CaseSense "Off", as the v1 object keys do.
 class FlowDefinition {
-    ; Written files (WI-39, doc/ARCHITECTURE.md section 7): the root key "formatVersion" says that the file was saved by
+    ; Written files (WI-0039, doc/ARCHITECTURE.md section 7): the root key "formatVersion" says that the file was saved by
     ; v2 (a file without it comes from v1); an element whose expression texts are still in v1 syntax carries the key
     ; "v1Text". Neither key is kept in Raw: Pending names the elements, ToFileText writes the keys.
     static FORMAT_KEY := "formatVersion"
     static FORMAT_VERSION := 2
     static MARKER_KEY := "v1Text"
-    ; Key of an element (WI-45, E35): the places of its parameters that behave differently in v2, with MIGRATION IDs and
+    ; Key of an element (WI-0045, E0035): the places of its parameters that behave differently in v2, with MIGRATION IDs and
     ; the v1 text. Unlike v1Text it is an ordinary key of the element: it stays in Raw, so it is written back and
     ; clients see it (FlowExprConvert.Mark).
     static MIGRATION_KEY := "migration"
-    ; The flow option "strictTypes" in flowSettings (E34, WI-42): in strict mode a type error of an evaluation (a
+    ; The flow option "strictTypes" in flowSettings (E0034, WI-0042): in strict mode a type error of an evaluation (a
     ; comparison or a calculation with a text that is not a number, doc/EXPRESSION-LANGUAGE.md section 17) ends the
-    ; element with "exception"; in compatibility mode the result is the empty text plus a warning (E25), as v1 had it.
+    ; element with "exception"; in compatibility mode the result is the empty text plus a warning (E0025), as v1 had it.
     ; A flow without the key is a migrated flow (a v1 file, or a file that v2 saved before the option existed; no flow
-    ; is created by v2 before S4): compatibility mode. A flow that v2 creates gets NEW_FLOW_STRICT_TYPES. Saving
+    ; is created by v2 before S0004): compatibility mode. A flow that v2 creates gets NEW_FLOW_STRICT_TYPES. Saving
     ; writes the key always (ToFileText), so the mode of a flow never changes by itself.
     static STRICT_KEY := "strictTypes"
     static NEW_FLOW_STRICT_TYPES := 1

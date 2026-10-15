@@ -3,7 +3,7 @@
 #Include Role.ahk
 #Include PlaceholderRole.ahk
 
-; Maps the role name of --role to its class (v2-phase2-final:work_items/phase2/WI-06-role-basis.md). Lookup is case-insensitive.
+; Maps the role name of --role to its class (v2-phase2-final:work_items/phase2/WI-0006-role-basis.md). Lookup is case-insensitive.
 ; Each role file ends with RoleRegistry.Register(<name>, <class>); the entry point includes the
 ; role files, there is no dynamic loading. Names with a suffix ("editor:Flow 1") are looked up
 ; by their base name ("editor").
@@ -31,12 +31,12 @@ class RoleRegistry {
     static Lookup(name) => this.roles.Get(Role.BaseName(name), "")
 }
 
-; "supervisor" is not registered here: it is not a Role (WI-07) and the entry point starts it directly.
-; "storage" is registered by the entry point (WI-12, src/storage/Storage.ahk), like "engine" below.
-; "engine" is registered by the entry point (WI-10, src/engine/Engine.ahk): core/ must not include
+; "supervisor" is not registered here: it is not a Role (WI-0007) and the entry point starts it directly.
+; "storage" is registered by the entry point (WI-0012, src/storage/Storage.ahk), like "engine" below.
+; "engine" is registered by the entry point (WI-0010, src/engine/Engine.ahk): core/ must not include
 ; role folders, so the real class cannot be named here.
-RoleRegistry.Register("triggerhost", PlaceholderRole)  ; WI-14
+RoleRegistry.Register("triggerhost", PlaceholderRole)  ; WI-0014
 RoleRegistry.Register("editor", PlaceholderRole)       ; later phase
-; "worker" is registered by the entry point (WI-11, src/worker/Worker.ahk), like "engine" (see above).
-; "manager" is registered by the entry point (WI-13, src/manager/StubManager.ahk), like "storage". Registering it
+; "worker" is registered by the entry point (WI-0011, src/worker/Worker.ahk), like "engine" (see above).
+; "manager" is registered by the entry point (WI-0013, src/manager/StubManager.ahk), like "storage". Registering it
 ; here as well would make the entry point's Register throw (duplicate role).

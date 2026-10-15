@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; Read end of the anonymous pipe that carries stdout and stderr of one child (WI-23, ChildLauncher).
+; Read end of the anonymous pipe that carries stdout and stderr of one child (WI-0023, ChildLauncher).
 ; Nothing here blocks: PeekNamedPipe tells how many bytes are there, ReadFile then takes exactly those.
 ; Reading an anonymous pipe is not file I/O in the sense of CONVENTIONS section 3 (no file is opened).
 ;

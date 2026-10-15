@@ -1,4 +1,4 @@
-"""Measurement helpers of the stress tests (WI-16): latency distributions, process memory/handles/CPU.
+"""Measurement helpers of the stress tests (WI-0016): latency distributions, process memory/handles/CPU.
 
 record() prints a `MEASURE` line and, if AHF_MEASURE_OUT names a file, appends one JSON line to it, so a run
 can be collected into doc/MEASUREMENTS.md afterwards.

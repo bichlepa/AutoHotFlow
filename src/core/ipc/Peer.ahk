@@ -123,7 +123,7 @@ class Peer {
         this._Closed("local")
     }
 
-    ; Ends the peer for good like Close, but what was sent before still leaves (WI-30, F-26): the connection
+    ; Ends the peer for good like Close, but what was sent before still leaves (WI-0030, F-0026): the connection
     ; takes no new frames and closes when its send queue is written or after timeoutMs
     ; (PipeConnection.CloseWhenFlushed). The connection is detached first, so its end starts no reconnect and
     ; incoming frames are no longer handled. onDone(flushed) is called once, never inside this call; flushed is
@@ -152,7 +152,7 @@ class Peer {
             this._SendSubscribe(topic)
     }
 
-    ; Frames waiting in the send queue of the connection (0 without a connection). See Role.LOG_SEND_SOFT (F-17).
+    ; Frames waiting in the send queue of the connection (0 without a connection). See Role.LOG_SEND_SOFT (F-0017).
     QueuedFrames => IsObject(this._conn) ? this._conn.QueuedFrames : 0
 
     ; Sends an event or other message without an answer. Returns the message id, or "" when the
@@ -212,7 +212,7 @@ class Peer {
         return id
     }
 
-    ; Sends the answer to a cmd.* request whose handler returned Deferred.Marker() (WI-12). request is the
+    ; Sends the answer to a cmd.* request whose handler returned Deferred.Marker() (WI-0012). request is the
     ; Message that the handler received. Returns false when the answer could not be sent (no connection).
     ; The answer is sent as the handler's result would be: payload Map, ok added as true when missing.
     Reply(request, payload) {
@@ -314,7 +314,7 @@ class Peer {
     _BeginReconnect() {
         if (this.status = "closed")
             return
-        ; A connection that ends before the welcome (hub accepts the pipe but does not answer sys.hello, F-29)
+        ; A connection that ends before the welcome (hub accepts the pipe but does not answer sys.hello, F-0029)
         ; continues the outage: the budget is not restarted, or a stuck hub would keep the peer alive for ever.
         failedHandshake := (this.status = "handshake")
         this.status := "reconnecting"
@@ -409,7 +409,7 @@ class Peer {
         }
         if (SubStr(t, 1, 4) = "cmd.") {
             result := this._dispatcher.Invoke(msg)
-            ; A handler that returned Deferred answers later with Reply (WI-12). Nothing is sent now.
+            ; A handler that returned Deferred answers later with Reply (WI-0012). Nothing is sent now.
             if (result is Deferred)
                 return
             this._Transmit(msg.from, Peer._ResType(t), result, msg.id)

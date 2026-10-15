@@ -1,8 +1,8 @@
-"""WI-10: engine role (src/engine/).
+"""WI-0010: engine role (src/engine/).
 
 The engine runs as a real process (src/AutoHotFlow.ahk --role=engine, started through tools/ahkrun.py).
 Its hub is the Python stand-in tests/support/pyhub.py (WakingHub, see test_peer.py). Its storage is a
-Python stand-in as well (StorageStub below, same protocol as WI-12 will implement), so the engine can be
+Python stand-in as well (StorageStub below, same protocol as WI-0012 will implement), so the engine can be
 tested before the storage role exists. Observers are AhfClient instances that subscribe to topics.
 """
 
@@ -35,7 +35,7 @@ class StorageStub:
         self.list_calls = 0
         self.read_calls = []
         self.logs = []          # payloads of evt.log.append (noReply), in arrival order
-        self.var_writes = []    # (type, payload) of cmd.storage.var.set / .delete, in arrival order (WI-41)
+        self.var_writes = []    # (type, payload) of cmd.storage.var.set / .delete, in arrival order (WI-0041)
 
     def start(self):
         self._thread.start()
@@ -67,7 +67,7 @@ class StorageStub:
                 files.append({"path": "Flows/" + p.name, "name": p.stem, "mtime": int(p.stat().st_mtime)})
             self.client.reply(msg, {"ok": True, "files": files})
         elif type_ == "cmd.storage.var.list":
-            # WI-41: the engine loads the variables before evt.engine.ready. This stand-in holds none.
+            # WI-0041: the engine loads the variables before evt.engine.ready. This stand-in holds none.
             self.client.reply(msg, {"ok": True, "names": []})
         elif type_ in ("cmd.storage.var.set", "cmd.storage.var.delete"):
             self.var_writes.append((type_, payload))
@@ -212,7 +212,7 @@ class DyingStorageStub(StorageStub):
 
 
 class VanishingStorageStub(StorageStub):
-    """Serves `serve` reads, then dies at the next read without answering it: the read stays open (F-40, WI-34)."""
+    """Serves `serve` reads, then dies at the next read without answering it: the read stays open (F-0040, WI-0034)."""
 
     def __init__(self, pipe, datadir, serve):
         super().__init__(pipe, datadir)
@@ -245,7 +245,7 @@ def wait_for(predicate, timeout=5.0):
 
 def test_engine_reads_at_most_two_flow_files_at_a_time_while_loading(procs, datadir, runs, session_id, pipe, hub,
                                                                     flowdir):
-    # WI-24: the next read is sent when an answer has been handled, so pings get their turn in between.
+    # WI-0024: the next read is sent when an answer has been handled, so pings get their turn in between.
     for n in range(8):
         shutil.copy(SKELETON_SRC, flowdir / "Flows" / ("copy%d.json" % n))
     stub = HoldingStorageStub(pipe, flowdir).start()
@@ -273,7 +273,7 @@ def test_engine_reads_at_most_two_flow_files_at_a_time_while_loading(procs, data
 def test_engine_does_not_ask_for_more_files_when_storage_has_stopped_answering(procs, datadir, runs, session_id, pipe,
                                                                               hub, flowdir):
     # A storage that does not answer would make 200 reads wait for their deadline one after the other once
-    # they are staggered; after the first transport failure no further file is asked for (WI-24). Since WI-31 this
+    # they are staggered; after the first transport failure no further file is asked for (WI-0024). Since WI-0031 this
     # is no error either: the engine waits, and when storage answers again it reads everything (no file had a result).
     for n in range(8):
         shutil.copy(SKELETON_SRC, flowdir / "Flows" / ("copy%d.json" % n))
@@ -298,7 +298,7 @@ def test_engine_does_not_ask_for_more_files_when_storage_has_stopped_answering(p
 @pytest.mark.slow
 def test_engine_waits_for_a_storage_that_starts_5_s_after_it_and_reports_no_error(procs, datadir, runs, session_id,
                                                                                  pipe, hub, flowdir):
-    # WI-31 (F-31, F-24): before, the engine gave up after 5 tries in 2.5 s and never loaded; every try that hit
+    # WI-0031 (F-0031, F-0024): before, the engine gave up after 5 tries in 2.5 s and never loaded; every try that hit
     # "no peer 'storage'" was also reported as evt.storage.error.
     with observer(pipe, "engine") as obs:
         run = start_engine(procs, flowdir, runs, pipe, session_id)
@@ -330,7 +330,7 @@ def test_engine_waits_for_a_storage_that_starts_5_s_after_it_and_reports_no_erro
 
 def test_engine_resumes_loading_when_storage_restarts_in_the_middle_and_loads_only_the_missing_files(
         procs, datadir, runs, session_id, pipe, hub, flowdir):
-    # WI-31 (F-24 follow-up): before, the files after the break were failed as errors and never loaded again.
+    # WI-0031 (F-0024 follow-up): before, the files after the break were failed as errors and never loaded again.
     for n in range(19):
         shutil.copy(SKELETON_SRC, flowdir / "Flows" / ("copy%02d.json" % n))
     all_paths = sorted("Flows/" + p.name for p in (flowdir / "Flows").glob("*.json"))
@@ -371,7 +371,7 @@ RESUME_BUDGET_S = scaled(5.0)   # from the death of storage to evt.engine.ready 
 
 def test_engine_resumes_loading_at_once_when_storage_dies_with_an_open_read(procs, datadir, runs, session_id, pipe,
                                                                             hub, flowdir):
-    # F-40 (WI-34): storage dies while a cmd.storage.flow.read of the engine is open. The hub answers it with
+    # F-0040 (WI-0034): storage dies while a cmd.storage.flow.read of the engine is open. The hub answers it with
     # peer_gone when the connection of storage ends; before, nobody answered it and the engine waited for its own
     # deadline (30 s) before it resumed. The answer is from the hub, so this needs the hub of the test to do the same
     # as the supervisor (tests/support/pyhub.py, Hub.ahk).
@@ -745,7 +745,7 @@ MANY_INSTANCES = 40
 
 def test_shutdown_with_many_instances_and_a_hub_that_reads_late_delivers_every_ended(procs, datadir, runs,
                                                                                       session_id, pipe, flowdir):
-    # WI-30 (F-26 cause A): at sys.shutdown the send queue of the engine is full (the hub reads nothing for
+    # WI-0030 (F-0026 cause A): at sys.shutdown the send queue of the engine is full (the hub reads nothing for
     # STALL_S). StopAll still reaches the observer with one evt.instance.ended per instance, then sys.bye.
     make_flow(flowdir, "many", sleep_ms=10000, policy="parallel")
     with StallingHub(pipe, first_pong_of("engine"), STALL_S) as hub:

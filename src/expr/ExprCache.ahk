@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 
 ; Cache from key to value with an upper limit; when it is full, the oldest entry is removed (first in,
-; first out; reading does not renew an entry). Used by Expr for the parse results (WI-37 task 4).
+; first out; reading does not renew an entry). Used by Expr for the parse results (WI-0037 task 4).
 ; The ring of keys is a fixed-size Array, because a Map does not keep the order of insertion.
 class ExprCache {
     maxEntries := 2000

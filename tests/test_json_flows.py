@@ -1,4 +1,4 @@
-"""WI-02: JSON round trip of the real v1 flow files and a 10,000-message measurement.
+"""WI-0002: JSON round trip of the real v1 flow files and a 10,000-message measurement.
 
 The AHK helper parses every flow file, writes it with indent 2, parses it again and writes it again.
 Python's json is the reference: types must match (str, int, float), and the written file must be
@@ -110,6 +110,6 @@ def test_ten_thousand_messages_are_measured(run_ahk, record_property):
     record_property("parse_ms_10000", b["parse_ms"])
     record_property("stringify_ms_10000", b["stringify_ms"])
     record_property("chars_each", b["chars_each"])
-    # Acceptance target of WI-02 is < 1000 ms per direction. Recorded only, no hard gate.
+    # Acceptance target of WI-0002 is < 1000 ms per direction. Recorded only, no hard gate.
     print("\nJSON 10000 messages (%d chars each): parse %d ms, stringify %d ms (target < 1000 ms each)"
           % (b["chars_each"], b["parse_ms"], b["stringify_ms"]))

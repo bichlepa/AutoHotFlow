@@ -1,4 +1,4 @@
-"""WI-27: sys.busy. A worker with a job is not pinged and not judged by pongs (ARCHITECTURE 6.4, PROTOCOL 4.1)."""
+"""WI-0027: sys.busy. A worker with a job is not pinged and not judged by pongs (ARCHITECTURE 6.4, PROTOCOL 4.1)."""
 
 import time
 
@@ -27,8 +27,8 @@ def done_for(client, exec_id, timeout):
 
 @pytest.mark.slow
 def test_worker_that_blocks_longer_than_the_pong_timeout_is_not_hung_while_it_has_a_job(started, clients):
-    """Action_TestLongBlockWorker blocks in one call for 7.5 s (pong timeout 6 s): before WI-27 the heartbeat
-    declared the worker hung and ended it (decision of WI-11, 'no tolerance')."""
+    """Action_TestLongBlockWorker blocks in one call for 7.5 s (pong timeout 6 s): before WI-0027 the heartbeat
+    declared the worker hung and ended it (decision of WI-0011, 'no tolerance')."""
     sup = started()
     engine = clients(sup.pipe, "engine")
     # a second client watches the process events: two readers on one client would take each other's messages

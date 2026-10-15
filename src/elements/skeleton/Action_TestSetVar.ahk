@@ -3,12 +3,12 @@
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
 
-; Test element of WI-41: changes variables through the element API, so that the tests can set, delete and read
-; global and static variables of a running engine (there is no other way yet: the variable elements come with WI-43).
+; Test element of WI-0041: changes variables through the element API, so that the tests can set, delete and read
+; global and static variables of a running engine (there is no other way yet: the variable elements come with WI-0043).
 ;   Steps  JSON text of an array of steps, run in this order. A step is an object with
 ;          op     "set" (store the JSON value as it is: text, number or object), "delete", or "probe"
 ;          name   the variable; its name decides the scope (global_, static_, or an instance variable)
-;          location  optional, only for "set": "thread" or "loop" for a name that starts with A_ (WI-43)
+;          location  optional, only for "set": "thread" or "loop" for a name that starts with A_ (WI-0043)
 ;          value  the value of "set"
 ;          "probe" copies the text form of the variable to the global variable global_probe_<name> and its type
 ;          ("String", "Integer", "Float", "Map", or "<missing>") to global_probetype_<name> and its location

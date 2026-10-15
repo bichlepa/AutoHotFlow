@@ -1,11 +1,11 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/storage/WriteQueue.ahk (WI-12, ARCHITECTURE 6.3): order, one answer per operation,
+; Unit tests for src/storage/WriteQueue.ahk (WI-0012, ARCHITECTURE 6.3): order, one answer per operation,
 ; deadlines, error codes, a failing answer does not stop the queue, FailAll at shutdown.
 ; No files and no timers are needed: RunOne is called directly.
 #Include lib\Assert.ahk
 #Include ..\..\src\storage\WriteQueue.ahk
 
-; WI-32: no timer may run between two lines of a case. Add and AddLow arm the queue's own timer; on a loaded
+; WI-0032: no timer may run between two lines of a case. Add and AddLow arm the queue's own timer; on a loaded
 ; machine the thread is interruptible after a stall, and the timer then ran operations in the middle of a case
 ; (159 instead of 300 operations in one go). Every case calls RunOne/RunFor itself.
 Critical("On")
@@ -164,9 +164,9 @@ CaseRetryEndsWithBusyWhenTheTimeIsUp() {
     Assert.Equal(q.Pending, 0)
 }
 
-; --- WI-25: two queues (requests first), time budget per timer run ------------------------------
+; --- WI-0025: two queues (requests first), time budget per timer run ------------------------------
 
-; A clock for the queue that only moves when an operation uses time (WI-32: no real time in these cases, so a loaded
+; A clock for the queue that only moves when an operation uses time (WI-0032: no real time in these cases, so a loaded
 ; machine cannot change how many operations a budget covers).
 FakeClock() => Map("t", 1000)
 

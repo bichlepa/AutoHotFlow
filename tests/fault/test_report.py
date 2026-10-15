@@ -1,4 +1,4 @@
-"""WI-28 step c: the crash report (cmd.diag.report, automatic reports, storage's Reports/ folder).
+"""WI-0028 step c: the crash report (cmd.diag.report, automatic reports, storage's Reports/ folder).
 doc/PROTOCOL.md 4.9, doc/ARCHITECTURE.md 6.2.
 
 Real supervisor with its real children (faultkit.Chain). The evidence is the folder Reports/<stamp>_<reason>/ in

@@ -4,12 +4,12 @@
 #Include StoragePaths.ahk
 #Include AtomicFile.ahk
 
-; Flow files in Flows/ (WI-12, ARCHITECTURE 7, MIGRATION M-07). Text in, text out: storage never
+; Flow files in Flows/ (WI-0012, ARCHITECTURE 7, MIGRATION M-0007). Text in, text out: storage never
 ; interprets the flow beyond checking that it is a JSON object, the engine parses it.
 ;
-; Backup (M-07): before an existing file is replaced, its content is copied to
+; Backup (M-0007): before an existing file is replaced, its content is copied to
 ; Flows/backup/<name>_backup_<yyyyMMddHHmmss><ms>.json. At most MAX_BACKUPS are kept, the oldest go
-; first (v1 Save.ahk:124-146 kept the same number, but never created a backup, see M-07).
+; first (v1 Save.ahk:124-146 kept the same number, but never created a backup, see M-0007).
 ; A failed backup stops the write: the old file is then still in place and nothing is lost.
 class FlowFiles {
     static BACKUP_DIR := "backup"

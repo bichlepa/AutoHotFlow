@@ -8,7 +8,7 @@
 #Include BuiltInVars.ahk
 #Include EngineVars.ahk
 
-; Access to the variables from one place of execution (WI-40, doc/EXPRESSION-LANGUAGE.md section 18): the view of
+; Access to the variables from one place of execution (WI-0040, doc/EXPRESSION-LANGUAGE.md section 18): the view of
 ; one element of one thread on the loop, thread, instance, static, global and built-in variables. Port of the v1
 ; functions Var_Get, Var_Set, Var_GetLocation, Var_Delete, Var_GetType, Var_GetListOf*, Var_replaceVariables
 ; (v1/Source_Execution/Variables/Variables.ahk) and their *_Common forms (v1/Source_Common/Variables/
@@ -149,7 +149,7 @@ class VarAccess {
         return out
     }
 
-    ; A copy of the visible instance variables, name -> value (v1 x_ExportAllInstanceVars, WI-42). Empty in common.
+    ; A copy of the visible instance variables, name -> value (v1 x_ExportAllInstanceVars, WI-0042). Empty in common.
     ExportInstance() {
         out := VarValues.NewMap()
         if (this.common)
@@ -292,7 +292,7 @@ class VarAccess {
         return this.inst.Vars.Has(name) ? "instance" : ""
     }
 
-    ; A global or static variable has changed: VarWriter writes it (WI-41). name is the root name.
+    ; A global or static variable has changed: VarWriter writes it (WI-0041). name is the root name.
     _Touch(location, name) {
         if (location = "global") {
             this.store.Touch("global", "", name)

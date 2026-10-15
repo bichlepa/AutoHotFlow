@@ -1,4 +1,4 @@
-"""WI-11: worker role (src/worker/).
+"""WI-0011: worker role (src/worker/).
 
 The worker runs as a real process (src/AutoHotFlow.ahk --role=worker --flow=<n>, started through
 tools/ahkrun.py). Its hub is the Python stand-in tests/support/pyhub.py (WakingHub, RoleHub from
@@ -20,7 +20,7 @@ ROOT_TIMEOUT_S = 5.0
 CANCEL_BUDGET_S = scaled(0.5)          # acceptance: cmd.worker.cancel -> evt.worker.done "stopped" within 500 ms
 PING_BUDGET_S = scaled(0.05)           # pings during a blocking element are answered while it blocks
 BLOCK_MS = 800                 # Action_TestBlockWorker blocks for this long
-CANCEL_BLOCK_MS = 3000         # the element of the cancel test blocks longer, so a late cancel still finds it (F-37)
+CANCEL_BLOCK_MS = 3000         # the element of the cancel test blocks longer, so a late cancel still finds it (F-0037)
 
 
 @pytest.fixture
@@ -160,7 +160,7 @@ def test_run_without_execid_is_bad_payload(worker):
 
 
 def test_evaluated_parameters_reach_the_element_and_an_error_ends_it(worker):
-    """WI-42, E26: ctx.EvalParams in the worker returns what the engine sent in `evaluated`; the first error of a
+    """WI-0042, E0026: ctx.EvalParams in the worker returns what the engine sent in `evaluated`; the first error of a
     parameter that is not skipped ends the element with exception and the text of the engine."""
     import json
     payload = run_payload("ev1", "Action_TestExprParamsWorker", {"Tag": "w", "Skip": "Int"})
@@ -204,7 +204,7 @@ def test_cancel_of_unknown_execution_is_not_found(worker):
 
 @pytest.mark.slow
 def test_cancel_stops_the_running_element_and_reports_stopped_within_500_ms(worker):
-    # The element must still run when the cancel arrives (F-37): with the default 800 ms a loaded machine
+    # The element must still run when the cancel arrives (F-0037): with the default 800 ms a loaded machine
     # delayed the cancel past the end of the element and the answer was not_found. So the element blocks long,
     # and the test waits until the worker reports the job in its snapshot (job accepted) before it cancels.
     assert send_run(worker, run_payload("c1", "Action_TestBlockWorker", {"Duration": str(CANCEL_BLOCK_MS)}))["ok"]
@@ -281,7 +281,7 @@ def test_shutdown_while_running_reports_stopped_before_bye(worker, supervisor_cl
 
 def test_shutdown_with_a_job_and_a_hub_that_reads_late_still_delivers_stopped_and_bye(procs, datadir, runs, pipe,
                                                                                        session_id):
-    # WI-30 (F-26 cause A): at sys.shutdown the send queue of the worker is full (the hub reads nothing for
+    # WI-0030 (F-0026 cause A): at sys.shutdown the send queue of the worker is full (the hub reads nothing for
     # STALL_S). evt.worker.done "stopped" still reaches the engine, and sys.bye comes after it.
     with StallingHub(pipe, first_pong_of("worker:1"), STALL_S) as hub:
         run = start_worker(procs, datadir, runs, pipe, session_id)
@@ -301,7 +301,7 @@ def test_shutdown_with_a_job_and_a_hub_that_reads_late_still_delivers_stopped_an
             assert types.index("evt.worker.done") < types.index("sys.bye"), types[-5:]
 
 
-# --- sys.busy (WI-27) ------------------------------------------------------------------------------
+# --- sys.busy (WI-0027) ------------------------------------------------------------------------------
 
 def busy_messages(supervisor_client, window=1.0):
     return [m["payload"]["busy"] for m in supervisor_client.events(timeout=window) if m.get("type") == "sys.busy"]
@@ -322,7 +322,7 @@ def test_worker_reports_not_busy_after_a_cancel_too(worker, supervisor_client):
 
 
 def test_log_entries_of_the_worker_reach_storage(worker, supervisor_client, hub, pipe):
-    # F-28: the worker never set a log target, its entries stayed in its own queue and were never written.
+    # F-0028: the worker never set a log target, its entries stayed in its own queue and were never written.
     with AhfClient(pipe, "storage") as storage:
         assert send_run(worker, run_payload("l1", "Action_TestEchoWorker"))["ok"]
         assert done_for(worker, "l1")["result"] == "normal"

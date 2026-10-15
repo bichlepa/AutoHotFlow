@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; Measurement for WI-37 task 4: parsing a typical expression without and with the parse cache.
+; Measurement for WI-0037 task 4: parsing a typical expression without and with the parse cache.
 ; Not a unit test. A_Args[1] = result file; one text line per expression and a summary line.
 ; Usage: python tools/ahkrun.py tests/ahk/helpers/expr_bench.ahk <result file>
 #Include ..\..\..\src\expr\Expr.ahk

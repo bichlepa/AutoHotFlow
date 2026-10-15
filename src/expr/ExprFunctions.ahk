@@ -38,7 +38,7 @@ class ExprFunctions {
         return Round(number, digits)
     }
 
-    ; object([key, value, ...]): a new Map that ignores case in its keys (decision E28).
+    ; object([key, value, ...]): a new Map that ignores case in its keys (decision E0028).
     static _Object(ctx, pairs*) {
         if (Mod(pairs.Length, 2) != 0)
             throw ValueError("object() needs pairs of key and value, got " pairs.Length " arguments")

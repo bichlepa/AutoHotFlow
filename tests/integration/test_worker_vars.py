@@ -1,6 +1,6 @@
-"""WI-50 (ARCHITECTURE R4): variables in a worker element and the variable requests cmd.engine.var.* (PROTOCOL 4.5).
+"""WI-0050 (ARCHITECTURE R0004): variables in a worker element and the variable requests cmd.engine.var.* (PROTOCOL 4.5).
 
-A real session (flow runner of WI-49): supervisor, storage, engine and the worker pool, with the test elements of
+A real session (flow runner of WI-0049): supervisor, storage, engine and the worker pool, with the test elements of
 tests/elements/. The elements Action_TestVarFunctions (inline) and Action_TestVarFunctionsWorker (worker) call every
 variable function in the same order and write a report of the results; the reports must be equal.
 """

@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; Detection of the deviation classes that can apply to a v1 expression text (WI-45, doc/EXPRESSION-LANGUAGE.md
+; Detection of the deviation classes that can apply to a v1 expression text (WI-0045, doc/EXPRESSION-LANGUAGE.md
 ; section 15.1, doc/MIGRATION.md). Used by V1ExprConverter.Convert.
 ;
 ;   classes := V1ExprDetect.Classes(text, ast)    ; ast: the tree of the text (or of the text after the syntax

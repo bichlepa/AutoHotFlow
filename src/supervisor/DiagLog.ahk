@@ -3,7 +3,7 @@
 #Include ..\core\Log.ahk
 #Include ..\core\Role.ahk
 
-; Log sink of the supervisor and collector of the unhandled errors of the roles (WI-23, doc/ARCHITECTURE.md 6.2).
+; Log sink of the supervisor and collector of the unhandled errors of the roles (WI-0023, doc/ARCHITECTURE.md 6.2).
 ; The supervisor is not a Role and has no peer, so it cannot use Role's log queue. Every entry goes
 ;   1. to the console (stderr), as before, and
 ;   2. as evt.log.append straight through the hub to "storage" (sender "supervisor"), while storage is
@@ -15,7 +15,7 @@
 ;   Log.Configure(diag.SinkFn)       ; function property: a method would receive its object as first argument
 ;   diag.Flush()                     ; storage is connected
 ;   diag.AddError("engine", payload) ; evt.diag.error of a role: logged and kept in a ring of ERROR_RING_MAX
-;   diag.Errors()                    ; copies of the ring (for the crash report, WI-28)
+;   diag.Errors()                    ; copies of the ring (for the crash report, WI-0028)
 class DiagLog {
     static ERROR_RING_MAX := 50
     static STORAGE := "storage"

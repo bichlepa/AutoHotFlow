@@ -1,4 +1,4 @@
-"""Shared helpers of the fault injection tests (WI-15, doc/TEST-STRATEGY.md 2, level L4).
+"""Shared helpers of the fault injection tests (WI-0015, doc/TEST-STRATEGY.md 2, level L4).
 
 A Chain is one supervisor (tools/ahkrun.py -> src/AutoHotFlow.ahk) with its real child roles, plus a
 Python observer client ("obs") that subscribes to the process topic and records every event with its
@@ -7,7 +7,7 @@ arrival time. Roles are found by name through cmd.process.list (the pid is the o
 Every process of a test carries the unique session id in its command line (--session=<id>). That is how
 a test finds its own leftovers (session_processes) and never touches a process that is not its own.
 
-Budgets (WI-15 acceptance, PROTOCOL 4.1a, ARCHITECTURE 6.2) are constants here, so the tests and the
+Budgets (WI-0015 acceptance, PROTOCOL 4.1a, ARCHITECTURE 6.2) are constants here, so the tests and the
 measurement notes use the same numbers.
 
 Repetition: AHF_FAULT_REPEAT=<n> runs every scenario n times (acceptance: 20). The default is 1, so the
@@ -28,7 +28,7 @@ from support.ahfclient import AhfClient
 from support.timing import scaled
 
 ROOT = Path(__file__).resolve().parents[2]
-ENTRY = ROOT / "tests" / "integration" / "helpers" / "AutoHotFlowTest.ahk"   # product entry plus test roles (WI-29)
+ENTRY = ROOT / "tests" / "integration" / "helpers" / "AutoHotFlowTest.ahk"   # product entry plus test roles (WI-0029)
 AHKRUN = ROOT / "tools" / "ahkrun.py"
 SKELETON_SRC = ROOT / "tests" / "data" / "skeleton_flow.json"
 SKELETON_FLOW = "skeleton"
@@ -42,9 +42,9 @@ EXIT_HUB_LOST = 4          # Role.EXIT_HUB_LOST (orphan guard)
 
 START_BUDGET_S = 10.0      # all children ready (generous for a loaded machine; measured values are printed)
 CRASH_BUDGET_S = scaled(1.0)  # evt.process.crashed within 1 s of the death (ARCHITECTURE 6.2)
-HANG_BUDGET_S = scaled(8.0)        # frozen process reported hung within 8 s (WI-15)
-CLEAN_EXIT_BUDGET_S = scaled(2.0)  # healthy roles: exit within 2 s (WI-15 shutdown)
-ORPHAN_BUDGET_S = 3.0 + scaled(2.0)  # Role.ORPHAN_MS (3 s) plus slack (WI-15 orphans)
+HANG_BUDGET_S = scaled(8.0)        # frozen process reported hung within 8 s (WI-0015)
+CLEAN_EXIT_BUDGET_S = scaled(2.0)  # healthy roles: exit within 2 s (WI-0015 shutdown)
+ORPHAN_BUDGET_S = 3.0 + scaled(2.0)  # Role.ORPHAN_MS (3 s) plus slack (WI-0015 orphans)
 REQUEST_BUDGET_S = scaled(1.0)  # an unanswered request ends at its own limit (test value)
 
 # Roles of a full chain: the UI stub is the manager in stub mode, the engine needs storage for its flows.
@@ -317,14 +317,14 @@ class Chain:
         def check():
             st = self.states().get(name, {})
             return st.get("state") == "ready" and st.get("pid") not in (0, old_pid)
-        timeout = scaled(timeout)           # a wait for a restart is an upper limit like the others (WI-34, F-42)
+        timeout = scaled(timeout)           # a wait for a restart is an upper limit like the others (WI-0034, F-0042)
         if not wait_until(check, timeout):
             raise AssertionError("%s not ready again within %.1f s:\n%s" % (name, timeout, self.sup.text()))
         return self.states()[name]["pid"], time.perf_counter()
 
     def wait_flows(self, flows=(SKELETON_FLOW,), timeout=START_BUDGET_S):
         """Waits until the engine has loaded the flows (cmd.engine.snapshot). Unlike waiting for evt.engine.ready this
-        cannot be missed when the event came before the observer subscribed (WI-28)."""
+        cannot be missed when the event came before the observer subscribed (WI-0028)."""
         def loaded():
             try:
                 have = {f["flowId"] for f in self.snapshot_ok()["flows"]}

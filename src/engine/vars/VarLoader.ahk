@@ -3,19 +3,19 @@
 #Include ..\..\core\Json.ahk
 #Include VarValues.ahk
 
-; Loads the global and static variables from storage at the start, before evt.engine.ready (WI-41, ARCHITECTURE 6.1).
+; Loads the global and static variables from storage at the start, before evt.engine.ready (WI-0041, ARCHITECTURE 6.1).
 ; The expression evaluator reads variables synchronously, so they must be in memory before a flow runs; loading on
 ; demand would only work by blocking.
 ;
 ; Work: one cmd.storage.var.list for the global scope and one for the static variables of each loaded flow, then one
 ; cmd.storage.var.get per name. At most PARALLEL requests are on their way, and the next one leaves when an answer
-; has been handled (as for the flow files, WI-24): each answer costs the engine a parse, and a ping must not wait
+; has been handled (as for the flow files, WI-0024): each answer costs the engine a parse, and a ping must not wait
 ; behind many of them.
 ;
 ; When storage is gone or silent no further request is sent. After the last answer the loader reports onDown and
 ; keeps what is not done yet; Run again (the engine does that when storage is back) continues with exactly that.
 ;
-; Not self-contained (F-281): the error branch uses Engine._StorageGone and Engine._ErrorText. Include this file
+; Not self-contained (F-0281): the error branch uses Engine._StorageGone and Engine._ErrorText. Include this file
 ; through Engine.ahk; a script that includes it alone gets a #Warn dialog for the unset name "Engine".
 ; A request that failed for another reason (a file that cannot be read, content that is not JSON) is reported as
 ; evt.storage.error and skipped: that variable is missing in memory, and the next write of it replaces the file.

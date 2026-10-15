@@ -16,7 +16,7 @@
 #Include vars\VarAccess.ahk
 #Include vars\VarNames.ahk
 
-; Runs the instances of the engine (WI-10, ARCHITECTURE 2.3, 5.1, 5.2, 6.2). Runs the state machines of
+; Runs the instances of the engine (WI-0010, ARCHITECTURE 2.3, 5.1, 5.2, 6.2). Runs the state machines of
 ; engine/core and calls the elements through ElementRunner. Knows nothing about IPC: it reports through
 ; owner.Emit, owner.EmitFlowState and owner.Kick (implemented by Engine).
 ;
@@ -24,30 +24,30 @@
 ; ready thread. A run of Tick is limited to TICK_BATCH dispatches, then it schedules itself again, so a flow
 ; of synchronous elements cannot keep the message loop busy.
 ;
-; Modes (ELEMENT-API-V2 section 2): inline runs here. worker goes to the pool (WorkerBridge, WI-11): the thread
+; Modes (ELEMENT-API-V2 section 2): inline runs here. worker goes to the pool (WorkerBridge, WI-0011): the thread
 ; waits in state ready while every worker is busy, and ends with "exception" ("worker not available") when no
 ; worker is usable at all. trigger cannot be an action.
 ;
-; Policy "wait" (ARCHITECTURE 5.1, E2, M-11): a start while the flow is executing creates the instance in state
+; Policy "wait" (ARCHITECTURE 5.1, E0002, M-0011): a start while the flow is executing creates the instance in state
 ; waiting and queues it (FIFO per flow, evt.instance.queued). When no started instance of the flow is left, the next
 ; waiting one is started. This happens in Tick (_PromoteWaiting), not in the call that ended the previous instance,
 ; so a long queue of short flows does not nest calls, and Tick's guard keeps it serial. Stop ends waiting and
 ; running instances; waiting ones first, so a stop never starts an instance on its way.
 ;
-; Revisions (ARCHITECTURE 4.2, E1): a run keeps only the flow ID. Every step reads the newest committed definition
+; Revisions (ARCHITECTURE 4.2, E0001): a run keeps only the flow ID. Every step reads the newest committed definition
 ; from owner.flows (DefOf), so an edit takes effect at the next step. A running element keeps the class and the
 ; parameters it was started with (they are stored in run["active"]). A flow that is gone from the table stops its
 ; instances at the next step (reason "flow.deleted"); Engine calls FlowDeleted when it removes a flow.
 ;
-; Variables (WI-40, doc/EXPRESSION-LANGUAGE.md section 18): every element run gets a VarAccess, its view on the loop
+; Variables (WI-0040, doc/EXPRESSION-LANGUAGE.md section 18): every element run gets a VarAccess, its view on the loop
 ; and thread variables of its thread (ThreadState), the instance variables (Instance), the static variables of the flow
 ; and the global variables (owner.vars, EngineVars). A worker element reaches the same view through the variable
-; requests (VarRequests, WI-50): the job keeps the context of the element; the job carries no copies (M-45).
+; requests (VarRequests, WI-0050): the job keeps the context of the element; the job carries no copies (M-0045).
 ; ContextOf makes such a view for a client that names an instance (and a thread).
 ;
 ; Parameters are passed as they are stored in the flow file (object with case-insensitive properties). An inline
-; element evaluates them when it calls ctx.EvalParams (WI-42, as v1 x_AutoEvaluateParameters); for a worker element
-; the engine evaluates all of them before the job is sent (E26, _DispatchWorker), because the worker has no access to
+; element evaluates them when it calls ctx.EvalParams (WI-0042, as v1 x_AutoEvaluateParameters); for a worker element
+; the engine evaluates all of them before the job is sent (E0026, _DispatchWorker), because the worker has no access to
 ; the variables.
 class Executor {
     static TICK_BATCH := 1000
@@ -298,7 +298,7 @@ class Executor {
                 }
             }
         }
-        ; Threads that wait for a worker: the pool grows to meet the demand (WI-27, ARCHITECTURE 6.4).
+        ; Threads that wait for a worker: the pool grows to meet the demand (WI-0027, ARCHITECTURE 6.4).
         if (waiting > 0)
             this._owner.workers.Want(waiting)
     }
@@ -319,7 +319,7 @@ class Executor {
             , this._VarAccess(run, thread, def, elementId))
         ctx.entryPoint := thread.EntryPoint      ; "head" or "tail" for a loop (v1 x_getEntryPoint)
         if (!def.HasElement(elementId)) {
-            ; The element was deleted while the thread waited (ARCHITECTURE 4.2, M-17).
+            ; The element was deleted while the thread waited (ARCHITECTURE 4.2, M-0017).
             Log.Write("f1", "engine", "element '" elementId "' was removed before it could start", flowId)
             ctx.Finish("exception", "element was removed")
             return
@@ -329,8 +329,8 @@ class Executor {
             ctx.Finish("exception", "unknown element class '" classId "'")
             return
         }
-        ctx.cls := cls                          ; Parameters() of the class for ctx.EvalParams (WI-42)
-        ctx.strictTypes := def.StrictTypes      ; the type mode of the flow (E34)
+        ctx.cls := cls                          ; Parameters() of the class for ctx.EvalParams (WI-0042)
+        ctx.strictTypes := def.StrictTypes      ; the type mode of the flow (E0034)
         if (cls.Mode = "worker") {
             this._DispatchWorker(run, thread, ctx, cls, classId, def)
             return
@@ -347,7 +347,7 @@ class Executor {
     ; Sends a worker element to the pool. The thread stays running until the worker reports (or the job is
     ; cancelled, see _StopRun). Without a usable worker the run ends with "exception" at once.
     _DispatchWorker(run, thread, ctx, cls, classId, def) {
-        ; E26: the engine evaluates every parameter now, with its variables and the mode of the flow; the worker has no
+        ; E0026: the engine evaluates every parameter now, with its variables and the mode of the flow; the worker has no
         ; access to them. An assignment in a parameter has run before the job leaves, so the element sees its result.
         try {
             evaluated := Executor._EvalForWorker(cls, ctx, Executor._Params(def, thread.ElementId))
@@ -366,7 +366,7 @@ class Executor {
         prev := Critical("On")  ; reason: register, start and note the execId as one step (see above)
         try {
             run["active"][thread.Id] := act
-            ; No copies of the variables (M-45, WI-50): the element asks the engine with the variable requests, which
+            ; No copies of the variables (M-0045, WI-0050): the element asks the engine with the variable requests, which
             ; find this context (ctx) through the job.
             execId := this._owner.workers.Run(classId, params, Map(), env
                 , ObjBindMethod(this, "_OnWorkerDone", ctx), cls.JobTimeoutMs, evaluated, ctx)
@@ -383,7 +383,7 @@ class Executor {
             ctx.Finish("exception", "worker not available for " classId)
     }
 
-    ; Every parameter of a worker element, evaluated in the engine (E26, ParamEvaluator): an Array, in the order of
+    ; Every parameter of a worker element, evaluated in the engine (E0026, ParamEvaluator): an Array, in the order of
     ; Parameters(), of Map {id, value} or {id, error}. The value is made fit for JSON (_Wire). Throws if Parameters() of
     ; the class throws.
     static _EvalForWorker(cls, ctx, params) {
@@ -418,7 +418,7 @@ class Executor {
     }
 
     ; Called by WorkerBridge when the job ends (bound: ctx first). Exports become variables where their name says (an
-    ; A_ name a thread variable). An element can also set variables during the run (SetVar through the engine, WI-50).
+    ; A_ name a thread variable). An element can also set variables during the run (SetVar through the engine, WI-0050).
     _OnWorkerDone(ctx, result, message, exports) {
         if (!ExecContext.IsResult(result)) {
             message := "worker reported result '" result "'"
@@ -457,7 +457,7 @@ class Executor {
     ; Critical: Scheduler.Advance sets a thread "ready" a few lines before it names the next element.
     ; A dispatch tick that interrupts in between (AHK interrupts after 15 ms) would run the thread with
     ; its old element, e.g. a trigger as an action ("cannot be an action"; seen in 2 of about 50 runs
-    ; with 200 parallel instances, WI-16).
+    ; with 200 parallel instances, WI-0016).
     _Advance(run, thread) {
         def := this._DefOf(run)
         if (!IsObject(def)) {
@@ -478,7 +478,7 @@ class Executor {
     }
 
     ; Stops one instance: running elements get Stop and are released at once (the element has no
-    ; asynchronous acknowledgement in WI-10, so the 2 s deadline of ARCHITECTURE 5.1 never applies).
+    ; asynchronous acknowledgement in WI-0010, so the 2 s deadline of ARCHITECTURE 5.1 never applies).
     _StopRun(run, reason) {
         inst := run["inst"]
         if (!inst.Stop(reason))
@@ -642,7 +642,7 @@ class Executor {
         return m
     }
 
-    ; The view of one element run on the variables (WI-40). The built-in variables a_flowName, a_elementName and
+    ; The view of one element run on the variables (WI-0040). The built-in variables a_flowName, a_elementName and
     ; a_workingdir come from the revision the element starts with.
     _VarAccess(run, thread, def, elementId) {
         el := def.Element(elementId)
@@ -653,7 +653,7 @@ class Executor {
         return VarAccess(this._owner.vars, run["inst"], thread, env)
     }
 
-    ; An element context for a variable request of a client (WI-50, VarRequests): the view of the instance and, with a
+    ; An element context for a variable request of a client (WI-0050, VarRequests): the view of the instance and, with a
     ; threadId, of that thread, with the type mode of the flow. Without a thread the context has no loop and thread
     ; variables (an empty stand-in; ctx.noThread is true). Throws AhfError gone when the instance or the thread does not
     ; exist (any more).

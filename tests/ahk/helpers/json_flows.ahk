@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; Helper for tests/test_json_flows.py (WI-02). Not a unit test: no TestRun, no summary from TestRun.
+; Helper for tests/test_json_flows.py (WI-0002). Not a unit test: no TestRun, no summary from TestRun.
 ; A_Args[1] = result file (JSON lines), A_Args[2] = output directory,
 ; A_Args[3...] = directories with flow files (only *.json directly inside, not recursive).
 ; For each file: parse the bytes, write with indent 2 into the output directory, parse that text

@@ -1,7 +1,7 @@
 """The v1 folder is a temporary reference and is removed after the port (AGENTS.md). Nothing that runs may depend on it.
 
 Tests read their data from tests/data (flows, variables) and create everything else in a fresh temporary directory.
-Exception: tests/golden generates reference data with the v1 interpreter (work_items/phase3/WI-36); its results are
+Exception: tests/golden generates reference data with the v1 interpreter (work_items/phase3/WI-0036); its results are
 checked in, so the normal test run does not need v1 either.
 """
 
@@ -15,7 +15,7 @@ V1_PATH = re.compile(r'''(?:^|[\s"'\\/(=])v1[\\/]|["']v1["']\s*/''')
 
 SCANNED = [("src", "*.ahk"), ("tests", "*.py"), ("tests", "*.ahk"), ("tools", "*.py"), ("tools", "*.ahk")]
 EXEMPT_PREFIXES = ("tests/golden/",)
-# the two tools of the golden data read v1 on purpose (WI-36); their results are checked in
+# the two tools of the golden data read v1 on purpose (WI-0036); their results are checked in
 EXEMPT_FILES = {"tests/test_no_v1_dependency.py", "tools/golden_v1.py", "tools/golden_corpus.py"}
 
 

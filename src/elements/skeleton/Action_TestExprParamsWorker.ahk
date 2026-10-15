@@ -3,8 +3,8 @@
 #Include ..\base\ElementRegistry.ahk
 #Include Action_TestExprParams.ahk
 
-; Test element of WI-42: Action_TestExprParams in a worker (same parameters). The engine evaluates the parameters
-; before the job (E26); Run takes them with ctx.EvalParams (skip list Skip, then EvalMoreParams for More) and exports
+; Test element of WI-0042: Action_TestExprParams in a worker (same parameters). The engine evaluates the parameters
+; before the job (E0026); Run takes them with ctx.EvalParams (skip list Skip, then EvalMoreParams for More) and exports
 ; the same JSON text as the inline element, as global_evalresult_<Tag>: the engine sets an export where its name says,
 ; so the test finds both results in the same place.
 class Action_TestExprParamsWorker extends AhfElement {

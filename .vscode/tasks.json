@@ -341,7 +341,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Tool: R3 measurement, parse time and memory with N element classes (run alone, about 6 min)",
+            "label": "Tool: R0003 measurement, parse time and memory with N element classes (run alone, about 6 min)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -354,7 +354,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Tool: R3 measurement, load phase of the engine with 200 big flows (run alone, about 10 min)",
+            "label": "Tool: R0003 measurement, load phase of the engine with 200 big flows (run alone, about 10 min)",
             "type": "shell",
             "command": "python",
             "args": [

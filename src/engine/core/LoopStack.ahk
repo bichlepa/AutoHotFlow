@@ -2,7 +2,7 @@
 #Include ..\..\core\Errors.ahk
 #Include ..\vars\VarValues.ahk
 
-; Stack of loop variables per thread (WI-08, ARCHITECTURE 5.2).
+; Stack of loop variables per thread (WI-0008, ARCHITECTURE 5.2).
 ;
 ; Port of v1 LoopVariable_AddToStack and LoopVariable_RestoreFromStack
 ; (v1/Source_Execution/Variables/Variables.ahk:174 and :194). Used from
@@ -13,7 +13,7 @@
 ; outer loop, hidden while an inner loop runs). Push stores copies of both current maps, Pop
 ; restores the last pair. Push does not clear the current maps (v1 does not either).
 ;
-; The file is named after the class (WI-29; it was Loops.ahk before).
+; The file is named after the class (WI-0029; it was Loops.ahk before).
 ; Variable names are case-insensitive, as in v1 (CaseSense "Off").
 class LoopStack {
     __New() {
@@ -64,7 +64,7 @@ class LoopStack {
     }
 
     ; Copies the entries into a new map with the same case rule. Map.Clone() is not used:
-    ; its CaseSense handling is not part of the verified behavior. An object value is copied as well (WI-40): every
+    ; its CaseSense handling is not part of the verified behavior. An object value is copied as well (WI-0040): every
     ; level of the stack and every thread owns its values.
     static CopyMap(source) {
         m := LoopStack.NewMap()

@@ -1,9 +1,9 @@
 #Requires AutoHotkey v2.0
 #Include VarValues.ahk
 
-; The variables that outlive an instance (WI-40, ARCHITECTURE 4): global (one table for all flows) and static (one
+; The variables that outlive an instance (WI-0040, ARCHITECTURE 4): global (one table for all flows) and static (one
 ; table per flow). The engine is the only owner; this is its working copy in memory. VarLoader fills it from the
-; files at the start, VarWriter writes the changes back (WI-41, both through storage; the engine never touches a
+; files at the start, VarWriter writes the changes back (WI-0041, both through storage; the engine never touches a
 ; file). Instance, thread and loop variables belong to Instance and ThreadState.
 class EngineVars {
     __New() {

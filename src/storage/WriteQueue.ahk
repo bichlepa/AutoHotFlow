@@ -3,7 +3,7 @@
 #Include ..\core\Role.ahk
 #Include ..\core\Time.ahk
 
-; Serial queues of storage operations (WI-12, WI-25, ARCHITECTURE 6.3). Two queues: requests (Add) and
+; Serial queues of storage operations (WI-0012, WI-0025, ARCHITECTURE 6.3). Two queues: requests (Add) and
 ; log operations (AddLow). A request always runs before a waiting log operation, so a flood of log
 ; lines cannot hold back flow.read or flow.write. The order inside each queue is kept.
 ;
@@ -21,14 +21,14 @@
 ; The queue is touched from timers and handlers. Every statement here is one operation on the array
 ; (RemoveAt, Push, Length), so an interrupting thread sees a consistent queue (HOW-TO, Pipes section).
 class WriteQueue {
-    ; Time one timer run may work before it yields to the message pump (WI-25: justification in the result).
+    ; Time one timer run may work before it yields to the message pump (WI-0025: justification in the result).
     static BUDGET_MS := 10
 
     ; A gap this long between two attempts of a retrying operation is a stall and is not counted against its retry time.
     static STALL_MS := 1000
 
     ; clock: optional function() returning milliseconds in the unit of Time.NowMs(); only unit tests pass one
-    ; (WI-32), so that budget and retry delays can be checked without real time.
+    ; (WI-0032), so that budget and retry delays can be checked without real time.
     __New(clock := "") {
         this._now := (clock = "") ? () => Time.NowMs() : clock
         this._ops := []     ; requests
@@ -55,7 +55,7 @@ class WriteQueue {
 
     ; Runs the next runnable operation and answers it: the first request, else the first log operation
     ; (when its retry delay is over). Returns false when nothing could run.
-    ; An operation may ask for a later retry (F-04, file locked by another process): its run function
+    ; An operation may ask for a later retry (F-0004, file locked by another process): its run function
     ; returns Map("retry", true, "message", text) and the operation has "retryMs" (the time it may keep
     ; trying, counted from the first retry) and optionally "retryDelayMs". It then stays at the head
     ; of its queue (the order is kept). A log operation is not run again before its delay is over, a
@@ -81,7 +81,7 @@ class WriteQueue {
                 } else if (now - op["lastTry"] > WriteQueue.STALL_MS) {
                     ; Longer than any retry delay since the last attempt: the process was stalled (or busy
                     ; with requests). That time did not give the other process a chance to let go, so it
-                    ; does not count against the retry time (F-25, F-272).
+                    ; does not count against the retry time (F-0025, F-0272).
                     op["retryUntil"] += now - op["lastTry"]
                 }
                 op["lastTry"] := now

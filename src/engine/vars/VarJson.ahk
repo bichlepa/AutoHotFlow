@@ -2,7 +2,7 @@
 #Include ..\..\core\Json.ahk
 #Include VarValues.ahk
 
-; JSON text of a variable value, in the form of v1 Jxon_Dump (WI-40, v1 Var_replaceVariables with the option
+; JSON text of a variable value, in the form of v1 Jxon_Dump (WI-0040, v1 Var_replaceVariables with the option
 ; ConvertObjectToString). A Map with exactly the keys 1..n is written as an array; any other Map as an object with
 ; its keys in the order of the Map (Integer keys ascending, then the texts sorted without case, as in v1).
 ; With indent n > 0 every value is on its own line with n spaces per level, as Jxon_Dump(value, 2) wrote.

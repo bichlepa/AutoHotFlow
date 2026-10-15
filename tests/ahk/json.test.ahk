@@ -1,9 +1,9 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/core/Json.ahk (WI-02).
+; Unit tests for src/core/Json.ahk (WI-0002).
 #Include lib\Assert.ahk
 #Include ..\..\src\core\Json.ahk
 
-; Open check of WI-02 (result: YES, the spelling of the first insertion is kept):
+; Open check of WI-0002 (result: YES, the spelling of the first insertion is kept):
 ; a Map with CaseSense "Off" keeps the key spelling of the first insertion when enumerated,
 ; and a later insertion of the same key in another case only replaces the value.
 ; Enumeration of a Map is sorted (zebra, apple, mango come out as apple, mango, zebra).

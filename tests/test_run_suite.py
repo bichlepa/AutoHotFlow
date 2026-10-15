@@ -31,7 +31,7 @@ def test_exclusive_runs_are_recognized(args, expected):
 
 def test_two_runs_of_the_same_commit_in_the_same_second_get_their_own_folder(tmp_path):
     """Two runs started in the same second shared one folder and one worktree: the second removed the worktree of the
-    first (seen in WI-42: the first ran no tests, the second failed with 'already exists')."""
+    first (seen in WI-0042: the first ran no tests, the second failed with 'already exists')."""
     first = run_suite.new_run_dir(tmp_path, "20261014-172526-782586e3")
     second = run_suite.new_run_dir(tmp_path, "20261014-172526-782586e3")
     third = run_suite.new_run_dir(tmp_path, "20261014-172526-782586e3")

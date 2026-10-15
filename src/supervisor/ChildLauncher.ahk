@@ -2,8 +2,8 @@
 #Include ..\core\Errors.ahk
 #Include ChildPipe.ahk
 
-; Starts a role process with its stdout and stderr redirected into an anonymous pipe (WI-23).
-; Run() cannot do that: a process started by Run has no usable stderr (F-05), so load errors, the
+; Starts a role process with its stdout and stderr redirected into an anonymous pipe (WI-0023).
+; Run() cannot do that: a process started by Run has no usable stderr (F-0005), so load errors, the
 ; last words of a role and the reason for an early exit were lost. CreateProcessW can.
 ;
 ;   info := ChildLauncher.Start(commandLine)     ; Map: pid, process (handle), reader (ChildPipe)

@@ -20,16 +20,16 @@
 ;
 ; Process handles: the handle CreateProcessW returns (ChildLauncher, all access) is used for the exit wait
 ; (WaitForSingleObject(h, 0) on every tick), the exit code and TerminateProcess (hard end after the deadline).
-; Judging an exit (WI-30, F-26): an ended process is judged (exited/crashed, clean) only after the hub has read its
+; Judging an exit (WI-0030, F-0026): an ended process is judged (exited/crashed, clean) only after the hub has read its
 ; connection to the end (Hub.HasLink is false: the link goes when the end of the pipe is read, so everything the
 ; child wrote before, sys.bye included, has been handled), or EXIT_GRACE_MS after the end was seen (a child that
 ; never connected, or a connection that does not end). Pumping the hub first in the tick is not enough: a pump that
 ; another thread runs at that moment (the tick interrupted it) makes the tick's own pump return at once.
-; Output (WI-23): stdout and stderr of a child are one anonymous pipe. Every tick reads what is there and
+; Output (WI-0023): stdout and stderr of a child are one anonymous pipe. Every tick reads what is there and
 ; writes each line as a log entry (level a0, source = role name, text "[<name>] <line>"); the last
 ; OUTPUT_RING_MAX lines of every child stay in memory after the process has ended (Output(name), for the
 ; crash report). When a process ends, the rest of its output is read first, then the handles are closed.
-; Workers (WI-27, ARCHITECTURE 6.4): the engine asks for them (SpawnWorker) and ends them (KillWorker); they are never
+; Workers (WI-0027, ARCHITECTURE 6.4): the engine asks for them (SpawnWorker) and ends them (KillWorker); they are never
 ; restarted here. A worker that reports sys.busy is not pinged and not judged by pongs (OnBusy, IsBusy). Records of
 ; ended workers are kept for diagnosis, but only the last GONE_WORKERS_KEEP of them.
 ; Restart policy: only roles in AUTO_RESTART restart by themselves, at most RESTART_MAX times within
@@ -66,7 +66,7 @@ class Children {
 
     shuttingDown := false
     ; Function property (kind, name): the supervisor wants to know about incidents (crashed, restart-limit, hung)
-    ; to write a report (WI-28). Called after the event was published; a failure of it is logged and ignored.
+    ; to write a report (WI-0028). Called after the event was published; a failure of it is logged and ignored.
     onIncident := ""
     ; Set once a child was terminated by the supervisor (hang or deadline). Decides exit code 5.
     killedSome := false
@@ -109,7 +109,7 @@ class Children {
     }
 
     ; Starts a role that is not running: a new child, or the record of an ended one again (the debug window that the
-    ; user closed and opens again, WI-28). Returns true when a process was started, false when it runs already.
+    ; user closed and opens again, WI-0028). Returns true when a process was started, false when it runs already.
     ; Throws what Spawn throws. The restart count of an ended record is kept (it is the history of the name).
     Open(entry) {
         if (!this._recs.Has(entry)) {
@@ -150,7 +150,7 @@ class Children {
         rec := this._recs[name]
         if (rec["gone"] || rec["handle"] = 0)
             return
-        ; Ended already, only not judged yet (F-46, WI-35): its end is its own (a crash), not a planned exit. The
+        ; Ended already, only not judged yet (F-0046, WI-0035): its end is its own (a crash), not a planned exit. The
         ; request of the engine can arrive in the few milliseconds between the death and the next tick.
         if (this._HasEnded(rec)) {
             Log.Write("a1", "children", name " has ended already, its end is judged as its own (kill request: " reason ")")
@@ -217,7 +217,7 @@ class Children {
     SinceLastPong(name, now) => now - this._recs[name]["lastPongAt"]
     SinceLastPing(name, now) => now - this._recs[name]["lastPingAt"]
 
-    ; The supervisor itself stood still for ms (Supervisor, Stall; WI-33, F-16): the liveness of the children begins again
+    ; The supervisor itself stood still for ms (Supervisor, Stall; WI-0033, F-0016): the liveness of the children begins again
     ; at "now" (ResetLiveness), and every other deadline of a record moves by ms, so its rest of the time stays: the kill
     ; time of a hung child, the time of a planned restart, the end of the wait for the connection of an ended process.
     ; The restart history (RESTART_WINDOW_MS) is a rate over real time and stays as it is.
@@ -409,7 +409,7 @@ class Children {
     AnyKilled() => this.killedSome
 
     ; Stops automatic restarts. Called when the shutdown starts. A restart that is planned already (a crash within the last
-    ; RESTART_DELAY_MS) is cancelled too (F-41, WI-34): it would start a process in the middle of the shutdown, in no group
+    ; RESTART_DELAY_MS) is cancelled too (F-0041, WI-0034): it would start a process in the middle of the shutdown, in no group
     ; of the order, that is only ended at the deadline.
     BeginShutdown() {
         this.shuttingDown := true
@@ -441,7 +441,7 @@ class Children {
     }
 
     ; True when every named child has said sys.bye or has already ended. A child that has never connected (state
-    ; "starting") does not hold its group (F-43): it cannot be told to shut down and has sent nothing that a later group
+    ; "starting") does not hold its group (F-0043): it cannot be told to shut down and has sent nothing that a later group
     ; (storage) must still write. Its late sys.hello is handled by Shutdown.OnHello; at the deadline it is ended.
     GroupDone(names) {
         for name in names {
@@ -470,7 +470,7 @@ class Children {
             }
             this._ReadOutput(rec)
             if (DllCall("WaitForSingleObject", "ptr", rec["handle"], "uint", 0, "uint") = Children.WAIT_OBJECT_0) {
-                ; The engine has ended: its workers end now, not when the end has been judged (WI-33, E10).
+                ; The engine has ended: its workers end now, not when the end has been judged (WI-0033, E0010).
                 if (rec["role"] = "engine" && rec.Get("exitSeenAt", 0) = 0)
                     this._EndWorkersOfGoneEngine()
                 if (this._ExitReadable(rec, now))
@@ -479,7 +479,7 @@ class Children {
         }
     }
 
-    ; E10 (WI-33): when the engine process has ended, every living worker is ended at once. The pool belongs to the
+    ; E0010 (WI-0033): when the engine process has ended, every living worker is ended at once. The pool belongs to the
     ; engine and nobody takes the result of a job any more (a worker with an open dialog would stay for the whole
     ; session). Not while the session ends: the shutdown order of the ranks applies then. The end is a planned one
     ; like KillWorker: evt.process.exited with reason "engine gone", no crash, not counted for exit code 5, no restart.
@@ -490,7 +490,7 @@ class Children {
         for name, rec in this._recs {
             if (rec["role"] != "worker" || rec["gone"] || rec["handle"] = 0)
                 continue
-            if (this._HasEnded(rec))        ; died on its own before: its end is a crash, not "engine gone" (F-46, WI-35)
+            if (this._HasEnded(rec))        ; died on its own before: its end is a crash, not "engine gone" (F-0046, WI-0035)
                 continue
             Log.Write("a1", "children", "ending " name ": the engine is gone")
             if (rec["state"] != "hung") {
@@ -528,11 +528,11 @@ class Children {
             cmd .= ' --test-roles'
         if (isRestart)
             cmd .= ' --restarted=' rec["restartTimes"].Length   ; the role knows it is a restart (engine: evt.engine.restarted)
-        cmd .= cfg["roleOpts"]   ; --ui, --headless, --stub-cancel-exit (WI-13), "" when not given
+        cmd .= cfg["roleOpts"]   ; --ui, --headless, --stub-cancel-exit (WI-0013), "" when not given
         ; The state is reset BEFORE the process starts. AHK may interrupt this thread between CreateProcessW and the
         ; assignment of the pid (the hub handles messages meanwhile, and other requests such as cmd.process.spawn can
         ; take long). The child can say sys.hello in that time: OnHello then sets "ready" first, and a reset after
-        ; Start would turn it back into "starting" for ever (WI-27: seen as a manager that never became ready).
+        ; Start would turn it back into "starting" for ever (WI-0027: seen as a manager that never became ready).
         rec["state"] := "starting"
         rec["startedAt"] := now
         rec["startedUtc"] := FormatTime(A_NowUTC, "yyyy-MM-dd HH:mm:ss")
@@ -578,7 +578,7 @@ class Children {
         ; A hung child that is killed is a crash, also during a shutdown. Everything else that ends
         ; during a shutdown (or after sys.shutdown was sent) is a normal exit.
         ; A child that said sys.bye {clean} and ended with exit 0 left by its own wish (the debug window that the user
-        ; closed, WI-28): a normal exit, not a crash.
+        ; closed, WI-0028): a normal exit, not a crash.
         voluntary := (rec["bye"] && rec["byeClean"] && exitCode == 0)
         if (rec["state"] != "hung" && (this.shuttingDown || rec["state"] = "stopping" || voluntary)) {
             rec["state"] := "exited"

@@ -1,4 +1,4 @@
-"""WI-16: clients connect and disconnect again and again while a flow runs (L5, scenario 3).
+"""WI-0016: clients connect and disconnect again and again while a flow runs (L5, scenario 3).
 
 A background client keeps the flow busy (a new parallel instance every 20 ms). N churn clients each loop:
 connect, subscribe to the topics of the engine and the flow, ask for a snapshot, listen for a short while,
@@ -165,13 +165,13 @@ def test_clients_connecting_and_leaving_do_not_disturb_the_engine_or_leak(stress
 
 LEAK_WARMUP = 100
 LEAK_CONNECTS = 400
-LEAK_GROWTH_LIMIT = 1.20      # supervisor RSS after / before (WI-16 soak rule: growth under 20 %)
+LEAK_GROWTH_LIMIT = 1.20      # supervisor RSS after / before (WI-0016 soak rule: growth under 20 %)
 
 
 @pytest.mark.stress
 @pytest.mark.timeout(200)
 def test_many_connects_keep_the_memory_of_the_supervisor_flat(stress_chain):
-    """num_handles alone does not show a leak of AHK objects: memory has to stay flat as well (finding F-07)."""
+    """num_handles alone does not show a leak of AHK objects: memory has to stay flat as well (finding F-0007)."""
     sc = stress_chain(flows={})
     sc.client("probe")
 

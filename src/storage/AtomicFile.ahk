@@ -16,7 +16,7 @@ class AtomicFile {
             handle := FileOpen(tmpPath, "w", "UTF-8-RAW")
             handle.Write(text)
             ; Data to disk before the rename: without it a power failure can leave the new name with
-            ; empty or partial data (WI-25). A failed flush is an error: the old file stays.
+            ; empty or partial data (WI-0025). A failed flush is an error: the old file stays.
             if (!DllCall("FlushFileBuffers", "Ptr", handle.Handle, "Int"))
                 throw OSError(A_LastError)
             handle.Close()
@@ -35,7 +35,7 @@ class AtomicFile {
     }
 
     ; Deletes the temp files "<name>.ahf-<pid>.tmp" below root (recursive) whose process does not run
-    ; any more: a hard stop between the temp write and the rename leaves them (WI-25). A file of a
+    ; any more: a hard stop between the temp write and the rename leaves them (WI-0025). A file of a
     ; running process (also our own, a write may be in progress) stays. Best effort: a file that cannot
     ; be deleted stays. Returns the number of deleted files.
     static RemoveStaleTemps(root) {

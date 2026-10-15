@@ -1,4 +1,4 @@
-"""Schema of cmd.diag.snapshot (doc/PROTOCOL.md 4.9, WI-28) as a checker for the tests.
+"""Schema of cmd.diag.snapshot (doc/PROTOCOL.md 4.9, WI-0028) as a checker for the tests.
 
 check_snapshot(snapshot, role) raises AssertionError with the path of the first wrong field. The general part
 is the same for every role (Role.Snapshot); the role part `info` differs (Role.DiagInfo). The supervisor has

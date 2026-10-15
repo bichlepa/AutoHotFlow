@@ -1,4 +1,4 @@
-"""WI-12: storage role (src/storage/).
+"""WI-0012: storage role (src/storage/).
 
 The storage role runs as a real process (src/AutoHotFlow.ahk --role=storage, started through
 tools/ahkrun.py). Its hub is the Python stand-in RoleHub (WakingHub). The files are checked on disk
@@ -98,7 +98,7 @@ def hub(pipe):
 
 @pytest.fixture
 def flowdir(datadir):
-    """Data directory with one flow in Flows/ (the folder name of v2, see MIGRATION M-15)."""
+    """Data directory with one flow in Flows/ (the folder name of v2, see MIGRATION M-0015)."""
     (datadir / "Flows").mkdir()
     shutil.copy(SKELETON_SRC, datadir / "Flows" / "skeleton.json")
     return datadir
@@ -426,7 +426,7 @@ def _hold_exclusive(path, stop, share_mode, permanent=False):
 
 @pytest.mark.parametrize("share_mode", [1, 0], ids=["readers-allow-read", "readers-deny-all"])
 def test_no_log_line_is_lost_while_other_processes_hold_the_files(storage, flowdir, pipe, share_mode):
-    """F-04: other processes open Log.txt and Log_<source>.txt (share mode 1 = FILE_SHARE_READ, like a
+    """F-0004: other processes open Log.txt and Log_<source>.txt (share mode 1 = FILE_SHARE_READ, like a
     viewer; 0 = exclusive, like a scanner) while several sources log at once. Every line must arrive,
     in order per source, in Log.txt and in the file of its source."""
     import threading
@@ -483,7 +483,7 @@ def test_no_log_line_is_lost_while_other_processes_hold_the_files(storage, flowd
 
 @pytest.mark.slow
 def test_a_log_line_that_cannot_be_written_is_reported_in_the_own_log(storage, flowdir, pipe):
-    """F-04: when the retries fail, the loss is not silent: a line in Log_storage.txt names it."""
+    """F-0004: when the retries fail, the loss is not silent: a line in Log_storage.txt names it."""
     import threading
     _, _, client = storage
     logdir = flowdir / "Log"
@@ -509,7 +509,7 @@ def test_a_log_line_that_cannot_be_written_is_reported_in_the_own_log(storage, f
     assert "never written" not in held.read_text("utf-8")
 
 
-# --- WI-25: log throughput, priority of requests, limit of the log queue, temp files ------------------
+# --- WI-0025: log throughput, priority of requests, limit of the log queue, temp files ------------------
 
 def _now_utc():
     return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
@@ -562,10 +562,10 @@ def _flood_and_measure(storage, flowdir):
 
 @pytest.mark.slow
 def test_a_log_flood_is_written_completely_and_far_above_the_old_pace(storage, flowdir):
-    """F-08: before WI-25 the storage wrote about 30 lines per second (12000 lines would take 400 s). Standard run,
+    """F-0008: before WI-0025 the storage wrote about 30 lines per second (12000 lines would take 400 s). Standard run,
     also in parallel with other tests: the whole flood must be written within the 60 s of the helper (at least 200
     lines/s, a 6 times margin over the old pace) and the memory stays bounded. The strict rate (more than 1000 lines/s)
-    is measured in the stress group, alone on the machine (F-32, WI-32): a rate depends on the load of the machine."""
+    is measured in the stress group, alone on the machine (F-0032, WI-0032): a rate depends on the load of the machine."""
     rate, rss = _flood_and_measure(storage, flowdir)
     assert rate > 200, "%.0f lines/s" % rate
     assert rss < 120
@@ -573,8 +573,8 @@ def test_a_log_flood_is_written_completely_and_far_above_the_old_pace(storage, f
 
 @pytest.mark.stress
 def test_a_log_flood_is_written_at_more_than_1000_lines_per_second(storage, flowdir):
-    """F-08, the strict rate. Runs with -m stress (a single process, no other load), because a rate is only
-    meaningful then (F-32: 808 lines/s once under parallel load, 3138 lines/s alone)."""
+    """F-0008, the strict rate. Runs with -m stress (a single process, no other load), because a rate is only
+    meaningful then (F-0032: 808 lines/s once under parallel load, 3138 lines/s alone)."""
     rate, rss = _flood_and_measure(storage, flowdir)
     assert rate > 1000, "%.0f lines/s" % rate
     assert rss < 120
@@ -582,7 +582,7 @@ def test_a_log_flood_is_written_at_more_than_1000_lines_per_second(storage, flow
 
 @pytest.mark.slow
 def test_a_request_is_answered_in_time_during_a_log_flood(storage, flowdir, pipe):
-    """F-08: requests and log lines used to share one queue, so a read waited behind the whole flood."""
+    """F-0008: requests and log lines used to share one queue, so a read waited behind the whole flood."""
     _, _, client = storage
     other = AhfClient(pipe, "reader")
     try:
@@ -601,7 +601,7 @@ def test_a_request_is_answered_in_time_during_a_log_flood(storage, flowdir, pipe
 
 def test_a_flood_over_the_limit_drops_lines_counts_them_and_the_process_stays_up(procs, flowdir, runs, pipe,
                                                                                  session_id, hub):
-    """F-08: the log queue is limited (default 20000 lines, 8 MB). The limit is lowered here with
+    """F-0008: the log queue is limited (default 20000 lines, 8 MB). The limit is lowered here with
     --log-queue-max-lines, so the flood is small. Dropped lines are counted; once the queue has room again, a line
     '<n> log lines dropped' is written. Nothing blocks: requests are answered during the flood."""
     import threading
@@ -647,7 +647,7 @@ def _dead_pid():
 
 def test_temp_files_of_dead_processes_are_removed_at_start_and_those_of_live_ones_stay(procs, flowdir, runs, pipe,
                                                                                          session_id, hub):
-    """WI-25: *.ahf-<pid>.tmp (left after a hard stop) in Flows/ and Variables/ (recursive) go when the
+    """WI-0025: *.ahf-<pid>.tmp (left after a hard stop) in Flows/ and Variables/ (recursive) go when the
     process does not run any more. One of a running process (this test) stays."""
     (flowdir / "Variables" / "Flow 1").mkdir(parents=True)
     dead = _dead_pid()
@@ -696,7 +696,7 @@ def test_engine_starts_with_the_real_storage_and_its_log_arrives(procs, datadir,
     start_storage(procs, datadir, runs, pipe, session_id)
     wait_hello(hub, "storage")
     # Subscribe BEFORE the engine starts (PROTOCOL 5a). Subscribing after its sys.hello could miss evt.engine.ready when
-    # the engine is quick (WI-32, parallel run: failure after 15 s). The state is asked for below in any case.
+    # the engine is quick (WI-0032, parallel run: failure after 15 s). The state is asked for below in any case.
     obs = observer(pipe, "obs-engine", "engine")
     engine_args = ["--role=engine", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(datadir), "--workers=0"]
     engine = RoleRun(procs, datadir, "engine", engine_args)

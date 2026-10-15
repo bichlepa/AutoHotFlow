@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for error records, collecting errors, empty and very long input, limits and robustness
-; of the expression parser (WI-37, doc/EXPRESSION-LANGUAGE.md sections 10 and 11).
+; of the expression parser (WI-0037, doc/EXPRESSION-LANGUAGE.md sections 10 and 11).
 #Include lib\ExprCheck.ahk
 
 Repeat(s, n) {

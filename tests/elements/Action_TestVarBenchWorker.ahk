@@ -3,7 +3,7 @@
 #Include ..\..\src\elements\base\AhfElement.ahk
 #Include ..\..\src\elements\base\ElementRegistry.ahk
 
-; Test element of WI-50 (worker): measures the round trip of a variable request. It sets bench_x, then calls
+; Test element of WI-0050 (worker): measures the round trip of a variable request. It sets bench_x, then calls
 ; GetVar("bench_x") Count times and writes "median p95 max" in ms (three decimals) of the single calls into
 ; global_varbench_<Tag>. Pause (ms, default 0) waits between two calls (DllCall Sleep, so no message is handled in it).
 ; A large Count makes it a long-running element that asks all the time (fault tests: engine or worker killed while it

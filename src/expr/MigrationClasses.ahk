@@ -1,46 +1,46 @@
 #Requires AutoHotkey v2.0
 
 ; Mapping of the deviation classes of the expression language (doc/EXPRESSION-LANGUAGE.md section 15.1) to the ID of
-; their entry in doc/MIGRATION.md (WI-45, E35). The converter reports classes (V1ExprDetect); the loader writes the
+; their entry in doc/MIGRATION.md (WI-0045, E0035). The converter reports classes (V1ExprDetect); the loader writes the
 ; IDs into the flow (FlowExprConvert, key "migration", doc/ARCHITECTURE.md section 7).
 ;
 ; Handling, as in tools/golden_classes.py (a test compares the two lists, tests/test_migration_classes.py):
 ;   accept       known, decided deviation; the converter does not rewrite the text: the place is marked
 ;   unsupported  syntax that the converter reports and leaves unchanged: the place is marked
-;   rewrite      the converter rewrites the text so that the result agrees: nothing to mark (M-27)
+;   rewrite      the converter rewrites the text so that the result agrees: nothing to mark (M-0027)
 ;   failed       not a class of the golden data: a text that the new language cannot read and the converter cannot
 ;                convert (status "failed"); the place is marked with its own ID
 ;
 ; The table is a flat list (class, handling, ID) with one entry per line so that the test can read it as text.
 class MigrationClasses {
     static ENTRIES := [
-        "assignment refused", "accept", "M-38",
-        "assignment to a path", "accept", "M-30",
-        "assignment value", "accept", "M-29",
-        "built-in value", "accept", "M-41",
-        "escape sequence", "accept", "M-33",
-        "integer division with float", "accept", "M-35",
-        "integer overflow", "accept", "M-35",
-        "json text", "accept", "M-42",
-        "keyword as name", "accept", "M-34",
-        "no short circuit", "accept", "M-24",
-        "not", "accept", "M-31",
-        "number format", "accept", "M-26",
-        "number literal forms", "accept", "M-35",
-        "number-like texts", "accept", "M-32",
-        "object as text", "accept", "M-43",
-        "operand as result", "accept", "M-24",
-        "path into global or static", "accept", "M-40",
-        "script result value", "accept", "M-29",
-        "text comparison", "accept", "M-25",
-        "true and false", "accept", "M-34",
-        "v1 error", "accept", "M-36",
-        "v1 ignores text", "accept", "M-36",
-        "backtick", "rewrite", "M-27",
-        "concatenation dot", "rewrite", "M-27",
-        "number literal spelling", "rewrite", "M-27",
-        "unsupported syntax", "unsupported", "M-37",
-        "unreadable text", "failed", "M-50"
+        "assignment refused", "accept", "M-0038",
+        "assignment to a path", "accept", "M-0030",
+        "assignment value", "accept", "M-0029",
+        "built-in value", "accept", "M-0041",
+        "escape sequence", "accept", "M-0033",
+        "integer division with float", "accept", "M-0035",
+        "integer overflow", "accept", "M-0035",
+        "json text", "accept", "M-0042",
+        "keyword as name", "accept", "M-0034",
+        "no short circuit", "accept", "M-0024",
+        "not", "accept", "M-0031",
+        "number format", "accept", "M-0026",
+        "number literal forms", "accept", "M-0035",
+        "number-like texts", "accept", "M-0032",
+        "object as text", "accept", "M-0043",
+        "operand as result", "accept", "M-0024",
+        "path into global or static", "accept", "M-0040",
+        "script result value", "accept", "M-0029",
+        "text comparison", "accept", "M-0025",
+        "true and false", "accept", "M-0034",
+        "v1 error", "accept", "M-0036",
+        "v1 ignores text", "accept", "M-0036",
+        "backtick", "rewrite", "M-0027",
+        "concatenation dot", "rewrite", "M-0027",
+        "number literal spelling", "rewrite", "M-0027",
+        "unsupported syntax", "unsupported", "M-0037",
+        "unreadable text", "failed", "M-0050"
     ]
 
     static _byClass := ""

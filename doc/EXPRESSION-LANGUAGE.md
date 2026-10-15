@@ -2,9 +2,9 @@
 
 Specification of the language that parameters and scripts are written in, and of the library `src/expr/` that reads it.
 
-Status: complete for step S1 (WI-43 checked the document against the code). Tokenizer, parser, evaluator and converter are implemented and tested (`tests/ahk/expr_*.test.ahk`). Section 17 describes the evaluator; section 14 lists the differences from AutoHotkey v2; section 15 is the deviation catalog and the converter of old expressions (WI-39). The variables (scopes, objects, built-in variables, `%var%` substitution) are not part of this library: they belong to the engine (`src/engine/vars/`, WI-40) and are described in section 18. The use in the parameters of elements (content types, the flow option `strictTypes`) is described in doc/ELEMENT-API-V2.md section 3.1 (WI-42).
+Status: complete for step S0001 (WI-0043 checked the document against the code). Tokenizer, parser, evaluator and converter are implemented and tested (`tests/ahk/expr_*.test.ahk`). Section 17 describes the evaluator; section 14 lists the differences from AutoHotkey v2; section 15 is the deviation catalog and the converter of old expressions (WI-0039). The variables (scopes, objects, built-in variables, `%var%` substitution) are not part of this library: they belong to the engine (`src/engine/vars/`, WI-0040) and are described in section 18. The use in the parameters of elements (content types, the flow option `strictTypes`) is described in doc/ELEMENT-API-V2.md section 3.1 (WI-0042).
 
-The language follows AutoHotkey v2 (decision E22) as far as that makes sense in AutoHotFlow. Where it deviates, section 14 says so.
+The language follows AutoHotkey v2 (decision E0022) as far as that makes sense in AutoHotFlow. Where it deviates, section 14 says so.
 
 ## 1. Overview
 
@@ -118,7 +118,7 @@ Which functions exist is decided by the evaluator; calling an unknown function i
 | Function | Result |
 |---|---|
 | `round(number [, digits])` | AutoHotkey `Round`: `round(2.5)` is `3`, `round(-2.5)` is `-3`, `round(2.567, 2)` is `2.57`, a negative `digits` rounds left of the point (`round(1234, -2)` is `1200`). A text that is not a number gives the empty text and a warning |
-| `object([key, value, ...])` | a new `Map` that ignores case in its keys (E28). An odd number of arguments is a warning |
+| `object([key, value, ...])` | a new `Map` that ignores case in its keys (E0028). An odd number of arguments is a warning |
 | `print(value, ...)` | writes the values, separated by a space, to the log (level `f1`, text `print: ...`); an object is written as `<Map>`. Result is the empty text |
 | `mod(a, b)` | remainder with the sign of `a`, as AutoHotkey `Mod`; the replacement for the missing operator `%` (section 13). Division by zero is a warning |
 
@@ -201,7 +201,7 @@ AutoHotkey ends the whole process (not just the call) when its call stack is ful
 | errors collected | 50 | the rest is dropped |
 | length of a name | 253 (variable name rule); the expression parser itself accepts longer names | - |
 
-No limit on the length of strings, comments, the number of statements or arguments (tested with a string of one million characters, 5000 statements, 5000 arguments). The evaluator (WI-38) may walk the tree recursively up to the height limit.
+No limit on the length of strings, comments, the number of statements or arguments (tested with a string of one million characters, 5000 statements, 5000 arguments). The evaluator (WI-0038) may walk the tree recursively up to the height limit.
 
 ## 12. Parse cache
 
@@ -236,16 +236,16 @@ Average 554 us uncached, 1.6 us cached (about 300 times faster). Filling the cac
 
 ## 14. Differences from AutoHotkey v2
 
-Decided by the project owner (2026-10-13) and implemented by the evaluator (WI-38, tests in `tests/ahk/expr_eval_operators.test.ahk`):
+Decided by the project owner (2026-10-13) and implemented by the evaluator (WI-0038, tests in `tests/ahk/expr_eval_operators.test.ahk`):
 
-Since WI-44 the list is checked against native AutoHotkey v2: generated expressions run as real AutoHotkey code and in the evaluator, and every difference must be one of the entries below or of the list in section 19.
+Since WI-0044 the list is checked against native AutoHotkey v2: generated expressions run as real AutoHotkey code and in the evaluator, and every difference must be one of the entries below or of the list in section 19.
 
-- **E29: `/` with two integers** returns an Integer if the division is exact (`4/2` is `2`, `-8/-2` is `4`), else a Float (`7/2` is `3.5`). AutoHotkey v2 gives `2.0` for `4/2`. This is a rule of the language. `//` is the integer division as in AutoHotkey v2 (`7//2` is `3`, `-7//2` is `-3`; a Float operand is a `TypeError` there, handled as E25).
-- **E30: `<` `>` `<=` `>=` follow AutoHotkey v2.** A comparison with a text that is not a number throws a `TypeError` in AutoHotkey (`"a" < "B"`); in AutoHotFlow the evaluator catches it (E25): the result is the empty text (false) plus an `f1` log entry. A text comparison that v1 did alphabetically is therefore false. `"10" < "9"` compares numbers (false). `=` and `==` compare as in AutoHotkey.
-- **E31: `&&` and `||` return the operand** as AutoHotkey v2 does (`"a" || 0` is `"a"`, `0 && "x"` is `0`), not 1/0 as in v1. Evaluation is short-circuit (`0 and (x := 5)` does not assign). As a condition both behave the same.
-- **E32: text form of floats** is the AutoHotkey v2 form, without own formatting (`0.1+0.2` is `0.30000000000000004`, `1/3` is `0.33333333333333331`).
-- **E34: type errors per flow.** E25 is the behavior of the *compatibility mode* (`flowSettings.strictTypes` false, the mode of every migrated flow). In the *strict mode* (`strictTypes` true, new flows) the evaluator reports the same cases as before, but the caller turns every warning into an error of the element (section 17, doc/ELEMENT-API-V2.md section 3.1, MIGRATION M-47). The language itself is the same in both modes.
-- **E25: type errors** while calculating (`"" + 1`, `"abc" + 1`) are caught; the result is the empty text and an `f1` log entry (in AutoHotkey v2 they throw a `TypeError`). The same holds for a division by zero (`1/0`, `1//0`, `mod(1, 0)`; `ZeroDivisionError` in AutoHotkey) and for any other calculation or function that fails. The entry is also a warning in the result (section 17).
+- **E0029: `/` with two integers** returns an Integer if the division is exact (`4/2` is `2`, `-8/-2` is `4`), else a Float (`7/2` is `3.5`). AutoHotkey v2 gives `2.0` for `4/2`. This is a rule of the language. `//` is the integer division as in AutoHotkey v2 (`7//2` is `3`, `-7//2` is `-3`; a Float operand is a `TypeError` there, handled as E0025).
+- **E0030: `<` `>` `<=` `>=` follow AutoHotkey v2.** A comparison with a text that is not a number throws a `TypeError` in AutoHotkey (`"a" < "B"`); in AutoHotFlow the evaluator catches it (E0025): the result is the empty text (false) plus an `f1` log entry. A text comparison that v1 did alphabetically is therefore false. `"10" < "9"` compares numbers (false). `=` and `==` compare as in AutoHotkey.
+- **E0031: `&&` and `||` return the operand** as AutoHotkey v2 does (`"a" || 0` is `"a"`, `0 && "x"` is `0`), not 1/0 as in v1. Evaluation is short-circuit (`0 and (x := 5)` does not assign). As a condition both behave the same.
+- **E0032: text form of floats** is the AutoHotkey v2 form, without own formatting (`0.1+0.2` is `0.30000000000000004`, `1/3` is `0.33333333333333331`).
+- **E0034: type errors per flow.** E0025 is the behavior of the *compatibility mode* (`flowSettings.strictTypes` false, the mode of every migrated flow). In the *strict mode* (`strictTypes` true, new flows) the evaluator reports the same cases as before, but the caller turns every warning into an error of the element (section 17, doc/ELEMENT-API-V2.md section 3.1, MIGRATION M-0047). The language itself is the same in both modes.
+- **E0025: type errors** while calculating (`"" + 1`, `"abc" + 1`) are caught; the result is the empty text and an `f1` log entry (in AutoHotkey v2 they throw a `TypeError`). The same holds for a division by zero (`1/0`, `1//0`, `mod(1, 0)`; `ZeroDivisionError` in AutoHotkey) and for any other calculation or function that fails. The entry is also a warning in the result (section 17).
 
 Smaller points of the evaluator that follow from these rules or from v1:
 
@@ -253,7 +253,7 @@ Smaller points of the evaluator that follow from these rules or from v1:
 - **Compound assignment** (`x += 1`) reads `x` first. If `x` does not exist, that is a missing variable and `"" + 1` is a type error: `x` becomes the empty text. `x .= "a"` works on a missing variable. If the calculation of a compound assignment fails, the variable gets the empty text, as the calculation did in v1.
 - **`mod(a, b)`** replaces the missing operator `%`.
 - **`MinInt // -1`** (the smallest Integer divided by -1) would end the AutoHotkey process, not just the call; the evaluator refuses it as a calculation error (warning, empty text). `MinInt / -1` gives a Float.
-- **`/` with texts:** a text that looks like an integer counts as an integer for E29 (`"4"/"2"` is `2`), as in all arithmetic; `"4.0"/2` is `2.0`.
+- **`/` with texts:** a text that looks like an integer counts as an integer for E0029 (`"4"/"2"` is `2`), as in all arithmetic; `"4.0"/2` is `2.0`.
 - **Script result:** the value of the last statement, as in v1. A script without statements gives the empty text; an `if` without `else` whose condition is false, and an empty block, give `0` (v1 gave `false`).
 
 Differences in the **syntax** (implemented and tested):
@@ -270,11 +270,11 @@ Differences in the **syntax** (implemented and tested):
 
 ## 15. Differences from v1 and conversion
 
-What the new language does with the expressions of v1, checked against the golden data of v1 (WI-36: the result of the unchanged v1 code, run in the v1 interpreter). The language follows AutoHotkey v2 (E22); the converter rewrites an old text only where that is needed for the same result, and the rest is a known, documented deviation.
+What the new language does with the expressions of v1, checked against the golden data of v1 (WI-0036: the result of the unchanged v1 code, run in the v1 interpreter). The language follows AutoHotkey v2 (E0022); the converter rewrites an old text only where that is needed for the same result, and the rest is a known, documented deviation.
 
 ### 15.1 Deviation catalog
 
-Reproduce with `python tools/golden_compare.py --plain` (list of the classes; `--list CLASS` shows the cases of one class). The check is `tests/golden/test_golden_v2.py`: every case in `tests/golden/cases/` (2161 cases) is run by the harness `tests/golden/v2/harness.ahk` with the variable model of the engine (section 18) and compared with v1: the 1418 expressions and scripts with the unchanged text (`--plain`, the column "Cases") and with the converted text (the column "After conversion"), and the cases of the variable model (WI-40): `%var%` substitution (`replace`, 392), name rule (`checkname`, 151), scope of a name (`destination`, 52), reading and setting a variable through the element API (`varget`, 67, `varset`, 81). The value and the variables afterwards (per scope) are compared. A case either agrees with v1 (`same`; numbers are compared as numbers, so `2.000000` and `2` agree) or gets exactly one class. A case without a class fails the test.
+Reproduce with `python tools/golden_compare.py --plain` (list of the classes; `--list CLASS` shows the cases of one class). The check is `tests/golden/test_golden_v2.py`: every case in `tests/golden/cases/` (2161 cases) is run by the harness `tests/golden/v2/harness.ahk` with the variable model of the engine (section 18) and compared with v1: the 1418 expressions and scripts with the unchanged text (`--plain`, the column "Cases") and with the converted text (the column "After conversion"), and the cases of the variable model (WI-0040): `%var%` substitution (`replace`, 392), name rule (`checkname`, 151), scope of a name (`destination`, 52), reading and setting a variable through the element API (`varget`, 67, `varset`, 81). The value and the variables afterwards (per scope) are compared. A case either agrees with v1 (`same`; numbers are compared as numbers, so `2.000000` and `2` agree) or gets exactly one class. A case without a class fails the test.
 
 Handling: **accept** = decided, the converter does not rewrite it (entry in `doc/MIGRATION.md`); **rewrite** = the converter rewrites the text so that the result agrees (section 15.2); **unsupported** = syntax that the converter reports and does not convert (section 15.3). The column "After conversion" is the number of cases that still have the class when the converted text is evaluated.
 
@@ -283,24 +283,24 @@ Handling: **accept** = decided, the converter does not rewrite it (entry in `doc
 | assignment refused | 7 | 7 | `A_Index := 5` | (empty) | error: Setting variable 'A_Index' failed. No permission. | accept: an assignment that v1 refuses with an f0 log (an A_ name, no permission) is an error of the expression in v2, with the same text |
 | assignment to a path | 31 | 31 | `a.b := 5` | (empty) | `5` | accept: v1 cannot assign to a path (a.b := 1 only logs an error); v2 can |
 | assignment value | 36 | 36 | `x := 5` | (empty) | `5` | accept: an assignment has a value in v2; in v1 it has none (the empty text) |
-| built-in value | 2 | 2 | `A_PtrSize` | `4` | `8` | accept: A_PtrSize is 8 (64 bit only, E4); A_LanguageName is the name of the language, v1 always gave the empty text |
-| escape sequence | 11 | 11 | ``"a`nb"`` | `anb` | `a\nb` | accept: v1 drops the backtick in a string, v2 reads the escape (E22) |
-| integer division with float | 3 | 3 | `7.0//2` | `3.000000` | (empty) | accept: // with a float operand is a type error in AutoHotkey v2 (E25); v1 divided |
+| built-in value | 2 | 2 | `A_PtrSize` | `4` | `8` | accept: A_PtrSize is 8 (64 bit only, E0004); A_LanguageName is the name of the language, v1 always gave the empty text |
+| escape sequence | 11 | 11 | ``"a`nb"`` | `anb` | `a\nb` | accept: v1 drops the backtick in a string, v2 reads the escape (E0022) |
+| integer division with float | 3 | 3 | `7.0//2` | `3.000000` | (empty) | accept: // with a float operand is a type error in AutoHotkey v2 (E0025); v1 divided |
 | integer overflow | 1 | 1 | `12345678901234567890+1` | `-9223372036854775808` | `1.2345678901234567e+19` | accept: v1 wraps integers at 64 bit; v2 continues with a float |
 | json text | 2 | 2 | `%o%` | `{\n  "k": "q\"uote\\back\/slash\nnl\ttab"\n}` | `{\n  "k": "q\"uote\\back/slash\nnl\ttab"\n}` | accept: the JSON text of an object (ConvertObjectToString) writes / without a backslash and a float inside an object as a number; v1 wrote \/ and a text |
 | keyword as name | 8 | 8 | `if` | (empty) | error: 'if' is only valid at the start of a line of a script | accept: if, else, and, or, not cannot be variable names in v2 |
-| no short circuit | 2 | 2 | `1 or (x := 5)` | `1` | `1` | accept: v1 evaluates both sides of and/or, v2 stops at the first that decides (E31) |
+| no short circuit | 2 | 2 | `1 or (x := 5)` | `1` | `1` | accept: v1 evaluates both sides of and/or, v2 stops at the first that decides (E0031) |
 | not | 16 | 16 | `not 0` | `0` | `1` | accept: not and ! do not negate at the start of an expression in v1 (bug); v2 negates |
-| number format | 22 | 21 | `x` | `0.500000` | `0.5` | accept: the same number in the text form of v2 (E24, E32) |
+| number format | 22 | 21 | `x` | `0.500000` | `0.5` | accept: the same number in the text form of v2 (E0024, E0032) |
 | number literal forms | 9 | 9 | `1e3` | `1` | `1000.0` | accept: v1 reads only digits (0x10 is 0, 1e3 is 1); v2 reads hexadecimal and exponent |
 | number-like texts | 3 | 3 | `"1.0"="1"` | `1` | `0` | accept: v1 compares two texts that look like numbers as numbers, v2 as texts |
-| object as text | 3 | 3 | `a . "x"` | `x` | (empty) | accept: an object in a concatenation is a type error in v2 (empty text and a warning, E25); v1 used the empty text for the object |
-| operand as result | 34 | 34 | `5 && 6` | `1` | `6` | accept: and/or return an operand in v2, 1 or 0 in v1; the same as a condition (E31) |
+| object as text | 3 | 3 | `a . "x"` | `x` | (empty) | accept: an object in a concatenation is a type error in v2 (empty text and a warning, E0025); v1 used the empty text for the object |
+| operand as result | 34 | 34 | `5 && 6` | `1` | `6` | accept: and/or return an operand in v2, 1 or 0 in v1; the same as a condition (E0031) |
 | path into global or static | 6 | 6 | `global_o.a` | (empty) | `1` | accept: v1 cannot read a member of a global or static object (it looks for a file of that name); v2 can |
 | script result value | 79 | 79 | `x := 5` | (empty) | `5` | accept: the value of a script is the value of its last statement (v1: unspecific) |
-| text comparison | 26 | 26 | `"a"<"B"` | `1` | (empty) | accept: comparison with a text that is not a number: false in v2, alphabetical in v1 (E30, E25) |
+| text comparison | 26 | 26 | `"a"<"B"` | `1` | (empty) | accept: comparison with a text that is not a number: false in v2, alphabetical in v1 (E0030, E0025) |
 | true and false | 2 | 2 | `true` | (empty) | `1` | accept: keywords with the values 1 and 0 in v2; ordinary (missing) variables in v1 |
-| v1 error | 189 | 189 | `round(2.5)` | error: Expecting punctuation: ")" | `3` | accept: v1 reports an error or hangs; nothing to reproduce (E22) |
+| v1 error | 189 | 189 | `round(2.5)` | error: Expecting punctuation: ")" | `3` | accept: v1 reports an error or hangs; nothing to reproduce (E0022) |
 | v1 ignores text | 62 | 62 | `2*-3` | `2` | `-6` | accept: v1 stops at a token it cannot use and ignores the rest (glued operators like *-, a stray ), unknown operators, a second line) |
 | backtick | 3 | 0 | ``"a`xb"`` | `axb` | error: unknown escape sequence `x | rewrite: a backtick in front of a character that v2 does not know as an escape |
 | concatenation dot | 3 | 0 | `"a"."b"` | `ab` | error: the concatenation operator '.' needs a space before and after it | rewrite: v1 reads "a"."b" as concatenation; v2 needs spaces around the dot |
@@ -309,17 +309,17 @@ Handling: **accept** = decided, the converter does not rewrite it (entry in `doc
 
 **Result (all 2161 cases, converted text):** 1600 agree with v1. Of the 1418 expressions and scripts, 867 agree, 543 deviate in a class with the handling "accept" (189 of them are cases where v1 itself fails or hangs), 8 use syntax that is reported (section 15.3); no case is without a class. The name rules (`checkname`, `destination`) and setting variables (`varset`) agree in every case; reading variables (`varget`, 67) has 7 deviations (a member of a global or static object, the number format), the substitution (`replace`, 392) has 3 (number format, JSON text). The same check without the conversion (`--plain`) has 9 cases in the classes "backtick", "concatenation dot" and "number literal spelling" (3 each); the converter fixes these.
 
-**In the example flows** (group `corpus_flows`, from 22 flows): of 519 expressions, 473 agree, 23 are `and`/`or` used as a value in a condition (same truth value), 6 differ in the number format only (`pi / 6`), 14 are comparisons of a missing or non-numeric variable with a number (`a_index <= 3` in the variants where `A_Index` is missing or a text, `countShuffleTries < 3`, `myIndex <= 5`: true in v1, false in v2; finding F-277), 3 are v1 errors (`%a_windowID%`). All 310 substitutions and all 102 variable names agree. Eleven distinct literals such as `4.9990` and `5.000000001` are converted to strings.
+**In the example flows** (group `corpus_flows`, from 22 flows): of 519 expressions, 473 agree, 23 are `and`/`or` used as a value in a condition (same truth value), 6 differ in the number format only (`pi / 6`), 14 are comparisons of a missing or non-numeric variable with a number (`a_index <= 3` in the variants where `A_Index` is missing or a text, `countShuffleTries < 3`, `myIndex <= 5`: true in v1, false in v2; finding F-0277), 3 are v1 errors (`%a_windowID%`). All 310 substitutions and all 102 variable names agree. Eleven distinct literals such as `4.9990` and `5.000000001` are converted to strings.
 
 Notes on the classes:
 
-- **v1 error** also contains the calls of functions (`round(2.5)` never worked in v1, S1 of the findings), `%` as modulo, `!` at the start, unary minus in front of a variable or a parenthesis, and every script that hangs the v1 parser. v2 evaluates these texts as written (`round(2.5)` is `3`); nothing is reproduced.
+- **v1 error** also contains the calls of functions (`round(2.5)` never worked in v1, S0001 of the findings), `%` as modulo, `!` at the start, unary minus in front of a variable or a parenthesis, and every script that hangs the v1 parser. v2 evaluates these texts as written (`round(2.5)` is `3`); nothing is reproduced.
 - **v1 ignores text** are cases where v1 stops reading at a token it cannot use and returns what it had until then (`2*-3` is `2` because `*-` is read as one unknown operator; `m[1][2]` and `m[1].x` give `m[1]`). The text was never meant to work that way; v2 reads it as written (`-6`). Not rewritten, because reproducing it would mean to cut off the text.
-- **text comparison**, **operand as result**, **no short circuit**, **not**, **true and false**, **number format**, **integer division with float** are the decisions E30, E31, E25, E32 and E29 (section 14); **number-like texts** is the consequence of E30 for `=` with two texts that look like numbers.
-- **escape sequence**: in v1 a backtick in a string is dropped (S2); v2 reads `` `n `` as a line feed. Only escapes that v2 does not know (`` `x ``, `` `1 ``) are rewritten (the backtick is dropped, as v1 did), because without that the text would not load.
+- **text comparison**, **operand as result**, **no short circuit**, **not**, **true and false**, **number format**, **integer division with float** are the decisions E0030, E0031, E0025, E0032 and E0029 (section 14); **number-like texts** is the consequence of E0030 for `=` with two texts that look like numbers.
+- **escape sequence**: in v1 a backtick in a string is dropped (S0002); v2 reads `` `n `` as a line feed. Only escapes that v2 does not know (`` `x ``, `` `1 ``) are rewritten (the backtick is dropped, as v1 did), because without that the text would not load.
 - **assignment value**, **script result value**: an assignment has a value in v2 (`(x := 3) + 1` is `4`). The value of a script is only used by tests; the variables afterwards agree in all these cases.
 - **assignment to a path**: `a.b := 5` only logged an error in v1 (variable names must not contain a dot); v2 sets the member.
-- **assignment refused**, **built-in value**, **path into global or static**, **object as text**, **json text**: the variable model (section 18; MIGRATION M-38 and M-40 to M-43).
+- **assignment refused**, **built-in value**, **path into global or static**, **object as text**, **json text**: the variable model (section 18; MIGRATION M-0038 and M-0040 to M-0043).
 
 ### 15.2 Conversion
 
@@ -342,7 +342,7 @@ Rules (classes with the handling "rewrite"):
 
 The rules work on the text only. Which texts of a flow are converted, and when, is decided by the loader of the engine (`FlowExprConvert`, doc/ARCHITECTURE.md section 7): only parameters with an expression content type or named in `V1Syntax` of the element class, once per text. The text `%var%` in `String` parameters is not expression syntax and is not touched. Every conversion is in the log at level `f2` (flow, element, parameter, old and new text), every text that stays in v1 syntax at level `f1`.
 
-The conversion is idempotent (checked for all golden texts: converting the result changes nothing). Not rewritten on purpose, with an entry in `doc/MIGRATION.md`: `/` (E29), the comparison of texts with `<` and the like (E30), `&&`/`||` as a value (E31), the text form of floats (E32), the escapes that v2 knows, the start of an expression with `not`, assignments as values, and everything that v1 ignored (class "v1 ignores text": a second line, glued operators such as `*-`, a stray `)`).
+The conversion is idempotent (checked for all golden texts: converting the result changes nothing). Not rewritten on purpose, with an entry in `doc/MIGRATION.md`: `/` (E0029), the comparison of texts with `<` and the like (E0030), `&&`/`||` as a value (E0031), the text form of floats (E0032), the escapes that v2 knows, the start of an expression with `not`, assignments as values, and everything that v1 ignored (class "v1 ignores text": a second line, glued operators such as `*-`, a stray `)`).
 
 ### 15.3 Syntax that is not converted
 
@@ -350,13 +350,13 @@ A text that uses one of these forms keeps its text and gets the status `unsuppor
 
 | Form | v1 | New language | In the golden data |
 |---|---|---|---|
-| `%` as modulo | error at evaluation: `Can't apply operator %` (S3); never worked | not supported; `mod(a, b)` is the replacement | counted as "v1 error" |
+| `%` as modulo | error at evaluation: `Can't apply operator %` (S0003); never worked | not supported; `mod(a, b)` is the replacement | counted as "v1 error" |
 | `^=` | the right operand and the assignment are ignored: `x ^= 2` returns x and sets nothing | not supported | `assignment.expr.pow.eq`, `assignment.script.pow.eq` (the v1 parser hangs on it in a script) |
 | `%=` | like `^=` | not supported | `assignment.expr.mod.eq`, `assignment.script.mod.eq` |
 | `<>` | one unknown operator, the right operand is ignored: `1<>2` is `1` | error with the hint to write `!=` | `comparison.not.equal.sql*` |
 | `"a""b"` | two strings that touch: `ab`; the doubled quote was never an escape | error with the hint to write a quote as `` `" `` | `strings.doubled.*`, `strings.two.strings.touching` |
 
-**Decided (project owner, 2026-10-14, WI-39):** these forms stay unsupported. None of them occurs in the expressions of the example flows (the corpus has only `%a_windowID%`, a text of unclear content type that the golden corpus also ran as an expression). All five are reported (`f1`) and left alone; they fail at the first use with an error that names the place. Possible later answers, if a real flow needs one: convert to the v2 form that does what the author meant (`<>` to `!=`; `"a""b"` to `` "a`"b" ``), or to what v1 really did (`"a" "b"`, which is `ab`).
+**Decided (project owner, 2026-10-14, WI-0039):** these forms stay unsupported. None of them occurs in the expressions of the example flows (the corpus has only `%a_windowID%`, a text of unclear content type that the golden corpus also ran as an expression). All five are reported (`f1`) and left alone; they fail at the first use with an error that names the place. Possible later answers, if a real flow needs one: convert to the v2 form that does what the author meant (`<>` to `!=`; `"a""b"` to `` "a`"b" ``), or to what v1 really did (`"a" "b"`, which is `ab`).
 
 ## 16. Tokens (for implementers)
 
@@ -380,11 +380,11 @@ res["missing"]     ; Array of records for variables that were read and do not ex
 
 | | Cause | Log |
 |---|---|---|
-| warning | a calculation or function call that fails: type error (E25), division by zero, `object("a")`, `round("abc")`, a failing compound assignment | `f1`, `Expression warning: '+' failed: <AutoHotkey message> (line L, column C)` |
+| warning | a calculation or function call that fails: type error (E0025), division by zero, `object("a")`, `round("abc")`, a failing compound assignment | `f1`, `Expression warning: '+' failed: <AutoHotkey message> (line L, column C)` |
 | error | unknown function, wrong number of arguments, method call, a name built by `%...%` that is not a valid variable name, a member of a value that has none, assignment to something that is not a variable, a refusal by the resolver | `f1`, `Expression error: <message> (line L, column C)` |
 | missing | a read of a variable that does not exist | `f0`, `Retrieving variable 'x' failed. It does not exist` (a member of a path: the dotted path as name) |
 
-Whether a warning or a missing variable matters is decided by the caller. For parameters and `ctx.EvaluateExpression` (WI-42, doc/ELEMENT-API-V2.md section 3.1): an error is always an error of the element; a warning is one only in the strict mode of a flow (`strictTypes`, E34), in compatibility mode it stays the empty text plus the `f1` entry (E25); a missing variable is never one.
+Whether a warning or a missing variable matters is decided by the caller. For parameters and `ctx.EvaluateExpression` (WI-0042, doc/ELEMENT-API-V2.md section 3.1): an error is always an error of the element; a warning is one only in the strict mode of a flow (`strictTypes`, E0034), in compatibility mode it stays the empty text plus the `f1` entry (E0025); a missing variable is never one.
 
 **Resolver.** The evaluator knows nothing about scopes. `resolver` is any object with
 
@@ -402,7 +402,7 @@ Whether a warning or a missing variable matters is decided by the caller. For pa
 
 ## 18. Variables
 
-The engine owns all variables (ARCHITECTURE section 4). The model ports the v1 functions of `v1/Source_Execution/Variables/Variables.ahk` and `v1/Source_Common/Variables/Global variables.ahk` (WI-40). Code in `src/engine/vars/`:
+The engine owns all variables (ARCHITECTURE section 4). The model ports the v1 functions of `v1/Source_Execution/Variables/Variables.ahk` and `v1/Source_Common/Variables/Global variables.ahk` (WI-0040). Code in `src/engine/vars/`:
 
 | Class | Content |
 |---|---|
@@ -410,7 +410,7 @@ The engine owns all variables (ARCHITECTURE section 4). The model ports the v1 f
 | `VarValues` | values: copies, objects as `Map`, keys |
 | `VarAccess` | the view of one element run: element API, `%var%` substitution, resolver of the evaluator (section 17), imports of a worker |
 | `BuiltInVars` | the built-in variables (18.4), the working directory of a flow |
-| `EngineVars` | global and static variables (working copy in memory; loading and writing: WI-41) |
+| `EngineVars` | global and static variables (working copy in memory; loading and writing: WI-0041) |
 | `VarJson` | JSON text of a value (substitution with `ConvertObjectToString`) |
 
 ### 18.1 Scopes
@@ -420,8 +420,8 @@ The engine owns all variables (ARCHITECTURE section 4). The model ports the v1 f
 | loop | `A_...` | the thread (`ThreadState.Loops`, the loop stack) | while the loop runs: entering a loop at `head` pushes the loop variables, leaving it (`tail`, `exception`) restores them (ARCHITECTURE 5.2) |
 | thread | `A_...` | the thread (`ThreadState.Vars`) | as long as the thread; a branch (clone) gets a copy |
 | instance | any name without prefix | the instance (`Instance.Vars`) | as long as the instance; shared by its threads |
-| static | `static_...` | `EngineVars`, one table per flow | permanent (WI-41) |
-| global | `global_...` | `EngineVars`, one table | permanent (WI-41) |
+| static | `static_...` | `EngineVars`, one table per flow | permanent (WI-0041) |
+| global | `global_...` | `EngineVars`, one table | permanent (WI-0041) |
 | built-in | 68 `A_` names (18.4) | - | read only |
 
 Loop, thread and instance each have a **hidden** table (`LoopStack.Hidden`, `ThreadState.HiddenVars`, `Instance.HiddenVars`), for elements that protect a value from the user (in v1 the loop "work through a list" and the trace points). Only the element API with `hidden := true` reaches them; an expression, the substitution and `ListVars` never see them. Global and static variables cannot be hidden (`ElementError`, v1 threw an exception).
@@ -442,18 +442,18 @@ At the start of an instance the trigger thread gets the thread variables `A_Trig
 
 Refused as well: an empty name (`Setting a variable failed. Its name is empty.`) and a name with a forbidden character (`Setting variable 'a.b' failed. It contains forbidden characters.`). A refusal is an `f0` log entry and the return value 0, as in v1. The name rule is that of section 3 (`ExprNames.Check`); as in v1, setting accepts a name that starts with a digit.
 
-**Setting in an expression** (`x := 1`) follows the same rules without a location: an `A_` name cannot be assigned from an expression. v1 logged `No permission`; v2 reports the same text as an error of the expression (`f1`, MIGRATION M-38).
+**Setting in an expression** (`x := 1`) follows the same rules without a location: an `A_` name cannot be assigned from an expression. v1 logged `No permission`; v2 reports the same text as an error of the expression (`f1`, MIGRATION M-0038).
 
 **The common place** is a view without instance and thread (v1 `*_Common`, used by the editor and the manager): only global, static and built-in variables are visible, only global and static can be set, any other name is `No permission`.
 
-### 18.3 Values and objects (E28)
+### 18.3 Values and objects (E0028)
 
-- A value is a text, a number (`Integer`, `Float`) or an object. A number keeps its type; v1 turned it into a text on the way through a variable (`0.5` came back as `0.500000`, M-39).
-- **An object is a `Map` with `CaseSense "Off"`. There are no Arrays in variables** (decided in WI-40): a list is a `Map` with the keys 1..n, as in v1, where a list was an object with integer keys. An Array that comes in (a JSON array of a variable file in WI-41, a value set by an element, an export of a worker) becomes such a `Map` (`VarValues.Import`). Reason: one kind of object for paths, assignment and the JSON text; `list.1` and `list[1]` must be the same member.
+- A value is a text, a number (`Integer`, `Float`) or an object. A number keeps its type; v1 turned it into a text on the way through a variable (`0.5` came back as `0.500000`, M-0039).
+- **An object is a `Map` with `CaseSense "Off"`. There are no Arrays in variables** (decided in WI-0040): a list is a `Map` with the keys 1..n, as in v1, where a list was an object with integer keys. An Array that comes in (a JSON array of a variable file in WI-0041, a value set by an element, an export of a worker) becomes such a `Map` (`VarValues.Import`). Reason: one kind of object for paths, assignment and the JSON text; `list.1` and `list[1]` must be the same member.
 - **Keys:** a key that is a text of decimal digits (an optional minus, at most 18 digits) is the `Integer`: `list.1`, `list[1]`, `list["1"]` and `list["01"]` are the same member, as in v1 (golden cases `objects.dict.key.*`). Every other key is a text and ignores case; the spelling of the first insertion stays.
 - **Order:** an object enumerates its `Integer` keys in ascending order, then its texts sorted without case (`-3, 1, 2, 10, A, b`), which is the order of v1 (golden case `objects.dict.whole`). This is the order of an AutoHotkey `Map` (verified).
 - **Copies:** a value is copied when it goes into a variable and when an element reads it. `b := a` gives `b` its own object; `b.k := 2` does not change `a` (as v1). A thread that is cloned and every level of the loop stack own their values.
-- **Paths:** `a.b.1` in a name (element API, `%a.b.1%`; split at every dot as v1 `parseObjectPath`) and `a.b[i]` in an expression. A member that does not exist, or a member of a text, does not exist (`f0`, as a missing variable). Assigning to a member in an expression creates the variable and the members on the way as objects; a member of a text is an error of the expression (`'t' is not an object; its member 'k' cannot be set`). A member of a global or static object can be read and set (v1 looked for a file with the dotted name, M-40). `DeleteVar("a.b")` removes a member. A name with a dot cannot be set with `SetVar` (forbidden character, as in v1); members are set in an expression.
+- **Paths:** `a.b.1` in a name (element API, `%a.b.1%`; split at every dot as v1 `parseObjectPath`) and `a.b[i]` in an expression. A member that does not exist, or a member of a text, does not exist (`f0`, as a missing variable). Assigning to a member in an expression creates the variable and the members on the way as objects; a member of a text is an error of the expression (`'t' is not an object; its member 'k' cannot be set`). A member of a global or static object can be read and set (v1 looked for a file with the dotted name, M-0040). `DeleteVar("a.b")` removes a member. A name with a dot cannot be set with `SetVar` (forbidden character, as in v1); members are set in an expression.
 
 ### 18.4 Built-in variables
 
@@ -466,14 +466,14 @@ Refused as well: an empty name (`Setting a variable failed. Its name is empty.`)
 | `A_TickCount`, `A_TimeIdle`, `A_TimeIdlePhysical` | AutoHotkey | the AutoHotkey v2 variable | - |
 | `A_Temp`, `A_WinDir`, `A_ProgramFiles`, `A_AppData`, `A_AppDataCommon`, `A_Desktop`, `A_DesktopCommon`, `A_StartMenu`, `A_StartMenuCommon`, `A_Programs`, `A_ProgramsCommon`, `A_Startup`, `A_StartupCommon`, `A_MyDocuments` | AutoHotkey | the AutoHotkey v2 variable | - |
 | `A_OSVersion`, `A_Is64bitOS`, `A_Language`, `A_ComputerName`, `A_UserName`, `A_IsAdmin`, `A_ScreenWidth`, `A_ScreenHeight`, `A_ScreenDPI`, `A_Cursor` | AutoHotkey | the AutoHotkey v2 variable | - |
-| `A_PtrSize` | AutoHotkey (4, 32 bit) | 8 | 64 bit only (E4), M-41 |
+| `A_PtrSize` | AutoHotkey (4, 32 bit) | 8 | 64 bit only (E0004), M-0041 |
 | `A_ScriptDir` | AutoHotkey: the folder of the v1 program | `A_ScriptDir` of the engine: the folder of the v2 program (where `AutoHotFlow.ahk` is) | the folder, not the meaning |
 | `A_IPAddress1` to `A_IPAddress4` | AutoHotkey v1 | `SysGetIPAddresses()` (v2 has no such variables); `0.0.0.0` if there are fewer adapters | not checked against v1 |
 | `A_CaretX`, `A_CaretY` | AutoHotkey v1 | `CaretGetPos` with `CoordMode("Caret", "Window")` (relative to the active window, the v1 default); empty without a caret | not checked against v1 |
 | `A_YWeek` | own: the last two characters of `A_YWeek` (only the week) | the same | - |
 | `A_LineFeed`, `A_LF`, `A_CarriageReturn`, `A_CR` | own | line feed, carriage return | - |
-| `A_WorkingDir` | own: `x_GetWorkingDir` (flow setting `WorkingDir` unless `DefaultWorkingDir`, else the setting `FlowWorkingDir`) | the same rule (`BuiltInVars.WorkingDirOf`); until the settings exist (S4) the default is `A_MyDocuments "\AutoHotFlow"` (E28) | - |
-| `A_LanguageName` | own: always empty (a TODO in the v1 code) | the English name of the user's language (`A_Language` through `LCIDToLocaleName` and `GetLocaleInfoEx`, e.g. `German`) | M-41 |
+| `A_WorkingDir` | own: `x_GetWorkingDir` (flow setting `WorkingDir` unless `DefaultWorkingDir`, else the setting `FlowWorkingDir`) | the same rule (`BuiltInVars.WorkingDirOf`); until the settings exist (S0004) the default is `A_MyDocuments "\AutoHotFlow"` (E0028) | - |
+| `A_LanguageName` | own: always empty (a TODO in the v1 code) | the English name of the user's language (`A_Language` through `LCIDToLocaleName` and `GetLocaleInfoEx`, e.g. `German`) | M-0041 |
 | `A_NowString` | own: `FormatTime` of `A_Now` with the default format | `FormatTime(A_Now)` | - |
 | `A_FlowName`, `A_ElementName` | own: read from the flow when the variable is read | from the revision of the flow the element started with | at most a rename during the element |
 | `A_FlowID`, `A_ElementID` | own | the IDs of the element run | - |
@@ -482,7 +482,7 @@ Refused as well: an empty name (`Setting a variable failed. Its name is empty.`)
 
 ### 18.5 `%var%` substitution
 
-`VarAccess.Replace(text, convertObjects)` is v1 `Var_replaceVariables`, step by step, with its odd cases (golden group `replace`): the first pair of percent signs is taken (`SU).*%(.+)%.*`), whatever is between them is the name (also `a b` or `x+1`, which do not exist); the first occurrence of `%name%` in the result is replaced by the value, and in the rest of the search text by `_`. So `50% off %x%` gives `50x%` (the name is ` off `), and a value that contains `%y%` is not replaced again. A variable that does not exist gives the empty text and the `f0` entry `Retrieving variable 'x' failed. It does not exist` (in the common place: `... It does not exist or is neither global nor static`); its name is added to the list `missing` if the caller passes one. An object gives the empty text, or with `convertObjects` its JSON text (`VarJson`: indented by 2 spaces, in the common place on one line, as v1). The JSON text writes `/` as it is and a float as a number; v1 wrote `\/` and a float inside an object as a text (M-42).
+`VarAccess.Replace(text, convertObjects)` is v1 `Var_replaceVariables`, step by step, with its odd cases (golden group `replace`): the first pair of percent signs is taken (`SU).*%(.+)%.*`), whatever is between them is the name (also `a b` or `x+1`, which do not exist); the first occurrence of `%name%` in the result is replaced by the value, and in the rest of the search text by `_`. So `50% off %x%` gives `50x%` (the name is ` off `), and a value that contains `%y%` is not replaced again. A variable that does not exist gives the empty text and the `f0` entry `Retrieving variable 'x' failed. It does not exist` (in the common place: `... It does not exist or is neither global nor static`); its name is added to the list `missing` if the caller passes one. An object gives the empty text, or with `convertObjects` its JSON text (`VarJson`: indented by 2 spaces, in the common place on one line, as v1). The JSON text writes `/` as it is and a float as a number; v1 wrote `\/` and a float inside an object as a text (M-0042).
 
 v1 wrote an `f3` entry for every variable that was read (`Retrieving instance variable 'x'`). v2 does not (a log call per read would cost more than the read itself); only missing variables are logged.
 
@@ -494,11 +494,11 @@ Measured with `tests/ahk/helpers/expr_eval_bench.ahk` and `VarAccess` instead of
 
 The element API (`ctx`, ELEMENT-API-V2 section 3) is `SetVar`, `GetVar` (a copy, or the default if it does not exist; no log), `DeleteVar`, `VarLocation` (`loop`, `thread`, `builtin`, `instance`, `static`, `global` or empty; v1 wrote `Loop`, `Thread`, `BuiltIn`) and `ListVars(scope)` (the visible variables of a scope, or of all scopes in the order loop, thread, instance, static, global; no hidden and no built-in variables, as v1 `Var_GetListOf*Vars`).
 
-**A worker** gets copies of the visible loop, thread and instance variables as its imports (a loop variable hides a thread variable of the same name); global, static, hidden and built-in variables are not sent. Its exports come back as variables where their name says (an `A_` name as a thread variable). Both are provisional until variables in the worker are reached through `ctx.Request` (S2, R4).
+**A worker** gets copies of the visible loop, thread and instance variables as its imports (a loop variable hides a thread variable of the same name); global, static, hidden and built-in variables are not sent. Its exports come back as variables where their name says (an `A_` name as a thread variable). Both are provisional until variables in the worker are reached through `ctx.Request` (S0002, R0004).
 
 ## 19. Oracle: what is compared with native AutoHotkey v2, and the deliberate deviations
 
-The language follows AutoHotkey v2 (E22), so AutoHotkey v2 itself is the yardstick of the evaluator (E35, WI-44; the v1 golden data of section 15 is frozen and only a regression test of the converter). `tools/expr_oracle.py` generates expressions from the grammar with a seed, runs each one as AutoHotkey code (a function per case, the variables as parameters, `try/catch`) and in the evaluator, and compares type (`Type()`), text form (`String()`) and error. Details of the tool and the tiers: doc/TEST-STRATEGY.md section 8.
+The language follows AutoHotkey v2 (E0022), so AutoHotkey v2 itself is the yardstick of the evaluator (E0035, WI-0044; the v1 golden data of section 15 is frozen and only a regression test of the converter). `tools/expr_oracle.py` generates expressions from the grammar with a seed, runs each one as AutoHotkey code (a function per case, the variables as parameters, `try/catch`) and in the evaluator, and compares type (`Type()`), text form (`String()`) and error. Details of the tool and the tiers: doc/TEST-STRATEGY.md section 8.
 
 ### 19.1 The subset that is compared
 
@@ -525,8 +525,8 @@ The comparison accepts a difference only if it is one of these (`CLASSES` in `to
 
 | Class | Deviation | Decision |
 |---|---|---|
-| E25 | A calculation or function call that throws in AutoHotkey (`TypeError`, `ZeroDivisionError`, `ValueError`) gives a warning and the empty text for that part; the evaluation goes on. The message of the warning contains the message of AutoHotkey, so the error class is the same. In strict mode (E34) the caller turns the warning into an error of the element. The value of the whole expression is not compared (AutoHotkey ends the expression at the first error, the evaluator goes on with the empty text). Examples: `"" + 1`, `1 / 0`, `"abc" < 5`, `Round("abc")`, `m + 1` | E25, E30, E34 |
-| E29 | `/` of two integers (or texts that look like integers) that divide exactly gives an Integer (`4 / 2` is `2`, AutoHotkey: `2.0`). Model: `/` as the function `D`; `x /= y` as `x := D(x, y)` | E29 |
+| E0025 | A calculation or function call that throws in AutoHotkey (`TypeError`, `ZeroDivisionError`, `ValueError`) gives a warning and the empty text for that part; the evaluation goes on. The message of the warning contains the message of AutoHotkey, so the error class is the same. In strict mode (E0034) the caller turns the warning into an error of the element. The value of the whole expression is not compared (AutoHotkey ends the expression at the first error, the evaluator goes on with the empty text). Examples: `"" + 1`, `1 / 0`, `"abc" < 5`, `Round("abc")`, `m + 1` | E0025, E0030, E0034 |
+| E0029 | `/` of two integers (or texts that look like integers) that divide exactly gives an Integer (`4 / 2` is `2`, AutoHotkey: `2.0`). Model: `/` as the function `D`; `x /= y` as `x := D(x, y)` | E0029 |
 | literal beyond 63 bits | A decimal integer literal that does not fit into 63 bits is a Float (`12345678901234567890` is `1.2345678901234567e+19`); AutoHotkey wraps it around to `-6101065172474983726`. Model: the literal with `.0` | own rule (section 14) |
 | missing | A variable or `Map` key that does not exist gives the empty text, an `f0` log entry and an entry in `missing`; it is not a warning (AutoHotkey: `UnsetError`, `UnsetItemError`). The value of the whole expression is not compared | section 14 |
 
@@ -534,6 +534,6 @@ Verified by the oracle (so these statements of section 14 are no longer only rea
 
 Differences that the oracle does not compare because the native script would not load or would end the process:
 
-- `"a" + 1` (a string literal in front of an arithmetic operator): a load error in AutoHotkey (`Unexpected operator following literal string`); the evaluator reports the type error as a warning (E25). `1 + "a"` loads there and is compared.
+- `"a" + 1` (a string literal in front of an arithmetic operator): a load error in AutoHotkey (`Unexpected operator following literal string`); the evaluator reports the type error as a warning (E0025). `1 + "a"` loads there and is compared.
 - `MinInt // -1` and `Mod(MinInt, -1)`: end the AutoHotkey process; the evaluator refuses the first as a calculation error and gives `0` for `mod(x, -1)` of integers (section 14). The generator keeps `//` and `Mod` away from operands near the limits of Integer.
-- A text that is a number outside the range of Float (`1e-3001`, made by appending digits to a tiny Float) as the operand of `||`, `&&`, `!` or `if`: AutoHotkey takes the temporary text as true, the evaluator (which keeps the value in a variable) as false (finding F-284, AutoHotkey quirk). The generator does not build such texts.
+- A text that is a number outside the range of Float (`1e-3001`, made by appending digits to a tiny Float) as the operand of `||`, `&&`, `!` or `if`: AutoHotkey takes the temporary text as true, the evaluator (which keeps the value in a variable) as false (finding F-0284, AutoHotkey quirk). The generator does not build such texts.

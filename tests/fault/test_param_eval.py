@@ -1,10 +1,10 @@
-"""WI-42: parameter evaluation end to end, the same flow inline and in a worker.
+"""WI-0042: parameter evaluation end to end, the same flow inline and in a worker.
 
 Under the real supervisor (storage, engine with its worker pool, UI stub), as tests/fault/test_var_persistence.py; the
 chain helpers of this folder are used, but this is no fault test. The test element Action_TestExprParams evaluates its
 parameters in the engine (ctx.EvalParams on call); its twin Action_TestExprParamsWorker runs in a worker process and
-gets them evaluated by the engine before the job (E26, the field "evaluated" of cmd.worker.run). Both leave the result
-in the global variable global_evalresult_<tag>, which the engine writes to Variables/ (WI-41). An error ends the element
+gets them evaluated by the engine before the job (E0026, the field "evaluated" of cmd.worker.run). Both leave the result
+in the global variable global_evalresult_<tag>, which the engine writes to Variables/ (WI-0041). An error ends the element
 with exception; its message comes with evt.element.state. Global variables for the expressions are given as variable
 files. The rules per content type are covered by tests/ahk/element_evalparams.test.ahk.
 """
@@ -96,7 +96,7 @@ def test_the_same_parameters_give_the_same_result_inline_and_in_a_worker(chains,
         cls = INLINE if name.endswith("_in") else WORKER
         flow(datadir, name, cls, {"Expr": "global_t + 1", "Tag": name}, strict=name.startswith("strict"))
     chain = chains(FULL_CHAIN, STUB_OPTS)
-    # evt.engine.ready comes after the variables are loaded (WI-41); the flows alone are loaded earlier
+    # evt.engine.ready comes after the variables are loaded (WI-0041); the flows alone are loaded earlier
     assert chain.rec.wait(event("evt.engine.ready"), READY_S) is not None, chain.sup.text()
 
     # values: the same report from both, and the expected values

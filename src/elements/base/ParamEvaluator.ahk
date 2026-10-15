@@ -4,10 +4,10 @@
 #Include ..\..\expr\ExprDiag.ahk
 #Include ..\..\expr\ExprNames.ahk
 
-; Evaluation of the parameters of an element (WI-42, doc/ELEMENT-API-V2.md section 3.1): the port of v1
+; Evaluation of the parameters of an element (WI-0042, doc/ELEMENT-API-V2.md section 3.1): the port of v1
 ; x_AutoEvaluateOneParameter (v1/Source_Execution/API/API for Elements.ahk:171) with the new expression language.
 ; Used by ExecContext.EvalParams (inline elements, on call) and by the engine for worker elements, which evaluates
-; every parameter before the job is sent (E26).
+; every parameter before the job is sent (E0026).
 ;
 ; A parameter description is an entry of Parameters() of the class (an object literal or a Map) with
 ;   id                  the parameter, or an Array of parameters that share the description
@@ -22,7 +22,7 @@
 ; The evaluation needs a source: an object with
 ;   vars        the variable access of the element run (VarAccess of the engine: Replace, and the resolver of Expr)
 ;   workingDir  the working directory of the flow (relative paths of file and folder parameters)
-;   strict      1 in strict mode (flow option strictTypes, E34): a warning of the evaluator is an error
+;   strict      1 in strict mode (flow option strictTypes, E0034): a warning of the evaluator is an error
 ;   logFn       logFn(level, text) for the log entries of the evaluator, or ""
 ; One result is a Map: id, value, error ("" if there is none). The error texts are those of v1 (Lang).
 class ParamEvaluator {

@@ -1,6 +1,6 @@
-"""Collects the golden cases for the parameter values of real v1 flows (work item WI-36, task 5).
+"""Collects the golden cases for the parameter values of real v1 flows (work item WI-0036, task 5).
 
-FROZEN since E35 (2026-10-14): no new cases against v1 (see tools/golden_v1.py); the oracle of the expression language
+FROZEN since E0035 (2026-10-14): no new cases against v1 (see tools/golden_v1.py); the oracle of the expression language
 is native AutoHotkey v2 (tools/expr_oracle.py).
 
 Usage:

@@ -13,7 +13,7 @@
 ;   conn.OnClose := (conn, reason) => ...           ; once; reason see below
 ;   conn.SendFrame(text)  -> true | false
 ;   conn.Pump()           ; called on wake and by the fallback timer (see Wake.ahk)
-;   conn.CloseWhenFlushed(1000, (flushed) => ExitApp())   ; end after the send queue is written (WI-30)
+;   conn.CloseWhenFlushed(1000, (flushed) => ExitApp())   ; end after the send queue is written (WI-0030)
 ;
 ; Close reasons: "peer_closed" (end of stream, the normal end), "broken" (I/O error),
 ; "queue_overflow" (send queue limit hit), "protocol_error" (bad frame header), "local" (Close()).
@@ -22,7 +22,7 @@
 ; the peer). The last frames of a process (its events, sys.bye) are ended with CloseWhenFlushed instead.
 ; A peer that has gone may have left frames in the pipe that are not read yet (its sys.bye). A write that fails
 ; because the peer is gone therefore closes only the write side (the send queue is dropped, SendFrame refuses);
-; reading goes on to the end of the stream, which closes the connection with "peer_closed" (WI-30, F-26).
+; reading goes on to the end of the stream, which closes the connection with "peer_closed" (WI-0030, F-0026).
 class PipeConnection {
     static WAKE_MESSAGE := 0x8001
     ; Reads handled in one Pump before it yields (64 KiB each). Bounds the time a busy peer can
@@ -214,7 +214,7 @@ class PipeConnection {
         this._Fail("local", false)
     }
 
-    ; Ends the connection after the send queue is written (WI-30): the last frames of a process (its events, sys.bye)
+    ; Ends the connection after the send queue is written (WI-0030): the last frames of a process (its events, sys.bye)
     ; must not be dropped as Close drops them. From now on SendFrame refuses new frames. A timer (DRAIN_POLL_MS)
     ; writes the queue on; the connection is closed with Close (OnClose "local") as soon as the queue is empty, or
     ; when timeoutMs has passed (the rest is dropped), or earlier with the reason of an I/O error (peer gone).
@@ -258,7 +258,7 @@ class PipeConnection {
             Log.Write("a1", "ipc", "closing " this.Name " with " this._queue.Length " frames unwritten after "
                 . Round(Time.NowMs() - this._drainStart) " ms")
         SetTimer(this._drainFn, 0)
-        this._drainFn := ""                         ; breaks the cycle object -> bound method -> object (F-07)
+        this._drainFn := ""                         ; breaks the cycle object -> bound method -> object (F-0007)
         this.Close()
         cb := this._drainDone
         this._drainDone := ""

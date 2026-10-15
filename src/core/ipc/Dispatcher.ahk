@@ -52,7 +52,7 @@ class Dispatcher {
             code := (e is AhfError) ? e.code : ErrCode.INTERNAL
             return Map("ok", false, "error", Map("code", code, "message", Type(e) ": " e.Message))
         }
-        ; The handler answers later with Peer.Reply (WI-12): pass the marker through unchanged.
+        ; The handler answers later with Peer.Reply (WI-0012): pass the marker through unchanged.
         if (result is Deferred)
             return result
         ; A handler without a return statement gives "" (nothing); any other non-Map value is a bug.

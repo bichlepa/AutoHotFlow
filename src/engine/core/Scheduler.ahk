@@ -4,7 +4,7 @@
 #Include Instance.ahk
 #Include FlowDefinition.ahk
 
-; Choice of the next connection after an element finished (WI-08, ARCHITECTURE 5.2).
+; Choice of the next connection after an element finished (WI-0008, ARCHITECTURE 5.2).
 ;
 ; Port of the finished branch of executionTask in
 ; v1/Source_Execution/Execution Task/Execution Task.ahk, lines 98 to 170:
@@ -12,11 +12,11 @@
 ;     or if the element is a loop and fromPart equals the result (line 119, "type = loop").
 ;   - for a loop that is left with "tail" or "exception", the loop stack is restored (lines 123 to
 ;     126). v1 does this once per matching connection; v2 does it once per finished loop element
-;     (a second pop would throw on the stack of depth 1, WI-21, MIGRATION M-19).
+;     (a second pop would throw on the stack of depth 1, WI-0021, MIGRATION M-0019).
 ;   - the first match moves the thread, every further match gets a clone (lines 128 to 133).
 ;   - when the next element is a loop entered at "head", the loop stack is pushed (lines 142 to 145).
 ;     v1 pushes onto the origin thread (OneThreadID); v2 pushes onto the thread that enters the loop
-;     (M-19). Clones are made before any push, so only the thread that enters the loop gets it.
+;     (M-0019). Clones are made before any push, so only the thread that enters the loop gets it.
 ;   - no match: the thread is removed (line 166). A result "exception" without a match is
 ;     reported as unhandled (lines 156 to 162), the caller logs f0.
 ;
@@ -66,10 +66,10 @@ class Scheduler {
 
         leavesLoop := (kind = "loop" && (StrLower(result) = "tail" || StrLower(result) = "exception"))
         ; The loop is left once, however many connections match: pop the stack before any clone is made, so
-        ; every branch starts from the restored state. v1 popped once per connection (M-14, M-19).
+        ; every branch starts from the restored state. v1 popped once per connection (M-0014, M-0019).
         if (leavesLoop && thread.Loops.Depth = 0) {
             ; Broken loop (for example entered at "tail"): Pop would throw out of the finish callback and
-            ; leave the thread "finished" for ever, so the instance would never end (F-12). End the thread
+            ; leave the thread "finished" for ever, so the instance would never end (F-0012). End the thread
             ; as an unhandled exception instead; the caller logs f0 with this message.
             thread.Message := "loop stack is empty when leaving loop " thread.ElementId " with '" result "'"
             instance.ReleaseThread(thread.Id, "loop stack is empty")

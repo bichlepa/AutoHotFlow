@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; Measurement for WI-38 (acceptance criterion): evaluating typical parameter expressions with the parse cache.
+; Measurement for WI-0038 (acceptance criterion): evaluating typical parameter expressions with the parse cache.
 ; Not a unit test. A_Args[1] = result file; one text line per expression and a summary line.
 ; Usage: python tools/ahkrun.py tests/ahk/helpers/expr_eval_bench.ahk <result file>
 #Include ..\lib\ExprTestResolver.ahk

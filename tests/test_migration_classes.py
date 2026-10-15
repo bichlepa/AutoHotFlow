@@ -1,4 +1,4 @@
-"""WI-45: the mapping of deviation classes to MIGRATION IDs (src/expr/MigrationClasses.ahk) agrees with the class list of
+"""WI-0045: the mapping of deviation classes to MIGRATION IDs (src/expr/MigrationClasses.ahk) agrees with the class list of
 the golden data (tools/golden_classes.py) and with doc/MIGRATION.md."""
 
 import re

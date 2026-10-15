@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/core/Debug.ahk (WI-28): Debug.Dump never blocks and never throws, and Render makes readable,
+; Unit tests for src/core/Debug.ahk (WI-0028): Debug.Dump never blocks and never throws, and Render makes readable,
 ; bounded JSON of anything. The send path through a ready peer is covered by tests/fault/test_debug_dump.py.
 #Include lib\Assert.ahk
 #Include ..\..\src\core\Role.ahk

@@ -3,7 +3,7 @@
 #Include ..\..\src\elements\base\AhfElement.ahk
 #Include ..\..\src\elements\base\ElementRegistry.ahk
 
-; Test element of WI-50 (inline): calls every variable function of the context in a fixed order and writes a report of
+; Test element of WI-0050 (inline): calls every variable function of the context in a fixed order and writes a report of
 ; what each call returned (or the text of the error it threw) into the global variable global_varreport_<Tag>. Its twin
 ; Action_TestVarFunctionsWorker runs the same Exercise in a worker, where every call goes to the engine
 ; (cmd.engine.var.*): the two reports must be equal (tests/integration/test_worker_vars.py).

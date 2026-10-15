@@ -1,6 +1,6 @@
-"""Checks the golden data of v1 (WI-36): every case file has a result file, and both follow the format.
+"""Checks the golden data of v1 (WI-0036): every case file has a result file, and both follow the format.
 
-The comparison with v2 comes with the converter (WI-39). The tests here need neither the v2 interpreter nor v1,
+The comparison with v2 comes with the converter (WI-0039). The tests here need neither the v2 interpreter nor v1,
 except `test_a_sample_of_cases_is_reproduced_by_the_v1_interpreter`, which runs a few cases in the v1 interpreter
 and compares them with the checked-in results (it is skipped when v1/ is gone after the port).
 """
@@ -21,7 +21,7 @@ import golden_v1  # noqa: E402
 CASES = REPO / "tests" / "golden" / "cases"
 EXPECTED = REPO / "tests" / "golden" / "expected"
 
-# the groups of work item WI-36, task 4
+# the groups of work item WI-0036, task 4
 REQUIRED_GROUPS = ["arithmetic", "division", "comparison", "logic", "concat", "numbers", "strings", "variables",
                    "assignment", "functions", "errors", "script", "replace", "builtin", "varaccess", "names", "objects",
                    "corpus_flows"]

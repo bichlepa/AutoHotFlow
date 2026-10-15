@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/core/Log.ahk and src/core/Time.ahk (WI-03).
+; Unit tests for src/core/Log.ahk and src/core/Time.ahk (WI-0003).
 #Include lib\Assert.ahk
 #Include ..\..\src\core\Log.ahk
 #Include ..\..\src\core\Time.ahk

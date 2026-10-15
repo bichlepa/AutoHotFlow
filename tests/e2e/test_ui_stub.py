@@ -1,4 +1,4 @@
-"""WI-13: manager stub (src/manager/StubManager.ahk, StubGui.ahk) under the real supervisor, headless.
+"""WI-0013: manager stub (src/manager/StubManager.ahk, StubGui.ahk) under the real supervisor, headless.
 
 The supervisor starts storage, engine and manager (--ui=stub --headless) as real processes through
 tools/ahkrun.py. The skeleton flow (tests/data/skeleton_flow.json, copied to Flows/skeleton.json) runs
@@ -7,7 +7,7 @@ events can be compared.
 
 The stub's copy of the events is written by storage into Log/Log_manager.txt ("... ui-event {json}").
 The test never reads that file while the run is going on: storage fails to append a line when another
-process holds the file (OSError 6, "invalid handle"), and the line is lost (WI-13 findings, F-04). The
+process holds the file (OSError 6, "invalid handle"), and the line is lost (WI-0013 findings, F-0004). The
 observer subscribes to topic log instead. storage forwards every line after it has been written, so the
 test knows when a line is in the file. The file is read once, after the supervisor has ended.
 
@@ -116,7 +116,7 @@ def stub_events_from_file(datadir):
 
 def connect_obs(pipe, timeout=20.0):
     """Connects the observer. A supervisor that starts together with many others (parallel test run) needs
-    more than the 5 s of one connect attempt (F-02), so the attempt is repeated."""
+    more than the 5 s of one connect attempt (F-0002), so the attempt is repeated."""
     deadline = time.monotonic() + timeout
     while True:
         try:
@@ -281,7 +281,7 @@ def test_engine_restart_is_seen_and_resynced_without_restarting_the_stub(procs, 
         epoch_after = wait_until(new_epoch, 15)
         assert epoch_after, "no evt.engine.ready with a new epoch"
 
-        # F-01: the engine announces its restart itself, with the new epoch, before it is ready.
+        # F-0001: the engine announces its restart itself, with the new epoch, before it is ready.
         def restarted_event():
             for m in rec.snapshot():
                 if m.get("type") == "evt.engine.restarted":

@@ -1,4 +1,4 @@
-"""WI-22 point 1: the supervisor itself stands still (frozen process, as in standby or after a long backlog).
+"""WI-0022 point 1: the supervisor itself stands still (frozen process, as in standby or after a long backlog).
 
 Expected (ARCHITECTURE 6.2): after the stand-still no child is judged by its old pong time. No
 evt.process.hung, no evt.process.crashed, all pids unchanged, all roles ready. The children do not give
@@ -26,7 +26,7 @@ SETTLE_S = 4.0          # after the thaw: ping schedule restarts, a wrong verdic
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_supervisor_stand_still_does_not_make_healthy_children_hung(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)
-    # worker:1 is the warm worker the engine asks for when it is ready (WI-27). A worker that is still in its handshake
+    # worker:1 is the warm worker the engine asks for when it is ready (WI-0027). A worker that is still in its handshake
     # when the hub freezes gives up after 3 s (no welcome), which is right but not what this test is about.
     before = chain.wait_ready(["storage", "engine", "manager", "worker:1"])
     sup_pid = chain.sup.ahk_pid()
@@ -56,7 +56,7 @@ def test_supervisor_stand_still_does_not_make_healthy_children_hung(chains, roun
     assert "supervisor stood still" in chain.sup.text(), "stand-still not noticed: " + chain.sup.text()
 
 
-# --- deadlines after a stand-still (WI-33, F-16, E12) ---------------------------------------------------------
+# --- deadlines after a stand-still (WI-0033, F-0016, E0012) ---------------------------------------------------------
 
 PREPARE_LIMIT_MS = 5000
 HELLO_LIMIT_S = 5.0     # Hub.HELLO_TIMEOUT_MS

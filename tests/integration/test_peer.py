@@ -1,4 +1,4 @@
-"""WI-05: message layer (Message, Dispatcher, Peer) against a Python stand-in hub.
+"""WI-0005: message layer (Message, Dispatcher, Peer) against a Python stand-in hub.
 
 Real AutoHotkey processes run src/core/ipc/Peer.ahk through tests/integration/helpers/peer_probe.ahk.
 The hub is tests/support/pyhub.py, with one addition: WakingHub posts the wake-up message to the
@@ -24,7 +24,7 @@ import rawpipe  # noqa: E402
 from rawpipe import Helper  # noqa: E402
 from support.ahfclient import AhfClient  # noqa: E402
 from support.timing import scaled  # noqa: E402
-from support.pyhub import WakingHub  # noqa: E402  (moved to tests/support/pyhub.py in WI-07)
+from support.pyhub import WakingHub  # noqa: E402  (moved to tests/support/pyhub.py in WI-0007)
 
 PROBE = HELPERS / "peer_probe.ahk"
 WM_AHF_WAKE = 0x8001

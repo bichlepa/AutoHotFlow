@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; Harness of the comparison of v2 with the golden data of v1 (WI-39, WI-40, doc/TEST-STRATEGY.md section 7,
+; Harness of the comparison of v2 with the golden data of v1 (WI-0039, WI-0040, doc/TEST-STRATEGY.md section 7,
 ; doc/EXPRESSION-LANGUAGE.md sections 15 and 18).
 ;
 ;   AutoHotkey64.exe harness.ahk <result file> <input file> <mode>

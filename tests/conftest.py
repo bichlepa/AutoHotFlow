@@ -338,7 +338,7 @@ def default_dir_guard():
 
 @pytest.fixture(autouse=True)
 def strict_wire_booleans():
-    """A frame that a Python test peer decoded and that carries 1/0 in a boolean protocol field fails the test (WI-26)."""
+    """A frame that a Python test peer decoded and that carries 1/0 in a boolean protocol field fails the test (WI-0026)."""
     wirebool.take_violations()
     yield
     bad = wirebool.take_violations()

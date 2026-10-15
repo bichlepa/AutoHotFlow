@@ -25,7 +25,7 @@ class ExecContext {
         this.State := {}                 ; per-run state of the element
         this.vars := vars                ; VarAccess of the engine, or "" (no variables)
         this.cls := ""                   ; the element class (set by the engine): its Parameters() for EvalParams
-        this.strictTypes := 0            ; the flow option strictTypes of the revision the element started with (E34)
+        this.strictTypes := 0            ; the flow option strictTypes of the revision the element started with (E0034)
         this.onFinish := onFinish
         this.finished := false
         this.result := ""
@@ -81,7 +81,7 @@ class ExecContext {
         Log.Write(level, "element " this.elementId, text, this.flowId)
     }
 
-    ; Variables (WI-40, doc/ELEMENT-API-V2.md section 3). The name decides the scope as in v1: A_ names are loop or
+    ; Variables (WI-0040, doc/ELEMENT-API-V2.md section 3). The name decides the scope as in v1: A_ names are loop or
     ; thread variables (scope "loop" or "thread" is required to set one), global_ and static_ names are global and
     ; static, any other name is an instance variable. The engine passes the access object (VarAccess); without it
     ; (a worker, a test without engine) there are no variables.
@@ -107,7 +107,7 @@ class ExecContext {
         return this._Vars().Location(name, hidden)
     }
 
-    ; The same as GetVarLocation (the name of WI-40).
+    ; The same as GetVarLocation (the name of WI-0040).
     VarLocation(name, hidden := false) => this.GetVarLocation(name, hidden)
 
     ; "object", "normal", or "" if the variable does not exist (v1 x_getVariableType).
@@ -128,7 +128,7 @@ class ExecContext {
 
     ; The value of an expression (v1 x_EvaluateExpression). Throws ElementError with the errors of the evaluator (line,
     ; column, marked line); in strict mode (flow option strictTypes) also for a warning such as a type error. In
-    ; compatibility mode a warning gives the empty text for the failed part and an f1 log entry (E25).
+    ; compatibility mode a warning gives the empty text for the failed part and an f1 log entry (E0025).
     EvaluateExpression(text) {
         return this._Evaluate(text, "expression")
     }
@@ -158,7 +158,7 @@ class ExecContext {
         throw ElementError("Request is only available in a worker element")
     }
 
-    ; ---- parameters (WI-42, doc/ELEMENT-API-V2.md section 3.1) ------------------------------------------------------
+    ; ---- parameters (WI-0042, doc/ELEMENT-API-V2.md section 3.1) ------------------------------------------------------
 
     ; The evaluated parameters of the element (v1 x_AutoEvaluateParameters), as an object with case-insensitive
     ; properties. Every parameter of Parameters() is evaluated by its content type, except labels, buttons and the ids

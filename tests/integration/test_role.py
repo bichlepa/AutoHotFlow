@@ -1,4 +1,4 @@
-"""WI-06: entry point and role base (src/AutoHotFlow.ahk, src/core/Role.ahk, src/core/RoleRegistry.ahk).
+"""WI-0006: entry point and role base (src/AutoHotFlow.ahk, src/core/Role.ahk, src/core/RoleRegistry.ahk).
 
 The role under test is the echo role (tests/integration/helpers/EchoRole.ahk). It is started the way
 the protocol describes, through the entry point and tools/ahkrun.py (never the interpreter directly).
@@ -21,7 +21,7 @@ from support.timing import scaled
 from test_peer import WakingHub
 
 ROOT = Path(__file__).resolve().parents[2]
-ENTRY = ROOT / "tests" / "integration" / "helpers" / "AutoHotFlowTest.ahk"   # product entry plus test roles (WI-29)
+ENTRY = ROOT / "tests" / "integration" / "helpers" / "AutoHotFlowTest.ahk"   # product entry plus test roles (WI-0029)
 AHKRUN = ROOT / "tools" / "ahkrun.py"
 
 EXIT_OK = 0
@@ -44,7 +44,7 @@ class RoleHub(WakingHub):
 
 
 class StallingHub(RoleHub):
-    """RoleHub that stops reading one client once for a while (WI-30, F-26 cause A).
+    """RoleHub that stops reading one client once for a while (WI-0030, F-0026 cause A).
 
     The first received message that satisfies stall_on holds the reading thread of its connection for stall_s
     seconds. The role keeps writing meanwhile: its pipe (64 KiB) fills and the rest waits in its send queue.
@@ -114,7 +114,7 @@ class RoleRun:
 
 
 def start_role(procs, datadir, pipe, session, role, *extra):
-    # --test-roles: the echo role is a test role and is registered only with the flag (WI-07)
+    # --test-roles: the echo role is a test role and is registered only with the flag (WI-0007)
     args = ["--role=" + role, "--session=" + session, "--hub=" + pipe, "--data=" + str(datadir), "--test-roles", *extra]
     return RoleRun(procs, datadir, role.replace(":", "_"), args)
 
@@ -176,7 +176,7 @@ def test_missing_connection_arguments_exit_2(procs, datadir, runs, session_id):
 
 
 def test_role_without_implementation_reports_not_implemented(procs, datadir, runs, session_id, pipe):
-    # "engine" (WI-10), "worker" (WI-11) and "storage" (WI-12) are implemented; "triggerhost" is still a placeholder (WI-14).
+    # "engine" (WI-0010), "worker" (WI-0011) and "storage" (WI-0012) are implemented; "triggerhost" is still a placeholder (WI-0014).
     run = launch(procs, datadir, runs, pipe, session_id, "triggerhost")
     code = run.wait_exit(timeout=30)
     assert code == EXIT_NOT_IMPLEMENTED, "exit %s, stderr: %s" % (code, run.stderr_text())
@@ -234,8 +234,8 @@ def test_shutdown_sends_bye_and_exits_0_within_one_second(procs, datadir, runs, 
 
 
 def test_frames_queued_at_shutdown_and_the_bye_reach_a_hub_that_reads_late(procs, datadir, runs, session_id, pipe):
-    # F-26 cause A (WI-30): when sys.shutdown comes, the role still has frames in its send queue (the hub reads
-    # nothing for STALL_S). Every pong and then sys.bye must arrive; before WI-30 Close dropped the queue.
+    # F-0026 cause A (WI-0030): when sys.shutdown comes, the role still has frames in its send queue (the hub reads
+    # nothing for STALL_S). Every pong and then sys.bye must arrive; before WI-0030 Close dropped the queue.
     with StallingHub(pipe, first_pong_of("echo"), STALL_S) as hub:
         run = launch(procs, datadir, runs, pipe, session_id, "echo")
         pid = wait_hello(hub, "echo")
@@ -285,7 +285,7 @@ class SilentHub(RoleHub):
 
 
 def test_hub_that_never_answers_hello_ends_the_role_with_exit_4(procs, datadir, runs, session_id, pipe):
-    # F-29 follow-up: every failed hello restarted the 10 s budget and the orphan guard, so the role lived for ever
+    # F-0029 follow-up: every failed hello restarted the 10 s budget and the orphan guard, so the role lived for ever
     limit_s = scaled(25.0)
     hub = SilentHub(pipe).start()
     try:

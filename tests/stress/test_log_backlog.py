@@ -1,12 +1,12 @@
-"""WI-16, WI-25: an event flood and the log queue of the storage (finding F-08).
+"""WI-0016, WI-0025: an event flood and the log queue of the storage (finding F-0008).
 
-The manager stub writes every engine event to the log through the storage (PROTOCOL 4.8). Before WI-25 the
+The manager stub writes every engine event to the log through the storage (PROTOCOL 4.8). Before WI-0025 the
 storage drained only about 30 lines per second and the queue had no limit. This test floods the engine with
 events for 20 s and records how far the storage falls behind (memory of the storage, time until the log files
-stop changing). Assertions: the engine stays responsive in the budget, no process is restarted, and (WI-25) the
+stop changing). Assertions: the engine stays responsive in the budget, no process is restarted, and (WI-0025) the
 log is complete shortly after the flood and the memory of the storage returns close to its start value.
 
-The second test sends log lines straight to the storage at 1500 lines per second for 10 s (WI-25: at least
+The second test sends log lines straight to the storage at 1500 lines per second for 10 s (WI-0025: at least
 1000 lines/s over 10 s), the third floods more than the limit of the log queue allows.
 """
 
@@ -21,7 +21,7 @@ from stresskit import stress_chain  # noqa: F401  (fixture)
 FLOW = "flood"
 FLOOD_SECONDS = 20.0
 DRAIN_LIMIT_S = 240.0
-DRAIN_BUDGET_S = 60.0   # generous: the drain takes seconds since WI-25, 240 s were not enough before
+DRAIN_BUDGET_S = 60.0   # generous: the drain takes seconds since WI-0025, 240 s were not enough before
 RSS_BACK_MB = 40.0      # growth over the start value that is still "back" (the queue holds at most 20000 entries)
 MEDIAN_BUDGET_MS = 5.0
 P99_BUDGET_MS = 50.0
@@ -100,7 +100,7 @@ def _wait_text(path, needle, timeout):
 @pytest.mark.stress
 @pytest.mark.timeout(300)
 def test_storage_writes_1500_log_lines_per_second_for_10_seconds(stress_chain, datadir):
-    """WI-25: the sender paces itself (150 lines every 100 ms). The end marker is the last line of its source
+    """WI-0025: the sender paces itself (150 lines every 100 ms). The end marker is the last line of its source
     and shows up in both files when the storage has caught up. The rate is not measured per second but
     as 'all written within 5 s after the last line was sent' (a backlog of seconds would fail it)."""
     sc = stress_chain(flows={FLOW: (100, "parallel")})

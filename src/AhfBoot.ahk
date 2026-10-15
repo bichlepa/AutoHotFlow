@@ -1,23 +1,23 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
 
-; Boot code of every role process (WI-29: split from the entry so that the test entry can reuse it). The entry
-; src/AutoHotFlow.ahk includes this file and calls AhfMain(). It is the single entry point of every role process (doc/ARCHITECTURE.md D12, v2-phase2-final:work_items/phase2/README.md):
+; Boot code of every role process (WI-0029: split from the entry so that the test entry can reuse it). The entry
+; src/AutoHotFlow.ahk includes this file and calls AhfMain(). It is the single entry point of every role process (doc/ARCHITECTURE.md D0012, v2-phase2-final:work_items/phase2/README.md):
 ;   AutoHotkey64.exe src\AutoHotFlow.ahk --role=<name> --session=<id> --hub=<pipe> --data=<dir> [--flow=<id>] [--hubHwnd=<n>] [--test-roles]
-; --role=supervisor (or no --role) starts the supervisor (WI-07, src/supervisor/), which is not a Role.
+; --role=supervisor (or no --role) starts the supervisor (WI-0007, src/supervisor/), which is not a Role.
 ; Exit codes: 0 normal end, 1 role or supervisor failed to start (also an error while the files load), 2 bad
 ; arguments, unknown role or a 32-bit interpreter,
 ; 3 role not implemented yet, 4 hub lost (orphan guard) or peer closed, 5 supervisor: a child was terminated,
-; 6 a role: too many unexpected errors (Role.ERROR_LIMIT within Role.ERROR_WINDOW_MS, WI-23).
+; 6 a role: too many unexpected errors (Role.ERROR_LIMIT within Role.ERROR_WINDOW_MS, WI-0023).
 ; No dialog is ever shown: every message goes to the console sink (stderr).
 ;
-; Roles are included here, not loaded dynamically (WI-06). The test roles are not part of src/: the test entry
+; Roles are included here, not loaded dynamically (WI-0006). The test roles are not part of src/: the test entry
 ; tests/integration/helpers/AutoHotFlowTest.ahk includes this file, adds the test roles and calls AhfMain. They are
-; registered only with --test-roles (WI-07, WI-29).
+; registered only with --test-roles (WI-0007, WI-0029).
 ;
 ; The first two statements run before any #Include below, because included files may contain code on file level
 ; (the element files call ElementRegistry.Register there) and AHK runs it in text order, before AhfMain:
-;  1. Only the 64-bit interpreter is supported (decision E4). Exit 2, message on stderr, no dialog.
+;  1. Only the 64-bit interpreter is supported (decision E0004). Exit 2, message on stderr, no dialog.
 ;  2. AhfLoadError catches an error in that file-level code: message on stderr, exit 1, no dialog. AhfMain removes
 ;     it again before the supervisor or the role installs its own OnError handler.
 if (A_PtrSize != 8) {
@@ -120,8 +120,8 @@ AhfRegisterRoles() {
     RoleRegistry.Register("engine", Engine)
     RoleRegistry.Register("worker", Worker)
     RoleRegistry.Register("storage", Storage)
-    RoleRegistry.Register("manager", StubManager)   ; WI-13: stub only, needs --ui=stub
-    RoleRegistry.Register("debug", DebugView)       ; WI-28: the debug window (--headless without a window)
+    RoleRegistry.Register("manager", StubManager)   ; WI-0013: stub only, needs --ui=stub
+    RoleRegistry.Register("debug", DebugView)       ; WI-0028: the debug window (--headless without a window)
 }
 
 AhfExit(code, text) {

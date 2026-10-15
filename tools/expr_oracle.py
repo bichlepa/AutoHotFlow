@@ -1,4 +1,4 @@
-"""Oracle of the expression language: native AutoHotkey v2 against the evaluator (work item WI-44, E35).
+"""Oracle of the expression language: native AutoHotkey v2 against the evaluator (work item WI-0044, E0035).
 
 Usage:
     python tools/expr_oracle.py                      # fixed corpus (tests/oracle/corpus.jsonl)
@@ -64,7 +64,7 @@ NUMERIC_VARS = ["i0", "i1", "i2", "i3", "i7", "i16", "ineg", "f05", "f15", "fneg
 EDGE_VARS = ["imax", "imin"]
 TEXT_VARS = ["sabc", "shello", "supper", "smix", "sempty"]
 BIG_VARS = {"imax", "imin", "ibig"}
-# Floats whose text becomes a number outside the range of Float when digits are appended (F-284): not used where a text or
+# Floats whose text becomes a number outside the range of Float when digits are appended (F-0284): not used where a text or
 # a truth value is made of them
 RANGE_VARS = {"ftiny", "fhuge"}
 KEYS = ["k", "s", "f", "K", "k", "s", "f", "zz"]       # "zz" does not exist
@@ -74,11 +74,11 @@ MISSING_VAR = "nothere"            # not in ENV: a variable that does not exist
 
 # class -> description. A case that differs from native AutoHotkey v2 and has no entry here fails.
 CLASSES = {
-    "E25": "A calculation or function call that throws in AutoHotkey (TypeError, ZeroDivisionError, ValueError) gives "
-           "a warning and the empty text for that part; the evaluation goes on. Strict mode (E34) turns the warning "
+    "E0025": "A calculation or function call that throws in AutoHotkey (TypeError, ZeroDivisionError, ValueError) gives "
+           "a warning and the empty text for that part; the evaluation goes on. Strict mode (E0034) turns the warning "
            "into an error of the element. The message of the warning contains the message of AutoHotkey. The value "
            "of the whole expression is not compared (the evaluator goes on after the failed part).",
-    "E29": "`/` of two integers (or texts that look like integers) that divide exactly gives an Integer (4/2 is 2, "
+    "E0029": "`/` of two integers (or texts that look like integers) that divide exactly gives an Integer (4/2 is 2, "
            "AutoHotkey: 2.0). Model: `/` as the function D.",
     "literal beyond 63 bits": "A decimal integer literal that does not fit into 63 bits is a Float in the evaluator "
            "(AutoHotkey wraps it around: 9223372036854775808 is -9223372036854775808). Model: the literal with `.0`.",
@@ -111,7 +111,7 @@ class Node:
 
 
 def render(n, model=False):
-    """The text of a tree. model=True applies the deviations (E29 and literal beyond 63 bits) as native code."""
+    """The text of a tree. model=True applies the deviations (E0029 and literal beyond 63 bits) as native code."""
     k = n.kind
     if k == "lit":
         if model and n.big:
@@ -307,7 +307,7 @@ def case_of(tree):
     text = render(tree)
     rules = []
     if has_divide(tree):
-        rules.append("E29")
+        rules.append("E0029")
     if has_big_literal(tree):
         rules.append("literal beyond 63 bits")
     out = {"t": text}
@@ -343,10 +343,10 @@ HAND = [
     # literal beyond 63 bits
     "9223372036854775808", "12345678901234567890", "12345678901234567890 + 1", "-9223372036854775809",
     "99999999999999999999 . \"\"", "12345678901234567890 = 12345678901234567890.0",
-    # E29
+    # E0029
     "4 / 2", "-8 / -2", "7 / 2", "i16 / i2", "i7 / i2", "sint / sone", "sflt / f05", "i16 / i2 . \"\"", "imin / -1", "imax / imax", "i0 / i7", "i16 / ineg", "(i16 / i2) / i2", "i16 / i2 * i2",
     "sdot / sone", "f3 / i3", "shex / i2", "i3 / i3 + 0.5",
-    # E25
+    # E0025
     "sempty + 1", "1 + sempty", "sabc + 1", "1 - sabc", "sabc * 2", "-sempty", "-sabc", "m + 1", "m . \"x\"",
     "i1 / i0", "i1 // i0", "i1 / fz", "i7 // f3", "f15 // i1", "Mod(i1, i0)", "Mod(7, 0.0)", "Round(sabc)",
     "Round(m)", "sabc < i1", "sabc < shello", "shello > supper", "\"a\" < \"B\"", "sempty < i1",
@@ -441,7 +441,7 @@ NewMap(pairs*) {
     return m
 }
 
-; E29: `/` of two integers that divide exactly gives an Integer, otherwise AutoHotkey's `/`.
+; E0029: `/` of two integers that divide exactly gives an Integer, otherwise AutoHotkey's `/`.
 D(a, b) {
     r := a / b
     if (r is Float && IsInteger(a) && IsInteger(b)) {
@@ -612,7 +612,7 @@ def classify(case, raw, model, ev):
             if ev["missing"] and not ev["errors"]:
                 return "missing", ""
         elif message_matches(raw, ev):
-            return "E25", raw["class"]
+            return "E0025", raw["class"]
     if model is not None:
         if model["ok"] and same_value(model, ev):
             return " + ".join(case["r"]), ""
@@ -620,7 +620,7 @@ def classify(case, raw, model, ev):
             if model["class"] in ("UnsetError", "UnsetItemError") and ev["missing"] and not ev["errors"]:
                 return "missing", ""
             if message_matches(model, ev):
-                return "E25", model["class"]
+                return "E0025", model["class"]
     return "OPEN", "native: %s | model: %s | evaluator: %s" % (describe(raw), describe(model) if model else "-",
                                                                 describe_ev(ev))
 

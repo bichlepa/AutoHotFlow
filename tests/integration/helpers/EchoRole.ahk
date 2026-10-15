@@ -1,24 +1,24 @@
 #Requires AutoHotkey v2.0
 
-; Test role "echo" for tests/integration/test_role.py (WI-06). Not part of the product: the entry
+; Test role "echo" for tests/integration/test_role.py (WI-0006). Not part of the product: the entry
 ; point includes this file only so that the tests can start a role that answers and ends.
 ; It needs no includes of its own: Role and RoleRegistry are included by src/AutoHotFlow.ahk first.
 ;
 ;   cmd.test.echo {...}          -> {echo: <payload>}
 ;   cmd.test.log {count, level, text}  -> writes count entries (default a1 "entry <n>", or text), {logged}
-;   cmd.test.stderr {text}       -> one line on stderr (Role.Console), the supervisor logs it (WI-23)
+;   cmd.test.stderr {text}       -> one line on stderr (Role.Console), the supervisor logs it (WI-0023)
 ;   cmd.test.logstate            -> {queued, dropped, last}
 ;   cmd.test.setlogtarget {to}   -> Role.SetLogTarget(to)
-;   cmd.test.dump {title, value, kind, count} -> Debug.Dump (WI-28). kind: "value" (default, the value of the request),
+;   cmd.test.dump {title, value, kind, count} -> Debug.Dump (WI-0028). kind: "value" (default, the value of the request),
 ;                                   "cycle" (a Map that contains itself), "big" (a 200000 character text), "deep" (30 levels),
 ;                                   "objects" (functions and a class instance). count: how many times (default 1).
 ;                                   Answer: {sent, dropped, failed} (the counters of Debug)
 ;   cmd.test.throwlater {count}  -> count errors thrown from timers (default 1); the role keeps running
-;                                   until the limit of Role.ERROR_LIMIT is exceeded (WI-23)
+;                                   until the limit of Role.ERROR_LIMIT is exceeded (WI-0023)
 ;
 ; sys.shutdown is handled by the base class (sys.bye, exit 0).
 ;
-; Test option in the name (WI-34, F-41): "echo:slowhello<ms>" (the flow part of the name) starts its connection to the
+; Test option in the name (WI-0034, F-0041): "echo:slowhello<ms>" (the flow part of the name) starts its connection to the
 ; hub only <ms> after the process start, so a test can end the session while this child is still starting and says
 ; sys.hello during the shutdown. The supervisor needs no option for it (it starts the child as --flow=slowhello<ms>).
 class EchoRole extends Role {

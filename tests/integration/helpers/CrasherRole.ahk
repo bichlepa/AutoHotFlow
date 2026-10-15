@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; Test role "crasher" for tests/integration/test_supervisor.py (WI-07). Not part of the product. It is
+; Test role "crasher" for tests/integration/test_supervisor.py (WI-0007). Not part of the product. It is
 ; registered only with --test-roles (src/AutoHotFlow.ahk). It does nothing until it gets cmd.test.arm;
 ; CRASH_AFTER_MS later it ends itself with TerminateProcess on its own handle: no sys.bye, no cleanup,
 ; which is how a crash looks to the supervisor. The arm message lets the test start watching the

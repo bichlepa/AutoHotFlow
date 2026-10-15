@@ -1,5 +1,5 @@
-"""Deviation classes of the comparison of v1 and v2: the new expression language (work item WI-39) and the variable
-model (WI-40).
+"""Deviation classes of the comparison of v1 and v2: the new expression language (work item WI-0039) and the variable
+model (WI-0040).
 
 Used by tools/golden_compare.py. `classify(case, r1, r2)` gives the verdict of one golden case: `same`, the name
 of a class from CLASSES, or `open` (a deviation without a class: a failure of the check).
@@ -15,37 +15,37 @@ import golden_compare as gc
 #                run is a defect of the converter
 #   unsupported  syntax the converter reports and leaves unchanged; the owner has not decided (OPEN-ITEMS)
 CLASSES = {
-    "v1 error": ("accept", "v1 reports an error or hangs; nothing to reproduce (E22)"),
-    "number format": ("accept", "the same number in the text form of v2 (E24, E32)"),
+    "v1 error": ("accept", "v1 reports an error or hangs; nothing to reproduce (E0022)"),
+    "number format": ("accept", "the same number in the text form of v2 (E0024, E0032)"),
     "unsupported syntax": ("unsupported", "% as modulo, ^=, %=, <> and \"a\"\"b\": reported, not converted"),
     "script result value": ("accept", "the value of a script is the value of its last statement (v1: unspecific)"),
     "assignment value": ("accept", "an assignment has a value in v2; in v1 it has none (the empty text)"),
     "assignment to a path": ("accept", "v1 cannot assign to a path (a.b := 1 only logs an error); v2 can"),
-    "text comparison": ("accept", "comparison with a text that is not a number: false in v2, alphabetical in v1 (E30, E25)"),
-    "operand as result": ("accept", "and/or return an operand in v2, 1 or 0 in v1; the same as a condition (E31)"),
-    "no short circuit": ("accept", "v1 evaluates both sides of and/or, v2 stops at the first that decides (E31)"),
+    "text comparison": ("accept", "comparison with a text that is not a number: false in v2, alphabetical in v1 (E0030, E0025)"),
+    "operand as result": ("accept", "and/or return an operand in v2, 1 or 0 in v1; the same as a condition (E0031)"),
+    "no short circuit": ("accept", "v1 evaluates both sides of and/or, v2 stops at the first that decides (E0031)"),
     "not": ("accept", "not and ! do not negate at the start of an expression in v1 (bug); v2 negates"),
     "number-like texts": ("accept", "v1 compares two texts that look like numbers as numbers, v2 as texts"),
-    "escape sequence": ("accept", "v1 drops the backtick in a string, v2 reads the escape (E22)"),
+    "escape sequence": ("accept", "v1 drops the backtick in a string, v2 reads the escape (E0022)"),
     "true and false": ("accept", "keywords with the values 1 and 0 in v2; ordinary (missing) variables in v1"),
     "keyword as name": ("accept", "if, else, and, or, not cannot be variable names in v2"),
     "integer overflow": ("accept", "v1 wraps integers at 64 bit; v2 continues with a float"),
-    "integer division with float": ("accept", "// with a float operand is a type error in AutoHotkey v2 (E25); v1 divided"),
+    "integer division with float": ("accept", "// with a float operand is a type error in AutoHotkey v2 (E0025); v1 divided"),
     "number literal forms": ("accept", "v1 reads only digits (0x10 is 0, 1e3 is 1); v2 reads hexadecimal and exponent"),
     "v1 ignores text": ("accept", "v1 stops at a token it cannot use and ignores the rest (glued operators like *-, "
                                   "a stray ), unknown operators, a second line)"),
     "number literal spelling": ("rewrite", "v1 passes a number literal on as text (1.50, 007); v2 reads it as a number"),
     "concatenation dot": ("rewrite", "v1 reads \"a\".\"b\" as concatenation; v2 needs spaces around the dot"),
     "backtick": ("rewrite", "a backtick in front of a character that v2 does not know as an escape"),
-    # variable model (WI-40)
+    # variable model (WI-0040)
     "assignment refused": ("accept", "an assignment that v1 refuses with an f0 log (an A_ name, no permission) is an "
                                      "error of the expression in v2, with the same text"),
-    "built-in value": ("accept", "A_PtrSize is 8 (64 bit only, E4); A_LanguageName is the name of the language, "
+    "built-in value": ("accept", "A_PtrSize is 8 (64 bit only, E0004); A_LanguageName is the name of the language, "
                                  "v1 always gave the empty text"),
     "path into global or static": ("accept", "v1 cannot read a member of a global or static object (it looks for "
                                              "a file of that name); v2 can"),
     "object as text": ("accept", "an object in a concatenation is a type error in v2 (empty text and a warning, "
-                                 "E25); v1 used the empty text for the object"),
+                                 "E0025); v1 used the empty text for the object"),
     "json text": ("accept", "the JSON text of an object (ConvertObjectToString) writes / without a backslash and a "
                             "float inside an object as a number; v1 wrote \\/ and a text"),
 }
@@ -112,7 +112,7 @@ def v1_error_detail(r1):
 
 
 def classify_access(case, r1, r2):
-    """The kinds of the variable model (WI-40): replace, checkname, destination, varget, varset."""
+    """The kinds of the variable model (WI-0040): replace, checkname, destination, varget, varset."""
     if r2["outcome"] != "ok":
         return "open", "; ".join(r2.get("errors", []))[:100]
     v1v = gc.v1_plain(r1.get("value"))
@@ -189,7 +189,7 @@ def classify(case, r1, r2):
             return "number literal spelling", detail
         return "number format", detail
 
-    # variable model (WI-40)
+    # variable model (WI-0040)
     errs = " ".join(r2.get("errors", []))
     if v2err and "failed. No permission." in errs and vars_same:
         return "assignment refused", errs[:100]

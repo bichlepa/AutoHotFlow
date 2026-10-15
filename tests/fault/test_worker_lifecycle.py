@@ -1,4 +1,4 @@
-"""WI-27: life cycle of the worker pool under the real supervisor, storage and engine (ARCHITECTURE 6.4).
+"""WI-0027: life cycle of the worker pool under the real supervisor, storage and engine (ARCHITECTURE 6.4).
 
 A Chain (faultkit) is a supervisor with storage and engine as children, plus a Python observer. The pool
 options of the engine (--workers, --warm-workers, --worker-idle-ms) are passed on by the supervisor. The
@@ -119,7 +119,7 @@ def test_time_to_the_first_job_when_the_worker_has_to_be_started_cold(chains, da
     cold = started[0] - trigger_done[0]
     print("\nMEASURE cold start: trigger finished -> worker element running (spawn, process start, ready): %.0f ms"
           % (cold * 1000))
-    assert cold < 3.0, cold          # 300 ms is the aim (WI-27); this limit only catches a pool that does not start
+    assert cold < 3.0, cold          # 300 ms is the aim (WI-0027); this limit only catches a pool that does not start
     assert len(workers(chain)) == 1
 
 
@@ -231,7 +231,7 @@ def test_killed_worker_ends_its_element_with_worker_crashed_and_the_pool_has_a_r
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_worker_killed_before_it_answers_the_run_ends_the_element_with_worker_crashed_and_is_reported_as_crashed(
         chains, datadir, round_no):
-    """F-46 (WI-35), deterministic: the run is open at the frozen worker (the hub holds it, hub.routedOpen >= 1), then
+    """F-0046 (WI-0035), deterministic: the run is open at the frozen worker (the hub holds it, hub.routedOpen >= 1), then
     the worker dies. The hub answers peer_gone at once, before the supervisor has judged the end of the process. The
     engine must not read that as a refusal, and the supervisor must not report the end as a planned "killed"."""
     flows = dict(ECHO, whang=("Action_TestHangWorker", None))
@@ -315,7 +315,7 @@ def test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_ru
     t0 = time.perf_counter()
     psutil.Process(engine_pid).kill()
     new_engine, _ = chain.wait_restarted_ready("engine", engine_pid, timeout=15.0)
-    # "ready" in the supervisor is the hello of the engine; the flows are loaded later (F-270)
+    # "ready" in the supervisor is the hello of the engine; the flows are loaded later (F-0270)
     chain.wait_flows(["wecho"], timeout=READY_S)
     assert wait_until(lambda: not alive(old_pid), 10.0), "the orphan %s (pid %d) still lives:\n%s" % (
         old, old_pid, chain.sup.text())
@@ -323,14 +323,14 @@ def test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_ru
     # exactly the new engine's warm worker is left
     assert wait_until(lambda: len(ready_workers(chain)) == 1 and old not in live_workers(chain), READY_S), \
         "workers after the restart: %s" % workers(chain)
-    assert exited_engine_gone(chain, old, timeout=2.0) is not None      # WI-33 (E10): reason "engine gone", was "killed"
+    assert exited_engine_gone(chain, old, timeout=2.0) is not None      # WI-0033 (E0010): reason "engine gone", was "killed"
     run_echo_ok(chain)
     assert len(live_workers(chain)) == 1, live_workers(chain)
 
 
 @pytest.mark.slow
 def test_f49_restarted_engine_is_ready_for_the_supervisor_before_it_has_loaded_its_flows(chains, datadir):
-    """F-270, deterministic: storage is frozen, so the restarted engine can say hello (state "ready" in the
+    """F-0270, deterministic: storage is frozen, so the restarted engine can say hello (state "ready" in the
     supervisor) but cannot load its flows. A start in this window is answered with not_found. This is the
     documented order (PROTOCOL 4.3: evt.engine.ready only after loading), so a test that starts a flow after an
     engine restart has to wait for the flows first (chain.wait_flows)."""
@@ -345,9 +345,9 @@ def test_f49_restarted_engine_is_ready_for_the_supervisor_before_it_has_loaded_i
     assert "not loaded" in answer["error"]["message"], answer
 
 
-# --- the workers end with the engine (WI-33, E10) -------------------------------------------------------------
+# --- the workers end with the engine (WI-0033, E0010) -------------------------------------------------------------
 
-ENGINE_GONE_BUDGET_S = scaled(1.5)          # the aim is 1 s (WI-33); the margin is 0.5 s, three times that in the parallel run
+ENGINE_GONE_BUDGET_S = scaled(1.5)          # the aim is 1 s (WI-0033); the margin is 0.5 s, three times that in the parallel run
 
 
 def exited_engine_gone(chain, name, timeout):
@@ -377,7 +377,7 @@ def test_engine_killed_during_a_hanging_job_ends_the_worker_at_once_and_the_new_
     assert got is not None, "no evt.process.exited with reason 'engine gone':\n" + chain.sup.text()
     assert not chain.rec.find(event("evt.process.crashed", name=old))
     chain.wait_restarted_ready("engine", engine_pid, timeout=15.0)
-    chain.wait_flows(["wecho"], timeout=READY_S)        # F-270
+    chain.wait_flows(["wecho"], timeout=READY_S)        # F-0270
     assert wait_until(lambda: len(ready_workers(chain)) == 1 and old not in live_workers(chain), READY_S), \
         "workers after the restart: %s" % workers(chain)
     run_echo_ok(chain)          # the new engine's pool serves a new job

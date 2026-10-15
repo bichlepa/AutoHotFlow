@@ -1,4 +1,4 @@
-"""WI-28 step d: Debug.Dump (src/core/Debug.ahk), the replacement of the v1 function d().
+"""WI-0028 step d: Debug.Dump (src/core/Debug.ahk), the replacement of the v1 function d().
 doc/PROTOCOL.md 4.9. The test role echo calls it on request (cmd.test.dump).
 """
 

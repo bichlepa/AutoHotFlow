@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
 
-; Worker of tools/migration_report.py (WI-45): loads flow files with the loader of the engine (FlowTable, which runs
+; Worker of tools/migration_report.py (WI-0045): loads flow files with the loader of the engine (FlowTable, which runs
 ; FlowExprConvert and the converter) and writes, per flow, the elements of unknown class and the places that carry
 ; MIGRATION IDs, as JSON. There is no second implementation of the conversion in Python.
 ;
@@ -9,7 +9,7 @@
 ; Not started by hand: python tools/migration_report.py <flow file or folder> [--json]
 ;
 ; The element classes come from the include list below: the same element files as src/AhfBoot.ahk, so that the report
-; sees the registry of the engine process. When the element packages are generated (WI-47), take the generated block here.
+; sees the registry of the engine process. When the element packages are generated (WI-0047), take the generated block here.
 #Include ..\src\engine\FlowTable.ahk
 #Include ..\src\elements\skeleton\Trigger_Manual.ahk
 #Include ..\src\elements\skeleton\Action_Sleep.ahk

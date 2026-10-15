@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the parse cache of the expression library (WI-37 task 4, src/expr/ExprCache.ahk and Expr.Parse).
+; Unit tests for the parse cache of the expression library (WI-0037 task 4, src/expr/ExprCache.ahk and Expr.Parse).
 #Include lib\ExprCheck.ahk
 
 Fresh() {

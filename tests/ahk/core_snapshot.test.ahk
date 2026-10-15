@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/core/ProcInfo.ahk, Snapshot.ahk and Peer.Stats (WI-28): the building blocks of cmd.diag.snapshot.
+; Unit tests for src/core/ProcInfo.ahk, Snapshot.ahk and Peer.Stats (WI-0028): the building blocks of cmd.diag.snapshot.
 #Include lib\Assert.ahk
 #Include ..\..\src\core\Snapshot.ahk
 #Include ..\..\src\core\Role.ahk

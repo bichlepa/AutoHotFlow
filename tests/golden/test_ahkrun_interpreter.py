@@ -1,4 +1,4 @@
-"""tools/ahkrun.py --interpreter: another interpreter (the v1 one) with the same dialog guard (WI-36)."""
+"""tools/ahkrun.py --interpreter: another interpreter (the v1 one) with the same dialog guard (WI-0036)."""
 
 import os
 import sys

@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include Action_TestVarFunctions.ahk
 
-; Test element of WI-50: Action_TestVarFunctions in a worker. Every variable function asks the engine
+; Test element of WI-0050: Action_TestVarFunctions in a worker. Every variable function asks the engine
 ; (cmd.engine.var.*); the report goes to the same place (global_varreport_<Tag>, through SetVar in the engine), so the
 ; test compares the two reports.
 class Action_TestVarFunctionsWorker extends AhfElement {

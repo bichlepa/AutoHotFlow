@@ -1,4 +1,4 @@
-"""Shared helpers of the stress tests (WI-16, doc/TEST-STRATEGY.md 3).
+"""Shared helpers of the stress tests (WI-0016, doc/TEST-STRATEGY.md 3).
 
 Built on the chain of the fault injection tests (tests/fault/faultkit.py): a real supervisor with storage,
 engine and the manager stub, started through tools/ahkrun.py. Every process carries the session id in its

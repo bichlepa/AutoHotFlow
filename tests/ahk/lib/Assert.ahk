@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; Minimal unit test library for tests/ahk/*.test.ahk (see doc/TEST-STRATEGY.md, level L1).
+; Minimal unit test library for tests/ahk/*.test.ahk (see doc/TEST-STRATEGY.md, level L0001).
 ;
 ; Usage in a test file:
 ;   #Include lib\Assert.ahk

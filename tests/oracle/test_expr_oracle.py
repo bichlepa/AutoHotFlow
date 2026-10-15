@@ -1,4 +1,4 @@
-"""Oracle of the expression language (WI-44, E35, doc/TEST-STRATEGY.md section 8): native AutoHotkey v2 against the
+"""Oracle of the expression language (WI-0044, E0035, doc/TEST-STRATEGY.md section 8): native AutoHotkey v2 against the
 evaluator. The fixed corpus (tests/oracle/corpus.jsonl) runs in the fast tier; a long run with a random seed is `slow`.
 The generator, the native script and the list of deliberate deviations are in tools/expr_oracle.py.
 """
@@ -79,7 +79,7 @@ def test_the_generator_is_reproducible_and_the_corpus_is_the_generator_output():
 
 def test_the_model_applies_only_the_listed_deviations():
     case = expr_oracle.case_of_text("i16 / i2 . \"\"")
-    assert case["m"] == "D(i16, i2) . \"\"" and case["r"] == ["E29"]
+    assert case["m"] == "D(i16, i2) . \"\"" and case["r"] == ["E0029"]
     case = expr_oracle.case_of_text("12345678901234567890 + 1")
     assert case["m"] == "12345678901234567890.0 + 1" and case["r"] == ["literal beyond 63 bits"]
     assert "m" not in expr_oracle.case_of_text("i1 + 2 * i3")
@@ -97,16 +97,16 @@ def test_the_oracle_notices_a_wrong_evaluator_result():
     err = {"ok": False, "class": "TypeError", "message": "Expected a Number but got a String."}
     warn = {"type": "String", "text": "", "errors": [], "warnings": ["'+' failed: Expected a Number but got a String."],
             "missing": []}
-    assert expr_oracle.classify(case, err, None, warn)[0] == "E25"
+    assert expr_oracle.classify(case, err, None, warn)[0] == "E0025"
     assert expr_oracle.classify(case, err, None, dict(warn, warnings=["'+' failed: other message"]))[0] == "OPEN"
     assert expr_oracle.classify(case, err, None, dict(warn, errors=["boom"]))[0] == "OPEN"
     assert expr_oracle.classify(case, err, None, good)[0] == "OPEN"        # native fails, evaluator does not
     # a deviation needs the model to agree: the same value as the model, or it is still OPEN
-    div = {"t": "4 / 2", "m": "D(4, 2)", "r": ["E29"]}
+    div = {"t": "4 / 2", "m": "D(4, 2)", "r": ["E0029"]}
     native = {"ok": True, "type": "Float", "text": "2.0"}
     model = {"ok": True, "type": "Integer", "text": "2"}
     ev = {"type": "Integer", "text": "2", "errors": [], "warnings": [], "missing": []}
-    assert expr_oracle.classify(div, native, model, ev)[0] == "E29"
+    assert expr_oracle.classify(div, native, model, ev)[0] == "E0029"
     assert expr_oracle.classify(div, native, model, dict(ev, text="3"))[0] == "OPEN"
 
 

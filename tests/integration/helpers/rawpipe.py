@@ -1,4 +1,4 @@
-"""Raw frame level pipe helpers for tests/integration/test_pipe.py (WI-04).
+"""Raw frame level pipe helpers for tests/integration/test_pipe.py (WI-0004).
 
 The AHK pipe layer carries text frames and no protocol. These helpers speak exactly that:
 uint32 little endian length + UTF-8, no JSON. They are built on tests/support/winpipe.py

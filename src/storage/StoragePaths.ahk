@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\core\Errors.ahk
 
-; Validation of the names and paths that storage accepts from other roles (WI-12, PROTOCOL 4.6).
+; Validation of the names and paths that storage accepts from other roles (WI-0012, PROTOCOL 4.6).
 ; Every name is checked before it becomes part of a file path, so no request can leave the data
 ; directory. Invalid input throws AhfError with code bad_payload.
 class StoragePaths {

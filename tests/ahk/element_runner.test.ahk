@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/elements/base/ExecContext.ahk and ElementRunner.ahk (WI-09,
+; Unit tests for src/elements/base/ExecContext.ahk and ElementRunner.ahk (WI-0009,
 ; doc/ELEMENT-API-V2.md section 3). Timer cases use the message loop: Sleep() runs timers.
 #Include lib\Assert.ahk
 #Include ..\..\src\elements\base\ElementRunner.ahk
@@ -196,7 +196,7 @@ AfterAfterFinishIsNoop() {
     Assert.Equal(ctx.After(10, Noop), 0)
 }
 
-; Records the calls of ExecContext; the rules of the variables are tested in vars_*.test.ahk (WI-40).
+; Records the calls of ExecContext; the rules of the variables are tested in vars_*.test.ahk (WI-0040).
 class FakeAccess {
     calls := []
     SetVar(name, value, location, hidden) => (this.calls.Push("set " name "=" value " " location " " hidden), 1)

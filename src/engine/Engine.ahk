@@ -13,20 +13,20 @@
 #Include vars\VarLoader.ahk
 #Include vars\VarWriter.ahk
 
-; Engine role (WI-10, ARCHITECTURE 3, 4, 6.1, PROTOCOL 4.2, 4.3, 4.6).
+; Engine role (WI-0010, ARCHITECTURE 3, 4, 6.1, PROTOCOL 4.2, 4.3, 4.6).
 ;
 ; Owns the committed flow definitions (through FlowTable) and the runtime state. It never touches
 ; files: flow files are read from storage with cmd.storage.flow.read and parsed here. It never shows
 ; a dialog and never blocks: every request has a timeout and is answered by a callback.
 ;
-; Start (WI-31): after the handshake the engine waits until the supervisor reports storage as ready (it subscribes
+; Start (WI-0031): after the handshake the engine waits until the supervisor reports storage as ready (it subscribes
 ; to the topic "process" first, then asks cmd.process.list; PROTOCOL 5a), however long that takes. Then it asks
 ; storage for the flow list and reads the files, LOAD_PARALLEL at a time (the next request leaves when an answer
 ; has been handled, so the message loop answers pings in between). Single file errors are reported as
 ; evt.storage.error and do not stop the start. When storage does not answer (timeout, connection lost, no such
 ; peer) the files not yet asked for are not asked, nothing is reported as an error, and the engine waits for
 ; storage again; then it fetches the list again and reads only the files that have no result yet.
-; Then (WI-41) it loads the global and static variables through storage (VarLoader, staggered the same way, with
+; Then (WI-0041) it loads the global and static variables through storage (VarLoader, staggered the same way, with
 ; the same waiting for storage after an abort); evt.engine.ready is sent once every file of the list has a result
 ; (loaded, or a real read or parse error) and the variables are loaded. Changes of the variables are written back
 ; delayed by VarWriter and at shutdown.
@@ -48,12 +48,12 @@ class Engine extends Role {
     static STORAGE_LIST_TIMEOUT_MS := 5000
     static WAIT_LOG_MS := 30000
     ; At most this many cmd.storage.flow.read are on their way at the same time. Every answer costs the engine a
-    ; parse of the whole flow text (about 100 ms for 93 KB), so a ping behind many answers waited too long (WI-24).
+    ; parse of the whole flow text (about 100 ms for 93 KB), so a ping behind many answers waited too long (WI-0024).
     ; With K requests in flight, a ping waits for at most K answers.
     static LOAD_PARALLEL := 2
     ; Safety net for the dispatcher: a tick every 100 ms in case a kick was lost (ARCHITECTURE 2.3).
     static SAFETY_MS := 100
-    ; cmd.flow.save waits this long for the answer of storage (one write with a backup, WI-39).
+    ; cmd.flow.save waits this long for the answer of storage (one write with a backup, WI-0039).
     static SAVE_TIMEOUT_MS := 30000
 
     __New(args) {
@@ -61,7 +61,7 @@ class Engine extends Role {
         this.epoch := Engine._NewEpoch()
         this.seq := 0
         this.flows := FlowTable()
-        this.vars := EngineVars()      ; global and static variables (WI-40)
+        this.vars := EngineVars()      ; global and static variables (WI-0040)
         this.varLoader := VarLoader(this, this.vars)
         varOpts := Engine._VarOptions(args)
         this.varWriter := VarWriter(this, this.vars, varOpts["delayMs"], varOpts["timeoutMs"])
@@ -69,7 +69,7 @@ class Engine extends Role {
         this.executor := Executor(this)
         pool := Engine._PoolOptions(args)
         this.workers := WorkerBridge(this, pool["size"], pool["warm"], pool["idleMs"])
-        this.varRequests := VarRequests(this)   ; cmd.engine.var.* of worker elements and clients (WI-50)
+        this.varRequests := VarRequests(this)   ; cmd.engine.var.* of worker elements and clients (WI-0050)
         this._flowsLoaded := false     ; not _loaded: that name is the method _Loaded (case-insensitive)
         this._loadTries := 0           ; failed flow lists in a row for a real reason (not: storage missing)
         this._loadActive := false      ; flows.list or flow.read requests are on their way
@@ -96,7 +96,7 @@ class Engine extends Role {
         this.On("cmd.flow.save", (msg) => this._CmdFlowSave(msg))
         this.On("evt.worker.done", (msg) => this.workers.OnDone(msg))
         this.On("cmd.engine.var.", (msg) => this.varRequests.Handle(msg))
-        ; The topic "process" tells the engine when storage is ready (start, WI-31) and, with a pool, which worker
+        ; The topic "process" tells the engine when storage is ready (start, WI-0031) and, with a pool, which worker
         ; crashed (the supervisor owns the process handles).
         this.On("evt.process.", (msg) => this._OnProcessEvent(msg))
         this.peer.Subscribe("process")
@@ -105,7 +105,7 @@ class Engine extends Role {
 
     OnReady() {
         this.SetLogTarget(Engine.STORAGE)
-        this.workers.Start()        ; ends the workers of an earlier engine, then the pool may grow (WI-27)
+        this.workers.Start()        ; ends the workers of an earlier engine, then the pool may grow (WI-0027)
         if (!this._flowsLoaded)
             this._WaitForStorage()
     }
@@ -151,7 +151,7 @@ class Engine extends Role {
     ; The peer drops it when it is not ready (Peer.droppedSends); events are not kept (PROTOCOL 5a).
     ; Numbering and sending are one step: AHK interrupts a thread that runs longer than 15 ms, and
     ; an event emitted by the interrupting thread would otherwise leave first with a higher seq
-    ; (found by the 200 parallel instances of the stress test, WI-16).
+    ; (found by the 200 parallel instances of the stress test, WI-0016).
     Emit(to, msgType, payload) {
         prev := Critical("On")  ; reason: numbering and sending are one step (see above)
         try {
@@ -198,7 +198,7 @@ class Engine extends Role {
     }
 
     ; Asks the supervisor whether storage is ready; asks again after STORAGE_POLL_MS if it is not (or if the supervisor
-    ; did not answer). evt.process.ready of storage starts the load earlier. No limit of tries (F-31).
+    ; did not answer). evt.process.ready of storage starts the load earlier. No limit of tries (F-0031).
     _WaitForStorage() {
         if (this._flowsLoaded || this._loadActive || this._listPending)
             return
@@ -231,7 +231,7 @@ class Engine extends Role {
         SetTimer(this._pollFn, -Engine.STORAGE_POLL_MS)
     }
 
-    ; At most one line per WAIT_LOG_MS, level a1: waiting for a late storage is normal (F-24).
+    ; At most one line per WAIT_LOG_MS, level a1: waiting for a late storage is normal (F-0024).
     _LogWaiting(text) {
         if (this._lastWaitLog != "" && A_TickCount - this._lastWaitLog < Engine.WAIT_LOG_MS)
             return
@@ -339,7 +339,7 @@ class Engine extends Role {
             }
         } else if (Engine._StorageGone(res)) {
             ; A storage that does not answer would make every further read wait for its own deadline, one after the
-            ; other (before WI-24 all waited at once). No further file is asked for; this one has no result yet.
+            ; other (before WI-0024 all waited at once). No further file is asked for; this one has no result yet.
             if (st["storageDown"] = "")
                 st["storageDown"] := Engine._ErrorText(res)
         } else {
@@ -429,7 +429,7 @@ class Engine extends Role {
         return Map("action", "started", "instanceId", instId)
     }
 
-    ; Phase 2: sets the flag and reports it. No trigger is armed (WI-14, Phase 3).
+    ; Phase 2: sets the flag and reports it. No trigger is armed (WI-0014, Phase 3).
     _CmdFlowEnable(msg, enabled) {
         flowId := Engine.Text(msg, "flowId")
         rec := this.flows.Require(flowId)
@@ -465,7 +465,7 @@ class Engine extends Role {
         return Map("rev", rec.Rev)
     }
 
-    ; cmd.flow.save (PROTOCOL 4.2, WI-39): writes the committed definition through storage and answers when storage has
+    ; cmd.flow.save (PROTOCOL 4.2, WI-0039): writes the committed definition through storage and answers when storage has
     ; written it. The file carries the format version and the markers of the elements whose expression texts wait for
     ; their class (FlowDefinition.ToFileText). The revision is the one that was written, even if a patch commits
     ; another one while storage works.
@@ -514,7 +514,7 @@ class Engine extends Role {
         return (v = "") ? "" : String(v)
     }
 
-    ; Pool options (WI-27, ARCHITECTURE 6.4): --workers=<N> (default 4, 0 = no pool; worker elements then end with
+    ; Pool options (WI-0027, ARCHITECTURE 6.4): --workers=<N> (default 4, 0 = no pool; worker elements then end with
     ; "exception"), --warm-workers=<W> (default 1, at most N), --worker-idle-ms=<ms> (default 60000).
     static _PoolOptions(args) {
         size := Engine._IntOption(args, "workers", WorkerBridge.DEFAULT_SIZE, 0, WorkerBridge.MAX_SIZE)
@@ -524,7 +524,7 @@ class Engine extends Role {
         return Map("size", size, "warm", warm, "idleMs", idleMs)
     }
 
-    ; Options of the variable files (WI-41): --var-write-delay-ms=<ms> (default 200, 0 to 60000): how long a change
+    ; Options of the variable files (WI-0041): --var-write-delay-ms=<ms> (default 200, 0 to 60000): how long a change
     ; waits for more changes of the same variable; --var-write-timeout-ms=<ms> (default 10000, 100 to 120000): limit
     ; of one write request to storage. The supervisor passes both on to the engine.
     static _VarOptions(args) {

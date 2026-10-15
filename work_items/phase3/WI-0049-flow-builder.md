@@ -1,10 +1,10 @@
-# WI-49 Flow builder and headless flow runner for tests
+# WI-0049 Flow builder and headless flow runner for tests
 
-Size: M · Depends on: – · Blocks: WI-52 to WI-57
+Size: M · Depends on: – · Blocks: WI-0052 to WI-0057
 
 ## Goal
 
-Tests describe flows compactly in Python instead of writing flow JSON by hand, and run them headless with one call: start, wait for the end, read the result, the variables and the path through the flow. This carries the e2e tests of all core elements and the synthetic flows of WI-57.
+Tests describe flows compactly in Python instead of writing flow JSON by hand, and run them headless with one call: start, wait for the end, read the result, the variables and the path through the flow. This carries the e2e tests of all core elements and the synthetic flows of WI-0057.
 
 ## Read first
 
@@ -28,4 +28,4 @@ Tests describe flows compactly in Python instead of writing flow JSON by hand, a
 
 ## Not part of this
 
-New engine commands; if the runner needs one (for example to read the variables of an ended instance), it is a test command (`cmd.test.*`, only with `--test-roles`) until WI-50 brings the variable requests that a client can use (WI-50 task 5); then the runner switches to them.
+New engine commands; if the runner needs one (for example to read the variables of an ended instance), it is a test command (`cmd.test.*`, only with `--test-roles`) until WI-0050 brings the variable requests that a client can use (WI-0050 task 5); then the runner switches to them.

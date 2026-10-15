@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/core/ipc/Frame.ahk (FrameWriter, FrameReader), WI-04. Pure logic, no pipe.
+; Unit tests for src/core/ipc/Frame.ahk (FrameWriter, FrameReader), WI-0004. Pure logic, no pipe.
 #Include lib\Assert.ahk
 #Include ..\..\src\core\ipc\Frame.ahk
 

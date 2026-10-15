@@ -3,16 +3,16 @@
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
 
-; Test element of WI-39 and WI-42: one parameter of each content type of v1.
+; Test element of WI-0039 and WI-0042: one parameter of each content type of v1.
 ;
-; WI-39 (loading with the conversion of expression texts):
+; WI-0039 (loading with the conversion of expression texts):
 ;   Expr, Num, PosNum, Int, PosInt, PosIntOrZero, NeededExpr   expression content types: converted on load
 ;   Either              content selectable by the user (EitherType holds "string" or "expression")
 ;   Text, Json, Needed, VarName, NeededVar, Raw, NeededRaw     not expressions: stay as they are
 ;   File, NeededFile, Folder                                   paths
 ;   Script, Condition   evaluated by the element itself: named in V1Syntax
 ;
-; WI-42 (parameter evaluation): Run evaluates the parameters with ctx.EvalParams and stores the result in the global
+; WI-0042 (parameter evaluation): Run evaluates the parameters with ctx.EvalParams and stores the result in the global
 ; variable global_evalresult_<Tag> (JSON text: id -> {"type": AutoHotkey type, "value": value}), so that a test can
 ; read it (through the engine, or through the variable files). Skip (ids with commas) is passed as the skip list of
 ; EvalParams, More (ids with commas) is evaluated afterwards with EvalMoreParams. An error ends the element with

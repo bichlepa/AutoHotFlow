@@ -1,4 +1,4 @@
-"""WI-15: the storage process is killed in the middle of a write (atomic write, WI-12).
+"""WI-0015: the storage process is killed in the middle of a write (atomic write, WI-0012).
 
 Under the real supervisor: a 5 MB flow write is sent, storage is killed after a short delay (0 to 500 ms, so
 different phases of the write are hit). The target file must be the old or the new content, complete and valid

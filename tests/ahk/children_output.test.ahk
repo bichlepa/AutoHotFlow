@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the output handling of src/supervisor/Children.ahk (WI-23): log lines of the child output,
+; Unit tests for the output handling of src/supervisor/Children.ahk (WI-0023): log lines of the child output,
 ; the per-tick limit and the ring that survives the process.
 #Include lib\Assert.ahk
 #Include ..\..\src\supervisor\Children.ahk

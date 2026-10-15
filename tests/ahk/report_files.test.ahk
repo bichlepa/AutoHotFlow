@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/storage/ReportFiles.ahk (WI-28): the Reports/ folder written by storage.
+; Unit tests for src/storage/ReportFiles.ahk (WI-0028): the Reports/ folder written by storage.
 #Include lib\Assert.ahk
 #Include ..\..\src\storage\ReportFiles.ahk
 

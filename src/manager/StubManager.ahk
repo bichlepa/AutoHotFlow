@@ -7,7 +7,7 @@
 #Include ..\core\Role.ahk
 #Include StubGui.ahk
 
-; Role "manager" in stub mode (WI-13, doc/ARCHITECTURE 2.1 and 4.1, doc/PROTOCOL 4.3, 5, 5a).
+; Role "manager" in stub mode (WI-0013, doc/ARCHITECTURE 2.1 and 4.1, doc/PROTOCOL 4.3, 5, 5a).
 ; A minimal stand-in for the real manager. It shows what the engine reports and sends commands on request.
 ; It holds UI state only (flow list, element states, the last sequence number). The truth about the
 ; execution stays in the engine.
@@ -377,7 +377,7 @@ class StubManager extends Role {
         return Map("ok", true, "cancel", Json.Bool(this.cancelExit))
     }
 
-    ; cmd.manager.show (F-283, PROTOCOL 4.8): a second start of the product. Shows the window and brings it to the front.
+    ; cmd.manager.show (F-0283, PROTOCOL 4.8): a second start of the product. Shows the window and brings it to the front.
     ; Without a window (--headless) only the ui-event line is written.
     _OnShow(msg) {
         this._Ui("stub.show", Map("headless", this.headless ? 1 : 0))
@@ -390,7 +390,7 @@ class StubManager extends Role {
 
     ; One line per event, written through storage (Role log sink). The line is JSON after "ui-event ".
     ; The line is only queued here and sent by a timer, never inside the frame handler that received
-    ; the event: sending from the handler lost events under parallel load (WI-13 findings, HOW-TO).
+    ; the event: sending from the handler lost events under parallel load (WI-0013 findings, HOW-TO).
     _Ui(type, payload) {
         line := Json.Stringify(Map("type", type, "recvMs", StubManager.WallMs(), "payload", payload))
         this.uiQueue.Push(line)

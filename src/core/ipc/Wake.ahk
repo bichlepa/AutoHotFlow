@@ -15,7 +15,7 @@ class Wake {
     static FALLBACK_MS := 250
     ; Handler threads that may run at once (OnMessage MaxThreads). With 1, AHK may drop a wake that
     ; arrives while the handler runs; the fallback timer then delivers it up to 250 ms late. No
-    ; dropped wake was observed in 12000 ping-pong round trips with 1 and with 4 (WI-04).
+    ; dropped wake was observed in 12000 ping-pong round trips with 1 and with 4 (WI-0004).
     static MaxThreads := 1
     static _pumpFn := ""
     static _msgFn := ""

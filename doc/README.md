@@ -12,7 +12,7 @@ Lasting documents. The working papers of the port up to phase 2b and the fix blo
 | [EXPRESSION-LANGUAGE.md](EXPRESSION-LANGUAGE.md) | Expression language: syntax, operators, syntax tree, errors, limits, differences from AutoHotkey v2 and v1 |
 | [MIGRATION.md](MIGRATION.md) | Deliberate behavior changes compared to v1 |
 | [HOW-TO.md](HOW-TO.md) | Knowledge base for AHK v2: pitfalls and working solutions |
-| [DECISIONS.md](DECISIONS.md) | Decision log (E1 onward), with open decisions |
+| [DECISIONS.md](DECISIONS.md) | Decision log (E0001 onward), with open decisions |
 | [OPEN-ITEMS.md](OPEN-ITEMS.md) | Open findings, watch list, known problems, what has not been checked |
 | [MEASUREMENTS.md](MEASUREMENTS.md) | Measured values that decisions rest on, with method and status |
 | [MANUAL-CHECKS.md](MANUAL-CHECKS.md) | Manual checks for the project owner (GUI of the stub, debug window) |

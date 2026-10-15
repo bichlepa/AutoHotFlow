@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; The variable requests cmd.engine.var.* of the engine (WI-50, doc/PROTOCOL.md 4.5): VarRequests with a real Executor
+; The variable requests cmd.engine.var.* of the engine (WI-0050, doc/PROTOCOL.md 4.5): VarRequests with a real Executor
 ; and the stand-in pool of EngineOwner (no processes). A flow sets an instance and a thread variable and then waits in
 ; a worker element (Test_Wk, its job stays open), so the requests can name the job (execId) or the instance.
 #Include helpers\ExecutorKit.ahk

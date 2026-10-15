@@ -1,4 +1,4 @@
-"""Runs flows headless for tests (WI-49): write the flow, start the session, run, read what happened.
+"""Runs flows headless for tests (WI-0049): write the flow, start the session, run, read what happened.
 
     def test_a_branch(flows):
         fb = FlowBuilder("branch")
@@ -27,7 +27,7 @@ What a FlowRun holds (all of it comes from the events of the flow topic and the 
   probe(name)  the variables that a `FlowBuilder.probe` element copied: text, type and location of a variable at that
                place of the flow. Instance and thread variables are gone after the end of an instance; the probe
                element is the way to see them there. While an instance runs (`begin`, then `wait`), `instance_var`
-               asks the engine for one of its variables (`cmd.engine.var.get`, WI-50).
+               asks the engine for one of its variables (`cmd.engine.var.get`, WI-0050).
 Events of several instances of one flow that run at the same time are not told apart (the element event has no
 instance ID): use one instance at a time, or read the steps of the flow as a whole.
 
@@ -424,7 +424,7 @@ class FlowRunner:
         return run
 
     def instance_var(self, instance_id, name, thread_id=None, hidden=False):
-        """A variable of a running instance, asked from the engine (`cmd.engine.var.get`, WI-50): the answer payload
+        """A variable of a running instance, asked from the engine (`cmd.engine.var.get`, WI-0050): the answer payload
         (`exists`, `value`, `type`, `location`), or the error payload (`ok` false; `error.code` `gone` when the instance
         has ended). Without thread_id there are no loop and thread variables."""
         payload = {"instanceId": instance_id, "name": name, "hidden": bool(hidden)}

@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/engine/Executor.ahk (WI-21): re-entrant ticks
+; Unit tests for src/engine/Executor.ahk (WI-0021): re-entrant ticks
 ; and the job bookkeeping of worker elements.
 ; Executor runs against EngineOwner (helpers/), a stand-in for Engine that records the events.
 #Include helpers\ExecutorKit.ahk

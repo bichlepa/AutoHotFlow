@@ -1,6 +1,6 @@
 """Sends cmd.test.dump to the test role echo of a running test supervisor, so that Debug.Dump runs in that role.
 
-Manual test of the debug window (WI-28, step 6): start the test entry with the echo role and the debug window,
+Manual test of the debug window (WI-0028, step 6): start the test entry with the echo role and the debug window,
 then run this script. The value appears in the tab "Werte" of the debug window.
 
     python tools/ahf_dump.py                      (session main, role echo:a, value of the default kind)

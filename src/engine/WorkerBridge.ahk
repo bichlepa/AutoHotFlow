@@ -4,7 +4,7 @@
 #Include ..\core\Log.ahk
 #Include ..\core\Time.ahk
 
-; Engine side of the worker pool (WI-11, WI-27, PROTOCOL 4.5, ARCHITECTURE 2.3, 6.2 and 6.4). The pool is elastic:
+; Engine side of the worker pool (WI-0011, WI-0027, PROTOCOL 4.5, ARCHITECTURE 2.3, 6.2 and 6.4). The pool is elastic:
 ; the engine owns the slots and the jobs, the supervisor owns the processes and starts or kills a worker only when
 ; the engine asks (cmd.process.spawn, cmd.process.kill). Nothing here waits: every request is answered by a callback,
 ; a job is sent with cmd.worker.run, its answer and evt.worker.done come back as messages, and every job ends
@@ -164,9 +164,9 @@ class WorkerBridge {
     ; Starts a job on an idle slot. Returns the execId, or "" when no slot is idle.
     ; params and imports are Maps, env is a Map with flowId, elementId, instanceId and threadId.
     ; jobTimeoutMs > 0: the job ends with "worker timeout" after that long (class property JobTimeoutMs).
-    ; evaluated: the parameters evaluated by the engine (E26, WI-42), an Array of Maps {id, value} or {id, error} in the
+    ; evaluated: the parameters evaluated by the engine (E0026, WI-0042), an Array of Maps {id, value} or {id, error} in the
     ; order of Parameters(); sent as the field "evaluated" (PROTOCOL 4.5).
-    ; ctx: the engine context of the element (ExecContext); the variable requests of the job use it (JobOf, WI-50).
+    ; ctx: the engine context of the element (ExecContext); the variable requests of the job use it (JobOf, WI-0050).
     Run(classId, params, imports, env, onDone, jobTimeoutMs := 0, evaluated := "", ctx := "") {
         slot := this._IdleSlot()
         if (!IsObject(slot))
@@ -202,7 +202,7 @@ class WorkerBridge {
         return best
     }
 
-    ; The running job execId for a variable request (WI-50, VarRequests): Map("ctx", engine context of the element,
+    ; The running job execId for a variable request (WI-0050, VarRequests): Map("ctx", engine context of the element,
     ; "slot", name of the worker that runs it), or "" when the job is not running: finished, cancelled (Cancel forgets
     ; the job before cmd.worker.cancel leaves), ended by its deadline or by the loss of its worker.
     JobOf(execId) {
@@ -401,7 +401,7 @@ class WorkerBridge {
         if (code = ErrCode.PEER_GONE) {
             ; The hub answers peer_gone as soon as the worker's connection ends, usually a tick before the supervisor
             ; reports the end of the process. The worker is lost, not refusing: same text as evt.process.crashed, so the
-            ; order of the two messages does not matter (F-46, WI-35).
+            ; order of the two messages does not matter (F-0046, WI-0035).
             this._Finish(execId, "exception", "worker crashed (" job["slot"] ")")
         } else {
             this._Finish(execId, "exception", "worker not available: " job["slot"] " (" code ")")

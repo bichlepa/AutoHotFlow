@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/supervisor/DiagReport.ahk and ReportText.ahk (WI-28): collecting the snapshots with a deadline per
+; Unit tests for src/supervisor/DiagReport.ahk and ReportText.ahk (WI-0028): collecting the snapshots with a deadline per
 ; role, the wait for storage, the automatic triggers and their rate limit. Hub and children are fakes that record calls.
 #Include lib\Assert.ahk
 #Include ..\..\src\supervisor\DiagReport.ahk
@@ -209,7 +209,7 @@ CheckTheCallerIsAnsweredAfterTheWaitAndTheReportStaysForTheNextTime() {
     Assert.Equal(result["ok"], false, "the caller is not answered twice")
 }
 
-; WI-33 (F-16): the supervisor stood still; the wait for storage keeps its rest of the time.
+; WI-0033 (F-0016): the supervisor stood still; the wait for storage keeps its rest of the time.
 CheckAStandStillMovesTheWaitForStorage() {
     r := NewReport(&hub, &children)
     r.storageWaitMs := 600
@@ -324,7 +324,7 @@ TestRun.Case("an answer without a snapshot counts as missing", CheckARoleWithout
 TestRun.Case("a report without any child is still built (and waits for storage)", CheckAReportWithoutAnyChildIsStillBuilt)
 TestRun.Case("a report waits for storage and is written when it is back", CheckAReportWaitsForStorageAndIsWrittenWhenItIsBack)
 TestRun.Case("the caller is answered after the wait, the report is kept for the next time", CheckTheCallerIsAnsweredAfterTheWaitAndTheReportStaysForTheNextTime)
-TestRun.Case("a stand-still of the supervisor moves the wait for storage (WI-33)", CheckAStandStillMovesTheWaitForStorage)
+TestRun.Case("a stand-still of the supervisor moves the wait for storage (WI-0033)", CheckAStandStillMovesTheWaitForStorage)
 TestRun.Case("the list of unwritten reports is bounded", CheckTheWaitingListIsBounded)
 TestRun.Case("a write that finds storage gone is kept", CheckAWriteThatFindsStorageGoneIsKept)
 TestRun.Case("an error answer of storage is passed on", CheckAWriteErrorIsPassedOn)

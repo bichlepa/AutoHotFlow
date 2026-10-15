@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the detection of deviation classes in v1 expression texts (WI-45, src/expr/V1ExprDetect.ahk,
+; Unit tests for the detection of deviation classes in v1 expression texts (WI-0045, src/expr/V1ExprDetect.ahk,
 ; src/expr/MigrationClasses.ahk). The list of classes against the golden data: tests/test_migration_classes.py.
 #Include lib\Assert.ahk
 #Include ..\..\src\expr\V1ExprConverter.ahk
@@ -148,15 +148,15 @@ CheckRewritesAreNotMarked() {
     ; and the IDs of the marked ones: ascending, each once
     ids := MigrationClasses.IdsOf(["text comparison", "operand as result", "no short circuit", "v1 error", "backtick"])
     Assert.Equal(ids.Length, 3)
-    Assert.Equal(ids[1], "M-24")
-    Assert.Equal(ids[2], "M-25")
-    Assert.Equal(ids[3], "M-36")
+    Assert.Equal(ids[1], "M-0024")
+    Assert.Equal(ids[2], "M-0025")
+    Assert.Equal(ids[3], "M-0036")
 }
 
 CheckUnknownClassHasNoId() {
     Assert.Equal(MigrationClasses.IdOf("no such class"), "")
     Assert.Equal(MigrationClasses.IdsOf(["no such class"]).Length, 0)
-    Assert.Equal(MigrationClasses.IdOf("unreadable text"), "M-50")
+    Assert.Equal(MigrationClasses.IdOf("unreadable text"), "M-0050")
 }
 
 TestRun.Init()

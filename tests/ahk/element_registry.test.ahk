@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/elements/base/ElementRegistry.ahk and the skeleton element files (WI-09,
+; Unit tests for src/elements/base/ElementRegistry.ahk and the skeleton element files (WI-0009,
 ; doc/ELEMENT-API-V2.md sections 2 and 6).
 #Include lib\Assert.ahk
 #Include ..\..\src\elements\base\ElementRegistry.ahk

@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the conversion of expression texts when a flow is loaded (WI-39): src/engine/core/FlowExprConvert.ahk,
+; Unit tests for the conversion of expression texts when a flow is loaded (WI-0039): src/engine/core/FlowExprConvert.ahk,
 ; the format version and the marker in FlowDefinition.ToFileText, FlowTable.Load.
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\FlowTable.ahk
@@ -248,7 +248,7 @@ class Action_NotYetPorted extends AhfElement {
     static Parameters(ctx) => [{type: "Edit", id: "Expr", content: "Expression"}, {type: "Edit", id: "Other", content: "Expression"}]
 }
 
-; --- migration markers (WI-45) ----------------------------------------------------------------------------------
+; --- migration markers (WI-0045) ----------------------------------------------------------------------------------
 
 ; The entry of a parameter in the key "migration" of an element, "" if there is none.
 MigrationEntry(def, id, par) {
@@ -285,13 +285,13 @@ CheckAcceptedDeviationIsMarkedWithTheV1Text() {
     def := table.Get("f").Def
     entry := MigrationEntry(def, "e1", "Expr")
     Assert.True(IsObject(entry), "a marker for Expr")
-    Assert.Equal(Joined(entry["ids"]), "M-25")
+    Assert.Equal(Joined(entry["ids"]), "M-0025")
     Assert.Equal(entry["v1"], 'x < "abc"')
     ; the text itself is not changed: the converter does not rewrite this class
     Assert.Equal(Pars(def, "e1")["Expr"], 'x < "abc"')
     ; a text that is converted and also marked: the v1 original is the text before the conversion
     cond := MigrationEntry(def, "e1", "Condition")
-    Assert.Equal(Joined(cond["ids"]), "M-25")
+    Assert.Equal(Joined(cond["ids"]), "M-0025")
     Assert.Equal(cond["v1"], 'a < "b" and "a"."b"')
     Assert.Equal(Pars(def, "e1")["Condition"], 'a < "b" and "a" . "b"')
     ; a text without a deviation has no marker
@@ -303,11 +303,11 @@ CheckUnsupportedSyntaxAndUnreadableTextAreMarked() {
     table.Load("f", MigrationFlow())
     def := table.Get("f").Def
     unsupported := MigrationEntry(def, "e1", "Num")
-    Assert.Equal(Joined(unsupported["ids"]), "M-37")
+    Assert.Equal(Joined(unsupported["ids"]), "M-0037")
     Assert.Equal(unsupported["v1"], "7 % 3")
     Assert.Equal(Pars(def, "e1")["Num"], "7 % 3")
     unreadable := MigrationEntry(def, "e1", "PosInt")
-    Assert.Equal(Joined(unreadable["ids"]), "M-50")
+    Assert.Equal(Joined(unreadable["ids"]), "M-0050")
     Assert.Equal(unreadable["v1"], "1 +")
 }
 
@@ -334,7 +334,7 @@ CheckMarkersSurviveSaveAndLoadUnchanged() {
     def := second.Get("f").Def
     Assert.Equal(MigrationEntry(def, "e1", "Condition")["v1"], 'a < "b" and "a"."b"')
     Assert.Equal(Pars(def, "e1")["Condition"], 'a < "b" and "a" . "b"')
-    Assert.Equal(Joined(MigrationEntry(def, "e1", "Num")["ids"]), "M-37")
+    Assert.Equal(Joined(MigrationEntry(def, "e1", "Num")["ids"]), "M-0037")
     Assert.Equal(def.Element("e1")["migration"].Length, 4)
     ; and the next save is the same file
     Assert.Equal(def.ToFileText(), saved)
@@ -350,7 +350,7 @@ CheckAClassThatAppearsLaterAddsItsMarkers() {
         second.Load("f", saved)
         def := second.Get("f").Def
         entry := MigrationEntry(def, "e2", "Expr")
-        Assert.Equal(Joined(entry["ids"]), "M-25")
+        Assert.Equal(Joined(entry["ids"]), "M-0025")
         Assert.Equal(entry["v1"], 'x < "abc"')
         ; the next round trip keeps exactly one entry
         third := FlowTable()
@@ -366,14 +366,14 @@ CheckUnknownKeysOfAnElementAreKept() {
     text := Lines(
         '{"name":"k","formatVersion":2,"allElements":{',
         '"e1":{"ID":"e1","type":"Action","class":"Action_TestExprParams","v1Text":true,"future":{"a":1},',
-        '"migration":[{"par":"Expr","ids":["M-99"],"v1":"orig"}],"pars":{"Expr":"x < \"abc\""}}},',
+        '"migration":[{"par":"Expr","ids":["M-0099"],"v1":"orig"}],"pars":{"Expr":"x < \"abc\""}}},',
         '"allConnections":{}}'
     )
     table := FlowTable()
     table.Load("f", text)
     def := table.Get("f").Def
     entry := MigrationEntry(def, "e1", "Expr")
-    Assert.Equal(Joined(entry["ids"]), "M-99")
+    Assert.Equal(Joined(entry["ids"]), "M-0099")
     Assert.Equal(entry["v1"], "orig")
     Assert.Equal(def.Element("e1")["migration"].Length, 1)
     Assert.Equal(Json.Parse(def.ToFileText())["allElements"]["e1"]["future"]["a"], 1)

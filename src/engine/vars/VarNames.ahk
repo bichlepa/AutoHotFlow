@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\expr\ExprNames.ahk
 
-; Rules for names of variables (WI-40, doc/EXPRESSION-LANGUAGE.md section 18). Ports of v1 Var_RetrieveDestination,
+; Rules for names of variables (WI-0040, doc/EXPRESSION-LANGUAGE.md section 18). Ports of v1 Var_RetrieveDestination,
 ; Var_RetrieveDestination_Common and Var_CheckName (v1/Source_Execution/Variables/Variables.ahk:219,
 ; v1/Source_Common/Variables/Global variables.ahk:358 and :553). The scope of a variable follows from its name:
 ;   A_...      loop, thread or built-in (case does not matter: a_index is A_Index)

@@ -1,4 +1,4 @@
-"""Unit tests of the strict boolean check (WI-26)."""
+"""Unit tests of the strict boolean check (WI-0026)."""
 
 from support import wirebool
 from support.ahfclient import FrameDecoder, encode_frame

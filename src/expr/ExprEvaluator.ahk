@@ -26,7 +26,7 @@
 ; throws is ignored (counted in logFailures).
 ;
 ; The evaluator never throws because of what the user wrote. A calculation that fails (TypeError such as
-; "" + 1, division by zero, ...) gives the empty text, a warning and an f1 log (decision E25). An error
+; "" + 1, division by zero, ...) gives the empty text, a warning and an f1 log (decision E0025). An error
 ; (unknown function, wrong number of arguments, a resolver refusal, ...) gives the empty text for that part;
 ; the rest of the expression is still evaluated.
 class ExprEvaluator {
@@ -184,7 +184,7 @@ class ExprEvaluator {
         throw ValueError("unknown operator '" op "'")
     }
 
-    ; E29: `/` as in AutoHotkey, but two integers that divide exactly give an Integer (4/2 is 2, not 2.0).
+    ; E0029: `/` as in AutoHotkey, but two integers that divide exactly give an Integer (4/2 is 2, not 2.0).
     ; A text that looks like an integer counts as an integer, as in all arithmetic.
     static Divide(a, b) {
         r := a / b

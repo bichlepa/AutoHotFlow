@@ -1,7 +1,7 @@
-"""Fixtures of the fault injection tests (WI-15). Imported by the test modules (a conftest.py here would shadow tests/conftest.py for `from conftest import ...`).
+"""Fixtures of the fault injection tests (WI-0015). Imported by the test modules (a conftest.py here would shadow tests/conftest.py for `from conftest import ...`).
 
 chains(...) is the factory every test uses. Each chain it creates is closed at teardown, and the teardown
-fails the test if a process of its session is still alive after that (psutil check, WI-15 acceptance).
+fails the test if a process of its session is still alive after that (psutil check, WI-0015 acceptance).
 """
 
 import pytest

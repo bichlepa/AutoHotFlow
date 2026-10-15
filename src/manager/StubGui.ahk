@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; Window of the manager stub (v2-phase2-final:v2-phase2-final:work_items/phase2/WI-13-ui-stub.md). Shows the flow list, the element states of the
+; Window of the manager stub (v2-phase2-final:v2-phase2-final:work_items/phase2/WI-0013-ui-stub.md). Shows the flow list, the element states of the
 ; selected flow and a status line (connection, epoch, seq, counters, last command latency). Buttons:
 ; Start, Stop (selected flow), Beenden (cmd.app.exit). Closing the window means Beenden.
 ;

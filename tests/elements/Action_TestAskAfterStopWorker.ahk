@@ -2,7 +2,7 @@
 #Include ..\..\src\elements\base\AhfElement.ahk
 #Include ..\..\src\elements\base\ElementRegistry.ahk
 
-; Test element of WI-50 (worker): sets the instance variable ask_blocking, then blocks in one call of BlockMs (default 1500 ms, below the 2 s in which the worker must
+; Test element of WI-0050 (worker): sets the instance variable ask_blocking, then blocks in one call of BlockMs (default 1500 ms, below the 2 s in which the worker must
 ; confirm a cancel), so a stop of the instance reaches it only afterwards; then it asks the engine for a variable. After
 ; a stop the engine answers gone (PROTOCOL 4.5) and GetVar throws; the element logs the text ("asked after the stop:
 ; <message>", level f1) and lets the error end it. Without a stop it finishes "normal".

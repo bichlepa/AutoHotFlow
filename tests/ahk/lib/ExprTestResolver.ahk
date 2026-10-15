@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\..\src\expr\ExprResolveError.ahk
 
-; A simple resolver for the evaluator tests (the real one comes with WI-40): one table of variables, names ignore
+; A simple resolver for the evaluator tests (the real one comes with WI-0040): one table of variables, names ignore
 ; case, a path walks into Map values. Setting a member creates the Maps on the way. A variable whose name starts
 ; with "ro_" is read-only (Set throws ExprResolveError). Parts of a path are compared as text.
 class ExprTestResolver {

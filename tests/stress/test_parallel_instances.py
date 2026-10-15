@@ -1,4 +1,4 @@
-"""WI-16: many parallel instances of one flow (L5, doc/TEST-STRATEGY.md 3, scenario 1).
+"""WI-0016: many parallel instances of one flow (L5, doc/TEST-STRATEGY.md 3, scenario 1).
 
 The flow has ExecutionPolicy `parallel` and a sleep element, so all instances are alive at the same time.
 The requests are sent back to back without waiting for the answers. Expected:

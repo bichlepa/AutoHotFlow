@@ -1,4 +1,4 @@
-"""WI-45: tools/migration_report.py (migration markers of loaded v1 flows, run through the loader of the engine)."""
+"""WI-0045: tools/migration_report.py (migration markers of loaded v1 flows, run through the loader of the engine)."""
 
 import json
 import subprocess
@@ -59,15 +59,15 @@ def test_a_flow_with_marked_places_is_reported_in_text_and_json(tmp_path):
     assert f["elements"] == 2
     assert [u["element"] for u in f["unknownClass"]] == ["e2"]
     places = {(p["element"], p["par"]): p for p in f["places"]}
-    assert places[("e1", "Expr")]["ids"] == ["M-25"] and places[("e1", "Expr")]["v1"] == 'x < "abc"'
-    assert places[("e1", "Num")]["ids"] == ["M-37"]
-    assert places[("e1", "PosInt")]["ids"] == ["M-50"]
+    assert places[("e1", "Expr")]["ids"] == ["M-0025"] and places[("e1", "Expr")]["v1"] == 'x < "abc"'
+    assert places[("e1", "Num")]["ids"] == ["M-0037"]
+    assert places[("e1", "PosInt")]["ids"] == ["M-0050"]
     assert not any(p["element"] == "e2" for p in f["places"])
-    assert data["summary"]["places"] == 3 and data["summary"]["placesPerId"] == {"M-25": 1, "M-37": 1, "M-50": 1}
+    assert data["summary"]["places"] == 3 and data["summary"]["placesPerId"] == {"M-0025": 1, "M-0037": 1, "M-0050": 1}
 
     text = report(path).stdout
     assert "unknown class: 1 element(s): Action_NotThereYet (1)" in text
-    assert "e1 (Action_TestExprParams) parameter Expr [M-25] v1: x < \"abc\"" in text
+    assert "e1 (Action_TestExprParams) parameter Expr [M-0025] v1: x < \"abc\"" in text
     # the tool only reads
     assert path.read_text(encoding="utf-8") == before
 

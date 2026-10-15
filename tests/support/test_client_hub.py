@@ -2,7 +2,7 @@
 
 These tests cover the client, not the production hub: the hub is a stand-in.
 Not covered here: wake() (PostMessageW to a NULL handle returns TRUE, so a missing-window
-check needs a real stale handle); the wake-up of an AutoHotkey peer is covered by WI-04.
+check needs a real stale handle); the wake-up of an AutoHotkey peer is covered by WI-0004.
 """
 
 import threading

@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Shared helpers of the pipe test scripts (WI-04): deterministic test frames, result records.
+; Shared helpers of the pipe test scripts (WI-0004): deterministic test frames, result records.
 ; The frame generator must stay in sync with gen_text() in tests/integration/helpers/rawpipe.py.
 #Include ..\..\..\src\core\Json.ahk
 

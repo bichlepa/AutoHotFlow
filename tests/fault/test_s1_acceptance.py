@@ -1,8 +1,8 @@
-"""WI-43: acceptance of step S1 end to end (v1 flow, every kind of variable, restarts, the v1 data folder stays untouched).
+"""WI-0043: acceptance of step S0001 end to end (v1 flow, every kind of variable, restarts, the v1 data folder stays untouched).
 
 Under the real supervisor (storage, engine, UI stub), like tests/fault/test_var_persistence.py. The data of a v1 working
 directory is copied to a temporary folder (a flow of tests/data/flows/s1_acceptance in the v1 format, the variable files
-of tests/data/variables); v2 gets a data folder of its own, the files are copied over as the import of S4 will do it.
+of tests/data/variables); v2 gets a data folder of its own, the files are copied over as the import of S0004 will do it.
 Checked:
   * the v1 flow is converted when the engine loads it (the texts of the expression parameters);
   * a variable of each kind (instance, thread, global, static) is set by the test element, read back in the same
@@ -90,7 +90,7 @@ def test_a_v1_flow_with_every_kind_of_variable_survives_the_restarts_and_leaves_
     before = tree(v1dir)
     assert len(before) >= 8
 
-    # the data folder of v2 gets copies (S4 will import; for now by hand)
+    # the data folder of v2 gets copies (S0004 will import; for now by hand)
     shutil.copytree(v1dir / "Flows", datadir / "Flows")
     shutil.copytree(v1dir / "Variables", datadir / "Variables")
 

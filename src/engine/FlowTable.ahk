@@ -52,7 +52,7 @@ class FlowTable {
             throw AhfError("flow '" flowId "' is loaded already", ErrCode.CONFLICT)
         def := FlowDefinition.FromText(flowId, text, 1)
         try {
-            FlowExprConvert.Run(def)   ; expression texts of v1 into the new language (WI-39)
+            FlowExprConvert.Run(def)   ; expression texts of v1 into the new language (WI-0039)
         } catch as e {
             ; The flow stays usable with the texts as they are; element code never takes the engine down.
             Log.Write("f1", "flow load", "converting the expression texts failed (" Type(e) ": " e.Message "); "

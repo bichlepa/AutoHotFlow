@@ -1,11 +1,11 @@
-"""WI-24: large flow files must neither keep the hub busy nor starve the heartbeat of the engine.
+"""WI-0024: large flow files must neither keep the hub busy nor starve the heartbeat of the engine.
 
  - Hub cost of one large frame: a res.storage.flow.read with the biggest v1 flow (93 KB) goes through
-   Hub._OnFrame (fake connections, no I/O). Budget: under 5 ms (before WI-24: about 220 ms).
+   Hub._OnFrame (fake connections, no I/O). Budget: under 5 ms (before WI-0024: about 220 ms).
  - Many flows at the start: the Data directory holds N big flows (copies of the 8 large v1 flows under new
    names, BIG_FLOW_NAMES from tests/data/flows/v1_examples). The chain must start without `hung`/`crashed`, load every flow, and a
    `cmd.engine.snapshot` asked during the loading must be answered in under 1 s. The time from the start
-   of the supervisor to `evt.engine.ready` is recorded (a finding if it is far above 30 s, WI-24 point 6).
+   of the supervisor to `evt.engine.ready` is recorded (a finding if it is far above 30 s, WI-0024 point 6).
 
 Smoke variants run in the default run, the full 200-flow test with `-m stress`. Every test prints one
 MEASURE line (support/metrics.py).
@@ -32,8 +32,8 @@ BIGGEST_FLOW = V1_EXAMPLES / "Flow 1010290492.json"
 HELPER = TESTS_DIR / "ahk" / "helpers" / "hub_frame_cost.ahk"
 
 HUB_FRAME_BUDGET_MS = 5.0
-SNAPSHOT_BUDGET_S = 3.0     # E42 (was 1.0): guards against a blocked engine; F-282 has the measurements
-LOAD_NOTE_S = 30.0          # WI-24 point 6: above this, the load time is a finding for "native JSON parser"
+SNAPSHOT_BUDGET_S = 3.0     # E0042 (was 1.0): guards against a blocked engine; F-0282 has the measurements
+LOAD_NOTE_S = 30.0          # WI-0024 point 6: above this, the load time is a finding for "native JSON parser"
 
 
 @pytest.mark.parametrize("runs", [pytest.param(10, id="smoke"),
@@ -50,7 +50,7 @@ def test_hub_cost_of_a_large_frame_is_below_the_budget(run_ahk, runs):
           % (bench["frame_chars"], bench["mean_ms"], bench["max_ms"], runs))
     assert bench["delivered_ok"] == 1, "the target did not receive the frame unchanged except for `from`"
     # scaled(): the budget is exact in the serial run and under -m stress (the reference), three times looser in the
-    # parallel run, where 5.07 ms against 5.0 ms was seen (F-39).
+    # parallel run, where 5.07 ms against 5.0 ms was seen (F-0039).
     assert bench["mean_ms"] < scaled(HUB_FRAME_BUDGET_MS), bench
 
 
@@ -116,7 +116,7 @@ def test_many_big_flows_load_without_hung_and_with_a_responsive_engine(procs, da
         restarts = {n: p.get("restarts") for n, p in states.items()}
         bad_events = chain.rec.find(lambda m: m.get("type") in ("evt.process.hung", "evt.process.crashed",
                                                                 "evt.process.restarted"))
-        # Since WI-31 the engine waits for storage and reports no error for it (F-24): every error counts.
+        # Since WI-0031 the engine waits for storage and reports no error for it (F-0024): every error counts.
         errors = chain.rec.find(lambda m: m.get("type") == "evt.storage.error")
         metrics.record("big flow collection loaded", flows=count, megabytes=round(result["bytes"] / 2**20, 2),
                        seconds_to_ready=round(result["t_ready"], 2),

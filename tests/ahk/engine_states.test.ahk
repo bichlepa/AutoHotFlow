@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/engine/core/ThreadState.ahk and Instance.ahk (WI-08, ARCHITECTURE 5.1, 5.2).
+; Unit tests for src/engine/core/ThreadState.ahk and Instance.ahk (WI-0008, ARCHITECTURE 5.1, 5.2).
 ; The expected transitions below are copied from the tables in doc/ARCHITECTURE.md, not from the code.
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\core\Instance.ahk
@@ -272,7 +272,7 @@ AddForeignThread(inst, thread) {
     inst.AddThread(thread)
 }
 
-; wait policy (E2): an instance is queued (new -> waiting), started later, or stopped while it waits.
+; wait policy (E0002): an instance is queued (new -> waiting), started later, or stopped while it waits.
 WaitingInstanceStartsLater() {
     inst := Instance("i1", "f1")
     Assert.True(inst.Wait(), "queue")

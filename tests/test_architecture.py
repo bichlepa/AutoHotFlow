@@ -1,4 +1,4 @@
-"""Architecture guard (WI-19): runs tools/arch_check.py over src/ and tests the rules themselves.
+"""Architecture guard (WI-0019): runs tools/arch_check.py over src/ and tests the rules themselves.
 
 The first test fails with the complete list of violations (file:line: rule: text). The self tests feed small
 example texts to the check, one hit and one non-hit per rule.

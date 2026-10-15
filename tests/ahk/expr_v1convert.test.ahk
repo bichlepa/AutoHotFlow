@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the converter of v1 expressions (WI-39, doc/EXPRESSION-LANGUAGE.md section 15).
+; Unit tests for the converter of v1 expressions (WI-0039, doc/EXPRESSION-LANGUAGE.md section 15).
 ; The comparison with the golden data of v1 is tests/golden/test_golden_v2.py.
 #Include lib\Assert.ahk
 #Include ..\..\src\expr\V1ExprConverter.ahk

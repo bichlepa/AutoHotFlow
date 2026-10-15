@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Test owner for Executor (WI-21): a stand-in for Engine that records events instead of sending them.
+; Test owner for Executor (WI-0021): a stand-in for Engine that records events instead of sending them.
 ; Provides what Executor reads from its owner: flows (FlowTable), vars (EngineVars), workers, Emit, EmitFlowState, Kick.
 #Include ..\..\..\src\engine\Executor.ahk
 #Include ..\..\..\src\engine\FlowTable.ahk
@@ -51,7 +51,7 @@ class FakeWorkers {
         return execId
     }
 
-    ; As WorkerBridge.JobOf (WI-50): the context of an open job, the slot is always "worker:fake".
+    ; As WorkerBridge.JobOf (WI-0050): the context of an open job, the slot is always "worker:fake".
     JobOf(execId) {
         if (!this.jobs.Has(execId))
             return ""
