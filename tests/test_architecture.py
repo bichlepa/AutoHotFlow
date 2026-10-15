@@ -171,6 +171,15 @@ def test_warn_variants():
     assert "warn" in rules("AutoHotFlow.ahk", "#Warn All, MsgBox\n")
 
 
+def test_warn_must_not_switch_local_same_as_global_off():
+    # F-0078: a local that hides a class or a built-in function must stay reported in src/
+    assert "warn" in rules("core/A.ahk", "#Warn LocalSameAsGlobal, Off\nclass A {\n}\n")
+    assert "warn" in rules("core/A.ahk", "#Warn localsameasglobal, off\nclass A {\n}\n")
+    assert "warn" in rules("core/A.ahk", "#Warn All, Off\nclass A {\n}\n")
+    assert "warn" not in rules("core/A.ahk", "#Warn LocalSameAsGlobal, StdOut\nclass A {\n}\n")
+    assert "warn" not in rules("core/A.ahk", "#Warn VarUnset, Off\nclass A {\n}\n")
+
+
 def test_command_line_exit_code(tmp_path):
     (tmp_path / "core").mkdir()
     (tmp_path / "core" / "A.ahk").write_text("class A {\n}\n", encoding="utf-8")  # no #Requires

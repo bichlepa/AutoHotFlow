@@ -307,6 +307,9 @@ def check_text(relpath, text):
         target = parts[-1].lower() if len(parts) > 1 else ""
         if target not in ("stdout", "outputdebug", "off"):
             add(m.start(), "warn", f"#Warn without target StdOut/OutputDebug (default is a dialog): {m.group(0).strip()}")
+        elif target == "off" and parts[0].lower() in ("", "all", "localsameasglobal"):
+            # A local named like a class or a built-in function hides it (F-0078); the warning must stay on.
+            add(m.start(), "warn", f"#Warn switches LocalSameAsGlobal off: {m.group(0).strip()}")
 
     # Critical needs a reason in a comment (same or previous line)
     for m in CRITICAL_RE.finditer(code):

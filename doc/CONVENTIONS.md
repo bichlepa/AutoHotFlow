@@ -32,6 +32,7 @@ The patterns with fixed wording are **checked automatically**: `python tools/arc
 | `try` without handling (empty `catch`) | everywhere | log it or justify it deliberately |
 | Access to objects of another process, shared memory, `SendMessage` to other roles | everywhere | message via the hub |
 | Element code without `try/catch` around the call | `engine`, `worker`, `triggerhost` | central call site `ElementRunner` |
+| `#Warn` without target `StdOut`/`OutputDebug` (a dialog); `#Warn LocalSameAsGlobal, Off` or `#Warn All, Off` (rule `warn`) | `src/` | `#Warn All, StdOut`. A local named like a class or a built-in function (`type`, `role`, `ids`, `run`) hides it for the whole function: give the local another name. The unit-test scripts and the test entries have `#Warn All, StdOut` before their first include |
 | Boolean as literal (`"enabled", true`, `"cancel", 1`) in a protocol payload; `Json.False` in program state checked with `if` | everywhere | `Json.True`/`Json.False`/`Json.Bool(x)` only when building the message, internally `1`/`0` (PROTOCOL 2). `ok` is converted by `Message.Serialize` |
 
 ## 4. Errors and protocol
