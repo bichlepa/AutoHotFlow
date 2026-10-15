@@ -191,7 +191,7 @@ The trace points are in the first group on purpose: they record the path through
 | [WI-0051](WI-0051-dialog-test-seam.md) | Dialog indirection and test provider | S | WI-0047 |
 | [WI-0052](WI-0052-core-variables-conditions.md) | Core set A: variables, conditions, trace points | M | WI-0048, WI-0049 |
 | [WI-0053](WI-0053-core-lists.md) | Core set B: lists | M | WI-0048, WI-0049 |
-| [WI-0054](WI-0054-core-loops.md) | Core set C: loops | M | WI-0048, WI-0049, WI-0052 (trace points) |
+| [WI-0054](WI-0054-core-loops.md) | Core set C: loops | M | WI-0048, WI-0049, WI-0052 (trace points), WI-0053 (the v1 flow "Loop test" uses `New_List` and `Add_To_List`) |
 | [WI-0055](WI-0055-core-flow-control.md) | Core set D: flow control and the engine commands it needs | L | WI-0050, WI-0052 |
 | [WI-0056](WI-0056-core-dialogs.md) | Core set E: dialogs and worker elements | M | WI-0050, WI-0051 |
 | [WI-0057](WI-0057-test-corpus.md) | Test corpus: three v1 test flows adapted, synthetic flows | M | WI-0045, WI-0049, WI-0052 to WI-0056 |

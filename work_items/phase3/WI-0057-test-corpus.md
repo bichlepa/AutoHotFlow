@@ -4,7 +4,7 @@ Size: M · Depends on: WI-0045, WI-0049, WI-0052 to WI-0056 · Blocks: WI-0058
 
 ## Goal
 
-A fixed list of flows runs headless and green and is the acceptance of S0002 and the regression of later steps: three "Automatic tests" flows of v1, adapted where needed (E0035), and synthetic flows that use the core set much more widely than the v1 flows do. Every fix of a v1 flow is documented like a later AI-assisted import would need it.
+A fixed list of flows runs headless and green and is the acceptance of S0002 and the regression of later steps: three "Automatic tests" flows of v1, adapted where needed (E0035), and synthetic flows that use the core set much more widely than the v1 flows do. Every fix of a v1 flow is documented like a later AI-assisted import would need it. Requirements: REQ-TST-040 (three flows now, all of them in S0008), REQ-TST-030.
 
 ## Read first
 
@@ -13,7 +13,8 @@ README of this phase (E0035), result of WI-0045 (markers, report), WI-0049 (buil
 ## Tasks
 
 1. **v1 flows:** "variable test" (`Flow 1010290492.json`), "List test" (`Flow 1210127300.json`), "Loop test" (`Flow 634320780.json`). Load them, read the migration report (WI-0045), run them. What a test flow checks is read from the flow (it usually signals success or failure itself); the pytest test checks that signal. A fix of the flow is made on a copy (`tests/data/flows/v2_adapted/`); the original stays. Every fix gets a line in a fix list next to it: element, parameter, v1 text, new text, MIGRATION ID, reason. This list is the trial of what an AI-assisted import would have to do.
-2. **Synthetic flows** with the builder (WI-0049), each with trace points and a checked result: arithmetic and text in conditions (strict and compatibility mode), lists in loops in loops, a flow that calls itself recursively with variables, a flow that waits for two called flows, dialogs with scripted answers in a loop, `global_` and `static_` variables across two runs and an engine restart. At least 15 flows; the list is in the test file.
+   Needs of the three flows (counted in the flow files): "variable test" lists and `Execute_Flow` (WI-0053, WI-0055), "List test" lists (WI-0053), "Loop test" loops and lists (WI-0053, WI-0054).
+2. **Synthetic flows** with the builder (WI-0049), each with trace points and a checked result: arithmetic and text in conditions (strict and compatibility mode), lists in loops in loops, a flow that calls itself recursively with variables, a flow that waits for two called flows, dialogs with scripted answers in a loop (the debug dialog included, with a changed variable, REQ-DBG-060), a loop left through `exception`, a flow that calls a flow with an element of a missing package (E0047), `global_` and `static_` variables across two runs and an engine restart. At least 15 flows; the list is in the test file.
 3. The other 13 "Automatic tests" flows: per flow the elements that are missing and the step that brings them (S0003, S0008). Into the result, so that S0003 and S0008 can extend the list.
 
 ## Acceptance criteria
@@ -23,7 +24,7 @@ README of this phase (E0035), result of WI-0045 (markers, report), WI-0049 (buil
 
 ## Docs
 
-`doc/TEST-STRATEGY.md` 4 (acceptance flows), `doc/MIGRATION.md` (new IDs found by the fixes).
+`doc/TEST-STRATEGY.md` 4 (acceptance flows), `doc/MIGRATION.md` (new IDs found by the fixes). `doc/REQUIREMENTS.md` (AGENTS rule 12): REQ-TST-040 (`v2`, `Evidence`) and REQ-TST-030 (the e2e tests of all core elements exist), then `python tools/req_index.py`.
 
 ## Not part of this
 
