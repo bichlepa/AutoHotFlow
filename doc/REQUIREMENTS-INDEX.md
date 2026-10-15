@@ -10,8 +10,8 @@ run the tool. The legend of the columns is at the top of the source.
 | [Flows and execution (EXE)](#flows-and-execution-exe) | 15 | 7 | 0 | 6 | 2 | 0 | 1 |
 | [Expressions and variables (VAR)](#expressions-and-variables-var) | 14 | 7 | 0 | 4 | 3 | 0 | 2 |
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 0 | 0 | 0 | 6 | 0 | 0 |
-| [Elements (ELM)](#elements-elm) | 5 | 0 | 0 | 2 | 3 | 0 | 0 |
-| [Triggers (TRG)](#triggers-trg) | 4 | 0 | 0 | 1 | 3 | 0 | 0 |
+| [Elements (ELM)](#elements-elm) | 24 | 0 | 0 | 2 | 22 | 0 | 0 |
+| [Triggers (TRG)](#triggers-trg) | 12 | 0 | 0 | 1 | 11 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 10 | 0 | 0 | 0 | 10 | 0 | 0 |
 | [Editor (EDT)](#editor-edt) | 21 | 0 | 0 | 1 | 20 | 0 | 0 |
 | [Settings (SET)](#settings-set) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
@@ -27,7 +27,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 1 | 2 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 7 | 0 | 0 | 1 | 6 | 0 | 0 |
-| **All** | **155** | **50** | **0** | **24** | **80** | **1** | **3** |
+| **All** | **182** | **50** | **0** | **24** | **107** | **1** | **3** |
 
 ## Flows and execution (EXE)
 
@@ -77,7 +77,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-PKG-030](REQUIREMENTS.md#req-pkg-030-the-included-elements-are-split-into-a-basic-and-special-packages) | The included elements are split into a basic and special packages | no | open | should | later | - |
 | [REQ-PKG-040](REQUIREMENTS.md#req-pkg-040-users-create-their-own-packages-and-elements) | Users create their own packages and elements | no | open | should | later | - |
 | [REQ-PKG-050](REQUIREMENTS.md#req-pkg-050-a-broken-element-or-package-does-not-stop-autohotflow) | A broken element or package does not stop AutoHotFlow | no | open | must | later | - |
-| [REQ-PKG-060](REQUIREMENTS.md#req-pkg-060-the-package-name-is-part-of-the-identity-of-an-element) | The package name is part of the identity of an element | no | open | should | port | S0002 (WI-0047), proposed |
+| [REQ-PKG-060](REQUIREMENTS.md#req-pkg-060-the-package-name-is-part-of-the-identity-of-an-element) | The package name is part of the identity of an element | partial | open | should | port | S0002 (WI-0047), proposed |
 
 ## Elements (ELM)
 
@@ -85,9 +85,28 @@ run the tool. The legend of the columns is at the top of the source.
 |---|---|---|---|---|---|---|
 | [REQ-ELM-010](REQUIREMENTS.md#req-elm-010-element-contract-and-registry) | Element contract and registry | yes | partial | must | port | S0002 (WI-0047), S0007 (editor) |
 | [REQ-ELM-020](REQUIREMENTS.md#req-elm-020-every-element-is-documented-by-its-help-text) | Every element is documented by its help text | yes | open | must | port | S0007 |
-| [REQ-ELM-100](REQUIREMENTS.md#req-elm-100-the-actions-conditions-and-loops-of-v1-are-available) | The actions, conditions and loops of v1 are available | yes | partial | must | port | S0002 (core set), S0003, S0008 (rest) |
 | [REQ-ELM-110](REQUIREMENTS.md#req-elm-110-autohotkey-scripts-in-flows) | AutoHotkey scripts in flows | yes | open | must | port | S0008 |
-| [REQ-ELM-120](REQUIREMENTS.md#req-elm-120-ported-elements-behave-as-their-help-text-says) | Ported elements behave as their help text says | n/a | open | must | port | S0002, S0008 |
+| [REQ-ELM-200](REQUIREMENTS.md#req-elm-200-variables-and-calculations) | Variables and calculations | yes | open | must | port | S0002 (WI-0052), S0008 |
+| [REQ-ELM-210](REQUIREMENTS.md#req-elm-210-conditions-on-values) | Conditions on values | yes | open | must | port | S0002 (WI-0052) |
+| [REQ-ELM-220](REQUIREMENTS.md#req-elm-220-strings) | Strings | yes | open | must | port | S0008 |
+| [REQ-ELM-230](REQUIREMENTS.md#req-elm-230-lists) | Lists | yes | open | must | port | S0002 (WI-0053), S0008 |
+| [REQ-ELM-240](REQUIREMENTS.md#req-elm-240-loops) | Loops | yes | open | must | port | S0002 (WI-0054), S0008 |
+| [REQ-ELM-250](REQUIREMENTS.md#req-elm-250-flow-control) | Flow control | yes | partial | must | port | S0002 (WI-0047, WI-0052, WI-0055), S0003, S0008 |
+| [REQ-ELM-260](REQUIREMENTS.md#req-elm-260-trace-points) | Trace points | yes | open | must | port | S0002 (WI-0052) |
+| [REQ-ELM-270](REQUIREMENTS.md#req-elm-270-dialogs-and-notifications) | Dialogs and notifications | yes | open | must | port | S0002 (WI-0051, WI-0056), S0008 |
+| [REQ-ELM-280](REQUIREMENTS.md#req-elm-280-date-and-time) | Date and time | yes | open | must | port | S0008 |
+| [REQ-ELM-290](REQUIREMENTS.md#req-elm-290-clipboard) | Clipboard | yes | open | must | port | S0008 |
+| [REQ-ELM-300](REQUIREMENTS.md#req-elm-300-files-and-folders) | Files and folders | yes | open | must | port | S0008 |
+| [REQ-ELM-310](REQUIREMENTS.md#req-elm-310-ini-files) | Ini files | yes | open | must | port | S0008 |
+| [REQ-ELM-320](REQUIREMENTS.md#req-elm-320-archives) | Archives | yes | open | must | port | S0008 |
+| [REQ-ELM-330](REQUIREMENTS.md#req-elm-330-drives) | Drives | yes | open | should | port | S0008 |
+| [REQ-ELM-340](REQUIREMENTS.md#req-elm-340-internet) | Internet | yes | open | must | port | S0008 |
+| [REQ-ELM-350](REQUIREMENTS.md#req-elm-350-screen-and-images) | Screen and images | yes | open | must | port | S0008 |
+| [REQ-ELM-360](REQUIREMENTS.md#req-elm-360-windows-and-controls) | Windows and controls | yes | open | must | port | S0008 |
+| [REQ-ELM-370](REQUIREMENTS.md#req-elm-370-mouse-and-keyboard) | Mouse and keyboard | yes | open | must | port | S0008 |
+| [REQ-ELM-380](REQUIREMENTS.md#req-elm-380-sound-and-speech) | Sound and speech | yes | open | should | port | S0008 |
+| [REQ-ELM-390](REQUIREMENTS.md#req-elm-390-programs-and-processes) | Programs and processes | yes | open | must | port | S0008 |
+| [REQ-ELM-400](REQUIREMENTS.md#req-elm-400-power-and-session) | Power and session | yes | open | should | port | S0008 |
 
 ## Triggers (TRG)
 
@@ -96,7 +115,15 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-TRG-010](REQUIREMENTS.md#req-trg-010-triggers-react-at-once-whatever-the-load) | Triggers react at once, whatever the load | no | open | must | port | S0003 |
 | [REQ-TRG-020](REQUIREMENTS.md#req-trg-020-triggers-follow-the-enabled-state-also-after-a-restart) | Triggers follow the enabled state, also after a restart | yes | open | must | port | S0003 |
 | [REQ-TRG-030](REQUIREMENTS.md#req-trg-030-several-triggers-per-flow) | Several triggers per flow | yes | open | must | port | S0003, S0006 |
-| [REQ-TRG-100](REQUIREMENTS.md#req-trg-100-the-triggers-of-v1-are-available) | The triggers of v1 are available | yes | partial | must | port | S0002 (`Manual`), S0003, S0008 |
+| [REQ-TRG-200](REQUIREMENTS.md#req-trg-200-manual-trigger) | Manual trigger | yes | partial | must | port | S0002 (WI-0047) |
+| [REQ-TRG-210](REQUIREMENTS.md#req-trg-210-time-triggers) | Time triggers | yes | open | must | port | S0003, S0008 |
+| [REQ-TRG-220](REQUIREMENTS.md#req-trg-220-start-up-trigger) | Start-up trigger | yes | open | must | port | S0003 |
+| [REQ-TRG-230](REQUIREMENTS.md#req-trg-230-keyboard-triggers) | Keyboard triggers | yes | open | must | port | S0003, S0008 |
+| [REQ-TRG-240](REQUIREMENTS.md#req-trg-240-shortcut-trigger) | Shortcut trigger | yes | open | should | port | S0008 |
+| [REQ-TRG-250](REQUIREMENTS.md#req-trg-250-user-activity-triggers) | User activity triggers | yes | open | should | port | S0008 |
+| [REQ-TRG-260](REQUIREMENTS.md#req-trg-260-window-triggers) | Window triggers | yes | open | must | port | S0008 |
+| [REQ-TRG-270](REQUIREMENTS.md#req-trg-270-process-triggers) | Process triggers | yes | open | should | port | S0008 |
+| [REQ-TRG-280](REQUIREMENTS.md#req-trg-280-file-triggers) | File triggers | no | open | could | later | - |
 
 ## Manager (MGR)
 

@@ -41,6 +41,7 @@ Rules:
 
 - IDs are never reused or renumbered. New requirements get the next free number of their area, in steps of 10 (`010`, `020`, ...), so that related requirements can be numbered close together. The order of the sections may differ from the order of the numbers.
 - A dropped requirement stays in the document with `v2: dropped` and its reason.
+- A requirement may list its parts in a table, for example the elements of a group. A row whose plan is `later` is an idea for that requirement after the port: it needs no requirement of its own and does not change the fields, which refer to the rows of scope `port`.
 - Whoever implements, verifies or drops a feature updates its requirement **in the same commit** and runs `python tools/req_index.py`. The test `tests/test_requirements.py` fails when the format is broken, an evidence path or test does not exist, or the index is out of date. Whoever renames or deletes a test named as evidence updates the requirement.
 - Distinguish verified, assumed and not checked (AGENTS.md rule 6). `done` needs evidence; a claim about v1 that was not read in the code says so.
 - A requirement whose `Plan` is `-` but whose scope is `port` is a gap in the plan: the project owner decides whether it gets a step or is dropped.
@@ -121,7 +122,7 @@ Missing in v2: the global setting itself (settings come in S0004). Until then `d
 - **Plan:** S0004 (manager), S0006 (editor)
 - **Evidence:** `tests/integration/test_engine.py` (`test_start_*`, `test_stop_*`, `test_toggle_starts_and_stops_a_flow`)
 
-The user starts a flow from the manager or the editor, through its default manual trigger or a chosen one, and stops it there. Stopping ends all running and waiting instances of the flow. Starting and stopping from inside a flow is REQ-EXE-120 and REQ-ELM-100; starting by an event is TRG.
+The user starts a flow from the manager or the editor, through its default manual trigger or a chosen one, and stops it there. Stopping ends all running and waiting instances of the flow. Starting and stopping from inside a flow is REQ-EXE-120 and REQ-ELM-250; starting by an event is TRG.
 
 ### REQ-EXE-070 Enable and disable a flow
 
@@ -451,17 +452,26 @@ Open point (assumed, not checked): AutoHotkey reads all `#Include` files when a 
 
 ### REQ-PKG-060 The package name is part of the identity of an element
 
-- **v1:** no (the class name alone identifies an element)
+- **v1:** partial (the flow files store the package of each element, but the class name alone identifies it)
 - **v2:** open
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0002 (WI-0047), proposed
 
-Elements of different packages may have the same class name: an element is identified by its package and its class. For backward compatibility the elements of the included packages keep their v1 class IDs; for all other packages the package name is part of the identity. Flow files already store the package of each element (`ARCHITECTURE.md` section 7). Doing this together with the package layout of WI-0047 is cheaper than changing it later.
+Every element is identified by its package and its class, also the elements of v1. So elements of different packages may have the same class name.
+
+The flow files need nothing new: v1 already writes `package` for every element (verified: 1077 of 1077 elements in the test flows; 8 of them write `default` in lower case, so the comparison ignores case). The import fills in `Default` where the key is missing.
+
+What is more than a file question:
+
+- **AutoHotkey class names are global.** Two classes with the same name in one script are a load error ("This class declaration conflicts with an existing Class", verified). The class of an element therefore needs the package in its name. Nested classes do this: `class Default { class Action_Sleep ... }` has the type name `Default.Action_Sleep` (verified), which is the qualified ID at the same time.
+- **Every place that names a class carries the qualified ID:** the element registry (today keyed by the class ID alone, `src/elements/base/ElementRegistry.ahk`), the worker jobs and the trigger arming (`PROTOCOL.md` 4.4 and 4.5), logs, and elements that look up other elements by class (v1 `x_getAllElementIDsOfClass`, `Action_Set_element_parameter`).
+
+Doing this together with the package layout of WI-0047 is cheaper than changing it later, when many element classes exist.
 
 ## Elements (ELM)
 
-A single element is not a requirement of its own. REQ-ELM-100 tracks the elements of v1 during the port; after the port, a new element needs a requirement only when it brings a new capability (for example the AI elements of AI). The class IDs are `Action_<name>`, `Condition_<name>`, `Loop_<name>`, `Trigger_<name>`; the triggers are in TRG.
+Each group of elements is one requirement with a table of its elements. The fields of the requirement refer to the elements with scope `port`, that is the elements of v1. An idea for a further element of a group is a row with the plan `later`: it needs no requirement of its own and does not change the fields (rule in the format section). A new group is a new requirement. The class IDs are `Action_<name>`, `Condition_<name>`, `Loop_<name>`; the triggers are in TRG. The core set of S0002 comes first, the rest in S0008 (E0020).
 
 ### REQ-ELM-010 Element contract and registry
 
@@ -483,45 +493,7 @@ An element is a class with: name, category, user level, stability (stable or exp
 - **Plan:** S0007
 - **Evidence:** -
 
-The help text of an element is also its specification for the port (REQ-ELM-120). The help is reachable from the element settings.
-
-### REQ-ELM-100 The actions, conditions and loops of v1 are available
-
-- **v1:** yes
-- **v2:** partial (`Action_Sleep` and `Action_Do_nothing` exist as skeleton elements)
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S0002 (core set), S0003, S0008 (rest)
-- **Evidence:** `tests/ahk/element_sleep.test.ahk`
-
-The elements of the v1 Default package, by group. The core set of S0002 comes first; the rest comes in S0008 (E0020). The status of a group is the status of its elements in v2.
-
-| Group | Elements (without prefix) | Prio | Plan | v2 |
-|---|---|---|---|---|
-| Variables and calculations | `New_Variable`; `Random_Number`, `Absolute_Number`, `Square_Root`, `Trigonometry`, `Rounding_a_number`, `Exponentiation`, `Script` (REQ-VAR-020) | must | S0002 (`New_Variable`, WI-0052), S0008 | open |
-| Conditions on values | `Expression`, `Variable_Is_Empty`, `Variable_content_is`, `NumberIs` | must | S0002 (WI-0052) | open |
-| Strings | `Search_in_a_string`, `Substring`, `Substring2`, `Get_string_Length`, `Replace_in_a_string`, `Trim_a_string`, `Split_a_string`, `Change_character_case`, `Encode_string`; condition `String_Contains_Text` | must | S0008 | open |
-| Lists | `New_List`, `Add_to_list`, `Get_list_info`, `Delete_from_list`, `Get_index_of_element_in_list`, `Shuffle_list`, condition `List_Contains_Element`; `Get_from_list`, `Convert_list_to_string`, `Convert_string_to_list` | must | S0002 (WI-0053), S0008 (the last three) | open |
-| Loops | `SimpleLoop`, `Condition`, `Parse_A_String`, `Work_through_a_list`; `Loop_Through_Files` | must | S0002 (WI-0054), S0008 (`Loop_Through_Files`) | open |
-| Flow control | `Sleep`, `Do_nothing` (action and condition), `Execute_Flow` (REQ-EXE-120), `Stop_Flow`, condition `Flow_Running`; `Set_Flow_Status`; condition `Flow_Enabled`, `Set_element_parameter` | must | S0002 (WI-0047, WI-0052, WI-0055), S0003 (`Set_Flow_Status`), S0008 | partial |
-| Trace points | `Trace_Point`, `Trace_Point_Check` (record and check the path through a flow, REQ-TST-040) | must | S0002 (WI-0052) | open |
-| Dialogs and notifications | `Message_Box`, `Tooltip`, conditions `Confirmation_Dialog`, `Debug_Dialog`; `Input_Box`, `Select_file`, `Select_folder` | must | S0002 (WI-0051, WI-0056), S0008 | open |
-| Date and time | `New_Time`, `Time_calculation`, `Time_difference` | must | S0008 | open |
-| Clipboard | `Get_Clipboard`, `Set_Clipboard` | must | S0008 | open |
-| Files and folders | `Read_From_File`, `Write_To_File`, `Copy_file`, `Move_File`, `Rename_file`, `Delete_file`, `Create_folder`, `Copy_folder`, `Move_Folder`, `Rename_Folder`, `Delete_folder`, `Empty_Recycle_bin`, `Get_file_attributes`, `Get_file_size`, `Get_file_time`, `Set_file_attributes`, `Set_file_time`, `Get_shortcut_information`, `Create_Shortcut`, `Split_path`; conditions `File_Exists`, `File_Has_Attribute` | must | S0008 | open |
-| Ini files | `Read_From_Ini`, `Write_to_ini`, `Delete_From_Ini` | must | S0008 | open |
-| Archives | `Compress_files`, `Extract_files` | must | S0008 | open |
-| Drives | `List_Drives`, `Get_Drive_Information`, `Change_Drive_Label`, `Eject_Drive`, `Lock_Or_Unlock_Drive` | should | S0008 | open |
-| Internet | `Download_file`, `HTTP_Request` | must | S0008 | open |
-| Screen and images | `Screenshot`, `Get_pixel_color`, `Search_pixel`, `Search_Image`, `Get_Screen_Settings`, `Set_Screen_Settings` | must | S0008 | open |
-| Windows and controls | `activate_Window`, `Show_window`, `Hide_window`, `Close_Window`, `Move_window`, `Minimize_All_Windows`, `Get_control_text`, `Set_control_text`; conditions `Window_Active`, `Window_Exists` | must | S0008 | open |
-| Mouse and keyboard | `Click`, `Move_Mouse`, `Drag_with_mouse`, `Get_mouse_position`, `Send_Keystrokes`, `Send_Keystrokes_To_Control`, `Set_Lock_Key`, `Block_User_Input`; condition `Key_Is_Down` | must | S0008 | open |
-| Sound and speech | `Play_Sound`, `Stop_Sound`, `Beep`, `Get_Volume`, `Set_Volume`, `Speech_output` | should | S0008 | open |
-| Programs and processes | `Run`, `Kill_Process`, `Set_Process_Priority`; condition `Process_Is_Running` | must | S0008 | open |
-| Power and session | `Lock_Computer`, `Log_Off`, `Shutdown`, `Reboot_Computer`, `Hibernate_Computer`, `Suspend_Computer` | should | S0008 | open |
-| AutoHotkey script | `AutoHotkey_script` (REQ-ELM-110) | must | S0008 | open |
-
-Dialogs run separately from the flows (MIGRATION M-0002) and can be answered by a test provider (E0038).
+Every element has a help page that says what it does and what its parameters mean. The help is reachable from the element settings.
 
 ### REQ-ELM-110 AutoHotkey scripts in flows
 
@@ -531,17 +503,387 @@ Dialogs run separately from the flows (MIGRATION M-0002) and can be answered by 
 - **Scope:** port
 - **Plan:** S0008
 
-The action `Action_AutoHotkey_script` and the trigger `Trigger_AutoHotkey_Script` run AutoHotkey v2 code, separately from the flows (E0039). An imported v1 script is kept as text and marked; it does not run until it is ported, by hand or with the help of an AI (REQ-AI-040, MIGRATION M-0049).
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_AutoHotkey_script` | yes | open | S0008 |
+| `Trigger_AutoHotkey_Script` | yes | open | S0008 |
 
-### REQ-ELM-120 Ported elements behave as their help text says
+The action and the trigger run AutoHotkey v2 code, separately from the flows (E0039). An imported v1 script is kept as text and marked; it does not run until it is ported, by hand or with the help of an AI (REQ-AI-040, MIGRATION M-0049).
 
-- **v1:** n/a
+### REQ-ELM-200 Variables and calculations
+
+- **v1:** yes
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002, S0008
+- **Plan:** S0002 (WI-0052), S0008
 
-The specification of an element is the underlying AutoHotkey v2 command plus its v1 help text, not the v1 code (E0035). Every deviation from the help text is documented with a MIGRATION ID.
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_New_Variable` | yes | open | S0002 (WI-0052) |
+| `Action_Random_Number` | yes | open | S0008 |
+| `Action_Absolute_Number` | yes | open | S0008 |
+| `Action_Square_Root` | yes | open | S0008 |
+| `Action_Trigonometry` | yes | open | S0008 |
+| `Action_Rounding_a_number` | yes | open | S0008 |
+| `Action_Exponentiation` | yes | open | S0008 |
+| `Action_Script` (REQ-VAR-020) | yes | open | S0008 |
+
+### REQ-ELM-210 Conditions on values
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0002 (WI-0052)
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Condition_Expression` | yes | open | S0002 (WI-0052) |
+| `Condition_Variable_Is_Empty` | yes | open | S0002 (WI-0052) |
+| `Condition_Variable_content_is` | yes | open | S0002 (WI-0052) |
+| `Condition_NumberIs` | yes | open | S0002 (WI-0052) |
+
+### REQ-ELM-220 Strings
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Search_in_a_string` | yes | open | S0008 |
+| `Action_Substring` | yes | open | S0008 |
+| `Action_Substring2` | yes | open | S0008 |
+| `Action_Get_string_Length` | yes | open | S0008 |
+| `Action_Replace_in_a_string` | yes | open | S0008 |
+| `Action_Trim_a_string` | yes | open | S0008 |
+| `Action_Split_a_string` | yes | open | S0008 |
+| `Action_Change_character_case` | yes | open | S0008 |
+| `Action_Encode_string` | yes | open | S0008 |
+| `Condition_String_Contains_Text` | yes | open | S0008 |
+
+### REQ-ELM-230 Lists
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0002 (WI-0053), S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_New_List` | yes | open | S0002 (WI-0053) |
+| `Action_Add_to_list` | yes | open | S0002 (WI-0053) |
+| `Action_Get_list_info` | yes | open | S0002 (WI-0053) |
+| `Action_Delete_from_list` | yes | open | S0002 (WI-0053) |
+| `Action_Get_index_of_element_in_list` | yes | open | S0002 (WI-0053) |
+| `Action_Shuffle_list` | yes | open | S0002 (WI-0053) |
+| `Condition_List_Contains_Element` | yes | open | S0002 (WI-0053) |
+| `Action_Get_from_list` | yes | open | S0008 |
+| `Action_Convert_list_to_string` | yes | open | S0008 |
+| `Action_Convert_string_to_list` | yes | open | S0008 |
+
+### REQ-ELM-240 Loops
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0002 (WI-0054), S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Loop_SimpleLoop` | yes | open | S0002 (WI-0054) |
+| `Loop_Condition` | yes | open | S0002 (WI-0054) |
+| `Loop_Parse_A_String` | yes | open | S0002 (WI-0054) |
+| `Loop_Work_through_a_list` | yes | open | S0002 (WI-0054) |
+| `Loop_Loop_Through_Files` | yes | open | S0008 |
+
+Connection points and loop variables: REQ-EXE-030.
+
+### REQ-ELM-250 Flow control
+
+- **v1:** yes
+- **v2:** partial (`Action_Sleep` and `Action_Do_nothing` exist as skeleton elements)
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0002 (WI-0047, WI-0052, WI-0055), S0003, S0008
+- **Evidence:** `tests/ahk/element_sleep.test.ahk`
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Sleep` | yes | partial (skeleton) | S0002 (WI-0047) |
+| `Action_Do_nothing` | yes | partial (skeleton) | S0002 (WI-0052) |
+| `Condition_Do_nothing` | yes | open | S0002 (WI-0052) |
+| `Action_Execute_Flow` (REQ-EXE-120) | yes | open | S0002 (WI-0055) |
+| `Action_Stop_Flow` | yes | open | S0002 (WI-0055) |
+| `Condition_Flow_Running` | yes | open | S0002 (WI-0055) |
+| `Action_Set_Flow_Status` | yes | open | S0003 |
+| `Condition_Flow_Enabled` | yes | open | S0008 |
+| `Action_Set_element_parameter` | yes | open | S0008 |
+
+### REQ-ELM-260 Trace points
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0002 (WI-0052)
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Trace_Point` | yes | open | S0002 (WI-0052) |
+| `Action_Trace_Point_Check` | yes | open | S0002 (WI-0052) |
+
+They record the path through a flow and check it; automatic test flows use them (REQ-TST-040).
+
+### REQ-ELM-270 Dialogs and notifications
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0002 (WI-0051, WI-0056), S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Message_Box` | yes | open | S0002 (WI-0056) |
+| `Action_Tooltip` | yes | open | S0002 (WI-0056) |
+| `Condition_Confirmation_Dialog` | yes | open | S0002 (WI-0056) |
+| `Condition_Debug_Dialog` | yes | open | S0002 (WI-0056) |
+| `Action_Input_Box` | yes | open | S0008 |
+| `Action_Select_file` | yes | open | S0008 |
+| `Action_Select_folder` | yes | open | S0008 |
+
+Dialogs run separately from the flows (MIGRATION M-0002) and can be answered by a test provider (E0038).
+
+### REQ-ELM-280 Date and time
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_New_Time` | yes | open | S0008 |
+| `Action_Time_calculation` | yes | open | S0008 |
+| `Action_Time_difference` | yes | open | S0008 |
+
+### REQ-ELM-290 Clipboard
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Get_Clipboard` | yes | open | S0008 |
+| `Action_Set_Clipboard` | yes | open | S0008 |
+
+### REQ-ELM-300 Files and folders
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Read_From_File` | yes | open | S0008 |
+| `Action_Write_To_File` | yes | open | S0008 |
+| `Action_Copy_file` | yes | open | S0008 |
+| `Action_Move_File` | yes | open | S0008 |
+| `Action_Rename_file` | yes | open | S0008 |
+| `Action_Delete_file` | yes | open | S0008 |
+| `Action_Create_folder` | yes | open | S0008 |
+| `Action_Copy_folder` | yes | open | S0008 |
+| `Action_Move_Folder` | yes | open | S0008 |
+| `Action_Rename_Folder` | yes | open | S0008 |
+| `Action_Delete_folder` | yes | open | S0008 |
+| `Action_Empty_Recycle_bin` | yes | open | S0008 |
+| `Action_Get_file_attributes` | yes | open | S0008 |
+| `Action_Get_file_size` | yes | open | S0008 |
+| `Action_Get_file_time` | yes | open | S0008 |
+| `Action_Set_file_attributes` | yes | open | S0008 |
+| `Action_Set_file_time` | yes | open | S0008 |
+| `Action_Get_shortcut_information` | yes | open | S0008 |
+| `Action_Create_Shortcut` | yes | open | S0008 |
+| `Action_Split_path` | yes | open | S0008 |
+| `Condition_File_Exists` | yes | open | S0008 |
+| `Condition_File_Has_Attribute` | yes | open | S0008 |
+
+The loop over files is in REQ-ELM-240.
+
+### REQ-ELM-310 Ini files
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Read_From_Ini` | yes | open | S0008 |
+| `Action_Write_to_ini` | yes | open | S0008 |
+| `Action_Delete_From_Ini` | yes | open | S0008 |
+
+### REQ-ELM-320 Archives
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Compress_files` | yes | open | S0008 |
+| `Action_Extract_files` | yes | open | S0008 |
+
+### REQ-ELM-330 Drives
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_List_Drives` | yes | open | S0008 |
+| `Action_Get_Drive_Information` | yes | open | S0008 |
+| `Action_Change_Drive_Label` | yes | open | S0008 |
+| `Action_Eject_Drive` | yes | open | S0008 |
+| `Action_Lock_Or_Unlock_Drive` | yes | open | S0008 |
+
+### REQ-ELM-340 Internet
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Download_file` | yes | open | S0008 |
+| `Action_HTTP_Request` | yes | open | S0008 |
+
+### REQ-ELM-350 Screen and images
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Screenshot` | yes | open | S0008 |
+| `Action_Get_pixel_color` | yes | open | S0008 |
+| `Action_Search_pixel` | yes | open | S0008 |
+| `Action_Search_Image` | yes | open | S0008 |
+| `Action_Get_Screen_Settings` | yes | open | S0008 |
+| `Action_Set_Screen_Settings` | yes | open | S0008 |
+
+### REQ-ELM-360 Windows and controls
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_activate_Window` | yes | open | S0008 |
+| `Action_Show_window` | yes | open | S0008 |
+| `Action_Hide_window` | yes | open | S0008 |
+| `Action_Close_Window` | yes | open | S0008 |
+| `Action_Move_window` | yes | open | S0008 |
+| `Action_Minimize_All_Windows` | yes | open | S0008 |
+| `Action_Get_control_text` | yes | open | S0008 |
+| `Action_Set_control_text` | yes | open | S0008 |
+| `Condition_Window_Active` | yes | open | S0008 |
+| `Condition_Window_Exists` | yes | open | S0008 |
+
+### REQ-ELM-370 Mouse and keyboard
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Click` | yes | open | S0008 |
+| `Action_Move_Mouse` | yes | open | S0008 |
+| `Action_Drag_with_mouse` | yes | open | S0008 |
+| `Action_Get_mouse_position` | yes | open | S0008 |
+| `Action_Send_Keystrokes` | yes | open | S0008 |
+| `Action_Send_Keystrokes_To_Control` | yes | open | S0008 |
+| `Action_Set_Lock_Key` | yes | open | S0008 |
+| `Action_Block_User_Input` | yes | open | S0008 |
+| `Condition_Key_Is_Down` | yes | open | S0008 |
+
+### REQ-ELM-380 Sound and speech
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Play_Sound` | yes | open | S0008 |
+| `Action_Stop_Sound` | yes | open | S0008 |
+| `Action_Beep` | yes | open | S0008 |
+| `Action_Get_Volume` | yes | open | S0008 |
+| `Action_Set_Volume` | yes | open | S0008 |
+| `Action_Speech_output` | yes | open | S0008 |
+
+### REQ-ELM-390 Programs and processes
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Run` | yes | open | S0008 |
+| `Action_Kill_Process` | yes | open | S0008 |
+| `Action_Set_Process_Priority` | yes | open | S0008 |
+| `Condition_Process_Is_Running` | yes | open | S0008 |
+
+### REQ-ELM-400 Power and session
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S0008
+
+| Element | v1 | v2 | Plan |
+|---|---|---|---|
+| `Action_Lock_Computer` | yes | open | S0008 |
+| `Action_Log_Off` | yes | open | S0008 |
+| `Action_Shutdown` | yes | open | S0008 |
+| `Action_Reboot_Computer` | yes | open | S0008 |
+| `Action_Hibernate_Computer` | yes | open | S0008 |
+| `Action_Suspend_Computer` | yes | open | S0008 |
 
 ## Triggers (TRG)
 
@@ -553,7 +895,7 @@ The specification of an element is the underlying AutoHotkey v2 command plus its
 - **Scope:** port
 - **Plan:** S0003
 
-Hotkeys, hooks and timers react at once, no matter how busy the running flows are (Windows removes a low-level hook that answers too slowly). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. How: a trigger host process, `ARCHITECTURE.md` D0008.
+Hotkeys, hooks and timers react at once, no matter how busy the running flows are (Windows removes a low-level hook that answers too slowly). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. How: a trigger host process, `ARCHITECTURE.md` D8.
 
 ### REQ-TRG-020 Triggers follow the enabled state, also after a restart
 
@@ -575,30 +917,131 @@ The triggers of enabled flows are active from the start of AutoHotFlow on, and a
 
 A flow can have several triggers. Each trigger can be enabled and disabled on its own. One manual trigger is the default trigger, used when the flow is started without naming a trigger.
 
-### REQ-TRG-100 The triggers of v1 are available
+The trigger groups below follow the same rule as the element groups in ELM: one requirement per group, a table of its triggers, ideas as rows with the plan `later`. The AutoHotkey script trigger is in REQ-ELM-110.
+
+### REQ-TRG-200 Manual trigger
 
 - **v1:** yes
 - **v2:** partial (a skeleton `Trigger_Manual` exists, and a flow can be started through it)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (`Manual`), S0003, S0008
+- **Plan:** S0002 (WI-0047)
 - **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`
 
-The triggers of the v1 Default package, by group:
+| Trigger | v1 | v2 | Plan |
+|---|---|---|---|
+| `Trigger_Manual` | yes | partial (skeleton) | S0002 (WI-0047) |
 
-| Group | Triggers (without prefix `Trigger_`) | Prio | Plan | v2 |
-|---|---|---|---|---|
-| Manual | `Manual`: started by the user, by another flow (REQ-EXE-120) or through the command line (REQ-DST-040) | must | S0002 (WI-0047) | partial |
-| Time | `Periodic_Timer`; `Time_of_Day` (with week days) | must | S0003 (`Periodic_Timer`), S0008 | open |
-| Start-up | `Start_up`: when AutoHotFlow starts; it can tell a start with Windows (REQ-SET-030) from a start by hand | must | S0003 | open |
-| Keyboard | `Hotkey` (optionally only in a given window; disabled in the same context, MIGRATION M-0003); `Hotstring` | must | S0003 (`Hotkey`), S0008 | open |
-| Shortcut | `Shortcut`: creates a shortcut file (default on the desktop) that starts the flow through the command line (REQ-DST-040); the shortcut is removed when the trigger is disabled (option) | should | S0008 | open |
-| User activity | `User_Idle_Time`, `Clipboard_Changes` | should | S0008 | open |
-| Windows | `Window_opens`, `Window_closes`, `Window_gets_active`, `Window_gets_inactive` | must | S0008 | open |
-| Processes | `Process_starts`, `Process_closes` | should | S0008 | open |
-| AutoHotkey script | `AutoHotkey_Script` (REQ-ELM-110) | should | S0008 | open |
+Started by the user, by another flow (REQ-EXE-120) or through the command line (REQ-DST-040).
 
-The v1 changelog (0.02.20) names a trigger "File observer" that is not in the manifest of the Default package; it is not ported unless the project owner asks for it.
+### REQ-TRG-210 Time triggers
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0003, S0008
+
+| Trigger | v1 | v2 | Plan |
+|---|---|---|---|
+| `Trigger_Periodic_Timer` | yes | open | S0003 |
+| `Trigger_Time_of_Day` (with week days) | yes | open | S0008 |
+
+### REQ-TRG-220 Start-up trigger
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0003
+
+| Trigger | v1 | v2 | Plan |
+|---|---|---|---|
+| `Trigger_Start_up` | yes | open | S0003 |
+
+Fires when AutoHotFlow starts; it can tell a start with Windows (REQ-SET-030) from a start by hand.
+
+### REQ-TRG-230 Keyboard triggers
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0003, S0008
+
+| Trigger | v1 | v2 | Plan |
+|---|---|---|---|
+| `Trigger_Hotkey` | yes | open | S0003 |
+| `Trigger_Hotstring` | yes | open | S0008 |
+
+A hotkey can be limited to a given window; it is disabled in the same context (MIGRATION M-0003).
+
+### REQ-TRG-240 Shortcut trigger
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S0008
+
+| Trigger | v1 | v2 | Plan |
+|---|---|---|---|
+| `Trigger_Shortcut` | yes | open | S0008 |
+
+Creates a shortcut file (default on the desktop) that starts the flow through the command line of AutoHotFlow (REQ-DST-040); the shortcut is removed when the trigger is disabled (option).
+
+### REQ-TRG-250 User activity triggers
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S0008
+
+| Trigger | v1 | v2 | Plan |
+|---|---|---|---|
+| `Trigger_User_Idle_Time` | yes | open | S0008 |
+| `Trigger_Clipboard_Changes` | yes | open | S0008 |
+
+### REQ-TRG-260 Window triggers
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0008
+
+| Trigger | v1 | v2 | Plan |
+|---|---|---|---|
+| `Trigger_Window_opens` | yes | open | S0008 |
+| `Trigger_Window_closes` | yes | open | S0008 |
+| `Trigger_Window_gets_active` | yes | open | S0008 |
+| `Trigger_Window_gets_inactive` | yes | open | S0008 |
+
+### REQ-TRG-270 Process triggers
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S0008
+
+| Trigger | v1 | v2 | Plan |
+|---|---|---|---|
+| `Trigger_Process_starts` | yes | open | S0008 |
+| `Trigger_Process_closes` | yes | open | S0008 |
+
+### REQ-TRG-280 File triggers
+
+- **v1:** no (the changelog 0.02.20 names a "File observer", but it is not in the manifest of the Default package)
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+| Trigger | v1 | v2 | Plan |
+|---|---|---|---|
+| File observer: fires when files in a folder change | no | open | later |
 
 ## Manager (MGR)
 
@@ -954,7 +1397,7 @@ The global execution policy (REQ-EXE-050) and the global working directory (REQ-
 - **Scope:** port
 - **Plan:** - (not in the phase 3 plan)
 
-AutoHotFlow starts when the user logs on to Windows, in the background. The start-up trigger knows that it was a start with Windows (REQ-TRG-100).
+AutoHotFlow starts when the user logs on to Windows, in the background. The start-up trigger knows that it was a start with Windows (REQ-TRG-220).
 
 ### REQ-SET-040 Run as administrator
 
@@ -1321,7 +1764,7 @@ A 32-bit interpreter is rejected at the start with exit code 2 (E0004).
 - **Plan:** S0008 (commands of the shortcut trigger)
 - **Evidence:** `tests/fault/test_second_start.py`
 
-A second start of AutoHotFlow does not start a second application: it passes its command line to the running one and ends (MIGRATION M-0023). Commands start a flow through a trigger (REQ-TRG-100).
+A second start of AutoHotFlow does not start a second application: it passes its command line to the running one and ends (MIGRATION M-0023). Commands start a flow through a trigger (REQ-TRG-200, REQ-TRG-240).
 
 ### REQ-DST-050 Release checklist
 
