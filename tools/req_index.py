@@ -8,7 +8,7 @@ doc/REQUIREMENTS.md is the source. Every requirement is a heading with a fixed l
 
     ### REQ-EXE-010 Execution policy per flow
 
-    - **v1:** partial (`wait` behaves like `parallel`, M-11)
+    - **v1:** partial (`wait` behaves like `parallel`, M-0011)
     - **v2:** done
     - **Prio:** must
     - **Scope:** port
@@ -64,7 +64,7 @@ class Requirement:
     meta: dict = field(default_factory=dict)
 
     def word(self, key):
-        """First word of a status field ("partial (M-11)" -> "partial")."""
+        """First word of a status field ("partial (M-0011)" -> "partial")."""
         return self.meta.get(key, "").split(" ", 1)[0]
 
 

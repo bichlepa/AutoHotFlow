@@ -10,7 +10,7 @@ from pathlib import Path
 
 TOOLS_DIR = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(TOOLS_DIR))
-import req_index  # noqa: E402
+import req_index  # noqa: E0402
 
 GOOD = """\
 - **v1:** yes
@@ -50,7 +50,7 @@ def test_a_valid_requirement_is_parsed_with_its_fields():
 
 
 def test_a_note_after_the_first_word_is_allowed():
-    meta = GOOD.replace("- **v1:** yes", "- **v1:** partial (wait broken, M-11)")
+    meta = GOOD.replace("- **v1:** yes", "- **v1:** partial (wait broken, M-0011)")
     areas, errs = req_index.parse(doc(req(meta=meta)))
     assert errs == [] and areas[0].reqs[0].word("v1") == "partial"
 
@@ -122,7 +122,7 @@ def evidence_errors(tmp_path, evidence):
 
 def test_evidence_paths_and_test_names_must_exist(tmp_path):
     assert evidence_errors(tmp_path, "`tests/x.py`, `tests/x.py::test_a`, `tests/y_*.test.ahk`, `tests/`") == []
-    assert evidence_errors(tmp_path, "the `*_policy_*` tests, measurement M-01") == []   # not a path: not checked
+    assert evidence_errors(tmp_path, "the `*_policy_*` tests, measurement M-0001") == []   # not a path: not checked
     assert any("'tests/z.py' does not exist" in e for e in evidence_errors(tmp_path, "`tests/z.py`"))
     assert any("'tests/q_*.ahk' does not exist" in e for e in evidence_errors(tmp_path, "`tests/q_*.ahk`"))
     assert any("'test_b' not found" in e for e in evidence_errors(tmp_path, "`tests/x.py::test_b`"))
