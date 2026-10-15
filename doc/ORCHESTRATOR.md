@@ -56,7 +56,7 @@ Start agents in the background and wait for their notifications. Do not poll and
 - No volatile names in documents, OPEN-ITEMS entries and commit messages: no branch or workspace names, no run folders; write what happened, or name the commit.
 - Private data of the project owner (`%APPDATA%\AutoHotFlow`, his flows and variables) is never copied into the repository without his check; see `tests/data/README.md`.
 
-**ID blocks.** At the start of the session find the highest `F-nn` in OPEN-ITEMS. Give every agent its own block of 10 numbers so that entries from parallel branches do not collide. Keep the list of blocks you gave (also in `STATUS.md`, section 10). **Final IDs (owner's rule, 2026-10-14).** Agents write provisional IDs (`F-nn*`). Before the orchestrator commits an entry, it replaces each provisional ID by a final one: the next free number (check with `git grep -n -E "F-<n>([^0-9]|$)"` that it is not used anywhere), changes every reference to it in the same commit (documents, code comments, tests, work items, STATUS), and removes the `*`. If an ID that was already referenced elsewhere changes, the old-to-new mapping goes into the note below the table in OPEN-ITEMS.
+**Finding IDs.** Agents do not reserve blocks. An agent writes its new findings with provisional IDs that start at `F-9000*` (`F-9000*`, `F-9001*`, ...). Before the orchestrator commits an entry, it renames each provisional ID to the next free number of the dense series `F-0001`, `F-0002`, ... (four digits, the highest used ID plus one; check with `git grep -n -E "F-<n>([^0-9]|$)"` that it is not used anywhere), changes every reference to it in the same commit (documents, code comments, tests, work items, STATUS), and removes the `*`. No old-to-new mapping is kept in the documents: the history is in git. The test `tests/test_open_items_ids.py` fails on the main checkout while a provisional ID is left in OPEN-ITEMS.
 
 ## 3. Work
 
@@ -91,7 +91,7 @@ After a completed task whose commits are on `v2-port` **really changed source co
 
 1. Runs the tests that the change needs (section 4) with `python tools/run_suite.py --ref HEAD` (frozen state), once per test selection.
 2. Looks briefly at the reports and at the source of the change. If something is conspicuous, it writes down a **suspicion** (marked assumed). It does no deep root-cause research and does not fix anything.
-3. Documents every finding in `doc/OPEN-ITEMS.md` (provisional ID from its block, which the orchestrator renumbers before its commit, run ID, command, failure text, suspicion, which task or agent probably caused it) and commits that on its branch.
+3. Documents every finding in `doc/OPEN-ITEMS.md` (provisional ID `F-9xxx*`, which the orchestrator renumbers before its commit, run ID, command, failure text, suspicion, which task or agent probably caused it) and commits that on its branch.
 4. Reports the result: counts, run IDs, findings.
 
 The running of the commands may be given to a `haiku` agent when it is only "run this and report"; the review stays with a `sonnet` agent.
@@ -154,7 +154,7 @@ Read first: AGENTS.md, doc/PARALLEL-WORK.md, <task files>.
 Task: <precise task, acceptance criteria, what not to touch>
 Rules: <section 2, the relevant ones, including the decision rule>
 Tests: <which short runs; big runs only if ...>; every result with run ID and commit.
-ID block for new OPEN-ITEMS entries: F-<a> to F-<b>.
+Provisional IDs for new OPEN-ITEMS entries: start at `F-9000*` (section 2, finding IDs).
 If you are stuck after two different approaches: stop and end your report with `ESCALATE: ...`.
 Report: what changed (files, commits), tests run (run ID, commit, counts), decisions you took (what, why, alternative), findings written, anything unexpected about the tools or the procedure, what you did not check. Distinguish verified / assumed / not checked.
 ```
@@ -163,6 +163,6 @@ Report: what changed (files, commits), tests run (run ID, commit, counts), decis
 
 The session will hit quota limits again and again. Work so that it can be resumed:
 
-- Keep `work_items/phase3/STATUS.md` current after every state change (task, agent, model, branch, commit, run IDs, ID blocks given, review log). In wishes mode keep a section "Wishes" in the same file with the same columns.
+- Keep `work_items/phase3/STATUS.md` current after every state change (task, agent, model, branch, commit, run IDs, provisional IDs in use, review log). In wishes mode keep a section "Wishes" in the same file with the same columns.
 - Agents commit often. An agent that notices a limit commits what works, notes in its report where it stopped, and ends.
 - At the start of a session read `STATUS.md` and `git worktree list`, and look at the project owner's local state again (section 5a); retry the integrations marked `integration pending`. A workspace with commits that are not on `v2-port` belongs to an unfinished task: continue it (new agent in that workspace, with the notes) or integrate it if it is complete. A workspace without commits and without changes is removed.
