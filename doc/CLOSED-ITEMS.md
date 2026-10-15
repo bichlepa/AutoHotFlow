@@ -15,6 +15,7 @@ This document lists findings that are closed or accepted. Moved from doc/OPEN-IT
 | F-0024 | Worker log entries never reach `storage` | closed (fixed in 58e48d2) | yes |
 | F-0025 | Child in handshake is not covered by the orphan guard | accepted (owner, 2026-10-13: low impact; 10 s instead of 3 s, option (b)); described in ARCHITECTURE 6.3 point 4 | |
 | F-0026 | Lost `sys.busy {busy: false}` | closed (reconnect case fixed in 4d97c49) | |
+| F-0031 | Hub connection deadlines ignore supervisor stalls | closed (not a defect, 2026-10-15) | |
 | F-0032 | `sys.hello` unanswered for 15 s in `test_shutdown.py` | closed (owner decision, 2026-10-13) | |
 | F-0039 | Slow child during shutdown holds later groups | closed (fixed in 72b77e1) | yes |
 | F-0074 | A second start is silent (forwarded to a running supervisor) | closed (fixed in 10c1f01, interface in d530148) | |
@@ -100,6 +101,18 @@ This document lists findings that are closed or accepted. Moved from doc/OPEN-IT
 **Sign that it matters:** A worker shown as busy for more than 5 s.
 **Action:** Verify the case if it is seen. Otherwise no action.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-0027-worker-pool.md`.
+
+### F-0031: Hub connection deadlines ignore supervisor stalls
+
+**What:** Two time-bound spots in the hub connection do not know about a supervisor stall: `PipeConnection.WRITE_GONE_MAX_MS` and the drain deadline of `CloseWhenFlushed`. Both run on the wall clock.
+**Status:** Closed as not a defect (see the update below).
+**Why deferred:** Low priority. The effect would be that the connection of a process that is already gone is closed after a resume without the rest of its data (`peer_closed`).
+**Sign that it matters:** A connection closed with `peer_closed` after a stall, with data missing.
+**Action:** Apply the same stall handling as in WI-0033 (`Shift` of the deadline) to these two spots. The change is in `src/core/ipc/` and needs the project owner's agreement.
+**Update 2026-10-15 (bug hunter):** Read in code and checked with a test; the feared effect does not occur. (1) `WRITE_GONE_MAX_MS`: `PipeConnection.Pump` reads first (`_PumpRead`) and only then judges the age of `_writeGoneAt`. After a stall the first Pump therefore delivers what lies in the pipe, and the connection ends with `peer_closed`, the same reason the end of the stream gives. What lies in the pipe is at most `PipeListener.BUFFER_SIZE` (64 KiB, one read; the limit of 64 reads per Pump is far away). Frames the peer still had in its own queue never reached the pipe, and no deadline changes that. Verified by `tests/ahk/pipe_write_gone.test.ahk` (stale `_writeGoneAt`, 5 s old: the frame is delivered, then `peer_closed`; passes on `1b0831d`, run by `ahkrun.py`, exit 0). (2) Drain deadline of `CloseWhenFlushed`: only `Peer.CloseWhenFlushed`, called from `Role.ahk`, uses it; the supervisor and its hub connections never do (`grep` over `src/`). A role is not stalled by the supervisor's stall, so the supervisor's `Shift` has nothing to move there; a stall of the role itself shortens the wait for a process that is ending anyway. **Proposal:** close as not a defect (no `Shift` needed); the test stays as a regression test. Waits for the project owner's confirmation because the item was filed with the wish to change `src/core/ipc/`.
+**Evidence:** `v2-phase2-final:work_items/phase2b/WI-0033-worker-und-stillstand.md`.
+
+**Closed 2026-10-15.** Owner decision (option A): not a defect. The test `tests/ahk/pipe_write_gone.test.ahk` stays as a regression test; no change to `src/core/ipc/`.
 
 ### F-0032: `sys.hello` unanswered for 15 s in `test_shutdown.py`
 

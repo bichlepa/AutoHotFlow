@@ -19,7 +19,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0013 | `Ids.Next` and `ExecContext.Finish` not atomic | fixed (owner agreed on 2026-10-15), verifier pending | yes |
 | F-0019 | Supervisor messages after `storage` is gone go only to stderr | open, low | |
 | F-0020 | Flow file parsed twice in the engine | open, not implemented | yes |
-| F-0031 | Hub connection deadlines ignore supervisor stalls | analysed 2026-10-15: no defect found, decision needed (close as not a defect, proposed) | |
 | F-0041 | `refreshed` 2 instead of 3 in the debug role test | observed, open (0 of 33 in repetition on `dec432b`) | |
 | F-0043 | `cmd.worker.cancel` unanswered in the hang test | observed, open | |
 | F-0060 | `cmd.worker.run` unanswered for 5 s in `test_worker_busy.py` | observed once, open | |
@@ -88,16 +87,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Sign that it matters:** Slow start with many flows (for example 200 flows).
 **Action:** Choose one alternative in the phase 3 plan.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-0024-hub-routing-laden.md`.
-
-### F-0031: Hub connection deadlines ignore supervisor stalls
-
-**What:** Two time-bound spots in the hub connection do not know about a supervisor stall: `PipeConnection.WRITE_GONE_MAX_MS` and the drain deadline of `CloseWhenFlushed`. Both run on the wall clock.
-**Status:** Read in code (`src/core/ipc/`), not changed, not observed.
-**Why deferred:** Low priority. The effect would be that the connection of a process that is already gone is closed after a resume without the rest of its data (`peer_closed`).
-**Sign that it matters:** A connection closed with `peer_closed` after a stall, with data missing.
-**Action:** Apply the same stall handling as in WI-0033 (`Shift` of the deadline) to these two spots. The change is in `src/core/ipc/` and needs the project owner's agreement.
-**Update 2026-10-15 (bug hunter):** Read in code and checked with a test; the feared effect does not occur. (1) `WRITE_GONE_MAX_MS`: `PipeConnection.Pump` reads first (`_PumpRead`) and only then judges the age of `_writeGoneAt`. After a stall the first Pump therefore delivers what lies in the pipe, and the connection ends with `peer_closed`, the same reason the end of the stream gives. What lies in the pipe is at most `PipeListener.BUFFER_SIZE` (64 KiB, one read; the limit of 64 reads per Pump is far away). Frames the peer still had in its own queue never reached the pipe, and no deadline changes that. Verified by `tests/ahk/pipe_write_gone.test.ahk` (stale `_writeGoneAt`, 5 s old: the frame is delivered, then `peer_closed`; passes on `1b0831d`, run by `ahkrun.py`, exit 0). (2) Drain deadline of `CloseWhenFlushed`: only `Peer.CloseWhenFlushed`, called from `Role.ahk`, uses it; the supervisor and its hub connections never do (`grep` over `src/`). A role is not stalled by the supervisor's stall, so the supervisor's `Shift` has nothing to move there; a stall of the role itself shortens the wait for a process that is ending anyway. **Proposal:** close as not a defect (no `Shift` needed); the test stays as a regression test. Waits for the project owner's confirmation because the item was filed with the wish to change `src/core/ipc/`.
-**Evidence:** `v2-phase2-final:work_items/phase2b/WI-0033-worker-und-stillstand.md`.
 
 ### F-0041: `refreshed` 2 instead of 3 in the debug role test
 
