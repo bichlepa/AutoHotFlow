@@ -39,6 +39,13 @@ Later commits on `v2-port` after `6f4241c` that did not change these trees: none
 
 ## Agents
 
+Session 7 start: 2026-10-15 (late), work-item mode (`/orchestrate`, no wishes), HEAD `dec432b` on `v2-port`, main checkout clean, no workspaces left over. The session-6 note "WI-0052 paused by the owner's request after these subagents finish" was read as lifted by this start (the subagents have finished); the owner may object. Next open work item with dependencies done: WI-0052 (WI-0048 and WI-0049 done). ID blocks: implementer WI-0052 F-9000* to F-9009*, bug hunter hunt-17 F-9010* to F-9019*. Highest final ID at start: F-0089.
+
+| Slot | Role | Model | Workspace | Branch | Task | State |
+|---|---|---|---|---|---|---|
+| 1 | Implementer WI-0052 (core set A) | sonnet | wi-52 | wip/wi-52 | variables, conditions, trace points; stress run at the end (load path) | running |
+| 2 | Bug hunter (OPEN-ITEMS mode) | sonnet | hunt-17 | wip/hunt-17 | not in the area of WI-0052 | running |
+
 Session 6 start: 2026-10-15 (evening), work-item mode, HEAD `8c09337` on `v2-port`, main checkout clean, no workspaces left over. The state of S2 was taken from the commit history, not from the README checkboxes (not updated since S2 started): WI-44, WI-45, WI-46, WI-49, WI-50 integrated and verified; WI-47-PREP done (session 5). Next open work item with all dependencies done: WI-47 (E0045 is part of it). WI-48, WI-51 wait for WI-47. Workspaces this session: `wip/wi-47` (implementer), `wip/hunt-15` (bug hunter, OPEN-ITEMS mode).
 
 | Slot | Role | Model | Workspace | Branch | Task | State |
