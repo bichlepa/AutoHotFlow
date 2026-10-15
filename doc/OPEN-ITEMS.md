@@ -40,6 +40,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 
 | F-0090 | Fast tier: `test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_kill` got no `evt.engine.ready` of the second chain within 20 s | observed once, run 20261015-230752-0bb0d843 on `0bb0d84`, open | |
 | F-0091 | Slow tier: `test_clients_churn.py` smoke variant: handles of the engine grew from 145 to 164 (slack 3) | observed once, run 20261015-230952-0bb0d843 on `0bb0d84`, open | |
+| F-9010* | `WorkerBridge`: leftovers of a failed spawn, no start timeout for a slot in "starting" | read in code only, assumed, not checked, open | |
 
 ## Findings
 
@@ -242,6 +243,14 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **What:** `tests/stress/test_clients_churn.py::test_clients_connecting_and_leaving_do_not_disturb_the_engine_or_leak` fails in both variants (`[smoke]` and `[20x8]`) at `assert after[name]["handles"] <= before[name]["handles"] + HANDLE_SLACK`: engine `{'handles': 145}` before, `{'handles': 164}` after (limit 145 + 3). The supervisor stays at 185. Everything before that assertion passes (no errors, latency median 1.1 to 1.3 ms, p99 7 to 8 ms, no restart).
 **Status:** verified, deterministic: the same numbers 145 and 164 in four runs. Run 20261015-230453-2c56ba86-2 (slow tier, `[smoke]`, code of WI-0052 at `2c56ba8`), run 20261015-230812-2c56ba86 (the churn file alone, both variants), and run 20261015-231030-dec432b0 on the base `dec432b` without any change of WI-0052 (both variants). So it is not caused by WI-0052. Suspicion (assumed): a fixed number of handles that the engine opens once on its first instances or its first client connections (the language table, a log file, the first timers), not a leak per connection, because the count does not grow with the number of connects (6 connects: 164, 160 connects: 164). Not checked which handles; the slack of 3 is probably older than a recent change that opens them.
 **Action:** list the handle types of the engine before and after (`handle64` or the Windows API), then either remove the cause or measure the handles after a warm-up round, as the leak test of the supervisor in the same file does (`LEAK_WARMUP`).
+### F-9010*: `WorkerBridge`: leftovers of a failed spawn, no start timeout for a slot in "starting"
+
+**What:** three read-only observations on `src/engine/WorkerBridge.ahk` from a read of the file; none was reproduced.
+(a) `_earlyReady` entries stay behind when a spawn fails: `OnProcessEvent` stores the name when `evt.process.ready` arrives before the spawn answer, and only `_OnSpawn` (success) or a crash/exit event removes it. If the spawn answer then says `ok: false` or times out, the name stays in the map for ever (small leak; a reused name could be taken for ready by mistake, assumed only).
+(b) A worker that crashes before its spawn answer arrives: `evt.process.crashed`/`exited` finds no slot and returns, then `_OnSpawn` adds a slot in state "starting" for a process that is already gone. Nothing removes it, there is no start timeout in the file, so the slot stays and counts against the size N (`Want` also subtracts "starting" slots).
+(c) The header comment lists "a start that never got ready" as a failure that is counted, but no code for it was found in the file (same gap as (b)).
+**Status:** assumed, not checked (read in code only, no test, no run).
+**Action:** confirm (b) with a unit test of the bridge (crash event before the spawn answer); if confirmed, add a start timeout for "starting" slots that removes the slot, asks the supervisor to kill the process and counts a failure, and delete `_earlyReady` entries on a failed spawn.
 
 ## Watch list (E0007)
 
