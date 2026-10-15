@@ -1351,7 +1351,7 @@ The supervisor detects a crashed or frozen process, reports it and reacts by rol
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/test_architecture.py`, `tests/stress/` (repeated runs without a hang, MEASUREMENTS M-0012 to M-0017)
+- **Evidence:** `tests/test_architecture.py`, `tests/stress/` (repeated runs without a hang, MEASUREMENTS MS-0012 to MS-0017)
 
 Processes exchange messages; there is no shared memory and no global lock, and every datum has exactly one owner. The forbidden patterns are checked automatically (`CONVENTIONS.md` section 3).
 
@@ -1463,7 +1463,7 @@ The budgets are the targets of `ARCHITECTURE.md` section 9 and of the phase 3 pl
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/stress/test_measurements.py::test_message_latency_idle_and_under_load_is_within_the_budget` (MEASUREMENTS M-0001, M-0002)
+- **Evidence:** `tests/stress/test_measurements.py::test_message_latency_idle_and_under_load_is_within_the_budget` (MEASUREMENTS MS-0001, MS-0002)
 
 Engine and client through the hub: median below 5 ms, 99 % below 50 ms, also under load.
 
@@ -1474,7 +1474,7 @@ Engine and client through the hub: median below 5 ms, 99 % below 50 ms, also und
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/stress/test_measurements.py::test_idle_cpu_and_memory_of_the_chain_without_a_flow` (M-0004: 0.23 %)
+- **Evidence:** `tests/stress/test_measurements.py::test_idle_cpu_and_memory_of_the_chain_without_a_flow` (MS-0004: 0.23 %)
 
 Below 1 % of the whole system without running flows (E0005).
 
@@ -1485,7 +1485,7 @@ Below 1 % of the whole system without running flows (E0005).
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
-- **Evidence:** `tests/stress/test_measurements.py::test_idle_cpu_and_memory_of_the_chain_without_a_flow` (M-0005)
+- **Evidence:** `tests/stress/test_measurements.py::test_idle_cpu_and_memory_of_the_chain_without_a_flow` (MS-0005)
 
 Below 100 MB in total with 5 open editors.
 
@@ -1496,7 +1496,7 @@ Below 100 MB in total with 5 open editors.
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/stress/test_measurements.py::test_start_to_ready_time` (M-0008, M-0009)
+- **Evidence:** `tests/stress/test_measurements.py::test_start_to_ready_time` (MS-0008, MS-0009)
 
 From the start until all processes are ready: below 3 s (with few flows).
 
@@ -1528,18 +1528,18 @@ A state change of the engine is visible in a non-blocked editor within 50 ms. A 
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/stress/test_parallel_instances.py`, `tests/stress/test_start_stop_storm.py` (M-0012, M-0013)
+- **Evidence:** `tests/stress/test_parallel_instances.py`, `tests/stress/test_start_stop_storm.py` (MS-0012, MS-0013)
 
 200 parallel instances all end; 1000 start/stop cycles leave consistent states.
 
 ### REQ-PRF-080 Log throughput
 
-- **v1:** no (about 30 lines/s, MEASUREMENTS M-0021)
+- **v1:** no (about 30 lines/s, MEASUREMENTS MS-0021)
 - **v2:** done
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/integration/test_storage.py::test_a_log_flood_is_written_at_more_than_1000_lines_per_second`, `tests/integration/test_storage.py::test_a_request_is_answered_in_time_during_a_log_flood` (M-0022)
+- **Evidence:** `tests/integration/test_storage.py::test_a_log_flood_is_written_at_more_than_1000_lines_per_second`, `tests/integration/test_storage.py::test_a_request_is_answered_in_time_during_a_log_flood` (MS-0022)
 
 More than 1000 log lines per second; other requests to the storage are answered during a flood.
 
@@ -1550,7 +1550,7 @@ More than 1000 log lines per second; other requests to the storage are answered 
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/stress/test_soak.py` (M-0016, M-0025)
+- **Evidence:** `tests/stress/test_soak.py` (MS-0016, MS-0025)
 
 Memory, handles and the number of processes stay flat over long runs.
 

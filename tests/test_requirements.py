@@ -122,7 +122,7 @@ def evidence_errors(tmp_path, evidence):
 
 def test_evidence_paths_and_test_names_must_exist(tmp_path):
     assert evidence_errors(tmp_path, "`tests/x.py`, `tests/x.py::test_a`, `tests/y_*.test.ahk`, `tests/`") == []
-    assert evidence_errors(tmp_path, "the `*_policy_*` tests, measurement M-0001") == []   # not a path: not checked
+    assert evidence_errors(tmp_path, "the `*_policy_*` tests, measurement MS-0001") == []   # not a path: not checked
     assert any("'tests/z.py' does not exist" in e for e in evidence_errors(tmp_path, "`tests/z.py`"))
     assert any("'tests/q_*.ahk' does not exist" in e for e in evidence_errors(tmp_path, "`tests/q_*.ahk`"))
     assert any("'test_b' not found" in e for e in evidence_errors(tmp_path, "`tests/x.py::test_b`"))

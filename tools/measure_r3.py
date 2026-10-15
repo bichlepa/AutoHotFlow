@@ -19,7 +19,7 @@ written into src/): the entry includes src/AhfBoot.ahk and, after it, the genera
       tools/measure_r3_hooks.ahk, which wraps methods of the engine at run time (src/ stays unchanged).
 
   python tools/measure_r3.py roles [--counts 0,150] [--runs 5] [--layout auto|legacy|entries] [--out FILE]
-      (WI-0047-PREP, M-0032/M-0033) Private bytes of each role process in a normal session: supervisor, storage,
+      (WI-0047-PREP, MS-0032/MS-0033) Private bytes of each role process in a normal session: supervisor, storage,
       engine, manager (stub, headless), debug (headless), one worker, and a triggerhost stand-in (the role is a
       placeholder that ends at once, so a process with the same includes that idles is measured). The classes are
       synthetic with a mode mix (synthetic_mode). `legacy` is the entry before WI-0047-PREP (every process parses
