@@ -223,6 +223,16 @@ An element can have any number of outputs, for example a switch with one output 
 
 Open points: a connection whose output disappears after a change of the configuration (a warning of the flow check, REQ-EDT-160, or refused by the editor); how the editor draws a variable number of connection points; the file format of the connection type (today a fixed set).
 
+### REQ-EXE-160 Time limit per element
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+Every element that can wait (REQ-EXE-100) has a setting "maximum run time". The element does not provide it itself: the element settings add it to every such element, for example in an "advanced" part. When the time is over, the element is stopped like a stopped instance (REQ-EXE-110) and ends with `exception` and the reason "time limit", so that the flow can react on the `exception` connection. Without a value there is no limit beyond the one of the element class. Extends REQ-EXE-110.
+
 ## Expressions and variables (VAR)
 
 ### REQ-VAR-010 Expression language with AutoHotkey v2 semantics
@@ -238,7 +248,7 @@ Expressions follow AutoHotkey v2 (E0022, E0035): operators and precedence, assig
 
 Where AutoHotFlow deliberately differs from AutoHotkey v2, the difference is on a short fixed list (E0025, E0029, E0034). A test checks this automatically: it generates many expressions, runs each one as native AutoHotkey v2 code and in AutoHotFlow, and accepts a different result only when the list explains it. Such an independent reference for the expected results is called an "oracle" (`EXPRESSION-LANGUAGE.md` section 19).
 
-Expressions are checked while the user edits them: REQ-EDT-200.
+Expressions are checked while the user edits them: REQ-EDT-200. The language grows into a full script language: SCR.
 
 ### REQ-VAR-020 Script form for several statements
 
@@ -249,7 +259,7 @@ Expressions are checked while the user edits them: REQ-EDT-200.
 - **Plan:** S0008 (element)
 - **Evidence:** `tests/ahk/expr_script.test.ahk`
 
-One statement per line: assignments, function calls, `if`/`else` and blocks (`EXPRESSION-LANGUAGE.md` section 8).
+One statement per line: assignments, function calls, `if`/`else` and blocks (`EXPRESSION-LANGUAGE.md` section 8). Loops, error handling and own functions: SCR.
 
 ### REQ-VAR-030 `%var%` substitution in text parameters
 
@@ -396,6 +406,135 @@ Note: the cost in time is lower in v2 than in v1. v1 read the file at every acce
 When two flows or branches read, change and write the same variable through two elements, one change can be lost. A mechanism protects a variable for a short time, so that such a sequence is atomic: for example elements that change a value in one step (increment, append to a list), or a lock that other elements wait for.
 
 Note: an element that waits (REQ-EXE-100) may read a value, wait a long time (for example for a dialog) and write afterwards; the window for a lost change is then as long as it waits.
+
+## Script language (SCR)
+
+The expression language (REQ-VAR-010) and its script form (REQ-VAR-020) grow into a full script language: what a beginner builds from a chain of simple elements, an experienced user writes in a few lines. The language stays AutoHotkey v2 wherever it can (E0022, E0035), so that AutoHotkey users need to learn nothing new and the oracle (REQ-TST-050) checks every new part automatically. Elements stay the way for beginners; scripts are a second way, not a replacement.
+
+Not the same as REQ-ELM-110: an AutoHotkey script there is real AutoHotkey code in a process of its own, with full access to the system and without the flow variables. The script language runs inside AutoHotFlow, works on the flow variables and is checked by the editor.
+
+### REQ-SCR-010 Built-in functions
+
+- **v1:** no (`round`, `object` and `print` existed but could never be called)
+- **v2:** partial (four functions: `round`, `object`, `print`, `mod`)
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+The language has a library of functions with the names, parameters and results of AutoHotkey v2:
+
+| Group | Examples |
+|---|---|
+| Strings | `StrLen`, `SubStr`, `InStr`, `StrReplace`, `StrSplit`, `Trim`, `StrUpper`, `StrLower`, `StrTitle`, `Format`, `Ord`, `Chr`, `Sort` |
+| Regular expressions | `RegExMatch`, `RegExReplace` |
+| Numbers | `Abs`, `Ceil`, `Floor`, `Round`, `Mod`, `Min`, `Max`, `Sqrt`, `Exp`, `Log`, `Ln`, `Sin`, `Cos`, `Tan`, `ASin`, `ACos`, `ATan`, `Random` |
+| Types | `IsNumber`, `IsInteger`, `IsFloat`, `IsSpace`, `IsAlpha`, `IsDigit`, `Type`, `Integer`, `Float`, `String`, `Number` |
+| Date and time | `FormatTime`, `DateAdd`, `DateDiff` |
+| Data formats | JSON text to object and back (an addition of AutoHotFlow; the elements are in REQ-ELM-310) |
+
+Every function is documented in the help and checked by the oracle like the operators; a function that deliberately differs from AutoHotkey v2 is on the list of deviations.
+
+Open point: functions that change something outside the flow (write a file, start a program, send keys). In the graph of a flow the user sees what the flow does; a script hides it. Proposal: the language gets functions that only read (`FileExist`, `DirExist`, `WinExist`, `ProcessExist`, ...) and changes stay elements, or are called through REQ-SCR-090.
+
+### REQ-SCR-020 Methods and properties of lists and objects
+
+- **v1:** no
+- **v2:** open (calling a method is an evaluation error)
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+Lists and objects are changed inside an expression, with the methods and properties of AutoHotkey v2 `Array` and `Map`: `list.Push(x)`, `list.Pop()`, `list.InsertAt(i, x)`, `list.RemoveAt(i)`, `list.Length`, `obj.Has(key)`, `obj.Delete(key)`, `obj.Count`, `obj.Clone()`; going through all members is REQ-SCR-030.
+
+Open points:
+
+- A list is an object with the keys 1..n (REQ-VAR-060), not an AutoHotkey `Array`. The methods of `Array` must work on it; the oracle needs a rule for the differences (a gap in the keys, negative indexes).
+- Assigning an object copies it (REQ-VAR-060), so `a := b` followed by `a.Push(1)` leaves `b` unchanged, unlike AutoHotkey. This must be decided and documented before methods exist.
+
+### REQ-SCR-030 Loops and error handling in scripts
+
+- **v1:** no
+- **v2:** partial (`if`/`else` and blocks, `EXPRESSION-LANGUAGE.md` section 8)
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+As in AutoHotkey v2: `Loop n`, `Loop` with `until`, `while`, `for key, value in obj`, `break`, `continue`; `try`, `catch`, `finally`, `throw`. Loops make REQ-SCR-050 necessary.
+
+### REQ-SCR-040 Own functions
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+The user defines functions in a script and calls them from every expression of the same flow, and in a library of functions that all flows share. Variables inside a function are local to it.
+
+Open points: where the shared library is stored (a file in the data folder, a package, REQ-PKG-040); what happens to running instances when a shared function changes (REQ-EXE-080).
+
+### REQ-SCR-050 A script cannot hang AutoHotFlow
+
+- **v1:** n/a
+- **v2:** open
+- **Prio:** must
+- **Scope:** later
+- **Plan:** -
+
+An endless loop or a very long calculation in a script does not delay other flows (REQ-EXE-100). A script has a limit of time or of steps; when it is reached, the element ends with `exception` and says why. Stopping the flow ends a running script at once (REQ-EXE-110). The limit can be changed per element (REQ-EXE-160).
+
+Open point: whether a long script runs in a worker or is interrupted in the engine. Today a script cannot loop, so the question does not arise yet.
+
+### REQ-SCR-060 Errors name the place in the script
+
+- **v1:** no
+- **v2:** partial (expression errors carry line and column, `EXPRESSION-LANGUAGE.md` section 10)
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+Every error and warning of a script names the line, the column and the statement, in the log and at the element in the editor (REQ-EDT-150). An error that is not caught ends the element with `exception` (REQ-EXE-090); an error caught with `try` does not.
+
+### REQ-SCR-070 Script editor
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+A script field is a small code editor: line numbers, indentation with Tab, matching brackets, a window that can be enlarged. Checking while typing: REQ-EDT-200; syntax colours and completion: REQ-EDT-210.
+
+### REQ-SCR-080 Elements and functions behave the same
+
+- **v1:** n/a
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+Each element of the simple groups (calculations, strings, lists, date and time; REQ-ELM-200 to REQ-ELM-280) has a function or method with the same behaviour, and the help of each points to the other. A beginner uses the element, an experienced user writes one line, and the result is the same. Best when both share one implementation, so that they cannot drift apart.
+
+### REQ-SCR-090 Call elements from a script
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+- **Doubt:** The graph no longer shows what the flow does, and a script that calls a waiting element (REQ-EXE-100) must wait itself. The benefit may not be worth it.
+
+A script calls an element of any package like a function, with its parameters, and gets its result and its output variables. So a script can do everything an element can.
+
+### REQ-SCR-100 Step through a script in the debugger
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+The debugger (DBG) runs a script line by line, with breakpoints on lines, and shows the variables of the script and of its functions.
 
 ## Element packages (PKG)
 
