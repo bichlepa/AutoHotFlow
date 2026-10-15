@@ -201,6 +201,32 @@ ReadyEventBeforeTheSpawnAnswerStillMakesTheSlotIdle() {
     Assert.Equal(bridge.Free(), true)
 }
 
+AWorkerThatCrashesBeforeItsSpawnAnswerGetsNoSlot() {
+    ; F-9010*: the slot would stay "starting" for ever and count against the size.
+    r := NewPool(2, 0)
+    owner := r[1]
+    bridge := r[2]
+    bridge.Want(1)
+    bridge.OnProcessEvent(FakeMsg("evt.process.crashed", Map("name", "worker:1", "pid", 1)))
+    owner.peer.Answer(owner.peer.Open("cmd.process.spawn")[1], Map("ok", true, "name", "worker:1"))
+    Assert.Equal(bridge.Count, 0, "no slot for a worker that is gone")
+    Assert.Equal(bridge.DiagInfo()["failures"], 1, "counted as a failure")
+}
+
+EarlyEventsAreForgottenWhenASpawnFails() {
+    ; F-9010*: a failed spawn has no name; the early ready of an unknown worker must not stay for a later one.
+    r := NewPool(2, 0)
+    owner := r[1]
+    bridge := r[2]
+    bridge.Want(1)
+    bridge.OnProcessEvent(FakeMsg("evt.process.ready", Map("name", "worker:1", "pid", 1)))
+    owner.peer.Answer(owner.peer.Open("cmd.process.spawn")[1], Map("ok", false, "error", Map("code", "busy", "message", "x")))
+    bridge.Want(1)
+    owner.peer.Answer(owner.peer.Open("cmd.process.spawn")[1], Map("ok", true, "name", "worker:1"))
+    Assert.Equal(bridge.Free(), false, "the old ready event does not count for the new worker")
+    Assert.Equal(bridge.CountState("starting"), 1)
+}
+
 RunUsesTheMostRecentlyIdleWorkerSoTheOthersCanIdleOut() {
     r := NewPool(3, 0)
     owner := r[1]
@@ -492,6 +518,8 @@ TestRun.Case("Pool: size 0 is never usable and asks for nothing", NoPoolIsNeverU
 TestRun.Case("Pool: demand never goes above the limit", WantNeverGoesAboveTheLimit)
 TestRun.Case("Pool: demand counts workers that are already starting", WantCountsTheWorkersThatAreAlreadyStarting)
 TestRun.Case("Pool: ready before the spawn answer still gives an idle slot", ReadyEventBeforeTheSpawnAnswerStillMakesTheSlotIdle)
+TestRun.Case("Pool: a worker that crashes before its spawn answer gets no slot (F-9010*)", AWorkerThatCrashesBeforeItsSpawnAnswerGetsNoSlot)
+TestRun.Case("Pool: early events are forgotten when a spawn fails (F-9010*)", EarlyEventsAreForgottenWhenASpawnFails)
 TestRun.Case("Pool: Run takes the most recently idle worker", RunUsesTheMostRecentlyIdleWorkerSoTheOthersCanIdleOut)
 TestRun.Case("Pool: Run hands out idle slots only", RunHandsOutOnlyIdleSlots)
 TestRun.Case("Pool: idle workers beyond the warm ones are killed after the idle time", IdleWorkersBeyondTheWarmOnesAreKilledAfterTheIdleTime)

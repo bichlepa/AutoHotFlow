@@ -59,6 +59,7 @@ class WorkerBridge {
         this._spawning := 0                    ; cmd.process.spawn requests on their way
         this._failures := []                   ; times (ms) of the abnormal ends in the storm window
         this._earlyReady := Map()              ; names whose evt.process.ready came before their spawn answer
+        this._earlyGone := Map()               ; names whose crash or exit came before their spawn answer (F-9010*)
         this._started := false                 ; Start() was called
         this._ready := false                   ; the orphans are gone, the pool may grow
         this._stopped := false                 ; the engine shuts down
@@ -263,7 +264,8 @@ class WorkerBridge {
         slot := this._SlotNamed(name)
         if (msg.type = "evt.process.ready") {
             if (!IsObject(slot)) {
-                this._earlyReady[name] := true      ; the spawn answer follows (or the worker is not ours)
+                if (this._spawning > 0)             ; the spawn answer follows (or the worker is not ours)
+                    this._earlyReady[name] := true
             } else if (slot["state"] = "starting") {
                 this._SetIdle(slot)
                 this._owner.Kick()
@@ -271,8 +273,13 @@ class WorkerBridge {
         } else if (msg.type = "evt.process.crashed" || msg.type = "evt.process.exited") {
             if (this._earlyReady.Has(name))
                 this._earlyReady.Delete(name)
-            if (!IsObject(slot))
-                return                              ; one we ended ourselves, or not ours
+            if (!IsObject(slot)) {
+                ; Not ours, or one we ended ourselves, or one that ended before its spawn answer arrived (F-9010*):
+                ; then the answer must not create a slot for it.
+                if (this._spawning > 0)
+                    this._earlyGone[name] := msg.type
+                return
+            }
             execId := slot["execId"]
             this._RemoveSlot(slot)
             if (execId != "")
@@ -314,12 +321,21 @@ class WorkerBridge {
                 , ObjBindMethod(this, "_OnSpawn", why), WorkerBridge.SPAWN_TIMEOUT_MS)
         } catch as e {
             this._spawning -= 1
+            this._ForgetEarlyEvents()
             this._Failure("worker not requested: " Type(e) ": " e.Message)
         }
     }
 
     _OnSpawn(why, res) {
         this._spawning -= 1
+        try {
+            this._HandleSpawnAnswer(why, res)
+        } finally {
+            this._ForgetEarlyEvents()
+        }
+    }
+
+    _HandleSpawnAnswer(why, res) {
         if (this._stopped)
             return
         if (!res.payload.Get("ok", false)) {
@@ -329,6 +345,16 @@ class WorkerBridge {
             return
         }
         name := res.payload.Get("name", "")
+        if (this._earlyGone.Has(name)) {
+            ; The worker ended before the answer arrived: no slot, a failure like any other unexpected end.
+            this._earlyGone.Delete(name)
+            if (this._earlyReady.Has(name))
+                this._earlyReady.Delete(name)
+            this._Failure(name " ended before its start was answered")
+            this._Maintain()
+            this._owner.Kick()
+            return
+        }
         slot := Map("name", name, "state", "starting", "execId", "", "idleSince", 0)
         this._slots.Push(slot)
         if (this._earlyReady.Has(name)) {
@@ -336,6 +362,15 @@ class WorkerBridge {
             this._SetIdle(slot)
         }
         this._owner.Kick()
+    }
+
+    ; Early events (ready or ended before the spawn answer) are only kept while a spawn answer is on its way; a failed
+    ; spawn has no name to match them with (F-9010*).
+    _ForgetEarlyEvents() {
+        if (this._spawning = 0) {
+            this._earlyReady.Clear()
+            this._earlyGone.Clear()
+        }
     }
 
     ; --- maintenance (warm workers, idle end) ----------------------------------------------------

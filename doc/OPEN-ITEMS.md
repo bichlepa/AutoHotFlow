@@ -40,7 +40,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 
 | F-0090 | Fast tier: `test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_kill` got no `evt.engine.ready` of the second chain within 20 s | observed once, run 20261015-230752-0bb0d843 on `0bb0d84`, open | |
 | F-0091 | Slow tier: `test_clients_churn.py` smoke variant: handles of the engine grew from 145 to 164 (slack 3) | observed once, run 20261015-230952-0bb0d843 on `0bb0d84`, open | |
-| F-9010* | `WorkerBridge`: leftovers of a failed spawn, no start timeout for a slot in "starting" | read in code only, assumed, not checked, open | |
+| F-9010* | `WorkerBridge`: leftovers of a failed spawn, no start timeout for a slot in "starting" | (a), (b) verified by unit test and fixed; (c) read in code, covered by the supervisor; verifier pending | |
 
 ## Findings
 
@@ -249,8 +249,9 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 (a) `_earlyReady` entries stay behind when a spawn fails: `OnProcessEvent` stores the name when `evt.process.ready` arrives before the spawn answer, and only `_OnSpawn` (success) or a crash/exit event removes it. If the spawn answer then says `ok: false` or times out, the name stays in the map for ever (small leak; a reused name could be taken for ready by mistake, assumed only).
 (b) A worker that crashes before its spawn answer arrives: `evt.process.crashed`/`exited` finds no slot and returns, then `_OnSpawn` adds a slot in state "starting" for a process that is already gone. Nothing removes it, there is no start timeout in the file, so the slot stays and counts against the size N (`Want` also subtracts "starting" slots).
 (c) The header comment lists "a start that never got ready" as a failure that is counted, but no code for it was found in the file (same gap as (b)).
-**Status:** assumed, not checked (read in code only, no test, no run).
-**Action:** confirm (b) with a unit test of the bridge (crash event before the spawn answer); if confirmed, add a start timeout for "starting" slots that removes the slot, asks the supervisor to kill the process and counts a failure, and delete `_earlyReady` entries on a failed spawn.
+**Status:** (a) and (b) verified by unit test: both new cases in `tests/ahk/engine_worker_bridge.test.ahk` fail on the old code (slot count 1 instead of 0; stale early ready counted for a new worker) and pass with the fix (25 passed). (c) read in code: the supervisor judges a worker that does not become ready (state `starting` to `hung` on the startup timeout, `Children.ahk`) and ends it, which reaches the bridge as `evt.process.crashed`; so no second timeout is needed in the bridge, and only the header comment is imprecise. The window of (b) is small (the process must end before the spawn answer reaches the engine), so it shows up only under heavy load or a worker that dies at once; not seen in a real run. The fix is pending the fast tier.
+**Fix:** early ready/ended events are kept only while a spawn answer is on its way and are forgotten when the last one has arrived; a worker that ended before its answer gets no slot and counts as a failure.
+**Action:** close after a verifier run; correct the header comment (start failures come from the supervisor as crash events).
 
 ## Watch list (E0007)
 
