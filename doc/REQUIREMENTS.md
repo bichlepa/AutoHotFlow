@@ -553,6 +553,64 @@ A script calls an element of any package like a function, with its parameters, a
 
 The debugger (DBG) runs a script line by line, with breakpoints on lines, and shows the variables of the script and of its functions.
 
+### REQ-SCR-110 Script variants of conditions, loops and triggers
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+Every kind of element can be written as a script, not only an action (`Action_Script`, REQ-VAR-020):
+
+| Element | What the script does |
+|---|---|
+| Condition | its result decides between "yes" and "no" |
+| Loop | the loop repeats as long as an expression is true, or the script decides at each pass |
+| Trigger | the trigger checks an expression at a fixed interval and fires when it becomes true, for example `FileExist(path) && A_Hour >= 8` |
+
+The trigger can be built with a timer, a condition and a few elements, but then the flow starts at every check and writes to the log each time. The script trigger starts the flow only when the expression has become true.
+
+### REQ-SCR-120 Try out expressions
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+A field in the editor evaluates an expression or a short script at once and shows the result and the warnings, with values that the user enters. In the debug dialog (REQ-DBG-060) and in the debugger (DBG) the same field works on the variables of the halted branch.
+
+### REQ-SCR-130 Tests for own functions
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+The user writes test scripts for own functions and flows called as functions (REQ-SCR-040): call with given arguments, compare the result with the expected one. AutoHotFlow runs the tests on request and reports which failed and why. The tests are code like the functions; there is no separate editor for test cases.
+
+### REQ-SCR-140 Script templates
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+Ready-made pieces of script that the user inserts and adapts, for example "format a date", "filter a list", "read a value from JSON". The user can save own templates. Templates for element settings: REQ-EDT-220.
+
+### REQ-SCR-150 Types of function parameters
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+The parameters and the result of an own function (REQ-SCR-040) may carry a type (number, text, list, object). The editor uses it to check calls (REQ-EDT-200) and to offer completion (REQ-EDT-210); a call with a wrong type is a warning, in strict mode an error (REQ-VAR-100).
+
 ## Element packages (PKG)
 
 ### REQ-PKG-010 Elements are organised in packages
@@ -803,7 +861,7 @@ They record the path through a flow and check it; automatic test flows use them 
 | `Action_Message_Box` | yes | open | S0002 (WI-0056) |
 | `Action_Tooltip` | yes | open | S0002 (WI-0056) |
 | `Condition_Confirmation_Dialog` | yes | open | S0002 (WI-0056) |
-| `Condition_Debug_Dialog` | yes | open | S0002 (WI-0056) |
+| `Condition_Debug_Dialog` (REQ-DBG-060) | yes | open | S0002 (WI-0056) |
 | `Action_Input_Box` | yes | open | S0008 |
 | `Action_Select_file` | yes | open | S0008 |
 | `Action_Select_folder` | yes | open | S0008 |
@@ -1572,6 +1630,16 @@ The element settings check every expression field and every script field (REQ-VA
 
 Expression and script fields colour their syntax and complete names of variables and functions, as an IDE does.
 
+### REQ-EDT-220 Examples and templates in the element settings
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+The element settings offer typical settings and examples of the element, which the user takes over with one click: for example a few common formats of a date, or a typical HTTP request. The user can save the current settings of an element as an own template and use it again for other elements of the same class. Taking over a template asks before it overwrites values that the user has already entered. Where it is offered (a button with a menu, the help of the element) is open.
+
 ## Settings (SET)
 
 ### REQ-SET-010 Global settings dialog
@@ -1843,7 +1911,24 @@ A window shows the process table, the snapshot of each process, the live log, th
 
 ## Debugger (DBG)
 
-The debugger is the long-term goal of decision E0001. It is not part of phase 3 (E0019), but nothing built now may prevent it (`ARCHITECTURE.md` 4.3).
+The debugger is the long-term goal of decision E0001. It is not part of phase 3 (E0019), but nothing built now may prevent it (`ARCHITECTURE.md` 4.3). The debug dialog (REQ-DBG-060), which v1 has, is part of the port.
+
+### REQ-DBG-060 Debug dialog
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0002 (WI-0056)
+
+The condition `Condition_Debug_Dialog` is the debugging tool of the user: placed anywhere in a flow, it halts the branch there and opens a window in which the user
+
+- sees every variable that the branch can see, grouped by scope (loop, thread, instance, static, global; REQ-VAR-040), and refreshes the list;
+- sees the value of a variable; an object is shown as readable text, special characters optionally converted;
+- changes the value and the type (value or object) of a variable, and deletes a variable;
+- decides how the flow goes on: "Yes" or "No" (the outputs of the condition). Closing the window ends the element with `exception`.
+
+The halted branch waits; other branches and flows go on (REQ-EXE-100). In tests a test provider answers the dialog (E0038). Secret values stay hidden (REQ-SEC-040). Later ideas: show the built-in variables, and evaluate an expression against the variables of the branch (REQ-SCR-120).
 
 ### REQ-DBG-010 Pause and resume
 
@@ -1877,7 +1962,7 @@ Execute one element at a time, or all of them with a pause between the steps, so
 
 ### REQ-DBG-040 Inspect and change variables while paused
 
-- **v1:** partial (the condition `Debug_Dialog` shows variables during a run)
+- **v1:** partial (the debug dialog shows and changes variables during a run, REQ-DBG-060)
 - **v2:** open
 - **Prio:** should
 - **Scope:** later
@@ -2551,7 +2636,7 @@ Every hint that is not critical (for example "take care with global variables", 
 - **Scope:** port
 - **Plan:** S0004
 
-When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the user learns it without reading the log: a notice (a window as in v1, or in the tray) that never blocks the flows, and a mark at the flow in the manager until the user has looked at it. Many errors in a short time give one notice. The notice can be switched off per flow and globally (REQ-USE-070).
+When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the user learns it without reading the log: a window like the debug dialog (REQ-DBG-060) shows the error message, the element and the variables of the branch at the moment of the error. Unlike the debug dialog it does not halt anything, because the branch has already ended; the variables can be looked at, not changed. The flow also gets a mark in the manager until the user has looked at the error. Many errors in a short time give one notice. The notice can be switched off per flow and globally (REQ-USE-070).
 
 ### REQ-USE-090 Sharp and correctly sized on high-resolution displays
 
