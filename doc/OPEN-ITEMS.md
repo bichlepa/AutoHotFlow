@@ -35,7 +35,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0087 | Slow tier: `test_clients_churn.py` smoke variant got 13 snapshot probes during the churn, 20 required | observed once under load, run 20261015-201045-acc9907a on `acc9907`, green alone, open | |
 | F-0089 | Slow tier under load: three fault tests fail that pass alone: killed worker without `evt.process.crashed`, shutdown of session 1 took 6.15 s (limit 6.0), supervisor-stall test | observed once under load, run 20261015-203710-59c199ec (code of `d179825`), green alone (12 passed, run 20261015-204219-59c199ec), open | |
 
-| F-0090 | Fast tier: `test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_kill` got no `evt.engine.ready` of the second chain within 20 s | observed once, run 20261015-230752-0bb0d843 on `0bb0d84`, open | |
 | F-0094 | Fast tier: `test_pings_are_answered_while_a_blocking_element_runs` third ping answered after 0.808 s (limit 0.8 s) | observed once under load, run 20261015-231712-bc27cbe5 on `bc27cbe` (the commit only touches `WorkerBridge`, not used by this test); green alone, run 20261015-231824-bc27cbe5, open | |
 
 ## Findings
@@ -186,12 +185,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **What:** `tests/integration/test_supervisor.py::test_frozen_child_is_hung_within_8s_and_ended_like_a_crash` failed with `assert crashed[0] - hung[0] <= 4.0`: the child was terminated 5.08 s after the hang. The hang itself was detected in time (5.89 s after the freeze, within 8 s).
 **Status:** observed once, run 20261015-172954-99e2c044 on `1aceedd` (slow tier, one run). Same test family as F-0080 (frozen process timing under load). Suspicion (assumed): a slower child exit or start after the new entry scripts, or load; not separated.
 **Action:** compare with `b92d800` and with an idle machine, same test in a loop.
-
-### F-0090: the second chain of the persistence test does not get `evt.engine.ready`
-
-**What:** `tests/fault/test_var_persistence.py::test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_kill` failed at `wait_ready_count(other, 1)` (line 202, after the first part with the orderly exit had passed): `evt.engine.ready #1 missing` after 20 s, the supervisor text was empty.
-**Status:** observed once, run 20261015-230752-0bb0d843 on `0bb0d84` (`python tools/run_suite.py --ref 0bb0d84 -- -q`, fast tier: 1 failed, 842 passed, 1 skipped, no INTERNALERROR). The foundation run on the same commit was started at the same time (run 20261015-230752-0bb0d843-2) and was green. Not repeated. Suspicion (assumed): load from the parallel foundation run, or a second chain started right after `shutil.rmtree` of the data folder whose engine never became ready. The empty supervisor text is conspicuous; the run log data was not examined further. Probable cause task: none of the last two commits (they touch a supervisor test and an AHK pipe test); the tests of the variable persistence were not changed.
-**Action:** if it returns, look at the process list and the supervisor log in the run log data; run the test alone in a loop.
 
 ### F-0086: a child of ChildLauncher did not end within 10 s although its stdin is NUL
 

@@ -39,6 +39,7 @@ This document lists findings that are closed or accepted. Moved from doc/OPEN-IT
 | F-0092 | Slow tier, stress tests in it: `test_clients_churn.py` (smoke and 20x8) fail the handle check of the engine: 145 handles before, 164 after (limit 148), on the base `dec432b` too | closed 2026-10-15 | |
 | F-0093 | `WorkerBridge`: leftovers of a failed spawn, no start timeout for a slot in "starting" | closed 2026-10-15 | |
 
+| F-0090 | Fast tier: persistence test got no `evt.engine.ready` of the second chain within 20 s | closed 2026-10-15 | |
 
 ## Findings
 
@@ -358,4 +359,14 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 **Action:** close after a verifier run; correct the header comment (start failures come from the supervisor as crash events).
 
 **Closed 2026-10-15.** Verified on `6bdbda4`: the fast run 20261015-232304-6bdbda46 (860 passed, exit 0) contains both new unit cases of `tests/ahk/engine_worker_bridge.test.ahk`, and the same file run by hand passed 25 of 25. Point (c) is covered by the supervisor; no change.
+
+### F-0090: the second chain of the persistence test does not get `evt.engine.ready`
+
+**What:** `tests/fault/test_var_persistence.py::test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_kill` failed at `wait_ready_count(other, 1)` (line 202, after the first part with the orderly exit had passed): `evt.engine.ready #1 missing` after 20 s, the supervisor text was empty.
+**Status:** observed once, run 20261015-230752-0bb0d843 on `0bb0d84` (`python tools/run_suite.py --ref 0bb0d84 -- -q`, fast tier: 1 failed, 842 passed, 1 skipped, no INTERNALERROR). The foundation run on the same commit was started at the same time (run 20261015-230752-0bb0d843-2) and was green. Not repeated. Suspicion (assumed): load from the parallel foundation run, or a second chain started right after `shutil.rmtree` of the data folder whose engine never became ready. The empty supervisor text is conspicuous; the run log data was not examined further. Probable cause task: none of the last two commits (they touch a supervisor test and an AHK pipe test); the tests of the variable persistence were not changed.
+**Action:** if it returns, look at the process list and the supervisor log in the run log data; run the test alone in a loop.
+
+**Cause (verified):** a race of the test observer, not a fault of the engine. The log of a failed run shows the second session starting, `engine ready with 2 flow(s)` and the observer connecting in the same second, the observer after the engine. The observer subscribes after its connect, so `evt.engine.ready` was already sent and never recorded (the kit knows this case, `Chain.wait_flows`, WI-0028). A warm second start is fast enough to lose the race. Reproduced: 3 of 14 runs of the test alone (`-n 0`) failed with the 20 s wait.
+**Fix:** `cmd.engine.snapshot` answers `ready` (true after `evt.engine.ready`, PROTOCOL 4.2), and `wait_ready_count(chain, 1)` accepts it when the event is missing. Commit df3f320.
+**Closed 2026-10-15.** Verified on df3f320: 16 of 16 runs of the test alone passed (before: 3 of 14 failed); the fast tier of `94ac3b1` (same code, only comments differ) passed, run 20261015-233954-94ac3b11 (860 passed, 1 skipped, exit 0). Other tests that wait for the first `evt.engine.ready` through other helpers were not checked.
 
