@@ -39,6 +39,13 @@ Later commits on `v2-port` after `6f4241c` that did not change these trees: none
 
 ## Agents
 
+Session 5 start: 2026-10-15, work-item mode, HEAD `b92d800` on `v2-port`, main checkout clean. Highest final ID at start: F-0375; ID blocks F-0376 to F-0385 (implementer WI-0047-PREP), F-0386 to F-0395 (bug hunter round 7). Next open work item: WI-0047-PREP (depends on WI-0046 and WI-0042, both done). Leftover workspaces with commits not on `v2-port`, not created by this session and not in the table below: `wip/chrome-cleanup` (8778839), `wip/requirements` (5 commits plus an untracked file `doc/Untitled-1.txt` in its workspace), `wip/hunt-13` (1d7a6cd, held for the owner's decision on F-14). Left alone, to be decided by the owner.
+
+| Slot | Role | Model | Workspace | Branch | Task | State |
+|---|---|---|---|---|---|---|
+| 1 | Implementer WI-0047-PREP | sonnet | wi-47p | wip/wi-47p | role entry scripts, M-0032/M-0033 | running |
+| 2 | Bug hunter round 7 (OPEN-ITEMS) | sonnet | hunt-14 | wip/hunt-14 | excluded: F-0014, F-0282, F-0287, role entries | running |
+
 Session 4 start: 2026-10-14, work-item mode, HEAD `1c37bce` on `v2-port`, main checkout clean, no workspaces left over. WI-43 stays open: the owner's decision on F-282 (scheduled in S2) is recorded, the acceptance itself (stress green) is not met; the owner closes S1. S2 started with the packages that have no open dependency: WI-44 (depends on WI-38, done), in parallel the owner-decided fix F-17 and F-275 (option (a)).
 
 | Slot | Role | Model | Workspace | Branch | Task | State |
