@@ -1366,6 +1366,7 @@ Closing the manager window only hides it. Flows and triggers keep running; the t
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
+- **Evidence:** - (until S0004 no tray icon is shown, E0046; tests/integration/test_entry.py::test_the_boot_file_hides_the_tray_icon only checks that it is hidden)
 
 AutoHotFlow shows exactly one tray icon, however many of its processes run. The tray icon shows the manager (default action) and ends the application. Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030).
 

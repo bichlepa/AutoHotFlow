@@ -1,5 +1,8 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
+; No tray icon in any process (E0046): the manager gets its own icon in S0004 (REQ-MGR-090). The directive acts on the whole
+; script, so every entry that includes this file is covered; the first thing of this file is also the earliest point.
+#NoTrayIcon
 
 ; Boot code that every role process shares (WI-0029, split by WI-0047-PREP). Each entry script includes this file first,
 ; then the code of its own role (and only that), registers the role and calls AhfMain (doc/ARCHITECTURE.md D0012, 8):
