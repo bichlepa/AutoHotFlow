@@ -24,7 +24,7 @@ Each step is worked through individually: **detail** (package files WI-xx with t
 
 | # | Step | Content (rough) | Acceptance | Status |
 |---|---|---|---|---|
-| **S0001** | Expressions and variables | new expression language (AHK v2 semantics), conversion of old expressions, golden data from v1, variable model, `global`/`static` permanent, parameter evaluation | see below, packages WI-0036 to WI-0043 | implemented, acceptance open (F-0073) |
+| **S0001** | Expressions and variables | new expression language (AHK v2 semantics), conversion of old expressions, golden data from v1, variable model, `global`/`static` permanent, parameter evaluation | see below, packages WI-0036 to WI-0043 | done (acceptance closed 2026-10-15, E0050; F-0073 stays open) |
 | **S0002** | Element foundation and core set | oracle of the expression language (native AHK v2, E0035), migration markers, R0003 measurement, element layout per package (E0037), L0001 smoke test, flow builder for tests, R0004 (`ctx.Request`), dialog test seam (E0038), core set of 29 elements, test corpus from the "Automatic tests" flows | see below, packages WI-0044 to WI-0058 | **detailed** |
 | S0003 | Trigger host and a few triggers | role `triggerhost` (WI-0014), `cmd.trigger.arm/disarm`, `evt.trigger.fired/error`, re-arming after engine restart, activate/deactivate flow. Triggers: Manual, Hotkey, Periodic_Timer, Start_up | trigger e2e and fault tests | rough |
 | S0004 | UI foundation and manager | `ui_common/`, manager (category tree, start/stop/activate, new/rename/delete/duplicate, settings, log display, hints), **import from v1** (flows, variables), `.ahf` export/import, engine commands `cmd.flow.create/delete/meta.update`, `cmd.category.*`, `cmd.settings.*`, global setting for the number of workers (E0044, F-0082). Closing the window only hides it (E0014). Tray icon, start with Windows, run as administrator, user level setting, about window (REQ-MGR-090, REQ-SET-030, REQ-SET-040, REQ-USE-010, REQ-MGR-100). Notice on unhandled flow errors (REQ-USE-080), imported flows disabled with a warning (REQ-SEC-060), the manager can be reopened after a crash (REQ-ROB-120), sharp on high-resolution displays (REQ-USE-090, also S0005 to S0007) | operation by hand, e2e of the commands | rough |
@@ -145,7 +145,7 @@ WI-0036 and WI-0037 can run in parallel. WI-0036 starts only after WI-0034 (it c
 
 ### Progress S0001
 
-- [x] WI-0036  - [x] WI-0037  - [x] WI-0038  - [x] WI-0039  - [x] WI-0040  - [x] WI-0041  - [x] WI-0042  - [ ] WI-0043 (serial and parallel run green, one stress test red: F-0073)
+- [x] WI-0036  - [x] WI-0037  - [x] WI-0038  - [x] WI-0039  - [x] WI-0040  - [x] WI-0041  - [x] WI-0042  - [x] WI-0043 (closed by the owner 2026-10-15, E0050)
 
 ## S0002: Element foundation and core set
 

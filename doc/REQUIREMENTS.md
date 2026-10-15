@@ -1901,7 +1901,7 @@ Each process answers a diagnostic snapshot (memory, handles, connections, log ri
 ### REQ-DIA-050 Debug window for developers
 
 - **v1:** partial (`d()` with the setting `developing`, MIGRATION M-0021)
-- **v2:** done (the manual check of the window is still open)
+- **v2:** done
 - **Prio:** should
 - **Scope:** port
 - **Plan:** -

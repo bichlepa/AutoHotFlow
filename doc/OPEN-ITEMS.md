@@ -43,7 +43,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0085 | Foundation tier: the crasher restarts 4 times (`evt.process.started`), 3 expected | observed once, run 20261015-173445-99e2c044 on `1aceedd`, open | |
 | F-0086 | Foundation tier: `child_launcher.test.ahk` case "stdin of the child is NUL": `findstr` did not end within 10 s | observed once under load, run 20261015-201039-acc9907a on `acc9907`, green alone, open | |
 | F-0087 | Slow tier: `test_clients_churn.py` smoke variant got 13 snapshot probes during the churn, 20 required | observed once under load, run 20261015-201045-acc9907a on `acc9907`, green alone, open | |
-| F-0088 | Slow tier: a burst of 5000 log lines ends with 4999 lines written or counted as dropped; one line is lost without a count | cause found (race in the log buffers of storage), fixed in 8bd2293, verified under load; verifier pending | |
 | F-0089 | Slow tier under load: three fault tests fail that pass alone: killed worker without `evt.process.crashed`, shutdown of session 1 took 6.15 s (limit 6.0), supervisor-stall test | observed once under load, run 20261015-203710-59c199ec (code of `d179825`), green alone (12 passed, run 20261015-204219-59c199ec), open | |
 
 
@@ -268,20 +267,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** observed once, run 20261015-201045-acc9907a on `acc9907` (slow tier, next to a foundation-tier run and another agent). Green alone right after. Suspicion (assumed): load; the number of probes depends on how fast the churn ends. Not checked.
 **Action:** if it returns on an idle machine, count probes per second instead of an absolute number.
 
-### F-0088: one log line of a burst is neither written nor counted as dropped
-
-**What:** `tests/fault/test_log_burst.py::test_a_burst_of_log_lines_does_not_cost_the_storage_link` failed with `assert written + dropped == BURST, (written, dropped)`: `(2768, 2231)`, 4999 of 5000. The test promises that no line is lost silently: every line is in `Log.txt` or `Log_old.txt`, or counted in a "n log lines dropped" line. One line is neither.
-**Status:** observed once, run 20261015-202736-c08757b9 on `c08757b` (slow tier through `tools/run_suite.py`, the only suite on the machine; other agents may have run tests). Green alone right after (2 passed). The change under test (WI-0047, element packages) does not touch the log path (`src/core/Log.ahk`, `src/storage/`, `src/supervisor/DiagLog.ahk`). Suspicion (assumed): a line at the rotation from `Log.txt` to `Log_old.txt`, or a drop that is not counted; related to F-0063 (a line lost while other processes hold the files)? Not checked.
-**Action:** read the `pytest-log` of the run (the data folder of the failed test is kept there) and compare the sequence numbers of the lines around the rotation and the "dropped" lines; run the test in a loop.
-
-**Update 2026-10-15 (verifier, run 20261015-203710-59c199ec, code of `d179825`):** the same symptom happened again, 5000 lines end as (2935 written, 2064 dropped) = 4999. Green alone in a serial rerun (run 20261015-204219-59c199ec). Suspicion (assumed): a load-dependent bug in the log path (rotation or the drop count), not WI-0047. Action: treat as reproducible; loop the test under load and compare the sequence numbers around the rotation.
-
-**Update 2026-10-15 (bug hunter), cause found and fixed:**
-- **Reproduced (verified):** 6 parallel loops of the test (`pytest tests/fault/test_log_burst.py --all -m slow -k burst_of -n 0`, a copy of the test that keeps `Log/`): 6 of 30 runs ended with 4999 in the first batch (further batches: 3 to 4 of 24), one line short, once two lines short; some other runs failed with a hung storage under that load, a different effect. Alone the test is green.
-- **Cause (verified):** the lost line is neither in the rotation nor in a drop count. Counters in the processes (temporary instrumentation, removed) showed: role sent 5000, hub passed on and counted exactly the lines of its notes, storage received exactly 5000 minus the notes, but one line was never finished. The log of storage had `peer storage: handler for evt.log.append failed: UnsetItemError: Item has no value.`; the stack was `Storage._LogToFile` at `buf := this.logBuffers[fileName]` (one line after `if (!this.logBuffers.Has(fileName))`). `_FinishLogBundle` runs in the timer thread of the write queue and, when a file has no waiting lines, deletes the buffer from `logBuffers`; if it interrupts the handler between the check and the read, the read throws. `Dispatcher.Invoke` turns the throw into a failed handler (only a log line), so the entry vanished from both files, was not counted, and `logQueuedEntries` stayed one too high (a leak). The lost entry was also missing in the hub/role/storage drop counts because it had passed all of them.
-- **Fix (8bd2293):** `_LogToFile` and the tail of `_FinishLogBundle` (clear the flag, reschedule or delete the buffer) run under `Critical`; the buffer is read once with `Get`. Unit test `tests/ahk/storage_logbuf.test.ahk` simulates the interruption (a Map that removes the key after its first read): red before (UnsetItemError), green after. Verified under load: 30 of 30 runs of the burst test green with the same 6 parallel loops (before 6 of 30 with 4999).
-- **Also:** the same mechanism may explain F-0063 (a log line lost without a count); not checked.
-- **Next step:** the verifier runs the slow tier; if one line is missing again, look for `handler for evt.log.append failed` in the log of the run first.
 ### F-0089: three fault tests fail under load and pass alone
 
 **What:** in the same slow run: `test_process_crash.py::test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted[0]` ("no evt.process.crashed for worker:1", the watcher saw the death, state `exited`, event list ends with `evt.process.exited`), `test_shutdown.py::test_two_sessions_in_a_row_both_exit_within_2_seconds[0]` (`6.15 s <= 6.0`), `test_supervisor_stall.py::test_supervisor_stand_still_does_not_make_healthy_children_hung[0]` (assertion at line 55; the log shows "supervisor stood still for 7861 ms").
@@ -317,7 +302,6 @@ These items were deliberately not fixed in phase 2b. Closed items (F-0004, F-000
 - A real second Windows user connecting to the pipe (F-0017 is closed on the DACL test only).
 - Standby (see the watch list item on deadlines after standby).
 - Screenshots with a locked desktop.
-- GUI operation of the stub and of the debug window by hand. Guides: `v2-phase2-final:work_items/phase2/WI-0013-ui-stub.md` and `v2-phase2-final:work_items/phase2b/WI-0028-diagnose-bericht-debugfenster.md`.
 - Real blocking dialog elements in a worker.
 - Worker pool in a long run with more than 3 workers.
 - Trigger host (not built).

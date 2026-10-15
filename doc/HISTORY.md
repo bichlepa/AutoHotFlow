@@ -13,7 +13,7 @@ Commit IDs in the table below are the short IDs from the sources. The "Commits" 
 | Phase | Packages | Status (per sources) |
 |---|---|---|
 | Phase 0 and 1 | none (analysis and architecture, no WI numbers; commit `d3e0650` is the Phase 2b plan) | done |
-| Phase 2, walking skeleton | WI-0001 to WI-0017 | done, except WI-0013 (manual GUI check) and WI-0014 (not built, decision E0006) |
+| Phase 2, walking skeleton | WI-0001 to WI-0017 | done, except WI-0014 (not built, decision E0006); WI-0013 manual GUI check done 2026-10-15 (E0051) |
 | Phase 2b, hardening before phase 3 | WI-0018 to WI-0029 | done, with open points (end state of phase 2b) |
 | Fix block | WI-0030 to WI-0035 (WI-0030, WI-0031, WI-0033, WI-0032, WI-0034, WI-0035 in this order of work) | done; acceptance green in WI-0035, cycle 1 |
 | Phase 3 | WI-0036 to WI-0043 | approved by the project owner on 2026-10-13; the work items are open |
