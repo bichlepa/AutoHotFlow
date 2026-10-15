@@ -286,10 +286,10 @@ class ExprEvaluator {
     }
 
     static PathText(path) {
-        s := ""
+        str := ""
         for part in path
-            s .= (A_Index = 1 ? "" : ".") (IsObject(part) ? "<" Type(part) ">" : part)
-        return s
+            str .= (A_Index = 1 ? "" : ".") (IsObject(part) ? "<" Type(part) ">" : part)
+        return str
     }
 
     ; ---- assignment ------------------------------------------------------------------------------------
@@ -327,9 +327,9 @@ class ExprEvaluator {
 
     _Call(n) {
         callee := n["callee"]
-        args := []
+        argList := []
         for a in n["args"]
-            args.Push(this._Eval(a))
+            argList.Push(this._Eval(a))
         if (callee["type"] = "Index") {
             this._Error(callee, "methods cannot be called; only the functions of the language can")
             return ""
@@ -347,13 +347,13 @@ class ExprEvaluator {
             this._Error(callee, "unknown function '" name "'")
             return ""
         }
-        count := args.Length
+        count := argList.Length
         if (count < entry["min"] || (entry["max"] >= 0 && count > entry["max"])) {
             this._Error(n, "function '" name "' takes " ExprEvaluator._Range(entry["min"], entry["max"]) " argument(s), got " count)
             return ""
         }
         try {
-            return entry["fn"].Call(this, args*)
+            return entry["fn"].Call(this, argList*)
         } catch Error as e {
             this._Warn(n, "'" name "' failed: " e.Message)
             return ""

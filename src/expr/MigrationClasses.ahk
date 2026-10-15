@@ -75,27 +75,27 @@ class MigrationClasses {
     ; The IDs (ascending, each once) of the classes that are marked. Unknown classes and rewrites are left out.
     static IdsOf(classes) {
         seen := Map()
-        ids := []
+        idList := []
         for cls in classes {
             if (!MigrationClasses.IsMarked(cls))
                 continue
             id := MigrationClasses.IdOf(cls)
             if (!seen.Has(id)) {
                 seen[id] := true
-                ids.Push(id)
+                idList.Push(id)
             }
         }
         ; insertion sort: IDs have the form M-nn, so the text order is the numeric order
-        loop ids.Length - 1 {
+        loop idList.Length - 1 {
             k := A_Index + 1
-            item := ids[k]
+            item := idList[k]
             m := k - 1
-            while (m >= 1 && StrCompare(ids[m], item) > 0) {
-                ids[m + 1] := ids[m]
+            while (m >= 1 && StrCompare(idList[m], item) > 0) {
+                idList[m + 1] := idList[m]
                 m -= 1
             }
-            ids[m + 1] := item
+            idList[m + 1] := item
         }
-        return ids
+        return idList
     }
 }

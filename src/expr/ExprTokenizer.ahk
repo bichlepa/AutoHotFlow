@@ -184,7 +184,7 @@ class ExprTokenizer {
         pos := this._pos
         text := this.text
         RegExMatch(text, ExprTokenizer.NUM_RX, &m, pos)
-        s := m[0]
+        str := m[0]
         after := SubStr(text, pos + m.Len, 1)
         bad := (after != "" && ExprNames.IsWordChar(after))
         if (!bad && after == "." && RegExMatch(text, "A)\.[0-9]", , pos + m.Len))
@@ -196,30 +196,30 @@ class ExprTokenizer {
             return
         }
         value := ""
-        if (SubStr(s, 1, 2) = "0x") {
-            digits := LTrim(SubStr(s, 3), "0")
+        if (SubStr(str, 1, 2) = "0x") {
+            digits := LTrim(SubStr(str, 3), "0")
             if (StrLen(digits) > 16 || (StrLen(digits) = 16 && RegExMatch(digits, "^[89A-Fa-f]"))) {
-                this._Bad("hexadecimal number '" s "' is too large (63 bits at most)", pos, m.Len)
+                this._Bad("hexadecimal number '" str "' is too large (63 bits at most)", pos, m.Len)
                 return
             }
-            value := Integer(s)
-        } else if (RegExMatch(s, "^[0-9]+$")) {
-            digits := LTrim(s, "0")
+            value := Integer(str)
+        } else if (RegExMatch(str, "^[0-9]+$")) {
+            digits := LTrim(str, "0")
             if (StrLen(digits) > 19 || (StrLen(digits) = 19 && StrCompare(digits, "9223372036854775807") > 0))
-                value := Float(s)
+                value := Float(str)
             else
                 value := (digits = "") ? 0 : Integer(digits)
         } else
-            value := Float(s)
-        tok := this._Add("NUM", s, pos, m.Len)
+            value := Float(str)
+        tok := this._Add("NUM", str, pos, m.Len)
         tok.value := value
     }
 
     _String(q) {
         text := this.text
-        start := this._pos
+        strStart := this._pos
         n := StrLen(text)
-        i := start + 1
+        i := strStart + 1
         out := ""
         rx := (q == '"') ? ExprTokenizer.DQ_RX : ExprTokenizer.SQ_RX
         closed := false
@@ -254,23 +254,23 @@ class ExprTokenizer {
             }
             break
         }
-        len := i - start
+        len := i - strStart
         if (!closed) {
-            this._Bad("the string is not closed", start, len)
+            this._Bad("the string is not closed", strStart, len)
             return
         }
         if (badEscape) {
-            tok := this._Add("ERR", SubStr(text, start, len), start, len)
+            tok := this._Add("ERR", SubStr(text, strStart, len), strStart, len)
             return
         }
         ; Two strings directly behind each other: v1 wrote a quote inside a string as "".
         prev := (this.tokens.Length > 0) ? this.tokens[-1] : ""
-        if (prev != "" && prev.type == "STR" && !this._ws && prev.End = start) {
-            this._Error("two string literals directly behind each other; write a quote inside a string as ``" q, start, len)
-            tok := this._Add("ERR", SubStr(text, start, len), start, len)
+        if (prev != "" && prev.type == "STR" && !this._ws && prev.End = strStart) {
+            this._Error("two string literals directly behind each other; write a quote inside a string as ``" q, strStart, len)
+            tok := this._Add("ERR", SubStr(text, strStart, len), strStart, len)
             return
         }
-        tok := this._Add("STR", SubStr(text, start, len), start, len)
+        tok := this._Add("STR", SubStr(text, strStart, len), strStart, len)
         tok.value := out
     }
 

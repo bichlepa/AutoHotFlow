@@ -77,10 +77,10 @@ class V1ExprConverter {
         }
         result["status"] := "converted"
         result["text"] := final
-        for p in syntax
-            result["changes"].Push(Map("rule", p["rule"], "old", p["old"], "new", p["ins"]))
-        for p in literals
-            result["changes"].Push(Map("rule", p["rule"], "old", p["old"], "new", p["ins"]))
+        for hit in syntax
+            result["changes"].Push(Map("rule", hit["rule"], "old", hit["old"], "new", hit["ins"]))
+        for hit in literals
+            result["changes"].Push(Map("rule", hit["rule"], "old", hit["old"], "new", hit["ins"]))
         return result
     }
 
@@ -103,10 +103,10 @@ class V1ExprConverter {
             } else if (V1ExprConverter._IsNameChar(c)) {
                 i := V1ExprConverter._ScanName(text, i, n)
             } else if (InStr(V1ExprConverter.OP_CHARS, c)) {
-                run := V1ExprConverter._OpRun(text, i, n)
-                if (run = ".")
+                opRun := V1ExprConverter._OpRun(text, i, n)
+                if (opRun = ".")
                     V1ExprConverter._CheckDot(text, i, n, patches)
-                i += StrLen(run)
+                i += StrLen(opRun)
             } else {
                 i += 1
             }
@@ -265,8 +265,8 @@ class V1ExprConverter {
         if (patches.Length = 0)
             return text
         sorted := []
-        for p in patches
-            sorted.Push(p)
+        for patch in patches
+            sorted.Push(patch)
         ; insertion sort by position, stable (the patch sets are short)
         loop sorted.Length - 1 {
             k := A_Index + 1
@@ -280,9 +280,9 @@ class V1ExprConverter {
         }
         out := ""
         pos := 1
-        for p in sorted {
-            out .= SubStr(text, pos, p["pos"] - pos) p["ins"]
-            pos := p["pos"] + p["len"]
+        for patch in sorted {
+            out .= SubStr(text, pos, patch["pos"] - pos) patch["ins"]
+            pos := patch["pos"] + patch["len"]
         }
         return out SubStr(text, pos)
     }

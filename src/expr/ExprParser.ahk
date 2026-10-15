@@ -61,8 +61,8 @@ class ExprParser {
     ; Parses text. kind is "expression" (one value) or "script" (statements).
     static Parse(text, kind := "expression") {
         script := (kind = "script")
-        p := ExprParser(text, script)
-        return p.Run()
+        parser := ExprParser(text, script)
+        return parser.Run()
     }
 
     Run() {
@@ -73,11 +73,11 @@ class ExprParser {
         this.depth := 0
         this.pct := 0
         this.nest := 0
-        ast := ""
+        tree := ""
         if (this.script)
-            ast := this._Script()
+            tree := this._Script()
         else
-            ast := this._Expression()
+            tree := this._Expression()
         all := tk.errors.Clone()
         for err in this.errors {
             dup := false
@@ -105,7 +105,7 @@ class ExprParser {
         res["kind"] := this.script ? "script" : "expression"
         res["errors"] := all
         res["ok"] := (all.Length = 0) ? 1 : 0
-        res["ast"] := (all.Length = 0) ? ast : ""
+        res["ast"] := (all.Length = 0) ? tree : ""
         return res
     }
 
@@ -211,11 +211,11 @@ class ExprParser {
         if (first.type == "EOF")
             return ExprNode.EmptyNode(first)
         try {
-            expr := this._ParseAssign()
+            parsed := this._ParseAssign()
             tok := this._Cur()
             if (tok.type != "EOF")
                 this._Unexpected(tok)
-            return expr
+            return parsed
         } catch ExprAbort {
             return ""
         }
@@ -273,13 +273,13 @@ class ExprParser {
             return this._If()
         if (tok.type == "WORD" && tok.kw == "else")
             this._FailTok("'else' without a matching 'if'", tok)
-        expr := this._ParseAssign()
+        parsed := this._ParseAssign()
         t := this._Cur()
         if (t.type != "NL" && t.type != "EOF" && !t.IsOp("}"))
             this._Unexpected(t)
-        if (expr["type"] != "Assign" && expr["type"] != "Call")
-            this._FailNode("a line must be an assignment (x := 1) or a function call (f(x))", expr)
-        return ExprNode.ExprStmtNode(expr)
+        if (parsed["type"] != "Assign" && parsed["type"] != "Call")
+            this._FailNode("a line must be an assignment (x := 1) or a function call (f(x))", parsed)
+        return ExprNode.ExprStmtNode(parsed)
     }
 
     _Block() {
@@ -535,14 +535,14 @@ class ExprParser {
         this.depth += 1
         this._Enter(open)
         this._NotAtEnd(open)
-        args := []
+        argList := []
         tok := this._Cur()
         if (!tok.IsOp(")")) {
             loop {
                 tok := this._Cur()
                 if (tok.IsOp(",") || tok.IsOp(")"))
                     this._FailTok("an argument is expected", tok)
-                args.Push(this._ParseAssign())
+                argList.Push(this._ParseAssign())
                 tok := this._Cur()
                 if (tok.IsOp(","))
                     this._Next()
@@ -554,7 +554,7 @@ class ExprParser {
         this._Leave()
         this.depth -= 1
         this.pct := saved
-        return this._Check(ExprNode.CallNode(callee, args, close.End))
+        return this._Check(ExprNode.CallNode(callee, argList, close.End))
     }
 
     _Bracket(obj) {
@@ -640,17 +640,17 @@ class ExprParser {
         this._NotAtEnd(open)
         if (this._Cur().IsOp(")"))
             this._FailTok("an expression is expected between '(' and ')'", this._Cur())
-        expr := this._ParseAssign()
+        parsed := this._ParseAssign()
         close := this._Close(")", open)
         ; the span of the node includes the parentheses
-        expr["pos"] := open.pos
-        expr["line"] := open.line
-        expr["col"] := open.col
-        expr["end"] := close.End
+        parsed["pos"] := open.pos
+        parsed["line"] := open.line
+        parsed["col"] := open.col
+        parsed["end"] := close.End
         this._Leave()
         this.depth -= 1
         this.pct := saved
-        return expr
+        return parsed
     }
 
     ; A name made of words and %expression% parts that touch each other (a, a%i%, %n%, ro%x%nd, a%i+1%b).
@@ -684,7 +684,7 @@ class ExprParser {
                 this._Enter(open)
                 if (this._Cur().IsOp("%"))
                     this._FailTok("an expression is expected between the '%' signs", this._Cur())
-                expr := this._ParseAssign()
+                parsed := this._ParseAssign()
                 this._Leave()
                 this.pct := 0
                 cl := this._Cur()
@@ -696,7 +696,7 @@ class ExprParser {
                     this._Unexpected(cl, "expected '%'")
                 }
                 this._Next()
-                parts.Push(expr)
+                parts.Push(parsed)
                 lastEnd := cl.End
             } else
                 break

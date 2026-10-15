@@ -54,10 +54,10 @@ class ExprFunctions {
         text := ""
         for v in values {
             if (IsObject(v))
-                s := "<" Type(v) ">"
+                str := "<" Type(v) ">"
             else
-                s := String(v)
-            text .= (A_Index = 1 ? "" : " ") s
+                str := String(v)
+            text .= (A_Index = 1 ? "" : " ") str
         }
         ctx.Log("f1", "print: " text)
         return ""
