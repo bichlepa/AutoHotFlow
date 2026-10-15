@@ -177,6 +177,58 @@ class FlowDefinition {
         return this._connections.Get(connectionId, "")
     }
 
+    ; The IDs of the elements whose class is qualifiedId ("<package>.<class>", any case; a missing package is Default,
+    ; E0045), in the order of the Map (sorted by ID). v1 x_getAllElementIDsOfClass (WI-0052).
+    ElementIdsOfClass(qualifiedId) {
+        pos := InStr(qualifiedId, ".")
+        want := pos ? qualifiedId : "Default." qualifiedId
+        idList := []
+        for id in this._elements {
+            if (this._QualifiedIdOf(id) = want)
+                idList.Push(id)
+        }
+        return idList
+    }
+
+    ; The stored parameters of an element as an object with case-insensitive properties, a copy (v1 x_getElementPars,
+    ; WI-0052). Unlike the parameters that an element receives in Run, the values keep their type: a list stays an
+    ; Array, an object a Map (a JSON null is the empty text). "" if there is no such element.
+    ElementPars(elementId) {
+        elem := this._elements.Get(elementId, "")
+        if (!(elem is Map))
+            return ""
+        out := {}
+        pars := elem.Get("pars", "")
+        if (pars is Map) {
+            for k, v in pars
+                out.%k% := FlowDefinition.CopyValue(v)
+        }
+        return out
+    }
+
+    ; A deep copy of a parsed JSON value: Maps keep their case-insensitivity, Arrays stay Arrays, null is "".
+    static CopyValue(value) {
+        if (value is Map) {
+            m := Map()
+            m.CaseSense := value.CaseSense
+            for k, v in value
+                m[k] := FlowDefinition.CopyValue(v)
+            return m
+        }
+        if (value is Array) {
+            a := []
+            for v in value
+                a.Push(IsSet(v) ? FlowDefinition.CopyValue(v) : "")
+            return a
+        }
+        return (value == Json.Null) ? "" : value
+    }
+
+    _QualifiedIdOf(elementId) {
+        package := this._packages.Get(elementId, "")
+        return (package = "" ? "Default" : package) "." this._classes.Get(elementId, "")
+    }
+
     ; IDs of valid connections that start at the element, in the enumeration order of the Map
     ; (sorted by ID). Dangling connections are not included. Empty array for unknown IDs.
     FromConnections(elementId) {

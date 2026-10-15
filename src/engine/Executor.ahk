@@ -183,6 +183,20 @@ class Executor {
         return true
     }
 
+    ; The element IDs of a flow that have a class (v1 x_getAllElementIDsOfClass, WI-0052): the newest committed revision.
+    ; className is "<class>" (package Default) or "<package>.<class>". Empty Array if the flow is not loaded.
+    ElementIdsOfClass(flowId, className) {
+        rec := this._owner.flows.Get(flowId)
+        return IsObject(rec) ? rec.Def.ElementIdsOfClass(className) : []
+    }
+
+    ; The stored parameters of an element of a flow (v1 x_getElementPars, WI-0052), see FlowDefinition.ElementPars. ""
+    ; if the flow or the element does not exist.
+    ElementParams(flowId, elementId) {
+        rec := this._owner.flows.Get(flowId)
+        return IsObject(rec) ? rec.Def.ElementPars(elementId) : ""
+    }
+
     ; Stops all instances of the flow (ARCHITECTURE 5.1). Returns the number of instances stopped.
     ; Waiting instances are stopped first, so no stop starts an instance that was waiting.
     StopFlow(flowId, reason := "flow.stop") {
@@ -318,6 +332,7 @@ class Executor {
             , ObjBindMethod(this, "_OnFinish", run["instanceId"], thread.Id)
             , this._VarAccess(run, thread, def, elementId))
         ctx.entryPoint := thread.EntryPoint      ; "head" or "tail" for a loop (v1 x_getEntryPoint)
+        ctx.host := this                         ; the flow functions of the context: element lookup, stop (WI-0052)
         if (!def.HasElement(elementId)) {
             ; The element was deleted while the thread waited (ARCHITECTURE 4.2, M-0017).
             Log.Write("f1", "engine", "element '" elementId "' was removed before it could start", flowId)

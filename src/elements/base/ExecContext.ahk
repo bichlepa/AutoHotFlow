@@ -25,6 +25,7 @@ class ExecContext {
         this.State := {}                 ; per-run state of the element
         this.vars := vars                ; VarAccess of the engine, or "" (no variables)
         this.cls := ""                   ; the element class (set by the engine): its Parameters() for EvalParams
+        this.host := ""                  ; the engine side of the flow functions (GetElementIdsOfClass ...), or "" (WI-0052)
         this.strictTypes := 0            ; the flow option strictTypes of the revision the element started with (E0034)
         this.onFinish := onFinish
         this.finished := false
@@ -155,6 +156,32 @@ class ExecContext {
         this._Vars().ImportInstance(vars)
     }
 
+    ; The flow of the element (WI-0052, v1 x_getAllElementIDsOfClass, x_getElementPars, x_InstanceStop). Inline
+    ; elements only: the engine answers from the newest committed revision of the flow.
+
+    ; The IDs of the elements of this flow that have the class className ("Action_Trace_Point" for the package Default,
+    ; or "<package>.<class>"; any case), in the order of the flow file (sorted by ID).
+    GetElementIdsOfClass(className) {
+        return this._Host().ElementIdsOfClass(this.flowId, String(className))
+    }
+
+    ; The stored parameters of an element of this flow, as an object with case-insensitive properties and a copy of
+    ; every value (v1 x_getElementPars). They are not evaluated, and unlike the params of Run they keep a list as an
+    ; Array and an object as a Map. Throws ElementError if the flow has no such element.
+    GetElementPars(elementId) {
+        pars := this._Host().ElementParams(this.flowId, String(elementId))
+        if (!IsObject(pars))
+            throw ElementError("the flow has no element '" elementId "'")
+        return pars
+    }
+
+    ; Stops the instance of this element with all its threads (v1 x_InstanceStop). The instance ends with the reason
+    ; given (default "element.stop", PROTOCOL 4.3). Call it after Finish if the element finishes too: the finish is then
+    ; effective first, as in v1. Returns false if the instance is not running (any more).
+    StopInstance(reason := "element.stop") {
+        return this._Host().StopInstance(this.instanceId, reason) ? true : false
+    }
+
     ; A request to the engine with a callback (ELEMENT-API-V2 section 3): only for worker elements (WorkerContext) and
     ; later triggers. An inline element runs in the engine and calls it directly.
     Request(type, payload, callback, timeoutMs := 5000) {
@@ -218,6 +245,12 @@ class ExecContext {
         if (this.strictTypes && res["warnings"].Length)
             throw ElementError(ExprDiag.FormatAll(res["warnings"]))
         return res["value"]
+    }
+
+    _Host() {
+        if (!IsObject(this.host))
+            throw ElementError("the flow functions are only available in an inline element")
+        return this.host
     }
 
     _Vars() {
