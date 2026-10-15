@@ -13,8 +13,8 @@ run the tool. The legend of the columns is at the top of the source.
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
 | [Elements (ELM)](#elements-elm) | 24 | 0 | 0 | 2 | 22 | 0 | 0 |
 | [Triggers (TRG)](#triggers-trg) | 13 | 0 | 0 | 1 | 12 | 0 | 0 |
-| [Manager (MGR)](#manager-mgr) | 13 | 0 | 0 | 0 | 13 | 0 | 0 |
-| [Editor (EDT)](#editor-edt) | 22 | 0 | 0 | 1 | 21 | 0 | 0 |
+| [Manager (MGR)](#manager-mgr) | 14 | 0 | 0 | 2 | 12 | 0 | 0 |
+| [Editor (EDT)](#editor-edt) | 23 | 0 | 0 | 1 | 22 | 0 | 0 |
 | [Settings (SET)](#settings-set) | 7 | 1 | 0 | 2 | 4 | 0 | 0 |
 | [Import and migration (MIG)](#import-and-migration-mig) | 8 | 5 | 0 | 1 | 2 | 0 | 0 |
 | [Languages and help (LNG)](#languages-and-help-lng) | 5 | 0 | 0 | 2 | 3 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 2 | 1 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 0 | 0 | 1 | 9 | 0 | 0 |
-| **All** | **215** | **53** | **1** | **30** | **130** | **1** | **6** |
+| **All** | **217** | **53** | **1** | **32** | **130** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -161,7 +161,8 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-MGR-060](REQUIREMENTS.md#req-mgr-060-demonstration-flows) | Demonstration flows | yes | open | should | port | S0008 |
 | [REQ-MGR-070](REQUIREMENTS.md#req-mgr-070-show-the-log) | Show the log | yes | open | must | port | S0004 |
 | [REQ-MGR-080](REQUIREMENTS.md#req-mgr-080-closing-the-manager-window-keeps-autohotflow-running) | Closing the manager window keeps AutoHotFlow running | yes | open | must | port | S0004 |
-| [REQ-MGR-090](REQUIREMENTS.md#req-mgr-090-tray-icon) | Tray icon | yes | open | must | port | S0004 |
+| [REQ-MGR-090](REQUIREMENTS.md#req-mgr-090-tray-icon-of-the-application) | Tray icon of the application | yes | partial | must | port | S0004 |
+| [REQ-MGR-140](REQUIREMENTS.md#req-mgr-140-tray-menu-of-the-application) | Tray menu of the application | yes | partial | must | port | S0004 |
 | [REQ-MGR-100](REQUIREMENTS.md#req-mgr-100-about-window) | About window | yes | open | could | port | S0004 |
 | [REQ-MGR-110](REQUIREMENTS.md#req-mgr-110-restore-an-older-version-of-a-flow) | Restore an older version of a flow | no | open | could | later | - |
 | [REQ-MGR-120](REQUIREMENTS.md#req-mgr-120-show-and-change-permanent-variables) | Show and change permanent variables | no | open | should | later | - |
@@ -193,6 +194,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-EDT-200](REQUIREMENTS.md#req-edt-200-expressions-are-checked-while-editing) | Expressions are checked while editing | no | open | should | later | - (could fit into S0007) |
 | [REQ-EDT-210](REQUIREMENTS.md#req-edt-210-syntax-highlighting-and-auto-completion) | Syntax highlighting and auto-completion | no | open | could | later | - |
 | [REQ-EDT-220](REQUIREMENTS.md#req-edt-220-examples-and-templates-in-the-element-settings) | Examples and templates in the element settings | no | open | could | later | - |
+| [REQ-EDT-230](REQUIREMENTS.md#req-edt-230-tray-icon-of-an-editor) | Tray icon of an editor | yes | open | should | port | S0005 (icon), S0006 (menu) |
 
 ## Settings (SET)
 

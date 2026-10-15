@@ -1357,19 +1357,34 @@ The manager shows the log, filtered by level (only errors, some, many, all) and 
 - **Plan:** S0004
 - **Evidence:** -
 
-Closing the manager window only hides it. Flows and triggers keep running; the tray icon brings the window back. Only the "Exit" button of the manager and the "Exit" entry of the tray menu end the application. Decision E0014.
+Closing the manager window only hides it. Flows and triggers keep running; the tray icon brings the window back. Only the "Exit" button of the manager and the "Exit" entry of the tray menu of the application (REQ-MGR-140) end the application. Decision E0014.
 
-### REQ-MGR-090 Tray icon
+### REQ-MGR-090 Tray icon of the application
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the stub manager shows the icon)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** - (the manager keeps its tray icon, every other process and every test-run process hides its own, E0046; tests/integration/test_entry.py::test_every_entry_script_includes_the_boot_file_and_only_the_product_manager_shows_an_icon and ::test_the_boot_file_does_not_hide_the_icon_of_the_product_manager only check the mechanism; the tray menu of the stub manager has the one entry `Beenden`, which calls the same method as the button, and no AutoHotkey standard items: tests/integration/test_manager_tray.py, static source checks, the real menu is not checked by a test (doc/MANUAL-CHECKS.md step 7); the real manager with its default action "show the manager" comes with S0004)
+- **Evidence:** `tests/integration/test_entry.py::test_the_boot_file_does_not_hide_the_icon_of_the_product_manager`
 
-AutoHotFlow shows exactly one tray icon, however many of its processes run. The tray icon shows the manager (default action) and ends the application. Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030).
+While AutoHotFlow runs, its icon is in the tray, with the tooltip "AutoHotFlow". A double click shows the manager. The application has one tray icon however many of its processes run; besides it, only open editors have an icon (REQ-EDT-230). Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030). The menu: REQ-MGR-140.
 
+### REQ-MGR-140 Tray menu of the application
+
+- **v1:** yes
+- **v2:** partial (the stub manager has only an entry that ends the application)
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0004
+- **Evidence:** `tests/integration/test_manager_tray.py`, `doc/MANUAL-CHECKS.md`
+
+| Entry | Effect |
+|---|---|
+| Show manager | shows the manager window; default entry (double click on the icon) |
+| Exit | ends the application, the same as the "Exit" button of the manager (REQ-MGR-080, REQ-ROB-070) |
+
+The standard entries of AutoHotkey (pause, reload, exit without the shutdown of AutoHotFlow) are not in the menu. The entries are translated (REQ-LNG-010) and follow a change of the language without a restart (v1 needed a restart).
 ### REQ-MGR-100 About window
 
 - **v1:** yes
@@ -1640,6 +1655,25 @@ Expression and script fields colour their syntax and complete names of variables
 - **Plan:** -
 
 The element settings offer typical settings and examples of the element, which the user takes over with one click: for example a few common formats of a date, or a typical HTTP request. The user can save the current settings of an element as an own template and use it again for other elements of the same class. Taking over a template asks before it overwrites values that the user has already entered. Where it is offered (a button with a menu, the help of the element) is open.
+
+### REQ-EDT-230 Tray icon of an editor
+
+- **v1:** yes (read: one icon per open editor)
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S0005 (icon), S0006 (menu)
+
+Every open editor has a tray icon of its own besides the icon of the application (REQ-MGR-090). The icon shows the state of its flow (disabled, enabled, running; REQ-EXE-140), as does the icon of the editor window; the tooltip names the flow ("Flow: <name>").
+
+| Entry | Effect |
+|---|---|
+| Show | brings the editor window to the front; default entry (double click on the icon) |
+| Run | starts the flow (REQ-EDT-110) |
+| Enable or disable | switches the flow on or off (REQ-EXE-070) |
+| Close | closes this editor, with the question about unsaved changes (REQ-EDT-100); the application keeps running |
+
+The standard entries of AutoHotkey are not in the menu. v1 calls the last entry "Exit"; "Close" says that only the editor ends.
 
 ## Settings (SET)
 
