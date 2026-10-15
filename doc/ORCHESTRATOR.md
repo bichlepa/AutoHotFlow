@@ -167,3 +167,13 @@ The session will hit quota limits again and again. Work so that it can be resume
 - Keep `work_items/phase3/STATUS.md` current after every state change (task, agent, model, branch, commit, run IDs, provisional IDs in use, review log). In wishes mode keep a section "Wishes" in the same file with the same columns.
 - Agents commit often. An agent that notices a limit commits what works, notes in its report where it stopped, and ends.
 - At the start of a session read `STATUS.md` and `git worktree list`, and look at the project owner's local state again (section 5a); retry the integrations marked `integration pending`. A workspace with commits that are not on `v2-port` belongs to an unfinished task: continue it (new agent in that workspace, with the notes) or integrate it if it is complete. A workspace without commits and without changes is removed.
+
+## 11. The owner's attention file
+
+The project owner wants to see at a glance what waits for him. Keep `NEEDS-ATTENTION.md` (repository root) current:
+
+- It holds only what needs the project owner: a decision, a manual check, or a fact he must know. Not routine findings.
+- Whenever a state changes (a finding needs his decision, a decision is answered, a manual check is due or done), update the file in the same integration commit. Remove answered or finished items.
+- An entry that moves there leaves `doc/OPEN-ITEMS.md`, so the text is maintained in one place only. Name the commit where the full text is still visible.
+- Agents report such items to you in their report. You decide whether they go into the file.
+- The file is English like the rest of the repository.

@@ -1621,7 +1621,7 @@ Each process answers a diagnostic snapshot (memory, handles, connections, log ri
 ### REQ-DIA-050 Debug window for developers
 
 - **v1:** partial (`d()` with the setting `developing`, MIGRATION M-0021)
-- **v2:** done (the manual check of the window is still open, `MANUAL-CHECKS.md` section 2; finding F-0064)
+- **v2:** done (the manual check of the window is still open, `MANUAL-CHECKS.md` section 2; the open question on closing windows is in `NEEDS-ATTENTION.md`)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** -

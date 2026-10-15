@@ -4,11 +4,11 @@ Status: 2026-10-12, branch `v2-port`, after the fix block WI-0030 to WI-0035 (ac
 
 This document lists everything that is still open, observed, or deferred. Of the 45 finding IDs used in the work items (F-0001 to F-0043; F-0030 and F-0040 were never assigned), 27 are closed and are not carried over here. Their history is in the tag `v2-phase2-final`, table "Funde" in `v2-phase2-final:work_items/STATUS.md`. The work-item files that this document cites were removed from the working tree; they can be read with `git show v2-phase2-final:<path>`.
 
-The open findings that are observed but not closed are F-0041, F-0043, F-0060 to F-0063 and F-0064 and F-0065 (2026-10-13, from the test tiers and the manual check). F-0032 is closed by the project owner (2026-10-13).
+The open findings that are observed but not closed are F-0041, F-0043, F-0060 to F-0063 and F-0065 (2026-10-13, from the test tiers and the manual check). F-0032 is closed by the project owner (2026-10-13).
 
 Entries marked **(phase 3)** matter for the phase 3 plan.
 
-Closed and accepted findings are in `doc/CLOSED-ITEMS.md`.
+Closed and accepted findings are in `doc/CLOSED-ITEMS.md`. Entries that wait for the project owner are in `NEEDS-ATTENTION.md` (repository root), not here.
 
 Status words follow the sources: *verified* (read or tested), *assumed* (suspected, not proven), *not checked*. "Read in code" means the source was read but the behavior was not reproduced.
 
@@ -28,7 +28,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0061 | `flow 'wecho' is not loaded` after an engine restart during a worker job | test problem (wait missing), test fixed; product contract note below | yes |
 | F-0062 | `storage` not ready within 45 s after a freeze in the hang test | observed once under load, open | |
 | F-0063 | Log line lost while other processes hold the files (`readers-allow-read`) | observed once at `-n 12`, open (stall hypothesis fixed in 2675105, not proven) | |
-| F-0064 | Closing the debug window is reported as a crash; the supervisor stays up | observed by manual check, open; window-close path works in the test, cause is probably an external close of the role (tray or main window), decision needed on the tray icon | |
 | F-0065 | Manual-check guide and start tasks do not match | verified, open (owner's agent) | |
 | F-0067 | The F-0016 xfail test passes (strict XPASS) in the slow tier | strict mark dropped after a second XPASS (F-0069); watch | |
 | F-0068 | A comparison with an empty or missing variable is true in v1 and false in v2 | verified in the golden data; decided 2026-10-14 (E0034): per-flow option `strictTypes`, to implement in WI-0042 | yes |
@@ -39,7 +38,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0077 | `test_cancel_stops_the_running_element_and_reports_stopped_within_500_ms` did not see the job in the snapshot of the worker | observed once in a slow-tier run next to another suite run, 5 of 5 green alone, open | |
 | F-0079 | Foundation tier: `test_suspend_and_resume` leaves two processes behind (cleanup of the process tracker) | observed once on `b92d800` (run 20261015-153715-b92d8005), open | |
 | F-0080 | Foundation tier, timing under load: frozen-process tests exceed their budgets, one teardown leaves processes behind | observed once on `88be7fe` (run 20261015-153151-b481440a), not seen on `b92d800` in one run, open | |
-| F-0082 | No setting for the user limits the number of workers; `--worker-limit` exists only with `--test-roles`, the pool size `--workers` only as an option of the engine | verified (read), decided (E0044), implemented in S0004 | yes |
 | F-0083 | Fast tier: the expression oracle's time budget of the fixed corpus (`assert seconds < 15`) measured 16.6 s | observed once, run 20261015-172551-99e2c044 on `1aceedd`, open | |
 | F-0084 | Slow tier: a frozen child is terminated 5.08 s after the hang (budget 4.0 s) | observed once, run 20261015-172954-99e2c044 on `1aceedd`, open | |
 | F-0085 | Foundation tier: the crasher restarts 4 times (`evt.process.started`), 3 expected | observed once, run 20261015-173445-99e2c044 on `1aceedd`, open | |
@@ -160,16 +158,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Sign that it matters:** the failure at normal worker counts, or "lines lost" in a real session.
 **Action:** On the next failure read the failure text and `Log/` in the run log.
 **Evidence:** none kept.
-
-### F-0064: Closing the debug window is reported as a crash, and the supervisor stays up
-
-**What:** After the manager and the debug window were closed (2 s after start, no quit command sent), the supervisor kept running. Both children were logged as `ended unexpectedly (exited, exit 0)` and a crash report was written, although they exited normally. The manual check step 8 of the debug window expects only the debug process to end, with no "ended unexpectedly" entry and no report.
-**Status:** Observed once by the project owner's manual check (2026-10-13). Verified by the logs. The manager part is decided: closing the manager window only hides it, the application keeps running, and only its Exit button or the tray entry ends it (E0014, `work_items/phase3/README.md`, S0004). So the manager does not count as a defect. The debug part is a defect. Cause in code not analysed.
-**Update 2026-10-14 (bug hunter):** Analysed the log of the manual session (`Log/` and `Reports/` of the default data folder, 2026-10-13 19:12:49 to 19:12:51). Verified facts: the supervisor logged no `exit requested` at 19:12:51 (the stub manager's own window close would send `cmd.app.exit` and be logged by `Shutdown`), `debug` and `manager` were `gone (peer_closed)` in the same second, both with exit 0, and both were classified `crashed` (`Children._OnGone`, `voluntary` needs `sys.bye` with `clean`, `src/supervisor/Children.ahk:582`). So the two processes did not end through their own window-close paths: the debug window's close (`DebugGui._OnClose` -> `DebugView.CloseWindow` -> `sys.bye`) is covered by `test_closing_the_window_ends_only_that_role_without_a_crash_and_it_can_be_opened_again` (read, not run by me) and the manager's close would have been logged. What produces exactly this signature was reproduced (verified): a WM_CLOSE to the hidden main window of an AHK script (the same effect has the default tray menu entry "Exit") ends the script with exit 0, no `sys.bye`. Children set no `#NoTrayIcon` and no `A_IconHidden` (grep in `src/`), so every role has a tray icon and a main window that the user, the taskbar group menu or a tool can close. That the owner's windows were closed this way is assumed, not proven (no log of how they were closed). Not reproduced: the owner's exact steps. The earlier text "a defect of the debug part" is therefore not confirmed: the window close of the debug role works as designed in the test.
-**Options (nobody decided):** (a) hide the tray icon of all roles (`A_IconHidden := true` in `Role.Start`, or `#NoTrayIcon` in `AhfBoot.ahk`) so the "Exit" entry and the main-window close are not offered; the manager's own tray entry (E0014) is added later by the manager. Small, outside `src/core/ipc/`, but `Role` is `src/core/` and needs the owner's agreement. (b) `OnExit` in `Role`: an exit with reason `Close` or `Menu` sends `sys.bye {clean}` first, so the supervisor reports a normal exit; the user then ends single roles by tray, and the supervisor restarts nothing. Not recommended: a role disappearing silently is hard to diagnose. (c) accept: an external close of a role is an unexpected end and the report is correct.
-**Sign that it matters:** false crash reports after a normal close of a window.
-**Action (revised):** Ask the owner how the two windows were closed in step 8 (X button, taskbar, tray?) and decide (a) to (c). The original action: Fix the exit classification of a normal window close (debug window, and the manager window in S0004), and check the quit path. The manual check guide must follow E0014 (see F-0065).
-**Evidence:** `Log_children` of the last manual session (the entries at 19:12:51).
 
 ### F-0065: Manual-check guide and start tasks do not match
 
@@ -341,13 +329,6 @@ Work that is open but is not a finding with an entry. Rule: a finished action is
 
 ## Open decisions
 
-Decisions on entries are in the summary table (status `decision needed`, `accepted`, `closed`) and in the status book `work_items/phase3/STATUS.md`, section "Decisions of the project owner". This chapter lists only what is open without an entry:
+None here. The decisions waiting for the project owner are in `NEEDS-ATTENTION.md` (repository root).
 
-1. **Hand check of the GUI.** The owner checks the stub and the debug window by hand, using the guides in the "Not checked" section. The phase 2 checkbox for WI-0013 stays open until then.
-2. **Default working directory of flows (S0004).** v2 reads no `settings.json` yet. The v1 default of `FlowWorkingDir` is `A_MyDocuments\AutoHotFlow`; v2 takes it over only if decided in S0004. The test profile of a data directory will carry a `settings.json` with `FlowWorkingDir` below the data directory and `UILanguage` `en`. The auxiliary files of the v1 "Automatic tests" become fixtures in `tests/data/workdir/`; WI-0043 does not depend on the owner's Documents folder.
-
-### F-0082: The user has no setting that limits the workers
-
-**What:** E0040 says "users who need less memory limit `workerLimit`". `workerLimit` is `Children.WORKER_LIMIT` (16), a guard of the supervisor against a faulty engine; the supervisor accepts a lower value only with `--test-roles` (`--worker-limit`). What limits the workers in practice is the pool size N of the engine (`--workers=<n>`, default 4, at most 8, ARCHITECTURE 6.4), which the supervisor passes on from its own command line. There is no settings entry and no dialog for it, and `settings.json` is not read yet (S0004).
-**Status:** verified (read: `src/supervisor/Supervisor.ahk`, `src/supervisor/Children.ahk`, `src/engine/WorkerBridge.ahk`). Decided by the project owner (E0044, 2026-10-15): the number of workers is a global setting, part of S0004. Open for that work item: the exact setting (pool size N, `workerLimit`, or both) and the default. Memory with the default N=4 and 150 classes: 77.0 MB (MS-0033), below the budget.
-**Evidence:** `doc/MEASUREMENTS.md` MS-0033; `doc/ARCHITECTURE.md` section 9.
+Decisions on entries are in the summary table (status `decision needed`, `accepted`, `closed`) and in the status book `work_items/phase3/STATUS.md`, section "Decisions of the project owner".
