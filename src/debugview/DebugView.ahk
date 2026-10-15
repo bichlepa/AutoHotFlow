@@ -231,7 +231,7 @@ class DebugView extends Role {
     ; Asks every ready process (and the supervisor) for its snapshot. onDone(count) is called once when all answers or
     ; deadlines are in; count = number of snapshots stored from answers. A process that is not ready (starting, gone, ...)
     ; is not asked, but it is not left out either: its entry says "not ready (<state>)", because the window is meant to
-    ; show exactly such states (WI-0034, F-0038).
+    ; show exactly such states (WI-0034, F-0034).
     RefreshSnapshots(onDone := "") {
         names := ["supervisor"]
         for name, p in this.processes {

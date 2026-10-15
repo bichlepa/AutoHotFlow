@@ -31,7 +31,7 @@ class LogSink {
 
     ; Appends the entry to one file in logDir (rotating first). Returns "" when written, or the text
     ; of the error when another process holds the file (sharing or lock violation, access denied by a
-    ; scanner): the caller retries later (F-0004). Any other error is thrown.
+    ; scanner): the caller retries later (F-0003). Any other error is thrown.
     ; FileAppend is not used: it opens the file without sharing, so any other open handle (a viewer,
     ; a scanner) made it fail with error 32. FileOpen without the deny flags shares read and write.
     static AppendTo(logDir, fileName, line) {

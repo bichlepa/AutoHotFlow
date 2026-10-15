@@ -691,7 +691,7 @@ Closing the manager window only hides it. Flows and triggers keep running; the t
 - **Scope:** port
 - **Plan:** S0004 (assumed; the plan does not name the tray)
 
-The tray icon shows the manager (default action) and ends the application. Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030). `ARCHITECTURE.md` 6.1 puts the tray icon in the supervisor; finding F-0273 waits for a decision on it.
+The tray icon shows the manager (default action) and ends the application. Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030). `ARCHITECTURE.md` 6.1 puts the tray icon in the supervisor; finding F-0064 waits for a decision on it.
 
 ### REQ-MGR-100 About window
 
@@ -1164,7 +1164,7 @@ Each process answers a diagnostic snapshot (memory, handles, connections, log ri
 ### REQ-DIA-050 Debug window for developers
 
 - **v1:** partial (`d()` with the setting `developing`, MIGRATION M-0021)
-- **v2:** done (the manual check of the window is still open, `MANUAL-CHECKS.md` section 2; finding F-0273)
+- **v2:** done (the manual check of the window is still open, `MANUAL-CHECKS.md` section 2; finding F-0064)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** -
@@ -1503,10 +1503,10 @@ From the start until all processes are ready: below 3 s (with few flows).
 ### REQ-PRF-050 Many big flows load without blocking
 
 - **v1:** n/a
-- **v2:** partial (200 big flows load without a hang, but the engine answers too slowly during the load, F-0282)
+- **v2:** partial (200 big flows load without a hang, but the engine answers too slowly during the load, F-0073)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (F-0282)
+- **Plan:** S0002 (F-0073)
 - **Evidence:** `tests/stress/test_big_flows.py`
 
 While 200 big flows load, the engine answers a snapshot within 1 s and no process is taken for hung.

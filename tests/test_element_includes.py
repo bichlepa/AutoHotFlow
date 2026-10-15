@@ -125,7 +125,7 @@ def test_a_mode_in_a_comment_does_not_count(small_tree, capsys):
 
 
 def test_generator_refuses_a_class_file_that_includes_a_class_file(small_tree, capsys):
-    # F-0398: the include runs the Register line of the included class in every role that holds this file
+    # F-0081: the include runs the Register line of the included class in every role that holds this file
     (small_tree / "Action_B.ahk").write_text('#Include Action_A.ahk\nclass Action_B {\n    static Mode := "worker"\n}\n')
     assert gen.main([]) == 1
     err = capsys.readouterr().err
@@ -205,7 +205,7 @@ def expected_test_classes():
 
 @pytest.mark.parametrize("role", [r for r, m in TABLE.items() if m])
 def test_a_test_block_registers_only_the_test_classes_of_its_modes(role, datadir, run_ahk):
-    # F-0398: the text check of the blocks does not see a class that comes in through an include, this probe does
+    # F-0081: the text check of the blocks does not see a class that comes in through an include, this probe does
     script = datadir / "probe_test.ahk"
     script.write_text(PROBE.format(registry=ELEMENTS / "base" / "ElementRegistry.ahk",
                                    block=TEST_ENTRY_DIR / "generated" / ("TestElements_%s.ahk" % role)),

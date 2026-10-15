@@ -69,7 +69,7 @@ class VarWriter {
         }
         this._dirty := Map()
         ; The peer refuses requests beyond its limit of waiting ones and the process ends at once, so the rest is lost
-        ; (F-0279). One summary line instead of one error per variable.
+        ; (F-0070). One summary line instead of one error per variable.
         if (lost > 0)
             this._engine._Log("a0", "engine", "shutdown: " lost " of " (sent + lost) " variables not written (storage refused the requests)")
         return sent

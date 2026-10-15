@@ -51,7 +51,7 @@ CheckManyIds() {
     Assert.Equal(last, 100000)
 }
 
-; F-0014: an interrupting timer must not get the same id as the interrupted call.
+; F-0013: an interrupting timer must not get the same id as the interrupted call.
 ; The timer and the main loop both take ids; all ids must be different.
 global raceSeen := Map()
 global raceDup := ""

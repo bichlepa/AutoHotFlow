@@ -44,7 +44,7 @@ class RoleHub(WakingHub):
 
 
 class StallingHub(RoleHub):
-    """RoleHub that stops reading one client once for a while (WI-0030, F-0026 cause A).
+    """RoleHub that stops reading one client once for a while (WI-0030, F-0023 cause A).
 
     The first received message that satisfies stall_on holds the reading thread of its connection for stall_s
     seconds. The role keeps writing meanwhile: its pipe (64 KiB) fills and the rest waits in its send queue.
@@ -234,7 +234,7 @@ def test_shutdown_sends_bye_and_exits_0_within_one_second(procs, datadir, runs, 
 
 
 def test_frames_queued_at_shutdown_and_the_bye_reach_a_hub_that_reads_late(procs, datadir, runs, session_id, pipe):
-    # F-0026 cause A (WI-0030): when sys.shutdown comes, the role still has frames in its send queue (the hub reads
+    # F-0023 cause A (WI-0030): when sys.shutdown comes, the role still has frames in its send queue (the hub reads
     # nothing for STALL_S). Every pong and then sys.bye must arrive; before WI-0030 Close dropped the queue.
     with StallingHub(pipe, first_pong_of("echo"), STALL_S) as hub:
         run = launch(procs, datadir, runs, pipe, session_id, "echo")
@@ -285,7 +285,7 @@ class SilentHub(RoleHub):
 
 
 def test_hub_that_never_answers_hello_ends_the_role_with_exit_4(procs, datadir, runs, session_id, pipe):
-    # F-0029 follow-up: every failed hello restarted the 10 s budget and the orphan guard, so the role lived for ever
+    # F-0025 follow-up: every failed hello restarted the 10 s budget and the orphan guard, so the role lived for ever
     limit_s = scaled(25.0)
     hub = SilentHub(pipe).start()
     try:

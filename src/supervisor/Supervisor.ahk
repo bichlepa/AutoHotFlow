@@ -183,7 +183,7 @@ class Supervisor {
     }
 
     ; A client said sys.hello: the children learn about it; the log queue is delivered once storage is there. A child that
-    ; connects while the session ends gets sys.shutdown when its group has had its turn (Shutdown.OnHello, F-0041, WI-0034).
+    ; connects while the session ends gets sys.shutdown when its group has had its turn (Shutdown.OnHello, F-0037, WI-0034).
     _OnHello(link) {
         this.children.OnHello(link)
         if (link["name"] = DiagLog.STORAGE) {
@@ -271,7 +271,7 @@ class Supervisor {
         return Map("command", "debug", "started", Json.Bool(started))
     }
 
-    ; A plain second start (no --command, F-0283, the v1 behaviour): the manager shows its window. A running manager is
+    ; A plain second start (no --command, F-0074, the v1 behaviour): the manager shows its window. A running manager is
     ; asked (cmd.manager.show, PROTOCOL 4.8); one that is not running is started like at the first start and shows its
     ; window on its own. Never throws: the second start must end with exit 0, a failure is only logged.
     _ShowManager() {
@@ -368,7 +368,7 @@ class Supervisor {
         this._RunTick(Time.NowMs())
     }
 
-    ; One round of the timer at the time now. First the stand-still check (WI-0033, F-0016, E0012): this is the only place that
+    ; One round of the timer at the time now. First the stand-still check (WI-0033, F-0015, E0012): this is the only place that
     ; measures a stand-still of the supervisor. If there was one, the holders of deadlines move them by its length, before
     ; anything is judged by the clock: the children (liveness, kill time, restart, grace), the hub (requests such as
     ; cmd.app.prepareExit, the hello time of new connections), the shutdown (deadline) and the report (wait for storage).

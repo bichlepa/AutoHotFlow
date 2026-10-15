@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; Timing hooks for the load-phase measurement of tools/measure_r3.py (WI-0046, F-0282). Only measurement entries include
+; Timing hooks for the load-phase measurement of tools/measure_r3.py (WI-0046, F-0073). Only measurement entries include
 ; this file (generated in a temporary folder); nothing in src/ does. The product code stays unchanged: the hooks wrap
 ; methods at run time and keep the timings in memory, and the file named by the environment variable AHF_R3_LOADFILE
 ; gets one JSON line per measured item when the engine reports ready (so the writes do not disturb the load).

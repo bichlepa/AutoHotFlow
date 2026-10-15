@@ -50,9 +50,9 @@ class Worker extends Role {
     }
 
     ; After a reconnect to the hub the supervisor does not know whether a job is running: a sys.busy sent while the
-    ; link was down is dropped (Peer.Send), either direction. So the current state is always announced (F-0030).
+    ; link was down is dropped (Peer.Send), either direction. So the current state is always announced (F-0026).
     OnReady() {
-        this.SetLogTarget("storage")    ; F-0028: without a target the entries of the worker (and of its elements) were never written
+        this.SetLogTarget("storage")    ; F-0024: without a target the entries of the worker (and of its elements) were never written
         this._ReportBusy(this._job != "")
     }
 

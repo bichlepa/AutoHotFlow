@@ -456,7 +456,7 @@ def burst_end(procs, ahk_exe, datadir, pipe_name, timeout_ms):
 
 
 def test_frames_queued_when_the_connection_is_ended_reach_a_late_reader(procs, ahk_exe, datadir, pipe_name):
-    # F-0026 cause A (WI-0030): frames that still wait in the send queue when the connection is ended are written
+    # F-0023 cause A (WI-0030): frames that still wait in the send queue when the connection is ended are written
     # first; the last one arrives, then the end of the stream.
     server, end = burst_end(procs, ahk_exe, datadir, pipe_name, 5000)
     time.sleep(0.5)                                  # the reader is late: the pipe is full meanwhile
@@ -491,7 +491,7 @@ def test_ending_after_the_queue_is_written_gives_up_at_its_deadline_and_does_not
 
 
 def test_frames_of_a_peer_that_has_gone_are_read_although_a_write_to_it_fails(procs, ahk_exe, datadir, pipe_name):
-    # WI-0030 (F-0026): a client writes its last frame and ends. Before the server has read that frame, it writes
+    # WI-0030 (F-0023): a client writes its last frame and ends. Before the server has read that frame, it writes
     # to the client; the write fails (the pipe is being closed). The frame must still be read and delivered,
     # then the connection ends with peer_closed. Before WI-0030 the failed write tore the connection down and
     # the unread frame (in the hub: the sys.bye of a role) was lost.

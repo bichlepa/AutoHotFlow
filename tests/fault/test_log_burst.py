@@ -1,12 +1,12 @@
-"""F-0017 and F-0275: a burst of log lines.
+"""F-0016 and F-0066: a burst of log lines.
 
 Both tests guard the fix: log entries are droppable. Above a soft limit of the send queue the entry is dropped and
 counted, and one line "n log lines dropped" is written when there is room again (Hub.LOG_SOFT_LIMIT,
 Role.LOG_SEND_SOFT). The link and the role survive; the burst itself may lose lines, but never silently.
 
-* F-0275: a role logs thousands of lines in a tight loop. The hub's send queue to "storage" holds 1000 frames; the
+* F-0066: a role logs thousands of lines in a tight loop. The hub's send queue to "storage" holds 1000 frames; the
   overflow closes the link to storage (queue_overflow), storage is judged hung and restarted, and the lines are lost.
-* F-0017: the same burst while the supervisor stands still. The role's own send queue overflows, the role loses its
+* F-0016: the same burst while the supervisor stands still. The role's own send queue overflows, the role loses its
   connection and ends after the orphan deadline ("hub not reachable"), although it did nothing wrong.
 
 The test role echo (tests/integration/helpers/EchoRole.ahk) writes the lines on request (cmd.test.log).
@@ -68,7 +68,7 @@ def test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor(chains, dat
 
     thread = threading.Thread(target=ask)
     thread.start()
-    # Precondition: the role is inside its loop. A fixed sleep was not enough (F-0276): on a loaded machine the request
+    # Precondition: the role is inside its loop. A fixed sleep was not enough (F-0067): on a loaded machine the request
     # may reach the role after the suspension began, the role then stays quiet and the test passes by accident.
     # The first lines in the log file prove that the loop is running; 100000 lines last far longer than the suspension.
     deadline = time.monotonic() + scaled(20)

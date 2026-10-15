@@ -46,7 +46,7 @@ WI-0036 to WI-0043 are in `work_items/phase3/` in the working tree. They are not
 | WI-0019 | Architekturwächter | `4a2a6e4` | HANDOVER table |
 | WI-0020 | Entscheidungen und Beobachtungsliste dokumentieren | `f42ed73` | HANDOVER table |
 | WI-0021 | Engine: Loop-Stack, Wiedereintritt, neueste Revision, `wait` | `9e84422`, `26cada9`, `58c17d9`, `a06623f`, `5a705fc` | HANDOVER table |
-| WI-0022 | Supervisor: Heartbeat, F-0006, Startreihenfolge, 64 Bit, Pipe-Namen | `856ef22`, `dfe8137`, `ae919f9`, `6870a6f`, `638ce3a`, `c7a07fe`, `2da8beb` | HANDOVER table |
+| WI-0022 | Supervisor: Heartbeat, F-0005, Startreihenfolge, 64 Bit, Pipe-Namen | `856ef22`, `dfe8137`, `ae919f9`, `6870a6f`, `638ce3a`, `c7a07fe`, `2da8beb` | HANDOVER table |
 | WI-0023 | Diagnose I: Log des Supervisors, stderr der Kinder | `b47f42c`, `6892034`, `04bf3af`, `f0878c2`, `ef34b5b` | HANDOVER table |
 | WI-0024 | Hub routet über Kopffelder, Engine lädt gestaffelt | `0126ecc`, `87fd20f`, `c052813`, `f9aa362`, `b76288d`, `be3a2a3` | HANDOVER table |
 | WI-0025 | Storage: Log-Durchsatz und getrennte Warteschlangen | `831c9e8`, `41d1265`, `1e0f4d7`, `bff8955`, `f29b267`, `f1efb7a` | HANDOVER table |
@@ -55,11 +55,11 @@ WI-0036 to WI-0043 are in `work_items/phase3/` in the working tree. They are not
 | WI-0028 | Diagnose II: Snapshot, Absturzbericht, Debug-Fenster | `d27d0ef`, `32234b2`, `d35b5d7`, `3e00b94`, `2b1f07e`, `b450a5c`, `fec7d06`, `e744800` | HANDOVER table |
 | WI-0029 | Aufräumen und Abschluss | `31afcc2`, `1a6f5e4`, `facf064`, `20efac2`, `5555686`, `6d4d799`, `030cc31` (the last three are the documents "danach" in the table; from git log) | HANDOVER table, completed from git log |
 | Plan fix block | Work packages WI-0030 to WI-0033 (not WI-prefixed) | `d79fd89` | git log |
-| WI-0030 | Sauberes Beenden (F-0026) | `7b1da26`, `29b3635`, `cdee87f`, `598e0fd`, `5a3a83c` | HANDOVER table |
-| WI-0031 | Engine wartet auf `storage` (F-0031, F-0024) | `4bf303f`, `f7c9b48`, `e4b5c5b`, `9fb95d8` | HANDOVER table |
-| WI-0033 | Worker enden mit der Engine (E0010), Fristen nach Stillstand (F-0016, E0012) | `198d86e`, `576ab57`, `3d2bd06`, `751416d`, `c29d810` | HANDOVER table |
+| WI-0030 | Sauberes Beenden (F-0023) | `7b1da26`, `29b3635`, `cdee87f`, `598e0fd`, `5a3a83c` | HANDOVER table |
+| WI-0031 | Engine wartet auf `storage` (F-0027, F-0021) | `4bf303f`, `f7c9b48`, `e4b5c5b`, `9fb95d8` | HANDOVER table |
+| WI-0033 | Worker enden mit der Engine (E0010), Fristen nach Stillstand (F-0015, E0012) | `198d86e`, `576ab57`, `3d2bd06`, `751416d`, `c29d810` | HANDOVER table |
 | WI-0032 | Teststabilität und Abschluss des Blocks | `8d0e65a`, `056a1d5`, `c454658`, `ef90ede`, `bb39719`, `9ecdbb5`, `0a89f65`, `d9bfbaf` (the last three are the documents and the acceptance run "danach"; from git log) | HANDOVER table, completed from git log |
-| WI-0034 | Funde aus der Abnahme (F-0037 bis F-0042), Abnahme wiederholen | `a7dd1ad`, `6e5fc35`, `7f460ba`, `04192f9`, `27d49cb`, `57684d7`, `4ef3b38`, `6013d58`, `11e3a96`, `03664d1`, `fb0df1c`, `ce97772`, `39591cd`, `a6e4c68`, `3406214`, `645d99d`, `1c0da27` | git log (not in HANDOVER table) |
+| WI-0034 | Funde aus der Abnahme (F-0033 bis F-0038), Abnahme wiederholen | `a7dd1ad`, `6e5fc35`, `7f460ba`, `04192f9`, `27d49cb`, `57684d7`, `4ef3b38`, `6013d58`, `11e3a96`, `03664d1`, `fb0df1c`, `ce97772`, `39591cd`, `a6e4c68`, `3406214`, `645d99d`, `1c0da27` | git log (not in HANDOVER table) |
 | WI-0035 | Bugfix-Schleife bis zur grünen Abnahme | `ae14180`, `9263f28`, `abd993c`, `8f9ecdf`, `f6c32e7`, `2f2e6e5`, `be815b2`, `fc85151` (tag) | git log (not in HANDOVER table) |
 
 Notes on the table:

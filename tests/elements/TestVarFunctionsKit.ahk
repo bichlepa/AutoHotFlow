@@ -3,7 +3,7 @@
 
 ; Shared helpers of Action_TestVarFunctions (inline) and Action_TestVarFunctionsWorker (worker), WI-0050: the calls of
 ; every variable function and the report of their results. No element class and no ElementRegistry.Register here: a
-; class file that includes this file must not register a class in a role that does not hold it (F-0398, E0041).
+; class file that includes this file must not register a class in a role that does not hold it (F-0081, E0041).
 ; See Action_TestVarFunctions.ahk for what the report means.
 class TestVarFunctionsKit {
     static Exercise(ctx) {

@@ -80,7 +80,7 @@ class PipeListener {
         ; PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED (| FILE_FLAG_FIRST_PIPE_INSTANCE for the first)
         openMode := 0x40000003 | (this._first ? 0x00080000 : 0)
         ; PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS
-        ; Explicit DACL (F-0018): only the owner of the pipe (the user of this process) and the system
+        ; Explicit DACL (F-0017): only the owner of the pipe (the user of this process) and the system
         ; get access. The default DACL would give read access to Everyone and anonymous.
         psd := 0
         if (!DllCall("advapi32\ConvertStringSecurityDescriptorToSecurityDescriptorW"

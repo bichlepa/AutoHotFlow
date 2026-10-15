@@ -171,7 +171,7 @@ LEAK_GROWTH_LIMIT = 1.20      # supervisor RSS after / before (WI-0016 soak rule
 @pytest.mark.stress
 @pytest.mark.timeout(200)
 def test_many_connects_keep_the_memory_of_the_supervisor_flat(stress_chain):
-    """num_handles alone does not show a leak of AHK objects: memory has to stay flat as well (finding F-0007)."""
+    """num_handles alone does not show a leak of AHK objects: memory has to stay flat as well (finding F-0006)."""
     sc = stress_chain(flows={})
     sc.client("probe")
 

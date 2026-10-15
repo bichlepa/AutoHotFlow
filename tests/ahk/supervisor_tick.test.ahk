@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the order of work in Supervisor._Tick and the heartbeat rules (WI-0022, F-0006, F-0011,
+; Unit tests for the order of work in Supervisor._Tick and the heartbeat rules (WI-0022, F-0005, F-0010,
 ; doc/ARCHITECTURE.md 6.2). No process of the roles is started: Children works on hand-made records,
 ; the hub is a fake whose Pump() delivers what "has already arrived".
 #Include lib\Assert.ahk
@@ -130,10 +130,10 @@ NewSupervisor(hub) {
 
 TestRun.Init()
 
-TestRun.Case("Tick: a sys.bye that is unread when the process end is seen is read first (F-0006, F-0011)", ByeIsReadBeforeTheExitIsReported)
+TestRun.Case("Tick: a sys.bye that is unread when the process end is seen is read first (F-0005, F-0010)", ByeIsReadBeforeTheExitIsReported)
 TestRun.Case("Tick: an exit without any sys.bye is reported as not clean", ExitWithoutByeIsNotClean)
 TestRun.Case("Tick: the hub is pumped at the start of every tick", HubIsPumpedEveryTick)
-TestRun.Case("Tick: an exit is not judged while another pump still reads the connection of the child (F-0026, WI-0030)", ExitWaitsWhileAPumpRuns)
+TestRun.Case("Tick: an exit is not judged while another pump still reads the connection of the child (F-0023, WI-0030)", ExitWaitsWhileAPumpRuns)
 TestRun.Case("Children: an ended process whose connection does not end is judged after the grace time (WI-0030)", ExitIsJudgedAfterTheGraceTime)
 TestRun.Case("Children: an ended child without a connection is judged at once (WI-0030)", ExitWithoutLinkIsJudgedAtOnce)
 TestRun.Case("Children: an ended child that waits for its judgement is neither hung nor terminated (WI-0030)", EndedChildIsNotHungNorKilled)
@@ -142,18 +142,18 @@ TestRun.Case("Stall: regular ticks and a short delay move nothing (WI-0033)", No
 TestRun.Case("Stall: a stand-still before the first tick is measured too (WI-0033)", StallBeforeTheFirstTickIsMeasured)
 TestRun.Case("Children: a stand-still moves the kill time, the restart time and the grace time (WI-0033)", StallMovesTheTimesOfTheRecords)
 TestRun.Case("Shutdown: the deadline and the kill wait move with a stand-still (WI-0033)", ShutdownDeadlinesMove)
-TestRun.Case("Shutdown: a process that ended by itself at the deadline does not make exit code 5 (F-0033, WI-0033)", EndedAtTheDeadlineIsNoForcedExit)
+TestRun.Case("Shutdown: a process that ended by itself at the deadline does not make exit code 5 (F-0029, WI-0033)", EndedAtTheDeadlineIsNoForcedExit)
 TestRun.Case("Shutdown: a process that has to be terminated at the deadline makes exit code 5 (WI-0033)", TerminatedAtTheDeadlineIsAForcedExit)
 TestRun.Case("Hub: a request ends at its limit once, by the tick, and an answer in time wins (WI-0033)", HubRequestEndsAtItsLimit)
 TestRun.Case("Hub: a stand-still moves the limit of a request and the hello time of a connection (WI-0033)", HubShiftMovesTheLimits)
-TestRun.Case("Hub: a forwarded request is forgotten after its deadline, moves with a stand-still and ends only with the answer of its target (F-0040, WI-0034)", RoutedRequestEndsWithItsAnswerOrDeadline)
-TestRun.Case("Hub: when the target goes, each open request gets one peer_gone and an answered one none (F-0040, WI-0034)", GoneTargetAnswersItsOpenRequests)
-TestRun.Case("Hub: the requests of a sender that has gone are forgotten (F-0040, WI-0034)", RequestsOfAGoneSenderAreForgotten)
+TestRun.Case("Hub: a forwarded request is forgotten after its deadline, moves with a stand-still and ends only with the answer of its target (F-0036, WI-0034)", RoutedRequestEndsWithItsAnswerOrDeadline)
+TestRun.Case("Hub: when the target goes, each open request gets one peer_gone and an answered one none (F-0036, WI-0034)", GoneTargetAnswersItsOpenRequests)
+TestRun.Case("Hub: the requests of a sender that has gone are forgotten (F-0036, WI-0034)", RequestsOfAGoneSenderAreForgotten)
 TestRun.Case("Children: the end of the engine ends its workers at once, as a planned end with the reason engine gone (E0010, WI-0033)", EngineEndEndsTheWorkers)
 TestRun.Case("Children: a worker is not ended when the engine ends during the shutdown (E0010, WI-0033)", EngineEndDuringShutdownKeepsTheWorkers)
-TestRun.Case("Children: a kill request for a worker whose process has already ended does not turn its crash into a planned exit (F-0046, WI-0035)", KillOfAnEndedWorkerStaysACrash)
+TestRun.Case("Children: a kill request for a worker whose process has already ended does not turn its crash into a planned exit (F-0042, WI-0035)", KillOfAnEndedWorkerStaysACrash)
 TestRun.Case("Children: a kill request for a running worker ends it as a planned exit with the reason killed (WI-0035)", KillOfARunningWorkerIsAPlannedExit)
-TestRun.Case("Children: the end of the engine does not relabel a worker that has ended already (F-0046, WI-0035)", EngineEndKeepsTheCrashOfAnEndedWorker)
+TestRun.Case("Children: the end of the engine does not relabel a worker that has ended already (F-0042, WI-0035)", EngineEndKeepsTheCrashOfAnEndedWorker)
 TestRun.Case("Heartbeat: a child without pong for 6 s of regular ticks is hung", SilentChildIsHung)
 TestRun.Case("Heartbeat: a stand-still of the supervisor does not make a ready child hung", StallDoesNotHangReadyChild)
 TestRun.Case("Heartbeat: a stand-still does not make a starting child hung", StallDoesNotHangStartingChild)
@@ -165,11 +165,11 @@ TestRun.Case("Heartbeat: the pong time of a worker starts again when its job end
 TestRun.Case("Heartbeat: a worker without a job is hung as before (WI-0027)", IdleWorkerWithoutPongIsHung)
 TestRun.Case("Heartbeat: only a worker can be busy (WI-0027)", OnlyAWorkerCanBeBusy)
 TestRun.Case("Children: a hello before the pid is stored keeps the state ready and takes the pid (WI-0027)", HelloBeforeThePidIsStored)
-TestRun.Case("Shutdown: a child of a group that had its turn gets sys.shutdown at its late hello, then the next group follows (F-0041, WI-0034)", LateHelloGetsTheShutdown)
-TestRun.Case("Shutdown: a child of a later group that says hello during the shutdown waits for the turn of its group (F-0041, WI-0034)", LateHelloOfALaterGroupWaitsForItsTurn)
-TestRun.Case("Shutdown: a child that is in no group (started after the groups were made) gets sys.shutdown at its hello (F-0041, WI-0034)", LateHelloOfAChildInNoGroup)
-TestRun.Case("Shutdown: a hello in the prepare phase or in the kill phase gets no sys.shutdown (F-0041, WI-0034)", HelloOutsideThePhaseShutdownGetsNothing)
-TestRun.Case("Children: a restart that was planned before the shutdown does not start (F-0041, WI-0034)", PlannedRestartIsCancelledByTheShutdown)
+TestRun.Case("Shutdown: a child of a group that had its turn gets sys.shutdown at its late hello, then the next group follows (F-0037, WI-0034)", LateHelloGetsTheShutdown)
+TestRun.Case("Shutdown: a child of a later group that says hello during the shutdown waits for the turn of its group (F-0037, WI-0034)", LateHelloOfALaterGroupWaitsForItsTurn)
+TestRun.Case("Shutdown: a child that is in no group (started after the groups were made) gets sys.shutdown at its hello (F-0037, WI-0034)", LateHelloOfAChildInNoGroup)
+TestRun.Case("Shutdown: a hello in the prepare phase or in the kill phase gets no sys.shutdown (F-0037, WI-0034)", HelloOutsideThePhaseShutdownGetsNothing)
+TestRun.Case("Children: a restart that was planned before the shutdown does not start (F-0037, WI-0034)", PlannedRestartIsCancelledByTheShutdown)
 TestRun.Case("Data directory: --data wins over AHF_DATA_DIR, which wins over the application data folder", DataDirFollowsOptionThenEnvironmentThenAppData)
 
 ByeIsReadBeforeTheExitIsReported() {
@@ -202,7 +202,7 @@ HubIsPumpedEveryTick() {
     Assert.Equal(hub.pumps, 2)
 }
 
-; Cause B of F-0026: the tick timer interrupted a pump thread of the wake-up. Its own hub.Pump() returns at once
+; Cause B of F-0023: the tick timer interrupted a pump thread of the wake-up. Its own hub.Pump() returns at once
 ; (re-entrance guard), so the bye that the interrupted pump has not read yet is unread when the tick sees the
 ; ended process. The exit must wait until the connection is read to its end (the link is gone).
 ExitWaitsWhileAPumpRuns() {
@@ -391,7 +391,7 @@ StallBeforeTheFirstTick() {
     Assert.Equal(r[3].Count("evt.process.hung"), 0)
 }
 
-; --- deadlines after a stand-still (WI-0033, F-0016, E0012) -------------------------------------------------------------------
+; --- deadlines after a stand-still (WI-0033, F-0015, E0012) -------------------------------------------------------------------
 
 StallMovesEveryDeadline() {
     hub := FakeHub()
@@ -468,7 +468,7 @@ ShutdownDeadlinesMove() {
     Assert.Equal(sd.killDeadline, 61000)
 }
 
-; F-0033: the deadline passes while a process has ended by itself and is only judged in the grace time (its connection is
+; F-0029: the deadline passes while a process has ended by itself and is only judged in the grace time (its connection is
 ; not read to the end yet). Nothing is terminated, so the exit code is 0.
 EndedAtTheDeadlineIsNoForcedExit() {
     hub := FakeHub()
@@ -586,7 +586,7 @@ HubShiftMovesTheLimits() {
     Assert.True(anon.closed)
 }
 
-; --- requests between clients (F-0040, WI-0034) ---------------------------------------------------------------------------
+; --- requests between clients (F-0036, WI-0034) ---------------------------------------------------------------------------
 
 ; A connection that keeps what is sent to it.
 class RecordConn {
@@ -692,7 +692,7 @@ EngineEndEndsTheWorkers() {
     Assert.Equal(hub.Count("evt.process.crashed"), 1, "only the engine crashed")
 }
 
-; F-0046 (WI-0035): the engine asks for the kill of a worker that has died already, the supervisor has not judged its end yet.
+; F-0042 (WI-0035): the engine asks for the kill of a worker that has died already, the supervisor has not judged its end yet.
 ; The end must stay a crash; it is not a planned exit "killed".
 KillOfAnEndedWorkerStaysACrash() {
     hub := FakeHub()
@@ -819,7 +819,7 @@ HelloBeforeThePidIsStored() {
     Assert.Equal(kids._recs["echo"]["pid"], 5151)
 }
 
-; --- a child that says hello during the shutdown (F-0041, WI-0034) --------------------------------------------------
+; --- a child that says hello during the shutdown (F-0037, WI-0034) --------------------------------------------------
 
 ; A supervisor with a real Shutdown and two children without processes (handle 0; Children.Tick is not called).
 NewShutdownSupervisor(hub, children) {
@@ -835,7 +835,7 @@ NewShutdownSupervisor(hub, children) {
 }
 
 ; The late child (rank 3) is still starting when its group gets sys.shutdown: nothing reaches it. Its hello comes later.
-; It must get sys.shutdown then, with the rest of the deadline. Storage (rank 4) does not wait for it (F-0043).
+; It must get sys.shutdown then, with the rest of the deadline. Storage (rank 4) does not wait for it (F-0039).
 LateHelloGetsTheShutdown() {
     hub := FakeHub()
     s := NewShutdownSupervisor(hub, [["storage", "storage", "ready"], ["echo:late", "echo", "starting"]])
@@ -843,7 +843,7 @@ LateHelloGetsTheShutdown() {
     s.shutdown._StartShutdown()
     s.shutdown.Tick(Time.NowMs())
     Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 0, "not connected yet: nothing was sent")
-    Assert.Equal(hub.SentCount("storage", "sys.shutdown"), 1, "storage does not wait for a child that has not connected (F-0043)")
+    Assert.Equal(hub.SentCount("storage", "sys.shutdown"), 1, "storage does not wait for a child that has not connected (F-0039)")
     hub.offline.Delete("echo:late")
     s._OnHello(Map("name", "echo:late", "pid", 1))
     msg := hub.LastSent("echo:late", "sys.shutdown")

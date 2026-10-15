@@ -1,4 +1,4 @@
-"""WI-0046: R0003 measurement (cost of parsing many element classes in every process) and the load-phase baseline (F-0282).
+"""WI-0046: R0003 measurement (cost of parsing many element classes in every process) and the load-phase baseline (F-0073).
 
 Three modes (parse, load, roles). They run on the real chain with an entry script that is generated in a temporary folder (nothing is
 written into src/): the entry includes src/AhfBoot.ahk and, after it, the generated element files.

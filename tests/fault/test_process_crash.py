@@ -35,7 +35,7 @@ def kill_role(chain, name):
     psutil.Process(pid).kill()
     crashed = chain.rec.wait(event("evt.process.crashed", name=name), timeout=CRASH_BUDGET_S + 5)
     if crashed is None:
-        # F-0280: the supervisor stderr is empty in a healthy run, so it says nothing. Show what the chain knows:
+        # F-0071: the supervisor stderr is empty in a healthy run, so it says nothing. Show what the chain knows:
         # was the killed process really gone, what the supervisor thinks of the role, which events arrived.
         try:
             states = chain.states()

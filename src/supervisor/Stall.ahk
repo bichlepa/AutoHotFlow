@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; Detects a stand-still of the supervisor itself (WI-0033, F-0016, E0012, doc/ARCHITECTURE 6.2): frozen process, standby, a long
+; Detects a stand-still of the supervisor itself (WI-0033, F-0015, E0012, doc/ARCHITECTURE 6.2): frozen process, standby, a long
 ; hub backlog. It is the only place that measures it: the gap between two ticks of the supervisor's timer.
 ; Every holder of a deadline (children, hub requests and connections without hello, shutdown, report) is told by the
 ; supervisor how long the stand-still was and moves its deadline by that time, so the rest of the time is kept.

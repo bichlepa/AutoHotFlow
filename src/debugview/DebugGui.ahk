@@ -217,7 +217,7 @@ class DebugGui {
     }
 
     ; Replaces the text of a multiline Edit and keeps the vertical scroll position and the selection. Setting
-    ; Value resets both (F-0256). The snapshot JSON changes at every refresh (uptimeMs, rssBytes), but the lines stay
+    ; Value resets both (F-0058). The snapshot JSON changes at every refresh (uptimeMs, rssBytes), but the lines stay
     ; the same, so the first visible line index is still meaningful. Redraw is off meanwhile, so nothing flickers.
     _SetEditKeepView(edit, text) {
         static EM_GETSEL := 0x00B0, EM_SETSEL := 0x00B1, EM_GETFIRSTVISIBLELINE := 0x00CE, EM_LINESCROLL := 0x00B6

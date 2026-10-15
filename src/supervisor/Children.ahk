@@ -19,7 +19,7 @@
 ;
 ; Process handles: the handle CreateProcessW returns (ChildLauncher, all access) is used for the exit wait
 ; (WaitForSingleObject(h, 0) on every tick), the exit code and TerminateProcess (hard end after the deadline).
-; Judging an exit (WI-0030, F-0026): an ended process is judged (exited/crashed, clean) only after the hub has read its
+; Judging an exit (WI-0030, F-0023): an ended process is judged (exited/crashed, clean) only after the hub has read its
 ; connection to the end (Hub.HasLink is false: the link goes when the end of the pipe is read, so everything the
 ; child wrote before, sys.bye included, has been handled), or EXIT_GRACE_MS after the end was seen (a child that
 ; never connected, or a connection that does not end). Pumping the hub first in the tick is not enough: a pump that
@@ -170,7 +170,7 @@ class Children {
         rec := this._recs[name]
         if (rec["gone"] || rec["handle"] = 0)
             return
-        ; Ended already, only not judged yet (F-0046, WI-0035): its end is its own (a crash), not a planned exit. The
+        ; Ended already, only not judged yet (F-0042, WI-0035): its end is its own (a crash), not a planned exit. The
         ; request of the engine can arrive in the few milliseconds between the death and the next tick.
         if (this._HasEnded(rec)) {
             Log.Write("a1", "children", name " has ended already, its end is judged as its own (kill request: " reason ")")
@@ -237,7 +237,7 @@ class Children {
     SinceLastPong(name, now) => now - this._recs[name]["lastPongAt"]
     SinceLastPing(name, now) => now - this._recs[name]["lastPingAt"]
 
-    ; The supervisor itself stood still for ms (Supervisor, Stall; WI-0033, F-0016): the liveness of the children begins again
+    ; The supervisor itself stood still for ms (Supervisor, Stall; WI-0033, F-0015): the liveness of the children begins again
     ; at "now" (ResetLiveness), and every other deadline of a record moves by ms, so its rest of the time stays: the kill
     ; time of a hung child, the time of a planned restart, the end of the wait for the connection of an ended process.
     ; The restart history (RESTART_WINDOW_MS) is a rate over real time and stays as it is.
@@ -429,7 +429,7 @@ class Children {
     AnyKilled() => this.killedSome
 
     ; Stops automatic restarts. Called when the shutdown starts. A restart that is planned already (a crash within the last
-    ; RESTART_DELAY_MS) is cancelled too (F-0041, WI-0034): it would start a process in the middle of the shutdown, in no group
+    ; RESTART_DELAY_MS) is cancelled too (F-0037, WI-0034): it would start a process in the middle of the shutdown, in no group
     ; of the order, that is only ended at the deadline.
     BeginShutdown() {
         this.shuttingDown := true
@@ -461,7 +461,7 @@ class Children {
     }
 
     ; True when every named child has said sys.bye or has already ended. A child that has never connected (state
-    ; "starting") does not hold its group (F-0043): it cannot be told to shut down and has sent nothing that a later group
+    ; "starting") does not hold its group (F-0039): it cannot be told to shut down and has sent nothing that a later group
     ; (storage) must still write. Its late sys.hello is handled by Shutdown.OnHello; at the deadline it is ended.
     GroupDone(names) {
         for name in names {
@@ -510,7 +510,7 @@ class Children {
         for name, rec in this._recs {
             if (rec["role"] != "worker" || rec["gone"] || rec["handle"] = 0)
                 continue
-            if (this._HasEnded(rec))        ; died on its own before: its end is a crash, not "engine gone" (F-0046, WI-0035)
+            if (this._HasEnded(rec))        ; died on its own before: its end is a crash, not "engine gone" (F-0042, WI-0035)
                 continue
             Log.Write("a1", "children", "ending " name ": the engine is gone")
             if (rec["state"] != "hung") {

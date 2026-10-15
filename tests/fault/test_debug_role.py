@@ -66,7 +66,7 @@ def test_the_role_starts_with_start_debug_and_shows_the_process_table(chains, da
 def test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor(chains, datadir):
     chain = full_chain(chains, datadir)
     # The window asks only processes that are ready (as it sees them). Wait until its table shows every role as
-    # ready, not merely listed: in the state "starting" it gets the entry "not ready" instead of a snapshot (F-0038).
+    # ready, not merely listed: in the state "starting" it gets the entry "not ready" instead of a snapshot (F-0034).
     # Waiting for worker:1 alone was not enough: a loaded run (--all) refreshed 4 of 6 now and then.
     roles = ("storage", "engine", "manager", "debug", "worker:1")
     assert wait_until(lambda: all(dbg(chain, "state")["states"].get(r) == "ready" for r in roles), 15.0),         dbg(chain, "state")["states"]
@@ -81,7 +81,7 @@ def test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor(chains, da
 
 @pytest.mark.slow
 def test_refresh_shows_a_process_that_is_not_ready_as_not_ready_instead_of_leaving_it_out(chains, datadir):
-    # F-0038 (WI-0034): RefreshSnapshots asked only the ready processes and left the others out without a trace. The
+    # F-0034 (WI-0034): RefreshSnapshots asked only the ready processes and left the others out without a trace. The
     # window is meant to show such states. echo:slowhello says hello 4 s after its start, so it is "starting" here.
     late = "echo:slowhello4000"
     chain = chains("storage,debug," + late, ["--test-roles", *STUB_OPTS])

@@ -44,7 +44,7 @@ class Storage extends Role {
         super.__New(args)
         this.queue := WriteQueue()
         this._shutdownUntil := 0
-        this.logLinesLost := 0   ; log lines that could not be written even after the retries (F-0004)
+        this.logLinesLost := 0   ; log lines that could not be written even after the retries (F-0003)
         this.logBuffers := Map()           ; file name -> Map(items, scheduled): lines waiting for the file
         this.logQueuedEntries := 0         ; entries not yet written to all their files
         this.logQueuedChars := 0
@@ -282,7 +282,7 @@ class Storage extends Role {
     }
 
     ; Writes up to LOG_BUNDLE_MAX_LINES / LOG_BUNDLE_MAX_CHARS of the pending lines of one file.
-    ; Returns the retry request of the queue while another process holds the file (F-0004).
+    ; Returns the retry request of the queue while another process holds the file (F-0003).
     _RunLogBundle(logDir, fileName, buf, state) {
         text := ""
         n := 0

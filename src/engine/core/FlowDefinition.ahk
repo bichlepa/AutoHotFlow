@@ -123,7 +123,7 @@ class FlowDefinition {
     }
 
     ; The definition for the wire (cmd.flow.get and the conflict answer): Raw, but flowSettings.strictTypes, if the flow
-    ; has the key, as a JSON boolean (the parser reads true as 1, and the wire rule E0008 wants true/false; F-0285).
+    ; has the key, as a JSON boolean (the parser reads true as 1, and the wire rule E0008 wants true/false; F-0076).
     ; Raw itself is not changed; a flow without the key stays without it (compatibility mode, no invented key).
     WireDefinition() {
         settings := this.Raw.Get("flowSettings", "")

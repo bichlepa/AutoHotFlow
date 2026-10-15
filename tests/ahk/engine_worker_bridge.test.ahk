@@ -293,7 +293,7 @@ PeerGoneAnswerCode(owner) {
     owner.peer.Answer(owner.peer.Open("cmd.worker.run")[1], Map("ok", false, "error", Map("code", "peer_gone", "message", "x")))
 }
 
-; F-0046 (WI-0035): the hub answers peer_gone as soon as the worker is gone; that is a lost worker, not a refusal.
+; F-0042 (WI-0035): the hub answers peer_gone as soon as the worker is gone; that is a lost worker, not a refusal.
 APeerGoneAnswerToTheRunEndsTheJobAsWorkerCrashed() {
     r := NewPool(2, 0)
     owner := r[1]
@@ -312,7 +312,7 @@ APeerGoneAnswerToTheRunEndsTheJobAsWorkerCrashed() {
     Assert.Equal(bridge._failures.Length, 1, "one failure counted")
 }
 
-; The two ways to learn about the death of a worker have no fixed order (F-0046): the job ends once, with the same text.
+; The two ways to learn about the death of a worker have no fixed order (F-0042): the job ends once, with the same text.
 BothOrdersOfPeerGoneAndTheProcessEventEndTheJobOnce() {
     for order in ["answer first", "event first"] {
         r := NewPool(2, 0)
@@ -496,8 +496,8 @@ TestRun.Case("Pool: idle workers beyond the warm ones are killed after the idle 
 TestRun.Case("Pool: a busy worker is not ended as idle", ABusyWorkerIsNotEndedAsIdle)
 TestRun.Case("Pool: crash of a busy worker ends its job, the warm worker is asked for again", CrashOfABusyWorkerEndsItsJobAndTheWarmWorkerIsAskedForAgain)
 TestRun.Case("Pool: a refused run removes and kills the worker and ends the job", ARunThatTheWorkerRefusesRemovesAndKillsItAndEndsTheJob)
-TestRun.Case("Pool: a run answered with peer_gone ends the job as worker crashed, removes and kills the worker (F-0046, WI-0035)", APeerGoneAnswerToTheRunEndsTheJobAsWorkerCrashed)
-TestRun.Case("Pool: peer_gone and the process event in both orders end the job once with the same text (F-0046, WI-0035)", BothOrdersOfPeerGoneAndTheProcessEventEndTheJobOnce)
+TestRun.Case("Pool: a run answered with peer_gone ends the job as worker crashed, removes and kills the worker (F-0042, WI-0035)", APeerGoneAnswerToTheRunEndsTheJobAsWorkerCrashed)
+TestRun.Case("Pool: peer_gone and the process event in both orders end the job once with the same text (F-0042, WI-0035)", BothOrdersOfPeerGoneAndTheProcessEventEndTheJobOnce)
 TestRun.Case("Pool: five failures block the pool", FiveFailuresBlockThePoolAndWithoutAWorkerItIsNotUsable)
 TestRun.Case("Pool: ends caused by the engine are no failures", AnEndThatTheEngineCausedItselfIsNoFailure)
 TestRun.Case("Pool: refused spawn requests are failures", FailedSpawnRequestsAreCountedToo)

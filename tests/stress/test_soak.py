@@ -1,10 +1,10 @@
 """WI-0016: endurance run with mixed operations (marker `soak`, run with `-m soak`).
 
 Duration: AHF_SOAK_SECONDS (default 600). Mixed load (about 130 engine events per second, six times the load before WI-0025: the manager stub writes every
-event to the storage log, and the storage drains well over 1000 lines per second since WI-0025, finding F-0008; the
+event to the storage log, and the storage drains well over 1000 lines per second since WI-0025, finding F-0007; the
 rate is AHF_SOAK_BURST starts of the short flow every 0.25 s, default 4): parallel bursts of a short flow, start/stop of a long
 flow, snapshot requests, flow toggles. AHF_SOAK_CHURN=1 adds clients that connect and leave (off by default:
-that path has its own test, finding F-0007 would make every soak run red).
+that path has its own test, finding F-0006 would make every soak run red).
 
 At the start of the measured phase (after a warm-up of a quarter of the time, at most 30 s) and at the end the
 test compares per process: pid (no restart), handle count, memory (growth under 20 %), and the number of

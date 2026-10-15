@@ -18,7 +18,7 @@ As WI-0052, plus `doc/EXPRESSION-LANGUAGE.md` 18 (object variables as `Map` with
 
 ## Acceptance criteria
 
-- **Load path (F-0282, README S0002):** `tests/stress/test_big_flows.py` was run at the end; the time to `evt.engine.ready` and the largest snapshot answer are in the result and within the budget.
+- **Load path (F-0073, README S0002):** `tests/stress/test_big_flows.py` was run at the end; the time to `evt.engine.ready` and the largest snapshot answer are in the result and within the budget.
 - Smoke test and e2e tests green; the v1 flow "List test" (`Flow 1210127300.json`) runs (fixes documented in WI-0057).
 
 ## Docs

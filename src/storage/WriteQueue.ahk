@@ -55,7 +55,7 @@ class WriteQueue {
 
     ; Runs the next runnable operation and answers it: the first request, else the first log operation
     ; (when its retry delay is over). Returns false when nothing could run.
-    ; An operation may ask for a later retry (F-0004, file locked by another process): its run function
+    ; An operation may ask for a later retry (F-0003, file locked by another process): its run function
     ; returns Map("retry", true, "message", text) and the operation has "retryMs" (the time it may keep
     ; trying, counted from the first retry) and optionally "retryDelayMs". It then stays at the head
     ; of its queue (the order is kept). A log operation is not run again before its delay is over, a
@@ -81,7 +81,7 @@ class WriteQueue {
                 } else if (now - op["lastTry"] > WriteQueue.STALL_MS) {
                     ; Longer than any retry delay since the last attempt: the process was stalled (or busy
                     ; with requests). That time did not give the other process a chance to let go, so it
-                    ; does not count against the retry time (F-0025, F-0272).
+                    ; does not count against the retry time (F-0022, F-0063).
                     op["retryUntil"] += now - op["lastTry"]
                 }
                 op["lastTry"] := now

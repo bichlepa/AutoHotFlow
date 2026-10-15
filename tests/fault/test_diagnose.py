@@ -173,7 +173,7 @@ def test_the_handles_of_the_supervisor_stay_flat_over_many_restarts(chains, data
         try:
             new, _ = chain.wait_restarted_ready("crasher", old, timeout=RESTART_READY_S)
         except AssertionError as e:
-            # F-0042: the message of the helper held an empty supervisor text; the log file has the evidence.
+            # F-0038: the message of the helper held an empty supervisor text; the log file has the evidence.
             tail = log_text(datadir)[-3000:]
             raise AssertionError("restart %d: %s\nlog tail:\n%s" % (n, e, tail)) from e
         old = new

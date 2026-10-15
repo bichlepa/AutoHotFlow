@@ -34,7 +34,7 @@ NO_DIALOG_ROLES = {"core", "expr", "engine", "supervisor", "storage", "triggerho
 # Known, justified exceptions: (path relative to src/, rule, regex the offending line must match or None, reason).
 EXCEPTIONS = [
     ("core/Role.ahk", "file-io", r"FileAppend",
-     "Role.Console writes to stderr ('**') with FileAppend, not to a file; documented in Role.ahk (F-0005)."),
+     "Role.Console writes to stderr ('**') with FileAppend, not to a file; documented in Role.ahk (F-0004)."),
     ("AhfBoot.ahk", "file-io", r"FileAppend",
      "AhfConsole writes to stderr ('**') with FileAppend before Role.Console is loaded (WI-0022), not to a file."),
 ]

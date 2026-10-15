@@ -461,7 +461,7 @@ RealFlowRunsFromTriggerToEnd() {
     Assert.Equal(inst.State, "ended")
 }
 
-; F-0012: leaving a loop whose stack is empty must end the thread as unhandled, not throw.
+; F-0011: leaving a loop whose stack is empty must end the thread as unhandled, not throw.
 LoopLeftWithEmptyStackEndsTheThread() {
     flow := LoopFlow()
     pair := StartTrigger(flow)
@@ -499,7 +499,7 @@ TestRun.Case("Loop: two exception connections pop the loop stack once", LoopTwoE
 TestRun.Case("Loop: leaving a loop inside an outer loop keeps the outer level in every branch", LoopLeftInsideOuterLoopKeepsOuterLevel)
 TestRun.Case("Advance: branching into a loop pushes only the loop thread (loop connection first)", BranchIntoLoopFirst)
 TestRun.Case("Advance: branching into a loop pushes only the loop thread (loop connection second)", BranchIntoLoopSecond)
-TestRun.Case("Loop: leaving with an empty stack ends the thread as unhandled (F-0012)", LoopLeftWithEmptyStackEndsTheThread)
+TestRun.Case("Loop: leaving with an empty stack ends the thread as unhandled (F-0011)", LoopLeftWithEmptyStackEndsTheThread)
 TestRun.Case("real flow 464187831 runs from trigger to end", RealFlowRunsFromTriggerToEnd)
 
 TestRun.Finish()

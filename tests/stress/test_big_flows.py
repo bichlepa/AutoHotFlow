@@ -32,7 +32,7 @@ BIGGEST_FLOW = V1_EXAMPLES / "Flow 1010290492.json"
 HELPER = TESTS_DIR / "ahk" / "helpers" / "hub_frame_cost.ahk"
 
 HUB_FRAME_BUDGET_MS = 5.0
-SNAPSHOT_BUDGET_S = 3.0     # E0042 (was 1.0): guards against a blocked engine; F-0282 has the measurements
+SNAPSHOT_BUDGET_S = 3.0     # E0042 (was 1.0): guards against a blocked engine; F-0073 has the measurements
 LOAD_NOTE_S = 30.0          # WI-0024 point 6: above this, the load time is a finding for "native JSON parser"
 
 
@@ -50,7 +50,7 @@ def test_hub_cost_of_a_large_frame_is_below_the_budget(run_ahk, runs):
           % (bench["frame_chars"], bench["mean_ms"], bench["max_ms"], runs))
     assert bench["delivered_ok"] == 1, "the target did not receive the frame unchanged except for `from`"
     # scaled(): the budget is exact in the serial run and under -m stress (the reference), three times looser in the
-    # parallel run, where 5.07 ms against 5.0 ms was seen (F-0039).
+    # parallel run, where 5.07 ms against 5.0 ms was seen (F-0035).
     assert bench["mean_ms"] < scaled(HUB_FRAME_BUDGET_MS), bench
 
 
@@ -116,7 +116,7 @@ def test_many_big_flows_load_without_hung_and_with_a_responsive_engine(procs, da
         restarts = {n: p.get("restarts") for n, p in states.items()}
         bad_events = chain.rec.find(lambda m: m.get("type") in ("evt.process.hung", "evt.process.crashed",
                                                                 "evt.process.restarted"))
-        # Since WI-0031 the engine waits for storage and reports no error for it (F-0024): every error counts.
+        # Since WI-0031 the engine waits for storage and reports no error for it (F-0021): every error counts.
         errors = chain.rec.find(lambda m: m.get("type") == "evt.storage.error")
         metrics.record("big flow collection loaded", flows=count, megabytes=round(result["bytes"] / 2**20, 2),
                        seconds_to_ready=round(result["t_ready"], 2),

@@ -56,7 +56,7 @@ def test_supervisor_stand_still_does_not_make_healthy_children_hung(chains, roun
     assert "supervisor stood still" in chain.sup.text(), "stand-still not noticed: " + chain.sup.text()
 
 
-# --- deadlines after a stand-still (WI-0033, F-0016, E0012) ---------------------------------------------------------
+# --- deadlines after a stand-still (WI-0033, F-0015, E0012) ---------------------------------------------------------
 
 PREPARE_LIMIT_MS = 5000
 HELLO_LIMIT_S = 5.0     # Hub.HELLO_TIMEOUT_MS

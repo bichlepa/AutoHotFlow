@@ -198,7 +198,7 @@ class Engine extends Role {
     }
 
     ; Asks the supervisor whether storage is ready; asks again after STORAGE_POLL_MS if it is not (or if the supervisor
-    ; did not answer). evt.process.ready of storage starts the load earlier. No limit of tries (F-0031).
+    ; did not answer). evt.process.ready of storage starts the load earlier. No limit of tries (F-0027).
     _WaitForStorage() {
         if (this._flowsLoaded || this._loadActive || this._listPending)
             return
@@ -231,7 +231,7 @@ class Engine extends Role {
         SetTimer(this._pollFn, -Engine.STORAGE_POLL_MS)
     }
 
-    ; At most one line per WAIT_LOG_MS, level a1: waiting for a late storage is normal (F-0024).
+    ; At most one line per WAIT_LOG_MS, level a1: waiting for a late storage is normal (F-0021).
     _LogWaiting(text) {
         if (this._lastWaitLog != "" && A_TickCount - this._lastWaitLog < Engine.WAIT_LOG_MS)
             return

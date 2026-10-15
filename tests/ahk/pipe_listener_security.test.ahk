@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the access control of src/core/ipc/PipeListener.ahk (F-0018).
+; Unit tests for the access control of src/core/ipc/PipeListener.ahk (F-0017).
 #Include lib\Assert.ahk
 #Include ..\..\src\core\ipc\PipeListener.ahk
 

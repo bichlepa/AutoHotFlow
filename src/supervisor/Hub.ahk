@@ -32,7 +32,7 @@
 ; answer {ok:false, error:{code:"timeout"}} when timeoutMs has passed (checked by Tick, moved by Shift), or "" when the
 ; link is lost first.
 ; A real answer that comes after the timeout is dropped and counted in droppedAnswers (Peer does the same).
-; Requests between clients (F-0040, WI-0034): the hub remembers every cmd.* it forwards (head fields only: sender, id,
+; Requests between clients (F-0036, WI-0034): the hub remembers every cmd.* it forwards (head fields only: sender, id,
 ; type, target) until the answer passes back, or until the deadline of the request (timeoutMs) plus ROUTED_SLACK_MS.
 ; When the connection of the target ends (the process died, its pipe broke, its queue overflowed, it reconnected),
 ; every request it has not answered gets the answer {ok:false, error:{code:"peer_gone"}} from the hub at once. The
@@ -52,7 +52,7 @@ class Hub {
     ; for ROUTED_DEFAULT_MS, the longest standard deadline of the protocol (storage operations, PROTOCOL 2).
     static ROUTED_SLACK_MS := 1000
     static ROUTED_DEFAULT_MS := 30000
-    ; evt.log.append is droppable (F-0275): above this many frames in the send queue to the target the hub drops it
+    ; evt.log.append is droppable (F-0066): above this many frames in the send queue to the target the hub drops it
     ; and counts it per target (link["logDropped"]), so a log burst never drives the queue into the hard limit
     ; (PipeConnection.maxQueueFrames, 1000), which would close the link. Other message types are never dropped here.
     static LOG_SOFT_LIMIT := 800
@@ -73,7 +73,7 @@ class Hub {
         this._links := Map()      ; name -> link Map (see _Link)
         this._byConn := Map()     ; ObjPtr(conn) -> name
         this._pending := Map()    ; request id -> Map("to", name, "type", msgType, "cb", fn, "dueAt", ms)
-        ; forwarded requests between clients (F-0040): sender "`n" id -> Map("from", .., "to", .., "type", .., "id", .., "dueAt", ms)
+        ; forwarded requests between clients (F-0036): sender "`n" id -> Map("from", .., "to", .., "type", .., "id", .., "dueAt", ms)
         this._routed := Map()
         this.goneAnswers := 0     ; requests answered with peer_gone because their target went away
         this._dispatcher := Dispatcher()
@@ -149,7 +149,7 @@ class Hub {
     }
 
     ; The supervisor stood still for ms (Stall): every deadline of the hub moves by that time, so the rest of the time
-    ; is kept (WI-0033, F-0016): the hello time of the new connections and the time limit of the open requests.
+    ; is kept (WI-0033, F-0015): the hello time of the new connections and the time limit of the open requests.
     Shift(ms) {
         for _, rec in this._anon
             rec["since"] += ms
@@ -496,7 +496,7 @@ class Hub {
         this._NoteRouted(link["name"], to, head["type"], head["id"], head["corr"], head["timeoutMs"])
     }
 
-    ; --- requests between clients (F-0040, WI-0034) --------------------------------------------------
+    ; --- requests between clients (F-0036, WI-0034) --------------------------------------------------
 
     ; A message from `from` was forwarded to `to`. A cmd.* is remembered until its answer passes back; a res.* that
     ; passes back ends the request it answers (only when it comes from the target of that request).

@@ -39,7 +39,7 @@ class Role {
     static ORPHAN_MS := 3000
     static GUARD_MS := 200
     static LOG_QUEUE_MAX := 500
-    ; Log entries are droppable (F-0017): above this many frames in the send queue to the hub an entry is dropped and
+    ; Log entries are droppable (F-0016): above this many frames in the send queue to the hub an entry is dropped and
     ; counted, so a log burst never drives the queue into the hard limit (PipeConnection.maxQueueFrames, 1000), which
     ; would close the connection. The count is reported as one line when there is room again.
     static LOG_SEND_SOFT := 500
@@ -49,7 +49,7 @@ class Role {
     ; a zombie. The window keeps rare errors over a long life from adding up.
     static ERROR_LIMIT := 20
     static ERROR_WINDOW_MS := 60000
-    ; Ending (WI-0030, F-0026): the last frames (events, log lines, sys.bye) are written before the process ends
+    ; Ending (WI-0030, F-0023): the last frames (events, log lines, sys.bye) are written before the process ends
     ; (Peer.CloseWhenFlushed). The time for that is the rest of the shutdown deadline, but at most FLUSH_MAX_MS:
     ; a healthy hub empties a full pipe within one or two of its ticks (200 ms), one second also covers a hub that is
     ; busy with a burst of other clients, and the supervisor ends the process at its deadline anyway. FLUSH_MIN_MS
@@ -71,7 +71,7 @@ class Role {
     ; A role started by the supervisor has stdout and stderr in an anonymous pipe (WI-0023, ChildLauncher): what
     ; it writes here is read by the supervisor and ends up in the log. Without a usable stderr (a role started
     ; by hand without a console) FileAppend throws; the console is best effort and must never keep a role from
-    ; ending (orphan guard, WI-0015, F-0005).
+    ; ending (orphan guard, WI-0015, F-0004).
     static Console(level, source, text) {
         try {
             FileAppend(level " " source ": " text "`n", "**", "UTF-8-RAW")

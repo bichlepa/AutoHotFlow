@@ -18,7 +18,7 @@
 ;
 ; sys.shutdown is handled by the base class (sys.bye, exit 0).
 ;
-; Test option in the name (WI-0034, F-0041): "echo:slowhello<ms>" (the flow part of the name) starts its connection to the
+; Test option in the name (WI-0034, F-0037): "echo:slowhello<ms>" (the flow part of the name) starts its connection to the
 ; hub only <ms> after the process start, so a test can end the session while this child is still starting and says
 ; sys.hello during the shutdown. The supervisor needs no option for it (it starts the child as --flow=slowhello<ms>).
 class EchoRole extends Role {

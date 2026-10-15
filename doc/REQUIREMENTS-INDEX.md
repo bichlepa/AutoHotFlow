@@ -236,7 +236,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-PRF-020](REQUIREMENTS.md#req-prf-020-idle-cpu) | Idle CPU | n/a | done | must | port | - |
 | [REQ-PRF-030](REQUIREMENTS.md#req-prf-030-memory) | Memory | n/a | partial | must | port | S0005 |
 | [REQ-PRF-040](REQUIREMENTS.md#req-prf-040-start-time) | Start time | n/a | done | must | port | - |
-| [REQ-PRF-050](REQUIREMENTS.md#req-prf-050-many-big-flows-load-without-blocking) | Many big flows load without blocking | n/a | partial | must | port | S0002 (F-0282) |
+| [REQ-PRF-050](REQUIREMENTS.md#req-prf-050-many-big-flows-load-without-blocking) | Many big flows load without blocking | n/a | partial | must | port | S0002 (F-0073) |
 | [REQ-PRF-060](REQUIREMENTS.md#req-prf-060-editor-redraw) | Editor redraw | n/a | open | must | port | S0005 |
 | [REQ-PRF-070](REQUIREMENTS.md#req-prf-070-many-instances-and-fast-start-and-stop) | Many instances and fast start and stop | n/a | done | must | port | - |
 | [REQ-PRF-080](REQUIREMENTS.md#req-prf-080-log-throughput) | Log throughput | no | done | must | port | - |

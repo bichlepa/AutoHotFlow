@@ -209,7 +209,7 @@ CheckTheCallerIsAnsweredAfterTheWaitAndTheReportStaysForTheNextTime() {
     Assert.Equal(result["ok"], false, "the caller is not answered twice")
 }
 
-; WI-0033 (F-0016): the supervisor stood still; the wait for storage keeps its rest of the time.
+; WI-0033 (F-0015): the supervisor stood still; the wait for storage keeps its rest of the time.
 CheckAStandStillMovesTheWaitForStorage() {
     r := NewReport(&hub, &children)
     r.storageWaitMs := 600

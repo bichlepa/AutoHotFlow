@@ -69,7 +69,7 @@ class Scheduler {
         ; every branch starts from the restored state. v1 popped once per connection (M-0014, M-0019).
         if (leavesLoop && thread.Loops.Depth = 0) {
             ; Broken loop (for example entered at "tail"): Pop would throw out of the finish callback and
-            ; leave the thread "finished" for ever, so the instance would never end (F-0012). End the thread
+            ; leave the thread "finished" for ever, so the instance would never end (F-0011). End the thread
             ; as an unhandled exception instead; the caller logs f0 with this message.
             thread.Message := "loop stack is empty when leaving loop " thread.ElementId " with '" result "'"
             instance.ReleaseThread(thread.Id, "loop stack is empty")

@@ -93,7 +93,7 @@ LATE_DEADLINE_MS = 12000     # far above the late hello: an exit at the deadline
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean(chains, round_no):
-    # F-0041 (WI-0034): a child that is still starting when its group gets sys.shutdown (the warm worker, an editor, the
+    # F-0037 (WI-0034): a child that is still starting when its group gets sys.shutdown (the warm worker, an editor, the
     # debug window) says sys.hello later. It must get sys.shutdown then; before the fix it never did, its group never
     # ended, storage (the last group) never got sys.shutdown, and both were terminated at the deadline (exit 5).
     late = "echo:slowhello%d" % LATE_HELLO_MS
@@ -118,14 +118,14 @@ def test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_s
     assert wait_until(lambda: not session_processes(chain.session), 5.0), session_processes(chain.session)
 
 
-SLOW_HELLO_MS = int(scaled(4000))      # F-0043: this child says hello long after the deadline
+SLOW_HELLO_MS = int(scaled(4000))      # F-0039: this child says hello long after the deadline
 SLOW_DEADLINE_MS = int(scaled(1500))
 
 
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_a_child_that_has_not_connected_does_not_hold_storage_and_the_session_ends_with_storage_clean(chains, round_no):
-    # F-0043: a child in state "starting" (here a worker whose hello comes after the deadline) used to hold its group and
+    # F-0039: a child in state "starting" (here a worker whose hello comes after the deadline) used to hold its group and
     # with it storage, the last group. At the deadline storage was terminated without sys.shutdown (clean false). Now
     # the group does not wait for a child that has never connected: storage is told to shut down and ends clean; the
     # late child is the only one that is ended at the deadline (exit 5).

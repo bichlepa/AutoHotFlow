@@ -317,7 +317,7 @@ class Chain:
         def check():
             st = self.states().get(name, {})
             return st.get("state") == "ready" and st.get("pid") not in (0, old_pid)
-        timeout = scaled(timeout)           # a wait for a restart is an upper limit like the others (WI-0034, F-0042)
+        timeout = scaled(timeout)           # a wait for a restart is an upper limit like the others (WI-0034, F-0038)
         if not wait_until(check, timeout):
             raise AssertionError("%s not ready again within %.1f s:\n%s" % (name, timeout, self.sup.text()))
         return self.states()[name]["pid"], time.perf_counter()

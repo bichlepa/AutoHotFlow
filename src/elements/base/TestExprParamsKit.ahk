@@ -3,7 +3,7 @@
 
 ; Shared parts of Action_TestExprParams (inline) and Action_TestExprParamsWorker (worker), WI-0039 and WI-0042: the
 ; parameter list, the evaluation and the report. No element class and no ElementRegistry.Register here: a class file
-; that includes this file must not register a class in a role that does not hold it (F-0398, E0041).
+; that includes this file must not register a class in a role that does not hold it (F-0081, E0041).
 class TestExprParamsKit {
     static Parameters(ctx) => [
         {type: "Label", label: "Test"},

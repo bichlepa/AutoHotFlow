@@ -221,7 +221,7 @@ class DiagReport {
         Log.Write("a0", "report", "report '" job["reason"] "' waits for storage (" this._unwritten.Length " waiting)")
     }
 
-    ; The supervisor stood still for ms (Stall, WI-0033, F-0016): the wait for storage keeps its rest of the time. The timer
+    ; The supervisor stood still for ms (Stall, WI-0033, F-0015): the wait for storage keeps its rest of the time. The timer
     ; is set again for the new time. A timer that came due during the stand-still and ran before the tick that noticed
     ; it only answers the caller early ("kept and written when storage is back"); the report itself is not lost.
     Shift(now, ms) {

@@ -1,4 +1,4 @@
-"""F-0283: a second start of the product while a supervisor runs makes the manager show its window.
+"""F-0074: a second start of the product while a supervisor runs makes the manager show its window.
 
 The second instance is the real command line without --command (PROTOCOL 4.1 cmd.app.command, 4.8 cmd.manager.show).
 The headless manager stub records the request as a ui-event line `stub.show` (no window, so no gui test). The supervisor

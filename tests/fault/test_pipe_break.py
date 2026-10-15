@@ -229,7 +229,7 @@ def busy_flags(hub, name):
 
 
 def test_worker_announces_its_busy_state_again_after_it_rebuilt_the_connection(procs, datadir, session_id):
-    """F-0030: a sys.busy {busy: false} sent while the link is down is dropped. The supervisor then keeps the worker
+    """F-0026: a sys.busy {busy: false} sent while the link is down is dropped. The supervisor then keeps the worker
     as busy for ever (no ping, no pong judgement). After a reconnect the worker must announce its state, also when
     it has no job (before the fix it announced only `true` for a running job)."""
     pipe = "ahf.%s.fw" % session_id

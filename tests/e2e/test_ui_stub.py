@@ -7,7 +7,7 @@ events can be compared.
 
 The stub's copy of the events is written by storage into Log/Log_manager.txt ("... ui-event {json}").
 The test never reads that file while the run is going on: storage fails to append a line when another
-process holds the file (OSError 6, "invalid handle"), and the line is lost (WI-0013 findings, F-0004). The
+process holds the file (OSError 6, "invalid handle"), and the line is lost (WI-0013 findings, F-0003). The
 observer subscribes to topic log instead. storage forwards every line after it has been written, so the
 test knows when a line is in the file. The file is read once, after the supervisor has ended.
 

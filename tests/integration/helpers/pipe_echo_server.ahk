@@ -178,7 +178,7 @@ class EchoServer {
     }
 
     ; Sends count frames "<i>|xxx..." of about size bytes and a frame "last", then ends the connection
-    ; (WI-0030, F-0026 cause A). The frames that do not fit into the pipe wait in the send queue.
+    ; (WI-0030, F-0023 cause A). The frames that do not fit into the pipe wait in the send queue.
     static _BurstEnd(c, size, count, timeoutMs) {
         pad := Kit.Repeat("x", size)
         loop count

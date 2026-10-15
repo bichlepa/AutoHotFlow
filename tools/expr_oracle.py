@@ -64,7 +64,7 @@ NUMERIC_VARS = ["i0", "i1", "i2", "i3", "i7", "i16", "ineg", "f05", "f15", "fneg
 EDGE_VARS = ["imax", "imin"]
 TEXT_VARS = ["sabc", "shello", "supper", "smix", "sempty"]
 BIG_VARS = {"imax", "imin", "ibig"}
-# Floats whose text becomes a number outside the range of Float when digits are appended (F-0284): not used where a text or
+# Floats whose text becomes a number outside the range of Float when digits are appended (F-0075): not used where a text or
 # a truth value is made of them
 RANGE_VARS = {"ftiny", "fhuge"}
 KEYS = ["k", "s", "f", "K", "k", "s", "f", "zz"]       # "zz" does not exist

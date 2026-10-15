@@ -304,12 +304,12 @@ def test_frames_outside_the_canonical_form_are_routed_with_the_real_sender(start
     assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
 
 
-PEER_GONE_BUDGET_S = scaled(1.0)      # F-0040 (WI-0034): an open request to a client that is gone ends within 1 s
+PEER_GONE_BUDGET_S = scaled(1.0)      # F-0036 (WI-0034): an open request to a client that is gone ends within 1 s
 OPEN_REQUEST_S = 10.0                 # the own deadline of these requests: far above the budget
 
 
 def test_open_request_to_a_client_that_goes_away_is_answered_with_peer_gone_at_once(started, session_id):
-    # F-0040 (WI-0034): the hub forwards a cmd.* and the target goes away before it answers. Before, nobody answered and
+    # F-0036 (WI-0034): the hub forwards a cmd.* and the target goes away before it answers. Before, nobody answered and
     # the sender waited for its own deadline (the engine: 30 s for storage). Now the hub answers with peer_gone when
     # the connection of the target ends. An answer that was given before is not followed by a second one.
     sup = started()
@@ -345,7 +345,7 @@ def test_open_request_to_a_client_that_goes_away_is_answered_with_peer_gone_at_o
 
 
 def test_open_request_to_a_child_whose_process_dies_is_answered_with_peer_gone_at_once(started, session_id):
-    # F-0040 (WI-0034): the target is a role process that cannot answer (frozen) and is then killed, as a crashing
+    # F-0036 (WI-0034): the target is a role process that cannot answer (frozen) and is then killed, as a crashing
     # storage or engine would be. The sender learns it from the hub within 1 s of the death, not at its deadline.
     sup = started("--start=echo:a", "--test-roles")
     py = connect(sup.pipe, "py")

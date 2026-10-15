@@ -231,7 +231,7 @@ def test_killed_worker_ends_its_element_with_worker_crashed_and_the_pool_has_a_r
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_worker_killed_before_it_answers_the_run_ends_the_element_with_worker_crashed_and_is_reported_as_crashed(
         chains, datadir, round_no):
-    """F-0046 (WI-0035), deterministic: the run is open at the frozen worker (the hub holds it, hub.routedOpen >= 1), then
+    """F-0042 (WI-0035), deterministic: the run is open at the frozen worker (the hub holds it, hub.routedOpen >= 1), then
     the worker dies. The hub answers peer_gone at once, before the supervisor has judged the end of the process. The
     engine must not read that as a refusal, and the supervisor must not report the end as a planned "killed"."""
     flows = dict(ECHO, whang=("Action_TestHangWorker", None))
@@ -315,7 +315,7 @@ def test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_ru
     t0 = time.perf_counter()
     psutil.Process(engine_pid).kill()
     new_engine, _ = chain.wait_restarted_ready("engine", engine_pid, timeout=15.0)
-    # "ready" in the supervisor is the hello of the engine; the flows are loaded later (F-0270)
+    # "ready" in the supervisor is the hello of the engine; the flows are loaded later (F-0061)
     chain.wait_flows(["wecho"], timeout=READY_S)
     assert wait_until(lambda: not alive(old_pid), 10.0), "the orphan %s (pid %d) still lives:\n%s" % (
         old, old_pid, chain.sup.text())
@@ -330,7 +330,7 @@ def test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_ru
 
 @pytest.mark.slow
 def test_f49_restarted_engine_is_ready_for_the_supervisor_before_it_has_loaded_its_flows(chains, datadir):
-    """F-0270, deterministic: storage is frozen, so the restarted engine can say hello (state "ready" in the
+    """F-0061, deterministic: storage is frozen, so the restarted engine can say hello (state "ready" in the
     supervisor) but cannot load its flows. A start in this window is answered with not_found. This is the
     documented order (PROTOCOL 4.3: evt.engine.ready only after loading), so a test that starts a flow after an
     engine restart has to wait for the flows first (chain.wait_flows)."""
@@ -377,7 +377,7 @@ def test_engine_killed_during_a_hanging_job_ends_the_worker_at_once_and_the_new_
     assert got is not None, "no evt.process.exited with reason 'engine gone':\n" + chain.sup.text()
     assert not chain.rec.find(event("evt.process.crashed", name=old))
     chain.wait_restarted_ready("engine", engine_pid, timeout=15.0)
-    chain.wait_flows(["wecho"], timeout=READY_S)        # F-0270
+    chain.wait_flows(["wecho"], timeout=READY_S)        # F-0061
     assert wait_until(lambda: len(ready_workers(chain)) == 1 and old not in live_workers(chain), READY_S), \
         "workers after the restart: %s" % workers(chain)
     run_echo_ok(chain)          # the new engine's pool serves a new job

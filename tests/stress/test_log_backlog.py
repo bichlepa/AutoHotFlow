@@ -1,4 +1,4 @@
-"""WI-0016, WI-0025: an event flood and the log queue of the storage (finding F-0008).
+"""WI-0016, WI-0025: an event flood and the log queue of the storage (finding F-0007).
 
 The manager stub writes every engine event to the log through the storage (PROTOCOL 4.8). Before WI-0025 the
 storage drained only about 30 lines per second and the queue had no limit. This test floods the engine with

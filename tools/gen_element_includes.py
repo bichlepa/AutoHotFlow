@@ -9,7 +9,7 @@ file name.
   python tools/gen_element_includes.py --check    write nothing, exit 1 when a block is missing or out of date
 
 A class file must not #Include another class file: the include runs the file-level code of that file too (the
-Register line), so the class would land in every role that includes the first file (F-0398). Shared code of such
+Register line), so the class would land in every role that includes the first file (F-0081). Shared code of such
 classes goes into a file without a Mode line (`src/elements/base/`, or next to the test elements in `tests/elements/`).
 
 Classes (ROLE_MODES): supervisor, storage, debug and manager get no block (the manager loads all classes later if

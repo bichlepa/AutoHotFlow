@@ -22,7 +22,7 @@
 ; the peer). The last frames of a process (its events, sys.bye) are ended with CloseWhenFlushed instead.
 ; A peer that has gone may have left frames in the pipe that are not read yet (its sys.bye). A write that fails
 ; because the peer is gone therefore closes only the write side (the send queue is dropped, SendFrame refuses);
-; reading goes on to the end of the stream, which closes the connection with "peer_closed" (WI-0030, F-0026).
+; reading goes on to the end of the stream, which closes the connection with "peer_closed" (WI-0030, F-0023).
 class PipeConnection {
     static WAKE_MESSAGE := 0x8001
     ; Reads handled in one Pump before it yields (64 KiB each). Bounds the time a busy peer can
@@ -258,7 +258,7 @@ class PipeConnection {
             Log.Write("a1", "ipc", "closing " this.Name " with " this._queue.Length " frames unwritten after "
                 . Round(Time.NowMs() - this._drainStart) " ms")
         SetTimer(this._drainFn, 0)
-        this._drainFn := ""                         ; breaks the cycle object -> bound method -> object (F-0007)
+        this._drainFn := ""                         ; breaks the cycle object -> bound method -> object (F-0006)
         this.Close()
         cb := this._drainDone
         this._drainDone := ""
