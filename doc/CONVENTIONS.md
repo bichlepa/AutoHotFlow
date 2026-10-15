@@ -8,7 +8,7 @@ Applies to everything under `src/`, `tests/ahk/` and `tools/`. Language of the d
 - **One class per file**, file name = class name (`Dispatcher.ahk`). Several free functions only in `Util` files.
 - **No global variables.** State lives in classes or as `static` members. Exceptions (the entry point's `A_Args` parsing, the registry singleton) are in `AutoHotFlow.ahk` and the role module respectively.
 - Includes only according to the rules in ARCHITECTURE 8 (`core/` knows no roles, roles do not know each other).
-- Encoding: UTF-8 without BOM, line endings as in the repo (see `.gitattributes`).
+- Encoding: UTF-8 without BOM. Line endings: LF (`.gitattributes`: `* text=auto eol=lf`); a CRLF or mixed text file fails `tests/test_line_endings.py`. Files marked `-text` (test data, v1 language files) are byte for byte. `v1/` keeps the CRLF on disk (frozen reference).
 
 ## 2. Names
 
