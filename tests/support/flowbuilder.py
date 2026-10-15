@@ -25,6 +25,8 @@ A linear flow can also be written as text (see `FlowBuilder.linear`):
 Format. `v2=True` (default) writes what the engine writes: root key `formatVersion` 2 and `flowSettings.strictTypes` as a
 JSON boolean (a file with `formatVersion` is not converted, only elements marked with `v1Text` are). `v2=False` writes the
 format of v1 without both keys (the engine converts the expression texts when it loads it, for conversion tests).
+A class is written as `"Package.Class"` (the element then names that package, E0045) or plain: a plain test class
+(`Action_Test*`) is in the package Test, any other in Default (tests/support/elements.py); the text form takes both.
 Parameters keep their Python type (an int is written as a JSON number, a str as a JSON string). Parameters whose default
 may be used are simply left out. IDs are `element<10 digits>` and `connection<10 digits>` from one counter, positions
 are a column of 140 units per element.

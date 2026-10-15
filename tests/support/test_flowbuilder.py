@@ -22,6 +22,19 @@ def test_a_flow_has_the_root_keys_of_the_v2_format():
     assert el["class"] == "Trigger_Manual" and el["type"] == "trigger" and el["DefaultTrigger"] == "1"
 
 
+def test_an_element_names_its_package_and_its_class():
+    # E0045, WI-0047: "Package.Class", a plain test class is in Test, any other plain class in Default
+    fb = FlowBuilder("pkg")
+    els = [fb.trigger(), fb.action("Action_Sleep"), fb.action("Action_TestThrow"), fb.action("TestTwin.Action_TestPackageName"),
+           fb.action("default.Action_Do_nothing")]
+    els += fb.linear("Action_Do_nothing -> Test.Action_TestSetVar")
+    got = [(e["package"], e["class"]) for e in fb.to_dict()["allElements"].values()]
+    assert got == [("Default", "Trigger_Manual"), ("Default", "Action_Sleep"), ("Test", "Action_TestThrow"),
+                   ("TestTwin", "Action_TestPackageName"), ("default", "Action_Do_nothing"),
+                   ("Default", "Action_Do_nothing"), ("Test", "Action_TestSetVar")]
+    assert [e.package for e in els][3] == "TestTwin" and els[3].cls == "Action_TestPackageName"
+
+
 def test_the_v1_format_has_neither_the_version_nor_the_type_mode():
     fb = FlowBuilder("old", v2=False, strict_types=True)
     t = fb.trigger()
