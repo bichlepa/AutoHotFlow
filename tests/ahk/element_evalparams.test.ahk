@@ -462,6 +462,19 @@ CheckAMapValueKeepsItsIntegerKeysInTheWorker() {
     Assert.Equal(ctx.CheckVarName("ok"), 1)
 }
 
+; A request that cannot be sent ends with the ElementError of the context. A local named like the built-in Type()
+; once hid it inside the catch block, so the caller got a MethodError instead (AHK names are case-insensitive).
+FailingSend(*) {
+    throw Error("pipe is closed")
+}
+
+CheckARequestThatCannotBeSentGivesAnElementError() {
+    ctx := WorkerContext("f", "a1", "i", "t", Map(), "", "", "exec1", FailingSend)
+    err := Assert.Throws(() => ctx.GetVar("x"), ElementError)
+    Assert.True(InStr(err.Message, "could not be sent"), err.Message)
+    Assert.True(InStr(err.Message, "pipe is closed"), err.Message)
+}
+
 ; Parameters() of a worker class that throws: the element ends with exception, the engine goes on.
 class Action_TestBrokenWorkerParams extends AhfElement {
     static Mode := "worker"
@@ -519,6 +532,7 @@ TestRun.Case("worker: compatibility mode", InWorker(CheckTypeErrorInCompatibilit
 TestRun.Case("worker: strict mode", InWorker(CheckTypeErrorInStrictMode))
 TestRun.Case("worker: the engine sends every parameter evaluated, values and errors in order", CheckTheEngineSendsEveryParameterEvaluated)
 TestRun.Case("worker: a Map value keeps its Integer keys; variables need the engine", CheckAMapValueKeepsItsIntegerKeysInTheWorker)
+TestRun.Case("worker: a request that cannot be sent gives an ElementError (shadowed Type())", CheckARequestThatCannotBeSentGivesAnElementError)
 TestRun.Case("worker: Parameters() that throws ends the element, no job is sent", CheckParametersThatThrowEndTheWorkerElement)
 
 TestRun.Finish()

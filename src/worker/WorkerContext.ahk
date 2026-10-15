@@ -184,19 +184,19 @@ class WorkerContext extends ExecContext {
         fn := this._requestFn
         if (!IsObject(fn) || this.execId = "")
             throw ElementError("variables are not available here: the worker context has no connection to the engine")
-        type := "cmd.engine.var." op
+        reqType := "cmd.engine.var." op
         payload["execId"] := this.execId
         timeoutMs := WorkerContext.REQUEST_TIMEOUT_MS
         box := {done: false, res: ""}
         try {
-            fn("engine", type, payload, WorkerContext._Catcher(box), timeoutMs)
+            fn("engine", reqType, payload, WorkerContext._Catcher(box), timeoutMs)
         } catch as e {
-            throw ElementError("engine did not answer: " type " could not be sent (" Type(e) ": " e.Message ")")
+            throw ElementError("engine did not answer: " reqType " could not be sent (" Type(e) ": " e.Message ")")
         }
         limit := Time.NowMs() + timeoutMs + WorkerContext.WAIT_SLACK_MS
         while (!box.done) {
             if (Time.NowMs() > limit)
-                throw ElementError("engine did not answer " type " within " timeoutMs " ms")
+                throw ElementError("engine did not answer " reqType " within " timeoutMs " ms")
             WorkerContext._WaitForMessages(WorkerContext.WAIT_STEP_MS)
         }
         p := box.res.payload
@@ -205,10 +205,10 @@ class WorkerContext extends ExecContext {
             code := (err is Map) ? String(err.Get("code", "")) : ""
             text := (err is Map) ? String(err.Get("message", "")) : ""
             if (code = ErrCode.GONE)
-                throw ElementError("the execution has ended or was stopped (" type ": gone)")
+                throw ElementError("the execution has ended or was stopped (" reqType ": gone)")
             if (code = ErrCode.TIMEOUT || code = ErrCode.PEER_GONE || code = ErrCode.SHUTTING_DOWN)
-                throw ElementError("engine did not answer " type " (" code ": " text ")")
-            throw ElementError(type " failed (" code ": " text ")")
+                throw ElementError("engine did not answer " reqType " (" code ": " text ")")
+            throw ElementError(reqType " failed (" code ": " text ")")
         }
         if (p.Has("elementError"))
             throw ElementError(String(p["elementError"]))

@@ -21,6 +21,7 @@ This document lists findings that are closed or accepted. Moved from doc/OPEN-IT
 | F-17 | Chatty child gives up during a long supervisor stall | closed (fixed with option (a), verified 2026-10-14 on 8ec62dc) |  |
 | F-275 | A burst of log lines closes the hub's link to `storage` and loses the lines | closed (fixed with option (a), verified 2026-10-14 on 8ec62dc) | yes |
 | F-279 | `VarWriter.FlushAll` loses the variables beyond the limit of the peer (1000 waiting requests) | closed (option (b), accepted by the project owner 2026-10-14; verified 2026-10-14 on 53063dc) |  |
+| F-281 | `#Warn` dialog for `Engine` in `VarLoader.ahk:101` seen in a manual unit test run | closed (option (a), 2026-10-15, E43: comment in the file header) | |
 
 * Renumbered on 2026-10-14 (F-72 is now F-283). The mapping of all renumbered IDs is in `doc/OPEN-ITEMS.md`.
 
@@ -173,3 +174,10 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 - `work_items/STATUS.md`: table "Funde", "Beobachtungsliste (E7)", "Bekannte Probleme", "Nicht geprüft", "Nächste Schritte", "Abnahmelauf WI-34", "Abnahmelauf WI-35".
 - `work_items/HANDOVER.md`: "Offene Entscheidungen", "Offene Punkte", "Nicht gebaut", "Nicht geprüft".
 - The package files `work_items/phase2b/WI-*.md` and `work_items/phase2/WI-*.md` as cited above.
+
+### F-281: `#Warn` warning dialog from the variable loader (manual run)
+
+**What:** During a manual run of a unit test script, the dialog guard caught a `#Warn` warning: "This local variable appears to never be assigned a value. Specifically: Engine", at `src/engine/vars/VarLoader.ahk:101` (`Engine._StorageGone(res)` in the error branch of the load continuation, and the same kind of reference at lines 104 and 106).
+**Status:** Closed (2026-10-15, E43), no code change. Cause (verified by runs through `tools/ahkrun.py`, commit `6589718`): `VarLoader.ahk` uses the class `Engine` and works only in a script that also includes `Engine.ahk`; that holds for the product and for the unit test (`engine_var_files.test.ahk`: 16 passed, no dialog). A probe that includes only `VarLoader.ahk` shows exactly the reported dialog, because a script without a `#Warn` directive shows warnings by MsgBox, and the unknown name `Engine` is taken for an unset local. The original dialog was not reproduced; assumed: that run used a script without `Engine.ahk`.
+**Decision:** option (a) (close without a change) plus a comment in the header of `VarLoader.ahk`. Alternatives rejected: an `#Include` of `Engine.ahk` from the helper (circular, pulls the whole engine into a helper), and moving the two static helpers out of `Engine` (six call sites on the load path for a warning that only a wrong use shows).
+**Follow-up:** the measurement for this entry found `LocalSameAsGlobal` at 152 sites and one real defect: F-375.

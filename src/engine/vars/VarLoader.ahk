@@ -14,6 +14,9 @@
 ;
 ; When storage is gone or silent no further request is sent. After the last answer the loader reports onDown and
 ; keeps what is not done yet; Run again (the engine does that when storage is back) continues with exactly that.
+;
+; Not self-contained (F-281): the error branch uses Engine._StorageGone and Engine._ErrorText. Include this file
+; through Engine.ahk; a script that includes it alone gets a #Warn dialog for the unset name "Engine".
 ; A request that failed for another reason (a file that cannot be read, content that is not JSON) is reported as
 ; evt.storage.error and skipped: that variable is missing in memory, and the next write of it replaces the file.
 ;
