@@ -44,7 +44,9 @@ Session 5 start: 2026-10-15, work-item mode, HEAD `b92d800` on `v2-port`, main c
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
 | 1 | Implementer WI-0047-PREP | sonnet | wi-47p | wip/wi-47p | role entry scripts, M-0032/M-0033 | running |
-| 2 | Bug hunter round 7 (OPEN-ITEMS) | sonnet | hunt-14 | wip/hunt-14 | excluded: F-0014, F-0282, F-0287, role entries | running |
+| 2 | Bug hunter round 7 (OPEN-ITEMS) | sonnet | hunt-14 (removed) | (deleted) | F-0285 (cmd.flow.get sends strictTypes as JSON boolean); integrated as 22826c6, 994f22a (rebased once onto the session start commit); fast 687 passed 1 skipped exit 0 in the workspace; closed | done, verifier running |
+| 14 | Owner's go for F-0014 (held fix, hunt-13) | sonnet (earlier hunter) | hunt-13 (removed) | (deleted) | integrated as 02910a7 and 88be7fe (the stale OPEN-ITEMS hunk was dropped, the entry update was redone by hand); owner agreed 2026-10-15 | done, verifier running |
+| 15 | Verifier F-0285 and F-0014 | sonnet | (main checkout, run_suite --ref HEAD) | - | fast, slow and foundation runs on 88be7fe | running |
 
 Session 4 start: 2026-10-14, work-item mode, HEAD `1c37bce` on `v2-port`, main checkout clean, no workspaces left over. WI-43 stays open: the owner's decision on F-282 (scheduled in S2) is recorded, the acceptance itself (stress green) is not met; the owner closes S1. S2 started with the packages that have no open dependency: WI-44 (depends on WI-38, done), in parallel the owner-decided fix F-17 and F-275 (option (a)).
 
