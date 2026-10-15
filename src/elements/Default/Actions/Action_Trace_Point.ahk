@@ -61,7 +61,7 @@ class Action_Trace_Point extends AhfElement {
         passed[passed.Count + 1] := p.ID " (" ctx.elementId ")"
         ctx.SetVar(this.PASSED_VAR, passed, "", true)
         if (this.IsTrue(p.StopCondition)) {
-            ; first the finish, then the stop, as v1 (x_finish, x_InstanceStop). The text names the condition as written
+            ; first the finish, then the stop, as v1 did (finish, then stop the instance). The text names the condition as written
             ; (v1 named its value, MIGRATION M-0055)
             ctx.Finish("exception", Lang("Stopping execution because stop Condition '%1%' is not false"
                 , params.HasProp("StopCondition") ? params.StopCondition : ""))
