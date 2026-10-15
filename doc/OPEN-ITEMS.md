@@ -42,6 +42,9 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0397 | Foundation tier, timing under load: frozen-process tests exceed their budgets, one teardown leaves processes behind | observed once on `88be7fe` (run 20261015-153151-b481440a), not seen on `b92d800` in one run, open | |
 | F-0398 | The test element `Action_TestExprParamsWorker` includes the inline class `Action_TestExprParams`, so a worker of the test entry registers an inline class too | verified (read), open, low, test classes only | |
 | F-0399 | No setting for the user limits the number of workers; `--worker-limit` exists only with `--test-roles`, the pool size `--workers` only as an option of the engine | verified (read), decided (E0044), implemented in S0004 | yes |
+| F-0400 | Fast tier: the expression oracle's time budget of the fixed corpus (`assert seconds < 15`) measured 16.6 s | observed once, run 20261015-172551-99e2c044 on `1aceedd`, open | |
+| F-0401 | Slow tier: a frozen child is terminated 5.08 s after the hang (budget 4.0 s) | observed once, run 20261015-172954-99e2c044 on `1aceedd`, open | |
+| F-0402 | Foundation tier: the crasher restarts 4 times (`evt.process.started`), 3 expected | observed once, run 20261015-173445-99e2c044 on `1aceedd`, open | |
 
 * Provisional IDs (with `*`) were renumbered to final IDs on 2026-10-14, at the owner's request. Mapping, old to new: F-0048 to F-0269, F-0049 to F-0270, F-0050 to F-0271, F-0051 to F-0272, F-0073 to F-0273, F-0074 to F-0274, F-0085 to F-0275, F-0125 to F-0276, F-0105 to F-0277, F-0165 to F-0278, F-0235 to F-0279, F-0236 to F-0280, F-0255 to F-0281, F-0268 to F-0282, F-0072 to F-0283 (closed). From now on the orchestrator assigns the final ID before the commit. On 2026-10-15 the three gap IDs F-0364, F-0374 and F-0375 (left by the ID blocks reserved for WI-0049, WI-0050 and a bug hunter) were moved to F-0285, F-0286 and F-0287, and all IDs were written with four digits (`F-0002`), so that a search for a small ID finds only that ID. Work-item history (`work_items/phase3/STATUS.md`) keeps the old numbers. The same day all other ID families got four digits as well (`E0029`, `R0003`, `S0004`, `D0012`, `L0001`, `M-0025`, `WI-0040`), and the work-item files were renamed to `WI-0040-*.md`. Text in `work_items/phase3/STATUS.md` and the old file names there are not changed.
 
@@ -252,6 +255,24 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **What:** In the foundation run 20261015-153151-b481440a on `88be7fe`, three tests about frozen processes failed their timing assertions: `test_shutdown.py::test_frozen_storage_is_terminated_at_the_deadline_and_the_others_exit_clean[0]` (exit after 5.09 s, budget 5.0 s), `test_supervisor.py::test_frozen_child_is_hung_within_8s_and_ended_like_a_crash` (terminated 4.68 s after the hang, budget 4.0 s; teardown reported processes left behind), and `test_supervisor.py::test_frozen_child_at_exit_is_terminated_at_the_deadline` (no answer to `py#1` within 2.0 s).
 **Status:** observed once. Run 20261015-153715-b92d8005 (`b92d800`, one run) passed the same three tests. Not repeated on `88be7fe`. Suspicion (assumed): load from other runs at the same time (the run was not alone on the machine), not the commits of the session; the changed code (`src/core/Ids.ahk`, `src/engine/Engine.ahk`) is not on the path of these tests. The leftover processes are the part that matters: a teardown that leaves processes behind can disturb the next test.
 **Action:** if it comes back, record the load on the machine during the run and the process IDs left behind; a hunter may reproduce it with a frozen-process test in a loop.
+
+### F-0400: the expression oracle's time budget is exceeded under load
+
+**What:** `tests/oracle/test_expr_oracle.py::test_the_fixed_corpus_runs_in_its_time_budget` failed with `assert seconds < 15`, measured 16.6 s (target under 10 s). The whole fast tier of this run took 237 s instead of about 15 s, which is the usual time.
+**Status:** observed once, run 20261015-172551-99e2c044 on `1aceedd` (fast tier, one run, not repeated). Suspicion (assumed): machine load; the role-entry change (F-0398 and F-0399 in the same integration) is not on the path of the oracle. Not checked against `b92d800` or an idle machine.
+**Action:** if it returns on an idle machine, measure the corpus alone and look at the budget.
+
+### F-0401: a frozen child is terminated late in the slow tier
+
+**What:** `tests/integration/test_supervisor.py::test_frozen_child_is_hung_within_8s_and_ended_like_a_crash` failed with `assert crashed[0] - hung[0] <= 4.0`: the child was terminated 5.08 s after the hang. The hang itself was detected in time (5.89 s after the freeze, within 8 s).
+**Status:** observed once, run 20261015-172954-99e2c044 on `1aceedd` (slow tier, one run). Same test family as F-0397 (frozen process timing under load). Suspicion (assumed): a slower child exit or start after the new entry scripts, or load; not separated.
+**Action:** compare with `b92d800` and with an idle machine, same test in a loop.
+
+### F-0402: the crasher test sees four starts instead of three
+
+**What:** `tests/integration/test_supervisor.py::test_crashed_child_is_reported_within_1s_restarted_by_policy_and_others_are_untouched` failed with `assert len(watch.find(event("evt.process.started", name="crasher"))) == RESTART_LIMIT`: 4 instead of 3. The test comment says the first start predates the subscription and is not replayed, so either the first start was replayed this time or there was one more restart.
+**Status:** observed once, run 20261015-173445-99e2c044 on `1aceedd` (foundation tier, one run). An earlier slow run of the same test family had a similar count (on `0022025`, the implementer's run: 4 instead of 3, passed 3 of 3 alone). Suspicion (assumed): a race between the subscription and the first start event in the supervisor test helper. Not checked in the run log.
+**Action:** read the `pytest-log` of run 20261015-173445-99e2c044 for the `evt.process.started` lines before the subscription; if the first start is replayed, the test's assumption is wrong.
 
 ## Watch list (E0007)
 
