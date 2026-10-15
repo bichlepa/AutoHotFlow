@@ -450,7 +450,7 @@ The user can create a package of their own and add elements to it with little ef
 
 An element of an installed or self-made package that does not load or that fails is marked as faulty, with the reason, in the manager and in the editor. AutoHotFlow and all other elements keep working. Errors while an element runs are already covered by REQ-EXE-090; this requirement is about loading.
 
-Open point (assumed, not checked): AutoHotkey reads all `#Include` files when a script starts, and a syntax error in one of them stops the whole script. Today every process includes every element (one entry point, D0012). A compiled program cannot include files at run time at all (REQ-DST-020). So packages from users need their own way of loading, for example a check of the package in a separate process before it is used, or running its elements in separate processes. To be designed before REQ-PKG-020 and REQ-PKG-040.
+Open point (assumed, not checked): AutoHotkey reads all `#Include` files when a script starts, and a syntax error in one of them stops the whole script. Engine and editor include every element class (E0041), so one broken element file stops both. A compiled program cannot include files at run time at all (REQ-DST-020). So packages from users need their own way of loading, for example a check of the package in a separate process before it is used, or running its elements in separate processes. To be designed before REQ-PKG-020 and REQ-PKG-040.
 
 ### REQ-PKG-060 The package name is part of the identity of an element
 
@@ -1066,7 +1066,7 @@ The manager shows all flows in a tree of categories, with their state (enabled, 
 - **Scope:** port
 - **Plan:** S0004
 
-Names are checked: no forbidden characters, no second flow with the same name. Deleting asks for confirmation. The commands behind it (`cmd.flow.create`, `cmd.flow.delete`, `cmd.flow.meta.update`, `PROTOCOL.md` 4.2) are not built yet. Deleting a running flow stops its instances at once (E0009).
+Names are checked: no forbidden characters, no second flow with the same name. Deleting asks for confirmation. Deleting a running flow stops its instances at once (E0009).
 
 ### REQ-MGR-030 Manage categories
 
@@ -1137,7 +1137,7 @@ Closing the manager window only hides it. Flows and triggers keep running; the t
 - **Scope:** port
 - **Plan:** S0004 (assumed; the plan does not name the tray)
 
-The tray icon shows the manager (default action) and ends the application. Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030). `ARCHITECTURE.md` 6.1 puts the tray icon in the supervisor; finding F-0064 waits for a decision on it.
+The tray icon shows the manager (default action) and ends the application. Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030).
 
 ### REQ-MGR-100 About window
 
@@ -1380,7 +1380,7 @@ Expression and script fields colour their syntax and complete names of variables
 - **Scope:** port
 - **Plan:** S0004
 
-Settings are stored in the data folder and take effect at once where possible; a setting that needs a restart says so and offers it. The commands behind it (`cmd.settings.get/set`) are not built yet.
+Settings are stored in the data folder and take effect at once where possible; a setting that needs a restart says so and offers it.
 
 ### REQ-SET-020 Defaults for execution policy and working directory
 
@@ -1415,7 +1415,7 @@ AutoHotFlow restarts itself with administrator rights, so that flows can control
 ### REQ-SET-050 Logging settings
 
 - **v1:** yes (levels for app, flow and thread; log to file)
-- **v2:** partial (the level is a command-line option, `--log-level`)
+- **v2:** partial (the level can only be set on the command line)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
@@ -1621,7 +1621,7 @@ Each process answers a diagnostic snapshot (memory, handles, connections, log ri
 ### REQ-DIA-050 Debug window for developers
 
 - **v1:** partial (`d()` with the setting `developing`, MIGRATION M-0021)
-- **v2:** done (the manual check of the window is still open, `MANUAL-CHECKS.md` section 2; the open question on closing windows is in `NEEDS-ATTENTION.md`)
+- **v2:** done (the manual check of the window is still open)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** -
