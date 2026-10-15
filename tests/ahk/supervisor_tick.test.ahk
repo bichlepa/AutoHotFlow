@@ -173,99 +173,99 @@ TestRun.Case("Children: a restart that was planned before the shutdown does not 
 TestRun.Case("Data directory: --data wins over AHF_DATA_DIR, which wins over the application data folder", DataDirFollowsOptionThenEnvironmentThenAppData)
 
 ByeIsReadBeforeTheExitIsReported() {
-    hub := FakeHub()
-    s := NewSupervisor(hub)
+    hubStub := FakeHub()
+    s := NewSupervisor(hubStub)
     AddChild(s.children, "echo", "stopping", Time.NowMs())
     ; the bye was sent before the process ended, but lies unread in the pipe
-    hub.pending.Push(() => s.children.OnBye("echo", true))
+    hubStub.pending.Push(() => s.children.OnBye("echo", true))
     s._Tick()
-    ev := hub.Find("evt.process.exited")
+    ev := hubStub.Find("evt.process.exited")
     Assert.True(IsObject(ev), "evt.process.exited published")
     Assert.True(ev["payload"]["clean"] == Json.True, "clean, because the bye was read first")
 }
 
 ExitWithoutByeIsNotClean() {
-    hub := FakeHub()
-    s := NewSupervisor(hub)
+    hubStub := FakeHub()
+    s := NewSupervisor(hubStub)
     AddChild(s.children, "echo", "stopping", Time.NowMs())
     s._Tick()
-    ev := hub.Find("evt.process.exited")
+    ev := hubStub.Find("evt.process.exited")
     Assert.True(IsObject(ev), "evt.process.exited published")
     Assert.True(ev["payload"]["clean"] == Json.False)
 }
 
 HubIsPumpedEveryTick() {
-    hub := FakeHub()
-    s := NewSupervisor(hub)
+    hubStub := FakeHub()
+    s := NewSupervisor(hubStub)
     s._Tick()
     s._Tick()
-    Assert.Equal(hub.pumps, 2)
+    Assert.Equal(hubStub.pumps, 2)
 }
 
 ; Cause B of F-0023: the tick timer interrupted a pump thread of the wake-up. Its own hub.Pump() returns at once
 ; (re-entrance guard), so the bye that the interrupted pump has not read yet is unread when the tick sees the
 ; ended process. The exit must wait until the connection is read to its end (the link is gone).
 ExitWaitsWhileAPumpRuns() {
-    hub := FakeHub()
-    s := NewSupervisor(hub)
+    hubStub := FakeHub()
+    s := NewSupervisor(hubStub)
     AddChild(s.children, "echo", "stopping", Time.NowMs())
-    hub.links["echo"] := true
-    hub.pending.Push(() => s.children.OnBye("echo", true))
-    hub.pumping := true
+    hubStub.links["echo"] := true
+    hubStub.pending.Push(() => s.children.OnBye("echo", true))
+    hubStub.pumping := true
     s._Tick()
-    Assert.Equal(hub.Count("evt.process.exited") + hub.Count("evt.process.crashed"), 0
+    Assert.Equal(hubStub.Count("evt.process.exited") + hubStub.Count("evt.process.crashed"), 0
         , "not judged while the bye may still be unread")
     ; the interrupted pump goes on: it reads the bye and then the end of the pipe (the hub drops the link)
-    hub.pumping := false
-    hub.Pump()
-    hub.links.Delete("echo")
+    hubStub.pumping := false
+    hubStub.Pump()
+    hubStub.links.Delete("echo")
     s._Tick()
-    ev := hub.Find("evt.process.exited")
+    ev := hubStub.Find("evt.process.exited")
     Assert.True(IsObject(ev), "evt.process.exited published after the link is gone")
     Assert.True(ev["payload"]["clean"] == Json.True, "clean, because the bye was read before the exit was judged")
-    Assert.Equal(hub.Count("evt.process.exited"), 1)
+    Assert.Equal(hubStub.Count("evt.process.exited"), 1)
 }
 
 ExitIsJudgedAfterTheGraceTime() {
-    hub := FakeHub()
-    s := NewSupervisor(hub)
+    hubStub := FakeHub()
+    s := NewSupervisor(hubStub)
     t0 := 100000
     AddChild(s.children, "echo", "stopping", t0)
-    hub.links["echo"] := true                       ; the connection never ends (or is never read)
+    hubStub.links["echo"] := true                       ; the connection never ends (or is never read)
     s.children.Tick(t0)
     s.children.Tick(t0 + Children.EXIT_GRACE_MS - 1)
-    Assert.Equal(hub.Count("evt.process.exited"), 0, "still waiting within the grace time")
+    Assert.Equal(hubStub.Count("evt.process.exited"), 0, "still waiting within the grace time")
     s.children.Tick(t0 + Children.EXIT_GRACE_MS)
-    ev := hub.Find("evt.process.exited")
+    ev := hubStub.Find("evt.process.exited")
     Assert.True(IsObject(ev), "judged at the end of the grace time")
     Assert.True(ev["payload"]["clean"] == Json.False, "no bye was read")
     Assert.True(s.children.IsGone("echo"))
 }
 
 ExitWithoutLinkIsJudgedAtOnce() {
-    hub := FakeHub()
-    s := NewSupervisor(hub)
+    hubStub := FakeHub()
+    s := NewSupervisor(hubStub)
     t0 := 100000
     AddChild(s.children, "echo", "ready", t0)       ; ended without being asked, never connected
     s.children.Tick(t0)
-    ev := hub.Find("evt.process.crashed")
+    ev := hubStub.Find("evt.process.crashed")
     Assert.True(IsObject(ev), "crashed is reported in the first tick")
 }
 
 EndedChildIsNotHungNorKilled() {
-    hub := FakeHub()
-    s := NewSupervisor(hub)
+    hubStub := FakeHub()
+    s := NewSupervisor(hubStub)
     t0 := 100000
     AddChild(s.children, "echo", "ready", t0)
-    hub.links["echo"] := true
+    hubStub.links["echo"] := true
     s.children.Tick(t0)                              ; the end is seen, the judgement waits for the link
     s.children.MarkHung("echo", "test")
     Assert.Equal(s.children.State("echo"), "ready", "an ended process is not hung")
     s.children.KillAlive()                           ; the shutdown deadline passes in the grace time
     Assert.Equal(s.children.AnyKilled(), false, "an ended process is not terminated and does not count as killed")
-    hub.links.Delete("echo")
+    hubStub.links.Delete("echo")
     s.children.Tick(t0 + 200)
-    ev := hub.Find("evt.process.crashed")
+    ev := hubStub.Find("evt.process.crashed")
     Assert.True(IsObject(ev) && ev["payload"]["reason"] == "exited", "an exit, not a hang")
 }
 
@@ -288,12 +288,12 @@ AddChildRecord(children, name, state, t0) {
 }
 
 NewHeartbeat(state, t0) {
-    hub := FakeHub()
+    hubStub := FakeHub()
     ; Not named "children": AHK identifiers are case-insensitive, it would shadow the class Children.
     kids := Children(Map("session", "t", "pipe", "p", "data", "d", "hubHwnd", 0, "testRoles", false
-        , "script", "x", "roleOpts", ""), hub)
+        , "script", "x", "roleOpts", ""), hubStub)
     AddLiveChild(kids, "echo", state, t0)
-    return [Heartbeat(kids, hub), kids, hub]
+    return [Heartbeat(kids, hubStub), kids, hubStub]
 }
 
 ; Ticks every 200 ms from t0 + 200 up to and including t0 + untilMs.
@@ -328,11 +328,11 @@ StallDoesNotHangReadyChild() {
     t0 := 100000
     r := NewHeartbeat("ready", t0)
     hb := r[1]
-    stall := NewStall()
-    stall.Arm(t0)
+    stallObj := NewStall()
+    stallObj.Arm(t0)
     TickRegularly(hb, t0, 1000)
-    stall.Check(t0 + 1000)
-    StalledTick(r, stall, t0 + 1000 + 8000)        ; the supervisor was frozen for 8 s
+    stallObj.Check(t0 + 1000)
+    StalledTick(r, stallObj, t0 + 1000 + 8000)        ; the supervisor was frozen for 8 s
     Assert.Equal(r[2].State("echo"), "ready")
     Assert.Equal(r[3].Count("evt.process.hung"), 0)
     Assert.Equal(r[3].sent.Length, 0, "no shutdown sent to the child")
@@ -342,10 +342,10 @@ StallDoesNotHangStartingChild() {
     t0 := 100000
     r := NewHeartbeat("starting", t0)
     hb := r[1]
-    stall := NewStall()
-    stall.Arm(t0)
-    StalledTick(r, stall, t0 + 200)
-    StalledTick(r, stall, t0 + 200 + Children.STARTUP_MS + 5000)
+    stallObj := NewStall()
+    stallObj.Arm(t0)
+    StalledTick(r, stallObj, t0 + 200)
+    StalledTick(r, stallObj, t0 + 200 + Children.STARTUP_MS + 5000)
     Assert.Equal(r[2].State("echo"), "starting")
     ; the start deadline begins again after the stand-still
     TickRegularly(hb, t0 + 15200, Children.STARTUP_MS - 400)
@@ -358,10 +358,10 @@ PingScheduleRestartsAfterStall() {
     t0 := 100000
     r := NewHeartbeat("ready", t0)
     hb := r[1]
-    stall := NewStall()
-    stall.Arm(t0)
-    StalledTick(r, stall, t0 + 200)
-    StalledTick(r, stall, t0 + 20000)              ; stand-still
+    stallObj := NewStall()
+    stallObj.Arm(t0)
+    StalledTick(r, stallObj, t0 + 200)
+    StalledTick(r, stallObj, t0 + 20000)              ; stand-still
     Assert.Equal(r[3].sent.Length, 0, "no ping at the moment of the reset")
     hb.Tick(t0 + 20000 + Heartbeat.PING_EVERY_MS)
     Assert.Equal(r[3].sent.Length, 1)
@@ -372,10 +372,10 @@ SilentAfterStallIsStillHung() {
     t0 := 100000
     r := NewHeartbeat("ready", t0)
     hb := r[1]
-    stall := NewStall()
-    stall.Arm(t0)
-    StalledTick(r, stall, t0 + 200)
-    StalledTick(r, stall, t0 + 20000)              ; stand-still, reset
+    stallObj := NewStall()
+    stallObj.Arm(t0)
+    StalledTick(r, stallObj, t0 + 200)
+    StalledTick(r, stallObj, t0 + 20000)              ; stand-still, reset
     TickRegularly(hb, t0 + 20000, Heartbeat.PONG_TIMEOUT_MS + 400)
     Assert.Equal(r[2].State("echo"), "hung")
 }
@@ -384,9 +384,9 @@ StallBeforeTheFirstTick() {
     t0 := 100000
     r := NewHeartbeat("ready", t0)
     hb := r[1]
-    stall := NewStall()
-    stall.Arm(t0)                    ; the supervisor starts its timer
-    StalledTick(r, stall, t0 + 9000) ; frozen before the first tick ever ran
+    stallObj := NewStall()
+    stallObj.Arm(t0)                    ; the supervisor starts its timer
+    StalledTick(r, stallObj, t0 + 9000) ; frozen before the first tick ever ran
     Assert.Equal(r[2].State("echo"), "ready")
     Assert.Equal(r[3].Count("evt.process.hung"), 0)
 }
@@ -394,43 +394,43 @@ StallBeforeTheFirstTick() {
 ; --- deadlines after a stand-still (WI-0033, F-0015, E0012) -------------------------------------------------------------------
 
 StallMovesEveryDeadline() {
-    hub := FakeHub()
-    s := NewSupervisor(hub)
+    hubStub := FakeHub()
+    s := NewSupervisor(hubStub)
     t0 := 100000
     s.stall.Arm(t0)
     s._RunTick(t0 + 200)
-    Assert.Equal(hub.shifted, 0, "a regular tick moves nothing")
+    Assert.Equal(hubStub.shifted, 0, "a regular tick moves nothing")
     s._RunTick(t0 + 200 + 8200)              ; 8 s without a tick: the gap is 8200 ms, of which 200 ms are a regular tick
-    Assert.Equal(hub.shifted, 8000, "the hub moves by the length of the stand-still")
+    Assert.Equal(hubStub.shifted, 8000, "the hub moves by the length of the stand-still")
     Assert.Equal(s.shutdown.shifted, 8000)
     Assert.Equal(s.report.shifted, 8000)
     s._RunTick(t0 + 200 + 8200 + 200)
-    Assert.Equal(hub.shifted, 8000, "moved once, not again at the next tick")
+    Assert.Equal(hubStub.shifted, 8000, "moved once, not again at the next tick")
 }
 
 NoStallMovesNothing() {
-    hub := FakeHub()
-    s := NewSupervisor(hub)
+    hubStub := FakeHub()
+    s := NewSupervisor(hubStub)
     t0 := 100000
     s.stall.Arm(t0)
     s._RunTick(t0 + 200)
     s._RunTick(t0 + 200 + Stall.MIN_GAP_MS)  ; a gap of exactly the limit is no stand-still
-    Assert.Equal(hub.shifted, 0, "a gap of the limit is no stand-still")
+    Assert.Equal(hubStub.shifted, 0, "a gap of the limit is no stand-still")
     s._RunTick(t0 + 200 + Stall.MIN_GAP_MS + 2300)
-    Assert.Equal(hub.shifted, 2100)
+    Assert.Equal(hubStub.shifted, 2100)
 }
 
 StallBeforeTheFirstTickIsMeasured() {
-    stall := NewStall()
-    stall.Arm(1000)
-    Assert.Equal(stall.Check(1000 + 9000), 8800)
-    Assert.Equal(stall.Check(1000 + 9200), 0)
+    stallObj := NewStall()
+    stallObj.Arm(1000)
+    Assert.Equal(stallObj.Check(1000 + 9000), 8800)
+    Assert.Equal(stallObj.Check(1000 + 9200), 0)
 }
 
 StallMovesTheTimesOfTheRecords() {
-    hub := FakeHub()
+    hubStub := FakeHub()
     kids := Children(Map("session", "t", "pipe", "p", "data", "d", "hubHwnd", 0, "testRoles", false
-        , "script", "x", "roleOpts", ""), hub)
+        , "script", "x", "roleOpts", ""), hubStub)
     t0 := 100000
     hung := AddLiveChild(kids, "hung", "hung", t0)
     hung["killAt"] := t0 + 2000
@@ -454,9 +454,9 @@ NewKids(hub) {
 }
 
 ShutdownDeadlinesMove() {
-    hub := FakeHub()
-    kids := NewKids(hub)
-    sd := Shutdown(kids, hub)
+    hubStub := FakeHub()
+    kids := NewKids(hubStub)
+    sd := Shutdown(kids, hubStub)
     sd.Shift(5000)
     Assert.Equal(sd.deadlineAt, 0, "nothing is set before the shutdown: nothing moves")
     sd.deadlineAt := 50000
@@ -471,13 +471,13 @@ ShutdownDeadlinesMove() {
 ; F-0029: the deadline passes while a process has ended by itself and is only judged in the grace time (its connection is
 ; not read to the end yet). Nothing is terminated, so the exit code is 0.
 EndedAtTheDeadlineIsNoForcedExit() {
-    hub := FakeHub()
-    kids := NewKids(hub)
+    hubStub := FakeHub()
+    kids := NewKids(hubStub)
     t0 := 100000
     AddChild(kids, "echo", "stopping", t0)
-    hub.links["echo"] := true                        ; the connection is not read to its end yet
+    hubStub.links["echo"] := true                        ; the connection is not read to its end yet
     code := ""
-    sd := Shutdown(kids, hub)
+    sd := Shutdown(kids, hubStub)
     sd.onDone := (c) => code := c
     sd.phase := "shutdown"
     sd.deadlineAt := t0
@@ -486,7 +486,7 @@ EndedAtTheDeadlineIsNoForcedExit() {
     sd.Tick(t0)                                      ; the deadline: the kill phase begins
     Assert.Equal(sd.phase, "kill")
     Assert.Equal(kids.AnyKilled(), false, "an ended process is not terminated")
-    hub.links.Delete("echo")
+    hubStub.links.Delete("echo")
     kids.Tick(t0 + 200)
     sd.Tick(t0 + 200)
     Assert.Equal(sd.phase, "done")
@@ -509,14 +509,14 @@ WaitForEnd(h) {
 }
 
 TerminatedAtTheDeadlineIsAForcedExit() {
-    hub := FakeHub()
-    kids := NewKids(hub)
+    hubStub := FakeHub()
+    kids := NewKids(hubStub)
     t0 := 100000
     rec := AddChild(kids, "slow", "stopping", t0)
     DllCall("CloseHandle", "ptr", rec["handle"])
     rec["handle"] := RunningProcessHandle()
     code := ""
-    sd := Shutdown(kids, hub)
+    sd := Shutdown(kids, hubStub)
     sd.onDone := (c) => code := c
     sd.phase := "shutdown"
     sd.deadlineAt := t0
@@ -671,8 +671,8 @@ AddWorker(kids, name, t0) {
 }
 
 EngineEndEndsTheWorkers() {
-    hub := FakeHub()
-    kids := NewKids(hub)
+    hubStub := FakeHub()
+    kids := NewKids(hubStub)
     t0 := 100000
     engine := AddChild(kids, "engine", "ready", t0)     ; ended, never connected: judged at once
     engine["role"] := "engine"
@@ -684,19 +684,19 @@ EngineEndEndsTheWorkers() {
     WaitForEnd(w["handle"])
     kids.Tick(t0 + 200)
     ev := ""
-    for e in hub.events
+    for e in hubStub.events
         if (e["type"] = "evt.process.exited" && e["payload"]["name"] = "worker:1")
             ev := e
     Assert.True(IsObject(ev), "evt.process.exited for the worker")
     Assert.Equal(ev["payload"]["reason"], "engine gone")
-    Assert.Equal(hub.Count("evt.process.crashed"), 1, "only the engine crashed")
+    Assert.Equal(hubStub.Count("evt.process.crashed"), 1, "only the engine crashed")
 }
 
 ; F-0042 (WI-0035): the engine asks for the kill of a worker that has died already, the supervisor has not judged its end yet.
 ; The end must stay a crash; it is not a planned exit "killed".
 KillOfAnEndedWorkerStaysACrash() {
-    hub := FakeHub()
-    kids := NewKids(hub)
+    hubStub := FakeHub()
+    kids := NewKids(hubStub)
     t0 := 100000
     w := AddChild(kids, "worker:1", "ready", t0)         ; process ended, not judged yet
     w["role"] := "worker"
@@ -705,31 +705,31 @@ KillOfAnEndedWorkerStaysACrash() {
     Assert.Equal(w["state"], "ready", "an ended process is not relabelled as stopping")
     Assert.Equal(w.Get("killReason", ""), "")
     kids.Tick(t0)
-    Assert.Equal(hub.Count("evt.process.crashed"), 1, "judged as a crash")
-    Assert.Equal(hub.Count("evt.process.exited"), 0, "not as a planned exit")
-    Assert.Equal(hub.Find("evt.process.crashed")["payload"]["reason"], "exited")
+    Assert.Equal(hubStub.Count("evt.process.crashed"), 1, "judged as a crash")
+    Assert.Equal(hubStub.Count("evt.process.exited"), 0, "not as a planned exit")
+    Assert.Equal(hubStub.Find("evt.process.crashed")["payload"]["reason"], "exited")
     Assert.Equal(kids.AnyKilled(), false)
     Assert.Equal(kids.State("worker:1"), "crashed")
 }
 
 KillOfARunningWorkerIsAPlannedExit() {
-    hub := FakeHub()
-    kids := NewKids(hub)
+    hubStub := FakeHub()
+    kids := NewKids(hubStub)
     t0 := 100000
     w := AddWorker(kids, "worker:1", t0)
     kids.KillWorker("worker:1", "test")
     Assert.Equal(w["killReason"], "killed")
     WaitForEnd(w["handle"])
     kids.Tick(t0 + 200)
-    ev := hub.Find("evt.process.exited")
+    ev := hubStub.Find("evt.process.exited")
     Assert.True(IsObject(ev), "evt.process.exited")
     Assert.Equal(ev["payload"]["reason"], "killed")
-    Assert.Equal(hub.Count("evt.process.crashed"), 0)
+    Assert.Equal(hubStub.Count("evt.process.crashed"), 0)
 }
 
 EngineEndKeepsTheCrashOfAnEndedWorker() {
-    hub := FakeHub()
-    kids := NewKids(hub)
+    hubStub := FakeHub()
+    kids := NewKids(hubStub)
     t0 := 100000
     engine := AddChild(kids, "engine", "ready", t0)
     engine["role"] := "engine"
@@ -737,13 +737,13 @@ EngineEndKeepsTheCrashOfAnEndedWorker() {
     w["role"] := "worker"
     w["flow"] := "1"
     kids.Tick(t0)
-    Assert.Equal(hub.Count("evt.process.exited"), 0, "an ended worker is not reported as 'engine gone'")
-    Assert.Equal(hub.Count("evt.process.crashed"), 2, "engine and worker crashed")
+    Assert.Equal(hubStub.Count("evt.process.exited"), 0, "an ended worker is not reported as 'engine gone'")
+    Assert.Equal(hubStub.Count("evt.process.crashed"), 2, "engine and worker crashed")
 }
 
 EngineEndDuringShutdownKeepsTheWorkers() {
-    hub := FakeHub()
-    kids := NewKids(hub)
+    hubStub := FakeHub()
+    kids := NewKids(hubStub)
     t0 := 100000
     engine := AddChild(kids, "engine", "stopping", t0)
     engine["role"] := "engine"
@@ -837,16 +837,16 @@ NewShutdownSupervisor(hub, children) {
 ; The late child (rank 3) is still starting when its group gets sys.shutdown: nothing reaches it. Its hello comes later.
 ; It must get sys.shutdown then, with the rest of the deadline. Storage (rank 4) does not wait for it (F-0039).
 LateHelloGetsTheShutdown() {
-    hub := FakeHub()
-    s := NewShutdownSupervisor(hub, [["storage", "storage", "ready"], ["echo:late", "echo", "starting"]])
-    hub.offline["echo:late"] := true
+    hubStub := FakeHub()
+    s := NewShutdownSupervisor(hubStub, [["storage", "storage", "ready"], ["echo:late", "echo", "starting"]])
+    hubStub.offline["echo:late"] := true
     s.shutdown._StartShutdown()
     s.shutdown.Tick(Time.NowMs())
-    Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 0, "not connected yet: nothing was sent")
-    Assert.Equal(hub.SentCount("storage", "sys.shutdown"), 1, "storage does not wait for a child that has not connected (F-0039)")
-    hub.offline.Delete("echo:late")
+    Assert.Equal(hubStub.SentCount("echo:late", "sys.shutdown"), 0, "not connected yet: nothing was sent")
+    Assert.Equal(hubStub.SentCount("storage", "sys.shutdown"), 1, "storage does not wait for a child that has not connected (F-0039)")
+    hubStub.offline.Delete("echo:late")
     s._OnHello(Map("name", "echo:late", "pid", 1))
-    msg := hub.LastSent("echo:late", "sys.shutdown")
+    msg := hubStub.LastSent("echo:late", "sys.shutdown")
     Assert.True(IsObject(msg), "the late child gets sys.shutdown at its hello")
     d := msg["payload"]["deadlineMs"]
     Assert.True(d > 0 && d <= 5000, "with the rest of the deadline, got " d)
@@ -854,49 +854,49 @@ LateHelloGetsTheShutdown() {
     Assert.Equal(s.children.State("echo:late"), "stopping")
     s.children.OnBye("echo:late", true)
     s.shutdown.Tick(Time.NowMs())
-    Assert.Equal(hub.SentCount("storage", "sys.shutdown"), 1, "once")
-    Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 1, "once")
+    Assert.Equal(hubStub.SentCount("storage", "sys.shutdown"), 1, "once")
+    Assert.Equal(hubStub.SentCount("echo:late", "sys.shutdown"), 1, "once")
 }
 
 ; The manager (rank 0) has not said bye yet when the late child (rank 3) says hello: the order of the ranks applies.
 LateHelloOfALaterGroupWaitsForItsTurn() {
-    hub := FakeHub()
-    s := NewShutdownSupervisor(hub, [["manager", "manager", "ready"], ["echo:late", "echo", "starting"]
+    hubStub := FakeHub()
+    s := NewShutdownSupervisor(hubStub, [["manager", "manager", "ready"], ["echo:late", "echo", "starting"]
         , ["storage", "storage", "ready"]])
-    hub.offline["echo:late"] := true
+    hubStub.offline["echo:late"] := true
     s.shutdown._StartShutdown()
-    Assert.Equal(hub.SentCount("manager", "sys.shutdown"), 1)
-    hub.offline.Delete("echo:late")
+    Assert.Equal(hubStub.SentCount("manager", "sys.shutdown"), 1)
+    hubStub.offline.Delete("echo:late")
     s._OnHello(Map("name", "echo:late", "pid", 1))
-    Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 0, "its group has not had its turn yet")
+    Assert.Equal(hubStub.SentCount("echo:late", "sys.shutdown"), 0, "its group has not had its turn yet")
     s.children.OnBye("manager", true)
     s.shutdown.Tick(Time.NowMs())
-    Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 1, "sent when its group has its turn, once")
-    Assert.Equal(hub.SentCount("storage", "sys.shutdown"), 0, "storage after it")
+    Assert.Equal(hubStub.SentCount("echo:late", "sys.shutdown"), 1, "sent when its group has its turn, once")
+    Assert.Equal(hubStub.SentCount("storage", "sys.shutdown"), 0, "storage after it")
 }
 
 ; A child that was not alive when the groups were made (its process was being created at that moment) is in no group.
 ; Nobody waits for it in the order, but the shutdown waits for its end (AllGone): it gets sys.shutdown at its hello.
 LateHelloOfAChildInNoGroup() {
-    hub := FakeHub()
-    s := NewShutdownSupervisor(hub, [["storage", "storage", "ready"]])
+    hubStub := FakeHub()
+    s := NewShutdownSupervisor(hubStub, [["storage", "storage", "ready"]])
     s.shutdown._StartShutdown()
     rec := AddLiveChild(s.children, "worker:1", "starting", Time.NowMs())
     rec["role"] := "worker"
     s._OnHello(Map("name", "worker:1", "pid", 1))
-    Assert.Equal(hub.SentCount("worker:1", "sys.shutdown"), 1)
+    Assert.Equal(hubStub.SentCount("worker:1", "sys.shutdown"), 1)
 }
 
 HelloOutsideThePhaseShutdownGetsNothing() {
-    hub := FakeHub()
-    s := NewShutdownSupervisor(hub, [["echo:late", "echo", "starting"]])
+    hubStub := FakeHub()
+    s := NewShutdownSupervisor(hubStub, [["echo:late", "echo", "starting"]])
     s.shutdown.phase := "prepare"
     s._OnHello(Map("name", "echo:late", "pid", 1))
-    Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 0, "prepare: the groups are made later and include it")
+    Assert.Equal(hubStub.SentCount("echo:late", "sys.shutdown"), 0, "prepare: the groups are made later and include it")
     s.children._recs["echo:late"]["state"] := "starting"
     s.shutdown.phase := "kill"
     s._OnHello(Map("name", "echo:late", "pid", 1))
-    Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 0, "kill: KillAlive has ended it already")
+    Assert.Equal(hubStub.SentCount("echo:late", "sys.shutdown"), 0, "kill: KillAlive has ended it already")
 }
 
 ; Children that start no process: _Launch only records the name.

@@ -40,10 +40,10 @@ InWorker(fn) {
 ; WorkerContext, its result and exports go back through the bridge (FakeWorkers.Complete).
 RunWorkerJobs(owner) {
     fw := owner.workers
-    ids := []
+    idList := []
     for execId in fw.jobs
-        ids.Push(execId)
-    for execId in ids {
+        idList.Push(execId)
+    for execId in idList {
         job := fw.payloads[execId]
         wire := Json.Parse(Json.Stringify(Map("params", job["params"], "imports", job["imports"]
             , "evaluated", job["evaluated"])))
@@ -51,10 +51,10 @@ RunWorkerJobs(owner) {
         env := job["env"]
         ctx := WorkerContext(env["flowId"], env["elementId"], env["instanceId"], env["threadId"], wire["imports"]
             , (c, result, msg) => (done["result"] := result, done["message"] := msg), wire["evaluated"])
-        p := {}
+        params := {}
         for k, v in wire["params"]
-            p.%k% := v
-        ElementRunner.Run(ElementRegistry.Get(job["classId"]), ctx, p)
+            params.%k% := v
+        ElementRunner.Run(ElementRegistry.Get(job["classId"]), ctx, params)
         fw.Complete(execId, done["result"], ctx.exports, done["message"])
     }
     owner.Drive()
@@ -79,7 +79,7 @@ SetGlobals(owner) {
 ; texts are not converted from v1 syntax on load; strictTypes as given.
 ; cls is the qualified ID "<package>.<class>" (E0045).
 EvalFlow(pars, strict := false, cls := "Test.Action_TestExprParams", settings := "") {
-    el := Map("ID", "a1", "type", "action", "package", ElementRegistry.PackageOf(cls)
+    elem := Map("ID", "a1", "type", "action", "package", ElementRegistry.PackageOf(cls)
         , "class", ElementRegistry.ClassOf(cls), "pars", pars, "name", "a")
     tr := Map("ID", "t0", "type", "trigger", "class", "trigger_Manual", "pars", Map())
     fs := Map("ExecutionPolicy", "parallel", "strictTypes", strict ? Json.True : Json.False)
@@ -87,9 +87,9 @@ EvalFlow(pars, strict := false, cls := "Test.Action_TestExprParams", settings :=
         for k, v in settings
             fs[k] := v
     }
-    conn := Map("ID", "c1", "from", "t0", "to", "a1", "type", "Connection", "ConnectionType", "normal")
-    root := Map("name", "e", "formatVersion", 2, "flowSettings", fs, "allElements", Map("t0", tr, "a1", el)
-        , "allConnections", Map("c1", conn))
+    connRec := Map("ID", "c1", "from", "t0", "to", "a1", "type", "Connection", "ConnectionType", "normal")
+    root := Map("name", "e", "formatVersion", 2, "flowSettings", fs, "allElements", Map("t0", tr, "a1", elem)
+        , "allConnections", Map("c1", connRec))
     return Json.Stringify(root)
 }
 
@@ -431,10 +431,10 @@ CheckTheEngineSendsEveryParameterEvaluated() {
     }
     Ok(r)
     list := r["owner"].workers.payloads["fx-1"]["evaluated"]
-    ids := ""
+    idList := ""
     for entry in list
-        ids .= (ids = "" ? "" : ",") entry["id"]
-    Assert.Equal(ids, "Expr,Num,PosNum,Int,PosInt,PosIntOrZero,NeededExpr,Either,Text,Json,Needed,VarName,NeededVar,Raw,"
+        idList .= (idList = "" ? "" : ",") entry["id"]
+    Assert.Equal(idList, "Expr,Num,PosNum,Int,PosInt,PosIntOrZero,NeededExpr,Either,Text,Json,Needed,VarName,NeededVar,Raw,"
         . "NeededRaw,File,NeededFile,Folder,Script,Condition,EitherType,Tag,Skip,More")
     Assert.Equal(list[1]["value"], 10)
     Assert.True(!list[4].Has("value") && InStr(list[4]["error"], "is not an integer"), "error entry of Int")
@@ -446,11 +446,11 @@ CheckTheEngineSendsEveryParameterEvaluated() {
 CheckAMapValueKeepsItsIntegerKeysInTheWorker() {
     ctx := WorkerContext("f", "a1", "i", "t", Json.Parse('{"list":{"1":"a","2":{"x":"y"},"k":"v"}}'), ""
         , Json.Parse('[{"id":"Expr","value":{"1":"a","10":"b","k":{"2":3}}},{"id":"Bad","error":"boom"}]'))
-    p := ctx.EvalParams({}, "Bad")
-    Assert.True(p.Expr is Map)
-    Assert.Equal(p.Expr[1], "a")
-    Assert.Equal(p.Expr[10], "b")
-    Assert.Equal(p.Expr["K"][2], 3)
+    evaluated := ctx.EvalParams({}, "Bad")
+    Assert.True(evaluated.Expr is Map)
+    Assert.Equal(evaluated.Expr[1], "a")
+    Assert.Equal(evaluated.Expr[10], "b")
+    Assert.Equal(evaluated.Expr["K"][2], 3)
     err := Assert.Throws(() => ctx.EvalParams({}), ElementError)
     Assert.Equal(err.Message, "boom")
     ; an explicit import list is read with GetImport, keys as the engine stores them

@@ -9,9 +9,9 @@ class EvalCheck {
     ; Returns the result Map with the extra fields "log" (Array of "level: text") and "resolver".
     static Run(text, vars := "", kind := "expression") {
         resolver := ExprTestResolver(vars)
-        log := []
-        res := Expr.Evaluate(text, resolver, (level, msg) => log.Push(level ": " msg), kind)
-        res["log"] := log
+        logLines := []
+        res := Expr.Evaluate(text, resolver, (level, msg) => logLines.Push(level ": " msg), kind)
+        res["log"] := logLines
         res["resolver"] := resolver
         return res
     }

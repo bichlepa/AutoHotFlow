@@ -34,10 +34,10 @@ class TestExprParamsKit {
 
     ; ctx.EvalParams with the skip list Skip, then ctx.EvalMoreParams for More.
     static Evaluate(ctx, params) {
-        p := ctx.EvalParams(params, params.HasProp("Skip") ? params.Skip : "")
+        evaluated := ctx.EvalParams(params, params.HasProp("Skip") ? params.Skip : "")
         if (params.HasProp("More") && params.More != "")
-            p := ctx.EvalMoreParams(p, params, params.More)
-        return p
+            evaluated := ctx.EvalMoreParams(evaluated, params, params.More)
+        return evaluated
     }
 
     static ResultName(params) => "global_evalresult" ((params.HasProp("Tag") && params.Tag != "") ? "_" params.Tag : "")

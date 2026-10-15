@@ -44,10 +44,10 @@ class ExprDump {
     }
 
     static List(nodes) {
-        s := ""
+        out := ""
         for n in nodes
-            s .= (A_Index = 1 ? "" : " ") ExprDump.Sexp(n)
-        return s
+            out .= (A_Index = 1 ? "" : " ") ExprDump.Sexp(n)
+        return out
     }
 
     static Esc(s) {

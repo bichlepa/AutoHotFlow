@@ -9,8 +9,8 @@
 
 ; A v1 flow: the trigger, then the sleep element "s" with the parameters pars (JSON text) and the package as v1 writes it.
 SleepFlow(pars, package := "Default") {
-    el := '"s":{"ID":"s","type":"Action","package":"' package '","packageVersion":"1.2.0","class":"Action_Sleep","pars":' pars '}'
-    return FlowText([el], [Conn("c1", "t0", "s")])
+    elem := '"s":{"ID":"s","type":"Action","package":"' package '","packageVersion":"1.2.0","class":"Action_Sleep","pars":' pars '}'
+    return FlowText([elem], [Conn("c1", "t0", "s")])
 }
 
 ; Starts the flow and waits until the sleep element has ended. Returns Map: result (the last state of "s"), ms, owner.

@@ -39,8 +39,8 @@ WorkerJobEndedAtOnceLeavesNoActiveEntry() {
     owner.workers.failAtOnce := true
     instId := owner.executor.StartFlow(owner.flows.Get("f"))
     owner.Drive()
-    run := owner.executor._runs[instId]    ; the instance lives on: the thread of "h" still runs
-    Assert.Equal(run["active"].Count, 1, "only the thread of h is active")
+    runRec := owner.executor._runs[instId]    ; the instance lives on: the thread of "h" still runs
+    Assert.Equal(runRec["active"].Count, 1, "only the thread of h is active")
     Assert.Equal(owner.workers.runs, 1)
 }
 

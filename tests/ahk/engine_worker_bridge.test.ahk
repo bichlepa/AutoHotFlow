@@ -323,14 +323,14 @@ BothOrdersOfPeerGoneAndTheProcessEventEndTheJobOnce() {
         got := Map("result", "", "message", "", "n", 0)
         onDone := (result, message, exports) => (got["result"] := result, got["message"] := message, got["n"] += 1)
         bridge.Run("Action_X", Map(), Map(), Map(), onDone)
-        run := owner.peer.Open("cmd.worker.run")[1]
+        runRec := owner.peer.Open("cmd.worker.run")[1]
         ev := FakeMsg("evt.process.crashed", Map("name", "worker:1", "pid", 1001))
         if (order = "answer first") {
-            owner.peer.Answer(run, Map("ok", false, "error", Map("code", "peer_gone", "message", "x")))
+            owner.peer.Answer(runRec, Map("ok", false, "error", Map("code", "peer_gone", "message", "x")))
             bridge.OnProcessEvent(ev)
         } else {
             bridge.OnProcessEvent(ev)
-            owner.peer.Answer(run, Map("ok", false, "error", Map("code", "peer_gone", "message", "x")))
+            owner.peer.Answer(runRec, Map("ok", false, "error", Map("code", "peer_gone", "message", "x")))
         }
         Assert.Equal(got["n"], 1, order ": the job ends once")
         Assert.Equal(got["message"], "worker crashed (worker:1)", order)

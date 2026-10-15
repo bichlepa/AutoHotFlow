@@ -80,8 +80,8 @@ Ids.Configure("test")
 
 Lines(parts*) {
     out := ""
-    for i, p in parts
-        out .= ((i > 1) ? "`n" : "") p
+    for i, part in parts
+        out .= ((i > 1) ? "`n" : "") part
     return out
 }
 

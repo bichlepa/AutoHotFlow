@@ -238,10 +238,10 @@ CaseLogRetryWaitsForItsDelayWhileRequestsGoOn() {
     seen := []
     counter := Map("n", 0)
     after := Map("n", 0)
-    log := MakeOp(seen, "log", () => BusyThenOk(counter, 1))
-    log["retryMs"] := 5000
-    log["retryDelayMs"] := 300
-    q.AddLow(log)
+    logOp := MakeOp(seen, "log", () => BusyThenOk(counter, 1))
+    logOp["retryMs"] := 5000
+    logOp["retryDelayMs"] := 300
+    q.AddLow(logOp)
     Assert.True(q.RunOne())                ; asks for a retry in 300 ms
     Assert.Equal(q.RunOne(), false)        ; not due yet, nothing else is waiting
     Assert.True(q.NextWaitMs() > 100)
@@ -261,10 +261,10 @@ CaseRetryTimeIsNotUsedUpByAStall() {
     q := WriteQueue(() => clk["t"])
     seen := []
     counter := Map("n", 0)
-    log := MakeOp(seen, "log", () => BusyThenOk(counter, 2))
-    log["retryMs"] := 3000
-    log["retryDelayMs"] := 20
-    q.AddLow(log)
+    logOp := MakeOp(seen, "log", () => BusyThenOk(counter, 2))
+    logOp["retryMs"] := 3000
+    logOp["retryDelayMs"] := 20
+    q.AddLow(logOp)
     Assert.True(q.RunOne())                ; first attempt fails, the retry time starts
     clk["t"] += 5000                       ; the process is stalled for longer than the retry time
     Assert.True(q.RunOne())                ; second attempt fails: the stall does not end the retries
@@ -280,10 +280,10 @@ CaseRetryStillEndsWithBusyWithoutAStall() {
     q := WriteQueue(() => clk["t"])
     seen := []
     counter := Map("n", 0)
-    log := MakeOp(seen, "log", () => BusyThenOk(counter, 1000))
-    log["retryMs"] := 3000
-    log["retryDelayMs"] := 20
-    q.AddLow(log)
+    logOp := MakeOp(seen, "log", () => BusyThenOk(counter, 1000))
+    logOp["retryMs"] := 3000
+    logOp["retryDelayMs"] := 20
+    q.AddLow(logOp)
     loop 400 {
         q.RunOne()
         clk["t"] += 20

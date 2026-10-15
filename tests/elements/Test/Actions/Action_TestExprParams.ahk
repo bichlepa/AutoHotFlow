@@ -29,8 +29,8 @@ class Action_TestExprParams extends AhfElement {
     static Parameters(ctx) => TestExprParamsKit.Parameters(ctx)
 
     static Run(ctx, params) {
-        p := TestExprParamsKit.Evaluate(ctx, params)
-        ctx.SetVar(TestExprParamsKit.ResultName(params), TestExprParamsKit.Report(p))
+        evaluated := TestExprParamsKit.Evaluate(ctx, params)
+        ctx.SetVar(TestExprParamsKit.ResultName(params), TestExprParamsKit.Report(evaluated))
         ctx.Finish("normal")
     }
 }

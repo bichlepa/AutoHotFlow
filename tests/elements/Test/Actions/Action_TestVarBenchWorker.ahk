@@ -17,15 +17,15 @@ class Action_TestVarBenchWorker extends AhfElement {
 
     static Run(ctx, params) {
         count := Integer(params.Count)
-        pause := params.HasProp("Pause") && params.Pause != "" ? Integer(params.Pause) : 0
+        pauseMs := params.HasProp("Pause") && params.Pause != "" ? Integer(params.Pause) : 0
         ctx.SetVar("bench_x", 1)
         times := []
         loop count {
             t0 := Time.NowMs()
             ctx.GetVar("bench_x")
             times.Push(Time.NowMs() - t0)
-            if (pause > 0)
-                DllCall("Sleep", "UInt", pause)
+            if (pauseMs > 0)
+                DllCall("Sleep", "UInt", pauseMs)
         }
         sorted := this.Sorted(times)
         n := sorted.Length

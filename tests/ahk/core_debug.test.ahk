@@ -34,18 +34,18 @@ WithRole(&peer) {
 CheckNoRoleNoConnectionNothingHappens() {
     Role.Current := ""
     Assert.Equal(Debug.Dump(Map("a", 1), "t"), false, "no role: nothing is sent, nothing is thrown")
-    WithRole(&peer)
-    peer.status := "reconnecting"
+    WithRole(&peerStub)
+    peerStub.status := "reconnecting"
     Assert.Equal(Debug.Dump(1), false)
-    Assert.Equal(peer.sent.Length, 0)
+    Assert.Equal(peerStub.sent.Length, 0)
     Role.Current := ""
 }
 
 CheckSendsOneEventToTheDebugTopic() {
-    WithRole(&peer)
+    WithRole(&peerStub)
     Assert.Equal(Debug.Dump(Map("name", "x", "list", [1, "two", 3.5]), "my title"), true)
-    Assert.Equal(peer.sent.Length, 1)
-    m := peer.sent[1]
+    Assert.Equal(peerStub.sent.Length, 1)
+    m := peerStub.sent[1]
     Assert.Equal(m["to"], "topic:debug")
     Assert.Equal(m["type"], "evt.debug.dump")
     p := m["payload"]
@@ -60,18 +60,18 @@ CheckSendsOneEventToTheDebugTopic() {
 }
 
 CheckARefusedSendIsNotAnError() {
-    WithRole(&peer)
-    peer.fail := true
+    WithRole(&peerStub)
+    peerStub.fail := true
     Assert.Equal(Debug.Dump(1), false)
     Assert.Equal(Debug.failed, 0, "a send that the peer refuses is not a failure of Dump")
     Role.Current := ""
 }
 
 CheckRateLimitDropsTheRestAndCountsIt() {
-    WithRole(&peer)
+    WithRole(&peerStub)
     loop Debug.MAX_PER_SECOND + 30
         Debug.Dump(A_Index)
-    Assert.Equal(peer.sent.Length, Debug.MAX_PER_SECOND)
+    Assert.Equal(peerStub.sent.Length, Debug.MAX_PER_SECOND)
     Assert.Equal(Debug.dropped, 30)
     Debug._windowStart := Debug._windowStart - 2000          ; a second later
     Assert.Equal(Debug.Dump("again"), true)
@@ -79,12 +79,12 @@ CheckRateLimitDropsTheRestAndCountsIt() {
 }
 
 CheckEverythingCanBeRenderedWithoutThrowing() {
-    WithRole(&peer)
+    WithRole(&peerStub)
     cyc := Map("name", "loop")
     cyc["self"] := cyc
     arr := [1]
     arr.Push(arr)
-    for value in [cyc, arr, StrLen, ObjBindMethod(peer, "Send"), peer, {a: 1, b: [1, 2]}, Json.Null, Json.True, ""
+    for value in [cyc, arr, StrLen, ObjBindMethod(peerStub, "Send"), peerStub, {a: 1, b: [1, 2]}, Json.Null, Json.True, ""
         , 0, 1.5, "text", Map(), [], Buffer(4)] {
         Assert.Equal(Debug.Dump(value, "v"), true, Type(value))
     }

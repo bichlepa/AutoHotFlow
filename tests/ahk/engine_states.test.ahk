@@ -277,9 +277,9 @@ WaitingInstanceStartsLater() {
     inst := Instance("i1", "f1")
     Assert.True(inst.Wait(), "queue")
     Assert.Equal(inst.State, "waiting")
-    thread := inst.Start("t1", "trig")
+    thr := inst.Start("t1", "trig")
     Assert.Equal(inst.State, "running")
-    Assert.Equal(thread.State, "finished")
+    Assert.Equal(thr.State, "finished")
 }
 
 WaitingInstanceEndsOnStop() {

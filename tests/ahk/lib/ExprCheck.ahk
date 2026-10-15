@@ -48,7 +48,7 @@ class ExprCheck {
     }
 
     static Show(text) {
-        s := StrReplace(StrReplace(StrReplace(text, "`r", "\r"), "`n", "\n"), "`t", "\t")
-        return '<' (StrLen(s) > 80 ? SubStr(s, 1, 77) "..." : s) '>'
+        shown := StrReplace(StrReplace(StrReplace(text, "`r", "\r"), "`n", "\n"), "`t", "\t")
+        return '<' (StrLen(shown) > 80 ? SubStr(shown, 1, 77) "..." : shown) '>'
     }
 }

@@ -142,8 +142,8 @@ DanglingFlow() {
 ; Starts an instance on a trigger element and returns [instance, triggerThread].
 StartTrigger(flow, triggerId := "t0") {
     inst := Instance("i1", flow.FlowId)
-    thread := inst.Start("t1", triggerId)
-    return [inst, thread]
+    thr := inst.Start("t1", triggerId)
+    return [inst, thr]
 }
 
 ; Runs the element of a ready thread with the given result: ready -> running -> finished.
@@ -160,17 +160,17 @@ Advance(inst, flow, thread) {
 ResolveNextSimple() {
     flow := LinearFlow()
     inst := StartTrigger(flow)[1]
-    thread := inst.Threads["t1"]
-    matches := Scheduler.ResolveNext(flow, thread, "Normal")
+    thr := inst.Threads["t1"]
+    matches := Scheduler.ResolveNext(flow, thr, "Normal")
     Assert.Equal(matches.Length, 1)
     Assert.Equal(matches[1]["to"], "a")
 }
 
 ResolveNextYesNo() {
     flow := YesNoFlow()
-    thread := ThreadState("t5", "i1", "a")
-    yes := Scheduler.ResolveNext(flow, thread, "yes")
-    no := Scheduler.ResolveNext(flow, thread, "NO")
+    thr := ThreadState("t5", "i1", "a")
+    yes := Scheduler.ResolveNext(flow, thr, "yes")
+    no := Scheduler.ResolveNext(flow, thr, "NO")
     Assert.Equal(yes.Length, 1)
     Assert.Equal(yes[1]["to"], "b")
     Assert.Equal(no.Length, 1)
@@ -179,15 +179,15 @@ ResolveNextYesNo() {
 
 ResolveNextWithoutMatch() {
     flow := YesNoFlow()
-    thread := ThreadState("t5", "i1", "a")
-    Assert.Equal(Scheduler.ResolveNext(flow, thread, "exception").Length, 0)
+    thr := ThreadState("t5", "i1", "a")
+    Assert.Equal(Scheduler.ResolveNext(flow, thr, "exception").Length, 0)
     Assert.Equal(Scheduler.ResolveNext(flow, ThreadState("t6", "i1", "b"), "Normal").Length, 0)
 }
 
 ResolveNextReturnsEveryMatch() {
     flow := TwoConnectionsFlow()
-    thread := ThreadState("t5", "i1", "a")
-    matches := Scheduler.ResolveNext(flow, thread, "normal")
+    thr := ThreadState("t5", "i1", "a")
+    matches := Scheduler.ResolveNext(flow, thr, "normal")
     Assert.Equal(matches.Length, 2)
     Assert.Equal(matches[1]["to"], "b")
     Assert.Equal(matches[2]["to"], "c")
