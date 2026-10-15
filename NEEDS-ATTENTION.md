@@ -4,7 +4,9 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-Nothing waits for you. The decisions of 2026-10-15 are in `doc/DECISIONS.md` (E0046 to E0051): tray icons (F-0064), missing packages, number of workers, working directory, closing S1, manual GUI check.
+1. **Manual check of the tray icon (E0046, F-0064).** Start `src/AutoHotFlow.ahk` by hand (through the VS Code task `Start:`). No tray icon should appear, neither for the stub manager nor for the debug window. The tests check the directive only, not the real icon. Tell the orchestrator whether the icon is gone; F-0064 closes on your answer.
+
+Other decisions of 2026-10-15 are in `doc/DECISIONS.md` (E0046 to E0051).
 
 ## To know
 
