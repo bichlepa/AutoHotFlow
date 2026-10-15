@@ -5,16 +5,24 @@
 ; The files that the classes include come first, outside the class body; inside it AutoHotkey skips them.
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
+#Include lib\ListOps.ahk
 
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Default {
+    #Include Actions\Action_Add_To_List.ahk
+    #Include Actions\Action_Delete_from_list.ahk
     #Include Actions\Action_Do_nothing.ahk
+    #Include Actions\Action_Get_index_of_element_in_list.ahk
+    #Include Actions\Action_Get_List_Info.ahk
+    #Include Actions\Action_New_List.ahk
     #Include Actions\Action_New_variable.ahk
+    #Include Actions\Action_Shuffle_list.ahk
     #Include Actions\Action_Sleep.ahk
     #Include Actions\Action_Trace_Point.ahk
     #Include Actions\Action_Trace_Point_Check.ahk
     #Include Conditions\Condition_Do_nothing.ahk
     #Include Conditions\Condition_Expression.ahk
+    #Include Conditions\Condition_List_Contains_Element.ahk
     #Include Conditions\Condition_NumberIs.ahk
     #Include Conditions\Condition_Variable_content_is.ahk
     #Include Conditions\Condition_Variable_Is_Empty.ahk
@@ -22,13 +30,20 @@ class Default {
 }
 
 ElementRegistry.RegisterPackage("Default", "1.2.1")
+ElementRegistry.Register(Default.Action_Add_To_List)
+ElementRegistry.Register(Default.Action_Delete_from_list)
 ElementRegistry.Register(Default.Action_Do_nothing)
+ElementRegistry.Register(Default.Action_Get_index_of_element_in_list)
+ElementRegistry.Register(Default.Action_Get_List_Info)
+ElementRegistry.Register(Default.Action_New_List)
 ElementRegistry.Register(Default.Action_New_variable)
+ElementRegistry.Register(Default.Action_Shuffle_list)
 ElementRegistry.Register(Default.Action_Sleep)
 ElementRegistry.Register(Default.Action_Trace_Point)
 ElementRegistry.Register(Default.Action_Trace_Point_Check)
 ElementRegistry.Register(Default.Condition_Do_nothing)
 ElementRegistry.Register(Default.Condition_Expression)
+ElementRegistry.Register(Default.Condition_List_Contains_Element)
 ElementRegistry.Register(Default.Condition_NumberIs)
 ElementRegistry.Register(Default.Condition_Variable_content_is)
 ElementRegistry.Register(Default.Condition_Variable_Is_Empty)

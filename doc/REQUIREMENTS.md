@@ -313,7 +313,7 @@ Global and static variables keep their values when AutoHotFlow ends. A change is
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/ahk/vars_model.test.ahk`, `tests/golden/test_golden_v2.py`
+- **Evidence:** `tests/ahk/vars_model.test.ahk`, `tests/golden/test_golden_v2.py`, `tests/integration/test_core_b_lists.py::test_add_to_list_does_not_change_other_variables`
 
 A variable holds a text, a number or an object. A list is an object with the keys 1..n. Keys ignore case; `list.1` and `list["1"]` are the same member. Assigning an object copies it. Numbers keep their type through variables (MIGRATION M-0039).
 
@@ -725,7 +725,7 @@ The action and the trigger run AutoHotkey v2 code, separately from the flows (E0
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0052), S0008
-- **Evidence:** `tests/integration/test_core_a_elements.py::test_new_variable_sets_texts_numbers_and_lists`, `tests/integration/test_core_a_elements.py::test_new_variable_only_if_not_exist`, `tests/integration/test_core_a_elements.py::test_new_variable_scopes_and_invalid_names`, `tests/integration/test_core_a_elements.py::test_the_v1_flow_variable_test_runs_up_to_the_list_elements`
+- **Evidence:** `tests/integration/test_core_a_elements.py::test_new_variable_sets_texts_numbers_and_lists`, `tests/integration/test_core_a_elements.py::test_new_variable_only_if_not_exist`, `tests/integration/test_core_a_elements.py::test_new_variable_scopes_and_invalid_names`, `tests/integration/test_core_a_elements.py::test_the_v1_flow_variable_test_runs_up_to_the_first_result_list`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
@@ -778,23 +778,26 @@ The action and the trigger run AutoHotkey v2 code, separately from the flows (E0
 ### REQ-ELM-230 Lists
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the seven list elements are done in S0002; `Action_Get_from_list` and the conversions are S0008)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0053), S0008
+- **Evidence:** `tests/integration/test_core_b_lists.py::test_new_list_creates_empty_and_filled_lists`, `tests/integration/test_core_b_lists.py::test_add_to_list_every_position_and_method`, `tests/integration/test_core_b_lists.py::test_get_list_info_all_four_infos`, `tests/integration/test_core_b_lists.py::test_list_contains_element_key_and_content`, `tests/integration/test_core_b_lists.py::test_delete_from_list_every_position_and_method`, `tests/integration/test_core_b_lists.py::test_get_index_of_element_in_list`, `tests/integration/test_core_b_lists.py::test_shuffle_list_keeps_content_and_count`, `tests/integration/test_core_b_lists.py::test_the_v1_flow_list_test_runs`, `tests/ahk/element_list_ops.test.ahk`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_New_List` | yes | open | S0002 (WI-0053) |
-| `Action_Add_to_list` | yes | open | S0002 (WI-0053) |
-| `Action_Get_list_info` | yes | open | S0002 (WI-0053) |
-| `Action_Delete_from_list` | yes | open | S0002 (WI-0053) |
-| `Action_Get_index_of_element_in_list` | yes | open | S0002 (WI-0053) |
-| `Action_Shuffle_list` | yes | open | S0002 (WI-0053) |
-| `Condition_List_Contains_Element` | yes | open | S0002 (WI-0053) |
+| `Action_New_List` | yes | done | S0002 (WI-0053) |
+| `Action_Add_to_list` | yes | done | S0002 (WI-0053) |
+| `Action_Get_list_info` | yes | done | S0002 (WI-0053) |
+| `Action_Delete_from_list` | yes | done | S0002 (WI-0053) |
+| `Action_Get_index_of_element_in_list` | yes | done | S0002 (WI-0053) |
+| `Action_Shuffle_list` | yes | done | S0002 (WI-0053) |
+| `Condition_List_Contains_Element` | yes | done | S0002 (WI-0053) |
 | `Action_Get_from_list` | yes | open | S0008 |
 | `Action_Convert_list_to_string` | yes | open | S0008 |
 | `Action_Convert_string_to_list` | yes | open | S0008 |
+
+The differences from v1 that the list elements bring are in MIGRATION M-0057 and M-0058.
 
 ### REQ-ELM-240 Loops
 

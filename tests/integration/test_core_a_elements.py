@@ -360,21 +360,24 @@ def test_variable_is_empty(flows):
 
 
 # --- the v1 example flows ---------------------------------------------------------------------------------------------------
-def test_the_v1_flow_variable_test_runs_up_to_the_list_elements(flows):
+def test_the_v1_flow_variable_test_runs_up_to_the_first_result_list(flows):
     """"variable test" (Flow 1010290492), as v1 saved it (the expressions are converted on load). The trigger "variable
-    content test" runs New_variable and 100 Variable_content_is checks up to the first Action_New_List, the trigger "basic
-    variables test" runs New_variable, Variable_is_empty and Condition_Expression up to the first Action_Add_To_List.
-    Both elements are not in the core set A (WI-0053): the flow stops there with an exception of the missing class. Every
-    check before it must have answered as the connections of the flow expect, otherwise the instance would end earlier
-    without a matching connection."""
+    content test" runs New_variable, 100 Variable_content_is checks, Action_New_List and more up to the first
+    Action_Add_To_List that collects the result in `static_results`; the trigger "basic variables test" runs
+    New_variable, Variable_is_empty and Condition_Expression up to that element. Every check before it must have
+    answered as the connections of the flow expect, otherwise the instance would end earlier without a matching
+    connection. The element writes `%a_manualTriggerID%`, which only the trigger host sets (TriggerVariables, S0003);
+    a start by the engine does not, so the value is empty and the element ends with the exception of its parameter
+    (WarnIfEmpty). The list elements themselves ran before (WI-0053)."""
     flow_id = flows.add_file(V1_EXAMPLES / "Flow 1010290492.json")
     flows.start()
     content = flows.run(flow_id, trigger="element0000000039")
     basic = flows.run(flow_id, trigger="element0000000002")
-    assert content.path[-1] == "element0000000434" and len(content.path) == 104
-    assert content.exceptions == ["unknown element class 'Default.action_New_List'"]
+    assert content.path[-1] == "element0000000098" and len(content.path) == 113
+    assert "element0000000434" in content.path                  # the first Action_New_List
+    assert content.exceptions == ["String 'VarValue' is empty"]
     assert basic.path[-1] == "element0000000035" and len(basic.path) == 10
-    assert basic.exceptions == ["unknown element class 'Default.Action_Add_To_List'"]
+    assert basic.exceptions == ["String 'VarValue' is empty"]
     assert content.reason == basic.reason == "exception"
 
 

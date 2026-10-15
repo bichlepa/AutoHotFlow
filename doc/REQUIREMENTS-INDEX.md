@@ -11,7 +11,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [Expressions and variables (VAR)](#expressions-and-variables-var) | 15 | 8 | 0 | 3 | 4 | 0 | 2 |
 | [Script language (SCR)](#script-language-scr) | 15 | 0 | 0 | 3 | 12 | 0 | 1 |
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
-| [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 3 | 19 | 0 | 0 |
+| [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 4 | 18 | 0 | 0 |
 | [Triggers (TRG)](#triggers-trg) | 13 | 0 | 0 | 1 | 12 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 14 | 0 | 0 | 2 | 12 | 0 | 0 |
 | [Editor (EDT)](#editor-edt) | 23 | 0 | 0 | 1 | 22 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 2 | 1 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 0 | 0 | 1 | 9 | 0 | 0 |
-| **All** | **217** | **55** | **1** | **33** | **127** | **1** | **6** |
+| **All** | **217** | **55** | **1** | **34** | **126** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -112,7 +112,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-ELM-200](REQUIREMENTS.md#req-elm-200-variables-and-calculations) | Variables and calculations | yes | partial | must | port | S0002 (WI-0052), S0008 |
 | [REQ-ELM-210](REQUIREMENTS.md#req-elm-210-conditions-on-values) | Conditions on values | yes | done | must | port | S0002 (WI-0052) |
 | [REQ-ELM-220](REQUIREMENTS.md#req-elm-220-strings) | Strings | yes | open | must | port | S0008 |
-| [REQ-ELM-230](REQUIREMENTS.md#req-elm-230-lists) | Lists | yes | open | must | port | S0002 (WI-0053), S0008 |
+| [REQ-ELM-230](REQUIREMENTS.md#req-elm-230-lists) | Lists | yes | partial | must | port | S0002 (WI-0053), S0008 |
 | [REQ-ELM-240](REQUIREMENTS.md#req-elm-240-loops) | Loops | yes | open | must | port | S0002 (WI-0054), S0008 |
 | [REQ-ELM-250](REQUIREMENTS.md#req-elm-250-flow-control) | Flow control | yes | partial | must | port | S0002 (WI-0047, WI-0052, WI-0055), S0003, S0008 |
 | [REQ-ELM-260](REQUIREMENTS.md#req-elm-260-trace-points) | Trace points | yes | done | must | port | S0002 (WI-0052) |
