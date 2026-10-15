@@ -46,7 +46,10 @@ Session 7 start: 2026-10-15 (late), work-item mode (`/orchestrate`, no wishes), 
 | 1 | Implementer WI-0052 (core set A) | sonnet | wi-52 | wip/wi-52 | variables, conditions, trace points; stress run at the end (load path) | running |
 | 2 | Bug hunter round 1 (OPEN-ITEMS mode): F-0041, not reproduced in 33 runs on `dec432b` (7 tests per run, idle and under load); no fix, stays open | sonnet | hunt-17 (removed) | (deleted) | integrated as 1b0831d (doc only, no verifier needed) | done |
 | 3 | Bug hunter round 2 (OPEN-ITEMS mode): F-0031, no defect found by reading and a regression test; proposed close as not a defect, owner decides (NEEDS-ATTENTION) | sonnet | hunt-18 (removed) | (deleted) | integrated as 9b2d6eb (tests and doc; verifier with the next integrated tip, ORCHESTRATOR 3d) | done; owner chose option A (2026-10-15): F-0031 closed as not a defect, moved to CLOSED-ITEMS |
-| 4 | Bug hunter round 3 (OPEN-ITEMS mode) | - | - | - | not started; the next one is started after the WI-0052 report | ready |
+| 4 | Bug hunter round 3 (OPEN-ITEMS mode): F-0043, 0 of 360 runs under load, no cause found; stays open | sonnet | hunt-19 (removed) | (deleted) | integrated as dcb990f (doc only) | done |
+| 5 | Bug hunter round 4 (OPEN-ITEMS mode): F-0085, test race (the first start may follow the subscription); test corrected, verifier pending | sonnet | hunt-20 (removed) | (deleted) | integrated as 0bb0d84 (tests and doc, needs verifier) | done, verifier running |
+| 6 | Verifier of the tip after round 4 (`0bb0d84`, covers `9b2d6eb` and `5bbcfdf`) | sonnet | ver-r4 | wip/ver-r4 | fast, foundation, slow tiers, arch, req, AHK test file | running |
+| 7 | Bug hunter round 5 (OPEN-ITEMS mode) | sonnet | hunt-21 | wip/hunt-21 | not in the area of WI-0052; F-0031, F-0041, F-0043, F-0085, F-0013 excluded | running |
 
 Session 6 start: 2026-10-15 (evening), work-item mode, HEAD `8c09337` on `v2-port`, main checkout clean, no workspaces left over. The state of S2 was taken from the commit history, not from the README checkboxes (not updated since S2 started): WI-44, WI-45, WI-46, WI-49, WI-50 integrated and verified; WI-47-PREP done (session 5). Next open work item with all dependencies done: WI-47 (E0045 is part of it). WI-48, WI-51 wait for WI-47. Workspaces this session: `wip/wi-47` (implementer), `wip/hunt-15` (bug hunter, OPEN-ITEMS mode).
 
