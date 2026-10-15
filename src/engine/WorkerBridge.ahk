@@ -18,8 +18,10 @@
 ; (minus those already starting), up to N. W (--warm-workers) workers are asked for at the start and again after a
 ; loss. An idle slot beyond W that nobody used for idleMs (--worker-idle-ms) is killed.
 ;
-; Loss: a crashed worker ends its job with the exception "worker crashed". Failures (a crash, a start that never
-; got ready, a refused cmd.worker.run, a refused spawn) are counted; STORM_MAX of them within STORM_WINDOW_MS stop
+; Loss: a crashed worker ends its job with the exception "worker crashed". Failures (a crash, a worker that ended
+; before its spawn answer, a refused cmd.worker.run, a refused spawn) are counted. A start that never gets ready is
+; judged by the supervisor (startup timeout, state "hung", the process is ended) and reaches the bridge as
+; evt.process.crashed, so it is counted as a crash; STORM_MAX of them within STORM_WINDOW_MS stop
 ; the asking for workers until the oldest one has left the window (the pool is "blocked"). Normal growing and
 ; shrinking does not count. With the pool blocked and no worker alive, Usable() is false and jobs end with
 ; "worker not available".
