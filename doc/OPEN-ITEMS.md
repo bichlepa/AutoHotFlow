@@ -30,7 +30,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0077 | `test_cancel_stops_the_running_element_and_reports_stopped_within_500_ms` did not see the job in the snapshot of the worker | observed once in a slow-tier run next to another suite run, 5 of 5 green alone, open | |
 | F-0079 | Foundation tier: `test_suspend_and_resume` leaves two processes behind (cleanup of the process tracker) | observed once on `b92d800` (run 20261015-153715-b92d8005), open | |
 | F-0080 | Foundation tier, timing under load: frozen-process tests exceed their budgets, one teardown leaves processes behind | observed once on `88be7fe` (run 20261015-153151-b481440a), not seen on `b92d800` in one run, open | |
-| F-0083 | Fast tier: the expression oracle's time budget of the fixed corpus (`assert seconds < 15`) measured 16.6 s | observed once, run 20261015-172551-99e2c044 on `1aceedd`, open | |
+| F-0083 | Fast tier: the expression oracle's time budget of the fixed corpus (`assert seconds < 15`) measured 16.6 s | observed once, run 20261015-172551-99e2c044 on `1aceedd`; alone 2.7 s; budget now scaled, verifier pending | |
 | F-0084 | Slow tier: a frozen child is terminated 5.08 s after the hang (budget 4.0 s) | observed once, run 20261015-172954-99e2c044 on `1aceedd`, open | |
 | F-0085 | Foundation tier: the crasher restarts 4 times (`evt.process.started`), 3 expected | observed twice; cause found (test race, first start event); test corrected, verifier pending | |
 | F-0086 | Foundation tier: `child_launcher.test.ahk` case "stdin of the child is NUL": `findstr` did not end within 10 s | observed once under load, run 20261015-201039-acc9907a on `acc9907`, green alone, open | |
@@ -187,7 +187,9 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 
 **What:** `tests/oracle/test_expr_oracle.py::test_the_fixed_corpus_runs_in_its_time_budget` failed with `assert seconds < 15`, measured 16.6 s (target under 10 s). The whole fast tier of this run took 237 s instead of about 15 s, which is the usual time.
 **Status:** observed once, run 20261015-172551-99e2c044 on `1aceedd` (fast tier, one run, not repeated). Suspicion (assumed): machine load; the role-entry change (F-0081 and F-0082 in the same integration) is not on the path of the oracle. Not checked against `b92d800` or an idle machine.
-**Action:** if it returns on an idle machine, measure the corpus alone and look at the budget.
+**Measured (verified):** alone (`python -m pytest tests/oracle/test_expr_oracle.py -q -n 0 -k time_budget`, 3 runs, run IDs 20261015-231325-26932, 20261015-231328-25212, 20261015-231331-23960): 2.6 to 2.7 s, so the budget of 15 s has a margin of 5.7 on an idle machine; 16.6 s needs a machine that is about 6 times slower, as in the 237 s run.
+**Fix:** the budget goes through `scaled()` like every other upper time limit (factor 3 in a parallel run, so 45 s). The test only guards against a runaway oracle, not a product promise. Verifier: the next fast-tier runs.
+**Action:** close after the next fast-tier runs show no repeat.
 
 ### F-0084: a frozen child is terminated late in the slow tier
 

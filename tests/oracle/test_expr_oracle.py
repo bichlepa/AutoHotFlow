@@ -16,6 +16,9 @@ sys.path.insert(0, str(REPO / "tools"))
 
 import expr_oracle  # noqa: E402
 
+sys.path.insert(0, str(REPO / "tests"))
+from support.timing import scaled  # noqa: E402
+
 
 @pytest.fixture(scope="module")
 def corpus_rows():
@@ -60,7 +63,8 @@ def test_the_corpus_has_both_error_classes_and_all_value_types(corpus_rows):
 @pytest.mark.xdist_group("expr_oracle")
 def test_the_fixed_corpus_runs_in_its_time_budget(corpus_rows):
     _, _, seconds = corpus_rows
-    assert seconds < 15, "the oracle needs %.1f s (target under 10 s)" % seconds
+    limit = scaled(15)      # a product-independent budget; parallel runs get the load factor (F-0083)
+    assert seconds < limit, "the oracle needs %.1f s (limit %.0f s, alone it needs about 3 s)" % (seconds, limit)
 
 
 def test_the_generator_is_reproducible_and_the_corpus_is_the_generator_output():
