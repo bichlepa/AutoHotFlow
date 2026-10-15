@@ -2507,3 +2507,23 @@ A setting decides how much help AutoHotFlow shows: only the important hints, all
 - **Plan:** -
 
 Every hint that is not critical (for example "take care with global variables", REQ-VAR-130) has an option "do not show again". The settings list the switched-off hints and can switch them on again. Critical hints cannot be switched off: messages about a concrete error, and warnings of the flow check such as duplicate connections or connections without an end (REQ-EDT-160).
+
+### REQ-USE-080 Unhandled errors of a flow are noticed
+
+- **v1:** no (not checked)
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S0004
+
+When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the user learns it without reading the log: a notice in the tray, and a mark at the flow in the manager until the user has looked at it. Many errors in a short time give one notice. The notice can be switched off per flow and globally (REQ-USE-070).
+
+### REQ-USE-090 Sharp and correctly sized on high-resolution displays
+
+- **v1:** no (not checked)
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S0004 to S0007
+
+Manager, editor, dialogs and the tray icon are sharp and have the right size with a display scaling above 100 %, also when a window moves to a screen with another scaling. The editor draws the flow sharp at every zoom.
