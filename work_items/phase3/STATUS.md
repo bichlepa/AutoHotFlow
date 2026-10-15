@@ -39,7 +39,7 @@ Later commits on `v2-port` after `6f4241c` that did not change these trees: none
 
 ## Agents
 
-Session 5 start: 2026-10-15, work-item mode, HEAD `b92d800` on `v2-port`, main checkout clean. Highest final ID at start: F-0375; ID blocks F-0376 to F-0385 (implementer WI-0047-PREP), F-0386 to F-0395 (bug hunter round 7). Next open work item: WI-0047-PREP (depends on WI-0046 and WI-0042, both done). Leftover workspaces with commits not on `v2-port`, not created by this session and not in the table below: `wip/chrome-cleanup` (8778839), `wip/requirements` (5 commits plus an untracked file `doc/Untitled-1.txt` in its workspace), `wip/hunt-13` (1d7a6cd, held for the owner's decision on F-14). Left alone, to be decided by the owner.
+Session 5 start: 2026-10-15, work-item mode, HEAD `b92d800` on `v2-port`, main checkout clean. Highest final ID at start: F-0375; ID blocks F-0376 to F-0385 (implementer WI-0047-PREP), F-0386 to F-0395 (bug hunter round 7). Next open work item: WI-0047-PREP (depends on WI-0046 and WI-0042, both done). Leftover workspace not created by this session: `wip/requirements` (5 commits plus an untracked file `doc/Untitled-1.txt` in its workspace), left alone, to be decided by the owner. `wip/chrome-cleanup` integrated as a672b74 and 92c4f59 (owner's go, 2026-10-15; renumbering of the Chrome-branch text done in the same integration), workspace removed. `wip/hunt-13` (F-0014 fix) integrated as 02910a7 and 88be7fe on the owner's go, workspace removed.
 
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
