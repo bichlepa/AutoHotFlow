@@ -30,8 +30,8 @@ A flow decides what happens when it is triggered while an instance is still runn
 | `v1` | `yes`, `partial`, `no`, `n/a` | Does v1 have it? Facts about v1 come from reading its code and help texts, unless the text says "tested". `n/a` when the question makes no sense for v1. |
 | `v2` | `done`, `implemented`, `partial`, `open`, `dropped` | `done`: implemented and verified by a test or a measurement (the field `Evidence` is then mandatory). `implemented`: implemented, not verified. `partial`: a part works; the text says what is missing. `open`: not implemented. `dropped`: will not be implemented; the text says why. |
 | `Prio` | `must`, `should`, `could` | `must`: v2 cannot replace v1 (scope `port`) or the feature has no use (scope `later`) without it. |
-| `Scope` | `port`, `later` | `port`: needed so that v2 replaces v1 (phases 3 and 4). `later`: after the port. |
-| `Plan` | free text | Where the work is planned: a step (`S0004`), `phase 4`, a work item (`WI-0052`), or `-` when nothing is planned. |
+| `Scope` | `port`, `later` | `port`: needed so that v2 replaces v1. `later`: after the port. |
+| `Plan` | free text | Where the work is planned: a step (`S0004`), a work item (`WI-0052`), or `-` when nothing is planned. |
 | `Evidence` | free text, optional | Tests, measurements (`MEASUREMENTS.md` M-nn), manual checks. Mandatory for `done`. A path in backticks, relative to the repository root, must exist: a file, a folder (`tests/fault/`), a glob (`tests/ahk/expr_*.test.ahk`) or a Python test (`tests/x.py::test_name`). |
 | `Doubt` | free text, optional | The requirement is in doubt: the project owner may still change or drop it, also when it is implemented. The text says what is in doubt. The index marks it "(in doubt)" and counts it. |
 
@@ -1638,8 +1638,8 @@ The debugger is the long-term goal of decision E0001. It is not part of phase 3 
 - **v1:** no
 - **v2:** open
 - **Prio:** should
-- **Scope:** port
-- **Plan:** phase 4
+- **Scope:** later
+- **Plan:** -
 
 Pause an instance or a flow at any time and resume it.
 
@@ -1648,8 +1648,8 @@ Pause an instance or a flow at any time and resume it.
 - **v1:** no
 - **v2:** open
 - **Prio:** should
-- **Scope:** port
-- **Plan:** phase 4
+- **Scope:** later
+- **Plan:** -
 
 Execution stops before an element with a breakpoint.
 
@@ -1658,8 +1658,8 @@ Execution stops before an element with a breakpoint.
 - **v1:** no
 - **v2:** open
 - **Prio:** should
-- **Scope:** port
-- **Plan:** phase 4
+- **Scope:** later
+- **Plan:** -
 
 Execute one element at a time, or all of them with a pause between the steps, so that the user can follow the flow in the editor.
 
@@ -1668,16 +1668,16 @@ Execute one element at a time, or all of them with a pause between the steps, so
 - **v1:** partial (the condition `Debug_Dialog` shows variables during a run)
 - **v2:** open
 - **Prio:** should
-- **Scope:** port
-- **Plan:** phase 4
+- **Scope:** later
+- **Plan:** -
 
 ### REQ-DBG-050 Edit the flow while debugging
 
 - **v1:** no
 - **v2:** open
 - **Prio:** should
-- **Scope:** port
-- **Plan:** phase 4
+- **Scope:** later
+- **Plan:** -
 
 Changes apply at the next step, as in REQ-EXE-080.
 

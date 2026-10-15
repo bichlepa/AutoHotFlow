@@ -214,11 +214,11 @@ run the tool. The legend of the columns is at the top of the source.
 
 | ID | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|
-| [REQ-DBG-010](REQUIREMENTS.md#req-dbg-010-pause-and-resume) | Pause and resume | no | open | should | port | phase 4 |
-| [REQ-DBG-020](REQUIREMENTS.md#req-dbg-020-breakpoints) | Breakpoints | no | open | should | port | phase 4 |
-| [REQ-DBG-030](REQUIREMENTS.md#req-dbg-030-single-step-and-slow-execution) | Single step and slow execution | no | open | should | port | phase 4 |
-| [REQ-DBG-040](REQUIREMENTS.md#req-dbg-040-inspect-and-change-variables-while-paused) | Inspect and change variables while paused | partial | open | should | port | phase 4 |
-| [REQ-DBG-050](REQUIREMENTS.md#req-dbg-050-edit-the-flow-while-debugging) | Edit the flow while debugging | no | open | should | port | phase 4 |
+| [REQ-DBG-010](REQUIREMENTS.md#req-dbg-010-pause-and-resume) | Pause and resume | no | open | should | later | - |
+| [REQ-DBG-020](REQUIREMENTS.md#req-dbg-020-breakpoints) | Breakpoints | no | open | should | later | - |
+| [REQ-DBG-030](REQUIREMENTS.md#req-dbg-030-single-step-and-slow-execution) | Single step and slow execution | no | open | should | later | - |
+| [REQ-DBG-040](REQUIREMENTS.md#req-dbg-040-inspect-and-change-variables-while-paused) | Inspect and change variables while paused | partial | open | should | later | - |
+| [REQ-DBG-050](REQUIREMENTS.md#req-dbg-050-edit-the-flow-while-debugging) | Edit the flow while debugging | no | open | should | later | - |
 
 ## AI integration (AI)
 
