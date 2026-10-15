@@ -838,15 +838,16 @@ Connection points and loop variables: REQ-EXE-030.
 ### REQ-ELM-260 Trace points
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (MIGRATION M-0055, M-0056)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0052)
+- **Evidence:** `tests/integration/test_core_a_trace_points.py::test_trace_point_check_every_option`, `tests/integration/test_core_a_trace_points.py::test_trace_points_belong_to_the_instance_and_are_hidden`, `tests/integration/test_core_a_trace_points.py::test_trace_point_log_message_and_stop_condition`, `tests/integration/test_core_a_trace_points.py::test_trace_point_stops_every_thread_of_the_instance`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Trace_Point` | yes | open | S0002 (WI-0052) |
-| `Action_Trace_Point_Check` | yes | open | S0002 (WI-0052) |
+| `Action_Trace_Point` | yes | done | S0002 (WI-0052) |
+| `Action_Trace_Point_Check` | yes | done | S0002 (WI-0052) |
 
 They record the path through a flow and check it; automatic test flows use them (REQ-TST-040).
 

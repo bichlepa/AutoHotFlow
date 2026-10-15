@@ -11,6 +11,8 @@ class Default {
     #Include Actions\Action_Do_nothing.ahk
     #Include Actions\Action_New_variable.ahk
     #Include Actions\Action_Sleep.ahk
+    #Include Actions\Action_Trace_Point.ahk
+    #Include Actions\Action_Trace_Point_Check.ahk
     #Include Conditions\Condition_Do_nothing.ahk
     #Include Conditions\Condition_Expression.ahk
     #Include Conditions\Condition_NumberIs.ahk
@@ -23,6 +25,8 @@ ElementRegistry.RegisterPackage("Default", "1.2.1")
 ElementRegistry.Register(Default.Action_Do_nothing)
 ElementRegistry.Register(Default.Action_New_variable)
 ElementRegistry.Register(Default.Action_Sleep)
+ElementRegistry.Register(Default.Action_Trace_Point)
+ElementRegistry.Register(Default.Action_Trace_Point_Check)
 ElementRegistry.Register(Default.Condition_Do_nothing)
 ElementRegistry.Register(Default.Condition_Expression)
 ElementRegistry.Register(Default.Condition_NumberIs)
