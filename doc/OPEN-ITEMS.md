@@ -37,8 +37,8 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0087 | Slow tier: `test_clients_churn.py` smoke variant got 13 snapshot probes during the churn, 20 required | observed once under load, run 20261015-201045-acc9907a on `acc9907`, green alone, open | |
 | F-0089 | Slow tier under load: three fault tests fail that pass alone: killed worker without `evt.process.crashed`, shutdown of session 1 took 6.15 s (limit 6.0), supervisor-stall test | observed once under load, run 20261015-203710-59c199ec (code of `d179825`), green alone (12 passed, run 20261015-204219-59c199ec), open | |
 
-| F-9020 | Fast tier: `test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_kill` got no `evt.engine.ready` of the second chain within 20 s | observed once, run 20261015-230752-0bb0d843 on `0bb0d84`, open | |
-| F-9021 | Slow tier: `test_clients_churn.py` smoke variant: handles of the engine grew from 145 to 164 (slack 3) | observed once, run 20261015-230952-0bb0d843 on `0bb0d84`, open | |
+| F-0090 | Fast tier: `test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_kill` got no `evt.engine.ready` of the second chain within 20 s | observed once, run 20261015-230752-0bb0d843 on `0bb0d84`, open | |
+| F-0091 | Slow tier: `test_clients_churn.py` smoke variant: handles of the engine grew from 145 to 164 (slack 3) | observed once, run 20261015-230952-0bb0d843 on `0bb0d84`, open | |
 
 ## Findings
 
@@ -203,13 +203,13 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Fix:** the test now leaves the first incarnation (pid of the first armed crasher) out of the count of start events, so it holds with and without the first event. Test run 20261015-230556-3488 (`--all -m slow`, one test, serial): 1 passed. The failure itself could not be forced, so the verifier is the next slow-tier run.
 **Action:** close after the next slow/foundation runs show no repeat.
 
-### F-9020: the second chain of the persistence test does not get `evt.engine.ready`
+### F-0090: the second chain of the persistence test does not get `evt.engine.ready`
 
 **What:** `tests/fault/test_var_persistence.py::test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_kill` failed at `wait_ready_count(other, 1)` (line 202, after the first part with the orderly exit had passed): `evt.engine.ready #1 missing` after 20 s, the supervisor text was empty.
 **Status:** observed once, run 20261015-230752-0bb0d843 on `0bb0d84` (`python tools/run_suite.py --ref 0bb0d84 -- -q`, fast tier: 1 failed, 842 passed, 1 skipped, no INTERNALERROR). The foundation run on the same commit was started at the same time (run 20261015-230752-0bb0d843-2) and was green. Not repeated. Suspicion (assumed): load from the parallel foundation run, or a second chain started right after `shutil.rmtree` of the data folder whose engine never became ready. The empty supervisor text is conspicuous; the run log data was not examined further. Probable cause task: none of the last two commits (they touch a supervisor test and an AHK pipe test); the tests of the variable persistence were not changed.
 **Action:** if it returns, look at the process list and the supervisor log in the run log data; run the test alone in a loop.
 
-### F-9021: handle growth of the engine in the churn smoke test
+### F-0091: handle growth of the engine in the churn smoke test
 
 **What:** `tests/stress/test_clients_churn.py::test_clients_connecting_and_leaving_do_not_disturb_the_engine_or_leak[smoke]` failed with `assert after["handles"] <= before["handles"] + HANDLE_SLACK`: engine handles 145 to 164 (slack 3); supervisor stayed at 185 handles, memory flat (engine 18.56 to 19.82 MB).
 **Status:** observed once, run 20261015-230952-0bb0d843 on `0bb0d84` (`python tools/run_suite.py --ref 0bb0d84 -- --all -m slow -q`: 1 failed, 98 passed, no INTERNALERROR). Not repeated. Related entry: F-0087 (same test, different assertion). Suspicion (assumed): handles of the engine that are still open when the snapshot is taken (instances of the load, not yet ended after the 2 s wait), or a real handle leak per churning client; not separated. Probable cause task: the test and the churn path of the supervisor, not the last two commits.
