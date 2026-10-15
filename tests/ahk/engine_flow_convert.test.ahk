@@ -380,6 +380,33 @@ CheckUnknownKeysOfAnElementAreKept() {
     Assert.Equal(Json.Parse(def.ToFileText())["allElements"]["e1"]["future"]["a"], 1)
 }
 
+; WI-0047, E0045: an element is looked up by its package and its class. The package "default" in lower case (as 8
+; elements of the test flows write it) and a missing package are Default; an element of a package that is not installed
+; waits like one of an unknown class and is written back unchanged (with the marker).
+CheckElementsAreLookedUpByPackageAndClass() {
+    text := Lines(
+        '{"name":"pkg","allElements":{',
+        '"e1":{"ID":"e1","type":"Action","package":"default","class":"action_sleep","pars":{"Duration":"1.50"}},',
+        '"e2":{"ID":"e2","type":"Action","class":"Action_Sleep","pars":{"Duration":"2.50"}},',
+        '"e3":{"ID":"e3","type":"Action","package":"NotInstalled","class":"Action_Sleep","pars":{"Duration":"3.50"},"own":{"k":1}},',
+        '"e4":{"ID":"e4","type":"Action","package":"Default","class":"Action_TestExprParams","pars":{"Expr":"4.50"}}},',
+        '"allConnections":{}}'
+    )
+    table := FlowTable()
+    table.Load("f", text)
+    def := table.Get("f").Def
+    Assert.Equal(Pars(def, "e1")["Duration"], '"1.50"', "package default in lower case")
+    Assert.Equal(Pars(def, "e2")["Duration"], '"2.50"', "no package")
+    Assert.Equal(Pars(def, "e3")["Duration"], "3.50", "package not installed: the v1 text stays")
+    Assert.Equal(Pars(def, "e4")["Expr"], "4.50", "a test class is not in the package Default")
+    Assert.True(def.Pending.Has("e3") && def.Pending.Has("e4") && def.Pending.Count = 2)
+    saved := Json.Parse(def.ToFileText())["allElements"]["e3"]
+    Assert.True(saved["v1Text"] == 1)
+    Assert.Equal(saved["package"], "NotInstalled")
+    Assert.Equal(saved["own"]["k"], 1)
+    Assert.Equal(saved["pars"]["Duration"], "3.50")
+}
+
 TestRun.Init()
 
 TestRun.Case("a v1 flow: expression parameters and V1Syntax are converted, the rest stays", CheckV1FlowIsConverted)
@@ -399,5 +426,6 @@ TestRun.Case("migration: an unknown class has no marker list", CheckUnknownClass
 TestRun.Case("migration: markers are stable over save and load", CheckMarkersSurviveSaveAndLoadUnchanged)
 TestRun.Case("migration: a class that appears later adds its markers once", CheckAClassThatAppearsLaterAddsItsMarkers)
 TestRun.Case("migration: existing markers and unknown keys are kept", CheckUnknownKeysOfAnElementAreKept)
+TestRun.Case("packages: an element is looked up by package and class (E0045)", CheckElementsAreLookedUpByPackageAndClass)
 
 TestRun.Finish()

@@ -5,6 +5,9 @@ the test element Action_TestExprParams and an element of a class that does not e
 saved (cmd.flow.save), loaded again by a second engine: nothing is converted twice, and the element with the unknown
 class keeps its v1 texts and gets a marker. The same flow is also converted when a class becomes known later (unit
 test tests/ahk/engine_flow_convert.test.ahk).
+
+WI-0047: an element of a package that is not installed (an extension package of v1) loads like an element of an unknown
+class, ends with `exception` and a message that names the package when it runs, and is written back unchanged.
 """
 
 import json
@@ -162,3 +165,51 @@ def test_the_saved_file_answers_with_an_error_when_storage_cannot_write(procs, f
         stop(hub, run)
     finally:
         stub.close()
+
+
+# An element of an extension package that is not installed, with keys that v2 does not know (WI-0047, E0045).
+EXT_ELEMENT = {"ID": "element0000000002", "type": "action", "package": "SomeExtension", "packageVersion": "0.3",
+               "class": "Action_Speak", "x": "0", "y": "100", "name": "Speak", "StandardName": "1",
+               "pars": {"Text": "hello %name%", "Rate": "1.50"}, "extensionData": {"voice": 2}}
+EXT_FLOW = {
+    "name": "Ext", "category": "Tests", "ElementIDCounter": "3",
+    "flowSettings": {"ExecutionPolicy": "default"},
+    "allElements": {
+        "element0000000001": {"ID": "element0000000001", "type": "trigger", "package": "Default",
+                              "class": "Trigger_Manual", "x": "0", "y": "0", "enabled": "0", "pars": {"ID": "Ext"},
+                              "name": "Manual", "StandardName": "1"},
+        "element0000000002": EXT_ELEMENT,
+    },
+    "allConnections": {
+        "connection0000000003": {"ID": "connection0000000003", "type": "connection", "ConnectionType": "normal",
+                                 "from": "element0000000001", "to": "element0000000002"},
+    },
+}
+
+
+def test_an_element_of_a_package_that_is_not_installed_loads_fails_clearly_and_is_written_back(
+        procs, flowdir, runs, session_id, pipe, hub, storage):
+    (flowdir / "Flows" / "ext.json").write_text(json.dumps(EXT_FLOW, indent=2), encoding="utf-8")
+    obs = observer(pipe, "engine", "flow:ext")
+    run = start_engine(procs, flowdir, runs, pipe, session_id)
+    with obs:
+        wait_ready(obs)
+        definition = ask(obs, "cmd.flow.get", {"flowId": "ext"})["definition"]
+        assert definition["allElements"]["element0000000002"] == EXT_ELEMENT, "loaded unchanged"
+        ask(obs, "cmd.flow.start", {"flowId": "ext"})
+        state = None
+        for msg in obs.events(timeout=10):
+            p = msg["payload"]
+            if msg["type"] == "evt.element.state" and p.get("elementId") == "element0000000002"                     and p.get("state") == "exception":
+                state = p
+                break
+        assert state is not None, "the element did not end with exception"
+        assert state["message"] == ("element class 'SomeExtension.Action_Speak' is not available: package "
+                                    "'SomeExtension' is not installed")
+        ask(obs, "cmd.flow.save", {"flowId": "ext"})
+        on_disk = json.loads((flowdir / "Flows" / "ext.json").read_text(encoding="utf-8"))
+        written = on_disk["allElements"]["element0000000002"]
+        # unchanged, plus the marker of an element whose texts wait for their class (ARCHITECTURE 7)
+        assert written.pop("v1Text") is True
+        assert written == EXT_ELEMENT
+    stop(hub, run)
