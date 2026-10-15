@@ -329,6 +329,27 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Status:** verified (probe script with `ahkrun.py`, 2026-10-15; the v1 interpreter compared for 22 texts, MIGRATION M-0053)
 - **Source:** `src/elements/Default/Conditions/Condition_Variable_content_is.ahk`
 
+### `StrSplit(text, "ab")` has ONE delimiter of two characters
+
+- **Problem:** The delimiters of the list elements ("," and ";" and a space) were passed as a string `",;"`. The text `a,b;c` came back as `a,b;c`, one piece: a string is a single delimiter, not a set of characters.
+- **Wrong:** `StrSplit(text, ",;")` to split at the comma and at the semicolon.
+- **Right:** An Array of the delimiters: `StrSplit(text, StrSplit(",;"))` (the inner call gives the single characters). `StrSplit("")` with a delimiter gives an Array with no element.
+- **Status:** verified (`tests/ahk/element_list_ops.test.ahk`, case "Split")
+- **Source:** `src/elements/Default/lib/ListOps.ahk`; https://www.autohotkey.com/docs/v2/lib/StrSplit.htm
+
+### A parameter named `random` hides the function `Random` (names ignore case)
+
+- **Problem:** `Shuffle(m, random := "")` with `random := (lo, hi) => Random(lo, hi)` as the default: inside the lambda `Random` is the parameter `random` (variable names ignore case), so the function called itself until "Function recursion limit exceeded" ended the script (a fatal error, no dialog under `ahkrun`).
+- **Wrong:** A local or parameter with the name of a built-in function (`random`, `number`, `default`) when the function is also used in the body. For a local that is only assigned, `#Warn All` reports it ("same name as a global variable"), for a parameter it does not.
+- **Right:** Another name (`rng`).
+- **Status:** verified (the recursion error and the fix in `tests/ahk/element_list_ops.test.ahk`; the warning for `number` in the log of the engine)
+
+### A multi-statement function in an argument is `() {` ... `}`, not `() => {`
+
+- **Problem:** In a test file `TestRun.Case("name", () => { ...statements... })` is no function body: `=> {` starts an object literal, and the load fails with "Unexpected reserved word" at the first `for`.
+- **Right:** `() { ... }` for a body with statements (or a named function); `() => expression` for one expression (a comma list in parentheses `() => (a, b)` is one expression).
+- **Status:** verified (load error and fix in `tests/ahk/element_list_ops.test.ahk`)
+
 ## Objects, Maps, Arrays
 
 ### Map with `CaseSense "Off"` keeps the spelling of the first insertion
