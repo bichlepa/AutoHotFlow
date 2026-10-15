@@ -64,7 +64,7 @@ Answers of the project owner to the open questions (2026-10-13):
 | E14 | **Closing the manager window** only closes (hides) the window; AutoHotFlow keeps running. Only the "Exit" button of the manager and the "Exit" entry of the tray menu end the application. Same as v1 (verified by reading: the v1 manager has no `GuiClose` handler, so closing hides the window; `Button_manager_Exit` in `Manager GUI.ahk:1026` and the tray entry call the exit). | S4 |
 | E34 | **Type errors per flow (F-277, decided by the project owner, 2026-10-14).** Each flow has an option `strictTypes`. Migrated flows (recognised by `formatVersion` and the `v1Text` marker of WI-39) get `false`, which is the v1 behaviour: E25 stays as it is (empty text and `f1` warning). New flows get `true`: in strict mode a type error in a comparison or a calculation becomes an element error (`exception`). Independent of the mode, the `f1` warnings of the evaluator are shown in the editor (log display, S4/S5). | WI-42 (evaluator call from `ctx.EvalParams`, mode from the flow), flow format (WI-39 keys), MIGRATION M-24 and M-25 (text for the compatibility mode), S4/S5 (display) |
 
-Decisions of the project owner while S2 was detailed (2026-10-14):
+Decisions of the project owner while S2 was detailed (2026-10-14; E40 and E41 on 2026-10-15):
 
 | # | Decision | Affects |
 |---|---|---|
@@ -73,6 +73,8 @@ Decisions of the project owner while S2 was detailed (2026-10-14):
 | E37 | Element files are organised **per package** (`src/elements/<package>/`), the include block is generated per package. In phase 3 the only package is `Default`; the package information in flows stays. | WI-47 |
 | E38 | **Dialogs of elements go through an indirection.** The test entry point registers a provider with scripted answers, so dialog elements are tested headless, without the `gui` tier. | WI-51, WI-56 |
 | E39 | **v1 AHK code** in `Action_AutoHotkey_script` and `Trigger_AutoHotkey_Script` is not run with a v1 interpreter (E4 stays). The v2 elements run AHK v2 code; an imported v1 script is kept as text and marked (E35); porting it is a manual or AI-assisted step. Documented break (MIGRATION M-49). | S8 |
+| E40 | **Memory budget applies to the background processes only.** Supervisor, storage, engine, triggerhost, manager and the workers are counted (below 100 MB private bytes with one worker and about 150 elements); editors are not counted. The number of workers is the setting `workerLimit`; its default is an owner decision (default 16, owner decision: normal state with about 3 active workers, peaks may exceed the budget). | WI-47-PREP |
+| E41 | **Role entry scripts (R3 option A without B).** Each role's entry script includes only the element classes it needs, selected by the literal `static Mode` (engine: all; triggerhost: trigger; worker: worker; supervisor, storage and debug: none; manager: all if it needs them, accepted). Metadata and runtime code are not split. Supersedes D12 in part. | WI-47-PREP, WI-47 |
 
 ## Open questions for the project owner
 
@@ -178,7 +180,8 @@ The trace points are in the first group on purpose: they record the path through
 | [WI-44](WI-44-expression-oracle-ahk-v2.md) | Oracle of the expression language: native AHK v2; v1 golden data frozen | M | WI-38 |
 | [WI-45](WI-45-migration-markers.md) | Migration markers with MIGRATION ID and v1 original, import report | S | WI-39 |
 | [WI-46](WI-46-r3-measurement.md) | R3 measurement: parse time and memory with many elements | S | – |
-| [WI-47](WI-47-element-layout-packages.md) | Element layout per package, generated include block, test elements out of `src/` | M | WI-46, WI-42 |
+| [WI-47-PREP](WI-47-PREP-role-entries.md) | Role entry scripts (E41), class selection by `Mode`, memory per role (E40) | M | WI-46 |
+| [WI-47](WI-47-element-layout-packages.md) | Element layout per package, generated include block, test elements out of `src/` | M | WI-47-PREP, WI-42 |
 | [WI-48](WI-48-element-smoke-tests.md) | L1 smoke test of every registered element | S | WI-47 |
 | [WI-49](WI-49-flow-builder.md) | Flow builder and headless flow runner for tests | M | – |
 | [WI-50](WI-50-r4-ctx-request.md) | R4: `ctx.Request` and variable access in the worker | M | WI-42 |
@@ -191,7 +194,7 @@ The trace points are in the first group on purpose: they record the path through
 | [WI-57](WI-57-test-corpus.md) | Test corpus: three v1 test flows adapted, synthetic flows | M | WI-45, WI-49, WI-52 to WI-56 |
 | [WI-58](WI-58-acceptance-s2.md) | Acceptance S2 | S | all |
 
-**Order.** The orchestrator runs one implementation at a time (bug fixes and test runs in parallel). Proposed order: WI-44, WI-45, WI-46, WI-49 (they need no `ctx` and can start before WI-43 is finished), then WI-47, WI-48, WI-50, WI-51, then WI-52 to WI-56, then WI-57, WI-58. The column "Depends on" is binding, the order is not: if a package is blocked, any package whose dependencies are done may come first.
+**Order.** The orchestrator runs one implementation at a time (bug fixes and test runs in parallel). Proposed order: WI-44, WI-45, WI-46, WI-49 (they need no `ctx` and can start before WI-43 is finished), then WI-47-PREP, WI-47, WI-48, WI-50, WI-51, then WI-52 to WI-56, then WI-57, WI-58. The column "Depends on" is binding, the order is not: if a package is blocked, any package whose dependencies are done may come first.
 
 **Load path of the engine (F-282, retrospective of WI-43).** Since S1 the engine loads 200 big flows more slowly (ready after 59 s instead of 45 s, largest snapshot answer 2.3 s instead of 0.5 s; suspected: the conversion at load and the variable loading). S2 makes this work grow on purpose: every class it registers lets the loader convert more elements. Therefore: WI-46 measures the load phase per flow as a baseline before the first class comes; and every package that adds work to the load path (WI-45, WI-47, WI-52 to WI-56) runs `tests/stress/test_big_flows.py` at its end and records the time to ready and the largest snapshot answer in its result. If the budget is broken, the package stops and the project owner decides (stagger the conversion, convert on first use, or save converted flows).
 
@@ -208,5 +211,5 @@ The trace points are in the first group on purpose: they record the path through
 
 ### Progress S2
 
-- [ ] WI-44  - [ ] WI-45  - [ ] WI-46  - [ ] WI-47  - [ ] WI-48  - [ ] WI-49  - [ ] WI-50  - [ ] WI-51
+- [ ] WI-44  - [ ] WI-45  - [ ] WI-46  - [ ] WI-47-PREP  - [ ] WI-47  - [ ] WI-48  - [ ] WI-49  - [ ] WI-50  - [ ] WI-51
 - [ ] WI-52  - [ ] WI-53  - [ ] WI-54  - [ ] WI-55  - [ ] WI-56  - [ ] WI-57  - [ ] WI-58
