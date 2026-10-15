@@ -1303,6 +1303,36 @@ The tray icon shows the manager (default action) and ends the application. Error
 
 Shows the version of AutoHotFlow and of AutoHotkey, the license and the project site.
 
+### REQ-MGR-110 Restore an older version of a flow
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+The manager lists the saved backups of a flow (REQ-ROB-060) with their time and restores one. The current state becomes a backup itself, so that a restore can be undone.
+
+### REQ-MGR-120 Show and change permanent variables
+
+- **v1:** no (not found in the texts of the manager)
+- **v2:** open
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+The manager shows the global variables and the static variables of each flow with their values, and the user can change and delete them. A wrong value can be found without a flow that prints it. Secret values stay hidden (REQ-SEC-040).
+
+### REQ-MGR-130 Search and filter flows
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+A search field filters the flow list by name and category, and a filter shows only the flows in a given state (enabled, running, with errors).
+
 ## Editor (EDT)
 
 ### REQ-EDT-010 One editor per flow, several at the same time
@@ -2227,6 +2257,55 @@ The pipes reject remote clients, allow only the system and the owner, and their 
 - **Plan:** -
 
 Elements and AutoHotkey scripts run with the rights of the user. A flow from someone else is code; AutoHotFlow does not protect against a malicious flow or package.
+
+### REQ-SEC-040 Secret values are never shown or logged
+
+- **v1:** no
+- **v2:** open
+- **Prio:** must
+- **Scope:** later
+- **Plan:** -
+
+A value can be marked as secret, for example a password or an API key. A secret value is never shown in clear text (a field shows dots; a dialog, the variable view (REQ-MGR-120) and the debugger show it masked), never written to a log, a report or a snapshot (REQ-DIA-020 to REQ-DIA-040), never part of an exported flow (REQ-MGR-050), and never sent to an AI (AI) unless the user allows it.
+
+Open points:
+
+- How the user marks a value as secret: a parameter type "secret" in the element settings, an option of `Action_New_Variable`, a name prefix such as `secret_`, or several of these.
+- Whether a value made from a secret (a text that contains it) is secret too.
+- How a permanent secret is stored: encrypted for the Windows user (for example with DPAPI) instead of plain text in the variable file.
+
+### REQ-SEC-050 No data leaves the computer by itself
+
+- **v1:** yes (read: no network call outside the elements)
+- **v2:** implemented (nothing in v2 uses the network; not checked by a test)
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S0010 (check)
+
+AutoHotFlow sends nothing anywhere by itself: no telemetry, no usage statistics, no crash reports to the outside (crash reports stay on the computer, REQ-DIA-030). Only elements use the network, because the user put them into a flow. A later feature that contacts a server (for example a check for updates) is off until the user switches it on.
+
+### REQ-SEC-060 Imported flows are disabled and come with a warning
+
+- **v1:** no (not checked)
+- **v2:** open
+- **Prio:** could
+- **Scope:** port
+- **Plan:** S0004
+
+Importing flows from a file (REQ-MGR-050) tells the user that a flow is a program with the rights of the user (REQ-SEC-030) and lists the elements that act on the system (files, programs, keys and mouse, network, AutoHotkey scripts). The imported flows are disabled, so that nothing runs before the user has looked at them.
+
+### REQ-SEC-070 Changes of flow files from outside are noticed
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+- **Doubt:** What does it protect against? A program that runs as the same user can also change AutoHotFlow itself.
+
+AutoHotFlow notices when another program has changed a flow file since AutoHotFlow wrote it, and asks the user before the flow is enabled or runs. There are legitimate changes (a text editor, a sync tool, git), so AutoHotFlow asks and does not refuse.
+
+Open point: a checksum next to the file does not help against an attacker who can write the file, because they can write the checksum too. A key outside the data folder (for example protected by Windows for the user, DPAPI) protects against other users and against tools that do not know AutoHotFlow, but not against a program that runs as the same user and knows the scheme.
 
 ## Testability (TST)
 
