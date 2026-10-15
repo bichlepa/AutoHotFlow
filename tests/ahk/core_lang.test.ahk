@@ -1,14 +1,17 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/core/Lang.ahk and LangTable.ahk (WI-0042, E0028): the v1 language files in assets/language, read
-; as v1 lang() reads them.
+; Unit tests for src/core/Lang.ahk and LangTable.ahk (WI-0042, E0028, WI-0047): the v1 language files in assets/language
+; and in the element packages (src/elements/<package>/language), read as v1 lang() reads them.
 #Include lib\Assert.ahk
 #Include ..\..\src\core\Lang.ahk
 
 Log.Configure(Log.Memory)
 
-Reset(code := "en", dir := "") {
+; dir: the language folders ("" = the files of the program); a test folder has no element packages unless packages
+; names a folder (packages "" with dir "" = the packages of the program).
+Reset(code := "en", dir := "", packages := "") {
     LangTable.Code := code
     LangTable.Dir := dir
+    LangTable.PackagesDir := (packages != "") ? packages : (dir != "") ? dir "\no_packages" : ""
     LangTable.Load()
     Log.memoryLines := []
 }
@@ -102,6 +105,40 @@ CheckOtherFoldersAndFallback() {
     }
 }
 
+CheckTextsOfThePackageDefault() {
+    ; keys that only the language files of the package Default have (v1/Source_Elements/Default/language, UTF-16)
+    Reset()
+    Assert.Equal(Lang("ms #Milliseconds"), "ms")
+    Assert.Equal(Lang("Flow_control"), "Flow control")
+    Assert.Equal(Lang("Sleep"), "Sleep")
+    Assert.Equal(Log.memoryLines.Length, 0, "no key was missing")
+    Reset("de")
+    try {
+        Assert.Equal(Lang("ms #Milliseconds"), "Ms")
+        Assert.Equal(Lang("Sleep"), "Schlafen")
+        Assert.Equal(Lang("Cancel"), "Abbrechen", "the texts of basic are still there")
+    } finally {
+        Reset()
+    }
+}
+
+CheckPackageFoldersComeAfterTheProgramTexts() {
+    dir := TempDir()
+    DirCreate(dir "\packages\Pkg\language")
+    DirCreate(dir "\packages\NoTexts")
+    FileAppend("[common]`r`nBoth=from basic`r`nOnly basic=basic`r`n", dir "\basic\en.ini", "UTF-8-RAW")
+    FileAppend("[Pkg]`r`nBoth=from the package`r`nPackage text=pkg`r`n", dir "\packages\Pkg\language\en.ini", "UTF-16")
+    try {
+        Reset("en", dir, dir "\packages")
+        Assert.Equal(Lang("Package_text"), "pkg")
+        Assert.Equal(Lang("Only basic"), "basic")
+        Assert.Equal(Lang("Both"), "from the package", "a package comes after the program texts")
+    } finally {
+        DirDelete(dir, true)
+        Reset()
+    }
+}
+
 CheckMissingFolderGivesKeys() {
     Reset("en", A_Temp "\ahf_lang_no_such_folder")
     try {
@@ -123,5 +160,7 @@ TestRun.Case("the German file (UTF-16) is read; a missing German text falls back
 TestRun.Case("the section language_info holds no texts", CheckLanguageInfoIsNotAText)
 TestRun.Case("texts of further folders are read; a later folder replaces a text; fallback per key", CheckOtherFoldersAndFallback)
 TestRun.Case("without language files every key gives itself", CheckMissingFolderGivesKeys)
+TestRun.Case("the texts of the package Default are found (WI-0047)", CheckTextsOfThePackageDefault)
+TestRun.Case("the language folders of the packages are read after the program texts", CheckPackageFoldersComeAfterTheProgramTexts)
 
 TestRun.Finish()

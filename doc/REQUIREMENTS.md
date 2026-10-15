@@ -402,7 +402,7 @@ Note: an element that waits (REQ-EXE-100) may read a value, wait a long time (fo
 ### REQ-PKG-010 Elements are organised in packages
 
 - **v1:** yes
-- **v2:** partial (the package `Default` with its description and element files, one generated include block per package and role; language files, icons and help are missing)
+- **v2:** partial (the package `Default` with its description, element files, language files and icons, one generated include block per package and role; the help pages are missing)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0047), help: S0007
@@ -1530,7 +1530,7 @@ When a flow uses a package that is not installed, the manager asks the user whet
 - **Plan:** S0004
 - **Evidence:** `tests/ahk/core_lang.test.ahk`
 
-All texts go through `Lang()` with the v1 language files (`assets/language/`). A missing text falls back to the key and is logged (MIGRATION M-0046).
+All texts go through `Lang()` with the v1 language files (`assets/language/`, and `src/elements/<package>/language/` for the texts of the elements, WI-0047). A missing text falls back to the key and is logged (MIGRATION M-0046).
 
 ### REQ-LNG-020 Choice of the language
 
@@ -1545,10 +1545,11 @@ The language is the setting, or the language of Windows when nothing is set.
 ### REQ-LNG-030 Translated element texts
 
 - **v1:** yes (language files per package)
-- **v2:** open
+- **v2:** partial (the language files of the package Default are those of v1 and load in every role; the elements use them as they are ported)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0047), S0008
+- **Evidence:** `tests/ahk/core_lang.test.ahk`
 
 Names, categories and parameter labels of the elements are translated by the language files of their package.
 

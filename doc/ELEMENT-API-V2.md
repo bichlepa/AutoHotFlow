@@ -25,7 +25,7 @@ class Action_Example extends AhfElement {
     static Mode      := "inline"        ; "inline" | "worker" | "trigger"
     static Level     := "Beginner"      ; "Beginner" | "Advanced" | "Programmer"
     static Stability := "Stable"        ; "Stable" | "Experimental"
-    static Icon      := "example.ico"   ; file name under assets/Icons, "" = none
+    static Icon      := "example.ico"   ; file name in Icons/ of the package, "" = none
     static JobTimeoutMs := 0            ; worker only: job deadline in ms, 0 = none (WI-0027, ARCHITECTURE 6.4)
 
     static Name()     => Lang("Example")            ; display name
@@ -72,6 +72,8 @@ class Action_Example extends AhfElement {
 | `package.json` | `name` (the folder name), `version` (`Default`: 1.2.1, as the manifest of v1), `description`, `author`, `website`, `license`. The version is registered with the package (`ElementRegistry.PackageVersion`), so that `package` and `packageVersion` of a flow element can be checked |
 | `Actions/`, `Conditions/`, `Loops/`, `Triggers/` | one class file each, as in v1; the class name starts with `Action_`, `Condition_`, `Loop_` or `Trigger_` according to the folder. A folder exists once the package has an element of that kind |
 | `lib/` | shared code of the classes, no element class and no `Mode` line |
+| `language/<code>.ini` | the texts of the package (the v1 files, unchanged, UTF-16): `Lang()` finds their keys in every role (`core/LangTable.ahk` reads the language folders of all packages after `assets/language`) |
+| `Icons/` | the icons of the classes (`static Icon` is a file name in this folder; the v1 files, unchanged) |
 | `_includes_<role>.ahk` | generated, see below |
 
 `python tools/gen_element_includes.py` writes, per package and per role, the block `<package>/_includes_<role>.ahk`: the files that the selected class files include, then `class <package> { #Include <class file> ... }`, then `ElementRegistry.RegisterPackage(name, version)` and one `ElementRegistry.Register(<package>.<class>)` per class; and, per role, `src/entry/generated/Elements_<role>.ahk` (test packages: `tests/integration/helpers/entry/generated/TestElements_<role>.ahk`), which includes the blocks of all packages and which the role entry includes. The blocks are committed and never edited by hand; `tests/test_element_includes.py` fails when a block is stale or superfluous (`--check`; VS Code task `Tool: generate element include blocks`). No text substitution at run time.

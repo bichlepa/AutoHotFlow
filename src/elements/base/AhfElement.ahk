@@ -12,7 +12,7 @@ class AhfElement {
     static Mode := "inline"          ; "inline" | "worker" | "trigger" (ARCHITECTURE 2.3)
     static Level := "Beginner"       ; "Beginner" | "Advanced" | "Programmer"
     static Stability := "Stable"     ; "Stable" | "Experimental"
-    static Icon := ""                ; file name under assets/Icons, "" = none
+    static Icon := ""                ; file name in Icons/ of the package of the class, "" = none (WI-0047)
     ; Worker elements only: the engine ends the job with the exception "worker timeout" after this many ms and has
     ; the worker killed if it does not react to the cancel (ARCHITECTURE 6.4). 0 = no deadline (v1 had none).
     static JobTimeoutMs := 0

@@ -112,6 +112,26 @@ def test_the_product_has_the_package_default_and_no_test_class():
             assert target.relative_to(ROOT).parts[0] != "tests", (path, inc)
 
 
+def test_every_icon_of_a_class_is_in_the_icons_of_its_package():
+    for folder in (ELEMENTS, TEST_ELEMENTS):
+        for desc in folder.glob("*/package.json"):
+            for kind in KINDS:
+                for path in (desc.parent / kind).glob("*.ahk"):
+                    m = re.search(r'^\s*static\s+Icon\s*:=\s*"([^"]*)"', path.read_text(encoding="utf-8"), re.M)
+                    if m and m.group(1):
+                        assert (desc.parent / "Icons" / m.group(1)).is_file(), (path, m.group(1))
+
+
+def test_the_package_default_has_the_language_files_of_v1():
+    # copied unchanged from the v1 package (WI-0047): UTF-16 with BOM, CRLF (.gitattributes keeps them byte for byte)
+    ours = ELEMENTS / "Default" / "language"
+    assert sorted(p.name for p in ours.glob("*.ini")) == ["de.ini", "en.ini", "ko.ini", "ru.ini"]
+    for path in ours.glob("*.ini"):
+        data = path.read_bytes()
+        assert data[:2] == bytes([0xFF, 0xFE]), path.name
+        assert "[language_info]" in data.decode("utf-16"), path.name
+
+
 def test_the_package_default_has_the_version_of_v1():
     desc = json.loads((ELEMENTS / "Default" / "package.json").read_text(encoding="utf-8"))
     assert desc["name"] == "Default" and desc["version"] == "1.2.1"

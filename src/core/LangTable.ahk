@@ -4,9 +4,10 @@
 ; Translated texts (E0028, WI-0042): the port of v1 lang() (v1/language/language.ahk) for every role. Elements and the
 ; engine call the global function Lang(key, args*) (Lang.ahk), which uses this table.
 ;
-; The texts are the v1 files, unchanged: assets/language/<folder>/<code>.ini (basic: the texts of the program;
-; more folders, e.g. the element texts, come with S0002). Each folder may have a file per language. A line
-; "key=text" defines a text; section lines ("[common]") are ignored, and so is the section [language_info].
+; The texts are the v1 files, unchanged: assets/language/<folder>/<code>.ini (basic: the texts of the program), and
+; the texts of the element packages, src/elements/<package>/language/<code>.ini (WI-0047; Default: the files of the v1
+; package Default). Each folder may have a file per language. A line "key=text" defines a text; section lines
+; ("[common]") are ignored, and so is the section [language_info].
 ;
 ; As in v1 (lang() with readAll):
 ;   - "_" in a key is a space: Lang("Parameter_is_empty") finds "Parameter is empty".
@@ -22,6 +23,7 @@ class LangTable {
     static Code := "en"               ; the language (S0004: setting UILanguage)
     static Fallback := "en"
     static Dir := ""                  ; folder with the language folders; "" = assets\language of the program
+    static PackagesDir := ""          ; folder with the element packages; "" = src\elements of the program
     static _texts := ""               ; Map key -> text of Code, or "" before the first load
     static _fallbackTexts := ""
 
@@ -54,9 +56,11 @@ class LangTable {
     }
 
     static DefaultDir() => RegExReplace(A_LineFile, "\\src\\core\\[^\\]+$") "\assets\language"
+    static DefaultPackagesDir() => RegExReplace(A_LineFile, "\\src\\core\\[^\\]+$") "\src\elements"
 
-    ; Map key -> text of one language from every folder, folder "basic" first, then the others by name. A later
-    ; line with the same key replaces an earlier one, as in v1. A missing or unreadable file is skipped (f3 log).
+    ; Map key -> text of one language from every folder, folder "basic" first, then the others by name, then the
+    ; language folders of the element packages by name. A later line with the same key replaces an earlier one, as in
+    ; v1. A missing or unreadable file is skipped (f3 log).
     static _Read(code) {
         texts := Map()
         texts.CaseSense := "Off"           ; v1 keys are keys of an AutoHotkey v1 object: case does not matter
@@ -66,8 +70,13 @@ class LangTable {
             if (A_LoopFileName != "basic")
                 folders.Push(A_LoopFileName)
         }
-        for folder in folders {
-            path := dir "\" folder "\" code ".ini"
+        paths := []
+        for folder in folders
+            paths.Push(dir "\" folder "\" code ".ini")
+        packages := (LangTable.PackagesDir != "") ? LangTable.PackagesDir : LangTable.DefaultPackagesDir()
+        loop files packages "\*", "D"     ; arch-ok: file-io language files of the element packages, read once (ARCHITECTURE 4)
+            paths.Push(A_LoopFileFullPath "\language\" code ".ini")
+        for path in paths {
             if (!FileExist(path))
                 continue
             try {

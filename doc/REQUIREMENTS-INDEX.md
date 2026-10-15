@@ -16,7 +16,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [Editor (EDT)](#editor-edt) | 21 | 0 | 0 | 1 | 20 | 0 | 0 |
 | [Settings (SET)](#settings-set) | 7 | 1 | 0 | 2 | 4 | 0 | 0 |
 | [Import and migration (MIG)](#import-and-migration-mig) | 7 | 5 | 0 | 0 | 2 | 0 | 0 |
-| [Languages and help (LNG)](#languages-and-help-lng) | 5 | 0 | 0 | 1 | 4 | 0 | 0 |
+| [Languages and help (LNG)](#languages-and-help-lng) | 5 | 0 | 0 | 2 | 3 | 0 | 0 |
 | [Logging and diagnostics (DIA)](#logging-and-diagnostics-dia) | 5 | 4 | 0 | 1 | 0 | 0 | 0 |
 | [Debugger (DBG)](#debugger-dbg) | 5 | 0 | 0 | 0 | 5 | 0 | 0 |
 | [AI integration (AI)](#ai-integration-ai) | 5 | 0 | 0 | 0 | 5 | 0 | 0 |
@@ -27,7 +27,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 2 | 1 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 7 | 0 | 0 | 1 | 6 | 0 | 0 |
-| **All** | **184** | **53** | **1** | **25** | **104** | **1** | **3** |
+| **All** | **184** | **53** | **1** | **26** | **103** | **1** | **3** |
 
 ## Flows and execution (EXE)
 
@@ -196,7 +196,7 @@ run the tool. The legend of the columns is at the top of the source.
 |---|---|---|---|---|---|---|
 | [REQ-LNG-010](REQUIREMENTS.md#req-lng-010-user-interface-in-several-languages) | User interface in several languages | yes | partial | must | port | S0004 |
 | [REQ-LNG-020](REQUIREMENTS.md#req-lng-020-choice-of-the-language) | Choice of the language | yes | open | must | port | S0004 |
-| [REQ-LNG-030](REQUIREMENTS.md#req-lng-030-translated-element-texts) | Translated element texts | yes | open | must | port | S0002 (WI-0047), S0008 |
+| [REQ-LNG-030](REQUIREMENTS.md#req-lng-030-translated-element-texts) | Translated element texts | yes | partial | must | port | S0002 (WI-0047), S0008 |
 | [REQ-LNG-040](REQUIREMENTS.md#req-lng-040-help-pages) | Help pages | yes | open | must | port | S0007 |
 | [REQ-LNG-050](REQUIREMENTS.md#req-lng-050-translation-tools-for-contributors) | Translation tools for contributors | yes | open | could | port | - |
 
