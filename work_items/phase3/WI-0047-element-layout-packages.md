@@ -36,3 +36,20 @@ README of this phase (E0035, E0037, E0045), `doc/REQUIREMENTS.md` REQ-PKG-060, r
 ## Not part of this
 
 The core-set elements, help texts in the editor (S0007).
+
+## Result (2026-10-15)
+
+**Done:** tasks 1 to 8.
+
+- **Layout (1):** `src/elements/Default/` with `package.json` (name, version 1.2.1 as the v1 manifest, description, author, website, license), `Actions/` (`Action_Sleep`, `Action_Do_nothing`), `Triggers/` (`Trigger_Manual`); `Conditions/` and `Loops/` come with their first element. `elements/skeleton/` is gone.
+- **Generated blocks (2, 8):** `tools/gen_element_includes.py` writes per package and role `<package>/_includes_<role>.ahk` (the hoisted includes, `class <package> { #Include ... }`, `RegisterPackage`, `Register(<package>.<class>)`) and per role `src/entry/generated/Elements_<role>.ahk` (test set: `TestElements_<role>.ahk`). `--check` fails on a stale, missing or superfluous block (`tests/test_element_includes.py`). Rule in CONVENTIONS 1.
+- **Test elements (3):** the package `Test` below `tests/elements/` (15 classes, shared code in `lib/`), and `TestTwin` with two classes of the same names as in `Test`. A probe checks that the product engine block registers no `Action_Test*` class.
+- **Language and icons (4):** the four v1 language files and the seven icons of the v1 package Default, unchanged (`-text`/`binary` in `.gitattributes`). `LangTable` reads `src/elements/<package>/language/<code>.ini` after `assets/language`; `Lang("ms #Milliseconds")` gives `ms` (`tests/ahk/core_lang.test.ahk`).
+- **Sleep and Manual (5):** parameters, `GenerateName`, names and language keys of v1; Sleep evaluates with `ctx.EvalParams` (a missing Unit is the default index 2, seconds).
+- **Unknown packages (6):** load like an unknown class (kept, `v1Text` on save of a v1 file), `exception` "element class 'P.C' is not available: package 'P' is not installed" when run.
+- **VS Code (7):** `Tool: generate element include blocks`, `Tool: check element include blocks (no write, --check)`.
+- **Qualified ID (8):** the type name `Default.Action_Sleep`; registry keyed by it (case-insensitive), lookup by `package` and `class` (missing package is Default), worker jobs, logs and the migration report use it; `cmd.trigger.arm` is documented (PROTOCOL 4.4), there is no trigger host code yet (S0003).
+
+**Decisions of this package:** the package class has the name of the package unchanged (no prefix), so the type name is the qualified ID; a package name must be a safe AutoHotkey class name, checked by the generator (ELEMENT-API-V2 section 2). The test elements are a package of their own (`Test`), not part of `Default`; tests name them through `tests/support/elements.py` (a plain `Action_Test*` class is in `Test`). The registry refuses a class outside a package. `Trigger_Manual` has the default ID `""` (v1: a random phrase, a job of the editor, S0007).
+
+**Load path (F-0073, E0042):** `tests/stress/test_big_flows.py -m stress -n 0 -s`, 200 flows, 12.1 MB: on `956ce9b` ready after 61.6 s and 54.8 s (two runs), largest snapshot answer during loading 656 ms and 624 ms; on the base `8c09337` in the same session 52.6 s and 703 ms. Within the budget of 3 s; the time to ready is 4 to 17 % above the base in these runs (the Sleep elements of the flows are converted now, and the first `Lang` call reads the package texts).

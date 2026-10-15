@@ -44,6 +44,8 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0083 | Fast tier: the expression oracle's time budget of the fixed corpus (`assert seconds < 15`) measured 16.6 s | observed once, run 20261015-172551-99e2c044 on `1aceedd`, open | |
 | F-0084 | Slow tier: a frozen child is terminated 5.08 s after the hang (budget 4.0 s) | observed once, run 20261015-172954-99e2c044 on `1aceedd`, open | |
 | F-0085 | Foundation tier: the crasher restarts 4 times (`evt.process.started`), 3 expected | observed once, run 20261015-173445-99e2c044 on `1aceedd`, open | |
+| F-9000* | Foundation tier: `child_launcher.test.ahk` case "stdin of the child is NUL": `findstr` did not end within 10 s | observed once under load, run 20261015-201039-acc9907a on `acc9907`, green alone, open | |
+| F-9001* | Slow tier: `test_clients_churn.py` smoke variant got 13 snapshot probes during the churn, 20 required | observed once under load, run 20261015-201045-acc9907a on `acc9907`, green alone, open | |
 
 
 ## Findings
@@ -272,6 +274,18 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **What:** `tests/integration/test_supervisor.py::test_crashed_child_is_reported_within_1s_restarted_by_policy_and_others_are_untouched` failed with `assert len(watch.find(event("evt.process.started", name="crasher"))) == RESTART_LIMIT`: 4 instead of 3. The test comment says the first start predates the subscription and is not replayed, so either the first start was replayed this time or there was one more restart.
 **Status:** observed once, run 20261015-173445-99e2c044 on `1aceedd` (foundation tier, one run). An earlier slow run of the same test family had a similar count (on `0022025`, the implementer's run: 4 instead of 3, passed 3 of 3 alone). Suspicion (assumed): a race between the subscription and the first start event in the supervisor test helper. Not checked in the run log.
 **Action:** read the `pytest-log` of run 20261015-173445-99e2c044 for the `evt.process.started` lines before the subscription; if the first start is replayed, the test's assumption is wrong.
+
+### F-9000*: a child of ChildLauncher did not end within 10 s although its stdin is NUL
+
+**What:** `tests/ahk/child_launcher.test.ahk`, case "stdin of the child is NUL, it does not wait for input" (`CheckStdinIsNul`): `findstr x`, started with `ChildLauncher.Start`, had not ended after 10 s (`EndedWithin(..., 10000)`), message "the child waits for input".
+**Status:** observed once, run 20261015-201039-acc9907a on `acc9907` (foundation tier through `tools/run_suite.py`, at the same time as a slow-tier run of the same machine and the test runs of another agent). Green alone right after (`-n 0 -k child_launcher`, 11 passed). The change under test (WI-0047, element packages) does not touch `src/supervisor/` or `ChildLauncher`. Suspicion (assumed): load; but 10 s is long for a process start and an end of input, so a stdin that is sometimes not NUL is not excluded. Not checked.
+**Action:** run the case in a loop under load (two suites at once); if it fails again, log the handles of the child (stdin type) at the failure.
+
+### F-9001*: the client churn smoke test gets too few snapshot probes under load
+
+**What:** `tests/stress/test_clients_churn.py::test_clients_connecting_and_leaving_do_not_disturb_the_engine_or_leak[smoke]` failed with `assert len(latencies) >= 20`: 13 probe requests (answers 45 to 153 ms) during the churn. No error, no restart, no leak was reported before that assertion.
+**Status:** observed once, run 20261015-201045-acc9907a on `acc9907` (slow tier, next to a foundation-tier run and another agent). Green alone right after. Suspicion (assumed): load; the number of probes depends on how fast the churn ends. Not checked.
+**Action:** if it returns on an idle machine, count probes per second instead of an absolute number.
 
 ## Watch list (E0007)
 
