@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\core\Errors.ahk
 #Include ..\..\core\Lang.ahk      ; element files call Lang() in Name() and Parameters(); every role that holds element classes needs it
+#Include Dialogs.ahk              ; the only way for an element to show a dialog (E0038, WI-0051)
 
 ; Base class of every element (doc/ELEMENT-API-V2.md section 2). Elements are stateless: all
 ; members are static, the state of one run lives in ctx.State. Subclasses override what they need.

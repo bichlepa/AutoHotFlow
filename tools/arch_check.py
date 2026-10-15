@@ -24,7 +24,7 @@ from pathlib import Path, PurePosixPath
 REPO = Path(__file__).resolve().parent.parent
 
 RULES = ("requires", "one-class", "include-core", "include-roles", "include-tests", "dialog", "file-io",
-         "blocking", "inline-element", "warn", "critical", "empty-catch", "builtin-class", "wire-bool")
+         "blocking", "inline-element", "warn", "critical", "empty-catch", "builtin-class", "wire-bool", "dialog-seam")
 
 # Folders under src/ that are libraries, not process roles.
 LIB_DIRS = {"core", "elements", "ui_common", "expr"}
@@ -141,6 +141,11 @@ def role_of(relpath):
 
 NOT_MEMBER = r"(?<![\w.%])"  # not a method call (Foo.Sleep), not part of a longer name
 DIALOG_RE = re.compile(NOT_MEMBER + r"(MsgBox|InputBox|FileSelect|DirSelect)\b(?!\s*:=)")
+# Rule dialog-seam (E0038, WI-0051): an element calls a dialog function directly, or src/ registers a dialog provider.
+# SEAM_FILE is the indirection itself: it calls the real functions and is exempt from the rules "dialog" and "dialog-seam".
+SEAM_CALL_RE = re.compile(NOT_MEMBER + r"(MsgBox|InputBox|ToolTip|TrayTip|FileSelect|DirSelect)\s*\(")
+SEAM_PROVIDER_RE = re.compile(NOT_MEMBER + r"Dialogs\s*\.\s*UseProvider", re.I)
+SEAM_FILE = "elements/base/Dialogs.ahk"
 FILEIO_RE = re.compile(NOT_MEMBER + r"(FileRead|FileAppend|FileOpen|FileDelete|FileMove|FileCopy|DirCreate|"
                        r"DirDelete|DirMove|DirCopy)\b(?!\s*:=)|\bLoop[\s,]+(Files|Read)\b", re.I)
 SLEEP_RE = re.compile(NOT_MEMBER + r"Sleep\b(?!\s*:=)\s*\(?\s*([^\s,)]*)")
@@ -279,8 +284,14 @@ def check_text(relpath, text):
             if role != "worker":
                 add(pos, "blocking", label)
 
-    for m in DIALOG_RE.finditer(code):
-        forbid("dialog", m.start(), m.group(1) + " (dialog)")
+    if relpath != SEAM_FILE:
+        for m in DIALOG_RE.finditer(code):
+            forbid("dialog", m.start(), m.group(1) + " (dialog)")
+        if role == "elements":
+            for m in SEAM_CALL_RE.finditer(code):
+                add(m.start(), "dialog-seam", m.group(1) + "( called directly, use Dialogs." + m.group(1))
+        for m in SEAM_PROVIDER_RE.finditer(code):
+            add(m.start(), "dialog-seam", "Dialogs.UseProvider is for the test entries only")
     for m in FILEIO_RE.finditer(code):
         forbid("file-io", m.start(), (m.group(1) or m.group(0)) + " (file access)")
     for m in SLEEP_RE.finditer(code):

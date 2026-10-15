@@ -62,6 +62,9 @@ CASES = [
     ("builtin-class", "core/A.ahk", "class TimeoutError extends Error {\n}\n", "class AhfTimeoutError extends Error {\n}\n"),
     ("wire-bool", "engine/A.ahk", "class A {\n    M() {\n        return Map(\"enabled\", true)\n    }\n}\n",
      "class A {\n    M() {\n        return Map(\"enabled\", Json.True, \"ok\", true)\n    }\n}\n"),
+    ("dialog-seam", "elements/Default/Actions/A.ahk",
+     "class A {\n    static Mode := \"worker\"\n    M() {\n        ToolTip(\"x\")\n    }\n}\n",
+     "class A {\n    static Mode := \"worker\"\n    M() {\n        Dialogs.ToolTip(\"x\")\n    }\n}\n"),
     ("arch-ok", "engine/A.ahk", "; arch-ok: dialog\nclass A {\n}\n", "; arch-ok: dialog a dialog is needed here\nclass A {\n}\n"),
 ]
 
@@ -73,6 +76,19 @@ def test_rule_hits_and_misses(rule, relpath, bad, good):
     bad = bad.replace("class A", "class " + stem)
     assert rule in rules(relpath, bad), f"{rule}: expected a hit"
     assert rule not in rules(relpath, good), f"{rule}: expected no hit"
+
+
+def test_dialog_seam_details():
+    worker = "class A {\n    static Mode := \"worker\"\n    M() {\n        %s\n    }\n}\n"
+    path = "elements/Default/Actions/A.ahk"
+    assert "dialog-seam" in rules(path, worker % "MsgBox(\"x\")")
+    assert "dialog-seam" not in rules(path, worker % "Dialogs.MsgBox(\"x\")")
+    # the seam itself is the one place with the direct calls
+    seam = "class Dialogs {\n    M() {\n        MsgBox(\"x\")\n        ToolTip(\"y\")\n    }\n}\n"
+    assert not [r for r in rules("elements/base/Dialogs.ahk", seam) if r.startswith("dialog")]
+    # a provider is registered by the test entries, never by src/
+    assert "dialog-seam" in rules("engine/A.ahk", "class A {\n    M() {\n        Dialogs.UseProvider(P())\n    }\n}\n")
+    assert "dialog-seam" in rules(path, worker % "Dialogs.UseProvider(P())")
 
 
 def test_requires_hit_and_miss():

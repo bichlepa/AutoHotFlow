@@ -314,6 +314,13 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Status:** verified (probe script with `#Warn All, StdOut`, 2026-10-15)
 - **Source:** `src/elements/base/ElementRegistry.ahk`
 
+### A static property and a nested class share one namespace, ignoring case
+
+- **Problem:** `Dialogs` has the nested class `Real` and a `static real := ""` for the instance. The script did not load: "Duplicate declaration. Specifically: Real".
+- **Right:** Names of members and nested classes are not case-sensitive and live in one namespace: give the property another name (`_realDialogs`).
+- **Status:** verified (load error in the session, 2026-10-15)
+- **Source:** `src/elements/base/Dialogs.ahk`
+
 ## Objects, Maps, Arrays
 
 ### Map with `CaseSense "Off"` keeps the spelling of the first insertion
