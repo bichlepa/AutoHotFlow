@@ -341,6 +341,16 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: generate the element include blocks of the role entries (gen_element_includes.py)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/gen_element_includes.py"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: R0003 measurement, parse time and memory with N element classes (run alone, about 6 min)",
             "type": "shell",
             "command": "python",
