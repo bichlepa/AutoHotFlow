@@ -29,6 +29,7 @@ from pathlib import Path
 
 import pytest
 
+from support import admission, runrecord
 from support import ahk as ahk_locator
 from support import wirebool
 from support.procs import ProcessTracker
@@ -40,11 +41,14 @@ RUN_COUNTER = itertools.count(1)
 @pytest.hookimpl(tryfirst=True)
 def pytest_cmdline_main(config):
     """Measurements must never run in parallel with other load (idle CPU, latency, memory): a run that asks
-    for stress or soak tests (-m stress / -m soak) is switched to a single process, whatever pytest.ini says."""
+    for stress or soak tests (-m stress / -m soak) is switched to a single process, whatever pytest.ini says.
+    Then the machine-wide admission (WI-0059, tests/support/runrecord.py): it may wait, and it sets the number of
+    xdist workers before xdist reads it (this hook runs before the tryfirst hook of xdist, verified)."""
     asked = config.getoption("markexpr") or ""
-    if ("stress" in asked or "soak" in asked) and getattr(config.option, "numprocesses", 0):
+    if admission.is_exclusive_markexpr(asked) and getattr(config.option, "numprocesses", 0):
         config.option.numprocesses = 0
         config.option.dist = "no"
+    return runrecord.begin(config)
 
 
 # Foundation tier: tests of the base that later work packages are not expected to change (IPC, process
@@ -260,6 +264,12 @@ def pytest_sessionstart(session):
 def pytest_runtest_logreport(report):
     """Controller side (the reports of the workers arrive here too): results list and failures/<test>.txt."""
     config = _CONFIG[0]
+    recorder = runrecord.recorder_of(config)
+    if recorder is not None:
+        try:
+            recorder.logreport(report)
+        except Exception:       # an exception in a hook aborts the whole xdist run (INTERNALERROR)
+            pass
     results = getattr(config, "_ahf_results", None)
     run_dir = _runlog_dir() if results is not None else None
     if run_dir is None:
@@ -285,6 +295,9 @@ def pytest_runtest_logreport(report):
 
 def pytest_sessionfinish(session, exitstatus):
     config = session.config
+    recorder = runrecord.recorder_of(config)
+    if recorder is not None:
+        recorder.finish_record(exitstatus)          # frees the admission slots, writes the history record
     guard = getattr(config, "_ahf_guard_dir", None)
     if guard:
         shutil.rmtree(guard, ignore_errors=True)
@@ -318,6 +331,16 @@ def pytest_terminal_summary(terminalreporter):
     run_dir = os.environ.get(RUNLOG_ENV)
     if run_dir and getattr(terminalreporter.config, "_ahf_results", None):
         terminalreporter.write_line("Run log: " + run_dir)
+    recorder = runrecord.recorder_of(terminalreporter.config)
+    if recorder is not None:
+        for line in recorder.summary_lines():
+            terminalreporter.write_line(line)
+
+
+def pytest_unconfigure(config):
+    recorder = runrecord.recorder_of(config)
+    if recorder is not None:
+        recorder.unconfigure()
 
 
 @pytest.fixture(autouse=True)
