@@ -475,11 +475,14 @@ def test_crashed_child_is_reported_within_1s_restarted_by_policy_and_others_are_
         # The policy restarts it RESTART_LIMIT times, then gives up.
         final = None
         armed = set()
+        first_pid = None
         end = time.monotonic() + 40
         while time.monotonic() < end:
             crasher = {p["name"]: p for p in process_list(py)}.get("crasher")
             if crasher and crasher["state"] == "ready" and crasher["pid"] not in armed:
                 armed.add(crasher["pid"])
+                if first_pid is None:
+                    first_pid = crasher["pid"]
                 threads.append(start_watch_death(crasher["pid"], deaths))
                 request_ok(py, "crasher", "cmd.test.arm", {})
             crashes = watch.find(event("evt.process.crashed", name="crasher"))
@@ -502,8 +505,10 @@ def test_crashed_child_is_reported_within_1s_restarted_by_policy_and_others_are_
         time.sleep(1.5)
         final_list = {p["name"]: p for p in process_list(py)}["crasher"]
         assert final_list["state"] == "crashed" and final_list["restarts"] == RESTART_LIMIT, final_list
-        # the first start happened before the subscription and is not replayed (see wait_ready)
-        assert len(watch.find(event("evt.process.started", name="crasher"))) == RESTART_LIMIT
+        # The first start may or may not predate the subscription (the supervisor starts the crasher at the
+        # same time as this client connects), so the first incarnation is left out of the count (F-0085).
+        started = watch.find(event("evt.process.started", name="crasher"))
+        assert len([m for _, m in started if m["payload"]["pid"] != first_pid]) == RESTART_LIMIT,             [m["payload"] for _, m in started]
         # each crash is reported within 1 s of the death of that process
         for t_event, m in crashes:
             pid = m["payload"]["pid"]
