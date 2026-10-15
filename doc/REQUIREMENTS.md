@@ -855,7 +855,7 @@ Dialogs run separately from the flows (MIGRATION M-0002) and can be answered by 
 
 The loop over files is in REQ-ELM-240.
 
-### REQ-ELM-310 Ini files
+### REQ-ELM-310 Structured data files
 
 - **v1:** yes
 - **v2:** open
@@ -868,6 +868,11 @@ The loop over files is in REQ-ELM-240.
 | `Action_Read_From_Ini` | yes | open | S0008 |
 | `Action_Write_to_ini` | yes | open | S0008 |
 | `Action_Delete_From_Ini` | yes | open | S0008 |
+| JSON: read a file or text into an object, write an object as JSON | no | open | later |
+| YAML: read and write | no | open | later |
+| XML: read, query (XPath) and write | no | open | later |
+
+JSON text can also be converted in an expression (REQ-SCR-010).
 
 ### REQ-ELM-320 Archives
 
@@ -1000,6 +1005,10 @@ The loop over files is in REQ-ELM-240.
 | `Action_Kill_Process` | yes | open | S0008 |
 | `Action_Set_Process_Priority` | yes | open | S0008 |
 | `Condition_Process_Is_Running` | yes | open | S0008 |
+| Run a program and get its output (stdout, stderr) and its exit code | no | open | later |
+| Talk to a console program: send input and read its output while it runs | no | open | later |
+
+Talking to a console program is an element of its own, because it is much more complex than running a program: the program runs on while the flow sends input and reads output.
 
 ### REQ-ELM-400 Power and session
 

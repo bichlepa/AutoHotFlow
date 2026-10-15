@@ -97,7 +97,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-ELM-280](REQUIREMENTS.md#req-elm-280-date-and-time) | Date and time | yes | open | must | port | S0008 |
 | [REQ-ELM-290](REQUIREMENTS.md#req-elm-290-clipboard) | Clipboard | yes | open | must | port | S0008 |
 | [REQ-ELM-300](REQUIREMENTS.md#req-elm-300-files-and-folders) | Files and folders | yes | open | must | port | S0008 |
-| [REQ-ELM-310](REQUIREMENTS.md#req-elm-310-ini-files) | Ini files | yes | open | must | port | S0008 |
+| [REQ-ELM-310](REQUIREMENTS.md#req-elm-310-structured-data-files) | Structured data files | yes | open | must | port | S0008 |
 | [REQ-ELM-320](REQUIREMENTS.md#req-elm-320-archives) | Archives | yes | open | must | port | S0008 |
 | [REQ-ELM-330](REQUIREMENTS.md#req-elm-330-drives) | Drives | yes | open | should | port | S0008 |
 | [REQ-ELM-340](REQUIREMENTS.md#req-elm-340-internet) | Internet | yes | open | must | port | S0008 |
