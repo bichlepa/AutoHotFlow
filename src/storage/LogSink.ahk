@@ -40,11 +40,11 @@ class LogSink {
                 DirCreate(logDir)
             filePath := logDir "\" fileName
             LogSink._RotateIfBig(filePath)
-            file := FileOpen(filePath, "a", "UTF-8-RAW")
+            logFile := FileOpen(filePath, "a", "UTF-8-RAW")
             try {
-                file.Write(line)
+                logFile.Write(line)
             } finally {
-                file.Close()
+                logFile.Close()
             }
         } catch OSError as e {
             if (LogSink.IsBusy(e))

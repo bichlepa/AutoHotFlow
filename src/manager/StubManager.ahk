@@ -216,25 +216,25 @@ class StubManager extends Role {
         this.epoch := ep
         this.lastSeq := sq
         recs := Map()
-        ids := []
+        idList := []
         for f in p.Get("flows", []) {
             id := f["flowId"]
             recs[id] := Map("name", f.Get("name", ""), "enabled", f.Get("enabled", 0)
                 , "executing", f.Get("executing", 0), "rev", f.Get("rev", 0))
-            ids.Push(id)
+            idList.Push(id)
         }
         this.flowRecs := recs
-        this.flowIds := ids
+        this.flowIds := idList
         for id, _ in this.elementRecs.Clone()
             if (!recs.Has(id))
                 this.elementRecs.Delete(id)
-        for id in ids {
+        for id in idList {
             if (!this.flowTopics.Has(id)) {
                 this.flowTopics[id] := true
                 this.peer.Subscribe("flow:" id)
             }
         }
-        this._Ui("stub.snapshot", Map("reason", reason, "ok", Json.True, "epoch", ep, "seq", sq, "flows", ids.Length))
+        this._Ui("stub.snapshot", Map("reason", reason, "ok", Json.True, "epoch", ep, "seq", sq, "flows", idList.Length))
         this.dirty := true
     }
 

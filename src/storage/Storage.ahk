@@ -193,10 +193,10 @@ class Storage extends Role {
         if (payload["ok"])
             return
         code := payload["error"]["code"]
-        message := payload["error"]["message"]
-        this._Log("a0", "storage", opName " '" subject "' failed (" code "): " message)
+        msgText := payload["error"]["message"]
+        this._Log("a0", "storage", opName " '" subject "' failed (" code "): " msgText)
         this.peer.Send("topic:engine", "evt.storage.error"
-            , Map("op", opName, "path", subject, "code", code, "message", message))
+            , Map("op", opName, "path", subject, "code", code, "message", msgText))
     }
 
     ; --- operations (run inside the queue, one at a time) ------------------------------------
