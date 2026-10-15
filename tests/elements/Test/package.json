@@ -1,0 +1,6 @@
+{
+    "name": "Test",
+    "description": "Test elements of AutoHotFlow. Only the test entries include them, never the product.",
+    "license": "Unlicense",
+    "version": "1.0.0"
+}

@@ -24,6 +24,7 @@ from pathlib import Path
 import psutil
 
 from support import pipenames
+from support.elements import split as split_class
 from support.ahfclient import AhfClient
 from support.timing import scaled
 
@@ -158,7 +159,7 @@ def write_flow(datadir, name, element_class=None, pars=None):
     flow["name"] = name
     if element_class is not None:
         element = flow["allElements"]["element0000000002"]
-        element["class"] = element_class
+        element["package"], element["class"] = split_class(element_class)
         element["name"] = element_class
         element["pars"] = dict(pars or {})
     path = Path(datadir) / "Flows" / (name + ".json")

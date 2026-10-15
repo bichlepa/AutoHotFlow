@@ -402,10 +402,11 @@ Note: an element that waits (REQ-EXE-100) may read a value, wait a long time (fo
 ### REQ-PKG-010 Elements are organised in packages
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the package `Default` with its description and element files, one generated include block per package and role; language files, icons and help are missing)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0047)
+- **Plan:** S0002 (WI-0047), help: S0007
+- **Evidence:** `tests/test_element_includes.py`, `tests/ahk/element_registry.test.ahk`
 
 A package has a manifest (name, version, author, license, libraries, element lists), its element files, icons, language files and help. Flows store the package and its version per element. Phase 3 has only the package `Default` (E0037).
 
@@ -454,10 +455,11 @@ Open point (assumed, not checked): AutoHotkey reads all `#Include` files when a 
 ### REQ-PKG-060 The package name is part of the identity of an element
 
 - **v1:** partial (the flow files store the package of each element, but the class name alone identifies it)
-- **v2:** open
+- **v2:** implemented (registry, flow lookup, worker jobs and logs use `<package>.<class>`; not yet tested with a run of two packages)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0002 (WI-0047, decision E0045)
+- **Evidence:** `tests/ahk/element_registry.test.ahk`, `tests/test_element_includes.py::test_two_packages_with_a_class_of_the_same_name_load_in_one_process`
 
 Every element is identified by its package and its class, also the elements of v1. So elements of different packages may have the same class name.
 
@@ -466,7 +468,7 @@ The flow files need nothing new: v1 already writes `package` for every element (
 What is more than a file question:
 
 - **AutoHotkey class names are global.** Two classes with the same name in one script are a load error ("This class declaration conflicts with an existing Class", verified). The class of an element therefore needs the package in its name. Nested classes do this: `class Default { class Action_Sleep ... }` has the type name `Default.Action_Sleep` (verified), which is the qualified ID at the same time. The package class includes the element files in its body, so an element file stays one class (verified).
-- **Every place that names a class carries the qualified ID:** the element registry (today keyed by the class ID alone, `src/elements/base/ElementRegistry.ahk`), the worker jobs and the trigger arming (`PROTOCOL.md` 4.4 and 4.5), logs, and elements that look up other elements by class (v1 `x_getAllElementIDsOfClass`, `Action_Set_element_parameter`).
+- **Every place that names a class carries the qualified ID:** the element registry (`src/elements/base/ElementRegistry.ahk`, keyed by the qualified ID since WI-0047), the worker jobs and the trigger arming (`PROTOCOL.md` 4.4 and 4.5), logs, and elements that look up other elements by class (v1 `x_getAllElementIDsOfClass`, `Action_Set_element_parameter`; they come in S0008 and must use the qualified ID).
 
 Doing this together with the package layout of WI-0047 is cheaper than changing it later, when many element classes exist.
 

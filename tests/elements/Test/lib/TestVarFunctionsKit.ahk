@@ -1,9 +1,9 @@
 #Requires AutoHotkey v2.0
-#Include ..\..\src\core\Json.ahk
+#Include ..\..\..\..\src\core\Json.ahk
 
 ; Shared helpers of Action_TestVarFunctions (inline) and Action_TestVarFunctionsWorker (worker), WI-0050: the calls of
-; every variable function and the report of their results. No element class and no ElementRegistry.Register here: a
-; class file that includes this file must not register a class in a role that does not hold it (F-0081, E0041).
+; every variable function and the report of their results. A file in lib/ of a package is shared code, no element
+; class: the generator includes it before the package class (WI-0047), in every role that holds one of the two classes.
 ; See Action_TestVarFunctions.ahk for what the report means.
 class TestVarFunctionsKit {
     static Exercise(ctx) {

@@ -1,0 +1,8 @@
+{
+    "name": "Default",
+    "description": "Default AutoHotFlow elements",
+    "author": "Paul Bichler (bichlepa)",
+    "website": "https://github.com/bichlepa/AutoHotFlow",
+    "license": "Unlicense",
+    "version": "1.2.1"
+}

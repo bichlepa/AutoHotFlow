@@ -292,6 +292,28 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Status:** verified (probe scripts in the v1 interpreter and in v2 with `ahkrun.py`); MIGRATION M-0048
 - **Source:** `src/elements/base/ParamEvaluator.ahk` (`V1AtLeast`)
 
+### A nested class has no global name: inside an element class use `this`
+
+- **Problem:** Since WI-0047 an element class is nested in the class of its package (`class Default { class Action_Sleep ... }`). A static method that called its own class by name (`Action_Sleep.ToMs(params)`, `Action_TestSetVar.Plain(item)`) failed at run time with "This local variable has not been assigned a value" (`UnsetError`); with `#Warn` the load already warned "This local variable appears to never be assigned a value. Specifically: Action_A".
+- **Wrong:** `static Run(ctx, params) => Action_Sleep.ToMs(params)` inside the package class.
+- **Right:** `this.ToMs(params)`: in a static method `this` is the class (also inside a fat-arrow lambda of the method). From outside, the full name: `Default.Action_Sleep`. `tools/gen_element_includes.py` refuses a class file that names its own class.
+- **Status:** verified (probe script, 2026-10-15; test case in `tests/test_element_includes.py`)
+- **Source:** `src/elements/Default/Actions/Action_Sleep.ahk`
+
+### `#Include` inside a class body: a file is included only once, so include it before the class
+
+- **Problem:** The package class includes the element files in its body. An element file itself includes `AhfElement.ahk` and shared code. An `#Include` of a file that was not included before would put that file into the class body: a class there becomes a nested class (`Default.AhfElement`), code at file level a load error.
+- **Right:** Include every file that the element files include before the class (the generator does this), with the same file: AutoHotkey includes a file only once (resolved path), so the `#Include` lines inside the body are then skipped, whatever the relative spelling. `#Requires` inside the body is harmless. `#IncludeAgain` would include it again inside the body; the generator refuses it.
+- **Status:** verified (probe script with `#Include ..\..\base\Base.ahk` inside a class body after the same file at file level, 2026-10-15)
+- **Source:** `tools/gen_element_includes.py`, `src/elements/Default/_includes_engine.ahk`
+
+### A package class is a global name: a local variable `default` shadows `Default`
+
+- **Problem:** The package `Default` is the global class `Default`. A local variable or parameter `default` (common in code: `Get(key, default := "")`) is the same identifier (not case-sensitive). In that function `Default.Action_Sleep` then reads the local variable. With `#Warn All` an assigned local `default` gives the warning "This local variable has the same name as a global variable" (a parameter does not).
+- **Right:** Do not refer to a package class in a function with a local of the same name; code outside the elements reaches classes through `ElementRegistry` (by qualified ID) anyway. `default` is not a reserved word: `class Default` loads, `switch ... default:` still works.
+- **Status:** verified (probe script with `#Warn All, StdOut`, 2026-10-15)
+- **Source:** `src/elements/base/ElementRegistry.ahk`
+
 ## Objects, Maps, Arrays
 
 ### Map with `CaseSense "Off"` keeps the spelling of the first insertion
@@ -551,7 +573,7 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Wrong:** Assuming a long wait is blind to messages. A single `DllCall` is indeed blind, but AHK handles messages between command lines.
 - **Right:** Split long waits into short steps (100 ms). The latency is then the length of the longest step.
 - **Status:** verified (measurement: cancel 812 ms vs. 29 ms). The cause (message check between lines) is assumed.
-- **Source:** `src/elements/skeleton/Action_TestHangWorker.ahk`
+- **Source:** `tests/elements/Test/Actions/Action_TestHangWorker.ahk`
 
 ### `cmd` reply later: return `Deferred.Marker()` and reply with `Peer.Reply`
 

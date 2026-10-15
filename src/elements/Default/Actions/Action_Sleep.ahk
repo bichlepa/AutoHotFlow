@@ -1,6 +1,5 @@
 #Requires AutoHotkey v2.0
-#Include ..\base\AhfElement.ahk
-#Include ..\base\ElementRegistry.ahk
+#Include ..\..\base\AhfElement.ahk
 
 ; Walking-skeleton version of the v1 Action Sleep (doc/ELEMENT-API-V2.md section 4). Phase 2 only.
 ; Parameters arrive evaluated. Names are plain text: Lang() does not exist yet.
@@ -14,7 +13,7 @@ class Action_Sleep extends AhfElement {
     static Category() => "Flow_control"
 
     static Run(ctx, params) {
-        ctx.After(Action_Sleep.ToMs(params), () => ctx.Finish("normal"))
+        ctx.After(this.ToMs(params), () => ctx.Finish("normal"))
     }
 
     ; Converts Duration and Unit to milliseconds. Unit defaults to "Seconds" as in v1 (Radio default 2).
@@ -32,5 +31,3 @@ class Action_Sleep extends AhfElement {
         return params.Duration * factor
     }
 }
-
-ElementRegistry.Register(Action_Sleep)

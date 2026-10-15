@@ -1,7 +1,6 @@
 #Requires AutoHotkey v2.0
-#Include TestVarFunctionsKit.ahk
-#Include ..\..\src\elements\base\AhfElement.ahk
-#Include ..\..\src\elements\base\ElementRegistry.ahk
+#Include ..\lib\TestVarFunctionsKit.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
 
 ; Test element of WI-0050 (inline): calls every variable function of the context in a fixed order and writes a report of
 ; what each call returned (or the text of the error it threw) into the global variable global_varreport_<Tag>. Its twin
@@ -24,5 +23,3 @@ class Action_TestVarFunctions extends AhfElement {
         ctx.Finish("normal")
     }
 }
-
-ElementRegistry.Register(Action_TestVarFunctions)

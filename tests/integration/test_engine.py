@@ -15,6 +15,7 @@ from pathlib import Path
 import pytest
 
 from support.ahfclient import AhfClient
+from support.elements import split as split_class
 from support.timing import scaled
 from test_role import (FLOOD_PINGS, STALL_S, RoleHub, RoleRun, StallingHub, ahk_process, first_pong_of,
                        flood_pings, pongs_from, wait_hello)
@@ -462,7 +463,7 @@ def make_flow(flowdir, name, sleep_ms=200, policy="default", element_class=None)
     if element_class is None:
         element["pars"] = {"Duration": str(sleep_ms), "Unit": "Milliseconds"}
     else:
-        element["class"] = element_class
+        element["package"], element["class"] = split_class(element_class)
         element["name"] = element_class
         element["pars"] = {}
     (flowdir / "Flows" / (name + ".json")).write_text(json.dumps(flow, ensure_ascii=False, indent=2),

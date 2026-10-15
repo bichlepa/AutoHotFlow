@@ -1,6 +1,5 @@
 #Requires AutoHotkey v2.0
-#Include ..\base\AhfElement.ahk
-#Include ..\base\ElementRegistry.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
 
 ; Test element for WI-0011: a worker-mode element that always throws. The worker must report the run
 ; as "exception" with the message, through ElementRunner, and stay usable for the next job.
@@ -16,5 +15,3 @@ class Action_TestThrowWorker extends AhfElement {
         throw ElementError("test worker throw")
     }
 }
-
-ElementRegistry.Register(Action_TestThrowWorker)

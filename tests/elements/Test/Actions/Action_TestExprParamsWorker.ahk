@@ -1,7 +1,6 @@
 #Requires AutoHotkey v2.0
-#Include ..\base\AhfElement.ahk
-#Include ..\base\ElementRegistry.ahk
-#Include ..\base\TestExprParamsKit.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
+#Include ..\lib\TestExprParamsKit.ahk
 
 ; Test element of WI-0042: Action_TestExprParams in a worker (same parameters). The engine evaluates the parameters
 ; before the job (E0026); Run takes them with ctx.EvalParams (skip list Skip, then EvalMoreParams for More) and exports
@@ -25,5 +24,3 @@ class Action_TestExprParamsWorker extends AhfElement {
         ctx.Finish("normal")
     }
 }
-
-ElementRegistry.Register(Action_TestExprParamsWorker)

@@ -3,23 +3,28 @@
 ; the format version and the marker in FlowDefinition.ToFileText, FlowTable.Load.
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\FlowTable.ahk
-#Include ..\..\src\elements\skeleton\Action_TestExprParams.ahk
-#Include ..\..\src\elements\skeleton\Trigger_Manual.ahk
-#Include ..\..\src\elements\skeleton\Action_Sleep.ahk
-#Include ..\..\src\elements\skeleton\Action_Do_nothing.ahk
+#Include ..\..\src\elements\Default\_includes_engine.ahk
+#Include ..\elements\Test\_includes_engine.ahk
 
-; Test classes of a flow loader: a class without expression parameters, and one whose Parameters() fails.
-class Action_TestPlainConv extends AhfElement {
-    static Parameters(ctx) => [{type: "Edit", id: "Text", content: "String"}]
-}
-ElementRegistry.Register(Action_TestPlainConv)
+; Test classes of a flow loader, in the package ConvTest (E0045): a class without expression parameters, one whose
+; Parameters() fails, and one that a test registers later (a class that is ported after the flow was saved).
+class ConvTest {
+    class Action_TestPlainConv extends AhfElement {
+        static Parameters(ctx) => [{type: "Edit", id: "Text", content: "String"}]
+    }
 
-class Action_TestBrokenParams extends AhfElement {
-    static Parameters(ctx) {
-        throw Error("Parameters needs the editor")
+    class Action_TestBrokenParams extends AhfElement {
+        static Parameters(ctx) {
+            throw Error("Parameters needs the editor")
+        }
+    }
+
+    class Action_NotYetPorted extends AhfElement {
+        static Parameters(ctx) => [{type: "Edit", id: "Expr", content: "Expression"}, {type: "Edit", id: "Other", content: "Expression"}]
     }
 }
-ElementRegistry.Register(Action_TestBrokenParams)
+ElementRegistry.Register(ConvTest.Action_TestPlainConv)
+ElementRegistry.Register(ConvTest.Action_TestBrokenParams)
 
 Lines(parts*) {
     out := ""
@@ -34,11 +39,11 @@ V1Flow(extraRoot := "") {
         '{"name":"conv","category":"Tests","ElementIDCounter":"4",' extraRoot,
         '"flowSettings":{"ExecutionPolicy":"default"},',
         '"allElements":{',
-        '"e1":{"ID":"e1","type":"Action","class":"Action_TestExprParams","pars":{',
+        '"e1":{"ID":"e1","type":"Action","package":"Test","class":"Action_TestExprParams","pars":{',
         '"Expr":"x := 1.50","Num":"1.10","PosInt":"007","Either":"1.50","EitherType":"expression",',
         '"Text":"1.50 %v%","VarName":"v1.50","Raw":"1.50","Script":"a := 1.50\nb := 2","Condition":"x = 1.50 and \"a\".\"b\""}},',
-        '"e2":{"ID":"e2","type":"Action","class":"Action_NotYetPorted","pars":{"Expr":"1.50","Other":"\"a\".\"b\""}},',
-        '"e3":{"ID":"e3","type":"Action","class":"Action_TestPlainConv","pars":{"Text":"1.50"}}},',
+        '"e2":{"ID":"e2","type":"Action","package":"ConvTest","class":"Action_NotYetPorted","pars":{"Expr":"1.50","Other":"\"a\".\"b\""}},',
+        '"e3":{"ID":"e3","type":"Action","package":"ConvTest","class":"Action_TestPlainConv","pars":{"Text":"1.50"}}},',
         '"allConnections":{}}'
     )
 }
@@ -121,8 +126,8 @@ CheckAClassThatAppearsLaterConvertsItsMarkedElements() {
     first.Load("f", V1Flow())
     saved := first.Get("f").Def.ToFileText()
     ; the class of e2 becomes known
-    Assert.True(!ElementRegistry.classes.Has("Action_NotYetPorted"))
-    ElementRegistry.Register(Action_NotYetPorted)
+    Assert.True(!ElementRegistry.classes.Has("ConvTest.Action_NotYetPorted"))
+    ElementRegistry.Register(ConvTest.Action_NotYetPorted)
     try {
         second := FlowTable()
         second.Load("f", saved)
@@ -137,7 +142,7 @@ CheckAClassThatAppearsLaterConvertsItsMarkedElements() {
         third.Load("f", again)
         Assert.Equal(Pars(third.Get("f").Def, "e2")["Other"], '"a" . "b"')
     } finally {
-        ElementRegistry.classes.Delete("Action_NotYetPorted")
+        ElementRegistry.classes.Delete("ConvTest.Action_NotYetPorted")
     }
 }
 
@@ -145,7 +150,7 @@ CheckTextsOfAV2FileAreNotConvertedAgain() {
     ; a v2 file (format version, no marker): the texts are in the new syntax, even if they look like v1
     text := Lines(
         '{"name":"v2","formatVersion":2,"allElements":{',
-        '"e1":{"ID":"e1","type":"Action","class":"Action_TestExprParams","pars":{"Expr":"1.50","Script":"x := 007"}}},',
+        '"e1":{"ID":"e1","type":"Action","package":"Test","class":"Action_TestExprParams","pars":{"Expr":"1.50","Script":"x := 007"}}},',
         '"allConnections":{}}'
     )
     table := FlowTable()
@@ -160,7 +165,7 @@ CheckFailuresStayInV1Syntax() {
     ; unsupported and unreadable texts are left as they are and do not stop the load
     text := Lines(
         '{"name":"bad","allElements":{',
-        '"e1":{"ID":"e1","type":"Action","class":"Action_TestExprParams","pars":{"Expr":"7 % 3","Num":"1 +","PosInt":"2"}}},',
+        '"e1":{"ID":"e1","type":"Action","package":"Test","class":"Action_TestExprParams","pars":{"Expr":"7 % 3","Num":"1 +","PosInt":"2"}}},',
         '"allConnections":{}}'
     )
     entries := []
@@ -202,7 +207,7 @@ CheckEveryConversionIsLogged() {
 CheckBrokenParametersDoNotStopTheLoad() {
     text := Lines(
         '{"name":"b","allElements":{',
-        '"e1":{"ID":"e1","type":"Action","class":"Action_TestBrokenParams","pars":{"Expr":"1.50"}}},',
+        '"e1":{"ID":"e1","type":"Action","package":"ConvTest","class":"Action_TestBrokenParams","pars":{"Expr":"1.50"}}},',
         '"allConnections":{}}'
     )
     table := FlowTable()
@@ -216,7 +221,7 @@ CheckMarkerSpellings() {
     for marker in ['true', '1', '"1"', '"true"'] {
         text := Lines(
             '{"name":"m","formatVersion":2,"allElements":{',
-            '"e1":{"ID":"e1","type":"Action","class":"Action_TestExprParams","v1Text":' marker ',"pars":{"Expr":"1.50"}}},',
+            '"e1":{"ID":"e1","type":"Action","package":"Test","class":"Action_TestExprParams","v1Text":' marker ',"pars":{"Expr":"1.50"}}},',
             '"allConnections":{}}'
         )
         table := FlowTable()
@@ -225,7 +230,7 @@ CheckMarkerSpellings() {
     }
     text := Lines(
         '{"name":"m","formatVersion":2,"allElements":{',
-        '"e1":{"ID":"e1","type":"Action","class":"Action_TestExprParams","v1Text":false,"pars":{"Expr":"1.50"}}},',
+        '"e1":{"ID":"e1","type":"Action","package":"Test","class":"Action_TestExprParams","v1Text":false,"pars":{"Expr":"1.50"}}},',
         '"allConnections":{}}'
     )
     table := FlowTable()
@@ -242,10 +247,6 @@ CheckFlowsWithoutExpressionsKeepTheirDefinition() {
     Assert.Equal(def.Pending.Count, 0)
     Assert.True(!def.Raw.Has("formatVersion"))
     Assert.Equal(Json.Stringify(def.Raw), Json.Stringify(Json.Parse(text)))
-}
-
-class Action_NotYetPorted extends AhfElement {
-    static Parameters(ctx) => [{type: "Edit", id: "Expr", content: "Expression"}, {type: "Edit", id: "Other", content: "Expression"}]
 }
 
 ; --- migration markers (WI-0045) ----------------------------------------------------------------------------------
@@ -272,9 +273,9 @@ Joined(arr) {
 MigrationFlow() {
     return Lines(
         '{"name":"mig","allElements":{',
-        '"e1":{"ID":"e1","type":"Action","class":"Action_TestExprParams","pars":{',
+        '"e1":{"ID":"e1","type":"Action","package":"Test","class":"Action_TestExprParams","pars":{',
         '"Expr":"x < \"abc\"","Num":"7 % 3","PosInt":"1 +","Condition":"a < \"b\" and \"a\".\"b\"","Script":"x := 1"}},',
-        '"e2":{"ID":"e2","type":"Action","class":"Action_NotYetPorted","pars":{"Expr":"x < \"abc\""}}},',
+        '"e2":{"ID":"e2","type":"Action","package":"ConvTest","class":"Action_NotYetPorted","pars":{"Expr":"x < \"abc\""}}},',
         '"allConnections":{}}'
     )
 }
@@ -344,7 +345,7 @@ CheckAClassThatAppearsLaterAddsItsMarkers() {
     first := FlowTable()
     first.Load("f", MigrationFlow())
     saved := first.Get("f").Def.ToFileText()
-    ElementRegistry.Register(Action_NotYetPorted)
+    ElementRegistry.Register(ConvTest.Action_NotYetPorted)
     try {
         second := FlowTable()
         second.Load("f", saved)
@@ -357,7 +358,7 @@ CheckAClassThatAppearsLaterAddsItsMarkers() {
         third.Load("f", def.ToFileText())
         Assert.Equal(third.Get("f").Def.Element("e2")["migration"].Length, 1)
     } finally {
-        ElementRegistry.classes.Delete("Action_NotYetPorted")
+        ElementRegistry.classes.Delete("ConvTest.Action_NotYetPorted")
     }
 }
 
@@ -365,7 +366,7 @@ CheckUnknownKeysOfAnElementAreKept() {
     ; a marker list written by hand (or by a later version) is kept as it is and is not marked a second time
     text := Lines(
         '{"name":"k","formatVersion":2,"allElements":{',
-        '"e1":{"ID":"e1","type":"Action","class":"Action_TestExprParams","v1Text":true,"future":{"a":1},',
+        '"e1":{"ID":"e1","type":"Action","package":"Test","class":"Action_TestExprParams","v1Text":true,"future":{"a":1},',
         '"migration":[{"par":"Expr","ids":["M-0099"],"v1":"orig"}],"pars":{"Expr":"x < \"abc\""}}},',
         '"allConnections":{}}'
     )

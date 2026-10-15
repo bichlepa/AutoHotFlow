@@ -8,23 +8,11 @@
 ; A_Args: 1 = result file (one JSON document), 2 = list file (one flow file path per line, UTF-8).
 ; Not started by hand: python tools/migration_report.py <flow file or folder> [--json]
 ;
-; The element classes come from the include list below: the same element files as src/AhfBoot.ahk, so that the report
-; sees the registry of the engine process. When the element packages are generated (WI-0047), take the generated block here.
+; The element classes are the generated blocks of the engine (all classes of the packages, WI-0047), so that the report
+; sees the registry of the engine process. "class" in the result is the qualified ID "<package>.<class>" (E0045).
 #Include ..\src\engine\FlowTable.ahk
-#Include ..\src\elements\skeleton\Trigger_Manual.ahk
-#Include ..\src\elements\skeleton\Action_Sleep.ahk
-#Include ..\src\elements\skeleton\Action_Do_nothing.ahk
-#Include ..\src\elements\skeleton\Action_TestThrow.ahk
-#Include ..\src\elements\skeleton\Action_TestBlockWorker.ahk
-#Include ..\src\elements\skeleton\Action_TestHangWorker.ahk
-#Include ..\src\elements\skeleton\Action_TestThrowWorker.ahk
-#Include ..\src\elements\skeleton\Action_TestEchoWorker.ahk
-#Include ..\src\elements\skeleton\Action_TestLongBlockWorker.ahk
-#Include ..\src\elements\skeleton\Action_TestFreezeWorker.ahk
-#Include ..\src\elements\skeleton\Action_TestFreezeTimeoutWorker.ahk
-#Include ..\src\elements\skeleton\Action_TestExprParams.ahk
-#Include ..\src\elements\skeleton\Action_TestExprParamsWorker.ahk
-#Include ..\src\elements\skeleton\Action_TestSetVar.ahk
+#Include ..\src\entry\generated\Elements_engine.ahk
+#Include ..\tests\integration\helpers\entry\generated\TestElements_engine.ahk
 
 ReportOne(path) {
     flow := Map("file", path)
@@ -42,12 +30,13 @@ ReportOne(path) {
     places := []
     elements := def.Raw["allElements"]
     for elId, el in elements {
+        qid := ElementRegistry.QualifiedId(FlowDefinition.TextOf(id, el, "package", ""), FlowDefinition.TextOf(id, el, "class", ""))
         if (def.Pending.Has(elId))
-            unknown.Push(Map("element", elId, "class", FlowDefinition.TextOf(id, el, "class", "")))
+            unknown.Push(Map("element", elId, "class", qid))
         if (!el.Has(FlowDefinition.MIGRATION_KEY) || !(el[FlowDefinition.MIGRATION_KEY] is Array))
             continue
         for entry in el[FlowDefinition.MIGRATION_KEY] {
-            places.Push(Map("element", elId, "class", FlowDefinition.TextOf(id, el, "class", "")
+            places.Push(Map("element", elId, "class", qid
                 , "par", entry["par"], "ids", entry["ids"], "v1", entry["v1"]))
         }
     }

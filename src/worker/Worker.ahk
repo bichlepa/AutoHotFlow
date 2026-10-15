@@ -106,7 +106,7 @@ class Worker extends Role {
         job["ctx"] := ctx
         cls := ElementRegistry.Get(job["classId"])
         if (!IsObject(cls)) {
-            ctx.Finish("exception", "unknown element class '" job["classId"] "'")
+            ctx.Finish("exception", ElementRegistry.MissingText(job["classId"]))    ; class is the qualified ID (E0045)
             return
         }
         if (cls.Mode != "worker") {

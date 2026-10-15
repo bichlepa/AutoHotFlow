@@ -1,6 +1,5 @@
 #Requires AutoHotkey v2.0
-#Include ..\base\AhfElement.ahk
-#Include ..\base\ElementRegistry.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
 
 ; Test element for WI-0027: like Action_TestFreezeWorker (blocks a minute in one call) but with a job deadline of
 ; 1500 ms. The engine ends the element with "worker timeout" and has the frozen worker killed.
@@ -18,5 +17,3 @@ class Action_TestFreezeTimeoutWorker extends AhfElement {
         ctx.Finish("normal")
     }
 }
-
-ElementRegistry.Register(Action_TestFreezeTimeoutWorker)

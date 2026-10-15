@@ -1,7 +1,6 @@
 #Requires AutoHotkey v2.0
-#Include ..\base\TestExprParamsKit.ahk
-#Include ..\base\AhfElement.ahk
-#Include ..\base\ElementRegistry.ahk
+#Include ..\lib\TestExprParamsKit.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
 
 ; Test element of WI-0039 and WI-0042: one parameter of each content type of v1.
 ;
@@ -35,5 +34,3 @@ class Action_TestExprParams extends AhfElement {
         ctx.Finish("normal")
     }
 }
-
-ElementRegistry.Register(Action_TestExprParams)

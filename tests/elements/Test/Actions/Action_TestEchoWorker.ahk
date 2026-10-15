@@ -1,6 +1,5 @@
 #Requires AutoHotkey v2.0
-#Include ..\base\AhfElement.ahk
-#Include ..\base\ElementRegistry.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
 
 ; Test element for WI-0011: a worker-mode element that finishes at once. It exports the imported
 ; value "in" as "out" and finishes "normal". Tests use it for imports, exports and the worker's
@@ -18,5 +17,3 @@ class Action_TestEchoWorker extends AhfElement {
         ctx.Finish("normal", "echoed")
     }
 }
-
-ElementRegistry.Register(Action_TestEchoWorker)

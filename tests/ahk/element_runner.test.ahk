@@ -3,8 +3,8 @@
 ; doc/ELEMENT-API-V2.md section 3). Timer cases use the message loop: Sleep() runs timers.
 #Include lib\Assert.ahk
 #Include ..\..\src\elements\base\ElementRunner.ahk
-#Include ..\..\src\elements\skeleton\Action_Do_nothing.ahk
-#Include ..\..\src\elements\skeleton\Action_TestThrow.ahk
+#Include ..\..\src\elements\Default\_includes_engine.ahk
+#Include ..\elements\Test\_includes_engine.ahk
 
 ; Element classes used only by these tests. They are not registered.
 class Test_DoubleFinish extends AhfElement {
@@ -106,7 +106,7 @@ TestRun.Case("Context: without an access object there are no variables", NoVaria
 ExceptionBecomesException() {
     rec := Recorder()
     ctx := MakeCtx(rec)
-    ElementRunner.Run(Action_TestThrow, ctx, {})
+    ElementRunner.Run(Test.Action_TestThrow, ctx, {})
     Assert.Equal(rec.calls, 1, "callback called once")
     Assert.Equal(rec.result, "exception")
     Assert.Equal(rec.msg, "test")
@@ -127,7 +127,7 @@ QuickRunNotSlow() {
     rec := Recorder()
     ctx := MakeCtx(rec)
     slow := Recorder()
-    ElementRunner.Run(Action_Do_nothing, ctx, {}, (id, ms) => RecordSlow(slow, id, ms))
+    ElementRunner.Run(Default.Action_Do_nothing, ctx, {}, (id, ms) => RecordSlow(slow, id, ms))
     Assert.Equal(slow.calls, 0, "no slow report")
     Assert.Equal(rec.result, "normal")
 }

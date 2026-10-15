@@ -312,7 +312,7 @@ class Executor {
             return
         flowId := run["flowId"]
         elementId := thread.ElementId
-        classId := def.ElementClass(elementId)
+        classId := Executor._QidOf(def, elementId)    ; the qualified ID "<package>.<class>" (E0045)
         this._ElementStarted(run, elementId)
         ctx := ExecContext(flowId, elementId, run["instanceId"], thread.Id
             , ObjBindMethod(this, "_OnFinish", run["instanceId"], thread.Id)
@@ -326,10 +326,12 @@ class Executor {
         }
         cls := ElementRegistry.Get(classId)
         if (!IsObject(cls)) {
-            ctx.Finish("exception", "unknown element class '" classId "'")
+            ; not ported yet, or of a package that is not installed (WI-0047): the flow keeps the element as it is
+            ctx.Finish("exception", ElementRegistry.MissingText(classId))
             return
         }
-        ctx.cls := cls                          ; Parameters() of the class for ctx.EvalParams (WI-0042)
+        classId := ElementRegistry.IdOf(cls)    ; the spelling of the class, for the worker job and the log
+        ctx.cls := cls                         ; Parameters() of the class for ctx.EvalParams (WI-0042)
         ctx.strictTypes := def.StrictTypes      ; the type mode of the flow (E0034)
         if (cls.Mode = "worker") {
             this._DispatchWorker(run, thread, ctx, cls, classId, def)
@@ -680,8 +682,11 @@ class Executor {
     }
 
     static _IsWorkerElement(def, thread) {
-        return ElementRegistry.ModeOf(def.ElementClass(thread.ElementId)) = "worker"
+        return ElementRegistry.ModeOf(Executor._QidOf(def, thread.ElementId)) = "worker"
     }
+
+    ; The qualified ID of an element of the flow: its package (missing means Default) and its class (E0045).
+    static _QidOf(def, elementId) => ElementRegistry.QualifiedId(def.ElementPackage(elementId), def.ElementClass(elementId))
 
     ; Snapshot of the keys of a Map, so the Map can change while the keys are walked.
     static _Keys(m) {

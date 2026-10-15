@@ -6,7 +6,7 @@
 ; --- newest revision (point 3) ---------------------------------------------------------------------
 
 HoldFlow() {
-    return FlowText([El("h", "Test_Hold", '{"x":1}'), El("b", "Test_Count"), El("c", "Test_Count")]
+    return FlowText([El("h", "ExecKit.Test_Hold", '{"x":1}'), El("b", "ExecKit.Test_Count"), El("c", "ExecKit.Test_Count")]
         , [Conn("c1", "t0", "h"), Conn("c2", "h", "b")])
 }
 
@@ -15,7 +15,7 @@ NextConnectionComesFromTheNewestRevision() {
     owner.executor.StartFlow(owner.flows.Get("f"))
     owner.Drive()
     Assert.True(Probe.held.Has("h"), "h is running")
-    Commit(owner, FlowText([El("h", "Test_Hold", '{"x":1}'), El("b", "Test_Count"), El("c", "Test_Count")]
+    Commit(owner, FlowText([El("h", "ExecKit.Test_Hold", '{"x":1}'), El("b", "ExecKit.Test_Count"), El("c", "ExecKit.Test_Count")]
         , [Conn("c1", "t0", "h"), Conn("c3", "h", "c")]))
     Probe.Release("h")
     owner.Drive()
@@ -27,7 +27,7 @@ RunningElementKeepsItsParametersForStop() {
     owner := NewOwner(HoldFlow())
     owner.executor.StartFlow(owner.flows.Get("f"))
     owner.Drive()
-    Commit(owner, FlowText([El("h", "Test_Hold", '{"x":2}'), El("b", "Test_Count")]
+    Commit(owner, FlowText([El("h", "ExecKit.Test_Hold", '{"x":2}'), El("b", "ExecKit.Test_Count")]
         , [Conn("c1", "t0", "h"), Conn("c2", "h", "b")]))
     owner.executor.StopFlow("f")
     Assert.Equal(Probe.stops.Length, 1)
@@ -38,7 +38,7 @@ RunningElementDeletedRunsToTheEnd() {
     owner := NewOwner(HoldFlow())
     owner.executor.StartFlow(owner.flows.Get("f"))
     owner.Drive()
-    Commit(owner, FlowText([El("b", "Test_Count")], [Conn("c1", "t0", "b")]))   ; h and its connection are gone
+    Commit(owner, FlowText([El("b", "ExecKit.Test_Count")], [Conn("c1", "t0", "b")]))   ; h and its connection are gone
     Probe.Release("h")
     owner.Drive()
     Assert.Equal(Probe.Count("b"), 0, "no connection from a deleted element")
@@ -47,11 +47,11 @@ RunningElementDeletedRunsToTheEnd() {
 }
 
 ReadyThreadWhoseElementWasDeletedEndsWithException() {
-    owner := NewOwner(FlowText([El("w", "Test_Wk")], [Conn("c1", "t0", "w")]))
+    owner := NewOwner(FlowText([El("w", "ExecKit.Test_Wk")], [Conn("c1", "t0", "w")]))
     owner.workers.hasFree := false              ; the thread waits in state ready
     owner.executor.StartFlow(owner.flows.Get("f"))
     owner.Drive()
-    Commit(owner, FlowText([El("b", "Test_Count")], [Conn("c1", "t0", "b")]))   ; w is gone
+    Commit(owner, FlowText([El("b", "ExecKit.Test_Count")], [Conn("c1", "t0", "b")]))   ; w is gone
     owner.workers.hasFree := true
     owner.Drive()
     Assert.Equal(owner.workers.runs, 0, "the removed element is not started")
@@ -61,11 +61,11 @@ ReadyThreadWhoseElementWasDeletedEndsWithException() {
 }
 
 ReadyThreadStartsWithTheClassOfTheNewestRevision() {
-    owner := NewOwner(FlowText([El("w", "Test_Wk")], [Conn("c1", "t0", "w")]))
+    owner := NewOwner(FlowText([El("w", "ExecKit.Test_Wk")], [Conn("c1", "t0", "w")]))
     owner.workers.hasFree := false
     owner.executor.StartFlow(owner.flows.Get("f"))
     owner.Drive()
-    Commit(owner, FlowText([El("w", "Test_Count")], [Conn("c1", "t0", "w")]))   ; same ID, other class
+    Commit(owner, FlowText([El("w", "ExecKit.Test_Count")], [Conn("c1", "t0", "w")]))   ; same ID, other class
     owner.Drive()
     Assert.Equal(owner.workers.runs, 0)
     Assert.Equal(Probe.Count("w"), 1)

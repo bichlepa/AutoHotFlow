@@ -6,20 +6,24 @@
 #Include ..\..\src\engine\VarRequests.ahk
 #Include ..\..\src\core\ipc\Message.ahk
 
-class Test_SetX extends AhfElement {
-    static Mode := "inline"
-    static Run(ctx, params) {
-        ctx.SetVar("x", "inst value")
-        ctx.SetVar("A_T", "thread value", "thread")
-        ctx.SetVar("list", ["a", "b"])
-        ctx.Finish("normal")
+; The test elements of this file are classes of the package VarReqTest (E0045): a flow names them with
+; "package":"VarReqTest", the registry knows them as VarReqTest.<class>.
+class VarReqTest {
+    class Test_SetX extends AhfElement {
+        static Mode := "inline"
+        static Run(ctx, params) {
+            ctx.SetVar("x", "inst value")
+            ctx.SetVar("A_T", "thread value", "thread")
+            ctx.SetVar("list", ["a", "b"])
+            ctx.Finish("normal")
+        }
     }
 }
-ElementRegistry.Register(Test_SetX)
+ElementRegistry.Register(VarReqTest.Test_SetX)
 
 ; An owner whose flow waits in the worker element: job fx-1 is open.
 Waiting() {
-    owner := NewOwner(FlowText([El("s", "Test_SetX"), El("w", "Test_Wk")], [Conn("c1", "t0", "s"), Conn("c2", "s", "w")]))
+    owner := NewOwner(FlowText([El("s", "VarReqTest.Test_SetX"), El("w", "ExecKit.Test_Wk")], [Conn("c1", "t0", "s"), Conn("c2", "s", "w")]))
     owner.instId := owner.executor.StartFlow(owner.flows.Get("f"))
     owner.Drive()
     owner.req := VarRequests(owner)

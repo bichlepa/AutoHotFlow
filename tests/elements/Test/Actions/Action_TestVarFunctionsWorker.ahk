@@ -1,5 +1,6 @@
 #Requires AutoHotkey v2.0
-#Include TestVarFunctionsKit.ahk
+#Include ..\lib\TestVarFunctionsKit.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
 
 ; Test element of WI-0050: Action_TestVarFunctions in a worker. Every variable function asks the engine
 ; (cmd.engine.var.*); the report goes to the same place (global_varreport_<Tag>, through SetVar in the engine), so the
@@ -18,5 +19,3 @@ class Action_TestVarFunctionsWorker extends AhfElement {
         ctx.Finish("normal")
     }
 }
-
-ElementRegistry.Register(Action_TestVarFunctionsWorker)

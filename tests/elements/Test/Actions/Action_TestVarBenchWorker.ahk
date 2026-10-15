@@ -1,7 +1,6 @@
 #Requires AutoHotkey v2.0
-#Include ..\..\src\core\Time.ahk
-#Include ..\..\src\elements\base\AhfElement.ahk
-#Include ..\..\src\elements\base\ElementRegistry.ahk
+#Include ..\..\..\..\src\core\Time.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
 
 ; Test element of WI-0050 (worker): measures the round trip of a variable request. It sets bench_x, then calls
 ; GetVar("bench_x") Count times and writes "median p95 max" in ms (three decimals) of the single calls into
@@ -28,7 +27,7 @@ class Action_TestVarBenchWorker extends AhfElement {
             if (pause > 0)
                 DllCall("Sleep", "UInt", pause)
         }
-        sorted := Action_TestVarBenchWorker.Sorted(times)
+        sorted := this.Sorted(times)
         n := sorted.Length
         text := Format("{:.3f} {:.3f} {:.3f}", sorted[Max(1, Ceil(n / 2))], sorted[Max(1, Ceil(n * 0.95))], sorted[n])
         ctx.SetVar("global_varbench_" params.Tag, text)
@@ -47,5 +46,3 @@ class Action_TestVarBenchWorker extends AhfElement {
         return a
     }
 }
-
-ElementRegistry.Register(Action_TestVarBenchWorker)

@@ -1,6 +1,5 @@
 #Requires AutoHotkey v2.0
-#Include ..\base\AhfElement.ahk
-#Include ..\base\ElementRegistry.ahk
+#Include ..\..\base\AhfElement.ahk
 
 ; Walking-skeleton version of the v1 Action "Do nothing". Phase 2 only.
 class Action_Do_nothing extends AhfElement {
@@ -15,5 +14,3 @@ class Action_Do_nothing extends AhfElement {
         ctx.Finish("normal")
     }
 }
-
-ElementRegistry.Register(Action_Do_nothing)

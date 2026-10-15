@@ -12,6 +12,7 @@ import time
 import pytest
 
 from support.ahfclient import AhfClient
+from support.elements import qid
 from support.timing import scaled
 from test_role import (FLOOD_PINGS, STALL_S, RoleHub, RoleRun, StallingHub, ahk_process, first_pong_of,
                        flood_pings, pongs_from, wait_hello)
@@ -53,7 +54,7 @@ def start_worker(procs, datadir, runs, pipe, session_id, n=1):
 def run_payload(exec_id, cls, params=None, imports=None):
     return {
         "execId": exec_id,
-        "class": cls,
+        "class": qid(cls),          # the qualified ID (E0045, PROTOCOL 4.5)
         "params": params or {},
         "imports": imports or {},
         "env": {"flowId": "Flow 1", "elementId": "element0000000001", "instanceId": "inst-1",

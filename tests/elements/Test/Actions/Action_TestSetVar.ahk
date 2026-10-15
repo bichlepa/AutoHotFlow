@@ -1,7 +1,6 @@
 #Requires AutoHotkey v2.0
-#Include ..\..\core\Json.ahk
-#Include ..\base\AhfElement.ahk
-#Include ..\base\ElementRegistry.ahk
+#Include ..\..\..\..\src\core\Json.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
 
 ; Test element of WI-0041: changes variables through the element API, so that the tests can set, delete and read
 ; global and static variables of a running engine (there is no other way yet: the variable elements come with WI-0043).
@@ -33,7 +32,7 @@ class Action_TestSetVar extends AhfElement {
                 case "delete":
                     result := ctx.DeleteVar(name)
                 case "probe":
-                    result := Action_TestSetVar.Probe(ctx, name)
+                    result := this.Probe(ctx, name)
                 default:
                     throw ElementError("TestSetVar: unknown op '" op "'")
             }
@@ -55,9 +54,9 @@ class Action_TestSetVar extends AhfElement {
         out := isList ? [] : Map()
         for key, item in value {
             if (isList)
-                out.Push(Action_TestSetVar.Plain(item))
+                out.Push(this.Plain(item))
             else
-                out[String(key)] := Action_TestSetVar.Plain(item)
+                out[String(key)] := this.Plain(item)
         }
         return out
     }
@@ -70,9 +69,7 @@ class Action_TestSetVar extends AhfElement {
         }
         value := ctx.GetVar(name)
         ctx.SetVar("global_probeloc_" name, ctx.VarLocation(name))
-        ctx.SetVar("global_probe_" name, (value is Map) ? Json.Stringify(Action_TestSetVar.Plain(value)) : String(value))
+        ctx.SetVar("global_probe_" name, (value is Map) ? Json.Stringify(this.Plain(value)) : String(value))
         return ctx.SetVar("global_probetype_" name, (value is Map) ? "Map" : Type(value))
     }
 }
-
-ElementRegistry.Register(Action_TestSetVar)

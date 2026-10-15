@@ -1,6 +1,5 @@
 #Requires AutoHotkey v2.0
-#Include ..\base\AhfElement.ahk
-#Include ..\base\ElementRegistry.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
 
 ; Test element for the skeleton (WI-0009, used in WI-0011 and WI-0015): blocks for 800 ms, then finishes. The optional
 ; parameter Duration (ms, WI-0027) sets another time, so a pool test can keep several workers busy at once.
@@ -21,5 +20,3 @@ class Action_TestBlockWorker extends AhfElement {
         ctx.Finish("normal")
     }
 }
-
-ElementRegistry.Register(Action_TestBlockWorker)

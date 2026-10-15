@@ -67,6 +67,7 @@ class FlowDefinition {
         this._elements := FlowDefinition.NewIndex()
         this._kinds := FlowDefinition.NewIndex()
         this._classes := FlowDefinition.NewIndex()
+        this._packages := FlowDefinition.NewIndex()
         this._connections := FlowDefinition.NewIndex()
         this._from := FlowDefinition.NewIndex()
 
@@ -81,6 +82,7 @@ class FlowDefinition {
             this._elements[id] := el
             this._kinds[id] := StrLower(FlowDefinition.TextOf(flowId, el, "type", ""))
             this._classes[id] := FlowDefinition.TextOf(flowId, el, "class", "")
+            this._packages[id] := FlowDefinition.TextOf(flowId, el, "package", "")
             this._from[id] := []
         }
 
@@ -157,6 +159,12 @@ class FlowDefinition {
     ; Class name as written in the file (e.g. "action_Encode_string"). "" if unknown ID.
     ElementClass(elementId) {
         return this._classes.Get(elementId, "")
+    }
+
+    ; Package name as written in the file (e.g. "default"); "" if the element has none or the ID is unknown. With the
+    ; class it is the identity of the element (E0045): ElementRegistry.QualifiedId(package, class), where "" means Default.
+    ElementPackage(elementId) {
+        return this._packages.Get(elementId, "")
     }
 
     ; The element Map as parsed (keys ID, class, type, pars, ...). "" if unknown ID.

@@ -45,7 +45,9 @@ class FlowExprConvert {
                 el.Delete(FlowDefinition.MARKER_KEY)         ; the state is in def.Pending from here on
             if (versioned && !marked)
                 continue
-            cls := ElementRegistry.Get(FlowDefinition.TextOf(def.FlowId, el, "class", ""))
+            ; the package and the class name the element (E0045); a missing package is Default
+            cls := ElementRegistry.Lookup(FlowDefinition.TextOf(def.FlowId, el, "package", "")
+                , FlowDefinition.TextOf(def.FlowId, el, "class", ""))
             if (!IsObject(cls)) {
                 def.Pending[id] := true
                 counts["pending"] += 1

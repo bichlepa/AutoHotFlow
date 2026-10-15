@@ -1,6 +1,5 @@
 #Requires AutoHotkey v2.0
-#Include ..\base\AhfElement.ahk
-#Include ..\base\ElementRegistry.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
 
 ; Test element for the skeleton (WI-0009, used in WI-0011 and WI-0015): never finishes. It loops over
 ; DllCall("Sleep") slices. AHK checks for window messages between script lines, so the worker still
@@ -19,5 +18,3 @@ class Action_TestHangWorker extends AhfElement {
             DllCall("Sleep", "UInt", 100)
     }
 }
-
-ElementRegistry.Register(Action_TestHangWorker)

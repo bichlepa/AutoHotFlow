@@ -42,7 +42,7 @@ def test_a_flow_with_marked_places_is_reported_in_text_and_json(tmp_path):
     flow = {
         "name": "Report", "category": "Tests", "ElementIDCounter": "3",
         "allElements": {
-            "e1": {"ID": "e1", "type": "action", "class": "Action_TestExprParams",
+            "e1": {"ID": "e1", "type": "action", "package": "Test", "class": "Action_TestExprParams",
                    "pars": {"Expr": 'x < "abc"', "Num": "7 % 3", "PosInt": "1 +"}},
             "e2": {"ID": "e2", "type": "action", "class": "Action_NotThereYet", "pars": {"Expr": 'x < "abc"'}},
         },
@@ -66,8 +66,8 @@ def test_a_flow_with_marked_places_is_reported_in_text_and_json(tmp_path):
     assert data["summary"]["places"] == 3 and data["summary"]["placesPerId"] == {"M-0025": 1, "M-0037": 1, "M-0050": 1}
 
     text = report(path).stdout
-    assert "unknown class: 1 element(s): Action_NotThereYet (1)" in text
-    assert "e1 (Action_TestExprParams) parameter Expr [M-0025] v1: x < \"abc\"" in text
+    assert "unknown class: 1 element(s): Default.Action_NotThereYet (1)" in text
+    assert "e1 (Test.Action_TestExprParams) parameter Expr [M-0025] v1: x < \"abc\"" in text
     # the tool only reads
     assert path.read_text(encoding="utf-8") == before
 

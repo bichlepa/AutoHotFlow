@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 ; Parameter evaluation and the variable functions of ctx (WI-0042, doc/ELEMENT-API-V2.md section 3 and 3.1): the rules
 ; of v1 x_AutoEvaluateParameters per content type, the flow option strictTypes (E0034), the f1 entries of the evaluator.
-; The test element Action_TestExprParams (src/elements/skeleton) evaluates its parameters with ctx.EvalParams and
+; The test element Test.Action_TestExprParams (tests/elements/Test) evaluates its parameters with ctx.EvalParams and
 ; leaves the result in global_evalresult; it runs in an Executor with the stand-in owner (no processes).
 ;
 ; Worker (E0026): every case of the content types runs a second time with Action_TestExprParamsWorker. The engine side is
@@ -10,8 +10,7 @@
 ; evaluated). The cases expect the same results in both modes, except where E0026 differs on purpose.
 #Include helpers\ExecutorKit.ahk
 #Include ..\..\src\worker\WorkerContext.ahk
-#Include ..\..\src\elements\skeleton\Action_TestExprParams.ahk
-#Include ..\..\src\elements\skeleton\Action_TestExprParamsWorker.ahk
+#Include ..\elements\Test\_includes_engine.ahk
 
 ; Calls a ctx function inside a running element: Probe.onRun of Test_Count is the hook. Returns what fn returned, or
 ; the ElementError as "error: <message>".
@@ -78,8 +77,10 @@ SetGlobals(owner) {
 
 ; The flow "e": trigger t0, then element a1 of class cls with the parameters pars (a Map). formatVersion 2, so the
 ; texts are not converted from v1 syntax on load; strictTypes as given.
-EvalFlow(pars, strict := false, cls := "Action_TestExprParams", settings := "") {
-    el := Map("ID", "a1", "type", "action", "class", cls, "pars", pars, "name", "a")
+; cls is the qualified ID "<package>.<class>" (E0045).
+EvalFlow(pars, strict := false, cls := "Test.Action_TestExprParams", settings := "") {
+    el := Map("ID", "a1", "type", "action", "package", ElementRegistry.PackageOf(cls)
+        , "class", ElementRegistry.ClassOf(cls), "pars", pars, "name", "a")
     tr := Map("ID", "t0", "type", "trigger", "class", "trigger_Manual", "pars", Map())
     fs := Map("ExecutionPolicy", "parallel", "strictTypes", strict ? Json.True : Json.False)
     if (settings is Map) {
@@ -94,9 +95,9 @@ EvalFlow(pars, strict := false, cls := "Action_TestExprParams", settings := "") 
 
 ; Runs the element once and returns Map: result ("normal" or "exception"), message, values (Map id -> Map type,
 ; value; empty after an exception), owner.
-Eval(pars, strict := false, cls := "Action_TestExprParams", settings := "") {
-    if (cls = "Action_TestExprParams" && EvalMode.worker)
-        cls := "Action_TestExprParamsWorker"
+Eval(pars, strict := false, cls := "Test.Action_TestExprParams", settings := "") {
+    if (cls = "Test.Action_TestExprParams" && EvalMode.worker)
+        cls := "Test.Action_TestExprParamsWorker"
     Probe.Reset()
     Log.memoryLines := []
     owner := EngineOwner()
@@ -359,7 +360,7 @@ InElement(fn, strict := false) {
     Probe.Reset()
     Log.memoryLines := []
     owner := EngineOwner()
-    owner.flows.Load("e", EvalFlow(Map(), strict, "Test_Count"))
+    owner.flows.Load("e", EvalFlow(Map(), strict, "ExecKit.Test_Count"))
     SetGlobals(owner)
     CtxProbe.result := "<not run>"
     Probe.onRun := (ctx) => CtxProbe.result := CallSafe(fn, ctx)
@@ -476,17 +477,19 @@ CheckARequestThatCannotBeSentGivesAnElementError() {
 }
 
 ; Parameters() of a worker class that throws: the element ends with exception, the engine goes on.
-class Action_TestBrokenWorkerParams extends AhfElement {
-    static Mode := "worker"
-    static Parameters(ctx) {
-        throw Error("Parameters needs the editor")
+class EvalTest {
+    class Action_TestBrokenWorkerParams extends AhfElement {
+        static Mode := "worker"
+        static Parameters(ctx) {
+            throw Error("Parameters needs the editor")
+        }
     }
 }
-ElementRegistry.Register(Action_TestBrokenWorkerParams)
+ElementRegistry.Register(EvalTest.Action_TestBrokenWorkerParams)
 
 CheckParametersThatThrowEndTheWorkerElement() {
-    r := Eval(P(), false, "Action_TestBrokenWorkerParams")
-    Fails(r, "parameters of Action_TestBrokenWorkerParams could not be evaluated: Parameters needs the editor")
+    r := Eval(P(), false, "EvalTest.Action_TestBrokenWorkerParams")
+    Fails(r, "parameters of EvalTest.Action_TestBrokenWorkerParams could not be evaluated: Parameters needs the editor")
     Assert.Equal(r["owner"].workers.runs, 0, "no job was sent")
 }
 

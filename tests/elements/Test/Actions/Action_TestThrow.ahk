@@ -1,6 +1,5 @@
 #Requires AutoHotkey v2.0
-#Include ..\base\AhfElement.ahk
-#Include ..\base\ElementRegistry.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
 
 ; Test element for the skeleton (WI-0009): always throws, the run must end with "exception".
 class Action_TestThrow extends AhfElement {
@@ -15,5 +14,3 @@ class Action_TestThrow extends AhfElement {
         throw ElementError("test")
     }
 }
-
-ElementRegistry.Register(Action_TestThrow)

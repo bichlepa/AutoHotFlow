@@ -341,13 +341,24 @@
             "problemMatcher": []
         },
         {
-            "label": "Tool: generate the element include blocks of the role entries (gen_element_includes.py)",
+            "label": "Tool: generate element include blocks",
             "type": "shell",
             "command": "python",
             "args": [
                 "tools/gen_element_includes.py"
             ],
             "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: check element include blocks (no write, --check)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/gen_element_includes.py",
+                "--check"
+            ],
+            "group": "test",
             "problemMatcher": []
         },
         {

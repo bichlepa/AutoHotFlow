@@ -9,7 +9,7 @@
 ; A worker element is checked in Tick (ready?) and started after workers.Usable(). A tick that interrupts
 ; there starts the thread; the outer tick must not start it a second time.
 InterruptedTickStartsAnElementOnce() {
-    owner := NewOwner(FlowText([El("w", "Test_Wk")], [Conn("c1", "t0", "w")]))
+    owner := NewOwner(FlowText([El("w", "ExecKit.Test_Wk")], [Conn("c1", "t0", "w")]))
     owner.executor.StartFlow(owner.flows.Get("f"))
     owner.workers.hook := () => owner.executor.Tick()
     owner.Drive()
@@ -18,7 +18,7 @@ InterruptedTickStartsAnElementOnce() {
 
 ; An element whose Run calls Tick again: every element runs exactly once, none is lost.
 TickInsideRunStartsEveryElementOnce() {
-    owner := NewOwner(FlowText([El("a", "Test_Count"), El("b", "Test_Count"), El("c", "Test_Count")]
+    owner := NewOwner(FlowText([El("a", "ExecKit.Test_Count"), El("b", "ExecKit.Test_Count"), El("c", "ExecKit.Test_Count")]
         , [Conn("c1", "t0", "a"), Conn("c2", "a", "b"), Conn("c3", "a", "c")]))
     Probe.onRun := (ctx) => owner.executor.Tick()
     owner.executor.StartFlow(owner.flows.Get("f"))
@@ -34,7 +34,7 @@ TickInsideRunStartsEveryElementOnce() {
 ; WorkerBridge.Run can end a job at once (send error) and still return its execId. The thread has moved on,
 ; so no "active" entry may be left behind for it.
 WorkerJobEndedAtOnceLeavesNoActiveEntry() {
-    owner := NewOwner(FlowText([El("h", "Test_Hold"), El("w", "Test_Wk")]
+    owner := NewOwner(FlowText([El("h", "ExecKit.Test_Hold"), El("w", "ExecKit.Test_Wk")]
         , [Conn("c1", "t0", "h"), Conn("c2", "t0", "w")]))
     owner.workers.failAtOnce := true
     instId := owner.executor.StartFlow(owner.flows.Get("f"))
@@ -47,7 +47,7 @@ WorkerJobEndedAtOnceLeavesNoActiveEntry() {
 ; E0041: a worker element is sent to the pool; its Run never runs in the engine process (the engine has the class for the
 ; metadata only).
 WorkerElementIsNeverRunInTheEngine() {
-    owner := NewOwner(FlowText([El("w", "Test_Wk")], [Conn("c1", "t0", "w")]))
+    owner := NewOwner(FlowText([El("w", "ExecKit.Test_Wk")], [Conn("c1", "t0", "w")]))
     owner.executor.StartFlow(owner.flows.Get("f"))
     owner.Drive()
     Assert.Equal(owner.workers.runs, 1, "worker jobs started")

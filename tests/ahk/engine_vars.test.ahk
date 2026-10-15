@@ -35,44 +35,47 @@ class VarLog {
     }
 }
 
-; Op "set": SetVar(Name, Value, Scope); Value "@inst" is the instance ID, "@thread" the thread ID.
-; Op "get": records GetVar(Name) ("<none>" if it does not exist).
-class Test_Vars extends AhfElement {
-    static Mode := "inline"
-    static Run(ctx, params) {
-        if (params.Op = "set") {
-            value := params.Value
-            if (value = "@inst")
-                value := ctx.instanceId
-            else if (value = "@thread")
-                value := ctx.threadId
-            ctx.SetVar(params.Name, value, params.HasProp("Scope") ? params.Scope : "")
-        } else {
-            VarLog.lines.Push(ctx.instanceId "|" ctx.elementId "|" ctx.GetVar(params.Name, "<none>"))
+; The test elements of this file are classes of the package VarsTest (E0045): a flow names them with
+; "package":"VarsTest", the registry knows them as VarsTest.<class>.
+class VarsTest {
+    ; Op "set": SetVar(Name, Value, Scope); Value "@inst" is the instance ID, "@thread" the thread ID.
+    ; Op "get": records GetVar(Name) ("<none>" if it does not exist).
+    class Test_Vars extends AhfElement {
+        static Mode := "inline"
+        static Run(ctx, params) {
+            if (params.Op = "set") {
+                value := params.Value
+                if (value = "@inst")
+                    value := ctx.instanceId
+                else if (value = "@thread")
+                    value := ctx.threadId
+                ctx.SetVar(params.Name, value, params.HasProp("Scope") ? params.Scope : "")
+            } else {
+                VarLog.lines.Push(ctx.instanceId "|" ctx.elementId "|" ctx.GetVar(params.Name, "<none>"))
+            }
+            ctx.Finish("normal")
         }
-        ctx.Finish("normal")
+    }
+
+    ; A counting loop as the v1 loops do it: at "head" the loop variable starts at 1, at "tail" it counts on; the
+    ; element finishes "head" (run the body) or "tail" (leave). The loop stack is pushed and popped by the Scheduler.
+    class Test_Loop extends AhfElement {
+        static Mode := "inline"
+        static Run(ctx, params) {
+            if (ctx.entryPoint = "head")
+                ctx.SetVar("A_Index", 1, "loop")
+            else
+                ctx.SetVar("A_Index", ctx.GetVar("A_Index") + 1, "loop")
+            ctx.Finish(ctx.GetVar("A_Index") <= Integer(params.Count) ? "head" : "tail")
+        }
     }
 }
+ElementRegistry.Register(VarsTest.Test_Vars)
+ElementRegistry.Register(VarsTest.Test_Loop)
 
-; A counting loop as the v1 loops do it: at "head" the loop variable starts at 1, at "tail" it counts on; the
-; element finishes "head" (run the body) or "tail" (leave). The loop stack is pushed and popped by the Scheduler.
-class Test_Loop extends AhfElement {
-    static Mode := "inline"
-    static Run(ctx, params) {
-        if (ctx.entryPoint = "head")
-            ctx.SetVar("A_Index", 1, "loop")
-        else
-            ctx.SetVar("A_Index", ctx.GetVar("A_Index") + 1, "loop")
-        ctx.Finish(ctx.GetVar("A_Index") <= Integer(params.Count) ? "head" : "tail")
-    }
-}
-
-ElementRegistry.Register(Test_Vars)
-ElementRegistry.Register(Test_Loop)
-
-SetEl(id, name, value, scope := "") => El(id, "Test_Vars", '{"Op":"set","Name":"' name '","Value":"' value '","Scope":"' scope '"}')
-GetEl(id, name) => El(id, "Test_Vars", '{"Op":"get","Name":"' name '"}')
-LoopEl(id, count) => '"' id '":{"ID":"' id '","type":"loop","class":"Test_Loop","pars":{"Count":"' count '"}}'
+SetEl(id, name, value, scope := "") => El(id, "VarsTest.Test_Vars", '{"Op":"set","Name":"' name '","Value":"' value '","Scope":"' scope '"}')
+GetEl(id, name) => El(id, "VarsTest.Test_Vars", '{"Op":"get","Name":"' name '"}')
+LoopEl(id, count) => '"' id '":{"ID":"' id '","type":"loop","package":"VarsTest","class":"Test_Loop","pars":{"Count":"' count '"}}'
 LoopConn(id, from, to, fromPart := "", toPart := "") => '"' id '":{"ID":"' id '","from":"' from '","to":"' to
     . '","type":"Connection","ConnectionType":"normal"' (fromPart = "" ? "" : ',"fromPart":"' fromPart '"')
     . (toPart = "" ? "" : ',"toPart":"' toPart '"') '}'
@@ -86,7 +89,7 @@ Start(owner, flowId := "f") {
 ; Two instances of one flow wait at the same place: each sees its own instance and thread variables.
 CheckInstancesAreSeparated() {
     VarLog.Reset()
-    owner := NewOwner(FlowText([SetEl("s1", "x", "@inst"), SetEl("s2", "A_T", "@inst", "thread"), El("h", "Test_Hold")
+    owner := NewOwner(FlowText([SetEl("s1", "x", "@inst"), SetEl("s2", "A_T", "@inst", "thread"), El("h", "ExecKit.Test_Hold")
         , GetEl("g1", "x"), GetEl("g2", "A_T")]
         , [Conn("c1", "t0", "s1"), Conn("c2", "s1", "s2"), Conn("c3", "s2", "h"), Conn("c4", "h", "g1"), Conn("c5", "g1", "g2")]
         , "parallel"))
@@ -105,7 +108,7 @@ CheckInstancesAreSeparated() {
 ; Two instances at the same time: the second sets its variables while the first waits.
 CheckInstancesRunningTogether() {
     VarLog.Reset()
-    owner := NewOwner(FlowText([SetEl("s1", "x", "@inst"), El("h", "Test_Hold"), GetEl("g1", "x")]
+    owner := NewOwner(FlowText([SetEl("s1", "x", "@inst"), El("h", "ExecKit.Test_Hold"), GetEl("g1", "x")]
         , [Conn("c1", "t0", "s1"), Conn("c2", "s1", "h"), Conn("c3", "h", "g1")], "parallel"))
     first := Start(owner)
     held := Probe.held["h"]
@@ -122,7 +125,7 @@ CheckInstancesRunningTogether() {
 CheckThreadsAreSeparated() {
     VarLog.Reset()
     owner := NewOwner(FlowText([SetEl("a1", "A_T", "one", "thread"), SetEl("b1", "A_T", "two", "thread")
-        , SetEl("a2", "shared", "from a"), El("h", "Test_Hold"), GetEl("a3", "A_T"), GetEl("b3", "A_T"), GetEl("b4", "shared")]
+        , SetEl("a2", "shared", "from a"), El("h", "ExecKit.Test_Hold"), GetEl("a3", "A_T"), GetEl("b3", "A_T"), GetEl("b4", "shared")]
         , [Conn("c1", "t0", "a1"), Conn("c2", "t0", "b1"), Conn("c3", "a1", "a2"), Conn("c4", "a2", "a3")
         , Conn("c5", "b1", "h"), Conn("c6", "h", "b3"), Conn("c7", "b3", "b4")]))
     Start(owner)
@@ -185,7 +188,7 @@ CheckNestedLoops() {
 CheckWorkerImportsAndExports() {
     VarLog.Reset()
     owner := NewOwner(FlowText([SetEl("s1", "x", "inst value"), SetEl("s2", "A_T", "thread value", "thread")
-        , SetEl("s3", "global_g", "global value"), El("w", "Test_Wk"), GetEl("g1", "out"), GetEl("g2", "A_Out")]
+        , SetEl("s3", "global_g", "global value"), El("w", "ExecKit.Test_Wk"), GetEl("g1", "out"), GetEl("g2", "A_Out")]
         , [Conn("c1", "t0", "s1"), Conn("c2", "s1", "s2"), Conn("c3", "s2", "s3"), Conn("c4", "s3", "w")
         , Conn("c5", "w", "g1"), Conn("c6", "g1", "g2")]))
     Start(owner)

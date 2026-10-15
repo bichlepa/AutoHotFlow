@@ -26,7 +26,8 @@ V1_FLOW = {
     "allElements": {
         "element0000000001": {"ID": "element0000000001", "type": "trigger", "class": "Trigger_Manual", "x": "0", "y": "0",
                               "enabled": "0", "pars": {"ID": "Conv"}, "name": "Manual", "StandardName": "1"},
-        "element0000000002": {"ID": "element0000000002", "type": "action", "class": "Action_TestExprParams", "x": "0",
+        "element0000000002": {"ID": "element0000000002", "type": "action", "package": "Test", "class": "Action_TestExprParams",
+                              "x": "0",
                               "y": "100", "pars": V1_PARS, "name": "Test", "StandardName": "1"},
         "element0000000003": {"ID": "element0000000003", "type": "action", "class": "Action_NotYetPorted", "x": "0",
                               "y": "200", "pars": {"Expr": "1.50", "Other": '"a"."b"'}, "name": "Later",

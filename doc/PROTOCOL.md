@@ -247,7 +247,7 @@ Each event carries `seq` (increasing per engine epoch) and `epoch`.
 | `evt.trigger.fired` | triggerhost → engine (`to: "engine"`) | `{ triggerKey, flowId, elementId, data }` | none, the engine decides according to the execution policy |
 | `evt.trigger.error` | triggerhost → engine | `{ triggerKey, message }` | – |
 
-`triggerKey` = `<flowId>/<elementId>`. On `evt.engine.restarted` the engine re-arms all triggers; the trigger host discards all known ones beforehand.
+`triggerKey` = `<flowId>/<elementId>`. `class` is the qualified ID of the element class, `<package>.<class>` (E0045, WI-0047), for example `Default.Trigger_Hotkey`: the package of the flow element (a missing one is `Default`) and its class, in the spelling of the registered class. On `evt.engine.restarted` the engine re-arms all triggers; the trigger host discards all known ones beforehand.
 
 ### 4.5 Engine ↔ worker
 
@@ -258,9 +258,11 @@ Each event carries `seq` (increasing per engine epoch) and `epoch`.
 | `cmd.worker.cancel` | engine → worker | `{ execId }` | `res: { ok }`, then `evt.worker.done` with `result: "stopped"` |
 | `cmd.engine.var.*` | worker or client → engine | see "Variable requests" below (WI-0050) | answered at once |
 
+`class` is the qualified ID of the element class, `<package>.<class>` (E0045, WI-0047), for example `Test.Action_TestEchoWorker`: two packages may have a class of the same name, so the class name alone does not name the element. The engine sends the spelling of the registered class. The worker looks it up without regard to case; a class name without a package is an unknown class.
+
 **Implementation in WI-0011 (`src/worker/`):**
 
-- `cmd.worker.run` `{execId, class, params, imports, env, timeoutMs?}`: `env` carries `flowId`, `elementId`, `instanceId`, `threadId`. Response `{ok}` immediately, then the element runs. A second run during execution: `busy`. A class that does not have `Mode := "worker"` ends as `evt.worker.done` with `exception` ("is not a worker element"). The worker does not use `timeoutMs`: the deadline for acceptance is set by the sender, the runtime of the element is not limited.
+- `cmd.worker.run` `{execId, class, params, imports, env, timeoutMs?}`: `env` carries `flowId`, `elementId`, `instanceId`, `threadId`. Response `{ok}` immediately, then the element runs. A second run during execution: `busy`. A class that does not have `Mode := "worker"` ends as `evt.worker.done` with `exception` ("is not a worker element"). A class that the worker does not have ends with `exception` "unknown element class '<class>'", or "element class '<class>' is not available: package '<package>' is not installed" when the worker does not know the package at all (WI-0047). The worker does not use `timeoutMs`: the deadline for acceptance is set by the sender, the runtime of the element is not limited.
 - `evt.worker.done` `{execId, result, message, exports}`: `result` is `normal`, `yes`, `no`, `head`, `tail`, `exception` or `stopped`. `exports` is the map from `ctx.Export(name, value)` (only text and numbers). The worker sends it exactly once per run.
 - `cmd.worker.cancel` `{execId}`: response `{ok}` (otherwise `not_found`), then `evt.worker.done` with `stopped`. A later `Finish` of the element is discarded. A single long blocking call inside the element cannot receive the cancellation, because AHK only checks messages between command lines (loops in slices are uncritical, see `doc/HOW-TO.md`).
 - `sys.shutdown` during a run: `evt.worker.done` with `stopped` before `sys.bye`.

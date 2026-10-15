@@ -34,10 +34,11 @@ import json
 import re
 from pathlib import Path
 
+from support.elements import split as split_class
+
 KINDS = ("trigger", "action", "condition", "loop")
 # v1 spelling of the element type (the loader compares case-insensitively; v2 files of the engine use lower case)
 V1_KIND = {"trigger": "trigger", "action": "Action", "condition": "Condition", "loop": "Loop"}
-PACKAGE = "Default"
 PACKAGE_VERSION = "1.2.0"
 RESULTS = ("normal", "yes", "no", "exception")
 LOOP_PARTS = ("head", "tail", "break")
@@ -48,9 +49,10 @@ PROBE_CLASS = "Action_TestSetVar"
 class El:
     """Handle of an element in a builder. str(el) is its ID."""
 
-    def __init__(self, id_, cls, kind, name):
+    def __init__(self, id_, cls, kind, name, package="Default"):
         self.id = id_
         self.cls = cls
+        self.package = package
         self.kind = kind
         self.name = name
 
@@ -93,9 +95,12 @@ class FlowBuilder:
         return "%s%010d" % (prefix, self._counter)
 
     def element(self, cls, kind=None, name=None, v1_text=False, extra=None, **pars):
-        """Adds an element of class `cls` with the parameters `pars`. `kind` comes from the class prefix.
+        """Adds an element of class `cls` with the parameters `pars`. `cls` is `"Package.Class"` or a plain class: a
+        test class (`Action_Test*`) is in the package Test, any other in Default (support/elements.py, E0045).
+        `kind` comes from the class prefix.
         `name` is the display name (default: the class). `v1_text` marks the expression texts as v1 syntax in a v2 file.
         `extra` are further keys of the element (for example `HeightOfVerticalBar`). Returns the handle."""
+        package, cls = split_class(cls)
         kind = kind or kind_of_class(cls)
         if kind not in KINDS:
             raise ValueError("unknown kind '%s'" % kind)
@@ -105,7 +110,7 @@ class FlowBuilder:
             "class": cls,
             "ID": id_,
             "name": name or cls,
-            "package": PACKAGE,
+            "package": package,
             "packageVersion": PACKAGE_VERSION,
             "pars": dict(pars),
             "StandardName": "0" if name else "1",
@@ -123,7 +128,7 @@ class FlowBuilder:
             element["v1Text"] = True
         element.update(extra or {})
         self.elements[id_] = element
-        handle = El(id_, cls, kind, element["name"])
+        handle = El(id_, cls, kind, element["name"], package)
         self.handles[id_] = handle
         return handle
 
@@ -244,7 +249,7 @@ class FlowBuilder:
 
 # --- the text form: tokenizer ----------------------------------------------------------------------------------------
 _ARROW = re.compile(r"\s*(?:(normal|yes|no|exception)\s*)?->\s*", re.IGNORECASE)
-_CLASS = re.compile(r"\s*([A-Za-z][A-Za-z0-9_]*)")
+_CLASS = re.compile(r"\s*([A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z][A-Za-z0-9_]*)?)")
 _NUMBER = re.compile(r"-?\d+(?:\.\d+)?$")
 
 

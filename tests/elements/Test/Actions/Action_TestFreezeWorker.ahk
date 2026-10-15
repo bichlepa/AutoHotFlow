@@ -1,6 +1,5 @@
 #Requires AutoHotkey v2.0
-#Include ..\base\AhfElement.ahk
-#Include ..\base\ElementRegistry.ahk
+#Include ..\..\..\..\src\elements\base\AhfElement.ahk
 
 ; Test element for WI-0027: blocks for a minute in ONE call. The worker answers no ping and no cancel meanwhile
 ; (a MsgBox or a long DllCall in a real element behaves like this). Only a kill from outside ends it: the
@@ -18,5 +17,3 @@ class Action_TestFreezeWorker extends AhfElement {
         ctx.Finish("normal")
     }
 }
-
-ElementRegistry.Register(Action_TestFreezeWorker)

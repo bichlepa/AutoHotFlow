@@ -4,7 +4,7 @@
 ; early by design, but a loaded machine can delay it.
 #Include lib\Assert.ahk
 #Include ..\..\src\elements\base\ElementRunner.ahk
-#Include ..\..\src\elements\skeleton\Action_Sleep.ahk
+#Include ..\..\src\elements\Default\_includes_engine.ahk
 
 Recorder() {
     rec := {calls: 0, result: "", msg: ""}
@@ -41,7 +41,7 @@ SleepEndsAfterDuration() {
     rec := Recorder()
     ctx := MakeCtx(rec)
     start := Time.NowMs()
-    ElementRunner.Run(Action_Sleep, ctx, {Duration: 200, Unit: "Milliseconds"})
+    ElementRunner.Run(Default.Action_Sleep, ctx, {Duration: 200, Unit: "Milliseconds"})
     Assert.True(WaitUntil(() => rec.calls > 0), "sleep finished")
     elapsed := Time.NowMs() - start
     Assert.Equal(rec.result, "normal")
@@ -53,31 +53,31 @@ SleepEndsAfterDuration() {
 SleepStopGivesNoResult() {
     rec := Recorder()
     ctx := MakeCtx(rec)
-    ElementRunner.Run(Action_Sleep, ctx, {Duration: 300, Unit: "Milliseconds"})
-    ElementRunner.Stop(Action_Sleep, ctx, {Duration: 300, Unit: "Milliseconds"})
+    ElementRunner.Run(Default.Action_Sleep, ctx, {Duration: 300, Unit: "Milliseconds"})
+    ElementRunner.Stop(Default.Action_Sleep, ctx, {Duration: 300, Unit: "Milliseconds"})
     Sleep(400)
     Assert.Equal(rec.calls, 0, "a stopped sleep reports nothing")
 }
 
 SleepUnitConversion() {
-    Assert.Equal(Action_Sleep.ToMs({Duration: 5, Unit: "Milliseconds"}), 5)
-    Assert.Equal(Action_Sleep.ToMs({Duration: 2, Unit: "Seconds"}), 2000)
-    Assert.Equal(Action_Sleep.ToMs({Duration: 1, Unit: "Minutes"}), 60000)
-    Assert.Equal(Action_Sleep.ToMs({Duration: 2}), 2000, "missing Unit means Seconds")
-    Assert.Equal(Action_Sleep.ToMs({Duration: "3", Unit: "Seconds"}), 3000, "numeric text is accepted")
+    Assert.Equal(Default.Action_Sleep.ToMs({Duration: 5, Unit: "Milliseconds"}), 5)
+    Assert.Equal(Default.Action_Sleep.ToMs({Duration: 2, Unit: "Seconds"}), 2000)
+    Assert.Equal(Default.Action_Sleep.ToMs({Duration: 1, Unit: "Minutes"}), 60000)
+    Assert.Equal(Default.Action_Sleep.ToMs({Duration: 2}), 2000, "missing Unit means Seconds")
+    Assert.Equal(Default.Action_Sleep.ToMs({Duration: "3", Unit: "Seconds"}), 3000, "numeric text is accepted")
 }
 
 SleepBadParamsThrow() {
-    Assert.Throws(() => Action_Sleep.ToMs({}), ElementError, "missing Duration")
-    Assert.Throws(() => Action_Sleep.ToMs({Duration: "abc"}), ElementError, "non-numeric Duration")
-    Assert.Throws(() => Action_Sleep.ToMs({Duration: -1, Unit: "Seconds"}), ElementError, "negative Duration")
-    Assert.Throws(() => Action_Sleep.ToMs({Duration: 1, Unit: "Hours"}), ElementError, "unknown Unit")
+    Assert.Throws(() => Default.Action_Sleep.ToMs({}), ElementError, "missing Duration")
+    Assert.Throws(() => Default.Action_Sleep.ToMs({Duration: "abc"}), ElementError, "non-numeric Duration")
+    Assert.Throws(() => Default.Action_Sleep.ToMs({Duration: -1, Unit: "Seconds"}), ElementError, "negative Duration")
+    Assert.Throws(() => Default.Action_Sleep.ToMs({Duration: 1, Unit: "Hours"}), ElementError, "unknown Unit")
 }
 
 SleepBadParamsEndAsException() {
     rec := Recorder()
     ctx := MakeCtx(rec)
-    ElementRunner.Run(Action_Sleep, ctx, {Unit: "Seconds"})
+    ElementRunner.Run(Default.Action_Sleep, ctx, {Unit: "Seconds"})
     Assert.Equal(rec.calls, 1)
     Assert.Equal(rec.result, "exception")
     Assert.True(InStr(rec.msg, "Duration") > 0, "message names the parameter")

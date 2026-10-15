@@ -1,9 +1,9 @@
 #Requires AutoHotkey v2.0
-#Include ..\..\core\Json.ahk
+#Include ..\..\..\..\src\core\Json.ahk
 
 ; Shared parts of Action_TestExprParams (inline) and Action_TestExprParamsWorker (worker), WI-0039 and WI-0042: the
-; parameter list, the evaluation and the report. No element class and no ElementRegistry.Register here: a class file
-; that includes this file must not register a class in a role that does not hold it (F-0081, E0041).
+; parameter list, the evaluation and the report. A file in lib/ of a package is shared code, no element class: the
+; generator includes it before the package class (WI-0047), in every role that holds one of the two classes.
 class TestExprParamsKit {
     static Parameters(ctx) => [
         {type: "Label", label: "Test"},

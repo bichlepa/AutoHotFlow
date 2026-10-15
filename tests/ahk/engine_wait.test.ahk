@@ -3,7 +3,7 @@
 #Include helpers\ExecutorKit.ahk
 
 WaitFlow() {
-    return FlowText([El("h", "Test_Hold")], [Conn("c1", "t0", "h")], "wait")
+    return FlowText([El("h", "ExecKit.Test_Hold")], [Conn("c1", "t0", "h")], "wait")
 }
 
 ; Starts three instances of the wait flow; returns [owner, [id1, id2, id3]].
@@ -73,7 +73,7 @@ WaitStoppedWaitingInstanceIsSkipped() {
 
 ; With the policy parallel nothing waits.
 ParallelDoesNotQueue() {
-    owner := NewOwner(FlowText([El("h", "Test_Hold")], [Conn("c1", "t0", "h")], "parallel"))
+    owner := NewOwner(FlowText([El("h", "ExecKit.Test_Hold")], [Conn("c1", "t0", "h")], "parallel"))
     rec := owner.flows.Get("f")
     owner.executor.StartFlow(rec)
     b := owner.executor.StartFlow(rec)
@@ -88,7 +88,7 @@ WaitingInstanceWithVanishedTriggerEndsWithoutStart() {
     owner := r[1]
     ids := r[2]
     ; the first instance keeps running; the new revision has no trigger any more
-    Commit(owner, FlowText([El("h", "Test_Hold")], [], "wait", false))
+    Commit(owner, FlowText([El("h", "ExecKit.Test_Hold")], [], "wait", false))
     Probe.Release("h")
     owner.Drive()
     Assert.Equal(owner.executor.IsExecuting("f"), false)

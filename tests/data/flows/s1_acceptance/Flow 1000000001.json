@@ -31,7 +31,7 @@
       "class": "Action_TestSetVar",
       "ID": "element0000000002",
       "name": "Set variables",
-      "package": "Default",
+      "package": "Test",
       "packageVersion": "1.2.0",
       "pars": {
         "Steps": "[{\"op\": \"set\", \"name\": \"inst_value\", \"value\": 7}, {\"op\": \"set\", \"name\": \"A_thread_value\", \"value\": \"thread text\", \"location\": \"thread\"}, {\"op\": \"set\", \"name\": \"global_acc\", \"value\": \"global text\"}, {\"op\": \"set\", \"name\": \"static_acc\", \"value\": {\"k\": [1, 2]}}]"
@@ -45,7 +45,7 @@
       "class": "Action_TestSetVar",
       "ID": "element0000000003",
       "name": "Probe variables",
-      "package": "Default",
+      "package": "Test",
       "packageVersion": "1.2.0",
       "pars": {
         "Steps": "[{\"op\": \"probe\", \"name\": \"inst_value\"}, {\"op\": \"probe\", \"name\": \"A_thread_value\"}, {\"op\": \"probe\", \"name\": \"global_acc\"}, {\"op\": \"probe\", \"name\": \"static_acc\"}, {\"op\": \"probe\", \"name\": \"global_synthetic_text\"}, {\"op\": \"probe\", \"name\": \"static_synthetic_map\"}, {\"op\": \"probe\", \"name\": \"A_AhfVersion\"}]"
@@ -59,7 +59,7 @@
       "class": "Action_TestExprParams",
       "ID": "element0000000004",
       "name": "Converted expression",
-      "package": "Default",
+      "package": "Test",
       "packageVersion": "1.2.0",
       "pars": {
         "Expr": "x := 1.50",

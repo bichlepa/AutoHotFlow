@@ -34,43 +34,47 @@ class Probe {
     }
 }
 
-; Finishes at once.
-class Test_Count extends AhfElement {
-    static Mode := "inline"
-    static Run(ctx, params) {
-        Probe.runs.Push(ctx.elementId)
-        h := Probe.onRun
-        if (IsObject(h))
-            h(ctx)
-        ctx.Finish("normal")
+; The test elements are classes of the package ExecKit (E0045): their qualified IDs are ExecKit.Test_Count and so on,
+; and a flow names them with "package":"ExecKit" (El does that for "ExecKit.Test_Count").
+class ExecKit {
+    ; Finishes at once.
+    class Test_Count extends AhfElement {
+        static Mode := "inline"
+        static Run(ctx, params) {
+            Probe.runs.Push(ctx.elementId)
+            h := Probe.onRun
+            if (IsObject(h))
+                h(ctx)
+            ctx.Finish("normal")
+        }
+    }
+
+    ; Waits until the test calls Probe.Release. Instances of the same flow share the element ID, so a
+    ; second instance replaces the first entry: tests release one instance at a time.
+    class Test_Hold extends AhfElement {
+        static Mode := "inline"
+        static Run(ctx, params) {
+            Probe.runs.Push(ctx.elementId)
+            Probe.held[ctx.elementId] := ctx
+        }
+        static Stop(ctx, params) {
+            Probe.stops.Push(ctx.elementId ":" (params.HasProp("x") ? params.x : ""))
+        }
+    }
+
+    ; Runs in the worker pool (FakeWorkers). A call of Run here means the engine ran a worker element itself.
+    class Test_Wk extends AhfElement {
+        static Mode := "worker"
+        static Run(ctx, params) {
+            Probe.runs.Push(ctx.elementId)
+            ctx.Finish("normal")
+        }
     }
 }
 
-; Waits until the test calls Probe.Release. Instances of the same flow share the element ID, so a
-; second instance replaces the first entry: tests release one instance at a time.
-class Test_Hold extends AhfElement {
-    static Mode := "inline"
-    static Run(ctx, params) {
-        Probe.runs.Push(ctx.elementId)
-        Probe.held[ctx.elementId] := ctx
-    }
-    static Stop(ctx, params) {
-        Probe.stops.Push(ctx.elementId ":" (params.HasProp("x") ? params.x : ""))
-    }
-}
-
-; Runs in the worker pool (FakeWorkers). A call of Run here means the engine ran a worker element itself.
-class Test_Wk extends AhfElement {
-    static Mode := "worker"
-    static Run(ctx, params) {
-        Probe.runs.Push(ctx.elementId)
-        ctx.Finish("normal")
-    }
-}
-
-ElementRegistry.Register(Test_Count)
-ElementRegistry.Register(Test_Hold)
-ElementRegistry.Register(Test_Wk)
+ElementRegistry.Register(ExecKit.Test_Count)
+ElementRegistry.Register(ExecKit.Test_Hold)
+ElementRegistry.Register(ExecKit.Test_Wk)
 Log.Configure(Log.Memory)
 Ids.Configure("test")
 
@@ -82,7 +86,13 @@ Lines(parts*) {
 }
 
 Trig() => '"t0":{"ID":"t0","type":"trigger","class":"trigger_Manual","pars":{}}'
-El(id, cls, pars := "{}") => '"' id '":{"ID":"' id '","type":"action","class":"' cls '","pars":' pars '}'
+; An action element. cls is "<package>.<class>" (the element then names its package, E0045) or a class of the package
+; Default (no "package" key, as in many v1 files).
+El(id, cls, pars := "{}") {
+    pos := InStr(cls, ".")
+    pkg := pos ? '"package":"' SubStr(cls, 1, pos - 1) '",' : ""
+    return '"' id '":{"ID":"' id '","type":"action",' pkg '"class":"' SubStr(cls, pos + 1) '","pars":' pars '}'
+}
 Conn(id, from, to, type := "normal") => '"' id '":{"ID":"' id '","from":"' from '","to":"' to '","type":"Connection","ConnectionType":"' type '"}'
 
 ; Builds flow text: elements (array of strings) and connections (array of strings), optional policy.
