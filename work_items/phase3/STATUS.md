@@ -44,7 +44,8 @@ Session 6 start: 2026-10-15 (evening), work-item mode, HEAD `8c09337` on `v2-por
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
 | 1 | Implementer WI-0047 | opus | wi-47 (removed) | (deleted) | element layout per package, qualified IDs (E0045); 10 commits, rebased on v2-port, integrated as 862f392 to d179825 (renumbered F-9000* to F-0086, F-9001* to F-0088 by `e125b71`/`462a853`, see OPEN-ITEMS); stress 200 big flows: ready 52 to 62 s, largest snapshot 0.6 s (budget 3 s) | done, verifier running on d179825 |
-| 3 | Verifier WI-0047 | sonnet | (main checkout, `run_suite --ref HEAD`) | - | fast, foundation, slow, stress, arch and req checks on d179825 | running |
+| 3 | Verifier WI-0047 | sonnet | ver-47 (findings only) | wip/ver-47 | fast 796 passed; foundation 444 passed; slow 93 passed, 4 failed under load (F-0088 again, F-0089: three fault tests, green alone); stress 200 flows: ready 56 s, largest snapshot 718 ms; arch, gen, req checks 0 | done; findings integrated as 84ddcb0 (second observation as update of F-0088, new F-0089) |
+| 5 | Bug hunter F-0088 (log burst loss) | sonnet | hunt-16 | wip/hunt-16 | cause of the lost log line, branch from 188c570 | running |
 | 4 | Implementer rename of the F-0078 locals (owner's wish) | sonnet | wi-rename | wip/wi-rename | rename 151 locals, `#Warn All` in test scripts, arch rule; base d179825 | running |
 | 2 | Bug hunter (OPEN-ITEMS mode) | sonnet | hunt-15 | wip/hunt-15 | not in the area of WI-0047 | running |
 
