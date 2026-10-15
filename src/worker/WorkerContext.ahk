@@ -85,8 +85,8 @@ class WorkerContext extends ExecContext {
     ; ---- variables through the engine (WI-0050) ------------------------------------------------------------------------
 
     GetVar(name, default := "", hidden := false) {
-        p := this._Ask("get", Map("name", String(name), "hidden", Json.Bool(hidden)))
-        return p.Get("exists", 0) ? WorkerContext.FromWire(p.Get("value", "")) : default
+        answer := this._Ask("get", Map("name", String(name), "hidden", Json.Bool(hidden)))
+        return answer.Get("exists", 0) ? WorkerContext.FromWire(answer.Get("value", "")) : default
     }
 
     GetVarType(name, hidden := false) {
@@ -98,9 +98,9 @@ class WorkerContext extends ExecContext {
     }
 
     SetVar(name, value, scope := "", hidden := false) {
-        p := this._Ask("set", Map("name", String(name), "value", WorkerContext.ToWire(value), "scope", String(scope)
+        answer := this._Ask("set", Map("name", String(name), "value", WorkerContext.ToWire(value), "scope", String(scope)
             , "hidden", Json.Bool(hidden)))
-        return p.Get("accepted", 0) ? 1 : 0
+        return answer.Get("accepted", 0) ? 1 : 0
     }
 
     DeleteVar(name, hidden := false) {
@@ -126,8 +126,8 @@ class WorkerContext extends ExecContext {
     }
 
     ExportInstanceVars() {
-        p := this._Ask("list", Map("scope", "instance", "withValues", Json.True))
-        values := p.Get("values", "")
+        answer := this._Ask("list", Map("scope", "instance", "withValues", Json.True))
+        values := answer.Get("values", "")
         return WorkerContext._Map((values is Map) ? values : "")
     }
 
@@ -199,9 +199,9 @@ class WorkerContext extends ExecContext {
                 throw ElementError("engine did not answer " reqType " within " timeoutMs " ms")
             WorkerContext._WaitForMessages(WorkerContext.WAIT_STEP_MS)
         }
-        p := box.res.payload
-        if (!p.Get("ok", false)) {
-            err := p.Get("error", "")
+        answer := box.res.payload
+        if (!answer.Get("ok", false)) {
+            err := answer.Get("error", "")
             code := (err is Map) ? String(err.Get("code", "")) : ""
             text := (err is Map) ? String(err.Get("message", "")) : ""
             if (code = ErrCode.GONE)
@@ -210,9 +210,9 @@ class WorkerContext extends ExecContext {
                 throw ElementError("engine did not answer " reqType " (" code ": " text ")")
             throw ElementError(reqType " failed (" code ": " text ")")
         }
-        if (p.Has("elementError"))
-            throw ElementError(String(p["elementError"]))
-        return p
+        if (answer.Has("elementError"))
+            throw ElementError(String(answer["elementError"]))
+        return answer
     }
 
     ; Waits until a message is in the queue of this thread (at most ms), then lets AHK handle every queued message

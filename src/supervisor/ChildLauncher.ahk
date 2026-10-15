@@ -58,11 +58,11 @@ class ChildLauncher {
             NumPut("ptr", hWrite, si, 88)              ; hStdOutput
             NumPut("ptr", hWrite, si, 96)              ; hStdError
             NumPut("ptr", attr["buffer"].Ptr, si, 104)     ; lpAttributeList
-            cmd := Buffer((StrLen(commandLine) + 1) * 2, 0)   ; CreateProcessW may write into the command line
-            StrPut(commandLine, cmd, "UTF-16")
+            cmdBuf := Buffer((StrLen(commandLine) + 1) * 2, 0)   ; CreateProcessW may write into the command line
+            StrPut(commandLine, cmdBuf, "UTF-16")
             pi := Buffer(24, 0)
             flags := ChildLauncher.EXTENDED_STARTUPINFO_PRESENT | ChildLauncher.CREATE_UNICODE_ENVIRONMENT
-            ok := DllCall("CreateProcessW", "ptr", 0, "ptr", cmd, "ptr", 0, "ptr", 0, "int", 1, "uint", flags
+            ok := DllCall("CreateProcessW", "ptr", 0, "ptr", cmdBuf, "ptr", 0, "ptr", 0, "int", 1, "uint", flags
                 , "ptr", 0, "ptr", 0, "ptr", si, "ptr", pi)
             err := A_LastError
             if (!ok)

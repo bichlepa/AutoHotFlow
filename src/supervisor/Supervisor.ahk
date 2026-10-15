@@ -306,11 +306,11 @@ class Supervisor {
             return Map("processes", this.children.Snapshot())
         if (msg.type = "cmd.process.spawn") {
             Supervisor._RequireEngine(msg)
-            role := msg.payload.Get("role", "")
-            if (IsObject(role) || role = "")
+            roleName := msg.payload.Get("role", "")
+            if (IsObject(roleName) || roleName = "")
                 throw AhfError("payload field 'role' is missing", ErrCode.BAD_PAYLOAD)
-            if (role != "worker")
-                throw AhfError("only worker processes can be started on request, not '" role "'", ErrCode.DENIED)
+            if (roleName != "worker")
+                throw AhfError("only worker processes can be started on request, not '" roleName "'", ErrCode.DENIED)
             return Map("name", this.children.SpawnWorker())
         }
         if (msg.type = "cmd.process.kill") {

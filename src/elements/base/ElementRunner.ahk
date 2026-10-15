@@ -16,13 +16,13 @@ class ElementRunner {
     ; Runs cls.Run(ctx, params). params must already be evaluated.
     ; onSlow(classId, ms) is called after a Run that took longer than SlowMs (synchronous part only).
     static Run(cls, ctx, params, onSlow := "") {
-        start := Time.NowMs()
+        startMs := Time.NowMs()
         try {
             cls.Run(ctx, params)
         } catch as e {
             ctx.Finish("exception", e.Message)
         }
-        ms := Time.NowMs() - start
+        ms := Time.NowMs() - startMs
         if (ms > this.SlowMs && IsObject(onSlow))
             onSlow(ElementRegistry.IdOf(cls), ms)
     }

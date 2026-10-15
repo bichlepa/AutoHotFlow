@@ -78,11 +78,11 @@ class Children {
         this.workerLimit := config.Get("workerLimit", Children.WORKER_LIMIT)
         this._nextWorker := 1
         this._autoRoles := Map()
-        for role, _ in Children.AUTO_RESTART
-            this._autoRoles[role] := true
+        for roleName, _ in Children.AUTO_RESTART
+            this._autoRoles[roleName] := true
         if (config["testRoles"])
-            for role, _ in Children.TEST_AUTO_RESTART
-                this._autoRoles[role] := true
+            for roleName, _ in Children.TEST_AUTO_RESTART
+                this._autoRoles[roleName] := true
     }
 
     Has(name) => this._recs.Has(name)

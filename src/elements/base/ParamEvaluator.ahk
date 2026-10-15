@@ -35,17 +35,17 @@ class ParamEvaluator {
     static List(cls, ctx) {
         out := []
         for spec in cls.Parameters(ctx) {
-            ids := ParamEvaluator.Field(spec, "id")
-            if (!IsObject(ids) && ids = "")
+            idList := ParamEvaluator.Field(spec, "id")
+            if (!IsObject(idList) && idList = "")
                 continue
             kind := ParamEvaluator.Field(spec, "type")
             if (!IsObject(kind) && (kind = "label" || kind = "button"))
                 continue
-            if (ids is Array) {
-                for i, id in ids
+            if (idList is Array) {
+                for i, id in idList
                     out.Push(Map("id", id, "spec", spec, "n", i))
             } else {
-                out.Push(Map("id", ids, "spec", spec, "n", 0))
+                out.Push(Map("id", idList, "spec", spec, "n", 0))
             }
         }
         return out
