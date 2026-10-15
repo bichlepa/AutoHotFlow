@@ -40,9 +40,9 @@ class Log {
     ; level, source, text, flowId.
     static Recent(count := 0) {
         list := []
-        start := (count > 0 && count < this.ring.Length) ? this.ring.Length - count + 1 : 1
-        loop this.ring.Length - start + 1
-            list.Push(this.ring[start + A_Index - 1].Clone())
+        first := (count > 0 && count < this.ring.Length) ? this.ring.Length - count + 1 : 1
+        loop this.ring.Length - first + 1
+            list.Push(this.ring[first + A_Index - 1].Clone())
         return list
     }
 

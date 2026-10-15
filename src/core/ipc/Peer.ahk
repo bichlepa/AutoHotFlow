@@ -468,10 +468,10 @@ class Peer {
     }
 
     _FailAll(code, text) {
-        ids := []
+        idList := []
         for id, _ in this._pending
-            ids.Push(id)
-        for id in ids {
+            idList.Push(id)
+        for id in idList {
             if (this._pending.Has(id))
                 this._Finish(id, this._ErrorReply(this._pending[id], code, text))
         }

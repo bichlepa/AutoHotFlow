@@ -69,8 +69,8 @@ class Json {
             ; Most positions hold no whitespace (compact JSON), so the regex runs only when needed.
             if (this.pos >= this.len || NumGet(this.buf, this.pos * 2, "UShort") > 0x20)
                 return
-            RegExMatch(this.text, "[ \t\r\n]*", &run, this.pos + 1)
-            this.pos += StrLen(run[0])
+            RegExMatch(this.text, "[ \t\r\n]*", &runMatch, this.pos + 1)
+            this.pos += StrLen(runMatch[0])
         }
 
         ParseValue() {
@@ -104,8 +104,8 @@ class Json {
         }
 
         ParseNumber() {
-            start := this.pos
-            isFloat := false
+            numStart := this.pos
+            hasFraction := false
             if (this.Peek() = 0x2D)
                 this.pos++
             if (this.Peek() = 0x30) {
@@ -117,7 +117,7 @@ class Json {
                 this.Fail("invalid number")
             }
             if (this.Peek() = 0x2E) {  ; .
-                isFloat := true
+                hasFraction := true
                 this.pos++
                 if (!this.IsDigit())
                     this.Fail("digit expected after decimal point")
@@ -125,7 +125,7 @@ class Json {
                     this.pos++
             }
             if (this.Peek() = 0x65 || this.Peek() = 0x45) {  ; e E
-                isFloat := true
+                hasFraction := true
                 this.pos++
                 if (this.Peek() = 0x2B || this.Peek() = 0x2D)  ; + -
                     this.pos++
@@ -134,10 +134,10 @@ class Json {
                 while (this.IsDigit())
                     this.pos++
             }
-            text := SubStr(this.text, start + 1, this.pos - start)
-            digits := this.pos - start - ((SubStr(text, 1, 1) = "-") ? 1 : 0)
+            text := SubStr(this.text, numStart + 1, this.pos - numStart)
+            digits := this.pos - numStart - ((SubStr(text, 1, 1) = "-") ? 1 : 0)
             ; Integers with more than 18 digits do not fit safely into an AHK Integer, so they become Float.
-            if (isFloat || digits > 18) {
+            if (hasFraction || digits > 18) {
                 value := Float(text)
                 if (value - value != 0)  ; inf or NaN
                     this.Fail("number out of range")
@@ -156,9 +156,9 @@ class Json {
             out := ""
             loop {
                 ; Plain run up to the next quote, backslash or control character.
-                RegExMatch(this.text, '[^"\\\x00-\x1F]*', &run, this.pos + 1)
-                out .= run[0]
-                this.pos += StrLen(run[0])
+                RegExMatch(this.text, '[^"\\\x00-\x1F]*', &runMatch, this.pos + 1)
+                out .= runMatch[0]
+                this.pos += StrLen(runMatch[0])
                 c := this.Peek()
                 if (c = 0x22) {
                     this.pos++
@@ -404,13 +404,13 @@ class Json {
     }
 
     static EmitMap(m, indent, level, &out) {
-        keys := Json.SortedKeys(m)
-        if (keys.Length = 0) {
+        keyList := Json.SortedKeys(m)
+        if (keyList.Length = 0) {
             out .= "{}"
             return
         }
         out .= "{"
-        for i, key in keys {
+        for i, key in keyList {
             if (i > 1)
                 out .= ","
             Json.Newline(indent, level + 1, &out)
@@ -448,20 +448,20 @@ class Json {
     ; Keys in ascending order. Map enumeration is already sorted (verified); the insertion sort
     ; makes the order explicit and does not depend on it.
     static SortedKeys(m) {
-        keys := []
+        keyList := []
         for key, v in m
-            keys.Push(key)
-        loop keys.Length - 1 {
+            keyList.Push(key)
+        loop keyList.Length - 1 {
             i := A_Index + 1
             j := i
-            while (j > 1 && Json.Less(keys[j], keys[j - 1])) {
-                tmp := keys[j]
-                keys[j] := keys[j - 1]
-                keys[j - 1] := tmp
+            while (j > 1 && Json.Less(keyList[j], keyList[j - 1])) {
+                tmp := keyList[j]
+                keyList[j] := keyList[j - 1]
+                keyList[j - 1] := tmp
                 j--
             }
         }
-        return keys
+        return keyList
     }
 
     ; Compares by UTF-16 code unit. AHK's < operator converts strings to numbers, so it is not used here.
