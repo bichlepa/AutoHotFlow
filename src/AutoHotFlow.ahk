@@ -1,9 +1,11 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
 
-; Single entry point of every role process (doc/ARCHITECTURE.md D0012). The code is in AhfBoot.ahk (WI-0029), so that the
-; test entry tests/integration/helpers/AutoHotFlowTest.ahk can run the same code with the test roles added.
-;   AutoHotkey64.exe src\AutoHotFlow.ahk --role=<name> --session=<id> --hub=<pipe> --data=<dir> [--flow=<id>] [--hubHwnd=<n>]
+; Entry of the supervisor, the file the user starts (doc/ARCHITECTURE.md D0012, E0041). The other roles have an entry script
+; of their own in src\entry\<role>.ahk; the supervisor starts them from there (Children.EntryScript). This file
+; includes the shared boot code (AhfBoot.ahk) and the supervisor, no element class and no other role.
+;   AutoHotkey64.exe src\AutoHotFlow.ahk [--session=<id>] [--data=<dir>] [--start=<role>[:<flow>],...] (Supervisor.ahk)
 #Include AhfBoot.ahk
+#Include supervisor\Supervisor.ahk
 
-AhfMain()
+AhfMain((opts) => Supervisor.Run(opts))

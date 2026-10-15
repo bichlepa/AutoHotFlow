@@ -1,11 +1,10 @@
 #Requires AutoHotkey v2.0
 #Include Errors.ahk
 #Include Role.ahk
-#Include PlaceholderRole.ahk
 
 ; Maps the role name of --role to its class (v2-phase2-final:work_items/phase2/WI-0006-role-basis.md). Lookup is case-insensitive.
-; Each role file ends with RoleRegistry.Register(<name>, <class>); the entry point includes the
-; role files, there is no dynamic loading. Names with a suffix ("editor:Flow 1") are looked up
+; Each entry script calls RoleRegistry.Register(<name>, <class>) for its role after it has included the
+; role files; there is no dynamic loading. Names with a suffix ("editor:Flow 1") are looked up
 ; by their base name ("editor").
 ;
 ;   RoleRegistry.Register("engine", EngineRole)
@@ -31,12 +30,7 @@ class RoleRegistry {
     static Lookup(name) => this.roles.Get(Role.BaseName(name), "")
 }
 
-; "supervisor" is not registered here: it is not a Role (WI-0007) and the entry point starts it directly.
-; "storage" is registered by the entry point (WI-0012, src/storage/Storage.ahk), like "engine" below.
-; "engine" is registered by the entry point (WI-0010, src/engine/Engine.ahk): core/ must not include
-; role folders, so the real class cannot be named here.
-RoleRegistry.Register("triggerhost", PlaceholderRole)  ; WI-0014
-RoleRegistry.Register("editor", PlaceholderRole)       ; later phase
-; "worker" is registered by the entry point (WI-0011, src/worker/Worker.ahk), like "engine" (see above).
-; "manager" is registered by the entry point (WI-0013, src/manager/StubManager.ahk), like "storage". Registering it
-; here as well would make the entry point's Register throw (duplicate role).
+; Nothing is registered here. Each entry script registers its own role before it calls AhfMain (WI-0047-PREP, E0041),
+; so a process knows only the role it was started for: src/entry/<role>.ahk. "supervisor" is not a Role (WI-0007);
+; src/AutoHotFlow.ahk runs it directly. PlaceholderRole (core/PlaceholderRole.ahk) is included by the entries of the roles that are
+; not written yet (triggerhost, editor).

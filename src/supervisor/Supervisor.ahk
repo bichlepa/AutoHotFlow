@@ -142,7 +142,8 @@ class Supervisor {
         if (this._ForwardIfRunning())
             return
         config := Map("session", this.session, "pipe", this.pipe, "data", this.data
-            , "hubHwnd", Wake.Hwnd, "testRoles", this.testRoles, "script", A_ScriptFullPath
+            , "hubHwnd", Wake.Hwnd, "testRoles", this.testRoles
+            , "entryDir", A_ScriptDir "\entry"
             , "roleOpts", this.roleOpts, "restartMax", this.restartMax
             , "workerLimit", this.workerLimit)
         this.hub := Hub(this.pipe, this.session)

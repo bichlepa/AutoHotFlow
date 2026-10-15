@@ -4,13 +4,12 @@
 #Include ..\core\Time.ahk
 #Include ..\core\Role.ahk
 #Include ..\core\Json.ahk
-#Include ..\core\RoleRegistry.ahk
 #Include ChildLauncher.ahk
 
 ; The role processes started by the supervisor (doc/ARCHITECTURE.md 3, 5.3, 6.2).
 ; One record per child, keyed by its name ("echo" or "echo:a", as the role sees itself).
 ;
-;   children := Children(config, hub)     ; config Map: session, pipe, data, hubHwnd, testRoles, script
+;   children := Children(config, hub)     ; config Map: session, pipe, data, hubHwnd, testRoles, entryDir
 ;   children.Spawn("echo:a")              ; starts AutoHotkey with --role=echo --flow=a ...
 ;   children.Tick(now)                    ; called by the supervisor's timer: process exits, restarts
 ;
@@ -91,7 +90,8 @@ class Children {
     ; Starts a role process. entry is "role" or "role:flowId". Throws AhfError for an unknown role or a duplicate name.
     Spawn(entry) {
         roleName := Role.BaseName(entry)
-        if (RoleRegistry.Lookup(roleName) = "")
+        script := this.EntryScript(roleName)
+        if (script = "")
             throw AhfError("unknown role '" roleName "'", ErrCode.BAD_ARGS)
         if (this._recs.Has(entry))
             throw AhfError("child '" entry "' already exists", ErrCode.CONFLICT)
@@ -99,13 +99,33 @@ class Children {
         p := InStr(entry, ":")
         if (p)
             flow := SubStr(entry, p + 1)
-        rec := Map("name", entry, "role", roleName, "flow", flow, "state", "starting", "pid", 0, "handle", 0
+        rec := Map("name", entry, "role", roleName, "script", script, "flow", flow, "state", "starting", "pid", 0, "handle", 0
             , "gone", true, "exitCode", "", "startedAt", 0, "readyAt", 0, "lastPingAt", 0, "pingN", 0
             , "lastPongAt", 0, "bye", false, "byeClean", false, "restartTimes", [], "restartAt", 0
             , "killAt", 0, "restartable", this._autoRoles.Has(roleName), "exitSeenAt", 0
             , "reader", "", "output", [], "busy", false, "killReason", "")  ; arch-ok: wire-bool internal record, never sent
         this._recs[entry] := rec
         this._Launch(rec, false, Time.NowMs())
+    }
+
+    ; The entry script of a role (WI-0047-PREP, E0041): <entryDir>\<role>.ahk, with --test-roles also
+    ; <entryDir>\test\<role>.ahk. "" when there is none (an unknown role). The role name is checked as a file name.
+    ; FileExist is a status query of the program's own script folder, not data I/O.
+    EntryScript(roleName) {
+        if (!RegExMatch(roleName, "^\w+$"))
+            return ""
+        dir := this.config.Get("entryDir", "")
+        if (dir = "")
+            return ""
+        path := dir "\" roleName ".ahk"
+        if (FileExist(path))
+            return path
+        if (this.config["testRoles"]) {
+            path := dir "\test\" roleName ".ahk"
+            if (FileExist(path))
+                return path
+        }
+        return ""
     }
 
     ; Starts a role that is not running: a new child, or the record of an ended one again (the debug window that the
@@ -519,7 +539,7 @@ class Children {
 
     _Launch(rec, isRestart, now) {
         cfg := this.config
-        cmd := '"' A_AhkPath '" /ErrorStdOut=UTF-8 "' cfg["script"] '"'
+        cmd := '"' A_AhkPath '" /ErrorStdOut=UTF-8 "' rec["script"] '"'
             . ' --role=' rec["role"] ' --session=' cfg["session"] ' --hub=' cfg["pipe"]
             . ' --data="' cfg["data"] '" --hubHwnd=' cfg["hubHwnd"]
         if (rec["flow"] != "")

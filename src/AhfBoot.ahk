@@ -1,19 +1,23 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
 
-; Boot code of every role process (WI-0029: split from the entry so that the test entry can reuse it). The entry
-; src/AutoHotFlow.ahk includes this file and calls AhfMain(). It is the single entry point of every role process (doc/ARCHITECTURE.md D0012, v2-phase2-final:work_items/phase2/README.md):
-;   AutoHotkey64.exe src\AutoHotFlow.ahk --role=<name> --session=<id> --hub=<pipe> --data=<dir> [--flow=<id>] [--hubHwnd=<n>] [--test-roles]
-; --role=supervisor (or no --role) starts the supervisor (WI-0007, src/supervisor/), which is not a Role.
+; Boot code that every role process shares (WI-0029, split by WI-0047-PREP). Each entry script includes this file first,
+; then the code of its own role (and only that), registers the role and calls AhfMain (doc/ARCHITECTURE.md D0012, 8):
+;   src\AutoHotFlow.ahk      the supervisor, the file the user starts; it starts the other roles from src\entry\<role>.ahk
+;   src\entry\<role>.ahk    storage, engine, worker, manager, debug, triggerhost, editor
+; Command line of a role (the supervisor builds it, Children._Launch):
+;   AutoHotkey64.exe src\entry\<role>.ahk --role=<name> --session=<id> --hub=<pipe> --data=<dir> [--flow=<id>] [--hubHwnd=<n>] [--test-roles]
+; The supervisor takes only --session, --data, --start and the like (doc/PROTOCOL.md section 5a).
 ; Exit codes: 0 normal end, 1 role or supervisor failed to start (also an error while the files load), 2 bad
-; arguments, unknown role or a 32-bit interpreter,
+; arguments, unknown role (a role that the entry does not register) or a 32-bit interpreter,
 ; 3 role not implemented yet, 4 hub lost (orphan guard) or peer closed, 5 supervisor: a child was terminated,
 ; 6 a role: too many unexpected errors (Role.ERROR_LIMIT within Role.ERROR_WINDOW_MS, WI-0023).
 ; No dialog is ever shown: every message goes to the console sink (stderr).
 ;
-; Roles are included here, not loaded dynamically (WI-0006). The test roles are not part of src/: the test entry
-; tests/integration/helpers/AutoHotFlowTest.ahk includes this file, adds the test roles and calls AhfMain. They are
-; registered only with --test-roles (WI-0007, WI-0029).
+; Roles are included by the entry scripts, not here, and not loaded dynamically (WI-0006). The element classes of a role
+; are the generated block src\entry\generated\Elements_<role>.ahk (tools/gen_element_includes.py, E0041). The test roles
+; are not part of src/: the test entries in tests/integration/helpers include this file, add the test roles and the test
+; elements and register the roles only with --test-roles (WI-0007, WI-0029).
 ;
 ; The first two statements run before any #Include below, because included files may contain code on file level
 ; (the element files call ElementRegistry.Register there) and AHK runs it in text order, before AhfMain:
@@ -28,26 +32,6 @@ if (A_PtrSize != 8) {
 OnError(AhfLoadError)
 
 #Include core\RoleRegistry.ahk
-#Include supervisor\Supervisor.ahk
-#Include engine\Engine.ahk
-#Include worker\Worker.ahk
-#Include storage\Storage.ahk
-#Include manager\StubManager.ahk
-#Include debugview\DebugView.ahk
-#Include elements\skeleton\Trigger_Manual.ahk
-#Include elements\skeleton\Action_Sleep.ahk
-#Include elements\skeleton\Action_Do_nothing.ahk
-#Include elements\skeleton\Action_TestThrow.ahk
-#Include elements\skeleton\Action_TestBlockWorker.ahk
-#Include elements\skeleton\Action_TestHangWorker.ahk
-#Include elements\skeleton\Action_TestThrowWorker.ahk
-#Include elements\skeleton\Action_TestEchoWorker.ahk
-#Include elements\skeleton\Action_TestLongBlockWorker.ahk
-#Include elements\skeleton\Action_TestFreezeWorker.ahk
-#Include elements\skeleton\Action_TestFreezeTimeoutWorker.ahk
-#Include elements\skeleton\Action_TestExprParams.ahk
-#Include elements\skeleton\Action_TestExprParamsWorker.ahk
-#Include elements\skeleton\Action_TestSetVar.ahk
 ; The test entry (tests/integration/helpers/AutoHotFlowTest.ahk) sets this to a function that registers the test roles.
 ; The product entry leaves it empty, so --test-roles does nothing there.
 global AhfTestRolesFn := ""
@@ -68,10 +52,12 @@ AhfLoadError(e, mode) {
     ExitApp(1)
 }
 
-AhfMain() {
+; supervisorFn: the supervisor entry passes a function that runs the supervisor with the options (it is not a Role). The
+; other entries leave it empty, so for them "--role=supervisor" is an unknown role. The entry has registered its role
+; in RoleRegistry before it calls AhfMain.
+AhfMain(supervisorFn := "") {
     Persistent()
     Log.Configure(Role.ConsoleFn)
-    AhfRegisterRoles()
     opts := ""
     try {
         opts := Args.Parse(A_Args)
@@ -80,11 +66,11 @@ AhfMain() {
     }
     if (opts.Has("test-roles") && AhfTestRolesFn != "")
         AhfTestRolesFn()
-    roleName := opts.Get("role", "supervisor")
-    if (roleName = "supervisor") {
+    roleName := opts.Get("role", supervisorFn != "" ? "supervisor" : "")
+    if (supervisorFn != "" && roleName = "supervisor") {
         OnError(AhfLoadError, 0)     ; the supervisor installs its own handler
         try {
-            Supervisor.Run(opts)
+            supervisorFn(opts)
         } catch as e {
             AhfExit(1, "supervisor failed to start: " Type(e) ": " e.Message)
         }
@@ -93,12 +79,10 @@ AhfMain() {
     cls := RoleRegistry.Lookup(roleName)
     if (cls = "")
         AhfExit(2, "unknown role '" roleName "'")
-    if (Role.BaseName(roleName) != "supervisor") {
-        try {
-            Args.Require(opts, ["session", "hub", "data"])
-        } catch as e {
-            AhfExit(2, e.Message)
-        }
+    try {
+        Args.Require(opts, ["session", "hub", "data"])
+    } catch as e {
+        AhfExit(2, e.Message)
     }
     ; Not named "role": AHK identifiers are case-insensitive, so it would shadow the class Role.
     roleObj := ""
@@ -113,15 +97,6 @@ AhfMain() {
     } catch as e {
         AhfExit(1, roleObj.name " failed to start: " Type(e) ": " e.Message)
     }
-}
-
-; Registers the roles that the entry point itself knows (the others sit in RoleRegistry.ahk).
-AhfRegisterRoles() {
-    RoleRegistry.Register("engine", Engine)
-    RoleRegistry.Register("worker", Worker)
-    RoleRegistry.Register("storage", Storage)
-    RoleRegistry.Register("manager", StubManager)   ; WI-0013: stub only, needs --ui=stub
-    RoleRegistry.Register("debug", DebugView)       ; WI-0028: the debug window (--headless without a window)
 }
 
 AhfExit(code, text) {

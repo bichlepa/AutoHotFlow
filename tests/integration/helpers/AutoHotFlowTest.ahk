@@ -1,24 +1,38 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
 
-; Test entry point (WI-0029): the product boot code (src/AhfBoot.ahk) plus the test roles, which are registered only with
-; --test-roles. The supervisor starts its children with A_ScriptFullPath, so they get this entry, too.
+; Test entry point (WI-0029, changed by WI-0047-PREP): the supervisor with the test roles, and every product role in one
+; process, so that a test can start a role directly (--role=engine ...). The supervisor started from this file starts its
+; children from entry\ next to this file (the role entries of the tests, with the test elements) and, with
+; --test-roles, from entry\test\ (the test roles). The roles are registered here without the selection by Mode of the
+; product role entries: this entry parses all classes.
 ;   AutoHotkey64.exe tests\integration\helpers\AutoHotFlowTest.ahk --role=... --test-roles
 #Include ..\..\..\src\AhfBoot.ahk
+#Include ..\..\..\src\supervisor\Supervisor.ahk
+#Include ..\..\..\src\engine\Engine.ahk
+#Include ..\..\..\src\worker\Worker.ahk
+#Include ..\..\..\src\storage\Storage.ahk
+#Include ..\..\..\src\manager\StubManager.ahk
+#Include ..\..\..\src\debugview\DebugView.ahk
+#Include ..\..\..\src\core\PlaceholderRole.ahk
+#Include ..\..\..\src\entry\generated\Elements_engine.ahk
+#Include entry\generated\TestElements_engine.ahk
 #Include EchoRole.ahk
 #Include CrasherRole.ahk
 #Include HangerRole.ahk
 #Include SlowShutdownRole.ahk
 #Include RegisterFailure.ahk
-; Test elements that live in tests/ (WI-0050), registered in every role of this entry
-#Include ..\..\elements\Action_TestVarFunctions.ahk
-#Include ..\..\elements\Action_TestVarFunctionsWorker.ahk
-#Include ..\..\elements\Action_TestVarBenchWorker.ahk
-#Include ..\..\elements\Action_TestAskAfterStopWorker.ahk
 
+RoleRegistry.Register("engine", Engine)
+RoleRegistry.Register("worker", Worker)
+RoleRegistry.Register("storage", Storage)
+RoleRegistry.Register("manager", StubManager)
+RoleRegistry.Register("debug", DebugView)
+RoleRegistry.Register("triggerhost", PlaceholderRole)
+RoleRegistry.Register("editor", PlaceholderRole)
 AhfTestRolesFn := AhfRegisterTestRoles
 
-AhfMain()
+AhfMain((opts) => Supervisor.Run(opts))
 
 ; Registers the test roles. Called by AhfMain only with --test-roles.
 AhfRegisterTestRoles() {
