@@ -41,6 +41,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0090 | Fast tier: `test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_kill` got no `evt.engine.ready` of the second chain within 20 s | observed once, run 20261015-230752-0bb0d843 on `0bb0d84`, open | |
 | F-0091 | Slow tier: `test_clients_churn.py` smoke variant: handles of the engine grew from 145 to 164 (slack 3) | observed once, run 20261015-230952-0bb0d843 on `0bb0d84`, open | |
 | F-9010* | `WorkerBridge`: leftovers of a failed spawn, no start timeout for a slot in "starting" | (a), (b) verified by unit test and fixed; (c) read in code, covered by the supervisor; verifier pending | |
+| F-9011* | Fast tier: `test_pings_are_answered_while_a_blocking_element_runs` third ping answered after 0.808 s (limit 0.8 s) | observed once under load, run 20261015-231712-bc27cbe5 on `bc27cbe` (the commit only touches `WorkerBridge`, not used by this test); green alone, run 20261015-231824-bc27cbe5, open | |
 
 ## Findings
 
@@ -252,6 +253,12 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** (a) and (b) verified by unit test: both new cases in `tests/ahk/engine_worker_bridge.test.ahk` fail on the old code (slot count 1 instead of 0; stale early ready counted for a new worker) and pass with the fix (25 passed). (c) read in code: the supervisor judges a worker that does not become ready (state `starting` to `hung` on the startup timeout, `Children.ahk`) and ends it, which reaches the bridge as `evt.process.crashed`; so no second timeout is needed in the bridge, and only the header comment is imprecise. The window of (b) is small (the process must end before the spawn answer reaches the engine), so it shows up only under heavy load or a worker that dies at once; not seen in a real run. The fix is pending the fast tier.
 **Fix:** early ready/ended events are kept only while a spawn answer is on its way and are forgotten when the last one has arrived; a worker that ended before its answer gets no slot and counts as a failure.
 **Action:** close after a verifier run; correct the header comment (start failures come from the supervisor as crash events).
+
+### F-9011*: ping answered 8 ms over the limit while a blocking element runs
+
+**What:** `tests/integration/test_worker.py::test_pings_are_answered_while_a_blocking_element_runs` (line 259): `answered[-1][2] < BLOCK_MS / 1000.0` was 0.808 against 0.8.
+**Status:** observed once in the fast tier (844 passed, 1 failed) next to other suites; green alone. The limit equals the block time, so any scheduling delay breaks it. Assumed: load. Not checked: whether the limit is scaled (`scaled()`).
+**Action:** if it returns, scale or loosen the limit (compare against the block time plus a margin).
 
 ## Watch list (E0007)
 
