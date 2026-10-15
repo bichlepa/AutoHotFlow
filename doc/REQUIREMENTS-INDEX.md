@@ -9,24 +9,25 @@ run the tool. The legend of the columns is at the top of the source.
 |---|---:|---:|---:|---:|---:|---:|---:|
 | [Flows and execution (EXE)](#flows-and-execution-exe) | 15 | 7 | 0 | 6 | 2 | 0 | 1 |
 | [Expressions and variables (VAR)](#expressions-and-variables-var) | 14 | 7 | 0 | 4 | 3 | 0 | 2 |
-| [Elements (ELM)](#elements-elm) | 24 | 0 | 0 | 2 | 22 | 0 | 0 |
-| [Triggers (TRG)](#triggers-trg) | 13 | 0 | 0 | 1 | 12 | 0 | 0 |
+| [Element packages (PKG)](#element-packages-pkg) | 6 | 0 | 0 | 0 | 6 | 0 | 0 |
+| [Elements (ELM)](#elements-elm) | 5 | 0 | 0 | 2 | 3 | 0 | 0 |
+| [Triggers (TRG)](#triggers-trg) | 4 | 0 | 0 | 1 | 3 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 10 | 0 | 0 | 0 | 10 | 0 | 0 |
 | [Editor (EDT)](#editor-edt) | 21 | 0 | 0 | 1 | 20 | 0 | 0 |
 | [Settings (SET)](#settings-set) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
-| [Import and migration (MIG)](#import-and-migration-mig) | 8 | 5 | 0 | 0 | 3 | 0 | 0 |
+| [Import and migration (MIG)](#import-and-migration-mig) | 7 | 5 | 0 | 0 | 2 | 0 | 0 |
 | [Languages and help (LNG)](#languages-and-help-lng) | 5 | 0 | 0 | 1 | 4 | 0 | 0 |
-| [Element packages (PKG)](#element-packages-pkg) | 3 | 0 | 0 | 0 | 2 | 1 | 0 |
 | [Logging and diagnostics (DIA)](#logging-and-diagnostics-dia) | 5 | 4 | 0 | 1 | 0 | 0 | 0 |
 | [Debugger (DBG)](#debugger-dbg) | 5 | 0 | 0 | 0 | 5 | 0 | 0 |
+| [AI integration (AI)](#ai-integration-ai) | 5 | 0 | 0 | 0 | 5 | 0 | 0 |
 | [Distribution (DST)](#distribution-dst) | 5 | 1 | 0 | 2 | 2 | 0 | 0 |
 | [Robustness (ROB)](#robustness-rob) | 11 | 10 | 0 | 1 | 0 | 0 | 0 |
 | [Performance and resources (PRF)](#performance-and-resources-prf) | 10 | 6 | 0 | 2 | 2 | 0 | 0 |
 | [Security (SEC)](#security-sec) | 3 | 2 | 0 | 0 | 0 | 1 | 0 |
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 1 | 2 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
-| [Usability (USE)](#usability-use) | 4 | 0 | 0 | 1 | 3 | 0 | 0 |
-| **All** | **173** | **50** | **0** | **24** | **97** | **2** | **3** |
+| [Usability (USE)](#usability-use) | 7 | 0 | 0 | 1 | 6 | 0 | 0 |
+| **All** | **155** | **50** | **0** | **24** | **80** | **1** | **3** |
 
 ## Flows and execution (EXE)
 
@@ -67,34 +68,26 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-VAR-130](REQUIREMENTS.md#req-var-130-hints-on-global-and-static-variables) | Hints on global and static variables | no | open | could | later | - |
 | [REQ-VAR-140](REQUIREMENTS.md#req-var-140-protect-variables-against-concurrent-changes) | Protect variables against concurrent changes *(in doubt)* | no | open | could | later | - |
 
+## Element packages (PKG)
+
+| ID | Requirement | v1 | v2 | Prio | Scope | Plan |
+|---|---|---|---|---|---|---|
+| [REQ-PKG-010](REQUIREMENTS.md#req-pkg-010-elements-are-organised-in-packages) | Elements are organised in packages | yes | open | must | port | S2 (WI-47) |
+| [REQ-PKG-020](REQUIREMENTS.md#req-pkg-020-install-additional-packages) | Install additional packages | yes | open | could | later | - (phase 3 has only the Default package, E37) |
+| [REQ-PKG-030](REQUIREMENTS.md#req-pkg-030-the-included-elements-are-split-into-a-basic-and-special-packages) | The included elements are split into a basic and special packages | no | open | should | later | - |
+| [REQ-PKG-040](REQUIREMENTS.md#req-pkg-040-users-create-their-own-packages-and-elements) | Users create their own packages and elements | no | open | should | later | - |
+| [REQ-PKG-050](REQUIREMENTS.md#req-pkg-050-a-broken-element-or-package-does-not-stop-autohotflow) | A broken element or package does not stop AutoHotFlow | no | open | must | later | - |
+| [REQ-PKG-060](REQUIREMENTS.md#req-pkg-060-the-package-name-is-part-of-the-identity-of-an-element) | The package name is part of the identity of an element | no | open | should | port | S2 (WI-47), proposed |
+
 ## Elements (ELM)
 
 | ID | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|
 | [REQ-ELM-010](REQUIREMENTS.md#req-elm-010-element-contract-and-registry) | Element contract and registry | yes | partial | must | port | S2 (WI-47), S7 (editor) |
 | [REQ-ELM-020](REQUIREMENTS.md#req-elm-020-every-element-is-documented-by-its-help-text) | Every element is documented by its help text | yes | open | must | port | S7 |
-| [REQ-ELM-100](REQUIREMENTS.md#req-elm-100-variables-and-calculations) | Variables and calculations | yes | open | must | port | S2 (`New_Variable`, WI-52), S8 (rest) |
-| [REQ-ELM-110](REQUIREMENTS.md#req-elm-110-strings) | Strings | yes | open | must | port | S8 |
-| [REQ-ELM-120](REQUIREMENTS.md#req-elm-120-lists) | Lists | yes | open | must | port | S2 (WI-53), S8 (rest) |
-| [REQ-ELM-130](REQUIREMENTS.md#req-elm-130-date-and-time) | Date and time | yes | open | must | port | S8 |
-| [REQ-ELM-140](REQUIREMENTS.md#req-elm-140-clipboard) | Clipboard | yes | open | must | port | S8 |
-| [REQ-ELM-150](REQUIREMENTS.md#req-elm-150-dialogs-and-notifications) | Dialogs and notifications | yes | open | must | port | S2 (WI-51, WI-56), S8 (rest) |
-| [REQ-ELM-160](REQUIREMENTS.md#req-elm-160-files-and-folders) | Files and folders | yes | open | must | port | S8 |
-| [REQ-ELM-170](REQUIREMENTS.md#req-elm-170-ini-files-and-archives) | Ini files and archives | yes | open | must | port | S8 |
-| [REQ-ELM-180](REQUIREMENTS.md#req-elm-180-drives) | Drives | yes | open | should | port | S8 |
-| [REQ-ELM-190](REQUIREMENTS.md#req-elm-190-internet) | Internet | yes | open | must | port | S8 |
-| [REQ-ELM-200](REQUIREMENTS.md#req-elm-200-screen-and-images) | Screen and images | yes | open | must | port | S8 |
-| [REQ-ELM-210](REQUIREMENTS.md#req-elm-210-windows-and-controls) | Windows and controls | yes | open | must | port | S8 |
-| [REQ-ELM-220](REQUIREMENTS.md#req-elm-220-mouse-and-keyboard) | Mouse and keyboard | yes | open | must | port | S8 |
-| [REQ-ELM-230](REQUIREMENTS.md#req-elm-230-sound-and-speech) | Sound and speech | yes | open | should | port | S8 |
-| [REQ-ELM-240](REQUIREMENTS.md#req-elm-240-programs-and-processes) | Programs and processes | yes | open | must | port | S8 |
-| [REQ-ELM-250](REQUIREMENTS.md#req-elm-250-power-and-session) | Power and session | yes | open | should | port | S8 |
-| [REQ-ELM-260](REQUIREMENTS.md#req-elm-260-flow-control) | Flow control | yes | partial | must | port | S2 (WI-47, WI-52, WI-55), S3 (`Set_Flow_Status`), S8 (rest) |
-| [REQ-ELM-270](REQUIREMENTS.md#req-elm-270-conditions-on-values) | Conditions on values | yes | open | must | port | S2 (WI-52) |
-| [REQ-ELM-280](REQUIREMENTS.md#req-elm-280-loops) | Loops | yes | open | must | port | S2 (WI-54), S8 (`Loop_Through_Files`) |
-| [REQ-ELM-290](REQUIREMENTS.md#req-elm-290-autohotkey-script-element) | AutoHotkey script element | yes | open | must | port | S8 |
-| [REQ-ELM-300](REQUIREMENTS.md#req-elm-300-trace-points-for-automatic-tests) | Trace points for automatic tests | yes | open | must | port | S2 (WI-52) |
-| [REQ-ELM-310](REQUIREMENTS.md#req-elm-310-ported-elements-behave-as-their-help-text-says) | Ported elements behave as their help text says | n/a | open | must | port | S2, S8 |
+| [REQ-ELM-100](REQUIREMENTS.md#req-elm-100-the-actions-conditions-and-loops-of-v1-are-available) | The actions, conditions and loops of v1 are available | yes | partial | must | port | S2 (core set), S3, S8 (rest) |
+| [REQ-ELM-110](REQUIREMENTS.md#req-elm-110-autohotkey-scripts-in-flows) | AutoHotkey scripts in flows | yes | open | must | port | S8 |
+| [REQ-ELM-120](REQUIREMENTS.md#req-elm-120-ported-elements-behave-as-their-help-text-says) | Ported elements behave as their help text says | n/a | open | must | port | S2, S8 |
 
 ## Triggers (TRG)
 
@@ -103,16 +96,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-TRG-010](REQUIREMENTS.md#req-trg-010-triggers-react-at-once-whatever-the-load) | Triggers react at once, whatever the load | no | open | must | port | S3 |
 | [REQ-TRG-020](REQUIREMENTS.md#req-trg-020-triggers-follow-the-enabled-state-also-after-a-restart) | Triggers follow the enabled state, also after a restart | yes | open | must | port | S3 |
 | [REQ-TRG-030](REQUIREMENTS.md#req-trg-030-several-triggers-per-flow) | Several triggers per flow | yes | open | must | port | S3, S6 |
-| [REQ-TRG-100](REQUIREMENTS.md#req-trg-100-manual-trigger) | Manual trigger | yes | partial | must | port | S2 (WI-47) |
-| [REQ-TRG-110](REQUIREMENTS.md#req-trg-110-time-triggers) | Time triggers | yes | open | must | port | S3 (`Periodic_Timer`), S8 (`Time_of_Day`) |
-| [REQ-TRG-120](REQUIREMENTS.md#req-trg-120-start-up-trigger) | Start-up trigger | yes | open | must | port | S3 |
-| [REQ-TRG-130](REQUIREMENTS.md#req-trg-130-hotkey-and-hotstring) | Hotkey and hotstring | yes | open | must | port | S3 (`Hotkey`), S8 (`Hotstring`) |
-| [REQ-TRG-140](REQUIREMENTS.md#req-trg-140-shortcut-trigger) | Shortcut trigger | yes | open | should | port | S8 |
-| [REQ-TRG-150](REQUIREMENTS.md#req-trg-150-user-activity-triggers) | User activity triggers | yes | open | should | port | S8 |
-| [REQ-TRG-160](REQUIREMENTS.md#req-trg-160-window-triggers) | Window triggers | yes | open | must | port | S8 |
-| [REQ-TRG-170](REQUIREMENTS.md#req-trg-170-process-triggers) | Process triggers | yes | open | should | port | S8 |
-| [REQ-TRG-180](REQUIREMENTS.md#req-trg-180-autohotkey-script-trigger) | AutoHotkey script trigger | yes | open | should | port | S8 |
-| [REQ-TRG-190](REQUIREMENTS.md#req-trg-190-file-observer-trigger) | File observer trigger | partial | open | could | later | - |
+| [REQ-TRG-100](REQUIREMENTS.md#req-trg-100-the-triggers-of-v1-are-available) | The triggers of v1 are available | yes | partial | must | port | S2 (`Manual`), S3, S8 |
 
 ## Manager (MGR)
 
@@ -177,7 +161,6 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-MIG-050](REQUIREMENTS.md#req-mig-050-saved-flows-carry-a-format-version) | Saved flows carry a format version | n/a | done | must | port | - |
 | [REQ-MIG-060](REQUIREMENTS.md#req-mig-060-import-from-the-v1-data-folder) | Import from the v1 data folder | n/a | open | must | port | S4 |
 | [REQ-MIG-070](REQUIREMENTS.md#req-mig-070-flows-with-missing-element-packages) | Flows with missing element packages | yes | open | should | port | S4 |
-| [REQ-MIG-080](REQUIREMENTS.md#req-mig-080-ai-assisted-adaptation-of-imported-flows) | AI-assisted adaptation of imported flows | n/a | open | could | later | - (after phase 3, E35) |
 
 ## Languages and help (LNG)
 
@@ -188,14 +171,6 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-LNG-030](REQUIREMENTS.md#req-lng-030-translated-element-texts) | Translated element texts | yes | open | must | port | S2 (WI-47), S8 |
 | [REQ-LNG-040](REQUIREMENTS.md#req-lng-040-help-pages) | Help pages | yes | open | must | port | S7 |
 | [REQ-LNG-050](REQUIREMENTS.md#req-lng-050-translation-tools-for-contributors) | Translation tools for contributors | yes | open | could | port | - |
-
-## Element packages (PKG)
-
-| ID | Requirement | v1 | v2 | Prio | Scope | Plan |
-|---|---|---|---|---|---|---|
-| [REQ-PKG-010](REQUIREMENTS.md#req-pkg-010-elements-are-organised-in-packages) | Elements are organised in packages | yes | open | must | port | S2 (WI-47) |
-| [REQ-PKG-020](REQUIREMENTS.md#req-pkg-020-additional-packages) | Additional packages | yes | open | could | later | - (phase 3 has only the Default package, E37) |
-| [REQ-PKG-030](REQUIREMENTS.md#req-pkg-030-chrome-package) | Chrome package | yes | dropped | could | port | - |
 
 ## Logging and diagnostics (DIA)
 
@@ -216,6 +191,16 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-DBG-030](REQUIREMENTS.md#req-dbg-030-single-step-and-slow-execution) | Single step and slow execution | no | open | should | port | phase 4 |
 | [REQ-DBG-040](REQUIREMENTS.md#req-dbg-040-inspect-and-change-variables-while-paused) | Inspect and change variables while paused | partial | open | should | port | phase 4 |
 | [REQ-DBG-050](REQUIREMENTS.md#req-dbg-050-edit-the-flow-while-debugging) | Edit the flow while debugging | no | open | should | port | phase 4 |
+
+## AI integration (AI)
+
+| ID | Requirement | v1 | v2 | Prio | Scope | Plan |
+|---|---|---|---|---|---|---|
+| [REQ-AI-010](REQUIREMENTS.md#req-ai-010-connect-any-ai-through-a-provider-script) | Connect any AI through a provider script | no | open | should | later | - |
+| [REQ-AI-020](REQUIREMENTS.md#req-ai-020-elements-that-call-the-ai) | Elements that call the AI | no | open | should | later | - |
+| [REQ-AI-030](REQUIREMENTS.md#req-ai-030-ai-assistant-in-the-editor) | AI assistant in the editor | no | open | should | later | - |
+| [REQ-AI-040](REQUIREMENTS.md#req-ai-040-ai-assisted-import-of-v1-flows) | AI-assisted import of v1 flows | n/a | open | could | later | - (after phase 3, E35) |
+| [REQ-AI-050](REQUIREMENTS.md#req-ai-050-further-ai-elements) | Further AI elements | no | open | could | later | - |
 
 ## Distribution (DST)
 
@@ -295,3 +280,6 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-USE-020](REQUIREMENTS.md#req-use-020-experimental-elements-are-marked) | Experimental elements are marked | yes | open | could | port | S7 |
 | [REQ-USE-030](REQUIREMENTS.md#req-use-030-messages-reach-the-user-without-blocking-dialogs) | Messages reach the user without blocking dialogs | partial | open | must | port | S4 |
 | [REQ-USE-040](REQUIREMENTS.md#req-use-040-the-user-interface-stays-responsive) | The user interface stays responsive | no | partial | must | port | S4 to S7 |
+| [REQ-USE-050](REQUIREMENTS.md#req-use-050-the-first-start-asks-for-the-users-experience) | The first start asks for the user's experience | no | open | should | later | - |
+| [REQ-USE-060](REQUIREMENTS.md#req-use-060-amount-of-hints) | Amount of hints | no | open | should | later | - |
+| [REQ-USE-070](REQUIREMENTS.md#req-use-070-hints-can-be-switched-off-one-by-one) | Hints can be switched off one by one | no | open | should | later | - |

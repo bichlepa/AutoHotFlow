@@ -121,7 +121,7 @@ Missing in v2: the global setting itself (settings come in S4). Until then `defa
 - **Plan:** S4 (manager), S6 (editor)
 - **Evidence:** `tests/integration/test_engine.py` (`test_start_*`, `test_stop_*`, `test_toggle_starts_and_stops_a_flow`)
 
-The user starts a flow from the manager or the editor, through its default manual trigger or a chosen one, and stops it there. Stopping ends all running and waiting instances of the flow. Starting and stopping from inside a flow is REQ-EXE-120 and REQ-ELM-260; starting by an event is TRG.
+The user starts a flow from the manager or the editor, through its default manual trigger or a chosen one, and stops it there. Stopping ends all running and waiting instances of the flow. Starting and stopping from inside a flow is REQ-EXE-120 and REQ-ELM-100; starting by an event is TRG.
 
 ### REQ-EXE-070 Enable and disable a flow
 
@@ -395,9 +395,73 @@ When two flows or branches read, change and write the same variable through two 
 
 Note: an element that waits (REQ-EXE-100) works on copies and writes its changes back when it ends (REQ-VAR-110), so the window for a lost change is as long as the element runs.
 
+## Element packages (PKG)
+
+### REQ-PKG-010 Elements are organised in packages
+
+- **v1:** yes
+- **v2:** open
+- **Prio:** must
+- **Scope:** port
+- **Plan:** S2 (WI-47)
+
+A package has a manifest (name, version, author, license, libraries, element lists), its element files, icons, language files and help. Flows store the package and its version per element. Phase 3 has only the package `Default` (E37).
+
+### REQ-PKG-020 Install additional packages
+
+- **v1:** yes (extension packages with their own installers)
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** - (phase 3 has only the Default package, E37)
+
+The user installs element packages from others. Depends on REQ-PKG-050 and REQ-PKG-060.
+
+### REQ-PKG-030 The included elements are split into a basic and special packages
+
+- **v1:** no
+- **v2:** open
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+The elements that come with AutoHotFlow are split into a basic package (everything that most flows need) and special packages for particular purposes, which may be more complex and may use external dependencies. All packages are in the repository and in the installer; the user switches each special package on or off in the settings. The first start proposes a choice (REQ-USE-050).
+
+### REQ-PKG-040 Users create their own packages and elements
+
+- **v1:** no (possible in principle, not documented for users)
+- **v2:** open
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+The user can create a package of their own and add elements to it with little effort. AutoHotFlow gives all the information needed: a template, the element contract (REQ-ELM-010), the parameter types and how to test the element. The information is complete enough that a user without programming knowledge can give it to an AI in a chat window, describe what the element shall do, and get a working element (see also AI).
+
+### REQ-PKG-050 A broken element or package does not stop AutoHotFlow
+
+- **v1:** no
+- **v2:** open
+- **Prio:** must
+- **Scope:** later
+- **Plan:** -
+
+An element of an installed or self-made package that does not load or that fails is marked as faulty, with the reason, in the manager and in the editor. AutoHotFlow and all other elements keep working. Errors while an element runs are already covered by REQ-EXE-090; this requirement is about loading.
+
+Open point (assumed, not checked): AutoHotkey reads all `#Include` files when a script starts, and a syntax error in one of them stops the whole script. Today every process includes every element (one entry point, D12). A compiled program cannot include files at run time at all (REQ-DST-020). So packages from users need their own way of loading, for example a check of the package in a separate process before it is used, or running its elements in separate processes. To be designed before REQ-PKG-020 and REQ-PKG-040.
+
+### REQ-PKG-060 The package name is part of the identity of an element
+
+- **v1:** no (the class name alone identifies an element)
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S2 (WI-47), proposed
+
+Elements of different packages may have the same class name: an element is identified by its package and its class. For backward compatibility the elements of the included packages keep their v1 class IDs; for all other packages the package name is part of the identity. Flow files already store the package of each element (`ARCHITECTURE.md` section 7). Doing this together with the package layout of WI-47 is cheaper than changing it later.
+
 ## Elements (ELM)
 
-The element groups follow the manifest of the v1 Default package. Class IDs are `Action_<name>`, `Condition_<name>`, `Loop_<name>`, `Trigger_<name>`. The core set of S2 is named in each group; the rest comes in S8 (E20). The triggers are in TRG.
+A single element is not a requirement of its own. REQ-ELM-100 tracks the elements of v1 during the port; after the port, a new element needs a requirement only when it brings a new capability (for example the AI elements of AI). The class IDs are `Action_<name>`, `Condition_<name>`, `Loop_<name>`, `Trigger_<name>`; the triggers are in TRG.
 
 ### REQ-ELM-010 Element contract and registry
 
@@ -419,200 +483,47 @@ An element is a class with: name, category, user level, stability (stable or exp
 - **Plan:** S7
 - **Evidence:** -
 
-The help text of an element is also its specification for the port (E35). The help is reachable from the element settings.
+The help text of an element is also its specification for the port (REQ-ELM-120). The help is reachable from the element settings.
 
-### REQ-ELM-100 Variables and calculations
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S2 (`New_Variable`, WI-52), S8 (rest)
-
-`Action_New_Variable`, `Action_Random_Number`, `Action_Absolute_Number`, `Action_Square_Root`, `Action_Trigonometry`, `Action_Rounding_a_number`, `Action_Exponentiation`, `Action_Script` (REQ-VAR-020).
-
-### REQ-ELM-110 Strings
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S8
-
-`Action_Search_in_a_string`, `Action_Substring`, `Action_Substring2`, `Action_Get_string_Length`, `Action_Replace_in_a_string`, `Action_Trim_a_string`, `Action_Split_a_string`, `Action_Change_character_case`, `Action_Encode_string`; condition `Condition_String_Contains_Text`.
-
-### REQ-ELM-120 Lists
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S2 (WI-53), S8 (rest)
-
-Core set: `Action_New_List`, `Action_Add_to_list`, `Action_Get_list_info`, `Action_Delete_from_list`, `Action_Get_index_of_element_in_list`, `Action_Shuffle_list`, `Condition_List_Contains_Element`. In S8: `Action_Get_from_list`, `Action_Convert_list_to_string`, `Action_Convert_string_to_list`.
-
-### REQ-ELM-130 Date and time
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S8
-
-`Action_New_Time`, `Action_Time_calculation`, `Action_Time_difference`.
-
-### REQ-ELM-140 Clipboard
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S8
-
-`Action_Get_Clipboard`, `Action_Set_Clipboard`.
-
-### REQ-ELM-150 Dialogs and notifications
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S2 (WI-51, WI-56), S8 (rest)
-
-Core set: `Action_Message_Box`, `Action_Tooltip`, `Condition_Confirmation_Dialog`, `Condition_Debug_Dialog`. In S8: `Action_Input_Box`, `Action_Select_file`, `Action_Select_folder`. Dialogs run in a worker (MIGRATION M-02) and can be answered by a test provider (E38). v1 0.02.16 added many options to message box, input box and confirmation dialog.
-
-### REQ-ELM-160 Files and folders
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S8
-
-`Action_Read_From_File`, `Action_Write_To_File`, `Action_Copy_file`, `Action_Move_File`, `Action_Rename_file`, `Action_Delete_file`, `Action_Create_folder`, `Action_Copy_folder`, `Action_Move_Folder`, `Action_Rename_Folder`, `Action_Delete_folder`, `Action_Empty_Recycle_bin`, `Action_Get_file_attributes`, `Action_Get_file_size`, `Action_Get_file_time`, `Action_Set_file_attributes`, `Action_Set_file_time`, `Action_Get_shortcut_information`, `Action_Create_Shortcut`, `Action_Split_path`; conditions `Condition_File_Exists`, `Condition_File_Has_Attribute`; loop `Loop_Loop_Through_Files`.
-
-### REQ-ELM-170 Ini files and archives
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S8
-
-`Action_Read_From_Ini`, `Action_Write_to_ini`, `Action_Delete_From_Ini`, `Action_Compress_files`, `Action_Extract_files`.
-
-### REQ-ELM-180 Drives
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** should
-- **Scope:** port
-- **Plan:** S8
-
-`Action_List_Drives`, `Action_Get_Drive_Information`, `Action_Change_Drive_Label`, `Action_Eject_Drive`, `Action_Lock_Or_Unlock_Drive`.
-
-### REQ-ELM-190 Internet
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S8
-
-`Action_Download_file`, `Action_HTTP_Request`.
-
-### REQ-ELM-200 Screen and images
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S8
-
-`Action_Screenshot`, `Action_Get_pixel_color`, `Action_Search_pixel`, `Action_Search_Image`, `Action_Get_Screen_Settings`, `Action_Set_Screen_Settings`.
-
-### REQ-ELM-210 Windows and controls
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S8
-
-`Action_activate_Window`, `Action_Show_window`, `Action_Hide_window`, `Action_Close_Window`, `Action_Move_window`, `Action_Minimize_All_Windows`, `Action_Get_control_text`, `Action_Set_control_text`; conditions `Condition_Window_Active`, `Condition_Window_Exists`.
-
-### REQ-ELM-220 Mouse and keyboard
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S8
-
-`Action_Click`, `Action_Move_Mouse`, `Action_Drag_with_mouse`, `Action_Get_mouse_position`, `Action_Send_Keystrokes`, `Action_Send_Keystrokes_To_Control`, `Action_Set_Lock_Key`, `Action_Block_User_Input`; condition `Condition_Key_Is_Down`.
-
-### REQ-ELM-230 Sound and speech
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** should
-- **Scope:** port
-- **Plan:** S8
-
-`Action_Play_Sound`, `Action_Stop_Sound`, `Action_Beep`, `Action_Get_Volume`, `Action_Set_Volume`, `Action_Speech_output`.
-
-### REQ-ELM-240 Programs and processes
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S8
-
-`Action_Run`, `Action_Kill_Process`, `Action_Set_Process_Priority`; condition `Condition_Process_Is_Running`.
-
-### REQ-ELM-250 Power and session
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** should
-- **Scope:** port
-- **Plan:** S8
-
-`Action_Lock_Computer`, `Action_Log_Off`, `Action_Shutdown`, `Action_Reboot_Computer`, `Action_Hibernate_Computer`, `Action_Suspend_Computer`.
-
-### REQ-ELM-260 Flow control
+### REQ-ELM-100 The actions, conditions and loops of v1 are available
 
 - **v1:** yes
 - **v2:** partial (`Action_Sleep` and `Action_Do_nothing` exist as skeleton elements)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S2 (WI-47, WI-52, WI-55), S3 (`Set_Flow_Status`), S8 (rest)
+- **Plan:** S2 (core set), S3, S8 (rest)
 - **Evidence:** `tests/ahk/element_sleep.test.ahk`
 
-`Action_Sleep`, `Action_Do_nothing`, `Condition_Do_nothing`, `Action_Execute_Flow` (REQ-EXE-120), `Action_Stop_Flow`, `Condition_Flow_Running` (S2); `Action_Set_Flow_Status` (S3); `Condition_Flow_Enabled`, `Action_Set_element_parameter` (S8).
+The elements of the v1 Default package, by group. The core set of S2 comes first; the rest comes in S8 (E20). The status of a group is the status of its elements in v2.
 
-### REQ-ELM-270 Conditions on values
+| Group | Elements (without prefix) | Prio | Plan | v2 |
+|---|---|---|---|---|
+| Variables and calculations | `New_Variable`; `Random_Number`, `Absolute_Number`, `Square_Root`, `Trigonometry`, `Rounding_a_number`, `Exponentiation`, `Script` (REQ-VAR-020) | must | S2 (`New_Variable`, WI-52), S8 | open |
+| Conditions on values | `Expression`, `Variable_Is_Empty`, `Variable_content_is`, `NumberIs` | must | S2 (WI-52) | open |
+| Strings | `Search_in_a_string`, `Substring`, `Substring2`, `Get_string_Length`, `Replace_in_a_string`, `Trim_a_string`, `Split_a_string`, `Change_character_case`, `Encode_string`; condition `String_Contains_Text` | must | S8 | open |
+| Lists | `New_List`, `Add_to_list`, `Get_list_info`, `Delete_from_list`, `Get_index_of_element_in_list`, `Shuffle_list`, condition `List_Contains_Element`; `Get_from_list`, `Convert_list_to_string`, `Convert_string_to_list` | must | S2 (WI-53), S8 (the last three) | open |
+| Loops | `SimpleLoop`, `Condition`, `Parse_A_String`, `Work_through_a_list`; `Loop_Through_Files` | must | S2 (WI-54), S8 (`Loop_Through_Files`) | open |
+| Flow control | `Sleep`, `Do_nothing` (action and condition), `Execute_Flow` (REQ-EXE-120), `Stop_Flow`, condition `Flow_Running`; `Set_Flow_Status`; condition `Flow_Enabled`, `Set_element_parameter` | must | S2 (WI-47, WI-52, WI-55), S3 (`Set_Flow_Status`), S8 | partial |
+| Trace points | `Trace_Point`, `Trace_Point_Check` (record and check the path through a flow, REQ-TST-040) | must | S2 (WI-52) | open |
+| Dialogs and notifications | `Message_Box`, `Tooltip`, conditions `Confirmation_Dialog`, `Debug_Dialog`; `Input_Box`, `Select_file`, `Select_folder` | must | S2 (WI-51, WI-56), S8 | open |
+| Date and time | `New_Time`, `Time_calculation`, `Time_difference` | must | S8 | open |
+| Clipboard | `Get_Clipboard`, `Set_Clipboard` | must | S8 | open |
+| Files and folders | `Read_From_File`, `Write_To_File`, `Copy_file`, `Move_File`, `Rename_file`, `Delete_file`, `Create_folder`, `Copy_folder`, `Move_Folder`, `Rename_Folder`, `Delete_folder`, `Empty_Recycle_bin`, `Get_file_attributes`, `Get_file_size`, `Get_file_time`, `Set_file_attributes`, `Set_file_time`, `Get_shortcut_information`, `Create_Shortcut`, `Split_path`; conditions `File_Exists`, `File_Has_Attribute` | must | S8 | open |
+| Ini files | `Read_From_Ini`, `Write_to_ini`, `Delete_From_Ini` | must | S8 | open |
+| Archives | `Compress_files`, `Extract_files` | must | S8 | open |
+| Drives | `List_Drives`, `Get_Drive_Information`, `Change_Drive_Label`, `Eject_Drive`, `Lock_Or_Unlock_Drive` | should | S8 | open |
+| Internet | `Download_file`, `HTTP_Request` | must | S8 | open |
+| Screen and images | `Screenshot`, `Get_pixel_color`, `Search_pixel`, `Search_Image`, `Get_Screen_Settings`, `Set_Screen_Settings` | must | S8 | open |
+| Windows and controls | `activate_Window`, `Show_window`, `Hide_window`, `Close_Window`, `Move_window`, `Minimize_All_Windows`, `Get_control_text`, `Set_control_text`; conditions `Window_Active`, `Window_Exists` | must | S8 | open |
+| Mouse and keyboard | `Click`, `Move_Mouse`, `Drag_with_mouse`, `Get_mouse_position`, `Send_Keystrokes`, `Send_Keystrokes_To_Control`, `Set_Lock_Key`, `Block_User_Input`; condition `Key_Is_Down` | must | S8 | open |
+| Sound and speech | `Play_Sound`, `Stop_Sound`, `Beep`, `Get_Volume`, `Set_Volume`, `Speech_output` | should | S8 | open |
+| Programs and processes | `Run`, `Kill_Process`, `Set_Process_Priority`; condition `Process_Is_Running` | must | S8 | open |
+| Power and session | `Lock_Computer`, `Log_Off`, `Shutdown`, `Reboot_Computer`, `Hibernate_Computer`, `Suspend_Computer` | should | S8 | open |
+| AutoHotkey script | `AutoHotkey_script` (REQ-ELM-110) | must | S8 | open |
 
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S2 (WI-52)
+Dialogs run separately from the flows (MIGRATION M-02) and can be answered by a test provider (E38).
 
-`Condition_Expression`, `Condition_Variable_Is_Empty`, `Condition_Variable_content_is`, `Condition_NumberIs`. These are the most used elements of the known flows (`Condition_Expression` 128 times in 46 flows).
-
-### REQ-ELM-280 Loops
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S2 (WI-54), S8 (`Loop_Through_Files`)
-
-`Loop_SimpleLoop`, `Loop_Condition`, `Loop_Parse_A_String`, `Loop_Work_through_a_list`; `Loop_Loop_Through_Files` is in REQ-ELM-160. Connection points: REQ-EXE-030.
-
-### REQ-ELM-290 AutoHotkey script element
+### REQ-ELM-110 AutoHotkey scripts in flows
 
 - **v1:** yes (AutoHotkey v1 code in a new AutoHotkey_H thread)
 - **v2:** open
@@ -620,19 +531,9 @@ Core set: `Action_Message_Box`, `Action_Tooltip`, `Condition_Confirmation_Dialog
 - **Scope:** port
 - **Plan:** S8
 
-`Action_AutoHotkey_script` runs AutoHotkey v2 code in a worker (E39). An imported v1 script is kept as text and marked; it does not run until it is ported (MIGRATION M-49). The trigger of the same name is REQ-TRG-180.
+The action `Action_AutoHotkey_script` and the trigger `Trigger_AutoHotkey_Script` run AutoHotkey v2 code, separately from the flows (E39). An imported v1 script is kept as text and marked; it does not run until it is ported, by hand or with the help of an AI (REQ-AI-040, MIGRATION M-49).
 
-### REQ-ELM-300 Trace points for automatic tests
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S2 (WI-52)
-
-`Action_Trace_Point` and `Action_Trace_Point_Check` record the path through a flow and check it. The "Automatic tests" flows of v1 use them (REQ-TST-040).
-
-### REQ-ELM-310 Ported elements behave as their help text says
+### REQ-ELM-120 Ported elements behave as their help text says
 
 - **v1:** n/a
 - **v2:** open
@@ -651,7 +552,6 @@ The specification of an element is the underlying AutoHotkey v2 command plus its
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S3
-- **Evidence:** -
 
 Hotkeys, hooks and timers react at once, no matter how busy the running flows are (Windows removes a low-level hook that answers too slowly). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. How: a trigger host process, `ARCHITECTURE.md` D8.
 
@@ -675,106 +575,30 @@ The triggers of enabled flows are active from the start of AutoHotFlow on, and a
 
 A flow can have several triggers. Each trigger can be enabled and disabled on its own. One manual trigger is the default trigger, used when the flow is started without naming a trigger.
 
-### REQ-TRG-100 Manual trigger
+### REQ-TRG-100 The triggers of v1 are available
 
 - **v1:** yes
 - **v2:** partial (a skeleton `Trigger_Manual` exists, and a flow can be started through it)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S2 (WI-47)
+- **Plan:** S2 (`Manual`), S3, S8
 - **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`
 
-`Trigger_Manual`: started by the user, by another flow (REQ-EXE-120) or through the command line (REQ-TRG-140).
+The triggers of the v1 Default package, by group:
 
-### REQ-TRG-110 Time triggers
+| Group | Triggers (without prefix `Trigger_`) | Prio | Plan | v2 |
+|---|---|---|---|---|
+| Manual | `Manual`: started by the user, by another flow (REQ-EXE-120) or through the command line (REQ-DST-040) | must | S2 (WI-47) | partial |
+| Time | `Periodic_Timer`; `Time_of_Day` (with week days) | must | S3 (`Periodic_Timer`), S8 | open |
+| Start-up | `Start_up`: when AutoHotFlow starts; it can tell a start with Windows (REQ-SET-030) from a start by hand | must | S3 | open |
+| Keyboard | `Hotkey` (optionally only in a given window; disabled in the same context, MIGRATION M-03); `Hotstring` | must | S3 (`Hotkey`), S8 | open |
+| Shortcut | `Shortcut`: creates a shortcut file (default on the desktop) that starts the flow through the command line (REQ-DST-040); the shortcut is removed when the trigger is disabled (option) | should | S8 | open |
+| User activity | `User_Idle_Time`, `Clipboard_Changes` | should | S8 | open |
+| Windows | `Window_opens`, `Window_closes`, `Window_gets_active`, `Window_gets_inactive` | must | S8 | open |
+| Processes | `Process_starts`, `Process_closes` | should | S8 | open |
+| AutoHotkey script | `AutoHotkey_Script` (REQ-ELM-110) | should | S8 | open |
 
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S3 (`Periodic_Timer`), S8 (`Time_of_Day`)
-
-`Trigger_Periodic_Timer`, `Trigger_Time_of_Day` (with week days).
-
-### REQ-TRG-120 Start-up trigger
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S3
-
-`Trigger_Start_up` fires when AutoHotFlow starts; it can tell a start with Windows (REQ-SET-030) from a start by hand.
-
-### REQ-TRG-130 Hotkey and hotstring
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S3 (`Hotkey`), S8 (`Hotstring`)
-
-`Trigger_Hotkey` (optionally only in a given window), `Trigger_Hotstring`. A hotkey bound to a window is disabled in the same context (MIGRATION M-03).
-
-### REQ-TRG-140 Shortcut trigger
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** should
-- **Scope:** port
-- **Plan:** S8
-
-`Trigger_Shortcut` creates a shortcut file (default on the desktop) that starts the flow through the command line of AutoHotFlow; the shortcut is removed when the trigger is disabled (option). Needs REQ-DST-040.
-
-### REQ-TRG-150 User activity triggers
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** should
-- **Scope:** port
-- **Plan:** S8
-
-`Trigger_User_Idle_Time`, `Trigger_Clipboard_Changes`.
-
-### REQ-TRG-160 Window triggers
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S8
-
-`Trigger_Window_opens`, `Trigger_Window_closes`, `Trigger_Window_gets_active`, `Trigger_Window_gets_inactive`.
-
-### REQ-TRG-170 Process triggers
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** should
-- **Scope:** port
-- **Plan:** S8
-
-`Trigger_Process_starts`, `Trigger_Process_closes`.
-
-### REQ-TRG-180 AutoHotkey script trigger
-
-- **v1:** yes (AutoHotkey v1 code)
-- **v2:** open
-- **Prio:** should
-- **Scope:** port
-- **Plan:** S8
-
-`Trigger_AutoHotkey_Script` runs AutoHotkey v2 code that fires the trigger (E39, MIGRATION M-49).
-
-### REQ-TRG-190 File observer trigger
-
-- **v1:** partial (named in the changelog 0.02.20, but not in the manifest of the Default package; not checked further)
-- **v2:** open
-- **Prio:** could
-- **Scope:** later
-- **Plan:** -
-
-A trigger that fires when files in a folder change. To be decided whether it is wanted.
+The v1 changelog (0.02.20) names a trigger "File observer" that is not in the manifest of the Default package; it is not ported unless the project owner asks for it.
 
 ## Manager (MGR)
 
@@ -1130,7 +954,7 @@ The global execution policy (REQ-EXE-050) and the global working directory (REQ-
 - **Scope:** port
 - **Plan:** - (not in the phase 3 plan)
 
-AutoHotFlow starts when the user logs on to Windows, in the background. The start-up trigger knows that it was a start with Windows (REQ-TRG-120).
+AutoHotFlow starts when the user logs on to Windows, in the background. The start-up trigger knows that it was a start with Windows (REQ-TRG-100).
 
 ### REQ-SET-040 Run as administrator
 
@@ -1239,16 +1063,6 @@ The user imports the flows and variables of v1 into the v2 data folder through t
 
 When a flow uses a package that is not installed, the manager asks the user whether the file shall be deleted; no dialog blocks the running flows (MIGRATION M-08).
 
-### REQ-MIG-080 AI-assisted adaptation of imported flows
-
-- **v1:** n/a
-- **v2:** open
-- **Prio:** could
-- **Scope:** later
-- **Plan:** - (after phase 3, E35)
-
-An AI gets the marked places of an imported flow (MIGRATION IDs, v1 originals, descriptions) and proposes the fixes, also for ported AutoHotkey scripts (E39).
-
 ## Languages and help (LNG)
 
 ### REQ-LNG-010 User interface in several languages
@@ -1301,38 +1115,6 @@ A help window with general pages (welcome, variables, key list, color chart) and
 - **Plan:** -
 
 A tool finds the texts in the code and helps to add the translations.
-
-## Element packages (PKG)
-
-### REQ-PKG-010 Elements are organised in packages
-
-- **v1:** yes
-- **v2:** open
-- **Prio:** must
-- **Scope:** port
-- **Plan:** S2 (WI-47)
-
-A package has a manifest (name, version, author, license, libraries, element lists), its element files, icons, language files and help. Flows store the package and its version per element. Phase 3 has only the package `Default` (E37).
-
-### REQ-PKG-020 Additional packages
-
-- **v1:** yes (extension packages with their own installers)
-- **v2:** open
-- **Prio:** could
-- **Scope:** later
-- **Plan:** - (phase 3 has only the Default package, E37)
-
-The user installs further element packages. To be decided whether this is part of the port.
-
-### REQ-PKG-030 Chrome package
-
-- **v1:** yes
-- **v2:** dropped (decision of the project owner)
-- **Prio:** could
-- **Scope:** port
-- **Plan:** -
-
-v1 had a package with elements that control the Chrome browser. It is not ported (phase 1 release, item 7 in `DECISIONS.md`; MIGRATION M-09).
 
 ## Logging and diagnostics (DIA)
 
@@ -1442,6 +1224,60 @@ Execute one element at a time, or all of them with a pause between the steps, so
 
 Changes apply at the next step, as in REQ-EXE-080.
 
+## AI integration (AI)
+
+A large extension after the port. Imported v1 flows (REQ-MIG-040) and user packages (REQ-PKG-040) are prepared so that an AI can work with them.
+
+### REQ-AI-010 Connect any AI through a provider script
+
+- **v1:** no
+- **v2:** open
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+A global setting connects AutoHotFlow to an AI: a local model, a cloud API, or a command-line tool (Claude Code, GitHub Copilot, ...). Instead of fixed options, the setting points to an AutoHotkey script that follows a documented template. The user can write a connection to any AI; the template explains its interface so completely that the user can have an AI write it, also in a chat.
+
+### REQ-AI-020 Elements that call the AI
+
+- **v1:** no
+- **v2:** open
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+Elements send a freely defined prompt to the connected AI and return its answer. The conversation history is kept in thread variables; other elements can save it in permanent variables, export it to a file or change it.
+
+### REQ-AI-030 AI assistant in the editor
+
+- **v1:** no
+- **v2:** open
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+An AI in the editor analyses, changes and creates flows. It can read the logs of runs and, once the debugger exists (DBG), debug a flow step by step. Its references are the help of AutoHotFlow plus a system prompt and tools made for it.
+
+### REQ-AI-040 AI-assisted import of v1 flows
+
+- **v1:** n/a
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** - (after phase 3, E35)
+
+The AI gets the marked places of an imported flow (MIGRATION IDs, v1 originals, descriptions, REQ-MIG-040) and a system prompt made for the import, and proposes the fixes. This includes porting AutoHotkey v1 scripts to v2 (REQ-ELM-110, E39).
+
+### REQ-AI-050 Further AI elements
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+Elements for other AI services, for example speech output or image generation.
+
 ## Distribution (DST)
 
 ### REQ-DST-010 Installer
@@ -1485,7 +1321,7 @@ A 32-bit interpreter is rejected at the start with exit code 2 (E4).
 - **Plan:** S8 (commands of the shortcut trigger)
 - **Evidence:** `tests/fault/test_second_start.py`
 
-A second start of AutoHotFlow does not start a second application: it passes its command line to the running one and ends (MIGRATION M-23). Commands start a flow through a trigger (REQ-TRG-140).
+A second start of AutoHotFlow does not start a second application: it passes its command line to the running one and ends (MIGRATION M-23). Commands start a flow through a trigger (REQ-TRG-100).
 
 ### REQ-DST-050 Release checklist
 
@@ -1890,7 +1726,7 @@ Every deliberate behaviour change compared to v1 has a MIGRATION ID; no silent c
 - **Scope:** port
 - **Plan:** - (not in the phase 3 plan; assumed S7)
 
-Each element has a level; the setting "Shown elements" hides the elements above the user's level, so beginners are not overwhelmed.
+Each element has a level; the setting "Shown elements" hides the elements above the user's level, so beginners are not overwhelmed. The first start proposes a level (REQ-USE-050).
 
 ### REQ-USE-020 Experimental elements are marked
 
@@ -1921,3 +1757,41 @@ Errors and warnings that have no window of their own (for example a flow file th
 - **Plan:** S4 to S7
 
 Manager and editors never freeze while flows run, because they are processes of their own.
+
+### REQ-USE-050 The first start asks for the user's experience
+
+- **v1:** no
+- **v2:** open
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+At the first start AutoHotFlow asks how experienced the user is and preselects the options from the answer:
+
+| Level | Hints (REQ-USE-060) | Packages (REQ-PKG-030) | Complex elements (REQ-USE-010) |
+|---|---|---|---|
+| Beginner | all hints and tips | basic package only | hidden |
+| Advanced | all hints | basic package and the special packages whose dependencies are present | hidden |
+| Expert | only the important hints | basic package and all special packages | shown |
+
+After the choice of the level, every option can be changed on its own, there and later in the settings; the level only decides the preselection. Example of a complex element: the HTTP request with all its options, shown only to experts.
+
+### REQ-USE-060 Amount of hints
+
+- **v1:** no
+- **v2:** open
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+A setting decides how much help AutoHotFlow shows: only the important hints, all hints, or all hints plus tips.
+
+### REQ-USE-070 Hints can be switched off one by one
+
+- **v1:** no
+- **v2:** open
+- **Prio:** should
+- **Scope:** later
+- **Plan:** -
+
+Every hint that is not critical (for example "take care with global variables", REQ-VAR-130) has an option "do not show again". The settings list the switched-off hints and can switch them on again. Critical hints cannot be switched off: messages about a concrete error, and warnings of the flow check such as duplicate connections or connections without an end (REQ-EDT-160).
