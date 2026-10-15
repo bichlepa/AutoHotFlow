@@ -177,3 +177,13 @@ The project owner wants to see at a glance what waits for him. Keep `NEEDS-ATTEN
 - An entry that moves there leaves `doc/OPEN-ITEMS.md`, so the text is maintained in one place only. Name the commit where the full text is still visible.
 - Agents report such items to you in their report. You decide whether they go into the file.
 - The file is English like the rest of the repository.
+
+## 12. Wrap-up on request ("round up", "finish soon")
+
+When the project owner writes something like "round up" or "finish soon", the orchestrator changes its mode:
+
+- Running agents finish their current task. Do not start new implementers or bug hunters.
+- Verifiers are still started for every completed task that needs one (section 3d), so that nothing reaches `v2-port` unverified.
+- The integrator role keeps going: integrate finished branches, rebase them, and remove their workspaces (sections 5 and 5a).
+- At the end, all changes are on `v2-port`, the tests of the final state have run (their run IDs are in `STATUS.md`), any findings are in `doc/OPEN-ITEMS.md` with their final IDs, and the other documents are updated (`STATUS.md`, `NEEDS-ATTENTION.md`, requirements, history).
+- Then report to the project owner (section 8) and stop.
