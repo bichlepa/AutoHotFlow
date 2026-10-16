@@ -4,7 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **Read error of `FlowState.json` disables all writes for the session (WI-0060, decision 3).** Not accepted by the owner. An agent is implementing the change (a retry of the read) in its own workspace `flowstate-per-flow`. The owner will say when it is finished and reviewed.
+None open.
 
 ## Manual checks
 
@@ -12,7 +12,8 @@ None open.
 
 ## To know
 
-- **WI-0060 (enabled state of triggers) is integrated** (commits `ff6448d`–`4bbe858` on `v2-port`). Reviewer approved without changes. Decisions taken by the author and accepted by the reviewer: `cmd.flow.enable`/`disable` without a following trigger answer `{ok:false, message}` and change nothing; new storage message `cmd.storage.flowstate.keepBroken` (storage renames a file the engine cannot parse); the engine does not wait for that answer before `ready`; writes come at most once per second.
+- **E0063 confirmed by the owner:** the enabled state of the triggers is kept per flow in `FlowStates/<flowId>.json`, not in one `FlowState.json` (WI-0068, integrated on `v2-port`, verified; stress test with 200 flows green). A read error now affects only its own flow. This closes the item about the read error of `FlowState.json` (WI-0060, decision 3).
+- **WI-0060 (enabled state of triggers) is integrated** (commits `ff6448d`–`4bbe858` on `v2-port`). Reviewer approved without changes. Decisions taken by the author and accepted by the reviewer: `cmd.flow.enable`/`disable` without a following trigger answer `{ok:false, message}` and change nothing; new storage message `cmd.storage.flowstate.keepBroken` (storage renames a file the engine cannot parse); the engine does not wait for that answer before `ready`; writes come at most once per second. Note: the per-flow files of E0063 replace the single-file part of this.
 - **Open point from the review:** a trigger removed by `cmd.flow.save` keeps its enabled entry in memory, so it comes back enabled if the editor adds it again with the same ID. Relevant for S0006, not tested.
 
 ## To know
