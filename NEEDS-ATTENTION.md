@@ -4,8 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **Fast tier budget (F-0108).** Another agent cut the fast tier from 91 s to 52 s (`2737ceb`); the budget is about 45 s. Please decide: close F-0108 at 52 s, or ask for a further split.
-- **S0002 is not fully accepted yet.** WI-0058 is partly done: the retrospective (task 4) and the review of the documents besides ELEMENT-API section 8 (task 3) are missing. I write them when you have decided F-0108.
+- **S0002 is not fully accepted yet.** WI-0058 is partly done: the retrospective (task 4) and the review of the documents besides ELEMENT-API section 8 (task 3) are missing. I write them now that F-0108 is decided.
 
 ## Manual checks
 
