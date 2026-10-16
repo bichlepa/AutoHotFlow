@@ -30,27 +30,27 @@ L393-404 9. Performance budgets (targets, measured in Phase 2)
 L406-416 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (83.7 KB, 498 lines)
+## doc/PROTOCOL.md (85.6 KB, 501 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-92 3. Addresses and Topics
-L94-471 4. Message Catalog
+L94-474 4. Message Catalog
 L110-137   4.1 Lifecycle (`sys.*`)
 L139-156   4.1a Process events (topic `process`, supervisor → subscribers)
 L158-167   4.1b Test roles (only with `--test-roles`)
 L169-177   4.1c Unhandled errors (`evt.diag.error`, WI-0023)
-L179-201   4.2 Engine commands (clients → `engine`)
-L203-244   4.3 Engine events (`evt.*`, engine → topics)
-L246-276   4.4 Engine ↔ trigger host
-L278-343   4.5 Engine ↔ worker
-L345-386   4.6 Engine ↔ storage and log
-L388-395   4.7 Dialogs
-L397-409   4.8 Manager stub (WI-0013, `src/manager/`, only `--ui=stub`)
-L411-471   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
-L473-492 5. Connection setup, reconnection, resync
-L483-492   5a Events before subscription (design question, WI-0007)
-L494-498 6. Versioning and extension
+L179-203   4.2 Engine commands (clients → `engine`)
+L205-247   4.3 Engine events (`evt.*`, engine → topics)
+L249-279   4.4 Engine ↔ trigger host
+L281-346   4.5 Engine ↔ worker
+L348-389   4.6 Engine ↔ storage and log
+L391-398   4.7 Dialogs
+L400-412   4.8 Manager stub (WI-0013, `src/manager/`, only `--ui=stub`)
+L414-474   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
+L476-495 5. Connection setup, reconnection, resync
+L486-495   5a Events before subscription (design question, WI-0007)
+L497-501 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (51.1 KB, 321 lines)
