@@ -43,6 +43,6 @@ class FlowSwitchOps {
         return found
     }
 
-    ; The text of a parameter that is not valid (the v1 text of x_Parameter invalid).
+    ; The text of a parameter that is not valid (the v1 text, "Parameter '%1%' is invalid.").
     static InvalidParameter(name) => Lang("Unexpected Error!") " " Lang("Parameter '%1%' is invalid.", name)
 }
