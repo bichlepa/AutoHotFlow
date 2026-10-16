@@ -10,8 +10,9 @@
 ; "tail" or "exception") and :144 (push when entering a loop at its "head").
 ;
 ; v1 keeps two parallel stacks: visible loop variables and hidden loop variables (variables of an
-; outer loop, hidden while an inner loop runs). Push stores copies of both current maps, Pop
-; restores the last pair. Push does not clear the current maps (v1 does not either).
+; outer loop, hidden while an inner loop runs). Push stores copies of both current maps, Pop restores the last
+; pair. Push does not clear the current maps (v1 does not either). The values of the hidden map are shared
+; between the levels, not copied (F-0097).
 ;
 ; The file is named after the class (WI-0029; it was Loops.ahk before).
 ; Variable names are case-insensitive, as in v1 (CaseSense "Off").
@@ -30,10 +31,13 @@ class LoopStack {
         }
     }
 
-    ; Copy of the visible and hidden maps onto the stacks (v1 LoopVariable_AddToStack).
+    ; Copy of the visible and hidden maps onto the stacks (v1 LoopVariable_AddToStack). The hidden values are the
+    ; snapshots of the list loops (F-0097): nobody changes them in place (SetVar replaces an entry, an A_ name cannot
+    ; be assigned by path), so every level shares them and only the two small maps are copied. A snapshot of n members
+    ; is therefore not copied on entry.
     Push() {
         this.stackVisible.Push(LoopStack.CopyMap(this.Visible))
-        this.stackHidden.Push(LoopStack.CopyMap(this.Hidden))
+        this.stackHidden.Push(LoopStack.CopyEntries(this.Hidden))
     }
 
     ; Restores the last pushed pair (v1 LoopVariable_RestoreFromStack).
@@ -70,6 +74,15 @@ class LoopStack {
         m := LoopStack.NewMap()
         for name, value in source
             m[name] := VarValues.Copy(value)
+        return m
+    }
+
+    ; Copy of the entries with the same values (no copy of the values): the map is new, the values are shared.
+    ; Used for the hidden snapshots (F-0097, Push).
+    static CopyEntries(source) {
+        m := LoopStack.NewMap()
+        for name, value in source
+            m[name] := value
         return m
     }
 }
