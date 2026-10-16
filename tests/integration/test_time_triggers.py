@@ -4,9 +4,9 @@ triggerhost; PROTOCOL 4.4, ELEMENT-API-V2 3.5). The classes are in src/elements/
 Timing: the count of events is bounded from above by the time the timer could run at most (one interval per tick), so
 the upper bound is never scaled (as in test_triggerhost.py); the lower bounds are generous.
 
-Start up (REQ-TRG-220): a trigger fires once per start of AutoHotFlow when it is enabled in FlowState.json; with the type
-Windows only when the supervisor was started with --windows-startup; not when it is enabled later, and (foundation
-marker) not after a restart of the trigger host.
+Start up (REQ-TRG-220): a trigger fires once per start of AutoHotFlow when it is enabled in its
+FlowStates/<flowId>.json; with the type Windows only when the supervisor was started with --windows-startup; not when
+it is enabled later, and (foundation marker) not after a restart of the trigger host.
 """
 
 import json
@@ -49,9 +49,12 @@ def startup_flow(name, startup_type="AutoHotFlow"):
 
 
 def write_flow_state(datadir, enabled):
-    """FlowState.json with the given triggers enabled: enabled maps a flow ID to a list of trigger IDs."""
-    state = {"formatVersion": 1, "flows": enabled}
-    (datadir / "FlowState.json").write_text(json.dumps(state), encoding="utf-8")
+    """FlowStates/<flowId>.json (E0063) with the given triggers enabled.
+    enabled maps a flow ID to a list of trigger IDs."""
+    (datadir / "FlowStates").mkdir(exist_ok=True)
+    for flow_id, trigger_ids in enabled.items():
+        state = {"formatVersion": 1, "enabled": trigger_ids}
+        (datadir / "FlowStates" / (flow_id + ".json")).write_text(json.dumps(state), encoding="utf-8")
 
 
 def snapshot_flow(flows_, flow_id):

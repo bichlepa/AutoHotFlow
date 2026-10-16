@@ -35,7 +35,7 @@ HUB_FRAME_BUDGET_MS = 5.0
 SNAPSHOT_BUDGET_S = 3.0     # E0042 (was 1.0): guards against a blocked engine; F-0073 has the measurements
 LOAD_NOTE_S = 30.0          # WI-0024 point 6: above this, the load time is a finding for "native JSON parser"
 # WI-0062 (F-0073): every copy gets an enabled timer trigger, armed by the engine through the trigger host. The interval is
-# long, so no event starts an instance during the test; the arming (and the state in FlowState.json) is what is measured.
+# long, so no event starts an instance during the test; the arming (and the state in FlowStates/) is what is measured.
 TIMER_TRIGGER = "element_stress_timer"
 TIMER_INTERVAL = "60000"
 ARMED_BUDGET_S = 30.0       # all timers armed this long after evt.engine.ready, or the test fails
@@ -61,13 +61,15 @@ def test_hub_cost_of_a_large_frame_is_below_the_budget(run_ahk, runs):
 
 def fill_flows(datadir, count):
     """Copies the big flows round-robin to Flows/<n>.json, each with an enabled timer trigger (TIMER_TRIGGER), and writes
-    FlowState.json so that the engine enables them at the start. Returns the flow ids and the total size in bytes."""
+    FlowStates/<flowId>.json so that the engine enables them at the start. Returns the flow ids and the total size in
+    bytes."""
     flows = Path(datadir) / "Flows"
     flows.mkdir(exist_ok=True)
+    states = Path(datadir) / "FlowStates"
+    states.mkdir(exist_ok=True)
     sources = BIG_FLOWS
     assert all(src.is_file() for src in sources), "missing big flows in %s" % V1_EXAMPLES
     names, total = [], 0
-    state = {"formatVersion": 1, "flows": {}}
     for n in range(count):
         src = sources[n % len(sources)]
         name = "Big %03d" % n
@@ -76,10 +78,10 @@ def fill_flows(datadir, count):
                                               "class": "Trigger_TestTimer", "name": "stress timer", "enabled": "0",
                                               "pars": {"Interval": TIMER_INTERVAL}}
         (flows / (name + ".json")).write_text(json.dumps(flow, ensure_ascii=False), encoding="utf-8")
-        state["flows"][name] = [TIMER_TRIGGER]
+        state = {"formatVersion": 1, "enabled": [TIMER_TRIGGER]}
+        (states / (name + ".json")).write_text(json.dumps(state), encoding="utf-8")
         names.append(name)
         total += src.stat().st_size
-    (Path(datadir) / "FlowState.json").write_text(json.dumps(state), encoding="utf-8")
     return names, total
 
 

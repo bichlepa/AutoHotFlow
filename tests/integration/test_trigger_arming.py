@@ -195,8 +195,9 @@ def test_a_trigger_whose_enable_fails_is_not_armed_and_the_others_are(host_flows
 def test_the_startup_trigger_fires_once_at_the_start_of_autohotflow(host_flows):
     fb, trigger = fire_on_enable_flow("Startup")
     fid = host_flows.add(fb)
-    state_file = {"formatVersion": 1, "flows": {fid: [trigger.id]}}
-    (host_flows.datadir / "FlowState.json").write_text(json.dumps(state_file), encoding="utf-8")
+    (host_flows.datadir / "FlowStates").mkdir(exist_ok=True)
+    state_file = {"formatVersion": 1, "enabled": [trigger.id]}
+    (host_flows.datadir / "FlowStates" / (fid + ".json")).write_text(json.dumps(state_file), encoding="utf-8")
     host_flows.start()
     ended = host_flows.ended(fid, count=1, timeout=scaled(WAIT_S))
     assert len(ended) == 1, host_flows.stderr_text()
@@ -228,8 +229,9 @@ def test_the_engine_is_restarted_and_rearms_without_the_startup_context(host_flo
     timer_fb, timer = timer_flow("Timer after restart")
     sid = host_flows.add(startup_fb)
     tid = host_flows.add(timer_fb)
-    state_file = {"formatVersion": 1, "flows": {sid: [startup.id]}}
-    (host_flows.datadir / "FlowState.json").write_text(json.dumps(state_file), encoding="utf-8")
+    (host_flows.datadir / "FlowStates").mkdir(exist_ok=True)
+    state_file = {"formatVersion": 1, "enabled": [startup.id]}
+    (host_flows.datadir / "FlowStates" / (sid + ".json")).write_text(json.dumps(state_file), encoding="utf-8")
     host_flows.start()
     watch(host_flows)
     host_flows.enable(tid)
