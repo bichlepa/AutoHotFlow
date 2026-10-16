@@ -8,6 +8,7 @@
 #Include FlowTable.ahk
 #Include FlowStateFile.ahk
 #Include Executor.ahk
+#Include TriggerArms.ahk
 #Include WorkerBridge.ahk
 #Include VarRequests.ahk
 #Include vars\EngineVars.ahk
@@ -64,6 +65,7 @@ class Engine extends Role {
         this.seq := 0
         this.flows := FlowTable()
         this.flowState := FlowStateFile(this, this.flows)   ; enabled state of the triggers (WI-0060)
+        this.arms := TriggerArms(this)                       ; arming of the enabled triggers in the trigger host (WI-0062)
         this.vars := EngineVars()      ; global and static variables (WI-0040)
         this.varLoader := VarLoader(this, this.vars)
         varOpts := Engine._VarOptions(args)
@@ -100,6 +102,8 @@ class Engine extends Role {
         this.On("cmd.flow.patch", (msg) => this._CmdFlowPatch(msg))
         this.On("cmd.flow.save", (msg) => this._CmdFlowSave(msg))
         this.On("evt.worker.done", (msg) => this.workers.OnDone(msg))
+        this.On("evt.trigger.fired", (msg) => this._OnTriggerFired(msg))
+        this.On("evt.trigger.error", (msg) => this._OnTriggerError(msg))
         this.On("cmd.engine.var.", (msg) => this.varRequests.Handle(msg))
         ; The topic "process" tells the engine when storage is ready (start, WI-0031) and, with a pool, which worker
         ; crashed (the supervisor owns the process handles).
@@ -184,10 +188,21 @@ class Engine extends Role {
             , "independentActive", independent, "executing", Json.Bool(this.executor.IsExecuting(flowId))))
     }
 
-    ; evt.trigger.state for one trigger: its target state changed (WI-0060; WI-0062 adds armed and message).
-    EmitTriggerState(flowId, triggerId, enabled) {
+    ; evt.trigger.state for one trigger: its target state and its arming (WI-0060, WI-0062). Called whenever one of them
+    ; changes.
+    EmitTriggerState(flowId, triggerId) {
+        rec := this.flows.Get(flowId)
+        enabled := IsObject(rec) && rec.TriggerEnabled(triggerId)
+        info := this.arms.Info(flowId, triggerId)
         this.Emit("topic:flow:" flowId, "evt.trigger.state", Map("flowId", flowId, "elementId", triggerId
-            , "enabled", Json.Bool(enabled)))
+            , "enabled", Json.Bool(enabled), "armed", Json.Bool(info["armed"]), "message", info["message"]))
+    }
+
+    ; A flow leaves the flow table (no command does it yet, S0004): its instances stop, its triggers are disarmed.
+    RemoveFlow(flowId) {
+        this.executor.FlowDeleted(flowId)
+        this.arms.FlowRemoved(flowId)
+        return this.flows.Remove(flowId)
     }
 
     ; Asks for a dispatch tick soon (once, after the current message).
@@ -206,9 +221,18 @@ class Engine extends Role {
     ; --- loading (cmd.storage.*) ---------------------------------------------------------------
 
     _OnProcessEvent(msg) {
-        if (msg.payload.Get("name", "") = Engine.STORAGE) {
+        name := msg.payload.Get("name", "")
+        if (name = Engine.STORAGE) {
             if (msg.type = "evt.process.ready")
                 this._StartLoad()
+            return
+        }
+        ; The trigger host: a ready host starts a pass of arms (WI-0062); a host that ended has no arms any more.
+        if (name = TriggerArms.HOST) {
+            if (msg.type = "evt.process.ready")
+                this.arms.HostReady()
+            else if (msg.type = "evt.process.crashed" || msg.type = "evt.process.exited")
+                this.arms.HostGone()
             return
         }
         if (this.workers.Size > 0)
@@ -403,6 +427,7 @@ class Engine extends Role {
         this.Emit("topic:engine", "evt.flow.list.changed", Map("added", added, "removed", [], "changed", []))
         this.Emit("topic:engine", "evt.engine.ready", Map())
         this._Log("a1", "engine", "ready with " this.flows.Count " flow(s) and " this.varLoader.Count " variable(s)")
+        this.arms.EngineReady()         ; the arms of the enabled triggers follow when the trigger host is ready (WI-0062)
     }
 
     _StorageError(op, path, message) {
@@ -418,7 +443,7 @@ class Engine extends Role {
         for rec in this.flows.All() {
             list.Push(Map("flowId", rec.FlowId, "name", rec.Def.Name, "category", rec.Def.Category
                 , "enabled", Json.Bool(rec.IsFlowEnabled()), "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))
-                , "rev", rec.Rev))
+                , "rev", rec.Rev, "triggers", this.arms.Snapshot(rec)))
         }
         ; "ready": the start is complete (evt.engine.ready was sent). A client that subscribed late cannot know it from the
         ; event (F-0090).
@@ -488,13 +513,15 @@ class Engine extends Role {
         return Map()
     }
 
-    ; Sends evt.trigger.state for every trigger whose target state changed, then evt.flow.state, and marks the state
-    ; for FlowState.json (WI-0060). Nothing is sent when nothing changed.
+    ; Arms or disarms the switched triggers (WI-0062), sends evt.trigger.state for each of them, then evt.flow.state, and
+    ; marks the state for FlowState.json (WI-0060). Nothing is sent when nothing changed.
     _SwitchTriggers(rec, changed) {
         if (changed.Length = 0)
             return
         for triggerId in changed
-            this.EmitTriggerState(rec.FlowId, triggerId, rec.TriggerEnabled(triggerId))
+            this.arms.Changed(rec, triggerId)
+        for triggerId in changed
+            this.EmitTriggerState(rec.FlowId, triggerId)
         this.EmitFlowState(rec.FlowId)
         this.flowState.Touch()
     }
@@ -555,6 +582,37 @@ class Engine extends Role {
         } catch as e {
             this._Log("a0", "engine", "answering cmd.flow.save failed: " Type(e) ": " e.Message)
         }
+    }
+
+    ; evt.trigger.fired (WI-0062): an event of an armed trigger starts an instance at it. An event of another generation,
+    ; or of a trigger that is not armed or not enabled any more, is dropped (a2).
+    _OnTriggerFired(msg) {
+        p := msg.payload
+        key := String(p.Get("triggerKey", ""))
+        gen := p.Get("gen", "")
+        flowId := String(p.Get("flowId", ""))
+        elementId := String(p.Get("elementId", ""))
+        rec := this.flows.Get(flowId)
+        if (!IsObject(rec) || !this.arms.Accepts(key, gen) || !rec.TriggerEnabled(elementId)) {
+            this._Log("a2", "engine", "dropped the event of trigger '" key "' (generation " gen ")")
+            return
+        }
+        data := p.Get("data", "")
+        if (!(data is Map))
+            data := Map()
+        try {
+            this.executor.StartFlow(rec, elementId, Map("params", this.arms.ParamsOf(key), "data", data))
+        } catch as e {
+            ; busy (policy skip) and similar: the event is lost, as in v1, and the reason is in the log
+            Log.Write("f1", "engine", "trigger '" elementId "' did not start an instance: " Executor.ErrorText(e), flowId)
+        }
+    }
+
+    ; evt.trigger.error (WI-0062): the message of the current arming (it stays armed; the host has logged it).
+    _OnTriggerError(msg) {
+        p := msg.payload
+        key := String(p.Get("triggerKey", ""))
+        this.arms.Reported(key, p.Get("gen", ""), String(p.Get("message", "")))
     }
 
     ; --- helpers -------------------------------------------------------------------------------

@@ -12,7 +12,7 @@ class Trigger_TestFireOnEnable extends AhfElement {
     static Category() => "Test"
 
     static Enable(ctx, params) {
-        if (ctx.context = "ahfStartup")
+        if (InStr(ctx.context, "ahfStartup"))
             ctx.Fire(Map("startup", 1))
     }
 

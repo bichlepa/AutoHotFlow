@@ -71,8 +71,14 @@ class FakeWorkers {
     }
 }
 
+; Stand-in for TriggerArms (WI-0062): a start without an event has no trigger parameters.
+class NoArms {
+    StartInfo(rec, triggerId) => ""
+}
+
 class EngineOwner {
     __New() {
+        this.arms := NoArms()
         this.flows := FlowTable()
         this.vars := EngineVars()
         this.workers := FakeWorkers()

@@ -115,7 +115,9 @@ class Executor {
     ; Starts an instance of the flow at the given trigger (or the first trigger). Returns the instance ID.
     ; With the policy wait and a running instance the new one is only queued: IsWaiting(id) is true then.
     ; Throws AhfError: bad_payload (no trigger, or a flow without one, invalid policy), busy (policy skip).
-    StartFlow(rec, triggerId := "") => this._Start(rec, triggerId, "", "", 0)
+    ; fired: the event of an armed trigger (WI-0062): Map params (the evaluated parameters of the arming) and data (a Map
+    ; of the event, or ""). Without it the parameters are evaluated now (TriggerArms.StartInfo).
+    StartFlow(rec, triggerId := "", fired := "") => this._Start(rec, triggerId, "", "", 0, fired)
 
     ; Starts an instance of a flow for a caller (WI-0055, ELEMENT-API-V2 section 3, ARCHITECTURE 4.4): the engine
     ; function behind Action_Execute_Flow, meant to serve a flow called as a function too (REQ-SCR-040). opts (a Map, all
@@ -150,7 +152,7 @@ class Executor {
             call := Map("onEnd", onEnd, "withVars", opts.Get("withVars", false) ? 1 : 0, "caller", callerId
                 , "callerThread", String(opts.Get("callerThread", "")), "instanceId", "", "cancelled", 0)
         }
-        instId := this._Start(rec, triggerId, call, opts.Get("vars", ""), depth)
+        instId := this._Start(rec, triggerId, call, opts.Get("vars", ""), depth, "")
         return Map("instanceId", instId, "waiting", this.IsWaiting(instId) ? 1 : 0, "call", call)
     }
 
@@ -191,7 +193,7 @@ class Executor {
 
     ; StartFlow and CallFlow. call: the Map of a waiting call or "". vars: initial instance variables or "". depth: the
     ; number of waiting calls that lead to this instance (0 for a start that nobody waits for).
-    _Start(rec, triggerId, call, vars, depth) {
+    _Start(rec, triggerId, call, vars, depth, fired) {
         flowId := rec.FlowId
         def := rec.Def
         if (triggerId = "") {
@@ -219,6 +221,9 @@ class Executor {
         inst := Instance(instId, flowId)
         runRec := Executor._NewRun(instId, flowId, inst, triggerId)
         runRec["depth"] := depth
+        ; The parameters of the trigger for TriggerVariables (WI-0062, M-0069): kept with the run, so a waiting instance
+        ; has them as well. Evaluated now for a start that no event caused; "" when they cannot be evaluated.
+        runRec["trigger"] := IsObject(fired) ? fired : this._owner.arms.StartInfo(rec, triggerId)
         if (vars is Map)
             Executor._SetInstanceVars(inst, vars, flowId)
         this._runs[instId] := runRec
@@ -263,12 +268,35 @@ class Executor {
         ; trigger thread moves on, so every branch has them.
         trigger.Vars["A_TriggerTime"] := A_Now
         trigger.Vars["A_TriggerID"] := triggerId
+        this._SetTriggerVars(run, def, trigger)
         this._owner.Emit("topic:flow:" flowId, "evt.instance.started", Map("flowId", flowId, "instanceId", instId))
         if (emitState)
             this._owner.EmitFlowState(flowId)
         this._ElementStarted(run, triggerId)
         this._ElementStopped(run, triggerId, "normal", "")
         this._Advance(run, trigger)
+    }
+
+    ; The thread variables that the trigger class sets for its event (TriggerVariables(params, data), ELEMENT-API-V2 section
+    ; 2, WI-0062). Pure function of the class, called in the engine: an error is logged and the instance starts without them.
+    _SetTriggerVars(run, def, trigger) {
+        fire := run["trigger"]
+        if (!(fire is Map) || !IsObject(fire.Get("params", "")))
+            return
+        triggerId := run["triggerId"]
+        cls := ElementRegistry.Get(Executor._QidOf(def, triggerId))
+        if (!IsObject(cls) || !cls.HasMethod("TriggerVariables"))
+            return
+        try {
+            vars := cls.TriggerVariables(fire["params"], fire.Get("data", ""))
+            if (vars is Map) {
+                for name, value in vars
+                    trigger.Vars[name] := value
+            }
+        } catch as e {
+            Log.Write("f0", "engine", "trigger '" triggerId "' could not set its variables, the instance starts without "
+                . "them: " Executor.ErrorText(e), run["flowId"])
+        }
     }
 
     ; Stops one instance by ID (running or waiting). Returns false if it does not exist.
@@ -959,6 +987,15 @@ class Executor {
 
     ; The qualified ID of an element of the flow: its package (missing means Default) and its class (E0045).
     static _QidOf(def, elementId) => ElementRegistry.QualifiedId(def.ElementPackage(elementId), def.ElementClass(elementId))
+
+    ; The text of an error for a log line: an element error as it is, any other error with its type.
+    static ErrorText(e) {
+        if (e is ElementError)
+            return e.Message
+        if (e is Error)
+            return Type(e) ": " e.Message
+        return String(e)
+    }
 
     ; Snapshot of the keys of a Map, so the Map can change while the keys are walked.
     static _Keys(m) {
