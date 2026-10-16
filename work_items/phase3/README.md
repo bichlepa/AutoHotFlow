@@ -214,5 +214,5 @@ The trace points are in the first group on purpose: they record the path through
 
 ### Progress S0002
 
-- [ ] WI-0044  - [ ] WI-0045  - [ ] WI-0046  - [ ] WI-0047-PREP  - [ ] WI-0047  - [ ] WI-0048  - [ ] WI-0049  - [ ] WI-0050  - [ ] WI-0051
-- [ ] WI-0052  - [ ] WI-0053  - [ ] WI-0054  - [ ] WI-0055  - [ ] WI-0056  - [ ] WI-0057  - [ ] WI-0058
+- [x] WI-0044  - [x] WI-0045  - [x] WI-0046  - [x] WI-0047-PREP  - [x] WI-0047  - [x] WI-0048  - [x] WI-0049  - [x] WI-0050  - [x] WI-0051
+- [x] WI-0052  - [x] WI-0053  - [x] WI-0054  - [x] WI-0055  - [x] WI-0056  - [x] WI-0057  - [ ] WI-0058

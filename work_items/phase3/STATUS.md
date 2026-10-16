@@ -36,7 +36,7 @@ Step S0002 (element foundation and core set), state as of `cac616b`.
 | WI-0055 | Core set D: flow control | done, verified | opus | e4b368d–949afc2 | 2026-10-16 | Fix of F-0100 class open; see NEEDS-ATTENTION |
 | WI-0056 | Core dialogs (dialogs and worker) | done, verified | haiku (review sonnet) | c5db6ab–6a8ad1a | 2026-10-16 | Review approved with fixes; tooltip and A_UserAction decisions open for the owner |
 | WI-0057 | Test corpus | done, verified | haiku (review sonnet) | 7fa6b92–a5d5d89 | 2026-10-16 | 21 corpus tests, 3 v1 flows green (variable test as copy, M-0069); 13 flows pending S0003/S0008 |
-| WI-0058 | Acceptance S0002 | not started | | | | Last item of S0002 |
+| WI-0058 | Acceptance S0002 | partly done | haiku | see git log | 2026-10-16 | All six criteria met (runs 20261016-184147-073b6738, 20261016-184636-073b6738, 20261016-184426-073b6738, 20261016-184341-356, 20261016-185151-073b6738); open: documents of task 3 besides ELEMENT-API-V2 section 8, retrospective; F-9501, F-9502 for the owner |
 
 Step S0008 (remaining elements) is planned, not started.
 
