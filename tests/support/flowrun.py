@@ -289,14 +289,15 @@ class FlowRunner:
         return _wait_until(check, scaled(timeout))
 
     # --- session --------------------------------------------------------------------------------------------------
-    def start(self):
-        """Starts the session and waits until the engine has loaded every added flow."""
+    def start(self, extra=()):
+        """Starts the session and waits until the engine has loaded every added flow. extra: more options of the
+        supervisor, for example "--windows-startup" (WI-0063)."""
         assert self._sup is None, "session already running"
         session = self.base_session if not self.sessions else "%sr%d" % (self.base_session, len(self.sessions))
         self.sessions.append(session)
         self._err = open(self.datadir / ("flowrun-%d.stderr" % len(self.sessions)), "wb")
         args = [sys.executable, str(AHKRUN), "--timeout", "300", str(ENTRY), "--session=" + session,
-                "--data=" + str(self.datadir), "--start=" + self.roles]
+                "--data=" + str(self.datadir), "--start=" + self.roles] + list(extra)
         self._sup = self.procs.start(args, stdout=self._err, stderr=self._err, cwd=str(ROOT))
         pipe = pipenames.hub_pipe(session)
         deadline = time.monotonic() + scaled(START_TIMEOUT_S)
