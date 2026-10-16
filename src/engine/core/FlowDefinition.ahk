@@ -249,6 +249,20 @@ class FlowDefinition {
         return idList
     }
 
+    ; The ID of the default manual trigger (v1 xx_getDefaultManualTriggerID, WI-0055): the first element (sorted by ID) of
+    ; the class Default.Trigger_Manual whose key "DefaultTrigger" is true (1, "1" or true, any case of the class). "" if
+    ; the flow has none.
+    DefaultManualTrigger() {
+        for id in this.ElementIdsOfClass("Default.Trigger_Manual") {
+            if (this.ElementKind(id) != "trigger")
+                continue
+            v := this._elements[id].Get("DefaultTrigger", "")
+            if (v == Json.True || (!IsObject(v) && (v = 1 || v = "true")))
+                return id
+        }
+        return ""
+    }
+
     ; Creates an index Map with case-insensitive keys, as v1 object keys are.
     static NewIndex() {
         m := Map()

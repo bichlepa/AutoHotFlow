@@ -33,6 +33,7 @@ class ExecContext {
         this.message := ""
         this._timers := Map()            ; seq -> Map("fn", userFn, "timer", boundTimer)
         this._timerSeq := 0
+        this._calls := []                ; the handles of the waiting calls of CallFlow (cancelled with the timers)
     }
 
     ; Ends the run with a result. Returns true if this call was the effective one.
@@ -73,11 +74,21 @@ class ExecContext {
         return seq
     }
 
-    ; Removes every pending timer of this context. Called by Finish and by ElementRunner.Stop.
+    ; Removes every pending timer of this context and cancels its waiting flow calls (CallFlow; the called instances run
+    ; on). Called by Finish and by ElementRunner.Stop.
     CancelTimers() {
         for seq, entry in this._timers
             SetTimer(entry["timer"], 0)
         this._timers.Clear()
+        calls := this._calls
+        this._calls := []
+        for call in calls {
+            try {
+                this.host.CancelCall(call)
+            } catch as e {
+                Log.Write("a0", "element " this.elementId, "cancelling a flow call failed: " e.Message, this.flowId)
+            }
+        }
     }
 
     ; Writes a line to the log (level a0..a3, f0..f3, t0..t3).
@@ -180,6 +191,73 @@ class ExecContext {
     ; effective first, as in v1. Returns false if the instance is not running (any more).
     StopInstance(reason := "element.stop") {
         return this._Host().StopInstance(this.instanceId, reason) ? true : false
+    }
+
+    ; Other flows (WI-0055, v1 x_FlowExists, x_isFlowExecuting, x_getDefaultManualTriggerID, x_isTriggerEnabled,
+    ; x_ManualTriggerExecute, x_FlowStop). Inline elements only. A flow is named by its ID (the file name of the flow).
+
+    ; True if the flow exists (is loaded).
+    FlowExists(flowId) => this._Host().FlowExists(String(flowId)) ? true : false
+
+    ; True if an instance of the flow runs, is stopping or waits for its turn (policy wait).
+    IsFlowExecuting(flowId) => this._Host().IsExecuting(String(flowId)) ? true : false
+
+    ; True if the element is a trigger of the flow.
+    HasTrigger(flowId, triggerId) => this._Host().HasTrigger(String(flowId), String(triggerId)) ? true : false
+
+    ; The ID of the default manual trigger of the flow, "" if it has none.
+    DefaultTrigger(flowId) => this._Host().DefaultTriggerOf(String(flowId))
+
+    ; True if the trigger of the flow is enabled. Until S0003 a trigger is enabled when its flow is enabled.
+    IsTriggerEnabled(flowId, triggerId) => this._Host().IsTriggerEnabled(String(flowId), String(triggerId)) ? true : false
+
+    ; Starts an instance of a flow at a trigger ("" = the first trigger of the flow), with the instance variables vars (a
+    ; Map name -> value, copied; "" = none). Without onEnd the element does not wait. With onEnd the element waits:
+    ; onEnd(outcome) is called once when the instance has ended, later, on a thread of its own (never from inside this
+    ; call); an exception in it ends the element with "exception". outcome is a Map: result ("normal", "exception" or
+    ; "stopped"), reason (of evt.instance.ended), message (the first unhandled exception), instanceId, flowId, and vars
+    ; (a copy of the instance variables at the end if withVars is true, else ""). The wait ends without a call of onEnd
+    ; when the element is stopped or finishes otherwise; the called instance runs on. Returns Map instanceId and waiting
+    ; (1: the instance is queued by the policy wait of the flow). Throws ElementError: the flow does not exist, the
+    ; trigger is no trigger of the flow, the policy skip refused the start, the wait could never end (policy wait and an
+    ; instance of the flow waits for this element), or too many calls wait for each other (Executor.MAX_CALL_DEPTH).
+    CallFlow(flowId, triggerId := "", vars := "", onEnd := "", withVars := false) {
+        host := this._Host()
+        opts := Map("vars", vars, "caller", this.instanceId, "callerThread", this.threadId)
+        if (IsObject(onEnd)) {
+            opts["onEnd"] := ObjBindMethod(this, "_OnCallEnd", onEnd)
+            opts["withVars"] := withVars ? 1 : 0
+        }
+        try {
+            res := host.CallFlow(String(flowId), String(triggerId), opts)
+        } catch AhfError as e {
+            throw ElementError(e.Message)
+        }
+        if (IsObject(res["call"]) && !res["call"]["cancelled"])
+            this._calls.Push(res["call"])
+        return Map("instanceId", res["instanceId"], "waiting", res["waiting"])
+    }
+
+    ; Stops all instances of the flow, running and waiting ones (v1 x_FlowStop); they end with the reason given (default
+    ; "element.stopflow", PROTOCOL 4.3). Also the instance of this element when it is of that flow: call Finish first if
+    ; the element finishes too (as StopInstance). Returns the number of instances stopped.
+    StopFlow(flowId, reason := "element.stopflow") => this._Host().StopFlow(String(flowId), reason)
+
+    ; The end of a called instance (CallFlow), on a Tick of the engine. The handle is done: it leaves the list.
+    _OnCallEnd(onEnd, outcome) {
+        for i, call in this._calls {
+            if (call["instanceId"] = outcome["instanceId"]) {
+                this._calls.RemoveAt(i)
+                break
+            }
+        }
+        if (this.finished)
+            return
+        try {
+            onEnd(outcome)
+        } catch as e {
+            this.Finish("exception", e.Message)
+        }
     }
 
     ; A request to the engine with a callback (ELEMENT-API-V2 section 3): only for worker elements (WorkerContext) and

@@ -49,9 +49,21 @@
 ; element evaluates them when it calls ctx.EvalParams (WI-0042, as v1 x_AutoEvaluateParameters); for a worker element
 ; the engine evaluates all of them before the job is sent (E0026, _DispatchWorker), because the worker has no access to
 ; the variables.
+;
+; Calls (WI-0055, ARCHITECTURE 4.4): CallFlow starts an instance for a caller, with initial instance variables and a
+; chosen trigger, and, if the caller waits, notes the call. When the called instance ends, its outcome (a Map: result,
+; reason, message and, if asked for, a copy of its instance variables) goes to the caller's function, in the next Tick
+; (_notes), never from inside the step that ended the instance; so no element code runs nested in another instance's
+; step, and nothing in the engine waits. A call is cancelled with CancelCall (the context does it when the waiting
+; element is stopped); the called instance then runs on. A waiting call that could never end (the called flow has the
+; policy wait and one of its instances waits for the caller) is refused, and so is a chain of waiting calls deeper than
+; MAX_CALL_DEPTH.
 class Executor {
     static TICK_BATCH := 1000
     static DIAG_INSTANCES := 100
+    ; Waiting calls in a row (a flow that calls itself and waits, for example): deeper ones are refused. The calls do not
+    ; nest on the AutoHotkey stack (see the header), so the limit only bounds the instances that wait for each other.
+    static MAX_CALL_DEPTH := 100
 
     __New(owner) {
         this._owner := owner
@@ -64,6 +76,7 @@ class Executor {
         this._wantPromote.CaseSense := "Off"
         this._ticking := false    ; a Tick is running (see Tick)
         this._tickAgain := false  ; a Tick was asked for while one was running
+        this._notes := []         ; [call, outcome] of called instances that ended, delivered by Tick (CallFlow)
         this._counts.CaseSense := "Off"
         this._lastRun.CaseSense := "Off"
     }
@@ -102,7 +115,82 @@ class Executor {
     ; Starts an instance of the flow at the given trigger (or the first trigger). Returns the instance ID.
     ; With the policy wait and a running instance the new one is only queued: IsWaiting(id) is true then.
     ; Throws AhfError: bad_payload (no trigger, or a flow without one, invalid policy), busy (policy skip).
-    StartFlow(rec, triggerId := "") {
+    StartFlow(rec, triggerId := "") => this._Start(rec, triggerId, "", "", 0)
+
+    ; Starts an instance of a flow for a caller (WI-0055, ELEMENT-API-V2 section 3, ARCHITECTURE 4.4): the engine
+    ; function behind Action_Execute_Flow, meant to serve a flow called as a function too (REQ-SCR-040). opts (a Map, all
+    ; keys optional):
+    ;   vars       Map name -> value: instance variables of the new instance, set before its trigger fires (a copy)
+    ;   onEnd      onEnd(outcome): the caller waits; called once, in a later Tick, when the instance has ended
+    ;   withVars   true: the outcome holds a copy of the instance variables of the instance at its end
+    ;   caller     the instance ID of the caller (with callerThread, its thread): needed for a waiting call (depth,
+    ;              deadlock, and no wait is noted when the caller is gone by the time the instance starts)
+    ; outcome: Map instanceId, flowId, reason (of evt.instance.ended), result ("normal": the instance finished without an
+    ; unhandled exception; "exception": at least one thread ended with an exception that had no connection, message is
+    ; the first one; "stopped": the instance was stopped, reason says why), message, vars (a Map, or "").
+    ; Returns Map instanceId, waiting (1: queued by the policy wait), call (the handle for CancelCall, "" without onEnd).
+    ; Throws AhfError: not_found (flow not loaded), bad_payload (no such trigger), busy (policy skip and the flow runs),
+    ; denied (the wait could never end, or the chain of waiting calls is too deep).
+    CallFlow(flowId, triggerId := "", opts := "") {
+        if (!(opts is Map))
+            opts := Map()
+        rec := this._owner.flows.Get(flowId)
+        if (!IsObject(rec))
+            throw AhfError("flow '" flowId "' is not loaded", ErrCode.NOT_FOUND)
+        call := ""
+        depth := 0
+        onEnd := opts.Get("onEnd", "")
+        if (IsObject(onEnd)) {
+            callerId := String(opts.Get("caller", ""))
+            callerRun := this._runs.Get(callerId, "")
+            depth := (IsObject(callerRun) ? callerRun["depth"] : 0) + 1
+            if (depth > Executor.MAX_CALL_DEPTH)
+                throw AhfError("flow '" rec.FlowId "' was not started: " Executor.MAX_CALL_DEPTH
+                    . " calls that wait for each other are the limit", ErrCode.DENIED)
+            call := Map("onEnd", onEnd, "withVars", opts.Get("withVars", false) ? 1 : 0, "caller", callerId
+                , "callerThread", String(opts.Get("callerThread", "")), "instanceId", "", "cancelled", 0)
+        }
+        instId := this._Start(rec, triggerId, call, opts.Get("vars", ""), depth)
+        return Map("instanceId", instId, "waiting", this.IsWaiting(instId) ? 1 : 0, "call", call)
+    }
+
+    ; Cancels a waiting call (the handle of CallFlow): its function is not called, the called instance runs on. Called
+    ; when the waiting element is stopped (ExecContext.CancelTimers). Safe to call twice and after the end.
+    CancelCall(call) {
+        if (!(call is Map) || call["cancelled"])
+            return
+        call["cancelled"] := 1
+        call["onEnd"] := ""          ; the function holds the context of the caller: release it
+        callerRun := this._runs.Get(call["caller"], "")
+        if (IsObject(callerRun) && callerRun["callees"].Has(call["instanceId"]))
+            callerRun["callees"].Delete(call["instanceId"])
+    }
+
+    ; True if the flow is loaded.
+    FlowExists(flowId) => this._owner.flows.Has(flowId)
+
+    ; True if the element is a trigger of the newest revision of the flow.
+    HasTrigger(flowId, triggerId) {
+        rec := this._owner.flows.Get(flowId)
+        return IsObject(rec) && triggerId != "" && rec.Def.ElementKind(triggerId) = "trigger"
+    }
+
+    ; The default manual trigger of the flow (FlowDefinition.DefaultManualTrigger), "" if none or the flow is not loaded.
+    DefaultTriggerOf(flowId) {
+        rec := this._owner.flows.Get(flowId)
+        return IsObject(rec) ? rec.Def.DefaultManualTrigger() : ""
+    }
+
+    ; True if the trigger may be started by an element (v1 x_isTriggerEnabled). Until the triggers have their own state
+    ; (S0003, REQ-EXE-070) a trigger of a flow is enabled when its flow is enabled (FlowRecord.Enabled).
+    IsTriggerEnabled(flowId, triggerId) {
+        rec := this._owner.flows.Get(flowId)
+        return IsObject(rec) && rec.Enabled && this.HasTrigger(flowId, triggerId)
+    }
+
+    ; StartFlow and CallFlow. call: the Map of a waiting call or "". vars: initial instance variables or "". depth: the
+    ; number of waiting calls that lead to this instance (0 for a start that nobody waits for).
+    _Start(rec, triggerId, call, vars, depth) {
         flowId := rec.FlowId
         def := rec.Def
         if (triggerId = "") {
@@ -120,13 +208,21 @@ class Executor {
         }
         if (decision = "skip")
             throw AhfError("flow '" flowId "' is running and its execution policy is skip", ErrCode.BUSY)
+        if (decision = "wait" && IsObject(call) && this._WaitsFor(flowId, call["caller"]))
+            throw AhfError("flow '" flowId "' was not started: its execution policy is wait and one of its instances "
+                . "waits for the calling element, so the call would never end", ErrCode.DENIED)
         if (decision = "stop_and_start")
             this.StopFlow(flowId, "policy stop")
 
         instId := Ids.Next("inst-")
         inst := Instance(instId, flowId)
         runRec := Executor._NewRun(instId, flowId, inst, triggerId)
+        runRec["depth"] := depth
+        if (vars is Map)
+            Executor._SetInstanceVars(inst, vars, flowId)
         this._runs[instId] := runRec
+        if (IsObject(call))
+            this._NoteCall(runRec, call)
         if (decision = "wait") {
             inst.Wait()
             if (!this._waiting.Has(flowId))
@@ -272,6 +368,13 @@ class Executor {
         while (progress) {
             progress := false
             waitCount := 0
+            ; The ends of called instances go to their callers first (CallFlow): a caller that finishes now may let its
+            ; own instance end and a waiting one move up below.
+            while (this._notes.Length) {
+                this._Deliver(this._notes.RemoveAt(1))
+                progress := true
+                budget -= 1
+            }
             for flowId in Executor._Keys(this._wantPromote) {
                 this._wantPromote.Delete(flowId)
                 if (this._PromoteWaiting(flowId)) {
@@ -487,6 +590,8 @@ class Executor {
             if (advOutcome["unhandled"]) {
                 Log.Write("f0", "engine", "unhandled exception in element " thread.ElementId ": " thread.Message
                     , run["flowId"])
+                if (run["error"] = "")      ; for the caller of the instance (CallFlow)
+                    run["error"] := "element '" thread.ElementId "': " thread.Message
             }
             this._CheckEnded(run, advOutcome["unhandled"] ? "exception" : "finished")
         } finally {
@@ -564,6 +669,21 @@ class Executor {
             this._runs.Delete(instId)
             this._Unqueue(run["flowId"], instId)
             this._wantPromote[run["flowId"]] := true
+            ; A waiting call (CallFlow): the caller gets the outcome in the next Tick, not from inside this step.
+            call := run["call"]
+            if (IsObject(call)) {
+                callerRun := this._runs.Get(call["caller"], "")
+                if (IsObject(callerRun) && callerRun["callees"].Has(instId))
+                    callerRun["callees"].Delete(instId)
+                if (!call["cancelled"])
+                    this._notes.Push([call, Executor._Outcome(run, reason)])
+            }
+            ; The calls that this instance waited for: nobody waits for them any more, they run on.
+            for calleeId in Executor._Keys(run["callees"]) {
+                calleeRun := this._runs.Get(calleeId, "")
+                if (IsObject(calleeRun) && IsObject(calleeRun["call"]))
+                    this.CancelCall(calleeRun["call"])
+            }
         } finally {
             Critical(prev)
         }
@@ -615,10 +735,135 @@ class Executor {
 
     ; --- helpers -------------------------------------------------------------------------------
 
+    ; depth: waiting calls that lead to the instance; call: the waiting call that started it ("" if nobody waits);
+    ; callees: instance ID -> true for the calls that elements of this instance wait for; error: the first exception that
+    ; ended a thread without a connection ("element '<id>': <message>"), for the outcome of a call.
     static _NewRun(instId, flowId, inst, triggerId) {
-        runRec := Map("instanceId", instId, "flowId", flowId, "inst", inst, "triggerId", triggerId, "active", Map())
+        runRec := Map("instanceId", instId, "flowId", flowId, "inst", inst, "triggerId", triggerId, "active", Map()
+            , "depth", 0, "call", "", "callees", Map(), "error", "")
         runRec["active"].CaseSense := "Off"
+        runRec["callees"].CaseSense := "Off"
         return runRec
+    }
+
+    ; Sets the initial instance variables of a new instance (v1 newInstance with p_instanceVars): a copy of each value,
+    ; whatever the prefix of the name (as v1 InstanceVariable_Set and ctx.ImportInstanceVars). A name that is empty or has
+    ; a forbidden character is skipped with an f0 entry.
+    static _SetInstanceVars(inst, vars, flowId) {
+        for name, value in vars {
+            check := VarNames.Check(String(name))
+            if (check = "Empty" || check = "ForbiddenCharacter") {
+                Log.Write("f0", "engine", "Setting variable '" name "' failed. It contains forbidden characters.", flowId)
+                continue
+            }
+            try {
+                inst.Vars[String(name)] := VarValues.Import(value)
+            } catch as e {
+                Log.Write("f0", "engine", "Setting variable '" name "' failed: " e.Message, flowId)
+            }
+        }
+    }
+
+    ; Notes the waiting call of a new instance at its caller. A caller that is gone, or whose thread does not run its
+    ; element any more (a policy stop of the caller's own flow has just stopped it), waits for nothing: the call is
+    ; cancelled at once and the instance runs without anybody waiting for it.
+    _NoteCall(runRec, call) {
+        callerId := call["caller"]
+        if (callerId != "") {
+            callerRun := this._runs.Get(callerId, "")
+            thr := IsObject(callerRun) ? callerRun["inst"].Threads.Get(call["callerThread"], "") : ""
+            if (!IsObject(callerRun) || (call["callerThread"] != "" && (!IsObject(thr) || thr.State != "running"))) {
+                call["cancelled"] := 1
+                call["onEnd"] := ""
+                return
+            }
+            callerRun["callees"][runRec["instanceId"]] := true
+        }
+        call["instanceId"] := runRec["instanceId"]
+        runRec["call"] := call
+    }
+
+    ; True if an instance of the flow (running, stopping or waiting) waits, directly or through others, for the instance
+    ; callerId. A new instance of the flow that is queued by the policy wait waits for all of them, so a call of it that
+    ; the caller waits for would never end. The edges: an instance waits for the instances its elements called and wait
+    ; for (callees); a queued instance waits for every started instance of its flow and for the queued ones before it.
+    _WaitsFor(flowId, callerId) {
+        if (callerId = "")
+            return false
+        todo := []
+        for id, runRec in this._runs {
+            if (runRec["flowId"] = flowId)
+                todo.Push(id)
+        }
+        seen := Map()
+        seen.CaseSense := "Off"
+        while (todo.Length) {
+            id := todo.Pop()
+            if (id = callerId)
+                return true
+            if (seen.Has(id))
+                continue
+            seen[id] := true
+            runRec := this._runs.Get(id, "")
+            if (!IsObject(runRec))
+                continue
+            for calleeId in runRec["callees"]
+                todo.Push(calleeId)
+            if (runRec["inst"].State != "waiting")
+                continue
+            queue := this._waiting.Get(runRec["flowId"], [])
+            for otherId, other in this._runs {
+                if (other["flowId"] != runRec["flowId"] || otherId = id)
+                    continue
+                if (other["inst"].State != "waiting") {
+                    todo.Push(otherId)
+                    continue
+                }
+                for queuedId in queue {           ; a queued instance before this one in the queue
+                    if (queuedId = id)
+                        break
+                    if (queuedId = otherId) {
+                        todo.Push(otherId)
+                        break
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    ; The outcome of an ended instance for its caller (see CallFlow).
+    static _Outcome(run, reason) {
+        if (run["error"] != "")
+            result := "exception"
+        else
+            result := (reason = "finished") ? "normal" : "stopped"
+        vars := ""
+        call := run["call"]
+        if (IsObject(call) && call["withVars"]) {
+            vars := VarValues.NewMap()
+            for name, value in run["inst"].Vars
+                vars[name] := VarValues.Copy(value)
+        }
+        return Map("instanceId", run["instanceId"], "flowId", run["flowId"], "reason", reason, "result", result
+            , "message", run["error"], "vars", vars)
+    }
+
+    ; Gives the outcome of a called instance to its caller, once (a Tick does it, see CallFlow). An error of the
+    ; function is logged; the function of an element (ExecContext) catches its own errors.
+    _Deliver(note) {
+        call := note[1]
+        if (call["cancelled"])
+            return
+        fn := call["onEnd"]
+        call["cancelled"] := 1
+        call["onEnd"] := ""
+        try {
+            fn(note[2])
+        } catch as e {
+            Log.Write("a0", "engine", "the end of instance " note[2]["instanceId"] " could not be given to its caller: "
+                . Type(e) ": " e.Message, note[2]["flowId"])
+        }
     }
 
     ; The newest committed definition of the run's flow, or "" if the flow is not loaded any more.

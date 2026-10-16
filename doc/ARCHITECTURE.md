@@ -166,6 +166,14 @@ The debugger is **not** built in Phase 2b. However, the following requirements m
 - Editing during a pause takes effect at the next step (follows from E0001 and the table in 4.2).
 - The events for this (e.g. `evt.instance.paused`) and commands (`cmd.debug.*`) are designed in Phase 3 or later.
 
+### 4.4 Calls between flows (WI-0055)
+
+An element starts another instance through the engine function `Executor.CallFlow` (behind `ctx.CallFlow`, ELEMENT-API-V2 3): in the engine, without a round trip through the supervisor, with initial instance variables and a chosen trigger. The execution policy of the called flow decides as for every start (5.1; `default` is `parallel` until S0004). If the caller waits, the call is noted at the called instance and at the caller. Nothing waits in the engine: the caller element simply has not finished yet. When the called instance ends, its outcome (result `normal`/`exception`/`stopped`, reason, first unhandled exception, optionally a copy of its instance variables) is queued and given to the caller in the next dispatch tick, never from inside the step that ended the instance, so no element code runs nested in another instance's step. The result is data, so the same function can serve a flow called as a function (REQ-SCR-040).
+
+- **Cancel:** a waiting call ends without an outcome when the caller element is stopped or finishes otherwise (`ExecContext.CancelTimers` cancels its calls with its timers), or when the caller instance ends. The called instance runs on (as in v1).
+- **Calls that could never end are refused:** a waiting call whose new instance would be queued by the policy `wait` behind an instance that waits (directly, through its callees, or through the queue) for the caller. Edges of the check: a caller waits for its callees; a queued instance waits for the started instances of its flow and for the queued ones before it. A chain of more than `Executor.MAX_CALL_DEPTH` (100) waiting calls is refused too; the calls do not nest on the AutoHotkey stack, the limit only bounds the instances that wait for each other.
+- **Policy `stop` and a call of the own flow:** the caller's instance is stopped first (reason `policy stop`); nobody waits for the new instance.
+
 ---
 
 ## 5. State machines
