@@ -1,10 +1,9 @@
 """Requirements document: doc/REQUIREMENTS.md keeps its format and doc/REQUIREMENTS-INDEX.md is up to date.
 
-The first test fails with the format errors of the source or with the hint to run tools/req_index.py. The
-other tests feed small example texts to the parser of the tool.
+The format, evidence and up-to-date checks of the source run in tests/test_doc_index.py, together with the
+other index (one check of the combined --check). The tests here feed small example texts to the parser.
 """
 
-import io
 import sys
 from pathlib import Path
 
@@ -34,12 +33,6 @@ def errors(text):
     return req_index.parse(text)[1]
 
 
-def test_requirements_document_is_valid_and_the_index_is_up_to_date():
-    out = io.StringIO()
-    code = req_index.run(check=True, out=out)
-    assert code == 0, out.getvalue()
-
-
 def test_a_valid_requirement_is_parsed_with_its_fields():
     areas, errs = req_index.parse(doc(req(body="- a list item in the text\n- **Note:** not a field\n")))
     assert errs == []
@@ -47,6 +40,18 @@ def test_a_valid_requirement_is_parsed_with_its_fields():
     assert (area.title, area.code) == ("Flows", "EXE")
     (r,) = area.reqs
     assert (r.id, r.title, r.word("v2"), r.meta["Evidence"]) == ("REQ-EXE-010", "Something", "done", "`tests/x.py`")
+
+
+def test_each_requirement_has_the_line_range_of_its_section():
+    text = doc(req(body="Text.\n\n\n"), req(rid="REQ-EXE-020", body="More\n```\n### not a heading\n```\n"))
+    areas, errs = req_index.parse(text)
+    assert errs == []
+    first, second = areas[0].reqs
+    lines = text.split("\n")
+    assert lines[first.line - 1].startswith("### REQ-EXE-010") and lines[second.line - 1].startswith("### REQ-EXE-020")
+    assert lines[first.last - 1] == "Text."
+    assert all(not l.strip() for l in lines[first.last:second.line - 1])   # only blank lines before the next heading
+    assert second.last == len(lines) - 1 and lines[second.last - 1] == "```"  # the code block belongs to the section
 
 
 def test_a_note_after_the_first_word_is_allowed():
@@ -99,7 +104,8 @@ def test_index_has_summary_counts_links_and_escaped_cells():
     areas, _ = req_index.parse(doc(req(title="A | B"), req(rid="REQ-EXE-020", meta=GOOD.replace("done", "open"))))
     text = req_index.render(areas)
     assert "| [Flows (EXE)](#flows-exe) | 2 | 1 | 0 | 0 | 1 | 0 | 0 |" in text
-    assert "[REQ-EXE-010](REQUIREMENTS.md#req-exe-010-a--b) | A \\| B | yes | done |" in text
+    assert "[REQ-EXE-010](REQUIREMENTS.md#req-exe-010-a--b) | L5-" in text
+    assert r"| A \| B | yes | done |" in text
 
 
 def test_a_requirement_in_doubt_is_marked_and_counted():

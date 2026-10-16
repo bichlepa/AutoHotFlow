@@ -1,23 +1,33 @@
 #!/usr/bin/env python
-"""Document index: writes doc/DOC-INDEX.md, a map of the large documents with line ranges.
+"""Document index: the one command that writes all index files of the repository, and checks them.
 
-An agent greps doc/DOC-INDEX.md for a keyword and then reads only the lines of the hit (Read with offset and
-limit). Every section of a listed document is one line, "L<first>-<last> <heading text>". The last line of a
+    doc/DOC-INDEX.md           map of the large documents with line ranges (written here)
+    doc/REQUIREMENTS-INDEX.md  summary and one table per area, with the line range of each requirement
+                               (written by tools/req_index.py, which this module imports and runs)
+
+An agent greps an index for a keyword and then reads only the lines of the hit (Read with offset and limit).
+In DOC-INDEX every section of a listed document is one line, "L<first>-<last> <heading text>". The last line of a
 section is the line before the next heading of the same or a higher level (or the end of the file); trailing
-blank lines do not count. A line inside a fenced code block is never a heading.
+blank lines do not count. A line inside a fenced code block is never a heading. The same rule gives the ranges of
+the requirements. The documents are listed in the constants at the top of this file: HEADING_DOCS (heading levels
+per document), HOWTO_DIR (the entries of the how-to knowledge base, with their status) and ID_DOCS (documents whose
+entries are found by ID). The indexes are never edited by hand.
 
-The documents are listed in the constants at the top of this file: HEADING_DOCS (heading levels per document),
-HOWTO_DIR (the entries of the how-to knowledge base, with their status) and ID_DOCS (documents whose entries
-are found by ID; only a line about how to find them). The index is never edited by hand.
+The check (--check) runs the format, evidence and reference checks of the requirements and the up-to-date test of
+both indexes; it fails when one of them fails. Command line of tools/req_index.py: the same options, delegating here.
 
-Usage:  python tools/doc_index.py            write doc/DOC-INDEX.md
-        python tools/doc_index.py --check    check that doc/DOC-INDEX.md is up to date (exit 1 if not)
+Usage:  python tools/doc_index.py                 write both indexes (exit 1 on errors)
+        python tools/doc_index.py --check         check both indexes (exit 1 if one fails or is outdated)
+        options: --only doc|requirements, --source/--index (requirements), --repo (root of the repository)
 """
 
 import argparse
 import re
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import req_index  # noqa: E0402  (requirements part: parsing, checks, rendering)
 
 REPO = Path(__file__).resolve().parent.parent
 INDEX = REPO / "doc" / "DOC-INDEX.md"
@@ -39,8 +49,9 @@ HOWTO_LEVELS = (3,)
 
 # Documents with IDs: one line on how to find an entry, no section list.
 ID_DOCS = {
-    "doc/REQUIREMENTS.md": "Entries are `### REQ-<AREA>-<NNN> <title>`. Find one by its ID, e.g. "
-                           "`grep -n REQ-ELM-240 doc/REQUIREMENTS.md`. Overview: `doc/REQUIREMENTS-INDEX.md`.",
+    "doc/REQUIREMENTS.md": "Entries are `### REQ-<AREA>-<NNN> <title>`: see doc/REQUIREMENTS-INDEX.md "
+                           "(line ranges per requirement). Find one by its ID, e.g. "
+                           "`grep -n REQ-ELM-240 doc/REQUIREMENTS.md`.",
     "doc/OPEN-ITEMS.md": "Open findings `F-<NNNN>`: one row each in the summary table at the top, one entry each "
                          "below. Find one with `grep -n F-0097 doc/OPEN-ITEMS.md`.",
     "doc/CLOSED-ITEMS.md": "Closed and accepted findings `F-<NNNN>`: one row each in the table at the top. "
@@ -136,9 +147,9 @@ def read(path):
     return text, lines
 
 
-def size_line(path, lines):
+def size_line(path, lines, repo=REPO):
     size_kb = round(path.stat().st_size / 1024, 1)
-    return "## %s (%.1f KB, %d lines)" % (path.relative_to(REPO).as_posix(), size_kb, len(lines))
+    return "## %s (%.1f KB, %d lines)" % (path.relative_to(repo).as_posix(), size_kb, len(lines))
 
 
 def section_lines(items, base_level):
@@ -149,53 +160,79 @@ def section_lines(items, base_level):
     return out
 
 
-def build():
+def build(repo=REPO):
     out = list(HEADER)
     for rel, levels in HEADING_DOCS.items():
-        path = REPO / rel
+        path = repo / rel
         _, lines = read(path)
-        out.append(size_line(path, lines))
+        out.append(size_line(path, lines, repo))
         out.append("```text")
         out += section_lines(sections(lines, levels), min(levels))
         out.append("```")
         out.append("")
-    for path in sorted((REPO / HOWTO_DIR).glob("*.md")):
+    for path in sorted((repo / HOWTO_DIR).glob("*.md")):
         _, lines = read(path)
-        out.append(size_line(path, lines))
+        out.append(size_line(path, lines, repo))
         out.append("```text")
         for first, last, level, text in sections(lines, HOWTO_LEVELS):
             out.append("L%d-%d %s (%s)" % (first, last, text, entry_status(lines, first, last)))
         out.append("```")
         out.append("")
     for rel, how in ID_DOCS.items():
-        path = REPO / rel
+        path = repo / rel
         _, lines = read(path)
-        out.append(size_line(path, lines))
+        out.append(size_line(path, lines, repo))
         out.append(how)
         out.append("")
     return "\n".join(out).rstrip("\n") + "\n"
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(description="Write or check doc/DOC-INDEX.md.")
-    parser.add_argument("--check", action="store_true", help="only check that the index is up to date")
-    args = parser.parse_args(argv)
-    try:
-        text = build()
-    except (ValueError, OSError) as error:
-        print("doc_index: %s" % error, file=sys.stderr)
-        return 1
-    current = INDEX.read_text(encoding="utf-8") if INDEX.exists() else ""
-    if args.check:
-        if current != text:
-            print("doc/DOC-INDEX.md is outdated: run python tools/doc_index.py", file=sys.stderr)
+def same_text(current, text):
+    # line ends depend on the git checkout; compare the content only
+    return current.replace("\r\n", "\n") == text
+
+
+def run(check=False, only=("doc", "requirements"), source=req_index.SOURCE, index=req_index.INDEX,
+        repo=REPO, out=sys.stdout):
+    """Write (or with check: verify) the selected indexes. Both are always run; 0 when all are fine, else 1."""
+    code = 0
+    if "requirements" in only:
+        code |= req_index.run(source, index, check=check, out=out, repo=repo)
+    if "doc" in only:
+        target = repo / "doc" / "DOC-INDEX.md"
+        try:
+            text = build(repo)
+        except (ValueError, OSError) as error:
+            print("doc_index: %s" % error, file=out)
             return 1
-        print("doc/DOC-INDEX.md is up to date")
-        return 0
-    with open(INDEX, "w", encoding="utf-8", newline="\n") as handle:
-        handle.write(text)
-    print("written %s (%.1f KB)" % (INDEX.relative_to(REPO).as_posix(), len(text.encode("utf-8")) / 1024))
-    return 0
+        current = target.read_text(encoding="utf-8") if target.exists() else ""
+        if check:
+            if not same_text(current, text):
+                print("doc/DOC-INDEX.md is outdated: run python tools/doc_index.py", file=out)
+                code |= 1
+            else:
+                print("doc/DOC-INDEX.md is up to date", file=out)
+        elif not same_text(current, text):
+            with open(target, "w", encoding="utf-8", newline="\n") as handle:
+                handle.write(text)
+            print("written doc/DOC-INDEX.md (%.1f KB)" % (len(text.encode("utf-8")) / 1024), file=out)
+        else:
+            print("doc/DOC-INDEX.md unchanged", file=out)
+    return code
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Write or check all index files (doc/DOC-INDEX.md, "
+                                                 "doc/REQUIREMENTS-INDEX.md).")
+    parser.add_argument("--check", action="store_true", help="only check; exit 1 if an index fails or is outdated")
+    parser.add_argument("--only", choices=("doc", "requirements"), action="append",
+                        help="write or check one index only (default: both)")
+    parser.add_argument("--source", type=Path, default=req_index.SOURCE, help="requirements source")
+    parser.add_argument("--index", type=Path, default=req_index.INDEX, help="requirements index")
+    parser.add_argument("--repo", type=Path, default=REPO, help="root of the repository")
+    args = parser.parse_args(argv)
+    only = tuple(args.only) if args.only else ("doc", "requirements")
+    return run(args.check, only, args.source, args.index, args.repo)
 
 
 if __name__ == "__main__":

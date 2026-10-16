@@ -316,7 +316,7 @@ L340-346 `Loop Parse` with the delimiter text "CSV" is the CSV mode (verified)
 ```
 
 ## doc/REQUIREMENTS.md (117.7 KB, 2692 lines)
-Entries are `### REQ-<AREA>-<NNN> <title>`. Find one by its ID, e.g. `grep -n REQ-ELM-240 doc/REQUIREMENTS.md`. Overview: `doc/REQUIREMENTS-INDEX.md`.
+Entries are `### REQ-<AREA>-<NNN> <title>`: see doc/REQUIREMENTS-INDEX.md (line ranges per requirement). Find one by its ID, e.g. `grep -n REQ-ELM-240 doc/REQUIREMENTS.md`.
 
 ## doc/OPEN-ITEMS.md (63.8 KB, 328 lines)
 Open findings `F-<NNNN>`: one row each in the summary table at the top, one entry each below. Find one with `grep -n F-0097 doc/OPEN-ITEMS.md`.

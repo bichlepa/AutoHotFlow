@@ -1,9 +1,12 @@
-"""Document index: doc/DOC-INDEX.md is up to date, and the line-range logic of tools/doc_index.py is correct.
+"""Indexes of the repository: the one check of tools/doc_index.py (both indexes, the requirement checks included)
+and the line-range logic of the tool.
 
-The first test fails with the hint to run tools/doc_index.py when the index is outdated. The other tests feed
-small example texts to the functions of the tool.
+The first test fails with the messages of the check: a format, evidence or reference error of the requirements,
+or an index that is outdated (run python tools/doc_index.py). The other tests feed small example texts to the
+functions of the tool.
 """
 
+import io
 import sys
 from pathlib import Path
 
@@ -16,9 +19,10 @@ def lines_of(text):
     return text.split("\n")
 
 
-def test_index_is_up_to_date():
-    assert doc_index.build() == doc_index.INDEX.read_text(encoding="utf-8"), (
-        "doc/DOC-INDEX.md is outdated: run python tools/doc_index.py")
+def test_all_indexes_are_up_to_date_and_the_requirements_are_valid():
+    out = io.StringIO()
+    code = doc_index.run(check=True, out=out)
+    assert code == 0, out.getvalue()
 
 
 def test_nested_levels_end_at_the_next_heading_of_same_or_higher_level():

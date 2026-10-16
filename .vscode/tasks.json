@@ -421,16 +421,6 @@
             "problemMatcher": []
         },
         {
-            "label": "Tool: requirements index (req_index.py)",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "tools/req_index.py"
-            ],
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
             "label": "Tool: expression parser benchmark (parse cache; result in %TEMP%/ahf_expr_bench.txt)",
             "type": "shell",
             "command": "python",
@@ -767,7 +757,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Tool: document index (doc_index.py)",
+            "label": "Tool: indexes (doc_index.py)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -776,6 +766,7 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
+            "group": "build",
             "problemMatcher": []
         },
         {
