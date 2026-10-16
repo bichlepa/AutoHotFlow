@@ -223,7 +223,7 @@ L351-357 An event of a trigger can arrive before the answer that arms it (verifi
 L359-365 An error in a request callback ends that request, the step after it never runs (verified)
 ```
 
-## doc/howto/syntax-and-language.md (34.3 KB, 337 lines)
+## doc/howto/syntax-and-language.md (35.2 KB, 344 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -266,9 +266,10 @@ L311-315 A helper function of a test file is a global name: `Owner()` turns ever
 L317-323 A class used by an element without its #Include: a warning dialog and a wrong local (verified)
 L325-330 A lambda in a static method of a class: `this` is the class (verified)
 L332-337 A timer period is limited to 2^31 - 1 milliseconds (partly verified)
+L339-344 A sliding window of counts costs one increment per count (verified)
 ```
 
-## doc/howto/tests-and-tools.md (39.6 KB, 395 lines)
+## doc/howto/tests-and-tools.md (40.3 KB, 402 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -317,6 +318,7 @@ L364-370 Writing AHK source with Python: a backslash-u in a Python literal becom
 L372-378 A stub that records a request before it does the work makes the test race (verified)
 L381-387 Kill tests: subscribe before the kill and wait for the restart before the next pid (verified)
 L389-395 A test double of an engine class must have the members that the real class adds (verified)
+L397-402 A timer trigger in an integration test needs the trigger host role (verified)
 ```
 
 ## doc/REQUIREMENTS.md
