@@ -38,7 +38,11 @@ def test_close_kills_process_and_its_children():
 def test_suspend_and_resume():
     tracker = ProcessTracker()
     try:
-        proc = _sleeper(tracker)
+        # Wait until the interpreter has started (F-0079): NtSuspendProcess stops only the threads that exist now, so
+        # a suspend during the start can leave a thread running ("running" instead of "stopped") on a loaded machine.
+        proc = tracker.start([sys.executable, "-c", "import time; print('up', flush=True); time.sleep(120)"],
+                             stdout=subprocess.PIPE)
+        assert proc.stdout.readline().strip() == b"up"
         assert tracker.alive(proc)
         tracker.suspend(proc)
         # The status follows the thread states with a lag of a few ms (measured: up to ~70 ms in 30 runs
