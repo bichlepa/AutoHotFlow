@@ -257,7 +257,7 @@ def test_pings_are_answered_while_a_blocking_element_runs(worker):
     t0 = time.perf_counter()
     for n in (1, 2, 3):
         # sys.pong answers the ping (corr), so it is taken with request(), not from the event stream
-        pong = worker.request("worker:1", "sys.ping", {"n": n}, timeout=1.0)
+        pong = worker.request("worker:1", "sys.ping", {"n": n}, timeout=scaled(1.0))
         answered.append((n, pong["payload"]["n"], time.perf_counter() - t0))
     assert [a[1] for a in answered] == [1, 2, 3]
     assert answered[-1][2] < block_s, answered
