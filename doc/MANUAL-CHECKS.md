@@ -68,7 +68,10 @@ Test on the real dialog windows of the elements Message_Box, Confirmation_Dialog
 
 **Set the scaling.** Windows Settings > System > Display > Scale: choose 100 %, 125 % or 150 %. Log off and on only if the text stays blurred after a change.
 
-**Start.** Not yet possible, see NEEDS-ATTENTION. A start path that shows a dialog element without the manager is not known yet. The tasks `Start:` in `.vscode/tasks.json` were checked by label only; no flow file in `tests/data` was checked for these elements. Do not run the steps until a start path is written here.
+**Start.** VS Code task "Start: manual check 3, dialog windows at other DPI scaling (manual_check.py)", or in a terminal:
+`python tools/manual_check.py start --flow dpi_dialogs -- --ui=stub --start=storage,engine,manager`
+
+The start prepares a fresh data folder with the flow `dpi_dialogs` (`tests/data/manual/dpi_dialogs.json`, which runs the message box, the confirmation dialog, the debug dialog with a few variables and the tooltip, in this order). The flow does not start by itself: in the manager stub select `dpi_dialogs` and click Start. The window of an element that ends the flow early (for example the debug window closed with X) stops the flow at that element; then start the flow again in the stub.
 
 ### Steps
 
