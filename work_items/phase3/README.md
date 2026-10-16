@@ -26,11 +26,11 @@ Each step is worked through individually: **detail** (package files WI-xx with t
 |---|---|---|---|---|
 | **S0001** | Expressions and variables | new expression language (AHK v2 semantics), conversion of old expressions, golden data from v1, variable model, `global`/`static` permanent, parameter evaluation | see below, packages WI-0036 to WI-0043 | done (acceptance closed 2026-10-15, E0050; F-0073 stays open) |
 | **S0002** | Element foundation and core set | oracle of the expression language (native AHK v2, E0035), migration markers, R0003 measurement, element layout per package (E0037), L0001 smoke test, flow builder for tests, R0004 (`ctx.Request`), dialog test seam (E0038), core set of 29 elements, test corpus from the "Automatic tests" flows | see below, packages WI-0044 to WI-0058 | **done** (acceptance WI-0058, 2026-10-16; F-0107 and F-0108 closed by the owner) |
-| S0003 | Trigger host and a few triggers | role `triggerhost` (WI-0014), `cmd.trigger.arm/disarm`, `evt.trigger.fired/error`, re-arming after engine restart, activate/deactivate flow. Triggers: Manual, Hotkey, Periodic_Timer, Start_up | trigger e2e and fault tests | rough |
-| S0004 | UI foundation and manager | `ui_common/`, manager (category tree, start/stop/activate, new/rename/delete/duplicate, settings, log display, hints), **import from v1** (flows, variables), `.ahf` export/import, engine commands `cmd.flow.create/delete/meta.update`, `cmd.category.*`, `cmd.settings.*`, global setting for the number of workers (E0044, F-0082). Closing the window only hides it (E0014). Tray icon and tray menu (REQ-MGR-140), start with Windows, run as administrator, user level setting, about window (REQ-MGR-090, REQ-SET-030, REQ-SET-040, REQ-USE-010, REQ-MGR-100). Notice on unhandled flow errors (REQ-USE-080), imported flows disabled with a warning (REQ-SEC-060), the manager can be reopened after a crash (REQ-ROB-120), sharp on high-resolution displays (REQ-USE-090, also S0005 to S0007) | operation by hand, e2e of the commands | rough |
+| **S0003** | Trigger host and a few triggers | enabled state per trigger, kept across starts (E0056, E0057), role `triggerhost` (WI-0014), `cmd.trigger.arm/disarm`, `evt.trigger.fired/error`, re-arming after a restart of engine or trigger host, activate/deactivate flow. Triggers: Manual, Hotkey (with window conditions, E0060), Periodic_Timer, Start_up; elements `Set_Flow_Status`, `Condition_Flow_Enabled`; guard against runaway flows (REQ-EXE-170, E0062) | see below, packages WI-0060 to WI-0067 | **detailed** |
+| S0004 | UI foundation and manager | `ui_common/`, manager (category tree, start/stop/activate, new/rename/delete/duplicate, settings, log display, hints), **import from v1** (flows, variables), `.ahf` export/import, engine commands `cmd.flow.create/delete/meta.update`, `cmd.category.*`, `cmd.settings.*`, global setting for the number of workers (E0044, F-0082). Closing the window only hides it (E0014). Tray icon and tray menu (REQ-MGR-140), start with Windows, run as administrator, user level setting, about window (REQ-MGR-090, REQ-SET-030, REQ-SET-040, REQ-USE-010, REQ-MGR-100). Notice on unhandled flow errors (REQ-USE-080), imported flows disabled with a warning (REQ-SEC-060), the manager can be reopened after a crash (REQ-ROB-120), sharp on high-resolution displays (REQ-USE-090, also S0005 to S0007). From S0003: the display of active independent triggers and the dialog that disables a flow completely (E0056), the notice when a flow was stopped by a limit and the global defaults of the limits (REQ-EXE-170, E0062), the autostart entry passes `--windows-startup` (WI-0063) | operation by hand, e2e of the commands | rough |
 | S0005 | Editor I: display | `Renderer`/`Scene`, GDI+ in v2, zoom, panning the view, live states, resync, tray icon of the editor with the state of the flow (REQ-EDT-230) | R0002 measurement (300 elements, under 16 ms per frame), memory with 5 editors | rough |
-| S0006 | Editor II: editing | selection, moving, connecting, copy/paste, undo/redo, patch operations, `baseRev` conflict, saving, prompt when quitting, a crashed editor loses nothing (REQ-ROB-120), tray menu of the editor (REQ-EDT-230) | e2e: editing during execution (E0001) | rough |
-| S0007 | Editor III: settings dialogs | parameter schema to GUI, `form` API for `CheckSettings`, flow settings, wizards (window info, color, mouse), help, element list filtered by user level (REQ-USE-010) | every element of the core set editable | rough |
+| S0006 | Editor II: editing | selection, moving, connecting, copy/paste, undo/redo, patch operations, `baseRev` conflict, saving, prompt when quitting, a crashed editor loses nothing (REQ-ROB-120), tray menu of the editor (REQ-EDT-230). From S0003: a changed, added or removed trigger of an enabled flow is re-armed or disarmed; the enabled state of a new trigger | e2e: editing during execution (E0001) | rough |
+| S0007 | Editor III: settings dialogs | parameter schema to GUI, `form` API for `CheckSettings`, flow settings, wizards (window info, color, mouse), help, element list filtered by user level (REQ-USE-010). From S0003: the checkbox "Switch with the flow" (`followsFlow`, E0056) in every trigger dialog, the limits of a flow in the flow settings (REQ-EXE-170) | every element of the core set editable | rough |
 | S0008 | Remaining elements | first the converter `tools/convert_element.py` (E0036, tested with the core set of S0002 as before/after cases), then the elements in groups: dialogs/worker, file/drive/process/internet/power/sound, window/user simulation/image, unsafe elements (AHK script with v2 code only, E0039; DllCall, TTS, Eject, Monitor, screen, input block), remaining triggers, demonstration flows (REQ-MGR-060) | the "Automatic tests" flows of the test corpus (WI-0057, adapted to v2 where needed) run green | rough |
 | S0009 | Distribution and release | compiled program (one program or one per role, R0007), installer with start menu entry and uninstaller, release checklist, translations brought up to date, translation tools for contributors, newer file formats are not destroyed (REQ-DST-010, REQ-DST-020, REQ-DST-050, REQ-LNG-050, REQ-MIG-080) | install, start, use and uninstall on a Windows without AutoHotkey | rough |
 | S0010 | Phase 3 completion | overall acceptance, equality list with v1, performance budgets, documents, check that nothing is sent from the computer (REQ-SEC-050), scope of Phase 4 | serial, parallel, stress green | rough |
@@ -78,9 +78,21 @@ Decisions of the project owner while S0002 was detailed (2026-10-14; E0040, E004
 | E0041 | **Role entry scripts (R0003 option A without B).** Each role's entry script includes only the element classes it needs, selected by the literal `static Mode` (engine: all; triggerhost: trigger; worker: worker; supervisor, storage and debug: none; manager: all if it needs them, accepted). Metadata and runtime code are not split. Supersedes D0012 in part. | WI-0047-PREP, WI-0047 |
 | E0045 | **The package name is part of the identity of an element**, also for the elements of v1 (REQ-PKG-060). Each package is an AHK class that includes its element files; the type name (`Default.Action_Sleep`) is the qualified ID used by registry, worker jobs, trigger arming and logs. Flow files stay as they are (`package` plus `class`; missing `package` means `Default`, case ignored). (2026-10-15) | WI-0047 |
 
+Decisions of the project owner while S0003 was detailed (2026-10-16; details in `doc/DECISIONS.md`):
+
+| # | Decision | Affects |
+|---|---|---|
+| E0056 | **Enabled state of triggers.** Every trigger has its own enabled state and the property `followsFlow` ("Switch with the flow", default true, stored in the flow file). A flow is active when at least one of its following triggers is enabled. Enabling or disabling a flow switches its following triggers only; switching one trigger changes only that trigger. Independent triggers keep their state, also across a restart. When the user disables, by hand, a flow that is inactive but has active independent triggers, the manager asks whether to disable them too, and says that only the editor can undo this. | WI-0060, WI-0062, WI-0065, S0004 (dialog, display), S0007 (checkbox) |
+| E0057 | **The enabled state is kept in its own file `FlowState.json`** in the data folder (written by storage, owned by the engine), not in the flow file and not in the settings: switching must not save unsaved changes of a flow, and the state belongs to the machine. | WI-0060 |
+| E0058 | **A flow file in the v1 format loads with all triggers disabled;** its `enabled` keys are ignored (REQ-SEC-060). Otherwise a flow that runs in the productive v1 would react twice. | WI-0060, MIGRATION |
+| E0059 | **Hotkey tests:** simple tests send unassigned virtual keys (`vk97` to `vk9F`) with `SendInput` and run in the normal tiers under a machine-wide input lock; key combinations with modifiers run in the `gui` tier (by the owner). A spike checks first that unassigned keys work. | WI-0064 |
+| E0060 | **`Trigger_Hotkey` comes complete in S0003, with its window conditions.** The window identification it needs is built as a shared library of the package, which S0008 reuses. | WI-0064, S0008 |
+| E0061 | **Acceptance evidence of S0003:** an adapted copy of the v1 flow "Trigger test" without its `Action_Speech_output` (S0008), recorded in the fix list with a MIGRATION ID. | WI-0067 |
+| E0062 | **Guard against runaway flows (new REQ-EXE-170).** Per flow: element executions per minute (the trigger counts too); over the limit all instances stop and all triggers of the flow are disabled, independent ones included, and the user is told. Waiting instances and parallel instances: a start over the limit is refused like `skip`. No separate "new instances per minute". Global defaults (S0004), per flow changeable (S0007), 0 = no limit. WI-0066 sets the defaults from its throughput measurement (start: 100 waiting, 100 parallel); the owner may change them later. | WI-0066, S0004, S0007 |
+
 ## Open questions for the project owner
 
-None at the moment (E0035 to E0039 answered on 2026-10-14).
+None at the moment (E0056 to E0062 answered on 2026-10-16).
 
 ## Required reading for every package
 
@@ -218,3 +230,64 @@ The trace points are in the first group on purpose: they record the path through
 
 - [x] WI-0044  - [x] WI-0045  - [x] WI-0046  - [x] WI-0047-PREP  - [x] WI-0047  - [x] WI-0048  - [x] WI-0049  - [x] WI-0050  - [x] WI-0051
 - [x] WI-0052  - [x] WI-0053  - [x] WI-0054  - [x] WI-0055  - [x] WI-0056  - [x] WI-0057  - [x] WI-0058
+
+## S0003: Trigger host and triggers
+
+**Goal:** Triggers react by themselves. The trigger host holds the OS handles (timers, hotkeys); the engine knows the enabled state of every trigger, keeps it across starts, arms the triggers in the host and starts instances on their events. Four triggers (Manual, Periodic_Timer, Start_up, Hotkey with window conditions), the elements `Action_Set_Flow_Status` and `Condition_Flow_Enabled`, and a guard against runaway flows (REQ-EXE-170). The v1 flow "Trigger test" runs headless and green on an adapted copy (E0061).
+
+**Not part of S0003:** the manager display of independent triggers and the dialog that disables a flow completely (S0004, E0056), the notice of a limit stop and the global defaults of the limits (S0004), import from v1 (S0004), the checkbox `followsFlow` and the limits in the flow settings (S0007), re-arming triggers that the editor changes (S0006), the other triggers (S0008), `ctx.Request` for triggers (only when a trigger of S0008 needs it), conflicting hotkeys reported (REQ-TRG-040, `later`).
+
+### Findings for S0003 (2026-10-16)
+
+- **Verified (read):** v1 keeps one `enabled` key per trigger in the flow file; the enabled state of a flow is derived ("any trigger enabled"); enabling a flow enables all its triggers, disabling disables all; every switch rewrites the whole flow file (`SaveFlowMetaData` calls `SaveFlow`, `v1/Source_Common/Flows/Save.ahk:5`). At start `EnableLoadedFlows` (`v1/Source_Common/Flows/Manage Flows.ahk`) enables every trigger with `enabled`; only during this pass `x_isAHFStartup()` is true (`v1/Source_Execution/Execution.ahk:90`), which `Trigger_Start_up` uses.
+- **Verified (read):** in v2 `FlowRecord.Enabled` is a flag only: not loaded, not kept (F-0099, E0053); `cmd.flow.enable/disable` only set it. The role `triggerhost` is a placeholder (`src/entry/triggerhost.ahk`); the supervisor already gives it its rank in the shutdown (`Children._RankOf`). `Trigger_Manual` has `Enable`, `Disable` and `TriggerVariables`, but the engine never calls `TriggerVariables` (M-0069).
+- **Verified (read):** the v1 flow "Trigger test" (`Flow 884290977`) uses `Trigger_Manual`, `Trigger_Periodic_Timer`, `Trigger_Start_up`, `Action_Set_Flow_Status`, `Condition_Flow_Enabled`, `Action_Execute_Flow`, `Condition_Debug_Dialog`, `Action_New_variable`, `Action_Sleep`, `Action_Add_To_List`, `Action_Stop_Flow` and one `Action_Speech_output` (S0008). No other flow of the table `PENDING` (`tests/integration/test_corpus.py`) becomes runnable with S0003 alone.
+- **Verified (read):** v2 has no file with state per machine yet; storage knows flow files and variable files. The settings file comes with S0004.
+- **Verified (read):** the test admission (WI-0059) runs `stress`, `soak` and `idle` alone, but two normal runs may overlap. There is no lock for tests that send real input.
+- **Verified (read, AHK v2 docs `lib/Hotkey.htm`):** in one AutoHotkey process a second `Hotkey()` with the same key and the same `HotIf` criteria updates the existing hotkey, so the callback of the first is replaced; different `HotIf` criteria make separate variants. v1 has all triggers in one process, so two flows with the same hotkey disturb each other there; the trigger host must share one registration between them (WI-0064).
+- **Not measured:** how many inline elements per second the engine executes (MS-0017 measures instance starts only, about 300 per second). WI-0066 measures it before the owner sets the defaults of the limits.
+
+### Design fixed while detailing
+
+No owner decision needed; a package may refine it and says so in its result.
+
+- The engine evaluates the parameters of a trigger when it arms it, with the global, static and built-in variables (there is no instance yet, as in v1). An evaluation error: the trigger is not armed, its state carries the message.
+- Every arming carries a generation number; the engine drops a fired event of an older generation or of a trigger that is no longer enabled.
+- Before it arms, the engine resets the host (`cmd.trigger.reset`); it arms again after its own restart and after a restart of the trigger host. Arming at start is staggered like the loading of the flows (F-0073).
+- `Trigger_Start_up` fires only in the first arming pass after the start of AutoHotFlow: not after a restart of engine or trigger host, and not when a flow is enabled later (as v1). A start with Windows is told by the supervisor option `--windows-startup`, which the autostart entry of S0004 sets.
+- Target state and armed state are separate. `IsTriggerEnabled` (`Action_Execute_Flow`, `Condition_Flow_Enabled`) reads the target state; whether a trigger is armed, and its error, is reported by `evt.trigger.state`.
+- `TriggerVariables` runs at every start of an instance, also at a start by `cmd.flow.start` or by another flow (M-0069 goes back).
+- A start by hand (`cmd.flow.start`) of a disabled flow stays allowed (WI-0060 checks v1).
+
+### Packages
+
+| ID | Title | Size | Depends on |
+|---|---|---|---|
+| [WI-0060](WI-0060-trigger-enabled-state.md) | Enabled state of triggers: model, `FlowState.json`, commands, F-0099 | L | – |
+| [WI-0061](WI-0061-trigger-host-role.md) | Role `triggerhost`: arm, disarm, fire, test triggers | M | – |
+| [WI-0062](WI-0062-engine-arming.md) | Engine: arming, re-arming, fired events, `TriggerVariables` | L | WI-0060, WI-0061 |
+| [WI-0063](WI-0063-timer-and-startup-triggers.md) | `Trigger_Periodic_Timer` and `Trigger_Start_up` | M | WI-0062 |
+| [WI-0064](WI-0064-hotkey-trigger.md) | `Trigger_Hotkey` with window conditions, window identification, input tests | L | WI-0062 |
+| [WI-0065](WI-0065-flow-status-elements.md) | `Action_Set_Flow_Status` and `Condition_Flow_Enabled` | M | WI-0060, WI-0062 |
+| [WI-0066](WI-0066-runaway-guard.md) | Guard against runaway flows (REQ-EXE-170) | M | WI-0060, WI-0062 |
+| [WI-0067](WI-0067-acceptance-s3.md) | Acceptance S0003 | M | all |
+
+**Order.** WI-0060 and WI-0061 first (they share only `doc/PROTOCOL.md`, in different sections), then WI-0062, then WI-0063 to WI-0066 in any order (WI-0064 starts with its spike; WI-0066 sets the defaults of the limits from its measurement), then WI-0067. As in S0002 the column "Depends on" is binding, the order is not.
+
+**Load path (F-0073).** Loading `FlowState.json` and arming at start add to the start of the engine. WI-0060 and WI-0062 run `tests/stress/test_big_flows.py` at their end (WI-0062 with enabled timer triggers in the big flows) and record the time to ready and the largest snapshot answer; budget as in S0002 (3 s, E0042).
+
+**Files with conflict risk in S0003:** `doc/PROTOCOL.md` (WI-0060, WI-0061, WI-0062, WI-0066), `doc/ELEMENT-API-V2.md` (WI-0061, WI-0062, WI-0064, WI-0065), `doc/MIGRATION.md` (every package), `src/engine/Engine.ahk` and `src/engine/Executor.ahk` (WI-0060, WI-0062, WI-0065, WI-0066), `tests/integration/test_corpus.py` (WI-0062, WI-0065, WI-0067).
+
+### Acceptance S0003
+
+- The triggers of enabled flows are active after the start of AutoHotFlow, after a restart of the engine and after a restart of the trigger host; the enabled state survives a restart of AutoHotFlow; a flow file in the v1 format loads disabled (REQ-EXE-070, REQ-TRG-020, REQ-ROB-040, E0058).
+- Every trigger of S0003 has e2e tests; the hotkey also with real input (E0059): the normal tests in the tiers, the `gui` tests run by the owner.
+- An error of one trigger stops neither the others nor the host; the host keeps reacting while the engine is busy (measurement, REQ-TRG-010).
+- The adapted v1 flow "Trigger test" runs headless and green (E0061); "variable test" runs as saved again (M-0069 back).
+- The guard stops a runaway flow and refuses starts over the limits (REQ-EXE-170), with the defaults that WI-0066 set from its measurement.
+- The memory of the background processes is measured again with the real trigger host (REQ-PRF-030, E0040).
+- Serial, parallel, `-m stress`, foundation and slow runs are green.
+
+### Progress S0003
+
+- [ ] WI-0060  - [ ] WI-0061  - [ ] WI-0062  - [ ] WI-0063  - [ ] WI-0064  - [ ] WI-0065  - [ ] WI-0066  - [ ] WI-0067

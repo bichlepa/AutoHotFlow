@@ -130,10 +130,10 @@ The user starts a flow from the manager or the editor, through its default manua
 - **v2:** partial (the state can be switched and is reported; triggers do not react yet; that the state survives a restart of AutoHotFlow is not checked)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003
+- **Plan:** S0003 (WI-0060, WI-0062), S0004 (manager)
 - **Evidence:** `tests/integration/test_engine.py::test_enable_and_disable_set_the_flag_and_report_it`
 
-Enabling a flow activates all its enabled triggers; disabling deactivates them. Running instances are not affected. Flows that were enabled when AutoHotFlow ended are enabled again at the next start.
+Enabling a flow activates its triggers that switch with the flow; disabling deactivates them (triggers that switch on their own: REQ-TRG-050). Running instances are not affected. The state survives a restart of AutoHotFlow. A flow file of v1 loads disabled (E0058). Decisions E0056, E0057.
 
 ### REQ-EXE-080 Change a flow while it runs
 
@@ -233,6 +233,16 @@ Open points: a connection whose output disappears after a change of the configur
 - **Plan:** -
 
 Every element that can wait (REQ-EXE-100) has a setting "maximum run time". The element does not provide it itself: the element settings add it to every such element, for example in an "advanced" part. When the time is over, the element is stopped like a stopped instance (REQ-EXE-110) and ends with `exception` and the reason "time limit", so that the flow can react on the `exception` connection. Without a value there is no limit beyond the one of the element class. Extends REQ-EXE-110.
+
+### REQ-EXE-170 Runaway flows are stopped
+
+- **v1:** no
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S0003 (WI-0066), S0004 (global defaults, notice), S0007 (per flow)
+
+A flow that runs away does not disturb the others (decision E0062, after the model of the Android app AutoMagic). A flow that executes more elements per minute than its limit (the trigger of each new instance counts) is stopped and all its triggers are disabled, also those that do not switch with the flow; the user is told. A start that would exceed the limit of waiting instances (policy `wait`) or of running instances of a flow is refused like the policy `skip`; a flow that calls it learns this (`exception`). The limits have global defaults and can be changed per flow; 0 means no limit. The defaults are chosen so that a loop over a long list passes.
 
 ## Expressions and variables (VAR)
 
@@ -836,8 +846,8 @@ Connection points and loop variables: REQ-EXE-030. The differences from v1 are i
 | `Action_Execute_Flow` (REQ-EXE-120) | yes | done | S0002 (WI-0055) |
 | `Action_Stop_Flow` | yes | done | S0002 (WI-0055) |
 | `Condition_Flow_Running` | yes | done | S0002 (WI-0055) |
-| `Action_Set_Flow_Status` | yes | open | S0003 |
-| `Condition_Flow_Enabled` | yes | open | S0008 |
+| `Action_Set_Flow_Status` | yes | open | S0003 (WI-0065) |
+| `Condition_Flow_Enabled` | yes | open | S0003 (WI-0065) |
 | `Action_Set_element_parameter` | yes | open | S0008 |
 
 ### REQ-ELM-260 Trace points
@@ -1130,7 +1140,7 @@ Hotkeys, hooks and timers react at once, no matter how busy the running flows ar
 - **Scope:** port
 - **Plan:** S0003
 
-The triggers of enabled flows are active from the start of AutoHotFlow on, and again after an internal restart (REQ-ROB-040); disabling a flow deactivates them.
+The enabled triggers are active from the start of AutoHotFlow on, and again after an internal restart (REQ-ROB-040); disabling a flow deactivates the triggers that switch with it (REQ-EXE-070).
 
 ### REQ-TRG-040 Conflicting hotkeys are reported
 
@@ -1150,7 +1160,24 @@ When two enabled flows, or two triggers of one flow, use the same hotkey or hots
 - **Scope:** port
 - **Plan:** S0003, S0006
 
-A flow can have several triggers. Each trigger can be enabled and disabled on its own. One manual trigger is the default trigger, used when the flow is started without naming a trigger.
+A flow can have several triggers. Each trigger can be enabled and disabled on its own, and can be set to switch with the flow or on its own (REQ-TRG-050). One manual trigger is the default trigger, used when the flow is started without naming a trigger.
+
+### REQ-TRG-050 Triggers that switch with the flow or on their own
+
+- **v1:** no (every trigger switches with the flow)
+- **v2:** open
+- **Prio:** should
+- **Scope:** port
+- **Plan:** S0003 (WI-0060, WI-0065), S0004 (manager), S0007 (editor)
+
+Each trigger has the option "Switch with the flow", on by default, so that a flow behaves as in v1 (decision E0056).
+
+- A trigger that switches with the flow is enabled and disabled together with the flow. The flow counts as active when at least one of these triggers is enabled; enabling one of them by itself makes the flow active.
+- A trigger that switches on its own is enabled and disabled only by itself: in the editor or by an element of a flow. It does not make the flow active, and it stays enabled when the flow is disabled. Use: a trigger that other elements switch on and off, while the rest of the flow is enabled or disabled as a whole.
+- The state of every trigger survives a restart of AutoHotFlow (REQ-EXE-070).
+- The manager shows when a flow is inactive but has active triggers of its own. When the user disables such a flow by hand, the manager asks whether to disable these triggers too; the question says that they can then be enabled again by hand only in the editor.
+- Elements can switch and query the flow, all its triggers, its triggers of their own, its default trigger and a given trigger (REQ-ELM-250).
+- A flow stopped by the runaway guard has all its triggers disabled, also those of their own (REQ-EXE-170).
 
 The trigger groups below follow the same rule as the element groups in ELM: one requirement per group, a table of its triggers, ideas as rows with the plan `later`. The AutoHotkey script trigger is in REQ-ELM-110.
 

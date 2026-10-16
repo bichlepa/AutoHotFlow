@@ -38,6 +38,19 @@ Step S0002 (element foundation and core set), state as of `cac616b`.
 | WI-0057 | Test corpus | done, verified | haiku (review sonnet) | 7fa6b92–a5d5d89 | 2026-10-16 | 21 corpus tests, 3 v1 flows green (variable test as copy, M-0069); 13 flows pending S0003/S0008 |
 | WI-0058 | Acceptance S0002 | done (all six criteria met; retrospective and document review in the result; 13 review items listed, none blocking) | haiku | see git log | 2026-10-16 | F-0107 and F-0108 closed by the owner |
 
+Step S0003 (trigger host and triggers), detailed on 2026-10-16 (E0056 to E0062).
+
+| WI | Title | State | Model | Commits | Date | Note |
+|---|---|---|---|---|---|---|
+| WI-0060 | Enabled state of triggers | open | | | | closes F-0099 |
+| WI-0061 | Role `triggerhost` | open | | | | parallel to WI-0060 |
+| WI-0062 | Engine: arming, fired events | open | | | | |
+| WI-0063 | Periodic timer and start-up triggers | open | | | | |
+| WI-0064 | Hotkey trigger with window conditions | open | | | | spike first (E0059) |
+| WI-0065 | Set_Flow_Status, Condition_Flow_Enabled | open | | | | |
+| WI-0066 | Guard against runaway flows | open | | | | sets the defaults from its measurement (E0062) |
+| WI-0067 | Acceptance S0003 | open | | | | |
+
 Step S0008 (remaining elements) is planned, not started.
 
 Step-independent work item: WI-0059 (test admission, load report, run history), done, closed by the owner's criterion, commits 9cefa8c–ce1024f (plus AGENTS.md commits 2524a5d, 1120c28).

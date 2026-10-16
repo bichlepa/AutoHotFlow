@@ -7,12 +7,12 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 
 | Area | Total | done | implemented | partial | open | dropped | in doubt |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| [Flows and execution (EXE)](#flows-and-execution-exe) | 16 | 9 | 0 | 5 | 2 | 0 | 1 |
+| [Flows and execution (EXE)](#flows-and-execution-exe) | 17 | 9 | 0 | 5 | 3 | 0 | 1 |
 | [Expressions and variables (VAR)](#expressions-and-variables-var) | 15 | 8 | 0 | 3 | 4 | 0 | 2 |
 | [Script language (SCR)](#script-language-scr) | 15 | 0 | 0 | 3 | 12 | 0 | 1 |
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
 | [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 6 | 16 | 0 | 0 |
-| [Triggers (TRG)](#triggers-trg) | 13 | 0 | 0 | 1 | 12 | 0 | 0 |
+| [Triggers (TRG)](#triggers-trg) | 14 | 0 | 0 | 1 | 13 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 14 | 0 | 0 | 2 | 12 | 0 | 0 |
 | [Editor (EDT)](#editor-edt) | 23 | 0 | 0 | 1 | 22 | 0 | 0 |
 | [Settings (SET)](#settings-set) | 7 | 1 | 0 | 2 | 4 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 0 | 0 | 2 | 8 | 0 | 0 |
-| **All** | **217** | **57** | **1** | **38** | **120** | **1** | **6** |
+| **All** | **219** | **57** | **1** | **38** | **122** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -40,7 +40,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-EXE-040](REQUIREMENTS.md#req-exe-040-instances-and-parallel-branches) | L84-93 | Instances and parallel branches | yes | done | must | port | - |
 | [REQ-EXE-050](REQUIREMENTS.md#req-exe-050-execution-policy-per-flow) | L95-114 | Execution policy per flow | partial | partial | must | port | S0004 (global setting) |
 | [REQ-EXE-060](REQUIREMENTS.md#req-exe-060-start-and-stop-a-flow-by-hand) | L116-125 | Start and stop a flow by hand | yes | partial | must | port | S0004 (manager), S0006 (editor) |
-| [REQ-EXE-070](REQUIREMENTS.md#req-exe-070-enable-and-disable-a-flow) | L127-136 | Enable and disable a flow | yes | partial | must | port | S0003 |
+| [REQ-EXE-070](REQUIREMENTS.md#req-exe-070-enable-and-disable-a-flow) | L127-136 | Enable and disable a flow | yes | partial | must | port | S0003 (WI-0060, WI-0062), S0004 (manager) |
 | [REQ-EXE-080](REQUIREMENTS.md#req-exe-080-change-a-flow-while-it-runs) | L138-147 | Change a flow while it runs | yes | done | must | port | - |
 | [REQ-EXE-090](REQUIREMENTS.md#req-exe-090-a-failing-element-ends-with-exception) | L149-159 | A failing element ends with `exception` *(in doubt)* | partial | done | must | port | - |
 | [REQ-EXE-100](REQUIREMENTS.md#req-exe-100-waiting-elements-do-not-delay-other-flows) | L161-170 | Waiting elements do not delay other flows | partial | done | must | port | - |
@@ -50,304 +50,306 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-EXE-140](REQUIREMENTS.md#req-exe-140-every-element-and-flow-shows-its-state) | L204-213 | Every element and flow shows its state | yes | partial | must | port | S0004 (manager), S0005 (editor) |
 | [REQ-EXE-150](REQUIREMENTS.md#req-exe-150-elements-with-any-number-of-named-outputs) | L215-225 | Elements with any number of named outputs | no | open | could | later | - |
 | [REQ-EXE-160](REQUIREMENTS.md#req-exe-160-time-limit-per-element) | L227-235 | Time limit per element | no | open | could | later | - |
+| [REQ-EXE-170](REQUIREMENTS.md#req-exe-170-runaway-flows-are-stopped) | L237-245 | Runaway flows are stopped | no | open | should | port | S0003 (WI-0066), S0004 (global defaults, notice), S0007 (per flow) |
 
 ## Expressions and variables (VAR)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-VAR-010](REQUIREMENTS.md#req-var-010-expression-language-with-autohotkey-v2-semantics) | L239-252 | Expression language with AutoHotkey v2 semantics | partial | done | must | port | - |
-| [REQ-VAR-020](REQUIREMENTS.md#req-var-020-script-form-for-several-statements) | L254-263 | Script form for several statements | yes | partial | should | port | S0008 (element) |
-| [REQ-VAR-030](REQUIREMENTS.md#req-var-030-var-substitution-in-text-parameters) | L265-275 | `%var%` substitution in text parameters *(in doubt)* | yes | done | must | port | - |
-| [REQ-VAR-040](REQUIREMENTS.md#req-var-040-variable-scopes) | L277-297 | Variable scopes | yes | done | must | port | - |
-| [REQ-VAR-050](REQUIREMENTS.md#req-var-050-permanent-global-and-static-variables) | L299-308 | Permanent global and static variables | yes | done | must | port | - |
-| [REQ-VAR-060](REQUIREMENTS.md#req-var-060-objects-and-lists-in-variables) | L310-319 | Objects and lists in variables | yes | done | must | port | - |
-| [REQ-VAR-070](REQUIREMENTS.md#req-var-070-built-in-variables) | L321-330 | Built-in variables | yes | done | must | port | - |
-| [REQ-VAR-080](REQUIREMENTS.md#req-var-080-values-of-the-trigger-reach-the-instance) | L332-341 | Values of the trigger reach the instance | yes | partial | must | port | S0003 |
-| [REQ-VAR-090](REQUIREMENTS.md#req-var-090-parameter-evaluation-by-content-type) | L343-352 | Parameter evaluation by content type | yes | done | must | port | - |
-| [REQ-VAR-100](REQUIREMENTS.md#req-var-100-type-errors-compatible-or-strict-per-flow) | L354-363 | Type errors: compatible or strict per flow | no | partial | must | port | S0004/S0005 (display of the warnings) |
-| [REQ-VAR-110](REQUIREMENTS.md#req-var-110-waiting-elements-can-use-all-variables) | L365-374 | Waiting elements can use all variables | yes | done | must | port | - |
-| [REQ-VAR-120](REQUIREMENTS.md#req-var-120-rounding-option-for-decimal-numbers) | L376-384 | Rounding option for decimal numbers | no | open | could | later | - |
-| [REQ-VAR-130](REQUIREMENTS.md#req-var-130-hints-on-global-and-static-variables) | L386-396 | Hints on global and static variables | no | open | could | later | - |
-| [REQ-VAR-140](REQUIREMENTS.md#req-var-140-protect-variables-against-concurrent-changes) | L398-409 | Protect variables against concurrent changes *(in doubt)* | no | open | could | later | - |
-| [REQ-VAR-150](REQUIREMENTS.md#req-var-150-several-variables-can-refer-to-the-same-object) | L411-421 | Several variables can refer to the same object | no | open | could | later | - |
+| [REQ-VAR-010](REQUIREMENTS.md#req-var-010-expression-language-with-autohotkey-v2-semantics) | L249-262 | Expression language with AutoHotkey v2 semantics | partial | done | must | port | - |
+| [REQ-VAR-020](REQUIREMENTS.md#req-var-020-script-form-for-several-statements) | L264-273 | Script form for several statements | yes | partial | should | port | S0008 (element) |
+| [REQ-VAR-030](REQUIREMENTS.md#req-var-030-var-substitution-in-text-parameters) | L275-285 | `%var%` substitution in text parameters *(in doubt)* | yes | done | must | port | - |
+| [REQ-VAR-040](REQUIREMENTS.md#req-var-040-variable-scopes) | L287-307 | Variable scopes | yes | done | must | port | - |
+| [REQ-VAR-050](REQUIREMENTS.md#req-var-050-permanent-global-and-static-variables) | L309-318 | Permanent global and static variables | yes | done | must | port | - |
+| [REQ-VAR-060](REQUIREMENTS.md#req-var-060-objects-and-lists-in-variables) | L320-329 | Objects and lists in variables | yes | done | must | port | - |
+| [REQ-VAR-070](REQUIREMENTS.md#req-var-070-built-in-variables) | L331-340 | Built-in variables | yes | done | must | port | - |
+| [REQ-VAR-080](REQUIREMENTS.md#req-var-080-values-of-the-trigger-reach-the-instance) | L342-351 | Values of the trigger reach the instance | yes | partial | must | port | S0003 |
+| [REQ-VAR-090](REQUIREMENTS.md#req-var-090-parameter-evaluation-by-content-type) | L353-362 | Parameter evaluation by content type | yes | done | must | port | - |
+| [REQ-VAR-100](REQUIREMENTS.md#req-var-100-type-errors-compatible-or-strict-per-flow) | L364-373 | Type errors: compatible or strict per flow | no | partial | must | port | S0004/S0005 (display of the warnings) |
+| [REQ-VAR-110](REQUIREMENTS.md#req-var-110-waiting-elements-can-use-all-variables) | L375-384 | Waiting elements can use all variables | yes | done | must | port | - |
+| [REQ-VAR-120](REQUIREMENTS.md#req-var-120-rounding-option-for-decimal-numbers) | L386-394 | Rounding option for decimal numbers | no | open | could | later | - |
+| [REQ-VAR-130](REQUIREMENTS.md#req-var-130-hints-on-global-and-static-variables) | L396-406 | Hints on global and static variables | no | open | could | later | - |
+| [REQ-VAR-140](REQUIREMENTS.md#req-var-140-protect-variables-against-concurrent-changes) | L408-419 | Protect variables against concurrent changes *(in doubt)* | no | open | could | later | - |
+| [REQ-VAR-150](REQUIREMENTS.md#req-var-150-several-variables-can-refer-to-the-same-object) | L421-431 | Several variables can refer to the same object | no | open | could | later | - |
 
 ## Script language (SCR)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-SCR-010](REQUIREMENTS.md#req-scr-010-built-in-functions) | L429-450 | Built-in functions | no | partial | should | later | - |
-| [REQ-SCR-020](REQUIREMENTS.md#req-scr-020-methods-and-properties-of-lists-and-objects) | L452-465 | Methods and properties of lists and objects | no | open | should | later | - |
-| [REQ-SCR-030](REQUIREMENTS.md#req-scr-030-loops-and-error-handling-in-scripts) | L467-475 | Loops and error handling in scripts | no | partial | should | later | - |
-| [REQ-SCR-040](REQUIREMENTS.md#req-scr-040-own-functions) | L477-493 | Own functions | no | open | could | later | - |
-| [REQ-SCR-050](REQUIREMENTS.md#req-scr-050-a-script-cannot-hang-autohotflow) | L494-504 | A script cannot hang AutoHotFlow | n/a | open | must | later | - |
-| [REQ-SCR-060](REQUIREMENTS.md#req-scr-060-errors-name-the-place-in-the-script) | L506-514 | Errors name the place in the script | no | partial | should | later | - |
-| [REQ-SCR-070](REQUIREMENTS.md#req-scr-070-script-editor) | L516-524 | Script editor | no | open | could | later | - |
-| [REQ-SCR-080](REQUIREMENTS.md#req-scr-080-elements-and-functions-behave-the-same) | L526-534 | Elements and functions behave the same | n/a | open | could | later | - |
-| [REQ-SCR-090](REQUIREMENTS.md#req-scr-090-call-elements-from-a-script) | L536-545 | Call elements from a script *(in doubt)* | no | open | could | later | - |
-| [REQ-SCR-100](REQUIREMENTS.md#req-scr-100-step-through-a-script-in-the-debugger) | L547-555 | Step through a script in the debugger | no | open | could | later | - |
-| [REQ-SCR-110](REQUIREMENTS.md#req-scr-110-script-variants-of-conditions-loops-and-triggers) | L557-573 | Script variants of conditions, loops and triggers | no | open | could | later | - |
-| [REQ-SCR-120](REQUIREMENTS.md#req-scr-120-try-out-expressions) | L575-583 | Try out expressions | no | open | could | later | - |
-| [REQ-SCR-130](REQUIREMENTS.md#req-scr-130-tests-for-own-functions) | L585-593 | Tests for own functions | no | open | could | later | - |
-| [REQ-SCR-140](REQUIREMENTS.md#req-scr-140-script-templates) | L595-603 | Script templates | no | open | could | later | - |
-| [REQ-SCR-150](REQUIREMENTS.md#req-scr-150-types-of-function-parameters) | L605-613 | Types of function parameters | no | open | could | later | - |
+| [REQ-SCR-010](REQUIREMENTS.md#req-scr-010-built-in-functions) | L439-460 | Built-in functions | no | partial | should | later | - |
+| [REQ-SCR-020](REQUIREMENTS.md#req-scr-020-methods-and-properties-of-lists-and-objects) | L462-475 | Methods and properties of lists and objects | no | open | should | later | - |
+| [REQ-SCR-030](REQUIREMENTS.md#req-scr-030-loops-and-error-handling-in-scripts) | L477-485 | Loops and error handling in scripts | no | partial | should | later | - |
+| [REQ-SCR-040](REQUIREMENTS.md#req-scr-040-own-functions) | L487-503 | Own functions | no | open | could | later | - |
+| [REQ-SCR-050](REQUIREMENTS.md#req-scr-050-a-script-cannot-hang-autohotflow) | L504-514 | A script cannot hang AutoHotFlow | n/a | open | must | later | - |
+| [REQ-SCR-060](REQUIREMENTS.md#req-scr-060-errors-name-the-place-in-the-script) | L516-524 | Errors name the place in the script | no | partial | should | later | - |
+| [REQ-SCR-070](REQUIREMENTS.md#req-scr-070-script-editor) | L526-534 | Script editor | no | open | could | later | - |
+| [REQ-SCR-080](REQUIREMENTS.md#req-scr-080-elements-and-functions-behave-the-same) | L536-544 | Elements and functions behave the same | n/a | open | could | later | - |
+| [REQ-SCR-090](REQUIREMENTS.md#req-scr-090-call-elements-from-a-script) | L546-555 | Call elements from a script *(in doubt)* | no | open | could | later | - |
+| [REQ-SCR-100](REQUIREMENTS.md#req-scr-100-step-through-a-script-in-the-debugger) | L557-565 | Step through a script in the debugger | no | open | could | later | - |
+| [REQ-SCR-110](REQUIREMENTS.md#req-scr-110-script-variants-of-conditions-loops-and-triggers) | L567-583 | Script variants of conditions, loops and triggers | no | open | could | later | - |
+| [REQ-SCR-120](REQUIREMENTS.md#req-scr-120-try-out-expressions) | L585-593 | Try out expressions | no | open | could | later | - |
+| [REQ-SCR-130](REQUIREMENTS.md#req-scr-130-tests-for-own-functions) | L595-603 | Tests for own functions | no | open | could | later | - |
+| [REQ-SCR-140](REQUIREMENTS.md#req-scr-140-script-templates) | L605-613 | Script templates | no | open | could | later | - |
+| [REQ-SCR-150](REQUIREMENTS.md#req-scr-150-types-of-function-parameters) | L615-623 | Types of function parameters | no | open | could | later | - |
 
 ## Element packages (PKG)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-PKG-010](REQUIREMENTS.md#req-pkg-010-elements-are-organised-in-packages) | L617-626 | Elements are organised in packages | yes | partial | must | port | S0002 (WI-0047), help: S0007 |
-| [REQ-PKG-020](REQUIREMENTS.md#req-pkg-020-install-additional-packages) | L628-636 | Install additional packages | yes | open | could | later | - (phase 3 has only the Default package, E0037) |
-| [REQ-PKG-030](REQUIREMENTS.md#req-pkg-030-the-included-elements-are-split-into-a-basic-and-special-packages) | L638-646 | The included elements are split into a basic and special packages | no | open | should | later | - |
-| [REQ-PKG-040](REQUIREMENTS.md#req-pkg-040-users-create-their-own-packages-and-elements) | L648-656 | Users create their own packages and elements | no | open | should | later | - |
-| [REQ-PKG-050](REQUIREMENTS.md#req-pkg-050-a-broken-element-or-package-does-not-stop-autohotflow) | L658-668 | A broken element or package does not stop AutoHotFlow | no | open | must | later | - |
-| [REQ-PKG-060](REQUIREMENTS.md#req-pkg-060-the-package-name-is-part-of-the-identity-of-an-element) | L670-679 | The package name is part of the identity of an element | partial | done | should | port | S0002 (WI-0047, decision E0045) |
+| [REQ-PKG-010](REQUIREMENTS.md#req-pkg-010-elements-are-organised-in-packages) | L627-636 | Elements are organised in packages | yes | partial | must | port | S0002 (WI-0047), help: S0007 |
+| [REQ-PKG-020](REQUIREMENTS.md#req-pkg-020-install-additional-packages) | L638-646 | Install additional packages | yes | open | could | later | - (phase 3 has only the Default package, E0037) |
+| [REQ-PKG-030](REQUIREMENTS.md#req-pkg-030-the-included-elements-are-split-into-a-basic-and-special-packages) | L648-656 | The included elements are split into a basic and special packages | no | open | should | later | - |
+| [REQ-PKG-040](REQUIREMENTS.md#req-pkg-040-users-create-their-own-packages-and-elements) | L658-666 | Users create their own packages and elements | no | open | should | later | - |
+| [REQ-PKG-050](REQUIREMENTS.md#req-pkg-050-a-broken-element-or-package-does-not-stop-autohotflow) | L668-678 | A broken element or package does not stop AutoHotFlow | no | open | must | later | - |
+| [REQ-PKG-060](REQUIREMENTS.md#req-pkg-060-the-package-name-is-part-of-the-identity-of-an-element) | L680-689 | The package name is part of the identity of an element | partial | done | should | port | S0002 (WI-0047, decision E0045) |
 
 ## Elements (ELM)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-ELM-010](REQUIREMENTS.md#req-elm-010-element-contract-and-registry) | L685-694 | Element contract and registry | yes | partial | must | port | S0002 (WI-0047), S0007 (editor) |
-| [REQ-ELM-020](REQUIREMENTS.md#req-elm-020-every-element-is-documented-by-its-help-text) | L696-705 | Every element is documented by its help text | yes | open | must | port | S0007 |
-| [REQ-ELM-110](REQUIREMENTS.md#req-elm-110-autohotkey-scripts-in-flows) | L707-720 | AutoHotkey scripts in flows | yes | open | must | port | S0008 |
-| [REQ-ELM-200](REQUIREMENTS.md#req-elm-200-variables-and-calculations) | L722-740 | Variables and calculations | yes | partial | must | port | S0002 (WI-0052), S0008 |
-| [REQ-ELM-210](REQUIREMENTS.md#req-elm-210-conditions-on-values) | L742-756 | Conditions on values | yes | done | must | port | S0002 (WI-0052) |
-| [REQ-ELM-220](REQUIREMENTS.md#req-elm-220-strings) | L758-777 | Strings | yes | open | must | port | S0008 |
-| [REQ-ELM-230](REQUIREMENTS.md#req-elm-230-lists) | L779-801 | Lists | yes | partial | must | port | S0002 (WI-0053), S0008 |
-| [REQ-ELM-240](REQUIREMENTS.md#req-elm-240-loops) | L803-820 | Loops | yes | partial | must | port | S0002 (WI-0054), S0008 |
-| [REQ-ELM-250](REQUIREMENTS.md#req-elm-250-flow-control) | L822-841 | Flow control | yes | partial | must | port | S0002 (WI-0047, WI-0052, WI-0055), S0003, S0008 |
-| [REQ-ELM-260](REQUIREMENTS.md#req-elm-260-trace-points) | L843-857 | Trace points | yes | done | must | port | S0002 (WI-0052) |
-| [REQ-ELM-270](REQUIREMENTS.md#req-elm-270-dialogs-and-notifications) | L859-877 | Dialogs and notifications | yes | partial | must | port | S0002 (WI-0051, WI-0056), S0008 |
-| [REQ-ELM-280](REQUIREMENTS.md#req-elm-280-date-and-time) | L879-891 | Date and time | yes | open | must | port | S0008 |
-| [REQ-ELM-290](REQUIREMENTS.md#req-elm-290-clipboard) | L893-904 | Clipboard | yes | open | must | port | S0008 |
-| [REQ-ELM-300](REQUIREMENTS.md#req-elm-300-files-and-folders) | L906-939 | Files and folders | yes | open | must | port | S0008 |
-| [REQ-ELM-310](REQUIREMENTS.md#req-elm-310-structured-data-files) | L941-958 | Structured data files | yes | open | must | port | S0008 |
-| [REQ-ELM-320](REQUIREMENTS.md#req-elm-320-archives) | L960-971 | Archives | yes | open | must | port | S0008 |
-| [REQ-ELM-330](REQUIREMENTS.md#req-elm-330-drives) | L973-987 | Drives | yes | open | should | port | S0008 |
-| [REQ-ELM-340](REQUIREMENTS.md#req-elm-340-internet) | L989-1000 | Internet | yes | open | must | port | S0008 |
-| [REQ-ELM-350](REQUIREMENTS.md#req-elm-350-screen-and-images) | L1002-1017 | Screen and images | yes | open | must | port | S0008 |
-| [REQ-ELM-360](REQUIREMENTS.md#req-elm-360-windows-and-controls) | L1019-1038 | Windows and controls | yes | open | must | port | S0008 |
-| [REQ-ELM-370](REQUIREMENTS.md#req-elm-370-mouse-and-keyboard) | L1040-1058 | Mouse and keyboard | yes | open | must | port | S0008 |
-| [REQ-ELM-380](REQUIREMENTS.md#req-elm-380-sound-and-speech) | L1060-1075 | Sound and speech | yes | open | should | port | S0008 |
-| [REQ-ELM-390](REQUIREMENTS.md#req-elm-390-programs-and-processes) | L1077-1094 | Programs and processes | yes | open | must | port | S0008 |
-| [REQ-ELM-400](REQUIREMENTS.md#req-elm-400-power-and-session) | L1096-1111 | Power and session | yes | open | should | port | S0008 |
+| [REQ-ELM-010](REQUIREMENTS.md#req-elm-010-element-contract-and-registry) | L695-704 | Element contract and registry | yes | partial | must | port | S0002 (WI-0047), S0007 (editor) |
+| [REQ-ELM-020](REQUIREMENTS.md#req-elm-020-every-element-is-documented-by-its-help-text) | L706-715 | Every element is documented by its help text | yes | open | must | port | S0007 |
+| [REQ-ELM-110](REQUIREMENTS.md#req-elm-110-autohotkey-scripts-in-flows) | L717-730 | AutoHotkey scripts in flows | yes | open | must | port | S0008 |
+| [REQ-ELM-200](REQUIREMENTS.md#req-elm-200-variables-and-calculations) | L732-750 | Variables and calculations | yes | partial | must | port | S0002 (WI-0052), S0008 |
+| [REQ-ELM-210](REQUIREMENTS.md#req-elm-210-conditions-on-values) | L752-766 | Conditions on values | yes | done | must | port | S0002 (WI-0052) |
+| [REQ-ELM-220](REQUIREMENTS.md#req-elm-220-strings) | L768-787 | Strings | yes | open | must | port | S0008 |
+| [REQ-ELM-230](REQUIREMENTS.md#req-elm-230-lists) | L789-811 | Lists | yes | partial | must | port | S0002 (WI-0053), S0008 |
+| [REQ-ELM-240](REQUIREMENTS.md#req-elm-240-loops) | L813-830 | Loops | yes | partial | must | port | S0002 (WI-0054), S0008 |
+| [REQ-ELM-250](REQUIREMENTS.md#req-elm-250-flow-control) | L832-851 | Flow control | yes | partial | must | port | S0002 (WI-0047, WI-0052, WI-0055), S0003, S0008 |
+| [REQ-ELM-260](REQUIREMENTS.md#req-elm-260-trace-points) | L853-867 | Trace points | yes | done | must | port | S0002 (WI-0052) |
+| [REQ-ELM-270](REQUIREMENTS.md#req-elm-270-dialogs-and-notifications) | L869-887 | Dialogs and notifications | yes | partial | must | port | S0002 (WI-0051, WI-0056), S0008 |
+| [REQ-ELM-280](REQUIREMENTS.md#req-elm-280-date-and-time) | L889-901 | Date and time | yes | open | must | port | S0008 |
+| [REQ-ELM-290](REQUIREMENTS.md#req-elm-290-clipboard) | L903-914 | Clipboard | yes | open | must | port | S0008 |
+| [REQ-ELM-300](REQUIREMENTS.md#req-elm-300-files-and-folders) | L916-949 | Files and folders | yes | open | must | port | S0008 |
+| [REQ-ELM-310](REQUIREMENTS.md#req-elm-310-structured-data-files) | L951-968 | Structured data files | yes | open | must | port | S0008 |
+| [REQ-ELM-320](REQUIREMENTS.md#req-elm-320-archives) | L970-981 | Archives | yes | open | must | port | S0008 |
+| [REQ-ELM-330](REQUIREMENTS.md#req-elm-330-drives) | L983-997 | Drives | yes | open | should | port | S0008 |
+| [REQ-ELM-340](REQUIREMENTS.md#req-elm-340-internet) | L999-1010 | Internet | yes | open | must | port | S0008 |
+| [REQ-ELM-350](REQUIREMENTS.md#req-elm-350-screen-and-images) | L1012-1027 | Screen and images | yes | open | must | port | S0008 |
+| [REQ-ELM-360](REQUIREMENTS.md#req-elm-360-windows-and-controls) | L1029-1048 | Windows and controls | yes | open | must | port | S0008 |
+| [REQ-ELM-370](REQUIREMENTS.md#req-elm-370-mouse-and-keyboard) | L1050-1068 | Mouse and keyboard | yes | open | must | port | S0008 |
+| [REQ-ELM-380](REQUIREMENTS.md#req-elm-380-sound-and-speech) | L1070-1085 | Sound and speech | yes | open | should | port | S0008 |
+| [REQ-ELM-390](REQUIREMENTS.md#req-elm-390-programs-and-processes) | L1087-1104 | Programs and processes | yes | open | must | port | S0008 |
+| [REQ-ELM-400](REQUIREMENTS.md#req-elm-400-power-and-session) | L1106-1121 | Power and session | yes | open | should | port | S0008 |
 
 ## Triggers (TRG)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-TRG-010](REQUIREMENTS.md#req-trg-010-triggers-react-at-once-whatever-the-load) | L1115-1123 | Triggers react at once, whatever the load | no | open | must | port | S0003 |
-| [REQ-TRG-020](REQUIREMENTS.md#req-trg-020-triggers-follow-the-enabled-state-also-after-a-restart) | L1125-1133 | Triggers follow the enabled state, also after a restart | yes | open | must | port | S0003 |
-| [REQ-TRG-040](REQUIREMENTS.md#req-trg-040-conflicting-hotkeys-are-reported) | L1135-1143 | Conflicting hotkeys are reported | no | open | should | later | - |
-| [REQ-TRG-030](REQUIREMENTS.md#req-trg-030-several-triggers-per-flow) | L1145-1155 | Several triggers per flow | yes | open | must | port | S0003, S0006 |
-| [REQ-TRG-200](REQUIREMENTS.md#req-trg-200-manual-trigger) | L1157-1171 | Manual trigger | yes | partial | must | port | S0002 (WI-0047) |
-| [REQ-TRG-210](REQUIREMENTS.md#req-trg-210-time-triggers) | L1173-1184 | Time triggers | yes | open | must | port | S0003, S0008 |
-| [REQ-TRG-220](REQUIREMENTS.md#req-trg-220-start-up-and-system-triggers) | L1186-1202 | Start-up and system triggers | yes | open | must | port | S0003 |
-| [REQ-TRG-230](REQUIREMENTS.md#req-trg-230-keyboard-triggers) | L1204-1217 | Keyboard triggers | yes | open | must | port | S0003, S0008 |
-| [REQ-TRG-240](REQUIREMENTS.md#req-trg-240-shortcut-trigger) | L1219-1231 | Shortcut trigger | yes | open | should | port | S0008 |
-| [REQ-TRG-250](REQUIREMENTS.md#req-trg-250-user-activity-triggers) | L1233-1245 | User activity triggers | yes | open | should | port | S0008 |
-| [REQ-TRG-260](REQUIREMENTS.md#req-trg-260-window-triggers) | L1247-1260 | Window triggers | yes | open | must | port | S0008 |
-| [REQ-TRG-270](REQUIREMENTS.md#req-trg-270-process-triggers) | L1262-1273 | Process triggers | yes | open | should | port | S0008 |
-| [REQ-TRG-280](REQUIREMENTS.md#req-trg-280-file-triggers) | L1275-1285 | File triggers | no | open | could | later | - |
+| [REQ-TRG-010](REQUIREMENTS.md#req-trg-010-triggers-react-at-once-whatever-the-load) | L1125-1133 | Triggers react at once, whatever the load | no | open | must | port | S0003 |
+| [REQ-TRG-020](REQUIREMENTS.md#req-trg-020-triggers-follow-the-enabled-state-also-after-a-restart) | L1135-1143 | Triggers follow the enabled state, also after a restart | yes | open | must | port | S0003 |
+| [REQ-TRG-040](REQUIREMENTS.md#req-trg-040-conflicting-hotkeys-are-reported) | L1145-1153 | Conflicting hotkeys are reported | no | open | should | later | - |
+| [REQ-TRG-030](REQUIREMENTS.md#req-trg-030-several-triggers-per-flow) | L1155-1163 | Several triggers per flow | yes | open | must | port | S0003, S0006 |
+| [REQ-TRG-050](REQUIREMENTS.md#req-trg-050-triggers-that-switch-with-the-flow-or-on-their-own) | L1165-1182 | Triggers that switch with the flow or on their own | no | open | should | port | S0003 (WI-0060, WI-0065), S0004 (manager), S0007 (editor) |
+| [REQ-TRG-200](REQUIREMENTS.md#req-trg-200-manual-trigger) | L1184-1198 | Manual trigger | yes | partial | must | port | S0002 (WI-0047) |
+| [REQ-TRG-210](REQUIREMENTS.md#req-trg-210-time-triggers) | L1200-1211 | Time triggers | yes | open | must | port | S0003, S0008 |
+| [REQ-TRG-220](REQUIREMENTS.md#req-trg-220-start-up-and-system-triggers) | L1213-1229 | Start-up and system triggers | yes | open | must | port | S0003 |
+| [REQ-TRG-230](REQUIREMENTS.md#req-trg-230-keyboard-triggers) | L1231-1244 | Keyboard triggers | yes | open | must | port | S0003, S0008 |
+| [REQ-TRG-240](REQUIREMENTS.md#req-trg-240-shortcut-trigger) | L1246-1258 | Shortcut trigger | yes | open | should | port | S0008 |
+| [REQ-TRG-250](REQUIREMENTS.md#req-trg-250-user-activity-triggers) | L1260-1272 | User activity triggers | yes | open | should | port | S0008 |
+| [REQ-TRG-260](REQUIREMENTS.md#req-trg-260-window-triggers) | L1274-1287 | Window triggers | yes | open | must | port | S0008 |
+| [REQ-TRG-270](REQUIREMENTS.md#req-trg-270-process-triggers) | L1289-1300 | Process triggers | yes | open | should | port | S0008 |
+| [REQ-TRG-280](REQUIREMENTS.md#req-trg-280-file-triggers) | L1302-1312 | File triggers | no | open | could | later | - |
 
 ## Manager (MGR)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-MGR-010](REQUIREMENTS.md#req-mgr-010-flow-list-with-categories-and-state) | L1289-1297 | Flow list with categories and state | yes | open | must | port | S0004 |
-| [REQ-MGR-020](REQUIREMENTS.md#req-mgr-020-create-rename-duplicate-and-delete-flows) | L1299-1307 | Create, rename, duplicate and delete flows | yes | open | must | port | S0004 |
-| [REQ-MGR-030](REQUIREMENTS.md#req-mgr-030-manage-categories) | L1309-1317 | Manage categories | yes | open | must | port | S0004 |
-| [REQ-MGR-040](REQUIREMENTS.md#req-mgr-040-operate-flows-from-the-manager) | L1319-1327 | Operate flows from the manager | yes | open | must | port | S0004 |
-| [REQ-MGR-050](REQUIREMENTS.md#req-mgr-050-import-and-export-flows) | L1329-1337 | Import and export flows | yes | open | must | port | S0004 |
-| [REQ-MGR-060](REQUIREMENTS.md#req-mgr-060-demonstration-flows) | L1339-1347 | Demonstration flows | yes | open | should | port | S0008 |
-| [REQ-MGR-070](REQUIREMENTS.md#req-mgr-070-show-the-log) | L1349-1357 | Show the log | yes | open | must | port | S0004 |
-| [REQ-MGR-080](REQUIREMENTS.md#req-mgr-080-closing-the-manager-window-keeps-autohotflow-running) | L1359-1368 | Closing the manager window keeps AutoHotFlow running | yes | open | must | port | S0004 |
-| [REQ-MGR-090](REQUIREMENTS.md#req-mgr-090-tray-icon-of-the-application) | L1370-1379 | Tray icon of the application | yes | partial | must | port | S0004 |
-| [REQ-MGR-140](REQUIREMENTS.md#req-mgr-140-tray-menu-of-the-application) | L1381-1395 | Tray menu of the application | yes | partial | must | port | S0004 |
-| [REQ-MGR-100](REQUIREMENTS.md#req-mgr-100-about-window) | L1396-1404 | About window | yes | open | could | port | S0004 |
-| [REQ-MGR-110](REQUIREMENTS.md#req-mgr-110-restore-an-older-version-of-a-flow) | L1406-1414 | Restore an older version of a flow | no | open | could | later | - |
-| [REQ-MGR-120](REQUIREMENTS.md#req-mgr-120-show-and-change-permanent-variables) | L1416-1424 | Show and change permanent variables | no | open | should | later | - |
-| [REQ-MGR-130](REQUIREMENTS.md#req-mgr-130-search-and-filter-flows) | L1426-1434 | Search and filter flows | no | open | could | later | - |
+| [REQ-MGR-010](REQUIREMENTS.md#req-mgr-010-flow-list-with-categories-and-state) | L1316-1324 | Flow list with categories and state | yes | open | must | port | S0004 |
+| [REQ-MGR-020](REQUIREMENTS.md#req-mgr-020-create-rename-duplicate-and-delete-flows) | L1326-1334 | Create, rename, duplicate and delete flows | yes | open | must | port | S0004 |
+| [REQ-MGR-030](REQUIREMENTS.md#req-mgr-030-manage-categories) | L1336-1344 | Manage categories | yes | open | must | port | S0004 |
+| [REQ-MGR-040](REQUIREMENTS.md#req-mgr-040-operate-flows-from-the-manager) | L1346-1354 | Operate flows from the manager | yes | open | must | port | S0004 |
+| [REQ-MGR-050](REQUIREMENTS.md#req-mgr-050-import-and-export-flows) | L1356-1364 | Import and export flows | yes | open | must | port | S0004 |
+| [REQ-MGR-060](REQUIREMENTS.md#req-mgr-060-demonstration-flows) | L1366-1374 | Demonstration flows | yes | open | should | port | S0008 |
+| [REQ-MGR-070](REQUIREMENTS.md#req-mgr-070-show-the-log) | L1376-1384 | Show the log | yes | open | must | port | S0004 |
+| [REQ-MGR-080](REQUIREMENTS.md#req-mgr-080-closing-the-manager-window-keeps-autohotflow-running) | L1386-1395 | Closing the manager window keeps AutoHotFlow running | yes | open | must | port | S0004 |
+| [REQ-MGR-090](REQUIREMENTS.md#req-mgr-090-tray-icon-of-the-application) | L1397-1406 | Tray icon of the application | yes | partial | must | port | S0004 |
+| [REQ-MGR-140](REQUIREMENTS.md#req-mgr-140-tray-menu-of-the-application) | L1408-1422 | Tray menu of the application | yes | partial | must | port | S0004 |
+| [REQ-MGR-100](REQUIREMENTS.md#req-mgr-100-about-window) | L1423-1431 | About window | yes | open | could | port | S0004 |
+| [REQ-MGR-110](REQUIREMENTS.md#req-mgr-110-restore-an-older-version-of-a-flow) | L1433-1441 | Restore an older version of a flow | no | open | could | later | - |
+| [REQ-MGR-120](REQUIREMENTS.md#req-mgr-120-show-and-change-permanent-variables) | L1443-1451 | Show and change permanent variables | no | open | should | later | - |
+| [REQ-MGR-130](REQUIREMENTS.md#req-mgr-130-search-and-filter-flows) | L1453-1461 | Search and filter flows | no | open | could | later | - |
 
 ## Editor (EDT)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-EDT-010](REQUIREMENTS.md#req-edt-010-one-editor-per-flow-several-at-the-same-time) | L1438-1446 | One editor per flow, several at the same time | partial | open | must | port | S0005 |
-| [REQ-EDT-020](REQUIREMENTS.md#req-edt-020-draw-the-flow) | L1448-1456 | Draw the flow | yes | open | must | port | S0005 |
-| [REQ-EDT-030](REQUIREMENTS.md#req-edt-030-zoom-and-move-the-view) | L1458-1466 | Zoom and move the view | yes | open | must | port | S0005 |
-| [REQ-EDT-040](REQUIREMENTS.md#req-edt-040-live-execution-state-in-the-editor) | L1468-1476 | Live execution state in the editor | yes | open | must | port | S0005 |
-| [REQ-EDT-050](REQUIREMENTS.md#req-edt-050-add-elements) | L1478-1486 | Add elements | yes | open | must | port | S0006, S0007 |
-| [REQ-EDT-060](REQUIREMENTS.md#req-edt-060-select-and-move) | L1488-1496 | Select and move | yes | open | must | port | S0006 |
-| [REQ-EDT-070](REQUIREMENTS.md#req-edt-070-connect-elements) | L1498-1506 | Connect elements | yes | open | must | port | S0006 |
-| [REQ-EDT-080](REQUIREMENTS.md#req-edt-080-delete-cut-copy-and-paste) | L1508-1516 | Delete, cut, copy and paste | yes | open | must | port | S0006 |
-| [REQ-EDT-090](REQUIREMENTS.md#req-edt-090-undo-and-redo) | L1518-1526 | Undo and redo | yes | open | must | port | S0006 |
-| [REQ-EDT-100](REQUIREMENTS.md#req-edt-100-save-and-changes-during-execution) | L1528-1537 | Save, and changes during execution | yes | partial | must | port | S0006 |
-| [REQ-EDT-110](REQUIREMENTS.md#req-edt-110-run-stop-and-enable-from-the-editor) | L1539-1547 | Run, stop and enable from the editor | yes | open | must | port | S0006 |
-| [REQ-EDT-120](REQUIREMENTS.md#req-edt-120-element-settings-dialog) | L1549-1557 | Element settings dialog | yes | open | must | port | S0007 |
-| [REQ-EDT-130](REQUIREMENTS.md#req-edt-130-assistants-in-the-element-settings) | L1559-1567 | Assistants in the element settings | yes | open | should | port | S0007 |
-| [REQ-EDT-140](REQUIREMENTS.md#req-edt-140-flow-settings-dialog) | L1569-1577 | Flow settings dialog | yes | open | must | port | S0007 |
-| [REQ-EDT-150](REQUIREMENTS.md#req-edt-150-warnings-of-the-evaluation-are-visible-in-the-editor) | L1579-1587 | Warnings of the evaluation are visible in the editor | no | open | must | port | S0004/S0005 |
-| [REQ-EDT-160](REQUIREMENTS.md#req-edt-160-flow-check-with-warnings) | L1589-1605 | Flow check with warnings | no | open | should | later | - |
-| [REQ-EDT-170](REQUIREMENTS.md#req-edt-170-refuse-invalid-edits) | L1607-1615 | Refuse invalid edits | partial | open | could | later | - |
-| [REQ-EDT-180](REQUIREMENTS.md#req-edt-180-quick-fixes-for-warnings) | L1617-1625 | Quick fixes for warnings | no | open | could | later | - |
-| [REQ-EDT-190](REQUIREMENTS.md#req-edt-190-help-with-variables-from-the-flow-analysis) | L1627-1635 | Help with variables from the flow analysis | no | open | could | later | - |
-| [REQ-EDT-200](REQUIREMENTS.md#req-edt-200-expressions-are-checked-while-editing) | L1637-1645 | Expressions are checked while editing | no | open | should | later | - (could fit into S0007) |
-| [REQ-EDT-210](REQUIREMENTS.md#req-edt-210-syntax-highlighting-and-auto-completion) | L1647-1655 | Syntax highlighting and auto-completion | no | open | could | later | - |
-| [REQ-EDT-220](REQUIREMENTS.md#req-edt-220-examples-and-templates-in-the-element-settings) | L1657-1665 | Examples and templates in the element settings | no | open | could | later | - |
-| [REQ-EDT-230](REQUIREMENTS.md#req-edt-230-tray-icon-of-an-editor) | L1667-1684 | Tray icon of an editor | yes | open | should | port | S0005 (icon), S0006 (menu) |
+| [REQ-EDT-010](REQUIREMENTS.md#req-edt-010-one-editor-per-flow-several-at-the-same-time) | L1465-1473 | One editor per flow, several at the same time | partial | open | must | port | S0005 |
+| [REQ-EDT-020](REQUIREMENTS.md#req-edt-020-draw-the-flow) | L1475-1483 | Draw the flow | yes | open | must | port | S0005 |
+| [REQ-EDT-030](REQUIREMENTS.md#req-edt-030-zoom-and-move-the-view) | L1485-1493 | Zoom and move the view | yes | open | must | port | S0005 |
+| [REQ-EDT-040](REQUIREMENTS.md#req-edt-040-live-execution-state-in-the-editor) | L1495-1503 | Live execution state in the editor | yes | open | must | port | S0005 |
+| [REQ-EDT-050](REQUIREMENTS.md#req-edt-050-add-elements) | L1505-1513 | Add elements | yes | open | must | port | S0006, S0007 |
+| [REQ-EDT-060](REQUIREMENTS.md#req-edt-060-select-and-move) | L1515-1523 | Select and move | yes | open | must | port | S0006 |
+| [REQ-EDT-070](REQUIREMENTS.md#req-edt-070-connect-elements) | L1525-1533 | Connect elements | yes | open | must | port | S0006 |
+| [REQ-EDT-080](REQUIREMENTS.md#req-edt-080-delete-cut-copy-and-paste) | L1535-1543 | Delete, cut, copy and paste | yes | open | must | port | S0006 |
+| [REQ-EDT-090](REQUIREMENTS.md#req-edt-090-undo-and-redo) | L1545-1553 | Undo and redo | yes | open | must | port | S0006 |
+| [REQ-EDT-100](REQUIREMENTS.md#req-edt-100-save-and-changes-during-execution) | L1555-1564 | Save, and changes during execution | yes | partial | must | port | S0006 |
+| [REQ-EDT-110](REQUIREMENTS.md#req-edt-110-run-stop-and-enable-from-the-editor) | L1566-1574 | Run, stop and enable from the editor | yes | open | must | port | S0006 |
+| [REQ-EDT-120](REQUIREMENTS.md#req-edt-120-element-settings-dialog) | L1576-1584 | Element settings dialog | yes | open | must | port | S0007 |
+| [REQ-EDT-130](REQUIREMENTS.md#req-edt-130-assistants-in-the-element-settings) | L1586-1594 | Assistants in the element settings | yes | open | should | port | S0007 |
+| [REQ-EDT-140](REQUIREMENTS.md#req-edt-140-flow-settings-dialog) | L1596-1604 | Flow settings dialog | yes | open | must | port | S0007 |
+| [REQ-EDT-150](REQUIREMENTS.md#req-edt-150-warnings-of-the-evaluation-are-visible-in-the-editor) | L1606-1614 | Warnings of the evaluation are visible in the editor | no | open | must | port | S0004/S0005 |
+| [REQ-EDT-160](REQUIREMENTS.md#req-edt-160-flow-check-with-warnings) | L1616-1632 | Flow check with warnings | no | open | should | later | - |
+| [REQ-EDT-170](REQUIREMENTS.md#req-edt-170-refuse-invalid-edits) | L1634-1642 | Refuse invalid edits | partial | open | could | later | - |
+| [REQ-EDT-180](REQUIREMENTS.md#req-edt-180-quick-fixes-for-warnings) | L1644-1652 | Quick fixes for warnings | no | open | could | later | - |
+| [REQ-EDT-190](REQUIREMENTS.md#req-edt-190-help-with-variables-from-the-flow-analysis) | L1654-1662 | Help with variables from the flow analysis | no | open | could | later | - |
+| [REQ-EDT-200](REQUIREMENTS.md#req-edt-200-expressions-are-checked-while-editing) | L1664-1672 | Expressions are checked while editing | no | open | should | later | - (could fit into S0007) |
+| [REQ-EDT-210](REQUIREMENTS.md#req-edt-210-syntax-highlighting-and-auto-completion) | L1674-1682 | Syntax highlighting and auto-completion | no | open | could | later | - |
+| [REQ-EDT-220](REQUIREMENTS.md#req-edt-220-examples-and-templates-in-the-element-settings) | L1684-1692 | Examples and templates in the element settings | no | open | could | later | - |
+| [REQ-EDT-230](REQUIREMENTS.md#req-edt-230-tray-icon-of-an-editor) | L1694-1711 | Tray icon of an editor | yes | open | should | port | S0005 (icon), S0006 (menu) |
 
 ## Settings (SET)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-SET-010](REQUIREMENTS.md#req-set-010-global-settings-dialog) | L1688-1696 | Global settings dialog | yes | open | must | port | S0004 |
-| [REQ-SET-020](REQUIREMENTS.md#req-set-020-defaults-for-execution-policy-and-working-directory) | L1698-1706 | Defaults for execution policy and working directory | yes | open | must | port | S0004 |
-| [REQ-SET-030](REQUIREMENTS.md#req-set-030-start-with-windows) | L1708-1716 | Start with Windows | yes | open | must | port | S0004 |
-| [REQ-SET-040](REQUIREMENTS.md#req-set-040-run-as-administrator) | L1718-1726 | Run as administrator | yes | open | should | port | S0004 |
-| [REQ-SET-050](REQUIREMENTS.md#req-set-050-logging-settings) | L1728-1735 | Logging settings | yes | partial | must | port | S0004 |
-| [REQ-SET-060](REQUIREMENTS.md#req-set-060-own-data-folder) | L1737-1746 | Own data folder | partial | done | must | port | - |
-| [REQ-SET-070](REQUIREMENTS.md#req-set-070-number-of-workers) | L1748-1756 | Number of workers | n/a | partial | must | port | S0004 (E0044) |
+| [REQ-SET-010](REQUIREMENTS.md#req-set-010-global-settings-dialog) | L1715-1723 | Global settings dialog | yes | open | must | port | S0004 |
+| [REQ-SET-020](REQUIREMENTS.md#req-set-020-defaults-for-execution-policy-and-working-directory) | L1725-1733 | Defaults for execution policy and working directory | yes | open | must | port | S0004 |
+| [REQ-SET-030](REQUIREMENTS.md#req-set-030-start-with-windows) | L1735-1743 | Start with Windows | yes | open | must | port | S0004 |
+| [REQ-SET-040](REQUIREMENTS.md#req-set-040-run-as-administrator) | L1745-1753 | Run as administrator | yes | open | should | port | S0004 |
+| [REQ-SET-050](REQUIREMENTS.md#req-set-050-logging-settings) | L1755-1762 | Logging settings | yes | partial | must | port | S0004 |
+| [REQ-SET-060](REQUIREMENTS.md#req-set-060-own-data-folder) | L1764-1773 | Own data folder | partial | done | must | port | - |
+| [REQ-SET-070](REQUIREMENTS.md#req-set-070-number-of-workers) | L1775-1783 | Number of workers | n/a | partial | must | port | S0004 (E0044) |
 
 ## Import and migration (MIG)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-MIG-010](REQUIREMENTS.md#req-mig-010-v1-flows-load-as-they-are) | L1760-1769 | v1 flows load as they are | n/a | done | must | port | - |
-| [REQ-MIG-020](REQUIREMENTS.md#req-mig-020-v1-variables-load) | L1771-1780 | v1 variables load | n/a | done | must | port | - |
-| [REQ-MIG-030](REQUIREMENTS.md#req-mig-030-v1-expressions-are-converted-on-load) | L1782-1791 | v1 expressions are converted on load | n/a | done | must | port | - |
-| [REQ-MIG-040](REQUIREMENTS.md#req-mig-040-places-that-need-a-fix-are-marked) | L1793-1802 | Places that need a fix are marked | n/a | done | must | port | - |
-| [REQ-MIG-050](REQUIREMENTS.md#req-mig-050-saved-flows-carry-a-format-version) | L1804-1813 | Saved flows carry a format version | n/a | done | must | port | - |
-| [REQ-MIG-060](REQUIREMENTS.md#req-mig-060-import-from-the-v1-data-folder) | L1815-1823 | Import from the v1 data folder | n/a | open | must | port | S0004 |
-| [REQ-MIG-070](REQUIREMENTS.md#req-mig-070-flows-with-missing-element-packages) | L1825-1833 | Flows with missing element packages | yes | partial | should | port | S0004 (manager), S0003 (triggers), S0005 to S0007 (editor) |
-| [REQ-MIG-080](REQUIREMENTS.md#req-mig-080-files-of-a-newer-version-are-not-destroyed) | L1835-1843 | Files of a newer version are not destroyed | n/a | open | must | port | S0009 |
+| [REQ-MIG-010](REQUIREMENTS.md#req-mig-010-v1-flows-load-as-they-are) | L1787-1796 | v1 flows load as they are | n/a | done | must | port | - |
+| [REQ-MIG-020](REQUIREMENTS.md#req-mig-020-v1-variables-load) | L1798-1807 | v1 variables load | n/a | done | must | port | - |
+| [REQ-MIG-030](REQUIREMENTS.md#req-mig-030-v1-expressions-are-converted-on-load) | L1809-1818 | v1 expressions are converted on load | n/a | done | must | port | - |
+| [REQ-MIG-040](REQUIREMENTS.md#req-mig-040-places-that-need-a-fix-are-marked) | L1820-1829 | Places that need a fix are marked | n/a | done | must | port | - |
+| [REQ-MIG-050](REQUIREMENTS.md#req-mig-050-saved-flows-carry-a-format-version) | L1831-1840 | Saved flows carry a format version | n/a | done | must | port | - |
+| [REQ-MIG-060](REQUIREMENTS.md#req-mig-060-import-from-the-v1-data-folder) | L1842-1850 | Import from the v1 data folder | n/a | open | must | port | S0004 |
+| [REQ-MIG-070](REQUIREMENTS.md#req-mig-070-flows-with-missing-element-packages) | L1852-1860 | Flows with missing element packages | yes | partial | should | port | S0004 (manager), S0003 (triggers), S0005 to S0007 (editor) |
+| [REQ-MIG-080](REQUIREMENTS.md#req-mig-080-files-of-a-newer-version-are-not-destroyed) | L1862-1870 | Files of a newer version are not destroyed | n/a | open | must | port | S0009 |
 
 ## Languages and help (LNG)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-LNG-010](REQUIREMENTS.md#req-lng-010-user-interface-in-several-languages) | L1847-1856 | User interface in several languages | yes | partial | must | port | S0004 |
-| [REQ-LNG-020](REQUIREMENTS.md#req-lng-020-choice-of-the-language) | L1858-1866 | Choice of the language | yes | open | must | port | S0004 |
-| [REQ-LNG-030](REQUIREMENTS.md#req-lng-030-translated-element-texts) | L1868-1877 | Translated element texts | yes | partial | must | port | S0002 (WI-0047), S0008 |
-| [REQ-LNG-040](REQUIREMENTS.md#req-lng-040-help-pages) | L1879-1887 | Help pages | yes | open | must | port | S0007 |
-| [REQ-LNG-050](REQUIREMENTS.md#req-lng-050-translation-tools-for-contributors) | L1889-1897 | Translation tools for contributors | yes | open | could | port | S0009 |
+| [REQ-LNG-010](REQUIREMENTS.md#req-lng-010-user-interface-in-several-languages) | L1874-1883 | User interface in several languages | yes | partial | must | port | S0004 |
+| [REQ-LNG-020](REQUIREMENTS.md#req-lng-020-choice-of-the-language) | L1885-1893 | Choice of the language | yes | open | must | port | S0004 |
+| [REQ-LNG-030](REQUIREMENTS.md#req-lng-030-translated-element-texts) | L1895-1904 | Translated element texts | yes | partial | must | port | S0002 (WI-0047), S0008 |
+| [REQ-LNG-040](REQUIREMENTS.md#req-lng-040-help-pages) | L1906-1914 | Help pages | yes | open | must | port | S0007 |
+| [REQ-LNG-050](REQUIREMENTS.md#req-lng-050-translation-tools-for-contributors) | L1916-1924 | Translation tools for contributors | yes | open | could | port | S0009 |
 
 ## Logging and diagnostics (DIA)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-DIA-010](REQUIREMENTS.md#req-dia-010-log-files) | L1901-1910 | Log files | yes | done | must | port | - |
-| [REQ-DIA-020](REQUIREMENTS.md#req-dia-020-elements-log-what-they-do) | L1912-1920 | Elements log what they do | yes | partial | must | port | S0002, S0008 |
-| [REQ-DIA-030](REQUIREMENTS.md#req-dia-030-crash-reports) | L1922-1931 | Crash reports | no | done | must | port | - |
-| [REQ-DIA-040](REQUIREMENTS.md#req-dia-040-snapshots-without-user-data) | L1933-1942 | Snapshots without user data | no | done | must | port | - |
-| [REQ-DIA-050](REQUIREMENTS.md#req-dia-050-debug-window-for-developers) | L1944-1953 | Debug window for developers | partial | done | should | port | - |
+| [REQ-DIA-010](REQUIREMENTS.md#req-dia-010-log-files) | L1928-1937 | Log files | yes | done | must | port | - |
+| [REQ-DIA-020](REQUIREMENTS.md#req-dia-020-elements-log-what-they-do) | L1939-1947 | Elements log what they do | yes | partial | must | port | S0002, S0008 |
+| [REQ-DIA-030](REQUIREMENTS.md#req-dia-030-crash-reports) | L1949-1958 | Crash reports | no | done | must | port | - |
+| [REQ-DIA-040](REQUIREMENTS.md#req-dia-040-snapshots-without-user-data) | L1960-1969 | Snapshots without user data | no | done | must | port | - |
+| [REQ-DIA-050](REQUIREMENTS.md#req-dia-050-debug-window-for-developers) | L1971-1980 | Debug window for developers | partial | done | should | port | - |
 
 ## Debugger (DBG)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-DBG-060](REQUIREMENTS.md#req-dbg-060-debug-dialog) | L1959-1975 | Debug dialog | yes | partial | must | port | S0002 (WI-0056) |
-| [REQ-DBG-010](REQUIREMENTS.md#req-dbg-010-pause-and-resume) | L1977-1985 | Pause and resume | no | open | should | later | - |
-| [REQ-DBG-020](REQUIREMENTS.md#req-dbg-020-breakpoints) | L1987-1995 | Breakpoints | no | open | should | later | - |
-| [REQ-DBG-030](REQUIREMENTS.md#req-dbg-030-single-step-and-slow-execution) | L1997-2005 | Single step and slow execution | no | open | should | later | - |
-| [REQ-DBG-040](REQUIREMENTS.md#req-dbg-040-inspect-and-change-variables-while-paused) | L2007-2013 | Inspect and change variables while paused | partial | open | should | later | - |
-| [REQ-DBG-050](REQUIREMENTS.md#req-dbg-050-edit-the-flow-while-debugging) | L2015-2023 | Edit the flow while debugging | no | open | should | later | - |
+| [REQ-DBG-060](REQUIREMENTS.md#req-dbg-060-debug-dialog) | L1986-2002 | Debug dialog | yes | partial | must | port | S0002 (WI-0056) |
+| [REQ-DBG-010](REQUIREMENTS.md#req-dbg-010-pause-and-resume) | L2004-2012 | Pause and resume | no | open | should | later | - |
+| [REQ-DBG-020](REQUIREMENTS.md#req-dbg-020-breakpoints) | L2014-2022 | Breakpoints | no | open | should | later | - |
+| [REQ-DBG-030](REQUIREMENTS.md#req-dbg-030-single-step-and-slow-execution) | L2024-2032 | Single step and slow execution | no | open | should | later | - |
+| [REQ-DBG-040](REQUIREMENTS.md#req-dbg-040-inspect-and-change-variables-while-paused) | L2034-2040 | Inspect and change variables while paused | partial | open | should | later | - |
+| [REQ-DBG-050](REQUIREMENTS.md#req-dbg-050-edit-the-flow-while-debugging) | L2042-2050 | Edit the flow while debugging | no | open | should | later | - |
 
 ## AI integration (AI)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-AI-010](REQUIREMENTS.md#req-ai-010-connect-any-ai-through-a-provider-script) | L2029-2037 | Connect any AI through a provider script | no | open | should | later | - |
-| [REQ-AI-020](REQUIREMENTS.md#req-ai-020-elements-that-call-the-ai) | L2039-2047 | Elements that call the AI | no | open | should | later | - |
-| [REQ-AI-030](REQUIREMENTS.md#req-ai-030-ai-assistant-in-the-editor) | L2049-2057 | AI assistant in the editor | no | open | should | later | - |
-| [REQ-AI-040](REQUIREMENTS.md#req-ai-040-ai-assisted-import-of-v1-flows) | L2059-2067 | AI-assisted import of v1 flows | n/a | open | could | later | - (after phase 3, E0035) |
-| [REQ-AI-050](REQUIREMENTS.md#req-ai-050-further-ai-elements) | L2069-2077 | Further AI elements | no | open | could | later | - |
+| [REQ-AI-010](REQUIREMENTS.md#req-ai-010-connect-any-ai-through-a-provider-script) | L2056-2064 | Connect any AI through a provider script | no | open | should | later | - |
+| [REQ-AI-020](REQUIREMENTS.md#req-ai-020-elements-that-call-the-ai) | L2066-2074 | Elements that call the AI | no | open | should | later | - |
+| [REQ-AI-030](REQUIREMENTS.md#req-ai-030-ai-assistant-in-the-editor) | L2076-2084 | AI assistant in the editor | no | open | should | later | - |
+| [REQ-AI-040](REQUIREMENTS.md#req-ai-040-ai-assisted-import-of-v1-flows) | L2086-2094 | AI-assisted import of v1 flows | n/a | open | could | later | - (after phase 3, E0035) |
+| [REQ-AI-050](REQUIREMENTS.md#req-ai-050-further-ai-elements) | L2096-2104 | Further AI elements | no | open | could | later | - |
 
 ## Distribution (DST)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-DST-010](REQUIREMENTS.md#req-dst-010-installer) | L2081-2089 | Installer | yes | open | must | port | S0009 (R0007) |
-| [REQ-DST-020](REQUIREMENTS.md#req-dst-020-compiled-program) | L2091-2100 | Compiled program | yes | partial | must | port | S0009 (R0007) |
-| [REQ-DST-030](REQUIREMENTS.md#req-dst-030-64-bit-only) | L2102-2111 | 64 bit only | n/a | done | must | port | - |
-| [REQ-DST-040](REQUIREMENTS.md#req-dst-040-single-instance-and-command-line) | L2113-2122 | Single instance and command line | partial | partial | must | port | S0008 (commands of the shortcut trigger) |
-| [REQ-DST-050](REQUIREMENTS.md#req-dst-050-release-checklist) | L2124-2130 | Release checklist | yes | open | should | port | S0009 |
+| [REQ-DST-010](REQUIREMENTS.md#req-dst-010-installer) | L2108-2116 | Installer | yes | open | must | port | S0009 (R0007) |
+| [REQ-DST-020](REQUIREMENTS.md#req-dst-020-compiled-program) | L2118-2127 | Compiled program | yes | partial | must | port | S0009 (R0007) |
+| [REQ-DST-030](REQUIREMENTS.md#req-dst-030-64-bit-only) | L2129-2138 | 64 bit only | n/a | done | must | port | - |
+| [REQ-DST-040](REQUIREMENTS.md#req-dst-040-single-instance-and-command-line) | L2140-2149 | Single instance and command line | partial | partial | must | port | S0008 (commands of the shortcut trigger) |
+| [REQ-DST-050](REQUIREMENTS.md#req-dst-050-release-checklist) | L2151-2157 | Release checklist | yes | open | should | port | S0009 |
 
 ## Robustness (ROB)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-ROB-010](REQUIREMENTS.md#req-rob-010-a-crashing-or-hanging-process-does-not-take-the-others-with-it) | L2134-2143 | A crashing or hanging process does not take the others with it | no | done | must | port | - |
-| [REQ-ROB-020](REQUIREMENTS.md#req-rob-020-no-deadlocks-and-no-races-by-design) | L2145-2154 | No deadlocks and no races by design | no | done | must | port | - |
-| [REQ-ROB-030](REQUIREMENTS.md#req-rob-030-nothing-waits-without-a-deadline) | L2156-2165 | Nothing waits without a deadline | no | done | must | port | - |
-| [REQ-ROB-040](REQUIREMENTS.md#req-rob-040-recovery-after-a-crash-of-the-flow-execution) | L2167-2176 | Recovery after a crash of the flow execution | no | partial | must | port | S0003 (triggers) |
-| [REQ-ROB-050](REQUIREMENTS.md#req-rob-050-restart-limits) | L2178-2187 | Restart limits | n/a | done | must | port | - |
-| [REQ-ROB-060](REQUIREMENTS.md#req-rob-060-files-are-never-half-written) | L2189-2198 | Files are never half written | no | done | must | port | - |
-| [REQ-ROB-070](REQUIREMENTS.md#req-rob-070-clean-exit-within-a-deadline) | L2200-2209 | Clean exit within a deadline | partial | done | must | port | - |
-| [REQ-ROB-080](REQUIREMENTS.md#req-rob-080-no-orphan-processes) | L2211-2220 | No orphan processes | n/a | done | must | port | - |
-| [REQ-ROB-090](REQUIREMENTS.md#req-rob-090-sleep-and-standby-do-not-cause-false-alarms) | L2222-2231 | Sleep and standby do not cause false alarms | n/a | done | must | port | - |
-| [REQ-ROB-100](REQUIREMENTS.md#req-rob-100-a-storage-that-does-not-answer-does-not-block-the-engine) | L2233-2240 | A storage that does not answer does not block the engine | n/a | done | must | port | - |
-| [REQ-ROB-110](REQUIREMENTS.md#req-rob-110-a-broken-flow-file-does-not-stop-the-start) | L2242-2251 | A broken flow file does not stop the start | n/a | done | must | port | - |
-| [REQ-ROB-120](REQUIREMENTS.md#req-rob-120-a-crashed-editor-or-manager-loses-nothing) | L2253-2262 | A crashed editor or manager loses nothing *(in doubt)* | no | open | must | port | S0004 (manager), S0006 (editor) |
+| [REQ-ROB-010](REQUIREMENTS.md#req-rob-010-a-crashing-or-hanging-process-does-not-take-the-others-with-it) | L2161-2170 | A crashing or hanging process does not take the others with it | no | done | must | port | - |
+| [REQ-ROB-020](REQUIREMENTS.md#req-rob-020-no-deadlocks-and-no-races-by-design) | L2172-2181 | No deadlocks and no races by design | no | done | must | port | - |
+| [REQ-ROB-030](REQUIREMENTS.md#req-rob-030-nothing-waits-without-a-deadline) | L2183-2192 | Nothing waits without a deadline | no | done | must | port | - |
+| [REQ-ROB-040](REQUIREMENTS.md#req-rob-040-recovery-after-a-crash-of-the-flow-execution) | L2194-2203 | Recovery after a crash of the flow execution | no | partial | must | port | S0003 (triggers) |
+| [REQ-ROB-050](REQUIREMENTS.md#req-rob-050-restart-limits) | L2205-2214 | Restart limits | n/a | done | must | port | - |
+| [REQ-ROB-060](REQUIREMENTS.md#req-rob-060-files-are-never-half-written) | L2216-2225 | Files are never half written | no | done | must | port | - |
+| [REQ-ROB-070](REQUIREMENTS.md#req-rob-070-clean-exit-within-a-deadline) | L2227-2236 | Clean exit within a deadline | partial | done | must | port | - |
+| [REQ-ROB-080](REQUIREMENTS.md#req-rob-080-no-orphan-processes) | L2238-2247 | No orphan processes | n/a | done | must | port | - |
+| [REQ-ROB-090](REQUIREMENTS.md#req-rob-090-sleep-and-standby-do-not-cause-false-alarms) | L2249-2258 | Sleep and standby do not cause false alarms | n/a | done | must | port | - |
+| [REQ-ROB-100](REQUIREMENTS.md#req-rob-100-a-storage-that-does-not-answer-does-not-block-the-engine) | L2260-2267 | A storage that does not answer does not block the engine | n/a | done | must | port | - |
+| [REQ-ROB-110](REQUIREMENTS.md#req-rob-110-a-broken-flow-file-does-not-stop-the-start) | L2269-2278 | A broken flow file does not stop the start | n/a | done | must | port | - |
+| [REQ-ROB-120](REQUIREMENTS.md#req-rob-120-a-crashed-editor-or-manager-loses-nothing) | L2280-2289 | A crashed editor or manager loses nothing *(in doubt)* | no | open | must | port | S0004 (manager), S0006 (editor) |
 
 ## Performance and resources (PRF)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-PRF-010](REQUIREMENTS.md#req-prf-010-message-latency) | L2268-2277 | Message latency | n/a | done | must | port | - |
-| [REQ-PRF-020](REQUIREMENTS.md#req-prf-020-idle-cpu) | L2279-2288 | Idle CPU | n/a | done | must | port | - |
-| [REQ-PRF-030](REQUIREMENTS.md#req-prf-030-memory) | L2290-2299 | Memory | n/a | partial | must | port | S0003, S0004, S0008 (measure again) |
-| [REQ-PRF-040](REQUIREMENTS.md#req-prf-040-start-time) | L2301-2310 | Start time | n/a | done | must | port | - |
-| [REQ-PRF-050](REQUIREMENTS.md#req-prf-050-many-big-flows-load-without-blocking) | L2312-2321 | Many big flows load without blocking | n/a | done | must | port | - |
-| [REQ-PRF-060](REQUIREMENTS.md#req-prf-060-editor-redraw) | L2323-2331 | Editor redraw | n/a | open | must | port | S0005 |
-| [REQ-PRF-070](REQUIREMENTS.md#req-prf-070-many-instances-and-fast-start-and-stop) | L2333-2342 | Many instances and fast start and stop | n/a | done | must | port | - |
-| [REQ-PRF-080](REQUIREMENTS.md#req-prf-080-log-throughput) | L2344-2353 | Log throughput | no | done | must | port | - |
-| [REQ-PRF-090](REQUIREMENTS.md#req-prf-090-stable-over-long-runs) | L2355-2364 | Stable over long runs | n/a | done | must | port | - |
-| [REQ-PRF-100](REQUIREMENTS.md#req-prf-100-load-flows-only-when-they-are-needed) | L2366-2374 | Load flows only when they are needed | no | open | could | later | - (after the port, E0042) |
+| [REQ-PRF-010](REQUIREMENTS.md#req-prf-010-message-latency) | L2295-2304 | Message latency | n/a | done | must | port | - |
+| [REQ-PRF-020](REQUIREMENTS.md#req-prf-020-idle-cpu) | L2306-2315 | Idle CPU | n/a | done | must | port | - |
+| [REQ-PRF-030](REQUIREMENTS.md#req-prf-030-memory) | L2317-2326 | Memory | n/a | partial | must | port | S0003, S0004, S0008 (measure again) |
+| [REQ-PRF-040](REQUIREMENTS.md#req-prf-040-start-time) | L2328-2337 | Start time | n/a | done | must | port | - |
+| [REQ-PRF-050](REQUIREMENTS.md#req-prf-050-many-big-flows-load-without-blocking) | L2339-2348 | Many big flows load without blocking | n/a | done | must | port | - |
+| [REQ-PRF-060](REQUIREMENTS.md#req-prf-060-editor-redraw) | L2350-2358 | Editor redraw | n/a | open | must | port | S0005 |
+| [REQ-PRF-070](REQUIREMENTS.md#req-prf-070-many-instances-and-fast-start-and-stop) | L2360-2369 | Many instances and fast start and stop | n/a | done | must | port | - |
+| [REQ-PRF-080](REQUIREMENTS.md#req-prf-080-log-throughput) | L2371-2380 | Log throughput | no | done | must | port | - |
+| [REQ-PRF-090](REQUIREMENTS.md#req-prf-090-stable-over-long-runs) | L2382-2391 | Stable over long runs | n/a | done | must | port | - |
+| [REQ-PRF-100](REQUIREMENTS.md#req-prf-100-load-flows-only-when-they-are-needed) | L2393-2401 | Load flows only when they are needed | no | open | could | later | - (after the port, E0042) |
 
 ## Security (SEC)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-SEC-010](REQUIREMENTS.md#req-sec-010-inter-process-communication-is-local-and-private) | L2378-2387 | Inter-process communication is local and private | n/a | done | must | port | - |
-| [REQ-SEC-020](REQUIREMENTS.md#req-sec-020-only-the-right-process-may-start-end-or-report) | L2389-2396 | Only the right process may start, end or report | n/a | done | must | port | - |
-| [REQ-SEC-030](REQUIREMENTS.md#req-sec-030-sandbox-for-element-code) | L2398-2406 | Sandbox for element code | no | dropped | could | later | - |
-| [REQ-SEC-040](REQUIREMENTS.md#req-sec-040-secret-values-are-never-shown-or-logged) | L2408-2422 | Secret values are never shown or logged | no | open | must | later | - |
-| [REQ-SEC-050](REQUIREMENTS.md#req-sec-050-no-data-leaves-the-computer-by-itself) | L2424-2432 | No data leaves the computer by itself | yes | implemented | must | port | S0010 (check) |
-| [REQ-SEC-060](REQUIREMENTS.md#req-sec-060-imported-flows-are-disabled-and-come-with-a-warning) | L2434-2442 | Imported flows are disabled and come with a warning | no | open | could | port | S0004 |
-| [REQ-SEC-070](REQUIREMENTS.md#req-sec-070-changes-of-flow-files-from-outside-are-noticed) | L2444-2455 | Changes of flow files from outside are noticed *(in doubt)* | no | open | could | later | - |
+| [REQ-SEC-010](REQUIREMENTS.md#req-sec-010-inter-process-communication-is-local-and-private) | L2405-2414 | Inter-process communication is local and private | n/a | done | must | port | - |
+| [REQ-SEC-020](REQUIREMENTS.md#req-sec-020-only-the-right-process-may-start-end-or-report) | L2416-2423 | Only the right process may start, end or report | n/a | done | must | port | - |
+| [REQ-SEC-030](REQUIREMENTS.md#req-sec-030-sandbox-for-element-code) | L2425-2433 | Sandbox for element code | no | dropped | could | later | - |
+| [REQ-SEC-040](REQUIREMENTS.md#req-sec-040-secret-values-are-never-shown-or-logged) | L2435-2449 | Secret values are never shown or logged | no | open | must | later | - |
+| [REQ-SEC-050](REQUIREMENTS.md#req-sec-050-no-data-leaves-the-computer-by-itself) | L2451-2459 | No data leaves the computer by itself | yes | implemented | must | port | S0010 (check) |
+| [REQ-SEC-060](REQUIREMENTS.md#req-sec-060-imported-flows-are-disabled-and-come-with-a-warning) | L2461-2469 | Imported flows are disabled and come with a warning | no | open | could | port | S0004 |
+| [REQ-SEC-070](REQUIREMENTS.md#req-sec-070-changes-of-flow-files-from-outside-are-noticed) | L2471-2482 | Changes of flow files from outside are noticed *(in doubt)* | no | open | could | later | - |
 
 ## Testability (TST)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-TST-010](REQUIREMENTS.md#req-tst-010-automatic-tests-at-several-levels) | L2459-2468 | Automatic tests at several levels | partial | done | must | port | - |
-| [REQ-TST-020](REQUIREMENTS.md#req-tst-020-fault-injection-and-stress) | L2470-2479 | Fault injection and stress | no | done | must | port | - |
-| [REQ-TST-030](REQUIREMENTS.md#req-tst-030-every-element-is-tested-headless) | L2481-2490 | Every element is tested headless | no | partial | must | port | S0002 (WI-0051, WI-0056, WI-0057), S0008 (the other elements) |
-| [REQ-TST-040](REQUIREMENTS.md#req-tst-040-the-v1-test-flows-run-green) | L2492-2501 | The v1 test flows run green | yes | partial | must | port | S0003 and S0008 (the 13 flows of PENDING in `tests/integration/test_corpus.py`) |
-| [REQ-TST-050](REQUIREMENTS.md#req-tst-050-independent-oracle-for-the-expression-language) | L2503-2512 | Independent oracle for the expression language | n/a | done | must | port | - |
-| [REQ-TST-060](REQUIREMENTS.md#req-tst-060-manual-checks-of-the-user-interfaces) | L2514-2523 | Manual checks of the user interfaces | n/a | partial | must | port | S0004 to S0007 |
+| [REQ-TST-010](REQUIREMENTS.md#req-tst-010-automatic-tests-at-several-levels) | L2486-2495 | Automatic tests at several levels | partial | done | must | port | - |
+| [REQ-TST-020](REQUIREMENTS.md#req-tst-020-fault-injection-and-stress) | L2497-2506 | Fault injection and stress | no | done | must | port | - |
+| [REQ-TST-030](REQUIREMENTS.md#req-tst-030-every-element-is-tested-headless) | L2508-2517 | Every element is tested headless | no | partial | must | port | S0002 (WI-0051, WI-0056, WI-0057), S0008 (the other elements) |
+| [REQ-TST-040](REQUIREMENTS.md#req-tst-040-the-v1-test-flows-run-green) | L2519-2528 | The v1 test flows run green | yes | partial | must | port | S0003 and S0008 (the 13 flows of PENDING in `tests/integration/test_corpus.py`) |
+| [REQ-TST-050](REQUIREMENTS.md#req-tst-050-independent-oracle-for-the-expression-language) | L2530-2539 | Independent oracle for the expression language | n/a | done | must | port | - |
+| [REQ-TST-060](REQUIREMENTS.md#req-tst-060-manual-checks-of-the-user-interfaces) | L2541-2550 | Manual checks of the user interfaces | n/a | partial | must | port | S0004 to S0007 |
 
 ## Maintainability (MNT)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-MNT-010](REQUIREMENTS.md#req-mnt-010-english-repository) | L2527-2536 | English repository | yes | done | must | port | - |
-| [REQ-MNT-020](REQUIREMENTS.md#req-mnt-020-stock-autohotkey-v2) | L2538-2547 | Stock AutoHotkey v2 | no | done | must | port | - |
-| [REQ-MNT-030](REQUIREMENTS.md#req-mnt-030-architecture-rules-are-checked-automatically) | L2549-2556 | Architecture rules are checked automatically | no | done | must | port | - |
-| [REQ-MNT-040](REQUIREMENTS.md#req-mnt-040-elements-can-be-ported-largely-mechanically) | L2558-2566 | Elements can be ported largely mechanically | n/a | open | should | port | S0008 (E0036) |
-| [REQ-MNT-050](REQUIREMENTS.md#req-mnt-050-deliberate-changes-are-documented) | L2568-2577 | Deliberate changes are documented | n/a | done | must | port | - |
+| [REQ-MNT-010](REQUIREMENTS.md#req-mnt-010-english-repository) | L2554-2563 | English repository | yes | done | must | port | - |
+| [REQ-MNT-020](REQUIREMENTS.md#req-mnt-020-stock-autohotkey-v2) | L2565-2574 | Stock AutoHotkey v2 | no | done | must | port | - |
+| [REQ-MNT-030](REQUIREMENTS.md#req-mnt-030-architecture-rules-are-checked-automatically) | L2576-2583 | Architecture rules are checked automatically | no | done | must | port | - |
+| [REQ-MNT-040](REQUIREMENTS.md#req-mnt-040-elements-can-be-ported-largely-mechanically) | L2585-2593 | Elements can be ported largely mechanically | n/a | open | should | port | S0008 (E0036) |
+| [REQ-MNT-050](REQUIREMENTS.md#req-mnt-050-deliberate-changes-are-documented) | L2595-2604 | Deliberate changes are documented | n/a | done | must | port | - |
 
 ## Usability (USE)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-USE-010](REQUIREMENTS.md#req-use-010-user-level-hides-advanced-elements) | L2581-2589 | User level hides advanced elements | yes | open | should | port | S0004 (setting), S0007 (element list) |
-| [REQ-USE-020](REQUIREMENTS.md#req-use-020-experimental-elements-are-marked) | L2591-2599 | Experimental elements are marked | yes | open | could | port | S0007 |
-| [REQ-USE-030](REQUIREMENTS.md#req-use-030-messages-reach-the-user-without-blocking-dialogs) | L2601-2609 | Messages reach the user without blocking dialogs | partial | open | must | port | S0004 |
-| [REQ-USE-040](REQUIREMENTS.md#req-use-040-the-user-interface-stays-responsive) | L2611-2619 | The user interface stays responsive | no | partial | must | port | S0004 to S0007 |
-| [REQ-USE-100](REQUIREMENTS.md#req-use-100-setup-assistant-at-the-first-start) | L2621-2636 | Setup assistant at the first start | no | open | should | later | - |
-| [REQ-USE-050](REQUIREMENTS.md#req-use-050-the-setup-assistant-asks-for-the-users-experience) | L2638-2654 | The setup assistant asks for the user's experience | no | open | should | later | - |
-| [REQ-USE-060](REQUIREMENTS.md#req-use-060-amount-of-hints) | L2656-2664 | Amount of hints | no | open | should | later | - |
-| [REQ-USE-070](REQUIREMENTS.md#req-use-070-hints-can-be-switched-off-one-by-one) | L2666-2674 | Hints can be switched off one by one | no | open | should | later | - |
-| [REQ-USE-080](REQUIREMENTS.md#req-use-080-unhandled-errors-of-a-flow-are-noticed) | L2676-2684 | Unhandled errors of a flow are noticed | yes | open | should | port | S0004 |
-| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2686-2695 | Sharp and correctly sized on high-resolution displays | no | partial | should | port | dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0006 |
+| [REQ-USE-010](REQUIREMENTS.md#req-use-010-user-level-hides-advanced-elements) | L2608-2616 | User level hides advanced elements | yes | open | should | port | S0004 (setting), S0007 (element list) |
+| [REQ-USE-020](REQUIREMENTS.md#req-use-020-experimental-elements-are-marked) | L2618-2626 | Experimental elements are marked | yes | open | could | port | S0007 |
+| [REQ-USE-030](REQUIREMENTS.md#req-use-030-messages-reach-the-user-without-blocking-dialogs) | L2628-2636 | Messages reach the user without blocking dialogs | partial | open | must | port | S0004 |
+| [REQ-USE-040](REQUIREMENTS.md#req-use-040-the-user-interface-stays-responsive) | L2638-2646 | The user interface stays responsive | no | partial | must | port | S0004 to S0007 |
+| [REQ-USE-100](REQUIREMENTS.md#req-use-100-setup-assistant-at-the-first-start) | L2648-2663 | Setup assistant at the first start | no | open | should | later | - |
+| [REQ-USE-050](REQUIREMENTS.md#req-use-050-the-setup-assistant-asks-for-the-users-experience) | L2665-2681 | The setup assistant asks for the user's experience | no | open | should | later | - |
+| [REQ-USE-060](REQUIREMENTS.md#req-use-060-amount-of-hints) | L2683-2691 | Amount of hints | no | open | should | later | - |
+| [REQ-USE-070](REQUIREMENTS.md#req-use-070-hints-can-be-switched-off-one-by-one) | L2693-2701 | Hints can be switched off one by one | no | open | should | later | - |
+| [REQ-USE-080](REQUIREMENTS.md#req-use-080-unhandled-errors-of-a-flow-are-noticed) | L2703-2711 | Unhandled errors of a flow are noticed | yes | open | should | port | S0004 |
+| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2713-2722 | Sharp and correctly sized on high-resolution displays | no | partial | should | port | dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0006 |
