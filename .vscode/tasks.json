@@ -87,6 +87,17 @@
             "problemMatcher": []
         },
         {
+            "label": "Setup: git hooks (core.hooksPath)",
+            "type": "process",
+            "command": "git",
+            "args": [
+                "config",
+                "core.hooksPath",
+                "tools/hooks"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Test: fast (parallel, default, no slow, no foundation, no windows)",
             "type": "shell",
             "command": "python",

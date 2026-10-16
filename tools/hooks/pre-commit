@@ -1,0 +1,5 @@
+#!/bin/sh
+# Regenerates the generated indexes and adds them to the commit (tools/precommit.py).
+# Installed with: git config core.hooksPath tools/hooks
+command -v python >/dev/null 2>&1 || exit 0
+exec python tools/precommit.py
