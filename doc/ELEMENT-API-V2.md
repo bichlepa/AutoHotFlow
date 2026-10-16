@@ -164,6 +164,25 @@ An element never calls `MsgBox`, `InputBox`, `ToolTip`, `TrayTip`, `FileSelect` 
 
 A test entry registers a provider (`Dialogs.UseProvider`) that answers from a script instead of opening a window: `tests/integration/helpers/TestDialogProvider.ahk`, how a test writes the script: `doc/TEST-STRATEGY.md` section 9a. The product entries cannot register one: they do not include the provider, and the architecture check (rule `dialog-seam`, `doc/CONVENTIONS.md` section 3) forbids `Dialogs.UseProvider` in `src/` and a direct dialog call in `src/elements/`. An element that is used in a test with a dialog must therefore not keep its own dialog code.
 
+**Windows (WI-0056).** Two more indirections of the same kind: `Dialogs.Window(spec)` shows a text with buttons (`spec` a Map: `title`, `text`, `buttons` an Array of Maps `id` and `label`, `width`, `height`, `timeoutMs` 0 = none, `defaultId`); it returns the id of the pressed button, `"close"` (close button or Escape) or `"timeout"`. `Dialogs.DebugWindow(view)` shows the debug window (section 3.4) and returns `"yes"`, `"no"` or `"close"`. The product window is `src/elements/base/DialogWindow.ahk` (a Gui, DPI aware per thread); the test provider answers both from the script (`doc/TEST-STRATEGY.md` 9a).
+
+### 3.4 Debug view (WI-0056, REQ-DBG-060)
+
+`Dialogs.DebugWindow(view)` gets an object of the element's package (`lib/DebugOps.ahk` of `Default`, class `DebugOps(ctx, readOnly)`) and uses only these members:
+
+| Member | Meaning |
+|---|---|
+| `Rows()` | Array of Maps `text`, `name`, `scope`: every visible variable of the branch, grouped by scope (loop, thread, instance, static, global; a group heading has `name` ""). Built from `ctx.ListVars(scope)`. |
+| `Text(name, convert)` | The value as text: an object as JSON; `convert` escapes backslashes, control characters and non-ASCII characters (as backslash-u with four hex digits). This is the only place where the window reads a value (a mask for secret values goes here, REQ-SEC-040). |
+| `Type(name)` | `"object"`, `"normal"` or `""`. |
+| `Write(name, text, asObject, convert)` | Sets the value (an object is parsed from JSON). Returns `""` or the error text; then the variable is unchanged. A loop or thread variable is set where it lives. |
+| `Delete(name)` | Removes the variable; 1 if it existed. |
+| `ReadOnly` | `true`: the window only shows the variables (REQ-USE-080, S0004); no change, no delete. |
+
+Static and global variables change the permanent store through the variable model (REQ-VAR-050). The element runs in a worker, so every call is a request to the engine (section 3.2).
+
+**Mode of `Action_Tooltip` (WI-0056, task 3): `worker`.** The tooltip is UI and the engine shows none (ARCHITECTURE 1). The element finishes at once, as v1 did; the removal timer runs in the worker process, so the element does not hold a pool slot for the duration. Limit and deviation: MIGRATION M-0065.
+
 ## 4. Example 1: `Action_Sleep` (inline, with timer)
 
 **v1** (`v1/Source_Elements/Default/Actions/Sleep.ahk`, abridged):

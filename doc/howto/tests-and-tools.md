@@ -361,3 +361,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Give the shared container a subclass of `Map` whose `Get` runs a hook once, after the value is read and before it is returned: the hook runs the other path (for example the deadline) at the same place where the interrupt would land. `class SpyJobs extends Map { Get(key, default := "") { value := super.Get(key, default); if (IsObject(this.hook) && IsObject(value)) { h := this.hook, this.hook := "", h() }; return value } }`. Copy the entries into the spy and put it in place of the field. Old code gives 2 callbacks, the fix gives 1.
 - **Status:** verified (`AnswerAndDeadlineOfOneJobEndTheJobOnce`, red before and green after); the spy catches only a `Get` that the code does before the change, so a test of a new code path needs its own spy method.
 - **Source:** `tests/ahk/engine_worker_bridge.test.ahk`
+### Writing AHK source with Python: a backslash-u in a Python literal becomes the character
+
+- **Problem:** A test file for AutoHotkey was written with a Python script, and the expected text (an AutoHotkey string with a backslash-u escape, as plain text) was stored as the real character e-acute. The test then failed with a message whose two values looked alike.
+- **Wrong:** Editing `.ahk` source through Python string literals, where backslash-u, backslash-n and similar are escapes of Python.
+- **Right:** Write source files with the editor tool, or in Python through raw strings or bytes; check for non-ASCII bytes after the edit (decode the file and look for characters above 127).
+- **Status:** verified (WI-0056, `tests/ahk/element_debug_ops.test.ahk`, fixed by byte replacement)
+- **Source:** `tests/ahk/element_debug_ops.test.ahk`

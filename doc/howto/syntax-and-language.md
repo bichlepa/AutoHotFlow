@@ -307,3 +307,17 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Problem:** In a test file `TestRun.Case("name", () => { ...statements... })` is no function body: `=> {` starts an object literal, and the load fails with "Unexpected reserved word" at the first `for`.
 - **Right:** `() { ... }` for a body with statements (or a named function); `() => expression` for one expression (a comma list in parentheses `() => (a, b)` is one expression).
 - **Status:** verified (load error and fix in `tests/ahk/element_list_ops.test.ahk`)
+
+### A helper function of a test file is a global name: `Owner()` turns every local `owner` into a warning
+
+- **Problem:** A test file defined the helpers `Owner(flows)`, `Ends(owner, id)` and `Cond(id, expr)`. With `#Warn All, StdOut` every function with a local `owner` or `ends` (in the test file, in `helpers/ExecutorKit.ahk`), and even `ExprParser._If` with its local `cond`, reported "This local variable has the same name as a global variable", and the script ended with exit 1. A function name is global and names ignore case, so it clashes with locals everywhere in the script, also in `src/` files the test includes.
+- **Right:** Name helper functions so that no local can have the name (`Owners`, `EndsOf`, `CondEl`); before adding one, grep the included code for the lowercase name as a local.
+- **Status:** verified (WI-0055, `tests/ahk/engine_call_flow.test.ahk`: 31 warnings, then none after the rename)
+
+### A class used by an element without its #Include: a warning dialog and a wrong local
+
+- **Problem:** An element called `ParamEvaluator.Truthy(...)`, but its file did not include `base/ParamEvaluator.ahk` (the engine and worker roles include it through `ExecContext`, the editor role does not). The block of the editor role then loaded with `#Warn All`: "This local variable appears to never be assigned a value. Specifically: ExprNames", a dialog, and the load of the role failed. The class name looked like an unassigned local to the loader.
+- **Wrong:** Relying on another file to have included the class: the element works in the roles that happen to load it, and fails in the one that does not.
+- **Right:** Every element file includes what it uses, or calls a helper of its own package's `lib/` (here `DialogOps.Truthy`, which needs no include of the expression files). The generated-block tests (`tests/test_element_includes.py`) catch it.
+- **Status:** verified (WI-0056: `tests/test_element_includes.py` failed for the editor and worker blocks, passed after the change)
+- **Source:** `src/elements/Default/Actions/Action_Message_Box.ahk`

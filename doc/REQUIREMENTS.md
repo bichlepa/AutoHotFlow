@@ -859,17 +859,17 @@ They record the path through a flow and check it; automatic test flows use them 
 ### REQ-ELM-270 Dialogs and notifications
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (four of seven elements; the input box, the file and folder selection are S0008)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0051, WI-0056), S0008
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Message_Box` | yes | open | S0002 (WI-0056) |
-| `Action_Tooltip` | yes | open | S0002 (WI-0056) |
-| `Condition_Confirmation_Dialog` | yes | open | S0002 (WI-0056) |
-| `Condition_Debug_Dialog` (REQ-DBG-060) | yes | open | S0002 (WI-0056) |
+| `Action_Message_Box` | yes | partial (headless tests; real window by gui test) | S0002 (WI-0056) |
+| `Action_Tooltip` | yes | partial (worker, headless tests; real tooltip by gui test) | S0002 (WI-0056) |
+| `Condition_Confirmation_Dialog` | yes | partial (headless tests; real window by gui test) | S0002 (WI-0056) |
+| `Condition_Debug_Dialog` (REQ-DBG-060) | yes | partial (headless tests; real window by gui test) | S0002 (WI-0056) |
 | `Action_Input_Box` | yes | open | S0008 |
 | `Action_Select_file` | yes | open | S0008 |
 | `Action_Select_folder` | yes | open | S0008 |
@@ -1959,10 +1959,11 @@ The debugger is the long-term goal of decision E0001. It is not part of phase 3 
 ### REQ-DBG-060 Debug dialog
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the window, its reading and changing of variables, the outputs and the close result are tested headless; the real window is only checked by the gui test and the owner's look)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0056)
+- **Evidence:** `tests/integration/test_core_e_dialogs.py`, `tests/ahk/element_debug_ops.test.ahk`, `tests/integration/test_dialog_windows_gui.py`
 
 The condition `Condition_Debug_Dialog` is the debugging tool of the user: placed anywhere in a flow, it halts the branch there and opens a window in which the user
 
@@ -2480,11 +2481,11 @@ Processes are killed, frozen and cut off on purpose; the system stays usable and
 ### REQ-TST-030 Every element is tested headless
 
 - **v1:** no
-- **v2:** partial (the flow builder, the headless flow runner and the smoke test of every registered element and the dialog test provider exist; the e2e tests of the elements are still missing)
+- **v2:** partial (the flow builder, the headless flow runner and the smoke test of every registered element and the dialog test provider exist; e2e tests exist for the dialog elements (WI-0056) and the core sets; the other elements are still missing)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0051)
-- **Evidence:** `tests/support/test_flowbuilder.py`, `tests/integration/test_flowrun.py`, `tests/ahk/element_smoke.test.ahk`, `tests/integration/test_dialogs.py`
+- **Plan:** S0002 (WI-0051, WI-0056)
+- **Evidence:** `tests/support/test_flowbuilder.py`, `tests/integration/test_flowrun.py`, `tests/ahk/element_smoke.test.ahk`, `tests/integration/test_dialogs.py`, `tests/integration/test_core_e_dialogs.py`
 
 A smoke test covers every registered element; each element has end-to-end tests built with the flow builder and run by the headless flow runner; dialog elements are answered by a test provider (E0038).
 

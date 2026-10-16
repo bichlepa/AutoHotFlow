@@ -53,7 +53,7 @@ L452-461   5a Events before subscription (design question, WI-0007)
 L463-467 6. Versioning and extension
 ```
 
-## doc/TEST-STRATEGY.md (48.7 KB, 316 lines)
+## doc/TEST-STRATEGY.md (49.5 KB, 317 lines)
 ```text
 L5-11 1. Principles
 L13-22 2. Levels
@@ -64,24 +64,25 @@ L87-217 6. Execution
 L219-246 7. Golden data from v1 (L0006, WI-0036)
 L248-269 8. Oracle of the expression language: native AHK v2 (E0035, WI-0044)
 L271-273 8a. Smoke test of every element (WI-0048)
-L275-294 9a. Dialog tests (E0038, WI-0051)
-L296-316 9. Flow builder and headless runner (WI-0049)
+L275-295 9a. Dialog tests (E0038, WI-0051)
+L297-317 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (44.8 KB, 418 lines)
+## doc/ELEMENT-API-V2.md (47.0 KB, 437 lines)
 ```text
 L8-18 1. Guidelines
 L20-87 2. Class contract
-L89-165 3. Context `ctx`
+L89-184 3. Context `ctx`
 L130-147   3.1 Parameter evaluation (WI-0042)
 L149-159   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
-L161-165   3.3 Dialogs (E0038, WI-0051)
-L167-249 4. Example 1: `Action_Sleep` (inline, with timer)
-L251-344 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L346-386 6. Mechanical conversion rules
-L388-409 7. What stays
-L395-409   7.1 Loop elements (WI-0054)
-L411-418 8. Still to be clarified (Phase 3)
+L161-167   3.3 Dialogs (E0038, WI-0051)
+L169-184   3.4 Debug view (WI-0056, REQ-DBG-060)
+L186-268 4. Example 1: `Action_Sleep` (inline, with timer)
+L270-363 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L365-405 6. Mechanical conversion rules
+L407-428 7. What stays
+L414-428   7.1 Loop elements (WI-0054)
+L430-437 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
@@ -145,12 +146,13 @@ L28-34 Console output is best effort and must not block shutdown (verified)
 L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (2.8 KB, 32 lines)
+## doc/howto/gui-and-hotkeys.md (3.6 KB, 40 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
 L19-24 Capture and operate a window of an AHK role without screen access (verified)
 L26-32 InputBox and MsgBox are standard dialogs (window class `#32770`) (verified)
+L34-40 A Gui window needs a DPI awareness set before it is created (assumed) (assumed)
 ```
 
 ## doc/howto/objects-maps-arrays.md (7.7 KB, 103 lines)
@@ -211,7 +213,7 @@ L325-330 The end of a called instance goes to the caller in the next tick, not f
 L333-339 Take a shared entry with one `Delete`, not with `Get` and then `Delete` (verified)
 ```
 
-## doc/howto/syntax-and-language.md (30.7 KB, 309 lines)
+## doc/howto/syntax-and-language.md (32.7 KB, 323 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -250,9 +252,11 @@ L279-284 `#Include` inside a class body: a file is included only once, so includ
 L287-293 `IsDigit`, `IsAlpha` and the like need a String: an Integer is a TypeError (verified)
 L296-302 `StrSplit(text, "ab")` has ONE delimiter of two characters (verified)
 L305-309 A multi-statement function in an argument is `() {` ... `}`, not `() => {` (verified)
+L311-315 A helper function of a test file is a global name: `Owner()` turns every local `owner` into a warning (verified)
+L317-323 A class used by an element without its #Include: a warning dialog and a wrong local (verified)
 ```
 
-## doc/howto/tests-and-tools.md (35.5 KB, 363 lines)
+## doc/howto/tests-and-tools.md (36.4 KB, 370 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -297,6 +301,7 @@ L331-336 Two flows or two elements whose IDs differ only in case (verified)
 L339-345 `ctx.GetVar` with a path and a default object: read one member, tell "missing" from "empty" (verified)
 L348-354 `Loop Parse` with the delimiter text "CSV" is the CSV mode (verified)
 L357-363 A race test without a way to interrupt: a Map subclass runs the other path inside `Get` (verified)
+L364-370 Writing AHK source with Python: a backslash-u in a Python literal becomes the character (verified)
 ```
 
 ## doc/REQUIREMENTS.md

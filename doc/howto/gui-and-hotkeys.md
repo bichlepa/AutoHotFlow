@@ -30,3 +30,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Such elements cannot be tested under the guard. Test them without the guard, or abstract the dialog away.
 - **Status:** verified (probe with `ahkrun.py`, exit 97)
 - **Source:** `src/elements/skeleton` (element removed again)
+
+### A Gui window needs a DPI awareness set before it is created (assumed)
+
+- **Problem:** The real dialogs of the dialog elements must be sharp and correctly sized on a display with a scaling above 100 %. An AutoHotkey script is DPI unaware by default, so Windows scales its windows as bitmaps.
+- **Wrong:** Creating the `Gui` and assuming it is sharp.
+- **Right:** Before the first `Gui` of the thread: `DllCall("user32\SetThreadDpiAwarenessContext", "ptr", -4, "ptr")` (per monitor V2). Wrapped in `try`, because older Windows versions lack the function. It is only a claim until the owner has looked at the window at a scaling above 100 % (WI-0056 manual check).
+- **Status:** assumed (the call is in `src/elements/base/DialogWindow.ahk`; no run on a scaled display)
+- **Source:** `src/elements/base/DialogWindow.ahk`
