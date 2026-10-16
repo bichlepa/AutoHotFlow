@@ -98,7 +98,7 @@ def changed_files(repo, base):
 
 
 def plan(repo, base):
-    """Returns None when there is nothing to renumber, else (mapping, changes) where mapping is {b"9090": "F-0101"}
+    """Returns None when there is nothing to renumber, else (mapping, changes) where mapping is {b"<provisional digits>": "F-<final number>"}
     and changes is {relative path bytes: (new bytes, replacement count)} for the files that change.
     Raises Refused when a check fails."""
     open_data = (repo / OPEN_ITEMS).read_bytes()
