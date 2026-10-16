@@ -121,12 +121,12 @@ L503-520   19.1 The subset that is compared
 L522-539   19.2 Deliberate deviations from native AutoHotkey v2
 ```
 
-## doc/MEASUREMENTS.md (27.9 KB, 112 lines)
+## doc/MEASUREMENTS.md (30.2 KB, 115 lines)
 ```text
 L11-21 Important: one machine, not an idle machine
-L23-68 Overview
-L70-90 Method
-L92-112 Not measured
+L23-69 Overview
+L71-93 Method
+L95-115 Not measured
 ```
 
 ## doc/CONVENTIONS.md (8.3 KB, 63 lines)

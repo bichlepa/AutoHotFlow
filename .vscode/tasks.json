@@ -490,6 +490,22 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: element rate benchmark (element executions per second, floods; result in %TEMP%/ahf_element_rate.txt)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/ahkrun.py",
+                "--timeout",
+                "600",
+                "tests/ahk/helpers/element_rate_bench.ahk",
+                "${env:TEMP}/ahf_element_rate.txt",
+                "20000",
+                "5000"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: long loop does not block the engine (100,000 passes; MEASURE line in the output)",
             "type": "shell",
             "command": "python",
