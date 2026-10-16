@@ -153,7 +153,7 @@ L19-24 Capture and operate a window of an AHK role without screen access (verifi
 L26-32 InputBox and MsgBox are standard dialogs (window class `#32770`) (verified)
 ```
 
-## doc/howto/objects-maps-arrays.md (7.8 KB, 103 lines)
+## doc/howto/objects-maps-arrays.md (7.7 KB, 103 lines)
 ```text
 L5-9 Map with `CaseSense "Off"` keeps the spelling of the first insertion (verified)
 L12-17 Copy keys into an array before deleting from a Map (not checked)
@@ -169,7 +169,7 @@ L89-94 A Map key `1` and `"1"` are two keys; Integer keys come before texts (ver
 L97-103 A function stored in an object that it holds is a reference cycle (assumed)
 ```
 
-## doc/howto/processes-pipes-messages.md (39.0 KB, 339 lines)
+## doc/howto/processes-pipes-messages.md (38.6 KB, 339 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L13-17 `PostMessageW` with a NULL handle reports success (verified)
@@ -211,7 +211,7 @@ L325-330 The end of a called instance goes to the caller in the next tick, not f
 L333-339 Take a shared entry with one `Delete`, not with `Get` and then `Delete` (verified)
 ```
 
-## doc/howto/syntax-and-language.md (31.0 KB, 309 lines)
+## doc/howto/syntax-and-language.md (30.7 KB, 309 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -252,7 +252,7 @@ L296-302 `StrSplit(text, "ab")` has ONE delimiter of two characters (verified)
 L305-309 A multi-statement function in an argument is `() {` ... `}`, not `() => {` (verified)
 ```
 
-## doc/howto/tests-and-tools.md (35.9 KB, 363 lines)
+## doc/howto/tests-and-tools.md (35.5 KB, 363 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)

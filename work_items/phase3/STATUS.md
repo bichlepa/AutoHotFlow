@@ -65,5 +65,5 @@ Tree hashes (`git rev-parse <commit>:<path>`): `src` `687433af`, `tests` `a26eb3
 
 ## Recorded only here
 
-None. On 2026-10-16 all notes of this section were moved to `doc/OPEN-ITEMS.md` (F-9100 to F-9103), to `doc/MIGRATION.md` (owner confirmation of M-0038 to M-0048) or dropped as covered by a document (`doc/TEST-STRATEGY.md` for the corpus size, `doc/MANUAL-CHECKS.md` section 1, `doc/ORCHESTRATOR.md` section 3c, `tests/test_open_items_ids.py` for the skip in a workspace, `AGENTS.md` for the interpreter option).
+None. On 2026-10-16 all notes of this section were moved to `doc/OPEN-ITEMS.md` (F-0103 to F-0106), to `doc/MIGRATION.md` (owner confirmation of M-0038 to M-0048) or dropped as covered by a document (`doc/TEST-STRATEGY.md` for the corpus size, `doc/MANUAL-CHECKS.md` section 1, `doc/ORCHESTRATOR.md` section 3c, `tests/test_open_items_ids.py` for the skip in a workspace, `AGENTS.md` for the interpreter option).
 
