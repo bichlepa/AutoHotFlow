@@ -105,7 +105,7 @@ def test_the_product_has_the_package_default_and_no_test_class():
         for q in block_classes(ENTRY_DIR / "generated" / ("Elements_%s.ahk" % role)):
             assert not q.split(".")[1].lower().startswith("action_test"), (role, q)
     # the test classes are in packages below tests/elements, and nothing of the product includes a file of tests/
-    assert classes_of_the_test_set() and all(q.split(".")[1].lower().startswith("action_test") for q in classes_of_the_test_set())
+    assert classes_of_the_test_set() and all(q.split(".")[1].lower().startswith(("action_test", "trigger_test")) for q in classes_of_the_test_set())
     for path in list(ENTRY_DIR.rglob("*.ahk")) + list(ELEMENTS.rglob("*.ahk")):
         for inc in includes_of(path):
             target = (path.parent / inc.split(";")[0].strip().replace("\\", "/")).resolve()
