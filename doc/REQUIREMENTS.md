@@ -1125,12 +1125,13 @@ Talking to a console program is an element of its own, because it is much more c
 ### REQ-TRG-010 Triggers react at once, whatever the load
 
 - **v1:** no (triggers live in the execution thread)
-- **v2:** open
+- **v2:** partial
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003
+- **Evidence:** `tests/integration/test_triggerhost.py` (WI-0061: an error of one trigger is reported, the others and the host keep running)
 
-Hotkeys, hooks and timers react at once, no matter how busy the running flows are (Windows removes a low-level hook that answers too slowly). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. How: a trigger host process, `ARCHITECTURE.md` D8.
+Hotkeys, hooks and timers react at once, no matter how busy the running flows are (Windows removes a low-level hook that answers too slowly). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. How: a trigger host process, `ARCHITECTURE.md` D8. Still missing: the engine side that arms the triggers of the enabled flows (WI-0062), and the measurement of the reaction while the engine is busy (WI-0067).
 
 ### REQ-TRG-020 Triggers follow the enabled state, also after a restart
 
