@@ -4,7 +4,9 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-None open.
+- **Flow calls need the enabled state? (F-0099).** Until S0003 a trigger counts as enabled when its flow is enabled, and no flow is enabled after a start (the loader does not keep the state). Action_Execute_Flow with "This flow" (44 uses in the v1 flows) depends on it. Should the enabled state come from the flow file already now, or with S0003 (proposal: S0003, REQ-EXE-070)?
+- **Result of a waiting call (WI-0055, decision 2).** The caller gets `exception` when the called instance had an unhandled exception or was stopped. Alternative: follow only the end reason. Please confirm.
+- **Skip policy gives `exception` (WI-0055, decision 3).** A call that the policy `skip` refuses ends with `exception`, so the user sees that the flow did not run. Alternative: `normal`, as v1 did. Please confirm.
 
 ## To know
 
