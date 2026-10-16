@@ -1,6 +1,6 @@
 # Needs attention (project owner)
 
-Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits for the project owner: a decision, a manual check, or a fact the owner must know. Last update: 2026-10-16 (session 8).
+Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits for the project owner: a decision, a manual check, or a fact the owner must know. Last update: 2026-10-16 (session 8, wrap-up).
 
 ## Decisions
 
@@ -15,5 +15,5 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 - **F-0098: both events stay** (confirmed by the owner, 2026-10-16). Recorded as `accepted` in `doc/OPEN-ITEMS.md`.
 - **WI-0054 (loops)** is integrated and verified (`be5c088` to `2467349`).
 - **WI-0059 (test admission, load figures, run history)** is done and integrated; see `work_items/phase3/STATUS.md`.
-- **WI-0055 (flow control)** is running. Its questions will follow in its report. WI-0056 (dialogs) is next.
+- **WI-0055 (flow control)** is integrated and verified (`e4b368d` to `949afc2`); its questions are under Decisions. WI-0056 (dialogs) is next.
 - **F-0089 is still open:** three fault tests that fail only under load. The supervisor fix for the kill case (F-0071) is verified and stays open until repeated slow runs are clean.
