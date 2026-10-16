@@ -1,0 +1,23 @@
+root = true
+
+# LF everywhere (.gitattributes: * text=auto eol=lf). Editors that honour this file keep LF in existing and new files.
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+# Byte for byte by design (.gitattributes -text): leave the endings of these files alone.
+[v1/**]
+end_of_line = unset
+insert_final_newline = unset
+
+[assets/language/**]
+end_of_line = unset
+insert_final_newline = unset
+
+[src/elements/*/language/**]
+end_of_line = unset
+insert_final_newline = unset
+
+[tests/data/**]
+end_of_line = unset
+insert_final_newline = unset
