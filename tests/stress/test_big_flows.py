@@ -11,7 +11,7 @@ Smoke variants run in the default run, the full 200-flow test with `-m stress`. 
 MEASURE line (support/metrics.py).
 """
 
-import shutil
+import json
 import time
 from pathlib import Path
 
@@ -34,6 +34,11 @@ HELPER = TESTS_DIR / "ahk" / "helpers" / "hub_frame_cost.ahk"
 HUB_FRAME_BUDGET_MS = 5.0
 SNAPSHOT_BUDGET_S = 3.0     # E0042 (was 1.0): guards against a blocked engine; F-0073 has the measurements
 LOAD_NOTE_S = 30.0          # WI-0024 point 6: above this, the load time is a finding for "native JSON parser"
+# WI-0062 (F-0073): every copy gets an enabled timer trigger, armed by the engine through the trigger host. The interval is
+# long, so no event starts an instance during the test; the arming (and the state in FlowState.json) is what is measured.
+TIMER_TRIGGER = "element_stress_timer"
+TIMER_INTERVAL = "60000"
+ARMED_BUDGET_S = 30.0       # all timers armed this long after evt.engine.ready, or the test fails
 
 
 @pytest.mark.parametrize("runs", [pytest.param(10, id="smoke"),
@@ -55,26 +60,44 @@ def test_hub_cost_of_a_large_frame_is_below_the_budget(run_ahk, runs):
 
 
 def fill_flows(datadir, count):
-    """Copies the big flows round-robin to Flows/<n>.json. Returns the flow ids and the total size in bytes."""
+    """Copies the big flows round-robin to Flows/<n>.json, each with an enabled timer trigger (TIMER_TRIGGER), and writes
+    FlowState.json so that the engine enables them at the start. Returns the flow ids and the total size in bytes."""
     flows = Path(datadir) / "Flows"
     flows.mkdir(exist_ok=True)
     sources = BIG_FLOWS
     assert all(src.is_file() for src in sources), "missing big flows in %s" % V1_EXAMPLES
     names, total = [], 0
+    state = {"formatVersion": 1, "flows": {}}
     for n in range(count):
         src = sources[n % len(sources)]
         name = "Big %03d" % n
-        shutil.copyfile(src, flows / (name + ".json"))
+        flow = json.loads(src.read_text(encoding="utf-8"))
+        flow["allElements"][TIMER_TRIGGER] = {"ID": TIMER_TRIGGER, "type": "trigger", "package": "Test",
+                                              "class": "Trigger_TestTimer", "name": "stress timer", "enabled": "0",
+                                              "pars": {"Interval": TIMER_INTERVAL}}
+        (flows / (name + ".json")).write_text(json.dumps(flow, ensure_ascii=False), encoding="utf-8")
+        state["flows"][name] = [TIMER_TRIGGER]
         names.append(name)
         total += src.stat().st_size
+    (Path(datadir) / "FlowState.json").write_text(json.dumps(state), encoding="utf-8")
     return names, total
+
+
+def armed_count(snap, names):
+    """How many of the flows have their timer armed in the snapshot."""
+    armed = set()
+    for f in snap["flows"]:
+        for t in f.get("triggers", []):
+            if t["elementId"] == TIMER_TRIGGER and t["armed"] is True:
+                armed.add(f["flowId"])
+    return len(armed & set(names))
 
 
 def load_chain_and_probe(procs, datadir, session_id, count):
     """Starts the chain over `count` big flows and asks for snapshots until evt.engine.ready.
     Returns a dict with the measurements; leaves cleaning up to the caller (chain)."""
     names, total_bytes = fill_flows(datadir, count)
-    chain = Chain(procs, datadir, session_id, FULL_CHAIN, STUB_OPTS, run_timeout=400)
+    chain = Chain(procs, datadir, session_id, FULL_CHAIN + ",triggerhost", STUB_OPTS, run_timeout=400)
     result = {"chain": chain, "names": names, "bytes": total_bytes}
     sc = StressChain(chain)
     probe = _connect(chain.sup.pipe, "probe", sc.hub_hwnd)
@@ -110,6 +133,17 @@ def test_many_big_flows_load_without_hung_and_with_a_responsive_engine(procs, da
     chain = result["chain"]
     try:
         assert result["t_ready"] is not None, "evt.engine.ready did not come:\n" + chain.sup.text()
+        # The engine arms the timers after the ready (WI-0062): every flow must show its timer armed in time.
+        t_armed = None
+        deadline = time.monotonic() + scaled(ARMED_BUDGET_S)
+        while time.monotonic() < deadline:
+            armed = armed_count(chain.snapshot_ok(timeout=10), result["names"])
+            if armed == count:
+                t_armed = time.monotonic() - chain.sup.t0
+                break
+            time.sleep(0.1)
+        assert t_armed is not None, "only %d of %d timers armed after %s s:\n%s" % (
+            armed, count, ARMED_BUDGET_S, chain.sup.text())
         lat = metrics.Dist([x * 1000 for x in result["latencies"]]) if result["latencies"] else None
         snap = chain.snapshot_ok(timeout=10)
         states = chain.states()
@@ -120,6 +154,7 @@ def test_many_big_flows_load_without_hung_and_with_a_responsive_engine(procs, da
         errors = chain.rec.find(lambda m: m.get("type") == "evt.storage.error")
         metrics.record("big flow collection loaded", flows=count, megabytes=round(result["bytes"] / 2**20, 2),
                        seconds_to_ready=round(result["t_ready"], 2),
+                       seconds_to_all_armed=round(t_armed, 2),
                        snapshot_during_load_ms=lat.as_dict() if lat else None,
                        snapshot_timeouts=result["timeouts"], flows_loaded=len(snap["flows"]),
                        storage_errors=len(errors), machine=metrics.machine())
