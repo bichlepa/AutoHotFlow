@@ -276,6 +276,13 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Action:** extend the guard of the generator to any operand of `.` (and of the boolean operators) that contains `ftiny` or `fhuge`, or mark the class with the entry of F-0075. Owner of the oracle decides.
 **Evidence:** run 20261016-163117-ebcaeac2 (`%TEMP%\ahf_runs\20261016-163117-ebcaeac2\output.txt`).
 
+### F-0102: the storm smoke test sees the engine's handle count grow now and then
+
+**What:** `tests/stress/test_start_stop_storm.py::test_start_stop_storm_leaves_a_consistent_engine[smoke]` failed in the slow tier with the engine's handle count rising from 145 to 164 (limit +5). It failed twice in a row, and once alone; then it was green three times on `9f1d403` and `c27ff8f`, whose code changes do not touch the engine.
+**Status:** observed, not reproduced in the green runs; cause not known (assumed: a handle that is released late, not a leak by a code change). Open.
+**Action:** watch the history of the test (`python tools/test_history.py --test "tests/stress/test_start_stop_storm.py::test_start_stop_storm_leaves_a_consistent_engine[smoke]"`). If it fails again alone, read the handle types of the engine process in the run log and open a work package; if it fails only under load, add it to the load flakes.
+**Evidence:** runs 20261016-172834-c27ff8f4-3 (red) and its recheck at 17:36 (red alone), in the run history of the main checkout.
+
 ## Watch list (E0007)
 
 These items were deliberately not fixed in phase 2b. Closed items (F-0004, F-0006, F-0010, F-0015, F-0018 and others) are not listed. The findings above are not repeated here.
