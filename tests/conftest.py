@@ -63,7 +63,7 @@ FOUNDATION_FILES = {
     "fault/test_shutdown.py", "fault/test_orphans.py", "fault/test_supervisor_stall.py", "fault/test_faultkit.py",
     "fault/test_diagnose.py", "fault/test_report.py", "fault/test_debug_dump.py", "fault/test_debug_role.py",
     "support/test_client_hub.py", "support/test_procs.py", "support/test_framing.py", "support/test_wirebool.py",
-    "support/test_dialogwatch.py",
+    "support/test_dialogwatch.py", "test_runtool_runs.py",
 }
 # AHK unit files (tests/ahk/<name>.test.ahk) of the same kind, and the checks of the runner itself.
 FOUNDATION_AHK = {
