@@ -576,4 +576,8 @@ def test_the_v1_flow_loop_test_runs(flows):
     flows.start()
     run = flows.run(flow_id, timeout=60)
     print("\nLOOP TEST: reason=%s exceptions=%s last=%s steps=%d" % (run.reason, run.exceptions, run.names[-3:], len(run.steps)))
-    assert run.reason == "finished", (run.reason, run.exceptions)
+    assert run.reason == "finished" and not run.exceptions, (run.reason, run.exceptions)
+    # the end of the flow: the check of the trace points passed (element 12), then the flow wrote its name to the global list
+    assert run.state_of("element0000000012") == ["finished"] and run.names[-1] == "element0000000030", run.names[-3:]
+    pair = flows.wait_var("global_testResults")
+    assert pair is not None and json.loads(pair[1]) == ["Loop test"], pair

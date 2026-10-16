@@ -1145,3 +1145,34 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Limits:** (1) A process that leaves the job is missing from the sum and counts as external load. With our job (no `JOB_OBJECT_LIMIT_BREAKAWAY_OK`) a child cannot break away: `CreateProcess` with `CREATE_BREAKAWAY_FROM_JOB` fails with error 5 (access denied), so a program that insists on breaking away does not start inside a test run at all. Nothing in the repository uses that flag. (2) A process that a test causes but that is not started below the controller (a service, a COM server, a program started through the shell of the desktop) is not in the job either and counts as external.
 - **Status:** verified: own vs external (`tests/test_runtool_runs.py::test_external_load_shows_in_the_figures_of_the_test`), no limit flags and refused breakaway (`tests/test_runtool_runs.py::test_the_job_object_only_counts`), fallback (`tests/test_load_history.py::test_without_a_job_the_sampler_falls_back_to_psutil`). Limit (2) is assumed, not tested.
 - **Source:** `tests/support/loadsampler.py`
+
+### The log of a flow is not in execution order across elements
+
+- **Problem:** A test of nested loops read the lines of two trace points (`I 1`, `I 2`, `O 1`, ...) from `run.log` and expected the order in which the elements ran. The lines of one element came first, then the lines of the next one (`I 1 I 2 I 3 I 1 I 2 I 3 O 1 O 2`), although the steps ran in the right order.
+- **Wrong:** Reading the order of events of different elements from `run.log`.
+- **Right:** The log entries are written in a batch per source (an element is a source), so the order holds inside one element only. To record an order, append to a list variable in the flow (`Action_Add_To_List` to `seq`, probe it at the end: `tests/integration/test_core_c_loops.py::note` and `seq_of`). The log is fine for one element.
+- **Status:** verified (WI-0054)
+- **Source:** `tests/integration/test_core_c_loops.py`
+
+### Two flows or two elements whose IDs differ only in case
+
+- **Problem:** The flow runner writes `Flows/<flow id>.json`; on Windows `parse-x-CSV.json` and `parse-x-csv.json` are one file, so one flow overwrote the other and the engine "did not load" the list of flows. The same in a flow file: the keys of `allElements` are case-insensitive for `Json.Parse` (a repeated key is refused), so the IDs `i` and `I` are a "duplicate key".
+- **Wrong:** Test flow names or element IDs that differ only by case.
+- **Right:** Make the names differ by more than case (`...-upper-CSV-...`, `...-lower-csv-...`).
+- **Status:** verified (WI-0054)
+
+### `ctx.GetVar` with a path and a default object: read one member, tell "missing" from "empty"
+
+- **Problem:** A loop that keeps its values in a hidden loop variable has to read one member per pass. Reading the whole variable per pass copies the whole list every time (a pass would cost O(size of the list)), and the empty text as the default cannot tell a missing member from an empty field.
+- **Wrong:** `list := ctx.GetVar("A_LoopCurrentList", "", true)` in every pass; `if (field = "")` as the end of the list.
+- **Right:** `ctx.GetVar("A_LoopCurrentList." index, NONE, true)` copies only the member (the path is split at the dots, an Integer key is found by its digits), and a default that is a unique object (`static NONE := Object()`) is returned as it is: compare with `ObjPtr`. Hidden loop variables are saved and restored with the other loop variables when a loop is entered and left.
+- **Status:** verified (WI-0054, `tests/ahk/element_loops.test.ahk`, `tests/integration/test_core_c_loops.py::test_long_loops_do_not_scale_with_the_size_of_the_list_or_the_text` runs 3,000 members; the time per pass for a big list was not measured)
+- **Source:** `src/elements/Default/lib/LoopOps.ahk`
+
+### `Loop Parse` with the delimiter text "CSV" is the CSV mode
+
+- **Problem:** The text of the delimiter field is a set of characters, except that AutoHotkey reads the text `CSV` (any case) as the CSV mode: `Loop Parse "a,b", "CSV"` gives `a` and `b`, not one field. v1 and v2 do the same.
+- **Wrong:** Assuming that every delimiter text is a set of characters.
+- **Right:** Keep the behavior (a flow may rely on it) and document it; a test pins it (`FieldsOf('a,"b,c",d', "CSV", "")` is three fields).
+- **Status:** verified (v1 interpreter and `tests/ahk/element_loops.test.ahk`)
+- **Source:** `src/elements/Default/Loops/Loop_Parse_A_String.ahk`
