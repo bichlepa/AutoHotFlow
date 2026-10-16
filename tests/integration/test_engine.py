@@ -946,9 +946,16 @@ def test_the_switched_state_survives_a_restart_of_the_engine(procs, runs, pipe, 
         ask(obs, "cmd.trigger.enable", {"flowId": "sw", "elementId": INDEPENDENT})
     # The engine ends at once after the switches: the state goes out before sys.bye (shutdown flush).
     hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 2000})
-    assert wait_for(lambda: len(storage.state_writes) >= 1, timeout=5.0), "no state file written"
-    assert json.loads(state_file(flowdir, "sw").read_text(encoding="utf-8")) == {
-        "formatVersion": 1, "enabled": sorted([TRIGGER, INDEPENDENT])}
+    expected = {"formatVersion": 1, "enabled": sorted([TRIGGER, INDEPENDENT])}
+
+    def written():
+        # the stub writes the file of each switch in turn; wait for the content of the last one (a read during the
+        # second write saw the file empty)
+        try:
+            return json.loads(state_file(flowdir, "sw").read_text(encoding="utf-8")) == expected
+        except (OSError, ValueError):
+            return False
+    assert wait_for(written, timeout=5.0), "no state file with both triggers written"
     with observer(pipe, "engine") as obs:
         run = start_engine(procs, flowdir, runs, pipe, session_id)
         wait_ready(obs)
