@@ -8,8 +8,9 @@ process (pid plus create time) is alive, so a killed run frees its slots at the 
 under a short lock file (admission.lock), so two starts cannot both pass the check.
 
 Rules: the sum of the workers of all running runs stays <= AHF_MAX_WORKERS (default: logical cores - 2, at least 1);
-a serial run counts as 1. A run gets min(requested, free) workers, at least 1. A run that asks for stress or soak
-tests (-m stress / -m soak) waits until no other run is active and blocks the start of others while it runs.
+a serial run counts as 1. A run gets min(requested, free) workers, at least 1. A run whose -m expression selects
+stress, soak or idle tests (selects_exclusive) waits until no other run is active and blocks the start of others
+while it runs.
 Waiting has no time limit unless AHF_ADMISSION_TIMEOUT (seconds) is set.
 """
 
@@ -23,7 +24,10 @@ from pathlib import Path
 
 import psutil
 
-EXCLUSIVE_MARKERS = ("stress", "soak")
+# Markers of tests that need the machine alone: measurements (stress, soak) and tests that need a quiet machine as
+# their reference (idle). A run that can select one of them runs serially and exclusively.
+EXCLUSIVE_MARKERS = ("stress", "soak", "idle")
+MAX_EXPRESSION_BRANCHES = 4096
 LOCK_STALE_S = 30.0          # a lock file older than this was left behind by a crashed process
 DIRECT_KEEP = 30             # finished direct-run entries kept in the registry
 WAIT_MESSAGE_EVERY_S = 30.0
@@ -66,13 +70,60 @@ def admission_timeout():
         return None
 
 
-def is_exclusive_markexpr(expr):
-    """True when a -m expression names stress or soak (conservative: 'not stress' counts too)."""
-    return bool(expr) and any(re.search(r"\b%s\b" % m, expr) for m in EXCLUSIVE_MARKERS)
+def _satisfiable_with(compiled, fixed):
+    """True when some assignment of the marker names that keeps the `fixed` values makes the expression true. The
+    names are found while evaluating (a name not yet assigned is false in that evaluation); every name met for the
+    first time opens a branch where it is true, so all relevant assignments are tried."""
+    stack = [dict(fixed)]
+    branches = 0
+    while stack:
+        assign = stack.pop()
+        branches += 1
+        if branches > MAX_EXPRESSION_BRANCHES:
+            return True                                 # too many names to try: treat as exclusive
+        met = []
+
+        def matcher(name, /, **kwargs):
+            if name not in assign:
+                assign[name] = False
+                met.append(name)
+            return assign[name]
+
+        if compiled.evaluate(matcher):
+            return True
+        for i, name in enumerate(met):
+            branch = {k: v for k, v in assign.items() if k not in met[i:]}
+            branch[name] = True
+            stack.append(branch)
+    return False
+
+
+def selects_exclusive(expr):
+    """The one decision whether a -m expression can select tests that need the machine alone (EXCLUSIVE_MARKERS),
+    used by tests/conftest.py (switch to one process), the admission and tools/run_suite.py.
+
+    True only if the expression can be satisfied with an exclusive marker true. The exclusive markers that the
+    expression does not name stay false in that check, because tests/conftest.py drops a stress, soak or idle test
+    unless its marker is named in -m (a test marked soak never runs under -m "not stress"). So: 'stress', 'soak',
+    'slow or stress' are true; 'not stress', 'not (stress or soak)', 'slow and not stress', 'not slow' and an empty
+    expression are false. Uses the expression parser of pytest (tests/test_admission.py guards that internal API);
+    an expression it cannot parse is checked by name, conservatively."""
+    if not expr or not expr.strip():
+        return False
+    named = [m for m in EXCLUSIVE_MARKERS if re.search(r"(?<![\w.+-])%s(?![\w.+-])" % m, expr)]
+    if not named:
+        return False
+    try:
+        from _pytest.mark.expression import Expression
+        compiled = Expression.compile(expr)
+    except Exception:                                    # pytest refuses it anyway; stay on the safe side
+        return True
+    unnamed = {m: False for m in EXCLUSIVE_MARKERS if m not in named}
+    return any(_satisfiable_with(compiled, dict(unnamed, **{m: True})) for m in named)
 
 
 def is_exclusive(pytest_args):
-    """True when the run asks for stress or soak tests with -m (measurements need an idle machine)."""
+    """True when a -m argument of the run selects exclusive tests (selects_exclusive)."""
     args = list(pytest_args)
     for i, arg in enumerate(args):
         expr = None
@@ -80,7 +131,7 @@ def is_exclusive(pytest_args):
             expr = args[i + 1]
         elif arg.startswith("-m") and len(arg) > 2:
             expr = arg[2:]
-        if is_exclusive_markexpr(expr):
+        if selects_exclusive(expr):
             return True
     return False
 

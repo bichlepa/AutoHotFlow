@@ -42,12 +42,13 @@ RUN_COUNTER = itertools.count(1)
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_cmdline_main(config):
-    """Measurements must never run in parallel with other load (idle CPU, latency, memory): a run that asks
-    for stress or soak tests (-m stress / -m soak) is switched to a single process, whatever pytest.ini says.
+    """Measurements must never run in parallel with other load (idle CPU, latency, memory): a run whose -m
+    expression can select stress, soak or idle tests (admission.selects_exclusive, the one shared decision) is
+    switched to a single process, whatever pytest.ini says.
     Then the machine-wide admission (WI-0059, tests/support/runrecord.py): it may wait, and it sets the number of
     xdist workers before xdist reads it (this hook runs before the tryfirst hook of xdist, verified)."""
     asked = config.getoption("markexpr") or ""
-    if admission.is_exclusive_markexpr(asked) and getattr(config.option, "numprocesses", 0):
+    if admission.selects_exclusive(asked) and getattr(config.option, "numprocesses", 0):
         config.option.numprocesses = 0
         config.option.dist = "no"
     return runrecord.begin(config)
@@ -197,6 +198,8 @@ def pytest_configure(config):
             pass          # no log is better than no test run
     config.addinivalue_line("markers", "stress: long-running stress test, run with -m stress")
     config.addinivalue_line("markers", "soak: endurance test (minutes), run with -m soak")
+    config.addinivalue_line("markers", "idle: needs a quiet machine as its reference; runs only with -m idle, serially "
+                                       "and alone (the admission waits for an idle machine)")
     config.addinivalue_line("markers", "fault: fault injection test (kill, freeze, timeout)")
     config.addinivalue_line("markers", "slow: takes about 3 s or more (waits for deadlines); not in the default run, "
                                        "run with -m slow or --all")
@@ -208,7 +211,8 @@ def pytest_configure(config):
 
 def pytest_collection_modifyitems(config, items):
     # Tiers (doc/TEST-STRATEGY.md section 6). The default run keeps only the fast tests without windows. A group is
-    # switched on by naming its marker in -m (stress and soak: full-size tests only, their smoke variants are slow);
+    # switched on by naming its marker in -m (stress and soak: full-size tests only, their smoke variants are slow;
+    # idle: tests that need a quiet machine);
     # --all switches on slow, foundation and gui. A test in several tiers runs only when all of them are on.
     asked = config.getoption("markexpr") or ""
     run_all = config.getoption("--all")
@@ -227,14 +231,14 @@ def pytest_collection_modifyitems(config, items):
         # smoke variants in tests/stress are not marked themselves: they count as slow
         if "stress" in item.path.parts and not any(item.get_closest_marker(m) for m in ("stress", "soak")):
             item.add_marker(pytest.mark.slow)
-    for marker in ("stress", "soak", "slow", "foundation", "gui"):
+    for marker in ("stress", "soak", "idle", "slow", "foundation", "gui"):
         if marker == "gui" and only_foundation:
             continue          # already removed above
         if marker not in asked and not (run_all and marker in ("slow", "foundation", "gui")):
-            # a full-size stress or soak test that was asked for is not dropped because it is also foundation or slow
+            # a stress, soak or idle test that was asked for is not dropped because it is also foundation or slow
             exempt = marker in ("slow", "foundation", "gui")
             kept = [i for i in items if i.get_closest_marker(marker) is None
-                    or (exempt and any(i.get_closest_marker(m) for m in ("stress", "soak")))]
+                    or (exempt and any(i.get_closest_marker(m) for m in admission.EXCLUSIVE_MARKERS))]
             if len(kept) != len(items):
                 config.hook.pytest_deselected(items=[i for i in items if i not in kept])
                 items[:] = kept

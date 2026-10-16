@@ -110,7 +110,7 @@ class RunRecorder:
             config.option.numprocesses = 0          # what xdist does for --pdb with -n auto
             config.option.dist = "no"
         self.requested = _requested_workers(config)
-        self.exclusive = admission.is_exclusive_markexpr(config.getoption("markexpr", "") or "")
+        self.exclusive = admission.selects_exclusive(config.getoption("markexpr", "") or "")
         admitted = os.environ.get("AHF_ADMITTED")
         if admitted:
             run_dir = admission.find_run(base, admitted)

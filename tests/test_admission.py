@@ -64,10 +64,38 @@ def test_max_workers_default_and_override(monkeypatch):
     assert admission.max_workers() == max(1, (os.cpu_count() or 1) - 2)
 
 
-@pytest.mark.parametrize("expr, expected", [("stress", True), ("soak", True), ("not stress", True),
-                                            ("slow", False), ("not gui", False), ("", False), (None, False)])
-def test_exclusive_marker_expressions(expr, expected):
-    assert admission.is_exclusive_markexpr(expr) is expected
+@pytest.mark.parametrize("expr, expected", [
+    ("stress", True), ("soak", True), ("idle", True),
+    ("not stress", False),                       # the defect of the old substring check (WI-0059 follow-up)
+    ("slow or stress", True),
+    ("not (stress or soak)", False),
+    ("not slow", False), ("slow", False), ("not gui", False), ("", False), ("   ", False), (None, False),
+    ("slow and not stress", False),
+    ("stress and not stress", False),
+    ("not stress or soak", True),
+    ("stress and soak", True),
+    ("(slow or gui) and not soak", False),
+    ("idle and not slow", True),
+    ("nostress", False),                         # another marker name, not stress
+    ("stress(", True),                           # pytest cannot parse it: conservative
+])
+def test_one_function_decides_whether_an_expression_selects_exclusive_tests(expr, expected):
+    assert admission.selects_exclusive(expr) is expected
+
+
+def test_the_internal_expression_api_of_pytest_still_works():
+    """selects_exclusive uses _pytest.mark.expression (internal API of pytest). If a pytest update changes it, this
+    test fails instead of the decision silently falling back to the name check."""
+    from _pytest.mark.expression import Expression
+    compiled = Expression.compile("slow and not (stress or m(a=1))")
+    seen = []
+
+    def matcher(name, /, **kwargs):
+        seen.append((name, kwargs))
+        return name == "slow"
+
+    assert compiled.evaluate(matcher) is True
+    assert ("slow", {}) in seen and ("stress", {}) in seen
 
 
 def test_admit_registers_with_the_granted_workers(tmp_path):

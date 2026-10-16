@@ -20,7 +20,9 @@ import run_suite  # noqa: E402
     (["tests", "-m", "stress"], True),
     (["tests", "-m", "soak"], True),
     (["tests", "-mstress"], True),
-    (["tests", "-m", "slow and not stress"], True),      # conservative: the word is there
+    (["tests", "-m", "slow and not stress"], False),     # cannot select a stress test (WI-0059 follow-up)
+    (["tests", "-m", "not stress"], False),
+    (["tests", "-m", "idle"], True),
     (["tests", "-m", "slow"], False),
     (["tests/stress", "-q"], False),                     # a path is not a request; the conftest drops full-size tests
     (["tests", "-k", "stress"], False),
