@@ -50,6 +50,7 @@ Step S0003 (trigger host and triggers), detailed on 2026-10-16 (E0056 to E0062).
 | WI-0065 | Set_Flow_Status, Condition_Flow_Enabled | open | | | | |
 | WI-0066 | Guard against runaway flows | open | | | | sets the defaults from its measurement (E0062) |
 | WI-0067 | Acceptance S0003 | open | | | | |
+| WI-0068 | Enabled state per flow file (E0063, answer to the FlowState read error) | integrated, verification pending (stress test) | haiku (review sonnet) | b1d55b9–8d2eb98 | 2026-10-16 | reviewer approved after a fix (late read arms the merged triggers); F-0109 closed |
 
 Step S0008 (remaining elements) is planned, not started.
 
