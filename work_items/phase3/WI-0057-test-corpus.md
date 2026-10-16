@@ -29,3 +29,10 @@ README of this phase (E0035), result of WI-0045 (markers, report), WI-0049 (buil
 ## Not part of this
 
 The remaining "Automatic tests" flows (S0003, S0008).
+
+## Result
+
+- Three v1 flows of "Automatic tests" run green: "variable test" (on the copy `tests/data/flows/v2_adapted/`, one fix, M-0069), "List test" and "Loop test" as saved. The fix list is `FIX_LIST` in `tests/integration/test_corpus.py`; it has one fix (two elements, the same kind), with its MIGRATION ID.
+- Sixteen synthetic flows (test_1 to test_16 of `tests/integration/test_corpus.py`) cover: arithmetic and text in conditions (strict and compatibility), `<` between texts (exception in strict, false with f1 in compatibility, M-0025), nested loops over lists, a break in a list loop, recursion with variables, a flow that waits for two called flows, message and confirmation dialogs in loops, the debug dialog with a changed variable, a loop left through `exception`, a call of a flow with a missing package (E0047; the caller ends with the outcome, M-0063), globals and statics across two runs and across an engine restart.
+- The other 13 "Automatic tests" flows: the table `PENDING` of the test file lists per flow the missing element classes and the step. Summary: S0003 brings Set_flow_status, Condition_Flow_Enabled, Trigger_Hotkey, Trigger_Periodic_Timer and Trigger_Start_Up; S0008 brings everything else (file, window, process, string, math, dialog input, ini, shortcut and process triggers, user idle time, AutoHotkey script under E0039, sound and speech, HTTP).
+- Not part of the corpus: the trigger state of a loaded flow. A v1 trigger with `enabled` does not enable its flow in v2 (the flow flag is set by `cmd.flow.enable` only); the corpus enables the flows it calls (REQ-EXE-070, S0003).
