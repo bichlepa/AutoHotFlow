@@ -107,12 +107,17 @@ def test_a_flood_of_refused_starts_is_answered_and_logged_a_few_times(host_flows
     flows.start()
     mark = flows.mark()
     flows.enable(flow_id)
+    t0 = time.monotonic()
     time.sleep(scaled(2.0))
     flows.request_ok("engine", "cmd.flow.disable", {"flowId": flow_id})
+    elapsed = time.monotonic() - t0            # wall clock: under load the window is longer than scaled(2.0)
     started = [m for m in flows.messages(mark) if m.get("type") == "evt.instance.started"]
     refused = [m["payload"]["text"] for m in flows.messages(mark)
                if m.get("type") == "evt.log.entry" and "refused" in m["payload"].get("text", "")]
     assert started, "the timer started no instance"
-    assert len(started) <= 10, "instances started in parallel beyond the limit: %d" % len(started)
-    assert 1 <= len(refused) <= 3, "refusals logged %d times: %s" % (len(refused), refused)
+    # At most 3 running; each lives 1 s, so at most 3 starts per elapsed second plus the first 3.
+    bound = 3 * (int(elapsed) + 2)
+    assert len(started) <= bound, "instances started beyond the limit: %d in %.1f s" % (len(started), elapsed)
+    # One refusal line at most per 10 s and flow (the throttle of the guard).
+    assert 1 <= len(refused) <= int(elapsed // 10) + 1, "refusals logged %d times in %.1f s: %s" % (len(refused), elapsed, refused)
     assert not any(m.get("type") == "evt.flow.limit" for m in flows.messages(mark))

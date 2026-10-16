@@ -250,7 +250,8 @@ def test_a_flow_calls_itself_with_and_without_waiting_under_every_policy(flows):
 
 
 def test_waiting_calls_of_a_flow_to_itself_are_limited(flows):
-    fb = FlowBuilder("endless")
+    # the parallel limit of the runaway guard (WI-0066) would refuse the 101st running call first: switched off here
+    fb = FlowBuilder("endless", flow_settings={"maxParallelInstances": 0})
     t = fb.trigger()
     fb.chain(t, fb.action("Action_Execute_Flow", name="E0", **exec_pars("", t.id, wait=1)))
     session(flows, [fb])

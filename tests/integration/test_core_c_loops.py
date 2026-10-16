@@ -534,7 +534,8 @@ def test_long_loops_do_not_scale_with_the_size_of_the_list_or_the_text(flows):
 @pytest.mark.slow
 def test_a_long_loop_does_not_block_the_engine_and_costs_little_per_pass(flows):
     passes_ = 100_000
-    fb = FlowBuilder("long")
+    # 100,000 passes are 200,000 element executions: the runaway guard (WI-0066) is switched off for this flow
+    fb = FlowBuilder("long", flow_settings={"maxExecutionsPerMinute": 0})
     loop = fb.loop("Loop_SimpleLoop", Infinite=0, repeatCount=passes_)
     fb.connect(start(fb, None), loop)
     fb.connect(loop, loop, "head", into="tail")                         # an empty body

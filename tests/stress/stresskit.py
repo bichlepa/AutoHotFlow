@@ -92,6 +92,8 @@ def write_flow(datadir, name, sleep_ms=200, policy="default"):
     flow = json.loads(SKELETON_SRC.read_text(encoding="utf-8"))
     flow["name"] = name
     flow["flowSettings"]["ExecutionPolicy"] = policy
+    # The stress tests measure the engine itself: the runaway guard (WI-0066) limits the running instances by default.
+    flow["flowSettings"]["maxParallelInstances"] = 0
     flow["allElements"][SLEEP_ELEMENT]["pars"] = {"Duration": str(sleep_ms), "Unit": "Milliseconds"}
     path = Path(datadir) / "Flows" / (name + ".json")
     path.parent.mkdir(exist_ok=True)
