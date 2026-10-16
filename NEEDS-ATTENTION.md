@@ -4,7 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **`Loop_Condition` sets `A_Index` before the first check (M-0059).** v1 set the index only after the check. The port follows the help text (`a_index <= 10` makes 10 passes). Please check this and confirm, or ask for the v1 order.
+None open.
 
 ## To know
 
