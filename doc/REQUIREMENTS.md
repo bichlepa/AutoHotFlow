@@ -237,10 +237,11 @@ Every element that can wait (REQ-EXE-100) has a setting "maximum run time". The 
 ### REQ-EXE-170 Runaway flows are stopped
 
 - **v1:** no
-- **v2:** open
+- **v2:** partial (the three limits work per flow with the defaults from MS-0036, set in the flow file; the notice in the manager and the global defaults are missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0003 (WI-0066), S0004 (global defaults, notice), S0007 (per flow)
+- **Plan:** S0003 (WI-0066, done), S0004 (global defaults, notice), S0007 (per flow, editing)
+- **Evidence:** `tests/ahk/engine_runaway.test.ahk`, `tests/integration/test_runaway.py::test_an_endless_loop_is_stopped_and_its_triggers_stay_disabled_after_a_restart`, `tests/integration/test_runaway.py::test_a_flood_of_refused_starts_is_answered_and_logged_a_few_times`
 
 A flow that runs away does not disturb the others (decision E0062, after the model of the Android app AutoMagic). A flow that executes more elements per minute than its limit (the trigger of each new instance counts) is stopped and all its triggers are disabled, also those that do not switch with the flow; the user is told. A start that would exceed the limit of waiting instances (policy `wait`) or of running instances of a flow is refused like the policy `skip`; a flow that calls it learns this (`exception`). The limits have global defaults and can be changed per flow; 0 means no limit. The defaults are chosen so that a loop over a long list passes.
 

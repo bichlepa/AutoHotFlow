@@ -215,6 +215,10 @@ The selection of the next connection follows v1 exactly: connection type equals 
 
 `starting` → (`sys.hello`) → `ready` → (`sys.shutdown`) → `stopping` → `exited`. Deviations: `hung` (ping timeout), `crashed` (process gone or pipe broken). See 6.2.
 
+### 5.4 Runaway guard (WI-0066, REQ-EXE-170, E0062)
+
+The counting lives in the engine, in the executor (`src/engine/Executor.ahk`, `_ElementStarted`): every element start of a flow, the start of a trigger of a new instance included, is counted once per flow in `RunawayGuard` (`src/engine/core/RunawayGuard.ahk`, a sliding window of 60 one-second buckets; a count is an increment and a total, the old buckets are cleared once per second of change). The limits are read from `flowSettings` of the newest revision. Over the limit the executor only marks the flow; it stops it at the next dispatch, so the element that crossed the limit does not start more work. The engine (`LimitReached`) disables the triggers and reports the event. Starts over the limits of waiting or running instances are refused in `_Start`, before anything is created. Nothing waits: the guard is state and messages, as the rest of the engine.
+
 ---
 
 ## 6. Flow, errors, shutdown
