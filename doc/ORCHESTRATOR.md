@@ -120,13 +120,13 @@ The reviewer gets: the task (work item file or wish), the author's report, and t
 - **Implementers and hunters run short runs:** the tests of the files and groups they changed, plus the fast tier (`python -m pytest tests -q`). Big runs (`--all`, `--foundation`, `-m slow`) only when the change touches `src/core/`, `src/supervisor/`, `src/Ahf*.ahk`, `src/debugview/`, `tests/support/`, `tests/integration/helpers/`, `tests/conftest.py`, `tools/ahkrun.py`, `doc/PROTOCOL.md` or a shared helper; otherwise `verify.py` does it after the integration.
 - Stress and soak (`-m stress`, `-m soak`) only when the project owner asks.
 
-**Verification** replaces the verifier agent. After an integration that changed source code, run in the main checkout, in the background:
+**Verification** replaces the verifier agent. After an integration, run in the main checkout, in the background (the script itself decides what a change needs; documents are read by fast-tier tests too):
 
 ```
 python tools/verify.py --ref <sha of the v2-port tip> --auto
 ```
 
-It runs the tiers that the changed paths need on the frozen commit, skips a state whose trees were verified green already, and ends with `VERDICT: green|red|skipped`. **When:** after every integrated work item; integrated hunter fixes are verified together with the next work item, or at the latest after the third unverified integration and at the end of the session. Record the verdict, the sha and the run IDs in `STATUS.md`.
+It runs the tiers that the changed paths need on the frozen commit (at least the fast tier for any change outside `work_items/`, `.claude/` and `NEEDS-ATTENTION.md`), and ends with `VERDICT: green|red|skipped`. Only a green `--auto` run without `--base` becomes the base of the next `--auto`. **When:** after every integrated work item; integrated hunter fixes are verified together with the next work item, or at the latest after the third unverified integration and at the end of the session. Record the verdict, the sha and the run IDs in `STATUS.md`.
 
 **When it is red:** read the failed test names in the verdict. Run `python tools/recheck.py <run id>` once for those tests (serially and alone). Green alone and red under load: a load flake; add it to an existing OPEN-ITEMS entry of the test or write one (you may do that small commit yourself), but it does not block the work item. Red alone too: a real failure. If the author is clear (the integrated branch touched the failing code), give it back to the author (section 7); otherwise write an OPEN-ITEMS entry and give it to the hunter as its next round. Do not start a new work item that depends on the broken state.
 
