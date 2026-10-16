@@ -1,0 +1,198 @@
+{
+  "name": "DPI dialogs",
+  "category": "Manual check",
+  "ElementIDCounter": "17",
+  "formatVersion": 2,
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "0.000000",
+    "Offsety": "0.000000",
+    "WorkingDir": "",
+    "zoomFactor": "1.000000",
+    "strictTypes": true
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "ID": "element0000000001",
+      "name": "Trigger_Manual",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "DPI dialogs"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "0",
+      "y": "0",
+      "enabled": "0",
+      "DefaultTrigger": "1"
+    },
+    "element0000000002": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000002",
+      "name": "Action_Message_Box",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "title": "DPI check: message box",
+        "message": "Message box. Check the text, the buttons and the size, then click OK."
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "140"
+    },
+    "element0000000003": {
+      "class": "Condition_Confirmation_Dialog",
+      "ID": "element0000000003",
+      "name": "Condition_Confirmation_Dialog",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "title": "DPI check: confirmation",
+        "message": "Confirmation dialog. Check the text and both buttons, then click Yes or No."
+      },
+      "StandardName": "1",
+      "type": "condition",
+      "x": "0",
+      "y": "280"
+    },
+    "element0000000004": {
+      "class": "Action_New_variable",
+      "ID": "element0000000004",
+      "name": "Action_New_variable",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Varname": "dpi_text",
+        "VarValue": "one",
+        "expression": "string"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "420"
+    },
+    "element0000000005": {
+      "class": "Action_New_List",
+      "ID": "element0000000005",
+      "name": "Action_New_List",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Varname": "dpi_list",
+        "NumberOfElements": "Multiple",
+        "VarValues": "first\nsecond\nthird"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "560"
+    },
+    "element0000000006": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000006",
+      "name": "Condition_Debug_Dialog",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "condition",
+      "x": "0",
+      "y": "700"
+    },
+    "element0000000007": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000007",
+      "name": "Action_Tooltip",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "text": "DPI check: tooltip. It is shown at the mouse pointer."
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "840"
+    },
+    "element0000000008": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000008",
+      "name": "DONE",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {},
+      "StandardName": "0",
+      "type": "action",
+      "x": "0",
+      "y": "980"
+    }
+  },
+  "allConnections": {
+    "connection0000000009": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000009",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000010": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000010",
+      "to": "element0000000003",
+      "type": "Connection"
+    },
+    "connection0000000011": {
+      "ConnectionType": "yes",
+      "from": "element0000000003",
+      "ID": "connection0000000011",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000012": {
+      "ConnectionType": "no",
+      "from": "element0000000003",
+      "ID": "connection0000000012",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000013": {
+      "ConnectionType": "normal",
+      "from": "element0000000004",
+      "ID": "connection0000000013",
+      "to": "element0000000005",
+      "type": "Connection"
+    },
+    "connection0000000014": {
+      "ConnectionType": "normal",
+      "from": "element0000000005",
+      "ID": "connection0000000014",
+      "to": "element0000000006",
+      "type": "Connection"
+    },
+    "connection0000000015": {
+      "ConnectionType": "yes",
+      "from": "element0000000006",
+      "ID": "connection0000000015",
+      "to": "element0000000007",
+      "type": "Connection"
+    },
+    "connection0000000016": {
+      "ConnectionType": "no",
+      "from": "element0000000006",
+      "ID": "connection0000000016",
+      "to": "element0000000007",
+      "type": "Connection"
+    },
+    "connection0000000017": {
+      "ConnectionType": "normal",
+      "from": "element0000000007",
+      "ID": "connection0000000017",
+      "to": "element0000000008",
+      "type": "Connection"
+    }
+  }
+}

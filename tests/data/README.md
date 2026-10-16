@@ -10,6 +10,7 @@ Files are compared byte for byte; `.gitattributes` turns line-ending conversion 
 | `variables/` | Synthetic variable files (`.ahfvd`/`.ahfvar`) in the v1 format: objects (a list, a map) and texts (a float text `0.500000`, a text with a leading zero and a non-ASCII character), UTF-8 with BOM like the files of v1 (WI-41) | hand-made, no real data |
 | `flows/s1_acceptance/` | One flow in the v1 format with the test elements (`Action_TestSetVar`, `Action_TestExprParams`, package `Test`): sets a variable of each kind and has expression texts that the loader converts (WI-43); the flow ID `Flow 1000000001` is the folder name of the static variables in `variables/` | hand-made |
 | `skeleton_flow.json` | Minimal flow of the walking skeleton | hand-made |
+| `manual/` | Flows of the manual checks, copied into the data folder by `tools/manual_check.py --flow <name>`: `dpi_dialogs.json` runs the four dialog elements (manual check 3) | hand-made |
 
 ## Rules
 
