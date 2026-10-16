@@ -107,7 +107,7 @@ class FlowDefinition {
 
     ; The text of the flow file: Raw with the format version at the root, the marker "v1Text" at the elements in
     ; Pending and flowSettings.strictTypes (StrictTypes). Raw itself is not changed. The key "enabled" of a trigger is
-    ; not written (E0058, WI-0060): the enabled state of a trigger is in FlowState.json. Json.Stringify sorts the keys;
+    ; not written (E0058, WI-0060): the enabled state of a trigger is in FlowStates/<flowId>.json. Json.Stringify sorts the keys;
     ; the storage role writes the line breaks.
     ToFileText() {
         root := this.Raw.Clone()

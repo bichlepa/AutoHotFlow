@@ -101,7 +101,7 @@ FlowWithoutFollowingTriggerSaysSo() {
     Assert.Equal(rec.IndependentActiveCount(), 1)
 }
 
-; The state is loaded from FlowState.json: the entries of the triggers of the flow, merged with what is set.
+; The state is loaded from the file of the flow (FlowStates/<flowId>.json): its triggers, merged with what is set.
 LoadedStateFromTheFileIsTakenAndMerged() {
     rec := FlowRecord("f", Flow())
     rec.SetTriggerEnabled("t3", true)
@@ -146,22 +146,20 @@ FileTextDropsTheEnabledKeyOfTriggers() {
     Assert.Equal(def.Raw["allElements"]["t4"].Has("enabled"), true, "Raw is not changed")
 }
 
-; --- FlowState.json (the format of the file, PROTOCOL 4.6) -------------------------------------------------------------
+; --- FlowStates/<flowId>.json (the format of one file, PROTOCOL 4.6) ----------------------------------------------------
 
-ParseReadsTheEntriesOfTheFile() {
-    m := FlowStateFile.Parse('{"formatVersion":1,"flows":{"f":["t1","t2"],"g":[]}}')
-    Assert.Equal(m.Count, 2)
-    Assert.Equal(Ids(m["f"]), "t1,t2,")
-    Assert.Equal(m["g"].Length, 0, "a flow with an empty list")
+ParseReadsTheEnabledTriggers() {
+    Assert.Equal(Ids(FlowStateFile.Parse('{"formatVersion":1,"enabled":["t1","t2"]}')), "t1,t2,")
+    Assert.Equal(FlowStateFile.Parse('{"formatVersion":1,"enabled":[]}').Length, 0, "an empty list")
 }
 
-ParseWithoutFlowsIsNothingEnabled() {
-    Assert.Equal(FlowStateFile.Parse('{"formatVersion":1}').Count, 0)
+ParseWithoutEnabledKeyIsNothingEnabled() {
+    Assert.Equal(FlowStateFile.Parse('{"formatVersion":1}').Length, 0)
 }
 
 ParseRefusesEverythingElse() {
-    for text in ['{"formatVersion":2,"flows":{}}', '[1]', '{"flows":{}}', '{"formatVersion":1,"flows":[]}'
-        , '{"formatVersion":1,"flows":{"f":"t1"}}', '{"formatVersion":1,"flows":{"f":[{}]}}', '{broken']
+    for text in ['{"formatVersion":2,"enabled":[]}', '[1]', '{"enabled":["t1"]}', '{"formatVersion":1,"enabled":"t1"}'
+        , '{"formatVersion":1,"enabled":[{}]}', '{broken']
         Assert.Throws(() => FlowStateFile.Parse(text), , "refused: " text)
 }
 
@@ -174,12 +172,12 @@ TestRun.Case("Trigger state: disabling the flow keeps the independent triggers, 
 TestRun.Case("Trigger state: a single trigger switch changes only that trigger", SingleTriggerSwitchChangesOnlyThatTrigger)
 TestRun.Case("Trigger state: an action or an unknown ID is never a trigger", NotATriggerIsNeverEnabled)
 TestRun.Case("Trigger state: a flow without a following trigger has nothing to switch", FlowWithoutFollowingTriggerSaysSo)
-TestRun.Case("Trigger state: the state from FlowState.json is merged into the flow", LoadedStateFromTheFileIsTakenAndMerged)
+TestRun.Case("Trigger state: the state from the flow's file is merged into the flow", LoadedStateFromTheFileIsTakenAndMerged)
 TestRun.Case("Trigger state: followsFlow is read as true or false, missing means true", FollowsFlowReadsTheKey)
 TestRun.Case("Trigger state: the file text has no enabled key at a trigger and keeps followsFlow", FileTextDropsTheEnabledKeyOfTriggers)
 
-TestRun.Case("FlowState.json: the entries of the file are read", ParseReadsTheEntriesOfTheFile)
-TestRun.Case("FlowState.json: without flows nothing is enabled", ParseWithoutFlowsIsNothingEnabled)
-TestRun.Case("FlowState.json: other formats are refused (the engine keeps the file as broken)", ParseRefusesEverythingElse)
+TestRun.Case("FlowStates: the enabled triggers of one file are read", ParseReadsTheEnabledTriggers)
+TestRun.Case("FlowStates: without an enabled key nothing is enabled", ParseWithoutEnabledKeyIsNothingEnabled)
+TestRun.Case("FlowStates: other formats are refused (the engine keeps the file as broken)", ParseRefusesEverythingElse)
 
 TestRun.Finish()

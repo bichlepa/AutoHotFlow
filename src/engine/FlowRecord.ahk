@@ -53,7 +53,7 @@ class FlowRecord {
         return n
     }
 
-    ; IDs of the enabled triggers, in the order of the triggers of the flow (sorted by ID). The file FlowState.json
+    ; IDs of the enabled triggers, in the order of the triggers of the flow (sorted by ID). The file FlowStates/<flowId>.json
     ; keeps exactly these.
     EnabledTriggers() {
         out := []
@@ -93,7 +93,7 @@ class FlowRecord {
         return changed
     }
 
-    ; Takes the enabled triggers of the file FlowState.json (the IDs that are triggers of this flow). Returns the number taken.
+    ; Takes the enabled triggers of the file FlowStates/<flowId>.json (the IDs that are triggers of this flow). Returns the number taken.
     LoadEnabledTriggers(triggerIds) {
         n := 0
         for triggerId in triggerIds {

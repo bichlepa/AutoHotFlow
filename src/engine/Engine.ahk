@@ -29,8 +29,8 @@
 ; peer) the files not yet asked for are not asked, nothing is reported as an error, and the engine waits for
 ; storage again; then it fetches the list again and reads only the files that have no result yet.
 ; Then (WI-0041) it loads the global and static variables through storage (VarLoader, staggered the same way, with
-; the same waiting for storage after an abort); then (WI-0060) the enabled state of the triggers from FlowState.json
-; (FlowStateFile). evt.engine.ready is sent once every file of the list has a result (loaded, or a real read or parse
+; the same waiting for storage after an abort); then (WI-0060, E0063) the enabled state of the triggers, one file per
+; flow (FlowStateFile). evt.engine.ready is sent once every file of the list has a result (loaded, or a real read or parse
 ; error) and the variables and the state are loaded. Changes of the variables are written back delayed by VarWriter
 ; and at shutdown; changes of the trigger state by FlowStateFile.
 ; A list that fails for another reason is retried without limit, with a growing pause.
@@ -184,8 +184,12 @@ class Engine extends Role {
         rec := this.flows.Get(flowId)
         enabled := IsObject(rec) ? rec.IsFlowEnabled() : false
         independent := IsObject(rec) ? rec.IndependentActiveCount() : 0
-        this.Emit("topic:flow:" flowId, "evt.flow.state", Map("flowId", flowId, "enabled", Json.Bool(enabled)
-            , "independentActive", independent, "executing", Json.Bool(this.executor.IsExecuting(flowId))))
+        payload := Map("flowId", flowId, "enabled", Json.Bool(enabled), "independentActive", independent
+            , "executing", Json.Bool(this.executor.IsExecuting(flowId)))
+        stateError := this.flowState.ErrorOf(flowId)
+        if (stateError != "")
+            payload["stateError"] := stateError          ; the state is unknown (E0063): its file cannot be read
+        this.Emit("topic:flow:" flowId, "evt.flow.state", payload)
     }
 
     ; evt.trigger.state for one trigger: its target state and its arming (WI-0060, WI-0062). Called whenever one of them
@@ -425,6 +429,9 @@ class Engine extends Role {
         if (this.args.Has("restarted"))
             this.Emit("topic:engine", "evt.engine.restarted", Map())
         this.Emit("topic:engine", "evt.flow.list.changed", Map("added", added, "removed", [], "changed", []))
+        for rec in this.flows.All()                     ; a flow whose state is unknown says so (E0063)
+            if (this.flowState.ErrorOf(rec.FlowId) != "")
+                this.EmitFlowState(rec.FlowId)
         this.Emit("topic:engine", "evt.engine.ready", Map())
         this._Log("a1", "engine", "ready with " this.flows.Count " flow(s) and " this.varLoader.Count " variable(s)")
         this.arms.EngineReady()         ; the arms of the enabled triggers follow when the trigger host is ready (WI-0062)
@@ -487,6 +494,10 @@ class Engine extends Role {
         rec := this.flows.Require(Engine.Text(msg, "flowId"))
         if (!rec.HasFollowingTrigger())
             return Engine._NoFollowingTrigger(rec.FlowId)
+        return this._SwitchOrRead(msg, rec, () => this._EnableFollowing(rec))
+    }
+
+    _EnableFollowing(rec) {
         this._SwitchTriggers(rec, rec.SetFollowingEnabled(true))
         return Map()
     }
@@ -498,6 +509,10 @@ class Engine extends Role {
         all := Engine._Flag(msg.payload.Get("all", 0))
         if (!all && !rec.HasFollowingTrigger())
             return Engine._NoFollowingTrigger(rec.FlowId)
+        return this._SwitchOrRead(msg, rec, () => this._DisableFollowing(rec, all))
+    }
+
+    _DisableFollowing(rec, all) {
         this._SwitchTriggers(rec, rec.SetFollowingEnabled(false, all))
         return Map("independentActive", rec.IndependentActiveCount())
     }
@@ -508,13 +523,59 @@ class Engine extends Role {
         triggerId := Engine.Text(msg, "elementId")
         if (rec.Def.ElementKind(triggerId) != "trigger")
             throw AhfError("element '" triggerId "' is not a trigger of flow '" rec.FlowId "'", ErrCode.BAD_PAYLOAD)
+        return this._SwitchOrRead(msg, rec, () => this._SwitchOne(rec, triggerId, enabled))
+    }
+
+    _SwitchOne(rec, triggerId, enabled) {
         if (rec.SetTriggerEnabled(triggerId, enabled))
             this._SwitchTriggers(rec, [triggerId])
         return Map()
     }
 
+    ; Applies a switch to a flow (E0063, PROTOCOL 4.2). A flow whose state is known switches at once. A flow whose
+    ; state is unknown reads its file first (the answer comes later, Deferred); force skips the read and writes the
+    ; state of the session. apply() returns the answer Map. A switch that cannot wait answers ok false at once.
+    _SwitchOrRead(msg, rec, apply) {
+        flowId := rec.FlowId
+        if (this.flowState.IsKnown(flowId))
+            return apply()
+        if (!this.flowState.Loaded)
+            return Map("ok", false, "message", "the state of flow '" flowId "' is not loaded yet; try again")
+        if (this.flowState.IsReading(flowId))
+            return Map("ok", false, "message", "the state of flow '" flowId "' is being read; try again")
+        if (Engine._Flag(msg.payload.Get("force", 0))) {
+            this.flowState.Force(flowId)
+            this.EmitFlowState(flowId)                  ; the state is known now (stateError is gone)
+            return apply()
+        }
+        why := this.flowState.Establish(flowId
+            , () => this._ReplySwitch(msg, flowId, apply)
+            , (text) => this._ReplyRefused(msg, flowId, text))
+        if (why != "")
+            return Map("ok", false, "message", "the state of flow '" flowId "' cannot be read (" why "); nothing changed")
+        return Deferred.Marker()
+    }
+
+    _ReplySwitch(request, flowId, apply) {
+        try {
+            this.EmitFlowState(flowId)                  ; the read succeeded: the state is known now
+            this.peer.Reply(request, apply())
+        } catch as e {
+            this._Log("a0", "engine", "answering a switch failed: " Type(e) ": " e.Message)
+        }
+    }
+
+    _ReplyRefused(request, flowId, why) {
+        try {
+            this.peer.Reply(request, Map("ok", false, "message", "the state of flow '" flowId "' cannot be read (" why
+                . "); nothing changed; try again, or force the write"))
+        } catch as e {
+            this._Log("a0", "engine", "answering a switch failed: " Type(e) ": " e.Message)
+        }
+    }
+
     ; Arms or disarms the switched triggers (WI-0062), sends evt.trigger.state for each of them, then evt.flow.state, and
-    ; marks the state for FlowState.json (WI-0060). Nothing is sent when nothing changed.
+    ; marks the state of this flow for its file (WI-0060, E0063). Nothing is sent when nothing changed.
     _SwitchTriggers(rec, changed) {
         if (changed.Length = 0)
             return
@@ -523,7 +584,7 @@ class Engine extends Role {
         for triggerId in changed
             this.EmitTriggerState(rec.FlowId, triggerId)
         this.EmitFlowState(rec.FlowId)
-        this.flowState.Touch()
+        this.flowState.Touch(rec.FlowId)
     }
 
     ; Patch schema (PROTOCOL 4.2). Phase 2 checks the revision and the shape of the operations, then
