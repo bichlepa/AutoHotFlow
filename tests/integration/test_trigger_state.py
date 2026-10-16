@@ -1,8 +1,8 @@
-"""WI-0060: the enabled state of the triggers in real sessions (supervisor, storage, engine; E0056, E0057, E0058).
+"""WI-0060, E0063: the enabled state of the triggers in real sessions (supervisor, storage, engine; E0056, E0057, E0058).
 
 The unit tests (tests/ahk/engine_trigger_state.test.ahk) and the stand-in storage of tests/integration/test_engine.py
-cover the transitions and the protocol. Here the real storage writes FlowState.json, and a second session on the same
-data folder must find the state again. Nothing is armed yet (WI-0062): the state is checked through the engine.
+cover the transitions and the protocol. Here the real storage writes FlowStates/<flowId>.json, and a second session on
+the same data folder must find the state again. Nothing is armed yet (WI-0062): the state is checked through the engine.
 """
 
 import json
@@ -45,13 +45,17 @@ def write_flow(datadir, v1_file=False):
     (datadir / "Flows" / (FLOW + ".json")).write_text(json.dumps(flow, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def state_file(datadir, flow_id=FLOW):
+    return datadir / "FlowStates" / (flow_id + ".json")
+
+
 def enabled_in_snapshot(flows, flow_id):
     snap = flows.request_ok("engine", "cmd.engine.snapshot", {})
     return [f["enabled"] for f in snap["flows"] if f["flowId"] == flow_id][0]
 
 
-def read_state(datadir):
-    path = datadir / "FlowState.json"
+def read_state(datadir, flow_id=FLOW):
+    path = state_file(datadir, flow_id)
     if not path.exists():
         return None
     return json.loads(path.read_text(encoding="utf-8-sig"))
@@ -76,8 +80,9 @@ def test_the_switched_state_survives_a_session_restart(flows):
     flows.enable(FLOW)
     flows.request_ok("engine", "cmd.trigger.enable", {"flowId": FLOW, "elementId": INDEPENDENT})
     # The first write follows the first switch at once; the second switch comes within the interval and is written after it.
-    expected = {"formatVersion": 1, "flows": {FLOW: sorted([TRIGGER, INDEPENDENT])}}
-    assert wait_for(lambda: read_state(flows.datadir) == expected),         "storage did not write the state: %s" % read_state(flows.datadir)
+    expected = {"formatVersion": 1, "enabled": sorted([TRIGGER, INDEPENDENT])}
+    assert wait_for(lambda: read_state(flows.datadir) == expected), \
+        "storage did not write the state: %s" % read_state(flows.datadir)
     flows.stop()                                    # the regular end of the session (cmd.app.exit)
     flows.start()
     assert enabled_in_snapshot(flows, FLOW) is True, "the enabled state was not loaded"
@@ -88,14 +93,33 @@ def test_a_v1_file_loads_disabled_in_a_real_session(flows):
     prepare(flows, v1_file=True)
     flows.start()
     assert enabled_in_snapshot(flows, FLOW) is False
-    assert not (flows.datadir / "FlowState.json").exists(), "nothing was switched, nothing is written"
+    assert not state_file(flows.datadir).exists(), "nothing was switched, nothing is written"
 
 
 def test_a_broken_flow_state_file_is_kept_and_the_session_starts(flows):
     prepare(flows)
-    (flows.datadir / "FlowState.json").write_text("{broken", encoding="utf-8")
+    state_file(flows.datadir).parent.mkdir(exist_ok=True)
+    state_file(flows.datadir).write_text("{broken", encoding="utf-8")
     flows.start()
     assert enabled_in_snapshot(flows, FLOW) is False
     # Storage renames the file on the request of the engine; the engine does not wait for that answer.
-    assert wait_for_file(flows.datadir / "FlowState.json.broken"), "the broken file was not kept"
-    assert (flows.datadir / "FlowState.json.broken").read_text(encoding="utf-8") == "{broken"
+    kept = state_file(flows.datadir).with_name(FLOW + ".json.broken")
+    assert wait_for_file(kept), "the broken file was not kept"
+    assert kept.read_text(encoding="utf-8") == "{broken"
+
+
+def test_an_unreadable_state_file_refuses_a_switch_until_it_can_be_read(flows):
+    prepare(flows)
+    state_file(flows.datadir).parent.mkdir(exist_ok=True)
+    state_file(flows.datadir).mkdir()              # a folder where the file is: it exists and cannot be read
+    flows.start()
+    assert enabled_in_snapshot(flows, FLOW) is False
+    answer = flows.request("engine", "cmd.flow.enable", {"flowId": FLOW})
+    assert answer["ok"] is False and "cannot be read" in answer["message"], answer
+    assert enabled_in_snapshot(flows, FLOW) is False, "a refused switch changes nothing"
+    # The file can be read again: the next switch reads it and applies to its state.
+    state_file(flows.datadir).rmdir()
+    state_file(flows.datadir).write_text(json.dumps({"formatVersion": 1, "enabled": [INDEPENDENT]}), encoding="utf-8")
+    flows.request_ok("engine", "cmd.flow.enable", {"flowId": FLOW})
+    expected = {"formatVersion": 1, "enabled": sorted([TRIGGER, INDEPENDENT])}
+    assert wait_for(lambda: read_state(flows.datadir) == expected), read_state(flows.datadir)

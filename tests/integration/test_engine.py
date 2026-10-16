@@ -35,7 +35,8 @@ class StorageStub:
         self._thread = threading.Thread(target=self._serve, name="storage-stub", daemon=True)
         self.list_calls = 0
         self.read_calls = []
-        self.state_writes = []  # texts of cmd.storage.flowstate.write, in arrival order (WI-0060)
+        self.state_writes = []  # (flowId, text) of cmd.storage.flowstate.write, in arrival order (WI-0060, E0063)
+        self.unreadable = set() # flow IDs whose state file answers cmd.storage.flowstate.read with a read error
         self.logs = []          # payloads of evt.log.append (noReply), in arrival order
         self.var_writes = []    # (type, payload) of cmd.storage.var.set / .delete, in arrival order (WI-0041)
 
@@ -57,6 +58,10 @@ class StorageStub:
                     if not self._stop:
                         raise
 
+    def state_path(self, flow_id):
+        """FlowStates/<flowId>.json of the data folder (WI-0060, E0063)."""
+        return self.datadir / "FlowStates" / (flow_id + ".json")
+
     def _handle(self, msg):
         type_ = msg.get("type")
         payload = msg.get("payload", {})
@@ -75,20 +80,26 @@ class StorageStub:
             self.var_writes.append((type_, payload))
             self.client.reply(msg, {"ok": True})
         elif type_ == "cmd.storage.flowstate.read":
-            # WI-0060: FlowState.json in the data folder, as storage keeps it.
-            target = self.datadir / "FlowState.json"
-            if target.is_file():
+            # WI-0060, E0063: FlowStates/<flowId>.json in the data folder, as storage keeps it. A flow in `unreadable`
+            # stands for a file that exists but cannot be read (a read error that is not "missing").
+            flow_id = payload.get("flowId", "")
+            target = self.state_path(flow_id)
+            if flow_id in self.unreadable:
+                self.client.reply(msg, {"ok": False, "error": {"code": "internal", "message": "cannot read " + target.name}})
+            elif target.is_file():
                 self.client.reply(msg, {"ok": True, "exists": True, "text": target.read_text(encoding="utf-8")})
             else:
                 self.client.reply(msg, {"ok": True, "exists": False})
         elif type_ == "cmd.storage.flowstate.write":
-            (self.datadir / "FlowState.json").write_text(payload.get("text", ""), encoding="utf-8")
-            self.state_writes.append(payload.get("text", ""))     # after the file: tests wait for the list
+            flow_id = payload.get("flowId", "")
+            self.state_path(flow_id).parent.mkdir(exist_ok=True)
+            self.state_path(flow_id).write_text(payload.get("text", ""), encoding="utf-8")
+            self.state_writes.append((flow_id, payload.get("text", "")))     # after the file: tests wait for the list
             self.client.reply(msg, {"ok": True})
         elif type_ == "cmd.storage.flowstate.keepBroken":
-            target = self.datadir / "FlowState.json"
+            target = self.state_path(payload.get("flowId", ""))
             if target.is_file():
-                target.replace(self.datadir / "FlowState.json.broken")
+                target.replace(target.with_name(target.name + ".broken"))
             self.client.reply(msg, {"ok": True})
         elif type_ == "cmd.storage.flow.read":
             path = payload.get("path", "")
@@ -935,9 +946,9 @@ def test_the_switched_state_survives_a_restart_of_the_engine(procs, runs, pipe, 
         ask(obs, "cmd.trigger.enable", {"flowId": "sw", "elementId": INDEPENDENT})
     # The engine ends at once after the switches: the state goes out before sys.bye (shutdown flush).
     hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 2000})
-    assert wait_for(lambda: len(storage.state_writes) >= 1, timeout=5.0), "no FlowState.json written"
-    assert json.loads((flowdir / "FlowState.json").read_text(encoding="utf-8")) == {
-        "formatVersion": 1, "flows": {"sw": sorted([TRIGGER, INDEPENDENT])}}
+    assert wait_for(lambda: len(storage.state_writes) >= 1, timeout=5.0), "no state file written"
+    assert json.loads(state_file(flowdir, "sw").read_text(encoding="utf-8")) == {
+        "formatVersion": 1, "enabled": sorted([TRIGGER, INDEPENDENT])}
     with observer(pipe, "engine") as obs:
         run = start_engine(procs, flowdir, runs, pipe, session_id)
         wait_ready(obs)
@@ -960,7 +971,7 @@ def test_switches_within_a_second_are_written_once_or_twice_not_per_switch(procs
         assert wait_for(lambda: len(storage.state_writes) >= 1, timeout=3.0)
         time.sleep(scaled(1.5))
         assert len(storage.state_writes) <= 3, len(storage.state_writes)
-        assert json.loads(storage.state_writes[-1])["flows"]["sw"] == [TRIGGER]
+        assert json.loads(storage.state_writes[-1][1])["enabled"] == [TRIGGER]
         hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
 
 
@@ -971,19 +982,89 @@ def test_a_v1_file_with_enabled_keys_loads_disabled(procs, runs, pipe, session_i
         wait_ready(obs)
         assert flow_enabled(ask(obs, "cmd.engine.snapshot"), "v1") is False
         assert ask(obs, "cmd.flow.disable", {"flowId": "v1", "all": True})["independentActive"] == 0
-        assert not (flowdir / "FlowState.json").exists(), "nothing was switched, so nothing is written"
+        assert not state_file(flowdir, "v1").exists(), "nothing was switched, so nothing is written"
         hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
 
 
 def test_a_broken_flow_state_is_kept_as_broken_and_does_not_stop_the_start(procs, runs, pipe, session_id, hub,
                                                                            flowdir, storage):
     make_switch_flow(flowdir, "sw")
-    (flowdir / "FlowState.json").write_text("{not json", encoding="utf-8")
+    state_file(flowdir, "sw").parent.mkdir(exist_ok=True)
+    state_file(flowdir, "sw").write_text("{not json", encoding="utf-8")
     with observer(pipe, "engine") as obs:
         start_engine(procs, flowdir, runs, pipe, session_id)
         wait_ready(obs)
         assert flow_enabled(ask(obs, "cmd.engine.snapshot"), "sw") is False
-        assert wait_for(lambda: (flowdir / "FlowState.json.broken").exists()), "the broken file was not kept"
-        assert (flowdir / "FlowState.json.broken").read_text(encoding="utf-8") == "{not json"
-        assert wait_for(lambda: any("FlowState.json is broken" in (line.get("text") or "") for line in storage.logs))
+        broken = state_file(flowdir, "sw").with_name("sw.json.broken")
+        assert wait_for(lambda: broken.exists()), "the broken file was not kept"
+        assert broken.read_text(encoding="utf-8") == "{not json"
+        assert wait_for(lambda: any("FlowStates/sw.json is broken" in (line.get("text") or "") for line in storage.logs))
+        hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
+
+
+def state_file(flowdir, flow_id):
+    """FlowStates/<flowId>.json of the data folder (E0063)."""
+    return flowdir / "FlowStates" / (flow_id + ".json")
+
+
+def write_state(flowdir, flow_id, enabled):
+    state_file(flowdir, flow_id).parent.mkdir(exist_ok=True)
+    state_file(flowdir, flow_id).write_text(json.dumps({"formatVersion": 1, "enabled": enabled}), encoding="utf-8")
+
+
+def test_an_unreadable_flow_state_affects_that_flow_only(procs, runs, pipe, session_id, hub, flowdir, storage):
+    make_switch_flow(flowdir, "sw")
+    make_switch_flow(flowdir, "ok")
+    write_state(flowdir, "ok", [TRIGGER])
+    storage.unreadable.add("sw")
+    with subscribe_flow(pipe, "sw") as obs:
+        start_engine(procs, flowdir, runs, pipe, session_id)
+        # The unknown state is announced before evt.engine.ready (evt.flow.state with stateError): keep the events.
+        seen = []
+        for msg in obs.events(timeout=READY_TIMEOUT_S):
+            seen.append(msg)
+            if msg["type"] == "evt.engine.ready":
+                break
+        assert any("stateError" in m["payload"] for m in seen if m["type"] == "evt.flow.state"), seen
+        snap = ask(obs, "cmd.engine.snapshot")
+        assert flow_enabled(snap, "ok") is True, "a readable flow keeps its state"
+        assert flow_enabled(snap, "sw") is False
+        # A switch of the unknown flow is refused, and nothing changes.
+        answer = obs.request("engine", "cmd.flow.enable", {"flowId": "sw"}, timeout=scaled(10))["payload"]
+        assert answer["ok"] is False and "cannot be read" in answer["message"], answer
+        assert flow_enabled(ask(obs, "cmd.engine.snapshot"), "sw") is False
+        assert all(flow_id != "sw" for flow_id, _ in storage.state_writes), "nothing is written for an unknown flow"
+        hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
+
+
+def test_a_switch_of_an_unknown_flow_reads_the_file_again_and_applies_to_its_state(procs, runs, pipe, session_id,
+                                                                                    hub, flowdir, storage):
+    make_switch_flow(flowdir, "sw")
+    write_state(flowdir, "sw", [INDEPENDENT])
+    storage.unreadable.add("sw")
+    with observer(pipe, "engine") as obs:
+        start_engine(procs, flowdir, runs, pipe, session_id)
+        wait_ready(obs)
+        assert obs.request("engine", "cmd.flow.enable", {"flowId": "sw"})["payload"]["ok"] is False
+        storage.unreadable.discard("sw")                 # the file can be read again
+        ask(obs, "cmd.flow.enable", {"flowId": "sw"})
+        assert flow_enabled(ask(obs, "cmd.engine.snapshot"), "sw") is True
+        assert wait_for(lambda: any(flow_id == "sw" for flow_id, _ in storage.state_writes), timeout=5.0)
+        written = json.loads([text for flow_id, text in storage.state_writes if flow_id == "sw"][-1])
+        assert sorted(written["enabled"]) == sorted([TRIGGER, INDEPENDENT]), "the file's entry is kept and merged"
+        hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
+
+
+def test_force_writes_the_session_state_over_an_unreadable_file(procs, runs, pipe, session_id, hub, flowdir, storage):
+    make_switch_flow(flowdir, "sw")
+    storage.unreadable.add("sw")
+    with observer(pipe, "engine") as obs:
+        start_engine(procs, flowdir, runs, pipe, session_id)
+        wait_ready(obs)
+        answer = obs.request("engine", "cmd.flow.enable", {"flowId": "sw", "force": True})["payload"]
+        assert answer["ok"] is True, answer
+        assert flow_enabled(ask(obs, "cmd.engine.snapshot"), "sw") is True
+        assert wait_for(lambda: any(flow_id == "sw" for flow_id, _ in storage.state_writes), timeout=5.0)
+        written = json.loads([text for flow_id, text in storage.state_writes if flow_id == "sw"][-1])
+        assert written["enabled"] == [TRIGGER]
         hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})

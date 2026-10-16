@@ -291,34 +291,46 @@ def test_missing_flow_read_reports_storage_error_to_the_engine_topic(storage, pi
         engine.close()
 
 
-# --- FlowState.json (WI-0060) -----------------------------------------------------------------------
+# --- FlowStates/<flowId>.json (WI-0060, E0063) ----------------------------------------------------
 
 def test_flow_state_is_missing_until_written_then_reads_back_unchanged(storage, flowdir):
     _, _, client = storage
-    assert not ask_ok(client, "cmd.storage.flowstate.read")["exists"]
-    state = {"formatVersion": 1, "flows": {"skeleton": ["element0000000001"]}}
-    ask_ok(client, "cmd.storage.flowstate.write", {"text": json.dumps(state, indent=2)})
-    answer = ask_ok(client, "cmd.storage.flowstate.read")
+    assert not ask_ok(client, "cmd.storage.flowstate.read", {"flowId": "skeleton"})["exists"]
+    state = {"formatVersion": 1, "enabled": ["element0000000001"]}
+    ask_ok(client, "cmd.storage.flowstate.write", {"flowId": "skeleton", "text": json.dumps(state, indent=2)})
+    answer = ask_ok(client, "cmd.storage.flowstate.read", {"flowId": "skeleton"})
     assert answer["exists"] is True and same(json.loads(answer["text"]), state)
-    assert (flowdir / "FlowState.json").read_bytes().count(b"\r\n") > 0      # CRLF as in the other files
+    assert (flowdir / "FlowStates" / "skeleton.json").read_bytes().count(b"\r\n") > 0      # CRLF as in the other files
+
+
+def test_each_flow_has_its_own_state_file(storage, flowdir):
+    _, _, client = storage
+    ask_ok(client, "cmd.storage.flowstate.write", {"flowId": "one", "text": '{"formatVersion":1,"enabled":[]}'})
+    ask_ok(client, "cmd.storage.flowstate.write", {"flowId": "two", "text": '{"formatVersion":1,"enabled":["a"]}'})
+    assert '"a"' not in ask_ok(client, "cmd.storage.flowstate.read", {"flowId": "one"})["text"]
+    assert '"a"' in ask_ok(client, "cmd.storage.flowstate.read", {"flowId": "two"})["text"]
+    assert sorted(p.name for p in (flowdir / "FlowStates").iterdir()) == ["one.json", "two.json"]
 
 
 def test_broken_flow_state_is_kept_as_broken_file_and_a_missing_one_is_no_error(storage, flowdir):
     _, _, client = storage
-    target = flowdir / "FlowState.json"
+    target = flowdir / "FlowStates" / "skeleton.json"
+    target.parent.mkdir(exist_ok=True)
     target.write_text("{not json", encoding="utf-8")
-    ask_ok(client, "cmd.storage.flowstate.keepBroken")
+    ask_ok(client, "cmd.storage.flowstate.keepBroken", {"flowId": "skeleton"})
     assert not target.exists()
-    assert (flowdir / "FlowState.json.broken").read_text(encoding="utf-8") == "{not json"
-    ask_ok(client, "cmd.storage.flowstate.keepBroken")          # nothing to keep: still ok
-    assert not ask_ok(client, "cmd.storage.flowstate.read")["exists"]
+    assert (flowdir / "FlowStates" / "skeleton.json.broken").read_text(encoding="utf-8") == "{not json"
+    ask_ok(client, "cmd.storage.flowstate.keepBroken", {"flowId": "skeleton"})     # nothing to keep: still ok
+    assert not ask_ok(client, "cmd.storage.flowstate.read", {"flowId": "skeleton"})["exists"]
 
 
-def test_flow_state_write_rejects_a_value_that_is_not_text(storage, flowdir):
+def test_flow_state_write_rejects_a_value_that_is_not_text_or_a_bad_flow_id(storage, flowdir):
     _, _, client = storage
-    answer = ask(client, "cmd.storage.flowstate.write", {"text": {"formatVersion": 1}})
+    answer = ask(client, "cmd.storage.flowstate.write", {"flowId": "skeleton", "text": {"formatVersion": 1}})
     assert not answer["ok"] and answer["error"]["code"] == "bad_payload"
-    assert not (flowdir / "FlowState.json").exists()
+    answer = ask(client, "cmd.storage.flowstate.write", {"flowId": "..\\evil", "text": "{}"})
+    assert not answer["ok"] and answer["error"]["code"] == "bad_payload"
+    assert not (flowdir / "FlowStates" / "skeleton.json").exists()
 
 
 # --- variables --------------------------------------------------------------------------------------
@@ -677,13 +689,15 @@ def _dead_pid():
 
 def test_temp_files_of_dead_processes_are_removed_at_start_and_those_of_live_ones_stay(procs, flowdir, runs, pipe,
                                                                                          session_id, hub):
-    """WI-0025: *.ahf-<pid>.tmp (left after a hard stop) in Flows/ and Variables/ (recursive) go when the
+    """WI-0025: *.ahf-<pid>.tmp (left after a hard stop) in Flows/, Variables/ and FlowStates/ (recursive) go when the
     process does not run any more. One of a running process (this test) stays."""
     (flowdir / "Variables" / "Flow 1").mkdir(parents=True)
+    (flowdir / "FlowStates").mkdir()                      # WI-0068: the state files are cleaned up too (F-0109)
     dead = _dead_pid()
     gone = [flowdir / "Flows" / ("a.json.ahf-%d.tmp" % dead),
             flowdir / "Variables" / ("global.ahfvd.ahf-%d.tmp" % dead),
-            flowdir / "Variables" / "Flow 1" / ("v.ahfvar.ahf-%d.tmp" % dead)]
+            flowdir / "Variables" / "Flow 1" / ("v.ahfvar.ahf-%d.tmp" % dead),
+            flowdir / "FlowStates" / ("sw.json.ahf-%d.tmp" % dead)]
     stays = [flowdir / "Flows" / ("b.json.ahf-%d.tmp" % os.getpid()), flowdir / "Flows" / "keep.json"]
     unrelated = flowdir / "Flows" / "note.ahf-x.tmp"
     for f in gone + stays + [unrelated]:

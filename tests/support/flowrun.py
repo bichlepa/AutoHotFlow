@@ -534,6 +534,10 @@ class FlowRunner:
         assert answer["payload"].get("ok"), "%s failed: %s" % (type_, answer["payload"])
         return answer["payload"]
 
+    def request(self, to, type_, payload):
+        """Like request_ok, but returns the payload of any answer (a refusal too)."""
+        return self._obs.request(to, type_, payload, timeout=scaled(10.0))["payload"]
+
 
 @pytest.fixture
 def flows(procs, datadir, session_id):
