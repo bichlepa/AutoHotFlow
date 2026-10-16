@@ -4,12 +4,11 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-None open. Tooltip and `A_UserAction` were decided by the owner (2026-10-16), see M-0065 and M-0067.
+- **F-0012: may it close without a test for `_ElementStarted` and `_ElementStopped`?** Both count the running elements of the executor. They are guarded by `Critical` (commit `ad6ac7d`, verified by reading only). The interruption cannot be forced in a test, and a spy on the counter would be the same pattern as the other fixes. Recommendation: accept them as guarded, and close F-0012 after one stress run of the engine (not yet done). Please answer yes or no.
 
 ## Manual checks
 
-- **DPI check of the dialog windows (REQ-USE-090): no start path yet.** The guide is in `doc/MANUAL-CHECKS.md` section 3 (16 steps, scales 100, 125 and 150 %). It cannot be run, because no flow in the test data shows a dialog element and no start task exists for one. Recommendation: a small manual-check flow with Message_Box, Confirmation_Dialog, the debug dialog and the tooltip, started by a `Start:` task through `tools/manual_check.py`. Please confirm, then it is a small work item.
-- **Scope of the DPI section (to confirm):** the section says that the dialog-box rule (window class `#32770`) does not cover these GUI windows. Please confirm that wording.
+- **DPI check of the dialog windows (REQ-USE-090).** Confirmed by the owner: a manual-check flow with its own start task. An implementer is building it now (flow, `manual_check.py` option, task "Start: manual check 3"). Then the owner runs the guide in `doc/MANUAL-CHECKS.md` section 3 at 100, 125 and 150 %.
 
 ## To know
 
