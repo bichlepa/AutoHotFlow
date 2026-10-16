@@ -5,9 +5,19 @@
 ; The files that the classes include come first, outside the class body; inside it AutoHotkey skips them.
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
+#Include lib\DialogOps.ahk
+#Include lib\DebugOps.ahk
 
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Default {
+    #Include Actions\Action_Message_Box.ahk
+    #Include Actions\Action_Tooltip.ahk
+    #Include Conditions\Condition_Confirmation_Dialog.ahk
+    #Include Conditions\Condition_Debug_Dialog.ahk
 }
 
 ElementRegistry.RegisterPackage("Default", "1.2.1")
+ElementRegistry.Register(Default.Action_Message_Box)
+ElementRegistry.Register(Default.Action_Tooltip)
+ElementRegistry.Register(Default.Condition_Confirmation_Dialog)
+ElementRegistry.Register(Default.Condition_Debug_Dialog)

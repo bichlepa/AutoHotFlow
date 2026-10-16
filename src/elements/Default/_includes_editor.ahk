@@ -6,6 +6,8 @@
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
 #Include lib\ListOps.ahk
+#Include lib\DialogOps.ahk
+#Include lib\DebugOps.ahk
 #Include lib\LoopOps.ahk
 
 ; arch-ok: one-class the generated package class is named after the package, not after this file
@@ -16,13 +18,17 @@ class Default {
     #Include Actions\Action_Execute_Flow.ahk
     #Include Actions\Action_Get_index_of_element_in_list.ahk
     #Include Actions\Action_Get_List_Info.ahk
+    #Include Actions\Action_Message_Box.ahk
     #Include Actions\Action_New_List.ahk
     #Include Actions\Action_New_variable.ahk
     #Include Actions\Action_Shuffle_list.ahk
     #Include Actions\Action_Sleep.ahk
     #Include Actions\Action_Stop_Flow.ahk
+    #Include Actions\Action_Tooltip.ahk
     #Include Actions\Action_Trace_Point.ahk
     #Include Actions\Action_Trace_Point_Check.ahk
+    #Include Conditions\Condition_Confirmation_Dialog.ahk
+    #Include Conditions\Condition_Debug_Dialog.ahk
     #Include Conditions\Condition_Do_nothing.ahk
     #Include Conditions\Condition_Expression.ahk
     #Include Conditions\Condition_Flow_Running.ahk
@@ -44,13 +50,17 @@ ElementRegistry.Register(Default.Action_Do_nothing)
 ElementRegistry.Register(Default.Action_Execute_Flow)
 ElementRegistry.Register(Default.Action_Get_index_of_element_in_list)
 ElementRegistry.Register(Default.Action_Get_List_Info)
+ElementRegistry.Register(Default.Action_Message_Box)
 ElementRegistry.Register(Default.Action_New_List)
 ElementRegistry.Register(Default.Action_New_variable)
 ElementRegistry.Register(Default.Action_Shuffle_list)
 ElementRegistry.Register(Default.Action_Sleep)
 ElementRegistry.Register(Default.Action_Stop_Flow)
+ElementRegistry.Register(Default.Action_Tooltip)
 ElementRegistry.Register(Default.Action_Trace_Point)
 ElementRegistry.Register(Default.Action_Trace_Point_Check)
+ElementRegistry.Register(Default.Condition_Confirmation_Dialog)
+ElementRegistry.Register(Default.Condition_Debug_Dialog)
 ElementRegistry.Register(Default.Condition_Do_nothing)
 ElementRegistry.Register(Default.Condition_Expression)
 ElementRegistry.Register(Default.Condition_Flow_Running)

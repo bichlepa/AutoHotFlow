@@ -19,6 +19,8 @@
 ;                    "Timeout" after that time as the real one does; without it the call waits for ever, in slices of
 ;                    50 ms, so a cancel of the job still reaches the element.
 ;     "kind"         optional, the function the entry is meant for; another one is an error (a wrong dialog was requested).
+;     Window (Dialogs.Window) and DebugWindow (Dialogs.DebugWindow, WI-0056) take the same entries: the answer is a button
+;                   id, "close" or "timeout"; a DebugWindow entry may carry "actions" (set, delete, read, rows) run on the view first.
 ;   requests.jsonl one JSON object per line and per request: index, kind, args (text, title, options, ...), scripted
 ;                  (true when it took an answer entry), pid, role. A ToolTip is logged and takes no entry.
 ; Registration is not tied to --test-roles: the flow runner of the tests starts its session without it.
@@ -72,7 +74,8 @@ class TestDialogProvider {
     Window(spec) {
         timeoutMs := spec.Get("timeoutMs", 0)
         args := Map("title", spec.Get("title", ""), "text", spec.Get("text", ""), "buttons", spec.Get("buttons", []),
-            "timeoutMs", timeoutMs, "defaultId", spec.Get("defaultId", ""))
+            "width", spec.Get("width", 0), "height", spec.Get("height", 0), "timeoutMs", timeoutMs
+            , "defaultId", spec.Get("defaultId", ""))
         return this._Dialog("Window", args, "", timeoutMs)
     }
 
@@ -99,6 +102,11 @@ class TestDialogProvider {
         }
         args := Map("rows", rows, "readOnly", view.ReadOnly ? 1 : 0, "results", this._RunActions(entry.Get("actions", []), view))
         this._Log("Debug", args, true, "")
+        if (entry.Get("noAnswer", 0)) {
+            loop {
+                Sleep(50)           ; nobody answers: the window stays open until the flow is stopped
+            }
+        }
         return entry.Has("answer") ? entry["answer"] : "close"
     }
 
