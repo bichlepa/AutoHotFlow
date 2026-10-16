@@ -114,6 +114,7 @@ def fresh_probe(datadir, names):
 
 # --- the round trip of v1 files -----------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_v1_variable_files_are_loaded_changed_written_and_loaded_again(chains, datadir):
     shutil.copytree(DATA_VARS, datadir / "Variables")
     names = ["global_synthetic_list", "global_synthetic_text", "static_synthetic_map", "static_synthetic_text"]
@@ -191,6 +192,7 @@ def test_a_change_is_written_after_the_delay_and_survives_a_killed_engine(chains
     assert probed(datadir, "global_kept") == ("before the kill", "String")
 
 
+@pytest.mark.slow
 def test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_kill(chains, datadir):
     slow = [*OPTS, "--var-write-delay-ms=30000"]
     write_flow(datadir, "setter", "Action_TestSetVar", {"Steps": steps(
@@ -219,6 +221,7 @@ def test_a_change_younger_than_the_delay_is_written_at_shutdown_and_lost_with_a_
 
 # --- a frozen storage -------------------------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_frozen_storage_does_not_block_the_engine_and_the_write_happens_after_thawing(chains, datadir):
     write_flow(datadir, "setter", "Action_TestSetVar", {"Steps": steps(
         {"op": "set", "name": "global_frozen", "value": "after the thaw"})})

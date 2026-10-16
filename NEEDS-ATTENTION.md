@@ -5,7 +5,6 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 ## Decisions
 
 - **Core set of S0002 (F-0107).** The README names 29 elements, the table lists 27. Is `Action_Sleep` part of the core set (it is already in the element files)? Please decide which number is right.
-- **Fast tier budget (F-0108).** The fast tier takes about 91 s in parallel, the budget is about 45 s. Proposal: run the AHK cases of `test_ahk_runner` as one process per file, and move `test_core_e_dialogs` and the variable persistence fault test to the slow tier. Please approve, or name another split.
 - **S0002 is not fully accepted yet.** WI-0058 is partly done: the retrospective (task 4) and the review of the documents besides ELEMENT-API section 8 (task 3) are missing. These go in after your two decisions above.
 
 ## Manual checks

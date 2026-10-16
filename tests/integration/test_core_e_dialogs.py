@@ -48,6 +48,7 @@ def test_ok_button_ends_normal_and_the_window_has_the_text_of_the_element(flows)
     assert request["role"] == "worker"
 
 
+@pytest.mark.slow
 def test_timeout_ends_with_the_result_on_timeout(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script(no_answer(), no_answer())
@@ -61,6 +62,7 @@ def test_timeout_ends_with_the_result_on_timeout(flows):
     assert exception.exceptions and "Timeout reached" in exception.exceptions[0], exception.steps
 
 
+@pytest.mark.slow
 def test_timeout_in_minutes_is_converted_to_milliseconds(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script(answer("ok"))
@@ -83,6 +85,7 @@ def test_cancel_button_has_its_own_result(flows):
     assert exception.exceptions and "User cancelled the dialog" in exception.exceptions[0], exception.steps
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("ifclose, expected", [("Normal", "normal"), ("Exception", "exception")])
 def test_closed_window_has_its_own_result(flows, ifclose, expected):
     dialogs = DialogScript(flows.datadir)
@@ -105,6 +108,7 @@ def confirmation_flow(name, **pars):
     return fb
 
 
+@pytest.mark.slow
 def test_yes_and_no_buttons_are_the_outputs(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script(answer("yes"), answer("no"))
@@ -117,6 +121,7 @@ def test_yes_and_no_buttons_are_the_outputs(flows):
     assert request["args"]["defaultId"] == "no", "the default button of v1 is No"
 
 
+@pytest.mark.slow
 def test_default_button_and_button_labels_are_passed_on(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script(answer("no"))
@@ -126,6 +131,7 @@ def test_default_button_and_button_labels_are_passed_on(flows):
     assert args["defaultId"] == "yes"
 
 
+@pytest.mark.slow
 def test_cancel_and_close_use_result_if_dismissed(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script(answer("cancel"), answer("close"), answer("cancel"))
@@ -138,6 +144,7 @@ def test_cancel_and_close_use_result_if_dismissed(flows):
     assert runs[2].exceptions and "User cancelled the dialog" in runs[2].exceptions[0]
 
 
+@pytest.mark.slow
 def test_timeout_uses_result_on_timeout(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script(no_answer(), no_answer(), no_answer())
@@ -176,6 +183,7 @@ def debug_entry(actions=(), answer_value="yes"):
     return {"answer": answer_value, "actions": list(actions)}
 
 
+@pytest.mark.slow
 def test_every_scope_the_branch_can_see_is_listed(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script(debug_entry([{"op": "rows"}]))
@@ -188,6 +196,7 @@ def test_every_scope_the_branch_can_see_is_listed(flows):
     assert {("Foo", "instance"), ("static_S", "static"), ("global_G", "global")} <= seen, rows
 
 
+@pytest.mark.slow
 def test_the_loop_variables_are_listed_inside_a_loop(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script(debug_entry())
@@ -204,6 +213,7 @@ def test_the_loop_variables_are_listed_inside_a_loop(flows):
     assert {"name": "A_Index", "scope": "loop"} in rows, rows
 
 
+@pytest.mark.slow
 def test_a_changed_value_and_type_and_a_deleted_variable(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script(debug_entry([
@@ -220,6 +230,7 @@ def test_a_changed_value_and_type_and_a_deleted_variable(flows):
     assert run.seen["Bar"].type == "<missing>"
 
 
+@pytest.mark.slow
 def test_a_text_that_is_no_object_stays_out_of_the_variable(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script(debug_entry([
@@ -235,6 +246,7 @@ def test_a_text_that_is_no_object_stays_out_of_the_variable(flows):
     assert run.seen["Foo"].text == "plain" and run.seen["Foo"].type == "String"
 
 
+@pytest.mark.slow
 def test_a_change_of_a_global_variable_is_seen_by_another_flow_a_static_one_by_the_next_instance(flows):
     """A static variable belongs to its flow (it is kept between the instances of that flow); a global one is seen by
     every flow. The setup of the writer keeps existing variables (onlyIfNotExist), so the second instance does not
@@ -265,6 +277,7 @@ def test_a_change_of_a_global_variable_is_seen_by_another_flow_a_static_one_by_t
     assert second.probe("static_S").text == "static changed", "the next instance of the flow sees it"
 
 
+@pytest.mark.slow
 def test_closing_the_debug_window_ends_the_element_with_exception(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script({"answer": "close"})
@@ -282,6 +295,7 @@ def test_read_shows_the_value_of_a_variable(flows):
     assert dialogs.requests()[0]["args"]["results"] == [{"op": "read", "name": "Foo", "type": "normal", "text": "shown"}]
 
 
+@pytest.mark.slow
 def test_other_branches_go_on_while_the_debug_window_is_open(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script({"noAnswer": True})
@@ -301,6 +315,7 @@ def test_other_branches_go_on_while_the_debug_window_is_open(flows):
 
 
 # --- Tooltip -------------------------------------------------------------------------------------------------------------
+@pytest.mark.slow
 def test_tooltip_finishes_at_once_and_is_removed_by_a_timer(flows):
     dialogs = DialogScript(flows.datadir)
     fb = FlowBuilder("tooltip")
@@ -318,6 +333,7 @@ def test_tooltip_finishes_at_once_and_is_removed_by_a_timer(flows):
 
 
 # --- two instances, a stop ------------------------------------------------------------------------------------------------
+@pytest.mark.slow
 def test_two_dialogs_of_two_instances_are_open_at_the_same_time(flows):
     dialogs = DialogScript(flows.datadir)
     dialogs.script(answer("ok", delay_ms=800), answer("ok"))
