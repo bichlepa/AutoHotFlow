@@ -8,12 +8,7 @@ Other decisions of 2026-10-15 are in `doc/DECISIONS.md` (E0046 to E0051).
 
 ## Decisions
 
-- **Test admission and run history (WI-0059), integrated as 9cefa8c to b53151a, verified on b53151a.** Four questions for you:
-  1. Default `AHF_MAX_WORKERS` = cores − 2: the fast tier gets 6 workers instead of 8 even on an idle machine. Keep it?
-  2. `-m "not stress"` runs exclusive and serial (the old behaviour, kept). Intended?
-  3. Every test process runs in a Windows job object, for an exact own-CPU measurement (fallback: psutil walk). Accepted?
-  4. Should the tooling tests (`test_admission.py`, `test_load_history.py`, `test_history_tools.py`) go into `FOUNDATION_FILES`? And should `recheck` test the run's commit in a worktree, as `run_suite` does, instead of the current checkout?
-  The synthetic-load test (`test_external_load_shows_in_the_figures_of_the_test`) is slow-marked and still has to run once on an idle machine.
+- **Test admission and run history (WI-0059), done.** Your decisions are implemented (`1120c28`, `ce1024f` and the commits before them): `AHF_MAX_WORKERS` stays cores − 2 (fast tier on an idle machine: 44.7 s with 6 workers, 41.2 s with 8, before the change; 48.2 s and 41.0 s after); `-m "not stress"` is not exclusive any more; the job object only counts, with a psutil fallback recorded as `ownTree`; the tooling tests are split; recheck runs at the commit of the run. The synthetic-load test ran green on the idle machine (run 20261016-083827-7ec528a4). **Note:** this follow-up was integrated without a verifier, because verifiers are paused; the implementer ran the fast tier and the foundation tier itself (foundation run 20261016-084047-7ec528a4, 460 passed).
 - **F-0090 may be back.** The persistence test failed twice (`evt.engine.ready #1 missing`) under high external load, in runs on an older base. Not yet confirmed on the final tip; see `work_items/phase3/STATUS.md`.
 
 ## To know
