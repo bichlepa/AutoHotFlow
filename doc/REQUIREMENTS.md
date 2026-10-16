@@ -1242,7 +1242,7 @@ Fires when AutoHotFlow starts; it can tell a start with Windows (REQ-SET-030) fr
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003, S0008
-- **Evidence:** `tests/ahk/element_hotkey.test.ahk` (WI-0064: the hotkey text of every option, the window condition of each UseWindow value, two triggers on one hotkey share it), `tests/ahk/element_window_ident.test.ahk` (the window identification). The input tests with real keys are written but not green yet (WI-0064, see the report)
+- **Evidence:** `tests/ahk/element_hotkey.test.ahk` (WI-0064: the hotkey text of every option, the window condition of each UseWindow value, two triggers on one hotkey share it), `tests/ahk/element_window_ident.test.ahk` (the window identification). The end-to-end tests with real key presses are pending (an open owner decision on how keys are delivered in the tests)
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
