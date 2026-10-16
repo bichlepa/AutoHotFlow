@@ -13,7 +13,7 @@ What it does:
   * the final number of a provisional ID is the highest final number (F-0001 to F-8999) in the headings of both files
     plus one, counting up in the order of the first heading (OPEN-ITEMS first, then CLOSED-ITEMS).
   * the files of the branch are the files that differ from the base (git diff --name-only <base>...HEAD), without
-    v1/ and without binary files. Every reference to the provisional ID in those files becomes the final ID without
+    the v1 folder and without binary files. Every reference to the provisional ID in those files becomes the final ID without
     the star. Provisional IDs in files the branch did not change (old text, examples in the documents) are not
     touched and do not cause a refusal. Bytes other than the ID are not touched: line endings and encoding stay as they are. Binary
     files (NUL bytes) are skipped.
