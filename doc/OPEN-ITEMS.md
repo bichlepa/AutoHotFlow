@@ -47,6 +47,8 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0104 | Ping test: the three `sys.ping` requests of `test_pings_are_answered_while_a_blocking_element_runs` use a fixed timeout of 1.0 s while the block time is scaled | assumed (read in the code), not reproduced | |
 | F-0105 | A role's summary line is written lazily: after a burst of log lines it can come late or not at all | assumed, not checked | |
 | F-0106 | The header of a slow-run output in `run_suite` named another commit than the run folder | observed once, not reproduced, not checked | |
+| F-9501 | S0002 acceptance (WI-0058): the README names a core set of 29 elements, the table of the core set lists 27 classes; `Action_Sleep` is registered and used by the tests but is in no row of the table | observed, not checked which list is meant; owner decides the count | |
+| F-9502 | Fast tier takes about twice its budget (about 45 s): 91 s with 4 workers, 306 s serial (WI-0058, sum of test times 214 s); the largest parts are the 584 AHK cases of `test_ahk_runner.py` (33 s) and `test_core_e_dialogs.py` (29 s) | verified (run times of the runs in WI-0058); split proposed, not decided | yes |
 
 ## Findings
 
@@ -309,6 +311,20 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **What:** The header of the output of one slow run named another commit than the run folder. Reading `tools/run_suite.py` (lines 189 to 195), the header label and the run folder both come from the commit that `--ref` resolves to, so the reading does not explain the mismatch.
 **Status:** observed once, not reproduced, not checked.
 **Action:** On the next slow run compare the header with the run record (`sha`) for a plain `--ref` run and for a `--with-changes` run.
+
+### F-9501: the core set of S0002 has 27 classes in the table, the README says 29
+
+**What:** `work_items/phase3/README.md` (S0002) names "a core set of 29 elements". The core set table lists 27 classes (variables and conditions 9, lists 7, loops 4, flow control 3, dialogs and worker 4). `Action_Sleep` is registered and used by the tests of WI-0052 and WI-0055, but it is in no row of the table.
+**Status:** observed by counting the README table; which list the count means is not checked. Open.
+**Action:** the project owner decides whether `Action_Sleep` belongs to the core set and which count stands; then correct the count in the README in the same commit.
+**Evidence:** WI-0058 check of the criteria (`work_items/phase3/WI-0058-acceptance-s2.md`, Result).
+
+### F-9502: the fast tier takes about twice its budget
+
+**What:** The fast tier (`python -m pytest tests -q`) ran 1121 passed, 1 skipped: 91 s with 4 workers (run 20261016-184147-073b6738), 306 s serial (run 20261016-184636-073b6738). The budget in AGENTS.md is about 45 s on a loaded machine. Sum of the test times of the serial run: 214 s. Largest modules (serial run): `test_ahk_runner.py` 584 cases, 33 s; `test_core_e_dialogs.py` 20 tests, 29 s; `fault/test_var_persistence.py` 4 tests, 18 s; `integration/test_engine.py` 24 tests, 13 s.
+**Status:** verified (the two runs above, read from their history records). The growth comes from the S0002 core tests and from the AHK cases; the split is not decided.
+**Action:** proposal for the owner: (a) run `test_ahk_runner.py` as one AHK process per file with the results in a file, so the 584 cases are 33 cases of files, or (b) move `test_core_e_dialogs.py` and `fault/test_var_persistence.py` to the slow tier and keep their smoke case in the fast tier. Then measure again.
+**Evidence:** runs 20261016-184147-073b6738 and 20261016-184636-073b6738 (run log folders under the run tool's temp folder, history in the main checkout).
 
 ## Watch list (E0007)
 
