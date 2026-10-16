@@ -38,6 +38,8 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0094 | Fast tier: `test_pings_are_answered_while_a_blocking_element_runs` third ping answered after 0.808 s (limit 0.8 s) | observed once under load, run 20261015-231712-bc27cbe5 on `bc27cbe` (the commit only touches `WorkerBridge`, not used by this test); green alone, run 20261015-231824-bc27cbe5, open | |
 | F-0095 | Foundation tier: `test_a_child_that_has_not_connected_does_not_hold_storage_and_the_session_ends_with_storage_clean[0]` found the storage process still alive after the session ended | observed once under load, run 20261016-080313-0052a030 on `0052a03`; the slow tier (run 20261016-080657-0052a030) was green, open | |
 | F-0096 | Foundation tier: `test_crashed_child_is_reported_within_1s_restarted_by_policy_and_others_are_untouched`: crash reported -0.053 s after the death (lower bound -0.05 s) | observed once under load, run 20261016-080313-0052a030 on `0052a03`; the slow tier (run 20261016-080657-0052a030) was green, open | |
+| F-0097 | A loop inside a list loop (or a parse loop) costs time proportional to the size of the outer list per entry: entering a loop copies the hidden snapshot of the outer loop (`LoopStack.Push`), leaving it restores a copy | verified (measured in WI-0054: 500, 1000 and 2000 members: 3.5, 5.5 and 9.9 ms per outer pass, a pass without the inner loop costs about 0.5 ms), open | |
+| F-0098 | A fast loop floods the subscribers of the flow topic: every element start and end is an `evt.element.state` event, so 100,000 passes of an empty loop send 200,000 events (and a loop with a body, three or more per pass) | verified for the number of events (WI-0054, MS-0034); what an editor does with them: not checked (no editor yet), open | |
 
 ## Findings
 
@@ -236,6 +238,21 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Run:** run 20261016-080313-0052a030, commit `0052a03`, `--foundation -q -rA`, exit 1. Green in the slow tier, run 20261016-080657-0052a030.
 **Suspicion (assumed):** the death time is measured by a watcher thread of the test (`start_watch_death`) that wakes late under load, so it can lie after the event time; the tolerance of 50 ms is below the scheduling delay of a loaded machine. A test measurement problem, not a late report. Related to F-0071/F-0089 only by being load-sensitive. Not checked.
 **Probable cause task:** none from the change under verification; load flake of an older test.
+### F-0097: A loop inside a list loop copies the snapshot of the outer loop at every entry and exit
+
+**What:** `Loop_Work_through_a_list` and `Loop_Parse_A_String` keep their values in the hidden loop variable `A_LoopCurrentList` (one member is read per pass, so a pass is cheap). Entering any loop at `head` pushes the loop variables (`LoopStack.Push` copies both maps, values included, `LoopStack.CopyMap`), leaving it restores the pushed copy; a branch of the flow (thread clone) copies the stack as well. A loop inside a list loop therefore copies the whole snapshot of the outer loop at every entry. As in v1, which copied too.
+**Status:** verified. Flow: list loop over n members, inside a `Loop_SimpleLoop` with 1 pass: n = 500 / 1000 / 2000 take 1.76 / 5.47 / 19.7 s, 3.5 / 5.5 / 9.9 ms per outer pass (quadratic; without the inner loop about 0.5 ms per pass). Run in the flow runner, `wip/wi-54`, one machine with the load of other agents.
+**Why deferred:** only a flow with a big list and a loop in its body suffers; a fix touches the loop stack of the engine (copy on write for values that nobody changes, or a snapshot outside the loop variables), which is hardened code (M-0019, WI-0021).
+**Action:** the project owner decides. A fix: share the hidden snapshot between the levels of the stack (it is never changed after the head) or keep it in the thread in a structure that `Push` and `Clone` share.
+**Evidence:** WI-0054 (measurement in the session of the report; no test pins it).
+
+### F-0098: A fast loop sends two events per element pass to every subscriber
+
+**What:** The engine emits `evt.element.state` (`running`, `finished`) for every element start (`Executor._ElementStarted`, `_ElementStopped`). A loop pass has the loop element and the elements of the body, so 100,000 passes of an empty loop are 200,000 events, one per 0.2 ms of engine time; each event is a message through the hub to every subscriber.
+**Status:** verified for the numbers: in the session the same loop takes 454 us per pass (93 s under load of other agents) against 213 us without the events (MS-0034), so the events cost as much as the loop. Not checked: the cost for an editor or a manager (they do not exist yet) and whether the hub drops events for a slow subscriber.
+**Why deferred:** nothing is wrong for the engine (a snapshot answer stayed below 20 ms during the run); the question belongs to the editor (S0005): it can subscribe to the counts only, or the engine can coalesce the events of an element that runs more often than a few times per second (a count with the last state).
+**Action:** decide with the editor design (S0005).
+**Evidence:** WI-0054, `tests/integration/test_core_c_loops.py::test_a_long_loop_does_not_block_the_engine_and_costs_little_per_pass`.
 
 ## Watch list (E0007)
 
