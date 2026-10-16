@@ -62,7 +62,7 @@ Step 6 uses the test role `echo:a`, which exists only in the test entry; its tas
 
 Test on the real dialog windows of the elements Message_Box, Confirmation_Dialog and Condition_Debug_Dialog (the debug dialog), and on the Tooltip. Not automated. The check is by eye: no screenshot is compared. The dialog windows are AutoHotkey GUI windows, so the dialog rule of this document (window class `#32770`) does not cover them; a window that is not the element's window is still a failure.
 
-**Why.** The code sets the DPI awareness of the dialog thread (`SetThreadDpiAwarenessContext`), and the pixel sizes of the windows are hard-coded (`src/elements/base/DialogWindow.ahk`). Whether the text stays sharp and the controls fit at 125 % and 150 % is not tested. The source marks this as assumed. This check decides whether it holds.
+**Why.** The code sets the DPI awareness of the dialog thread (`SetThreadDpiAwarenessContext`), and the layout of the windows is scaled by the DPI of the window (`src/elements/base/DialogWindow.ahk`, `_Apply` and `_OnDpiChanged`). Whether the text stays sharp and the controls fit at 125 % and 150 % is not tested. The source marks this as assumed. This check decides whether it holds. The first run (2026-10-16, before the scaling was added) found that the windows kept their pixel size, the title bar grew and pushed the button out, and that a scale change with an open window broke the layout.
 
 **What to look for.** The text is sharp (not blurred), no button or label is clipped, the window size is reasonable, and the window fits on the screen.
 
@@ -95,6 +95,8 @@ Close each dialog after its step (button or X). Steps 2 to 5 are repeated at eac
 | 14 | Start the debug dialog with a few variables. | As step 4. | |
 | 15 | Start the tooltip. | As step 5. | |
 | 16 | Optional: with a second monitor at another scale, start the message box and the debug dialog on that monitor. | The text is sharp on that monitor too, and each window fits on the screen of its monitor. If no second monitor with another scale is available, write "not run" in the Result column. | |
+| 18 | Test the start order. (a) Start the application at 225 % (restart it after the change) and open the message box. (b) Start it at 100 %, set 225 %, then open the message box. | Both windows look the same as at step 2 at 225 %: the text and the OK button are fully visible, the button has a margin to the edge. | |
+| 17 | At 100 %, start the message box and leave it open. Set the scale to 150 %, look at the window, then set it back to 100 %. Repeat with the debug dialog. | The window grows and shrinks with the scale. Text, buttons and size follow it, nothing is cut off, and no empty area remains. (Before the fix of 2026-10-16 only the title bar scaled.) | |
 
 **Not covered by these checks:** a screenshot comparison, the exact pixel sizes, and how a dialog reacts when it is moved between monitors while it is shown (not checked).
 

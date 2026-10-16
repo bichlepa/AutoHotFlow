@@ -146,13 +146,14 @@ L28-34 Console output is best effort and must not block shutdown (verified)
 L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (3.6 KB, 40 lines)
+## doc/howto/gui-and-hotkeys.md (5.9 KB, 49 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
 L19-24 Capture and operate a window of an AHK role without screen access (verified)
 L26-32 InputBox and MsgBox are standard dialogs (window class `#32770`) (verified)
 L34-40 A Gui window needs a DPI awareness set before it is created (assumed) (assumed)
+L42-49 Per-monitor DPI awareness scales only the title bar, not the controls (verified by the owner, fix assumed) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (7.7 KB, 103 lines)
