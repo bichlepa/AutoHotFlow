@@ -100,6 +100,50 @@ Close each dialog after its step (button or X). Steps 2 to 5 are repeated at eac
 
 **Not covered by these checks:** a screenshot comparison, the exact pixel sizes, and how a dialog reacts when it is moved between monitors while it is shown (not checked).
 
+## 4. Enabled flow with a hotkey and a periodic timer (REQ-TRG-010, REQ-TRG-020)
+
+Test with a real start of the application and with real keys: the triggers of an enabled flow work without any click. The flow `triggers_check` (`tests/data/manual/triggers_check.json`, enabled state in `triggers_check.state.json`) has three triggers, all enabled at the start: a hotkey `Ctrl+Alt+Shift+F12` (the key is not blocked), a periodic timer of 5 s, and a start-up trigger of the type Windows (it fires only with `--windows-startup`, section 5). Each one shows a tooltip.
+
+This check runs in the manual-check data folder, not in the default folder `%APPDATA%\AutoHotFlow v2` (the rule of this document). To run it in the default folder instead, copy the two files into `Flows\` and `FlowStates\` of that folder; the owner decides.
+
+**Start.** VS Code task "Start: manual check 4, enabled flow with a hotkey and a periodic timer (manual_check.py)", or in a terminal `python tools/manual_check.py start --flow triggers_check -- --ui=stub`.
+
+### Steps
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 1 | Start the application (see above). | The stub window opens and lists `triggers_check`. No dialog. | |
+| 2 | Wait 12 s without touching the keyboard. | A tooltip "Periodic timer fired" appears two or three times. No tooltip "Started with Windows". | |
+| 3 | Press `Ctrl+Alt+Shift+F12` once. | The tooltip "Hotkey fired" appears within about one second. | |
+| 4 | Press `Ctrl+Alt+Shift+F12` three times in quick succession. | Each press shows the tooltip "Hotkey fired" (the tooltips may follow each other). | |
+| 5 | Press `Ctrl+Alt+Shift+F12` in a text editor. | The text editor receives the key as well (the key is not blocked). | |
+| 6 | Watch for dialogs during the whole check. | No dialog (window class `#32770`) appears. | |
+| 7 | Quit the application (button Beenden, or close the window). | The task terminal prints `AutoHotFlow ended with exit code 0`. | |
+
+**Not covered by these checks:** the hotkey with window conditions (the flow uses "Everywhere"), a second flow with the same hotkey, and the start with Windows at log on (the autostart entry comes with S0004). Not checked: the hotkey while another application holds the key.
+
+## 5. Start with `--windows-startup` (REQ-TRG-220)
+
+The same flow, started as after a start of Windows. The supervisor option `--windows-startup` tells the engine that AutoHotFlow starts with Windows (WI-0063).
+
+**Start.** VS Code task "Start: manual check 5, the same enabled flow started with --windows-startup (manual_check.py)", or `python tools/manual_check.py start --flow triggers_check -- --ui=stub --windows-startup`.
+
+### Steps
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 1 | Start the application (see above). | The stub window opens. No dialog. | |
+| 2 | Look at the screen within 5 s after the start. | Exactly one tooltip "Started with Windows" appears. | |
+| 3 | Wait 12 s. | The periodic timer tooltips appear as in section 4, step 2. The start-up tooltip does not come again. | |
+| 4 | Press `Ctrl+Alt+Shift+F12` once. | The tooltip "Hotkey fired" appears (as in section 4, step 3). | |
+| 5 | Quit the application, then start it again with the task of section 4 (no option). | The second start shows no tooltip "Started with Windows". | |
+| 6 | Watch for dialogs during the whole check. | No dialog appears. | |
+
+## 6. Checks that wait for a decision of the project owner
+
+- **The gui tests of the hotkey trigger (WI-0064, real key combinations).** They do not exist in the repository yet: the test of the hotkey with real input is an open owner decision (how keys are delivered in the tests, `doc/OPEN-ITEMS.md`, `NEEDS-ATTENTION.md`). When the decision is made, a VS Code task "Test: hotkey input (gui)" is added with the test. Until then the gui tests that exist (the dialog windows of section 3 and the other `gui` tests) run with the task `Test: gui`.
+- **The hotkey part of the trigger measurement (REQ-TRG-010).** A hotkey on an unassigned key while the engine is busy (MS-0038): the hook must not be removed by Windows and must fire afterwards. Waits for the same decision.
+
 ## Result
 
 Record one result per run. Copy the template.
@@ -109,6 +153,7 @@ Date:
 Tester:
 Stub (section 1): steps 1 to 7 pass / fail (list failed steps)
 Debug window (section 2): steps 1 to 9 pass / fail (list failed steps)
+Triggers (sections 4 and 5): steps 1 to 7 and 1 to 6 pass / fail (list failed steps)
 Notes:
 ```
 

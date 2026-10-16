@@ -9,8 +9,9 @@ for something else. "prepare" empties the folder and copies tests/data/skeleton_
 It deletes only a folder that it created itself (marker file .ahf_manual_check) or an empty one.
 
 "--flow <name>" copies the manual-check flow tests/data/manual/<name>.json to Flows\\<name>.json. It implies a fresh
-folder (prepared as above, then the flow is copied in). The tool does not start the flow: the owner starts it in the
-manager stub (--ui=stub), where the flow is listed under its name.
+folder (prepared as above, then the flow is copied in). A companion `<name>.state.json` next to it is copied to
+FlowStates\<name>.json, which enables the triggers of the flow at the start. The tool does not start the flow: the
+owner starts it in the manager stub (--ui=stub), where the flow is listed under its name.
 
 "start" starts src/AutoHotFlow.ahk with --session=manual --data=<folder> and the given options, waits without a
 timeout until the application ends, and prints its exit code (the VS Code task terminal does not show an exit code
@@ -59,7 +60,8 @@ def flow_source(name):
         raise Refused("flow name '%s' must be lower case letters, digits or underscores" % name)
     path = os.path.join(FLOWS_DIR, name + ".json")
     if not os.path.isfile(path):
-        known = sorted(f[:-5] for f in os.listdir(FLOWS_DIR) if f.endswith(".json")) if os.path.isdir(FLOWS_DIR) else []
+        known = sorted(f[:-5] for f in os.listdir(FLOWS_DIR)
+                       if f.endswith(".json") and not f.endswith(".state.json")) if os.path.isdir(FLOWS_DIR) else []
         raise Refused("no manual-check flow '%s' (known: %s)" % (name, ", ".join(known) or "none"))
     return path
 
@@ -80,6 +82,12 @@ def prepare(folder, flow=None):
     shutil.copyfile(SKELETON, os.path.join(folder, "Flows", "skeleton.json"))
     if source:
         shutil.copyfile(source, os.path.join(folder, "Flows", flow + ".json"))
+        # An optional companion <name>.state.json holds the enabled triggers of the flow (FlowStates, E0063), so that
+        # the flow is enabled at the start without a click.
+        state = os.path.join(FLOWS_DIR, flow + ".state.json")
+        if os.path.isfile(state):
+            os.makedirs(os.path.join(folder, "FlowStates"), exist_ok=True)
+            shutil.copyfile(state, os.path.join(folder, "FlowStates", flow + ".json"))
 
 
 def command_line(exe, folder, options):

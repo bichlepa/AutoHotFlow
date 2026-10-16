@@ -1,0 +1,139 @@
+{
+  "name": "triggers_check",
+  "category": "Test",
+  "ElementIDCounter": "9",
+  "formatVersion": 2,
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "0.000000",
+    "Offsety": "0.000000",
+    "WorkingDir": "",
+    "zoomFactor": "1.000000",
+    "strictTypes": true
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Hotkey",
+      "ID": "element0000000001",
+      "name": "Trigger_Hotkey",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "hotkey": "^!+F12",
+        "BlockKey": "0",
+        "UseWindow": "Everywhere",
+        "ID": "triggers_check"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "0",
+      "y": "0",
+      "enabled": "0",
+      "DefaultTrigger": "1"
+    },
+    "element0000000002": {
+      "class": "Trigger_Periodic_Timer",
+      "ID": "element0000000002",
+      "name": "Trigger_Periodic_Timer",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Interval": "5",
+        "Unit": "Seconds",
+        "ID": "triggers_check"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "0",
+      "y": "140",
+      "enabled": "0",
+      "DefaultTrigger": "0"
+    },
+    "element0000000003": {
+      "class": "Trigger_Start_up",
+      "ID": "element0000000003",
+      "name": "Trigger_Start_up",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "startupType": "Windows",
+        "ID": "triggers_check"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "0",
+      "y": "280",
+      "enabled": "0",
+      "DefaultTrigger": "0"
+    },
+    "element0000000004": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000004",
+      "name": "Action_Tooltip",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "text": "Hotkey fired",
+        "duration": "2"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "420"
+    },
+    "element0000000006": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000006",
+      "name": "Action_Tooltip",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "text": "Periodic timer fired",
+        "duration": "2"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "560"
+    },
+    "element0000000008": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000008",
+      "name": "Action_Tooltip",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "text": "Started with Windows",
+        "duration": "3"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "700"
+    }
+  },
+  "allConnections": {
+    "connection0000000005": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000005",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000007": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000007",
+      "to": "element0000000006",
+      "type": "Connection"
+    },
+    "connection0000000009": {
+      "ConnectionType": "normal",
+      "from": "element0000000003",
+      "ID": "connection0000000009",
+      "to": "element0000000008",
+      "type": "Connection"
+    }
+  }
+}

@@ -1034,6 +1034,41 @@
             "problemMatcher": []
         },
         {
+            "label": "Start: manual check 4, enabled flow with a hotkey and a periodic timer (manual_check.py)",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/manual_check.py",
+                "start",
+                "--flow",
+                "triggers_check",
+                "--",
+                "--ui=stub"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start: manual check 5, the same enabled flow started with --windows-startup (manual_check.py)",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/manual_check.py",
+                "start",
+                "--flow",
+                "triggers_check",
+                "--",
+                "--ui=stub",
+                "--windows-startup"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Setup: fresh data folder for the manual checks (manual_check.py prepare)",
             "type": "process",
             "command": "python",
