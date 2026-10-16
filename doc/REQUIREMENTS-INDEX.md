@@ -7,7 +7,7 @@ run the tool. The legend of the columns is at the top of the source.
 
 | Area | Total | done | implemented | partial | open | dropped | in doubt |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| [Flows and execution (EXE)](#flows-and-execution-exe) | 16 | 8 | 0 | 5 | 3 | 0 | 1 |
+| [Flows and execution (EXE)](#flows-and-execution-exe) | 16 | 9 | 0 | 5 | 2 | 0 | 1 |
 | [Expressions and variables (VAR)](#expressions-and-variables-var) | 15 | 8 | 0 | 3 | 4 | 0 | 2 |
 | [Script language (SCR)](#script-language-scr) | 15 | 0 | 0 | 3 | 12 | 0 | 1 |
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 2 | 1 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 0 | 0 | 1 | 9 | 0 | 0 |
-| **All** | **217** | **56** | **1** | **34** | **125** | **1** | **6** |
+| **All** | **217** | **57** | **1** | **34** | **124** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -45,7 +45,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-EXE-090](REQUIREMENTS.md#req-exe-090-a-failing-element-ends-with-exception) | A failing element ends with `exception` *(in doubt)* | partial | done | must | port | - |
 | [REQ-EXE-100](REQUIREMENTS.md#req-exe-100-waiting-elements-do-not-delay-other-flows) | Waiting elements do not delay other flows | partial | done | must | port | - |
 | [REQ-EXE-110](REQUIREMENTS.md#req-exe-110-stopping-ends-waiting-elements-quickly) | Stopping ends waiting elements quickly | partial | done | must | port | - |
-| [REQ-EXE-120](REQUIREMENTS.md#req-exe-120-run-another-flow-from-a-flow) | Run another flow from a flow | yes | open | must | port | S0002 (WI-0055) |
+| [REQ-EXE-120](REQUIREMENTS.md#req-exe-120-run-another-flow-from-a-flow) | Run another flow from a flow | yes | done | must | port | S0002 (WI-0055) |
 | [REQ-EXE-130](REQUIREMENTS.md#req-exe-130-working-directory-of-a-flow) | Working directory of a flow | yes | partial | must | port | S0004 (global), S0007 (flow settings) |
 | [REQ-EXE-140](REQUIREMENTS.md#req-exe-140-every-element-and-flow-shows-its-state) | Every element and flow shows its state | yes | partial | must | port | S0004 (manager), S0005 (editor) |
 | [REQ-EXE-150](REQUIREMENTS.md#req-exe-150-elements-with-any-number-of-named-outputs) | Elements with any number of named outputs | no | open | could | later | - |

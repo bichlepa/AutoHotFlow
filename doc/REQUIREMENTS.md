@@ -183,12 +183,13 @@ A stopped instance ends at once, also while one of its elements waits for a dial
 ### REQ-EXE-120 Run another flow from a flow
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (MIGRATION M-0062; until S0003 a trigger counts as enabled when its flow is enabled)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0055)
+- **Evidence:** `tests/integration/test_core_d_flows.py::test_execute_flow_waits_sends_and_returns_the_variables`, `tests/integration/test_core_d_flows.py::test_a_third_flow_runs_while_an_element_waits_for_another_flow`, `tests/integration/test_core_d_flows.py::test_default_trigger_and_specified_trigger_and_their_errors`, `tests/integration/test_core_d_flows.py::test_disabled_and_missing_flows`, `tests/integration/test_core_d_flows.py::test_the_called_flow_ends_with_an_exception_or_has_an_element_of_a_missing_package`, `tests/integration/test_core_d_flows.py::test_the_called_flow_is_stopped_while_the_caller_waits`, `tests/integration/test_core_d_flows.py::test_the_caller_is_stopped_while_it_waits_and_the_called_flow_runs_on`, `tests/integration/test_core_d_flows.py::test_a_flow_calls_itself_with_and_without_waiting_under_every_policy`, `tests/integration/test_core_d_flows.py::test_waiting_calls_of_a_flow_to_itself_are_limited`, `tests/ahk/engine_call_flow.test.ahk`
 
-The action `Execute_Flow` starts a flow (this one or another) through its default trigger or a chosen manual trigger. Options: pass the local variables to the called flow, wait until it has finished, return its local variables to the caller, skip a disabled flow without error.
+The action `Execute_Flow` starts a flow (this one or another) through its default trigger or a chosen manual trigger. Options: pass the local variables to the called flow, wait until it has finished, return its local variables to the caller, skip a disabled flow without error. While an element waits for the called flow, other flows and other branches go on. The waiting element ends with `exception` when the called flow ends with an unhandled exception or is stopped; a stopped caller leaves the called flow running. A call that could never end (the called flow has the policy `wait` and waits for the caller) and more than 100 calls that wait for each other end with `exception` instead of hanging.
 
 ### REQ-EXE-130 Working directory of a flow
 
@@ -821,20 +822,20 @@ Connection points and loop variables: REQ-EXE-030. The differences from v1 are i
 ### REQ-ELM-250 Flow control
 
 - **v1:** yes
-- **v2:** partial (`Action_Sleep`, `Action_Do_nothing` and `Condition_Do_nothing` exist; the rest is open)
+- **v2:** partial (`Action_Sleep`, `Action_Do_nothing`, `Condition_Do_nothing`, `Action_Execute_Flow`, `Action_Stop_Flow` and `Condition_Flow_Running` exist; `Action_Set_Flow_Status`, `Condition_Flow_Enabled` and `Action_Set_element_parameter` are open)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0047, WI-0052, WI-0055), S0003, S0008
-- **Evidence:** `tests/ahk/element_sleep.test.ahk`, `tests/integration/test_core_a_elements.py::test_action_do_nothing_finishes_with_normal_or_exception`, `tests/integration/test_core_a_elements.py::test_condition_do_nothing_finishes_with_the_chosen_result`
+- **Evidence:** `tests/ahk/element_sleep.test.ahk`, `tests/integration/test_core_a_elements.py::test_action_do_nothing_finishes_with_normal_or_exception`, `tests/integration/test_core_a_elements.py::test_condition_do_nothing_finishes_with_the_chosen_result`, `tests/integration/test_core_d_flows.py::test_stop_flow_stops_running_and_queued_instances_and_its_own_flow`, `tests/integration/test_core_d_flows.py::test_flow_running_sees_running_and_queued_instances`, `tests/ahk/engine_call_flow.test.ahk`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
 | `Action_Sleep` | yes | partial (skeleton) | S0002 (WI-0047) |
 | `Action_Do_nothing` | yes | done | S0002 (WI-0052) |
 | `Condition_Do_nothing` | yes | done | S0002 (WI-0052) |
-| `Action_Execute_Flow` (REQ-EXE-120) | yes | open | S0002 (WI-0055) |
-| `Action_Stop_Flow` | yes | open | S0002 (WI-0055) |
-| `Condition_Flow_Running` | yes | open | S0002 (WI-0055) |
+| `Action_Execute_Flow` (REQ-EXE-120) | yes | done | S0002 (WI-0055) |
+| `Action_Stop_Flow` | yes | done | S0002 (WI-0055) |
+| `Condition_Flow_Running` | yes | done | S0002 (WI-0055) |
 | `Action_Set_Flow_Status` | yes | open | S0003 |
 | `Condition_Flow_Enabled` | yes | open | S0008 |
 | `Action_Set_element_parameter` | yes | open | S0008 |

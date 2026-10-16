@@ -468,6 +468,37 @@ class FlowRunner:
                 out.append({k: p.get(k) for k in ("ts", "level", "source", "text")})
         return out
 
+    # --- other instances (WI-0055) -------------------------------------------------------------------------------
+    def enable(self, *flow_ids):
+        """Enables flows of the running session (`cmd.flow.enable`; a trigger is enabled when its flow is, until S0003)."""
+        for flow_id in flow_ids:
+            self.request_ok("engine", "cmd.flow.enable", {"flowId": flow_id})
+
+    def mark(self):
+        """The position in the stream of events of the observer, for `ended` (needs a started session)."""
+        return self._rec.mark()
+
+    def ended(self, flow_id, since=0, count=1, timeout=RUN_TIMEOUT_S):
+        """The payloads of `evt.instance.ended` of a flow from the position `since` on, in order, after waiting until
+        there are `count` of them (or `scaled(timeout)` seconds). For instances that the test did not start itself, for
+        example those that an element started."""
+        def found():
+            got = [m["payload"] for m in self._rec.slice(since, self._rec.mark())
+                   if m.get("type") == "evt.instance.ended" and m["payload"].get("flowId") == flow_id]
+            return got if len(got) >= count else None
+        got = _wait_until(found, scaled(timeout))
+        if got is not None:
+            return got
+        return [m["payload"] for m in self._rec.slice(since, self._rec.mark())
+                if m.get("type") == "evt.instance.ended" and m["payload"].get("flowId") == flow_id]
+
+    def executing(self, flow_id):
+        """True if the engine reports the flow as executing (`cmd.engine.snapshot`)."""
+        for f in self.request_ok("engine", "cmd.engine.snapshot", {})["flows"]:
+            if f["flowId"] == flow_id:
+                return bool(f["executing"])
+        raise AssertionError("the engine has no flow '%s'" % flow_id)
+
     # --- probes ----------------------------------------------------------------------------------------------------
     def _clear_probes(self):
         for path in (self.datadir / "Variables").glob("global_probe*"):
