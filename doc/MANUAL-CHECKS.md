@@ -58,6 +58,43 @@ Step 6 uses the test role `echo:a`, which exists only in the test entry; its tas
 
 **Not covered by these checks** (listed as not checked in the source): real mouse operation, resizing the window, other DPI settings, and long running with "alle 2 s".
 
+## 3. Dialog windows at other scaling (DPI)
+
+Test on the real dialog windows of the elements Message_Box, Confirmation_Dialog and Condition_Debug_Dialog (the debug dialog), and on the Tooltip. Not automated. The check is by eye: no screenshot is compared. The dialog windows are AutoHotkey GUI windows, so the dialog rule of this document (window class `#32770`) does not cover them; a window that is not the element's window is still a failure.
+
+**Why.** The code sets the DPI awareness of the dialog thread (`SetThreadDpiAwarenessContext`), and the pixel sizes of the windows are hard-coded (`src/elements/base/DialogWindow.ahk`). Whether the text stays sharp and the controls fit at 125 % and 150 % is not tested. The source marks this as assumed. This check decides whether it holds.
+
+**What to look for.** The text is sharp (not blurred), no button or label is clipped, the window size is reasonable, and the window fits on the screen.
+
+**Set the scaling.** Windows Settings > System > Display > Scale: choose 100 %, 125 % or 150 %. Log off and on only if the text stays blurred after a change.
+
+**Start.** Not yet possible, see NEEDS-ATTENTION. A start path that shows a dialog element without the manager is not known yet. The tasks `Start:` in `.vscode/tasks.json` were checked by label only; no flow file in `tests/data` was checked for these elements. Do not run the steps until a start path is written here.
+
+### Steps
+
+Close each dialog after its step (button or X). Steps 2 to 5 are repeated at each scaling level (steps 7 to 10 and 12 to 15).
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 1 | Set the Windows scale to 100 %. | Settings shows 100 %. | |
+| 2 | Start the message box (see Start). | The text is sharp. The buttons and the text are fully visible. The window fits on the screen and its size looks reasonable. | |
+| 3 | Start the confirmation dialog. | The text is sharp. Both buttons are fully visible. The window fits on the screen. | |
+| 4 | Start the debug dialog with a few variables. | The text and the variable values are sharp and not cut off. The window fits on the screen. | |
+| 5 | Start the tooltip. | The text is sharp and not cut off. The tooltip is shown near the mouse pointer and fits on the screen. | |
+| 6 | Set the Windows scale to 125 %. | Settings shows 125 %. | |
+| 7 | Start the message box. | As step 2. | |
+| 8 | Start the confirmation dialog. | As step 3. | |
+| 9 | Start the debug dialog with a few variables. | As step 4. | |
+| 10 | Start the tooltip. | As step 5. | |
+| 11 | Set the Windows scale to 150 %. | Settings shows 150 %. | |
+| 12 | Start the message box. | As step 2. | |
+| 13 | Start the confirmation dialog. | As step 3. | |
+| 14 | Start the debug dialog with a few variables. | As step 4. | |
+| 15 | Start the tooltip. | As step 5. | |
+| 16 | Optional: with a second monitor at another scale, start the message box and the debug dialog on that monitor. | The text is sharp on that monitor too, and each window fits on the screen of its monitor. If no second monitor with another scale is available, write "not run" in the Result column. | |
+
+**Not covered by these checks:** a screenshot comparison, the exact pixel sizes, and how a dialog reacts when it is moved between monitors while it is shown (not checked).
+
 ## Result
 
 Record one result per run. Copy the template.
