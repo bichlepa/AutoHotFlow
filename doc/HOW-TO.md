@@ -350,6 +350,12 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Right:** `() { ... }` for a body with statements (or a named function); `() => expression` for one expression (a comma list in parentheses `() => (a, b)` is one expression).
 - **Status:** verified (load error and fix in `tests/ahk/element_list_ops.test.ahk`)
 
+### A helper function of a test file is a global name: `Owner()` turns every local `owner` into a warning
+
+- **Problem:** A test file defined the helpers `Owner(flows)`, `Ends(owner, id)` and `Cond(id, expr)`. With `#Warn All, StdOut` every function with a local `owner` or `ends` (in the test file, in `helpers/ExecutorKit.ahk`), and even `ExprParser._If` with its local `cond`, reported "This local variable has the same name as a global variable", and the script ended with exit 1. A function name is global and names ignore case, so it clashes with locals everywhere in the script, also in `src/` files the test includes.
+- **Right:** Name helper functions so that no local can have the name (`Owners`, `EndsOf`, `CondEl`); before adding one, grep the included code for the lowercase name as a local.
+- **Status:** verified (WI-0055, `tests/ahk/engine_call_flow.test.ahk`: 31 warnings, then none after the rename)
+
 ## Objects, Maps, Arrays
 
 ### Map with `CaseSense "Off"` keeps the spelling of the first insertion
@@ -800,6 +806,13 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Right:** Run code that may wait on a thread of its own: `ctx.Request` of a worker element calls its callback with `SetTimer(fn, -1)`, outside the pump, so the callback may use the variable functions (which wait).
 - **Status:** assumed (derived from the guard in `PipeConnection.Pump`, not reproduced)
 - **Source:** `src/worker/WorkerContext.ahk` (`_OnRequestAnswer`)
+
+### The end of a called instance goes to the caller in the next tick, not from the step that ended it
+
+- **Problem:** A waiting `Action_Execute_Flow` must finish when the called instance ends. The end is found in `Executor._EndRun`, deep inside the step of the called instance (`_Advance`, under `Critical`). Calling the caller's `ctx.Finish` there would run the caller's step (and maybe its end, and the end of its caller ...) nested inside the other one, under `Critical`, and a chain of 100 waiting calls would nest 100 steps on the AutoHotkey stack (which ends the process at about 2000 calls, see above).
+- **Right:** `_EndRun` only queues `[call, outcome]` (`Executor._notes`); `Tick` hands the outcomes over first, one by one, before it dispatches threads. Each end is a flat step; the depth of a call chain costs no stack. A call is a Map with a flag `cancelled`, so a stop of the caller (`ExecContext.CancelTimers`) also drops an outcome that is already queued, and the function reference is cleared on delivery or cancel (the bound context would otherwise be a reference cycle).
+- **Status:** verified (`tests/ahk/engine_call_flow.test.ahk`, cases of the depth limit and of the stopped caller; `tests/integration/test_core_d_flows.py::test_waiting_calls_of_a_flow_to_itself_are_limited`)
+- **Source:** `src/engine/Executor.ahk` (`CallFlow`, `_EndRun`, `_Deliver`)
 
 ## GUI and hotkeys
 
