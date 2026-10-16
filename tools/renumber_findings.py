@@ -49,7 +49,8 @@ DEFAULT_BASE = "v2-port"
 EXCLUDED_PREFIX = (REFERENCE_FOLDER + "/").encode()
 
 HEADING = re.compile(rb"^### (F-(\d{4}))\*?:", re.MULTILINE)
-PROVISIONAL_REF = re.compile(rb"F-(9\d{3})(?!\d)\*?")
+# the star is taken only when it is not the first of a bold "**" pair (**F-9nnn** keeps its stars)
+PROVISIONAL_REF = re.compile(rb"F-(9\d{3})(?!\d)(?:\*(?!\*))?")
 MAX_SHOWN = 10
 
 EXIT_OK = 0
@@ -175,11 +176,21 @@ def working_tree_clean(repo):
     return not git(repo, "status", "--porcelain", "--untracked-files=no").stdout.strip()
 
 
+def check_based_on(repo, base):
+    """The branch must contain the base: after the base moved on, the branch has to be rebased first."""
+    proc = git(repo, "merge-base", "--is-ancestor", base, "HEAD", check=False)
+    if proc.returncode == 1:
+        raise Refused("rebase onto %s first (%s is not an ancestor of HEAD)" % (base, base))
+    if proc.returncode != 0:
+        raise RuntimeError("git merge-base failed for %s: %s" % (base, proc.stderr.decode("utf-8", "replace").strip()))
+
+
 def run(repo, base=DEFAULT_BASE, dry_run=False, commit=False, out=print):
     if not working_tree_clean(repo):
         out("refused: the working tree has changes to tracked files (commit or stash them first)")
         return EXIT_USAGE
     try:
+        check_based_on(repo, base)
         result = plan(repo, base)
     except Refused as e:
         out("refused: %s" % e)

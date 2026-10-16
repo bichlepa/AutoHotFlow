@@ -73,6 +73,8 @@ BRANCH_FILES = {
     "doc/OPEN-ITEMS.md": OPEN_BRANCH,
     "doc/CLOSED-ITEMS.md": CLOSED_BRANCH,
     "tests/t.py": "# refers to %s and %s*\nX = 1\n" % (prov(9001), prov(9002)),
+    # bold marks around the ID keep their stars; a star that ends the ID is taken
+    "notes/bold.md": "Bold **%s** and %s* here.\n" % (prov(9001), prov(9001)),
 }
 
 
@@ -93,6 +95,7 @@ def test_references_in_changed_files_are_replaced_and_line_endings_kept(repo):
     assert b"\r\n" in opened and b"\n" not in opened.replace(b"\r\n", b"")
     assert b"See F-0087 and F-0087." in opened
     assert prov(9000).encode() not in opened
+    assert (repo / "notes/bold.md").read_bytes() == b"Bold **F-0088** and F-0088 here.\n"
     closed = (repo / "doc/CLOSED-ITEMS.md").read_bytes()
     assert b"### F-0089: closed provisional" in closed and b"\r\n" not in closed
     assert b"Text F-0088." in closed
@@ -177,3 +180,15 @@ def test_both_option_is_a_usage_error(repo):
 
 def test_unknown_base_is_a_usage_error(repo):
     assert renumber_findings.main(["--base", "no-such-ref"], repo=repo) == 2
+
+
+def test_a_base_that_moved_on_must_be_rebased_first(repo, capsys):
+    git(repo, "checkout", "-q", "v2-port")
+    write(repo, "moved.txt", "moved on\n")
+    git(repo, "add", "-A")
+    git(repo, "commit", "-q", "-m", "v2-port moves on")
+    git(repo, "checkout", "-q", "work")
+    before = (repo / "doc/OPEN-ITEMS.md").read_bytes()
+    assert renumber_findings.main([], repo=repo) == 1
+    assert "rebase onto v2-port first" in capsys.readouterr().out
+    assert (repo / "doc/OPEN-ITEMS.md").read_bytes() == before
