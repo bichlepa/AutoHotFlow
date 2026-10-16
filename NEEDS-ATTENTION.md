@@ -5,6 +5,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 ## Decisions
 
 - **Read error of `FlowState.json` disables all writes for the session (WI-0060, decision 3).** A locked or unreadable file is reported once, and from then on no state switch is saved (the file is never overwritten). The alternative is to retry the read. Your call: keep it, or retry (the retry needs a timer).
+- **The supervisor restarts the trigger host automatically after a crash (WI-0061, decision 5).** Until now only storage and the engine were restarted by the supervisor's policy. ARCHITECTURE 6.2 and the S0003 design imply the trigger host too. Confirm, or keep it manual.
 
 ## Manual checks
 
