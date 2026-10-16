@@ -75,6 +75,17 @@ def alive(pid):
         return False
 
 
+def describe_pid(pid):
+    """What runs under this pid now (name, start time, command line), for the message of a failed 'process is gone' check.
+    A pid that was reused by an unrelated process (F-0095) looks different from the child that ended."""
+    try:
+        p = psutil.Process(pid)
+        return "pid %d: name %s, started %s, status %s, cmdline %s" % (
+            pid, p.name(), time.strftime("%H:%M:%S", time.localtime(p.create_time())), p.status(), " ".join(p.cmdline())[:300])
+    except psutil.Error as e:
+        return "pid %d: not describable now (%s)" % (pid, type(e).__name__)
+
+
 def session_processes(session):
     """Every live process whose command line names this session (our test processes only)."""
     marker = "--session=" + session

@@ -10,7 +10,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import (CLEAN_EXIT_BUDGET_S, EXIT_FORCED, EXIT_OK, FULL_CHAIN, STUB_OPTS, alive, death_watch,
+from faultkit import (CLEAN_EXIT_BUDGET_S, EXIT_FORCED, EXIT_OK, FULL_CHAIN, STUB_OPTS, alive, death_watch, describe_pid,
                       event, repeat_ids, session_processes, wait_until)
 
 from faultfixtures import chains  # noqa: F401  (fixture)
@@ -114,7 +114,7 @@ def test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_s
     for name in ("storage", late):
         exited = chain.rec.wait(event("evt.process.exited", name=name), timeout=EVENT_LAG_S)
         assert exited and exited[1]["payload"]["clean"] is True, (name, exited)
-    assert not alive(pids["storage"])
+    assert not alive(pids["storage"]), describe_pid(pids["storage"])   # F-0095: say what runs there
     assert wait_until(lambda: not session_processes(chain.session), 5.0), session_processes(chain.session)
 
 
@@ -142,7 +142,7 @@ def test_a_child_that_has_not_connected_does_not_hold_storage_and_the_session_en
     exited = chain.rec.wait(event("evt.process.exited", name="storage"), timeout=EVENT_LAG_S)
     assert exited and exited[1]["payload"]["clean"] is True, ("storage was not told to shut down", exited, chain.sup.text())
     assert "terminating storage" not in chain.sup.text(), chain.sup.text()
-    assert not alive(pids["storage"])
+    assert not alive(pids["storage"]), describe_pid(pids["storage"])   # F-0095: say what runs there
     assert wait_until(lambda: not session_processes(chain.session), 5.0), session_processes(chain.session)
 
 
