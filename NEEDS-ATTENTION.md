@@ -10,6 +10,10 @@ None open.
 
 None open.
 
+## Pending owner review (to be decided when you are back)
+
+- **WI-0060 decisions** (to be listed here after its review): `cmd.flow.enable` without a following trigger answers `ok:false`; a new storage message `cmd.storage.flowstate.keepBroken`; a read error disables writes for the session.
+
 ## To know
 
 - **Manual check 3 (DPI of the dialog windows) passed on 2026-10-16** (owner): at 100 % and 225 %, process started at either scale, DPI change with the window open, message box, debug dialog and tooltip. Not run: a second monitor with another scale (step 16; the owner moved a window between two monitors and saw the same as with a DPI change), and 125 % and 150 % in the final state. REQ-USE-090 is done for the dialogs only; manager, editor, tray icon and zoom remain open.
