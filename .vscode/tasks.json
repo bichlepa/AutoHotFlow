@@ -459,6 +459,39 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: loop pass benchmark (100,000 passes of an empty loop; result in %TEMP%/ahf_loop_bench.txt)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/ahkrun.py",
+                "--timeout",
+                "300",
+                "tests/ahk/helpers/loop_bench.ahk",
+                "${env:TEMP}/ahf_loop_bench.txt",
+                "100000"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: long loop does not block the engine (100,000 passes; MEASURE line in the output)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/integration/test_core_c_loops.py",
+                "-k",
+                "test_a_long_loop_does_not_block_the_engine",
+                "--all",
+                "-n",
+                "0",
+                "-s"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: variable request round trip from a worker (300 GetVar; MEASURE line in the output)",
             "type": "shell",
             "command": "python",
