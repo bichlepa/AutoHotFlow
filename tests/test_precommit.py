@@ -29,7 +29,7 @@ def make_repo(tmp_path):
 
 
 class FakeRegen:
-    """Stands in for doc_index.run: writes 'index v2' unless it only checks; reports outdated when it would."""
+    """Stands in for doc_index.run: writes 'index new' unless it only checks; reports outdated when it would."""
     def __init__(self, new=b"index v2\n"):
         self.calls = []
         self.new = new
