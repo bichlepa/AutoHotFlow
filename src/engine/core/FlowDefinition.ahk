@@ -24,6 +24,10 @@ class FlowDefinition {
     static FORMAT_KEY := "formatVersion"
     static FORMAT_VERSION := 2
     static MARKER_KEY := "v1Text"
+    ; The key "enabled" of a trigger in a v1 file (ARCHITECTURE 7). The engine never reads it (E0058); a save drops it.
+    static ENABLED_KEY := "enabled"
+    ; The key "followsFlow" of a trigger (E0056, WI-0060): "Switch with the flow", true when missing.
+    static FOLLOWS_KEY := "followsFlow"
     ; Key of an element (WI-0045, E0035): the places of its parameters that behave differently in v2, with MIGRATION IDs and
     ; the v1 text. Unlike v1Text it is an ordinary key of the element: it stays in Raw, so it is written back and
     ; clients see it (FlowExprConvert.Mark).
@@ -102,7 +106,9 @@ class FlowDefinition {
     }
 
     ; The text of the flow file: Raw with the format version at the root, the marker "v1Text" at the elements in
-    ; Pending and flowSettings.strictTypes (StrictTypes). Raw itself is not changed. Json.Stringify sorts the keys; the storage role writes the line breaks.
+    ; Pending and flowSettings.strictTypes (StrictTypes). Raw itself is not changed. The key "enabled" of a trigger is
+    ; not written (E0058, WI-0060): the enabled state of a trigger is in FlowState.json. Json.Stringify sorts the keys;
+    ; the storage role writes the line breaks.
     ToFileText() {
         root := this.Raw.Clone()
         root[FlowDefinition.FORMAT_KEY] := FlowDefinition.FORMAT_VERSION
@@ -110,8 +116,18 @@ class FlowDefinition {
             : FlowDefinition.NewIndex()
         settings[FlowDefinition.STRICT_KEY] := Json.Bool(this.StrictTypes)
         root["flowSettings"] := settings
-        if (this.Pending.Count) {
-            elements := root["allElements"].Clone()
+        elements := root["allElements"].Clone()
+        withEnabledKey := []
+        for id, elem in elements {
+            if (this.ElementKind(id) = "trigger" && elem.Has(FlowDefinition.ENABLED_KEY))
+                withEnabledKey.Push(id)
+        }
+        if (this.Pending.Count || withEnabledKey.Length) {
+            for id in withEnabledKey {
+                elem := elements[id].Clone()
+                elem.Delete(FlowDefinition.ENABLED_KEY)
+                elements[id] := elem
+            }
             for id in this.Pending {
                 if (!elements.Has(id))
                     continue
@@ -237,6 +253,22 @@ class FlowDefinition {
             idList.Push(id)
         }
         return idList
+    }
+
+    ; True if the trigger switches with its flow (E0056): the key "followsFlow" is missing, null, true, 1 or a text other
+    ; than "0" and "false"; false for false, 0, "0" or "false". Not a trigger of the flow: false.
+    FollowsFlow(elementId) {
+        if (this.ElementKind(elementId) != "trigger")
+            return false
+        elem := this._elements[elementId]
+        if (!elem.Has(FlowDefinition.FOLLOWS_KEY))
+            return true
+        v := elem[FlowDefinition.FOLLOWS_KEY]
+        if (v == Json.False)            ; an object, so it is tested before IsObject
+            return false
+        if (v == Json.Null || v == Json.True || IsObject(v))
+            return true
+        return !(v = 0 || v = "0" || v = "false")
     }
 
     ; IDs of all elements of kind "trigger", in Map enumeration order (sorted by ID).

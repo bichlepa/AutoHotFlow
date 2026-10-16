@@ -181,11 +181,12 @@ class Executor {
         return IsObject(rec) ? rec.Def.DefaultManualTrigger() : ""
     }
 
-    ; True if the trigger may be started by an element (v1 x_isTriggerEnabled). Until the triggers have their own state
-    ; (S0003, REQ-EXE-070) a trigger of a flow is enabled when its flow is enabled (FlowRecord.Enabled).
+    ; True if the trigger may be started by an element (v1 x_isTriggerEnabled): its target state is enabled (E0056,
+    ; WI-0060, REQ-EXE-070). Whether it is armed is WI-0062; a trigger of a disabled flow is not enabled unless it is
+    ; independent and switched on (the flow itself does not count).
     IsTriggerEnabled(flowId, triggerId) {
         rec := this._owner.flows.Get(flowId)
-        return IsObject(rec) && rec.Enabled && this.HasTrigger(flowId, triggerId)
+        return IsObject(rec) && rec.TriggerEnabled(triggerId) && this.HasTrigger(flowId, triggerId)
     }
 
     ; StartFlow and CallFlow. call: the Map of a waiting call or "". vars: initial instance variables or "". depth: the

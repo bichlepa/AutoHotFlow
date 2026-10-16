@@ -17,8 +17,9 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | ID | Title | Status | Phase 3 |
 |---|---|---|---|
 | F-0073 | The stress test with 200 big flows fails its snapshot budget (largest snapshot answer during loading 2326 ms, budget 1000 ms); every flow file is parsed twice in the engine (F-0020 merged in) | budget raised to 3 s (E0042, owner 2026-10-15); stays open as an optimization after the port (pre-filter for inactive flows, one parse instead of two); measurements in WI-0046 | yes |
-| F-0099 | `Action_Execute_Flow` needs an enabled trigger, but every flow is disabled after the start of the engine (the enabled state is not loaded or kept) | decided by the project owner (2026-10-16, E0053, E0056, E0057): the enabled state of a trigger comes with S0003, WI-0060 (REQ-EXE-070, REQ-TRG-050); until then a trigger counts as enabled when its flow is enabled | yes |
 | F-0101 | Slow tier: `test_start_stop_storm_leaves_a_consistent_engine[smoke]` saw the engine's handle count grow by 19 (limit 5) | observed, red twice in a row and once alone, green since; the same 145 to 164 as F-0092; cause not known; open, watch the history | |
+| F-9000* | `FlowState.json`: a temp file of an interrupted write (`FlowState.json.ahf-<pid>.tmp`) in the data folder is not removed at start | observed by reading the code (not reproduced); open, low | |
+| F-9001* | Foundation tier: `test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` found the storage process still alive after the session ended (the symptom of F-0095) | observed once under load, run 20261016-211715-c03b628b on `c03b628`; not reproduced; the engine's shutdown adds no request to storage in this scenario (the trigger state is not marked); open, watch |  |
 
 ## Findings
 
@@ -32,15 +33,6 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Options if the budget breaks again (for the project owner, none needed for the conversion):** the conversion needs no change (stagger, convert on first use and save converted flows would save at most 4.3 s of 53 s). What would help: a parse of the frame that does not escape the flow text twice (the flow text travels inside a JSON frame), reading flows lazily (the engine is ready before all 200 flows are parsed), or `LOAD_PARALLEL` = 1.
 **Merged 2026-10-16:** F-0020 ("Flow file parsed twice in the engine", WI-0024: about 0.23 s per flow, 45 s for 200 flows) has the same cause and is closed in favour of this entry. Its alternatives: send the flow as an object instead of a text inside the frame, chunking, or a native parser.
 
-### F-0099: Execute_Flow needs an enabled trigger, but no flow is enabled after a start
-
-**Decision (project owner, 2026-10-16, E0053):** belongs to S0003 (REQ-EXE-070), not fixed earlier.
-
-**What:** The help of v1 says that the trigger of `Action_Execute_Flow` must be enabled, else the element ends with `exception` (or with `normal` with "Skip disabled flows"). Until the triggers have a state of their own (S0003) the engine counts a trigger as enabled when its flow is (`Executor.IsTriggerEnabled`, `FlowRecord.Enabled`). `FlowRecord.Enabled` is `false` for every flow after the engine has loaded it, and nothing keeps it (REQ-EXE-070: "the state survives a restart: not checked"; the `enabled` keys of the triggers in the files are not read). So after every start of AutoHotFlow each called flow has to be enabled again (`cmd.flow.enable`, later the manager) before a flow can call it; the v1 test flows that call their own triggers (44 uses, all with "This flow") end with `exception` unless the flow is enabled first.
-**Status:** verified by reading `src/engine/FlowRecord.ahk` and by the tests of WI-0055, which enable the flows after the start (`flows.enable`). Not checked: whether the "Automatic tests" flows of v1 enable themselves with `Set_Flow_Status` before they call (WI-0057).
-**Action:** fixed by WI-0060 (S0003): the enabled state per trigger after E0056, kept in `FlowState.json` (E0057, replaces "loaded from the file"); `IsTriggerEnabled` reads it. For WI-0057: the test corpus enables its flows. Alternative: a call of "This flow" does not need the enabled state (the flow runs already); not taken, because the help text makes no exception.
-**Evidence:** WI-0055, `tests/integration/test_core_d_flows.py::test_disabled_and_missing_flows`.
-
 ### F-0101: the storm smoke test sees the engine's handle count grow now and then
 
 **What:** `tests/stress/test_start_stop_storm.py::test_start_stop_storm_leaves_a_consistent_engine[smoke]` failed in the slow tier with the engine's handle count rising from 145 to 164 (limit +5). It failed twice in a row, and once alone; then it was green three times on `9f1d403` and `c27ff8f`, whose code changes do not touch the engine.
@@ -48,6 +40,20 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Action:** watch the history of the test (`python tools/test_history.py --test "tests/stress/test_start_stop_storm.py::test_start_stop_storm_leaves_a_consistent_engine[smoke]"`). If it fails again alone, read the handle types of the engine process in the run log and open a work package; if it fails only under load, add it to the load flakes.
 **Evidence:** runs 20261016-172834-c27ff8f4-3 (red) and its recheck at 17:36 (red alone), in the run history of the main checkout.
 **Update 2026-10-16 (cleanup of the open items):** green in every run since (6 runs from 17:36 on, run history). The numbers are exactly those of F-0092 (closed): 145 handles before, 164 after, the 19 handles that the first instance of a flow opens once. The churn test was fixed there by a warm-up instance before the baseline; the storm test already has a warm-up of 20 cycles (`WARMUP_CYCLES`) and still saw 145 in the two red runs, so the 19 handles do not always come with the first instance (assumed: something opened lazily, later than the warm-up; not checked). Next step if it fails again: answer the open question of F-0092, which 19 handles these are (handle types of the engine before and after).
+
+### F-9000*: a temp file of an interrupted FlowState.json write stays in the data folder
+
+**What:** The start cleanup of storage (`AtomicFile.RemoveStaleTemps`, `Storage._QueueTempCleanup`) looks only into `Flows/` and `Variables/`. A write of `FlowState.json` (WI-0060) that is cut off by a crash leaves `FlowState.json.ahf-<pid>.tmp` in the data folder, which is never removed. The file is not read, so nothing breaks; it only stays.
+**Status:** assumed from reading `src/storage/Storage.ahk` and `src/storage/AtomicFile.ahk`; not reproduced.
+**Action:** add the data folder root (non-recursive, or the single name pattern) to the start cleanup. Provisional ID, renumbered by `tools/renumber_findings.py` before the cherry-pick.
+**Evidence:** code reading only.
+
+### F-9001*: storage still alive after a session with a child that says hello during the shutdown
+
+**What:** `tests/fault/test_shutdown.py::test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` failed in the foundation tier: the storage process (started 21:18:10) was still running when the check ran after the session had exited with the expected code. It is the same symptom as F-0095 (storage alive after the end of a session, under load), in a sibling test.
+**Status:** observed once (run 20261016-211715-c03b628b, commit `c03b628`, 1 failed of 461). Not reproduced in the same run's other foundation tests. Not caused by WI-0060 as far as the code shows: the engine writes FlowState.json at shutdown only when a switch is pending, which this scenario does not do.
+**Action:** watch the history of the test. If it recurs, treat it together with F-0095 (the end of storage after `sys.bye`).
+**Evidence:** run 20261016-211715-c03b628b (output of the run, line 43).
 
 ## Observed only (not for the bug hunter)
 

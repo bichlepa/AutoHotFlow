@@ -65,6 +65,7 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0096 | Foundation tier: `test_crashed_child_is_reported_within_1s_restarted_by_policy_and_others_are_untouched`: crash reported -0.053 s after the death (lower bound -0.05 s) | closed 2026-10-16: tolerance accepted (M-0062), 27 green |  |
 | F-0097 | A loop inside a list loop (or a parse loop) costs time proportional to the size of the outer list per entry: entering a loop copies the hidden snapshot of the outer loop (`LoopStack.Push`), leaving it restores a copy | closed 2026-10-16: fixed (option A), verified by unit tests |  |
 | F-0098 | A fast loop floods the subscribers of the flow topic: every element start and end is an `evt.element.state` event, so 100,000 passes of an empty loop send 200,000 events (and a loop with a body, three or more per pass) | accepted (project owner, 2026-10-16): both events stay |  |
+| F-0099 | `Action_Execute_Flow` needs an enabled trigger, but no flow is enabled after a start | closed 2026-10-16 (WI-0060): every trigger has its own target state (E0056), kept in `FlowState.json` (E0057) and read by `IsTriggerEnabled`; a v1 flow file loads disabled (E0058) | yes |
 | F-0100 | Slow tier: the random run of the expression oracle stopped at the F-0075 class through a subtraction (`!(ftiny - fz . (f3 < ineg))`): the guard of the generator misses `ftiny` inside an operand of the concatenation | closed 2026-10-16: generator guard extended, corpus regenerated |  |
 | F-0102 | `tests/test_precommit.py` writes the text `index v1`, which the v1 guard of the fast tier reads as a dependency on `v1/` | closed 2026-10-16: fixed in c27ff8f |  |
 | F-0103 | `test_worker_reports_busy_when_a_job_begins_and_ends` failed once in a fast run; three serial reruns passed | closed 2026-10-16: one failure, 58 green |  |
@@ -225,6 +226,12 @@ This document lists findings that are closed or accepted. Entries are moved here
 **Evidence:** probe described above; code `src/engine/vars/VarWriter.ahk` (`FlushAll`, `_Send`), `src/core/ipc/Peer.ahk` (`Request`).
 **Resolution:** accepted by the project owner, option (b). Commit `a62d17d` ("F-0070: report one summary line when a shutdown flush loses variables"): `FlushAll` counts the requests the peer refuses and logs one line, `shutdown: <lost> of <total> variables not written (storage refused the requests)`, instead of one storage error per variable. The loss itself stays; no protocol change, no wait on the shutdown path. Test: `FlushAll beyond the limit of the peer reports one summary line` in `tests/ahk/engine_var_files.test.ahk` (stand-in peer with a request limit; 25 marked, 10 sent, exactly one log line, no per-variable error); it failed before the change and passes after. Status: fixed, verified; to be closed by the orchestrator.
 
+
+### F-0099: Execute_Flow needs an enabled trigger, but no flow is enabled after a start
+
+**Decision (project owner, 2026-10-16, E0053):** belongs to S0003 (REQ-EXE-070), not fixed earlier.
+**What:** `Action_Execute_Flow` needs the trigger it calls to be enabled. Until WI-0060 the engine took a trigger as enabled when its flow was, and the flag of a flow was not loaded or kept after a start.
+**Closed (WI-0060, 2026-10-16):** `FlowRecord` keeps the target state per trigger (E0056); `Executor.IsTriggerEnabled` reads it; the states are kept in `FlowState.json` (E0057, written through storage, read at start). Evidence: `tests/ahk/engine_trigger_state.test.ahk` (every transition), `tests/integration/test_engine.py::test_the_switched_state_survives_a_restart_of_the_engine`, `tests/integration/test_trigger_state.py::test_the_switched_state_survives_a_session_restart`, and the WI-0055 test `tests/integration/test_core_d_flows.py::test_disabled_and_missing_flows` (still green).
 
 ## Sources
 

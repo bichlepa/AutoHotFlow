@@ -34,14 +34,14 @@ Hold(id) => El(id, "ExecKit.Test_Hold")
 SetVar(id, name, expr) => El(id, "Action_New_variable", '{"Varname":"' name '","VarValue":"' expr '","expression":"Expression"}')
 CondEl(id, expr) => El(id, "Condition_Expression", '{"Expression":"' expr '"}')
 
-; An owner with the flows of the Map flows (flow ID -> text), every flow enabled (a trigger is enabled when its flow is).
+; An owner with the flows of the Map flows (flow ID -> text), every trigger that follows its flow enabled (E0056).
 Owners(flows) {
     Probe.Reset()
     Log.memoryLines := []
     owner := EngineOwner()
     for flowId, text in flows {
         owner.flows.Load(flowId, text)
-        owner.flows.Get(flowId).Enabled := true
+        owner.flows.Get(flowId).SetFollowingEnabled(true)
     }
     return owner
 }
@@ -243,11 +243,11 @@ Action_Execute_Flow_WhichOf(v) => Default.Action_Execute_Flow.WhichOf(v)
 ; --- disabled, missing -----------------------------------------------------------------------------------------------
 DisabledFlowWithAndWithoutSkip() {
     owner := CallerAndHeldCallee(ExecPars("g", "t0", 1))
-    owner.flows.Get("g").Enabled := false
+    owner.flows.Get("g").SetFollowingEnabled(false)
     Assert.Equal(ExecOnce(owner), "exception: Trigger 't0' in 'g' is disabled")
     Assert.Equal(EndsOf(owner, "g").Length, 0, "g did not start")
     owner := CallerAndHeldCallee(ExecPars("g", "t0", 1, 1, 0, 1))
-    owner.flows.Get("g").Enabled := false
+    owner.flows.Get("g").SetFollowingEnabled(false)
     Assert.Equal(ExecOnce(owner), "finished", "skipped without error")
     Assert.Equal(Probe.Count("z"), 1)
     Assert.Equal(EndsOf(owner, "g").Length, 0, "g did not start")

@@ -6,6 +6,7 @@
 #Include ..\core\Role.ahk
 #Include FlowRecord.ahk
 #Include FlowTable.ahk
+#Include FlowStateFile.ahk
 #Include Executor.ahk
 #Include WorkerBridge.ahk
 #Include VarRequests.ahk
@@ -27,9 +28,10 @@
 ; peer) the files not yet asked for are not asked, nothing is reported as an error, and the engine waits for
 ; storage again; then it fetches the list again and reads only the files that have no result yet.
 ; Then (WI-0041) it loads the global and static variables through storage (VarLoader, staggered the same way, with
-; the same waiting for storage after an abort); evt.engine.ready is sent once every file of the list has a result
-; (loaded, or a real read or parse error) and the variables are loaded. Changes of the variables are written back
-; delayed by VarWriter and at shutdown.
+; the same waiting for storage after an abort); then (WI-0060) the enabled state of the triggers from FlowState.json
+; (FlowStateFile). evt.engine.ready is sent once every file of the list has a result (loaded, or a real read or parse
+; error) and the variables and the state are loaded. Changes of the variables are written back delayed by VarWriter
+; and at shutdown; changes of the trigger state by FlowStateFile.
 ; A list that fails for another reason is retried without limit, with a growing pause.
 ;
 ; Every evt.* carries "epoch" (the start of this engine process) and "seq" (one counter per engine
@@ -61,6 +63,7 @@ class Engine extends Role {
         this.epoch := Engine._NewEpoch()
         this.seq := 0
         this.flows := FlowTable()
+        this.flowState := FlowStateFile(this, this.flows)   ; enabled state of the triggers (WI-0060)
         this.vars := EngineVars()      ; global and static variables (WI-0040)
         this.varLoader := VarLoader(this, this.vars)
         varOpts := Engine._VarOptions(args)
@@ -90,8 +93,10 @@ class Engine extends Role {
         this.On("cmd.flow.start", (msg) => this._CmdFlowStart(msg))
         this.On("cmd.flow.stop", (msg) => this._CmdFlowStop(msg))
         this.On("cmd.flow.toggle", (msg) => this._CmdFlowToggle(msg))
-        this.On("cmd.flow.enable", (msg) => this._CmdFlowEnable(msg, true))
-        this.On("cmd.flow.disable", (msg) => this._CmdFlowEnable(msg, false))
+        this.On("cmd.flow.enable", (msg) => this._CmdFlowEnable(msg))
+        this.On("cmd.flow.disable", (msg) => this._CmdFlowDisable(msg))
+        this.On("cmd.trigger.enable", (msg) => this._CmdTriggerSwitch(msg, true))
+        this.On("cmd.trigger.disable", (msg) => this._CmdTriggerSwitch(msg, false))
         this.On("cmd.flow.patch", (msg) => this._CmdFlowPatch(msg))
         this.On("cmd.flow.save", (msg) => this._CmdFlowSave(msg))
         this.On("evt.worker.done", (msg) => this.workers.OnDone(msg))
@@ -114,7 +119,7 @@ class Engine extends Role {
     DiagInfo() {
         flows := []
         for rec in this.flows.All() {
-            flows.Push(Map("flowId", rec.FlowId, "name", rec.Def.Name, "rev", rec.Rev, "enabled", Json.Bool(rec.Enabled)
+            flows.Push(Map("flowId", rec.FlowId, "name", rec.Def.Name, "rev", rec.Rev, "enabled", Json.Bool(rec.IsFlowEnabled())
                 , "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))))
         }
         return Map("epoch", this.epoch, "seq", this.seq, "flows", flows, "instances", this.executor.DiagInstances()
@@ -140,6 +145,11 @@ class Engine extends Role {
         } catch as e {
             this._Log("a0", "engine", "shutdown: stopping the instances failed: " Type(e) ": " e.Message)
         }
+        try {
+            this.flowState.FlushAll(deadlineMs)
+        } catch as e {
+            this._Log("a0", "engine", "shutdown: sending the trigger state failed: " Type(e) ": " e.Message)
+        }
         sent := this.varWriter.FlushAll(deadlineMs)
         if (sent > 0)
             this._Log("a1", "engine", "shutdown: " sent " variable(s) sent to storage")
@@ -164,12 +174,20 @@ class Engine extends Role {
         }
     }
 
-    ; evt.flow.state for one flow: enabled flag and whether an instance runs.
+    ; evt.flow.state for one flow: the derived enabled state, the number of independent triggers that are enabled and
+    ; whether an instance runs (E0056).
     EmitFlowState(flowId) {
         rec := this.flows.Get(flowId)
-        enabled := IsObject(rec) ? rec.Enabled : false
+        enabled := IsObject(rec) ? rec.IsFlowEnabled() : false
+        independent := IsObject(rec) ? rec.IndependentActiveCount() : 0
         this.Emit("topic:flow:" flowId, "evt.flow.state", Map("flowId", flowId, "enabled", Json.Bool(enabled)
-            , "executing", Json.Bool(this.executor.IsExecuting(flowId))))
+            , "independentActive", independent, "executing", Json.Bool(this.executor.IsExecuting(flowId))))
+    }
+
+    ; evt.trigger.state for one trigger: its target state changed (WI-0060; WI-0062 adds armed and message).
+    EmitTriggerState(flowId, triggerId, enabled) {
+        this.Emit("topic:flow:" flowId, "evt.trigger.state", Map("flowId", flowId, "elementId", triggerId
+            , "enabled", Json.Bool(enabled)))
     }
 
     ; Asks for a dispatch tick soon (once, after the current message).
@@ -358,10 +376,17 @@ class Engine extends Role {
         flowIds := []
         for rec in this.flows.All()
             flowIds.Push(rec.FlowId)
-        this.varLoader.Run(flowIds, () => this._VarsLoaded(), (why) => this._LoadInterrupted(why))
+        this.varLoader.Run(flowIds, () => this._StateLoaded(), (why) => this._LoadInterrupted(why))
     }
 
-    ; Flows and variables are loaded: the start is complete.
+    ; The variables are loaded: the enabled state of the triggers is next (WI-0060). Storage gone: the start waits again.
+    _StateLoaded() {
+        if (this._flowsLoaded)
+            return
+        this.flowState.Load(() => this._VarsLoaded(), (why) => this._LoadInterrupted(why))
+    }
+
+    ; Flows, variables and the trigger state are loaded: the start is complete.
     _VarsLoaded() {
         if (this._flowsLoaded)
             return
@@ -392,7 +417,7 @@ class Engine extends Role {
         list := []
         for rec in this.flows.All() {
             list.Push(Map("flowId", rec.FlowId, "name", rec.Def.Name, "category", rec.Def.Category
-                , "enabled", Json.Bool(rec.Enabled), "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))
+                , "enabled", Json.Bool(rec.IsFlowEnabled()), "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))
                 , "rev", rec.Rev))
         }
         ; "ready": the start is complete (evt.engine.ready was sent). A client that subscribed late cannot know it from the
@@ -432,13 +457,46 @@ class Engine extends Role {
         return Map("action", "started", "instanceId", instId)
     }
 
-    ; Phase 2: sets the flag and reports it. No trigger is armed (WI-0014, Phase 3).
-    _CmdFlowEnable(msg, enabled) {
-        flowId := Engine.Text(msg, "flowId")
-        rec := this.flows.Require(flowId)
-        rec.Enabled := enabled
-        this.EmitFlowState(flowId)
+    ; cmd.flow.enable (E0056): every trigger that follows the flow is enabled. Nothing is armed yet (WI-0062).
+    _CmdFlowEnable(msg) {
+        rec := this.flows.Require(Engine.Text(msg, "flowId"))
+        if (!rec.HasFollowingTrigger())
+            return Engine._NoFollowingTrigger(rec.FlowId)
+        this._SwitchTriggers(rec, rec.SetFollowingEnabled(true))
         return Map()
+    }
+
+    ; cmd.flow.disable (E0056): every trigger that follows the flow is disabled, with all: true every trigger. The answer
+    ; counts the independent triggers that stay enabled, so the manager can ask about them.
+    _CmdFlowDisable(msg) {
+        rec := this.flows.Require(Engine.Text(msg, "flowId"))
+        all := Engine._Flag(msg.payload.Get("all", 0))
+        if (!all && !rec.HasFollowingTrigger())
+            return Engine._NoFollowingTrigger(rec.FlowId)
+        this._SwitchTriggers(rec, rec.SetFollowingEnabled(false, all))
+        return Map("independentActive", rec.IndependentActiveCount())
+    }
+
+    ; cmd.trigger.enable / cmd.trigger.disable (E0056): one trigger. bad_payload if the element is not a trigger of the flow.
+    _CmdTriggerSwitch(msg, enabled) {
+        rec := this.flows.Require(Engine.Text(msg, "flowId"))
+        triggerId := Engine.Text(msg, "elementId")
+        if (rec.Def.ElementKind(triggerId) != "trigger")
+            throw AhfError("element '" triggerId "' is not a trigger of flow '" rec.FlowId "'", ErrCode.BAD_PAYLOAD)
+        if (rec.SetTriggerEnabled(triggerId, enabled))
+            this._SwitchTriggers(rec, [triggerId])
+        return Map()
+    }
+
+    ; Sends evt.trigger.state for every trigger whose target state changed, then evt.flow.state, and marks the state
+    ; for FlowState.json (WI-0060). Nothing is sent when nothing changed.
+    _SwitchTriggers(rec, changed) {
+        if (changed.Length = 0)
+            return
+        for triggerId in changed
+            this.EmitTriggerState(rec.FlowId, triggerId, rec.TriggerEnabled(triggerId))
+        this.EmitFlowState(rec.FlowId)
+        this.flowState.Touch()
     }
 
     ; Patch schema (PROTOCOL 4.2). Phase 2 checks the revision and the shape of the operations, then
@@ -553,6 +611,13 @@ class Engine extends Role {
             return true
         return code = ErrCode.NOT_FOUND && SubStr(String(err.Get("message", "")), 1, 7) = "no peer"
     }
+
+    ; The answer of a switch of a flow that has no trigger which follows it (nothing changed).
+    static _NoFollowingTrigger(flowId) => Map("ok", false, "message", "flow '" flowId "' has no trigger that follows the "
+        . "flow, nothing changed")
+
+    ; A boolean of a message: true for Json.True, 1, "1" or "true" (the parser gives 1 and 0 for true and false).
+    static _Flag(v) => (v == Json.True || (!IsObject(v) && (v = 1 || v = "1" || v = "true")))
 
     static _ErrorText(res) {
         err := res.payload.Get("error", "")

@@ -35,6 +35,7 @@ class StorageStub:
         self._thread = threading.Thread(target=self._serve, name="storage-stub", daemon=True)
         self.list_calls = 0
         self.read_calls = []
+        self.state_writes = []  # texts of cmd.storage.flowstate.write, in arrival order (WI-0060)
         self.logs = []          # payloads of evt.log.append (noReply), in arrival order
         self.var_writes = []    # (type, payload) of cmd.storage.var.set / .delete, in arrival order (WI-0041)
 
@@ -72,6 +73,22 @@ class StorageStub:
             self.client.reply(msg, {"ok": True, "names": []})
         elif type_ in ("cmd.storage.var.set", "cmd.storage.var.delete"):
             self.var_writes.append((type_, payload))
+            self.client.reply(msg, {"ok": True})
+        elif type_ == "cmd.storage.flowstate.read":
+            # WI-0060: FlowState.json in the data folder, as storage keeps it.
+            target = self.datadir / "FlowState.json"
+            if target.is_file():
+                self.client.reply(msg, {"ok": True, "exists": True, "text": target.read_text(encoding="utf-8")})
+            else:
+                self.client.reply(msg, {"ok": True, "exists": False})
+        elif type_ == "cmd.storage.flowstate.write":
+            (self.datadir / "FlowState.json").write_text(payload.get("text", ""), encoding="utf-8")
+            self.state_writes.append(payload.get("text", ""))     # after the file: tests wait for the list
+            self.client.reply(msg, {"ok": True})
+        elif type_ == "cmd.storage.flowstate.keepBroken":
+            target = self.datadir / "FlowState.json"
+            if target.is_file():
+                target.replace(self.datadir / "FlowState.json.broken")
             self.client.reply(msg, {"ok": True})
         elif type_ == "cmd.storage.flow.read":
             path = payload.get("path", "")
@@ -815,3 +832,146 @@ def test_patch_operations_are_validated_and_refused_until_phase_3(pipe, flowdir,
             if text is not None:
                 assert text in error["message"], error
         assert ask(obs, "cmd.engine.snapshot")["flows"][0]["rev"] == 1
+
+
+# --- enabled state of the triggers (WI-0060, E0056, E0057, E0058) ----------------------------------
+
+INDEPENDENT = "independent"
+
+
+def make_switch_flow(flowdir, name, following=True, v1_file=False):
+    """The skeleton with a second trigger INDEPENDENT that does not follow the flow (followsFlow false). following
+    false makes the first trigger independent too. v1_file: no formatVersion and an "enabled" key at the first trigger."""
+    flow = json.loads(SKELETON_SRC.read_text(encoding="utf-8"))
+    flow["name"] = name
+    if not v1_file:
+        flow["formatVersion"] = 2
+    first = flow["allElements"][TRIGGER]
+    if v1_file:
+        first["enabled"] = "1"
+    if not following:
+        first["followsFlow"] = False
+    other = dict(first)
+    other["ID"] = INDEPENDENT
+    other["followsFlow"] = False
+    flow["allElements"][INDEPENDENT] = other
+    (flowdir / "Flows" / (name + ".json")).write_text(json.dumps(flow, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def flow_enabled(snap, flow_id):
+    return [f["enabled"] for f in snap["flows"] if f["flowId"] == flow_id][0]
+
+
+def drain(obs, timeout=0.5):
+    return list(obs.events(timeout=timeout))
+
+
+def trigger_states(msgs):
+    return [(m["payload"]["elementId"], m["payload"]["enabled"]) for m in msgs if m["type"] == "evt.trigger.state"]
+
+
+def flow_states(msgs):
+    return [(m["payload"]["enabled"], m["payload"]["independentActive"]) for m in msgs if m["type"] == "evt.flow.state"]
+
+
+def test_switches_report_the_trigger_states_and_the_independent_count(procs, runs, pipe, session_id, hub,
+                                                                       flowdir, storage):
+    make_switch_flow(flowdir, "sw")
+    with subscribe_flow(pipe, "sw") as obs:
+        start_engine(procs, flowdir, runs, pipe, session_id)
+        wait_ready(obs)
+        assert flow_enabled(ask(obs, "cmd.engine.snapshot"), "sw") is False
+        ask(obs, "cmd.flow.enable", {"flowId": "sw"})
+        got = drain(obs)
+        assert trigger_states(got) == [(TRIGGER, True)] and flow_states(got) == [(True, 0)]
+        ask(obs, "cmd.trigger.enable", {"flowId": "sw", "elementId": INDEPENDENT})
+        got = drain(obs)
+        assert trigger_states(got) == [(INDEPENDENT, True)] and flow_states(got) == [(True, 1)]
+        assert ask(obs, "cmd.flow.disable", {"flowId": "sw"})["independentActive"] == 1
+        got = drain(obs)
+        assert trigger_states(got) == [(TRIGGER, False)] and flow_states(got) == [(False, 1)]
+        assert ask(obs, "cmd.flow.disable", {"flowId": "sw", "all": True})["independentActive"] == 0
+        got = drain(obs)
+        assert trigger_states(got) == [(INDEPENDENT, False)] and flow_states(got) == [(False, 0)]
+        ask(obs, "cmd.flow.disable", {"flowId": "sw"})          # nothing changes: no event
+        assert drain(obs) == []
+        refused = obs.request("engine", "cmd.trigger.enable", {"flowId": "sw", "elementId": SLEEP})["payload"]
+        assert refused["ok"] is False and refused["error"]["code"] == "bad_payload"
+        assert ask(obs, "cmd.flow.start", {"flowId": "sw"})["instanceId"]   # a disabled flow can still be started
+        stop_flow(obs, "sw")
+
+
+def test_a_flow_without_a_following_trigger_answers_with_a_message(procs, runs, pipe, session_id, hub,
+                                                                    flowdir, storage):
+    make_switch_flow(flowdir, "nf", following=False)
+    with subscribe_flow(pipe, "nf") as obs:
+        start_engine(procs, flowdir, runs, pipe, session_id)
+        wait_ready(obs)
+        for type_ in ("cmd.flow.enable", "cmd.flow.disable"):
+            answer = obs.request("engine", type_, {"flowId": "nf"})["payload"]
+            assert answer["ok"] is False and "follows" in answer["message"], answer
+        assert drain(obs) == []
+        answer = ask(obs, "cmd.flow.disable", {"flowId": "nf", "all": True})
+        assert answer["independentActive"] == 0 and drain(obs) == []
+
+
+def test_the_switched_state_survives_a_restart_of_the_engine(procs, runs, pipe, session_id, hub, flowdir, storage):
+    make_switch_flow(flowdir, "sw")
+    with observer(pipe, "engine") as obs:
+        start_engine(procs, flowdir, runs, pipe, session_id)
+        wait_ready(obs)
+        ask(obs, "cmd.flow.enable", {"flowId": "sw"})
+        ask(obs, "cmd.trigger.enable", {"flowId": "sw", "elementId": INDEPENDENT})
+    # The engine ends at once after the switches: the state goes out before sys.bye (shutdown flush).
+    hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 2000})
+    assert wait_for(lambda: len(storage.state_writes) >= 1, timeout=5.0), "no FlowState.json written"
+    assert json.loads((flowdir / "FlowState.json").read_text(encoding="utf-8")) == {
+        "formatVersion": 1, "flows": {"sw": sorted([TRIGGER, INDEPENDENT])}}
+    with observer(pipe, "engine") as obs:
+        run = start_engine(procs, flowdir, runs, pipe, session_id)
+        wait_ready(obs)
+        assert flow_enabled(ask(obs, "cmd.engine.snapshot"), "sw") is True
+        assert ask(obs, "cmd.flow.disable", {"flowId": "sw"})["independentActive"] == 1
+        hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
+        assert run.wait_exit(timeout=10) == 0, run.stderr_text()
+
+
+def test_switches_within_a_second_are_written_once_or_twice_not_per_switch(procs, runs, pipe, session_id, hub,
+                                                                           flowdir, storage):
+    make_switch_flow(flowdir, "sw")
+    with observer(pipe, "engine") as obs:
+        start_engine(procs, flowdir, runs, pipe, session_id)
+        wait_ready(obs)
+        for _ in range(10):
+            ask(obs, "cmd.flow.enable", {"flowId": "sw"})
+            ask(obs, "cmd.flow.disable", {"flowId": "sw"})
+        ask(obs, "cmd.flow.enable", {"flowId": "sw"})
+        assert wait_for(lambda: len(storage.state_writes) >= 1, timeout=3.0)
+        time.sleep(scaled(1.5))
+        assert len(storage.state_writes) <= 3, len(storage.state_writes)
+        assert json.loads(storage.state_writes[-1])["flows"]["sw"] == [TRIGGER]
+        hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
+
+
+def test_a_v1_file_with_enabled_keys_loads_disabled(procs, runs, pipe, session_id, hub, flowdir, storage):
+    make_switch_flow(flowdir, "v1", v1_file=True)
+    with observer(pipe, "engine") as obs:
+        start_engine(procs, flowdir, runs, pipe, session_id)
+        wait_ready(obs)
+        assert flow_enabled(ask(obs, "cmd.engine.snapshot"), "v1") is False
+        assert ask(obs, "cmd.flow.disable", {"flowId": "v1", "all": True})["independentActive"] == 0
+        assert not (flowdir / "FlowState.json").exists(), "nothing was switched, so nothing is written"
+        hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
+
+
+def test_a_broken_flow_state_is_kept_as_broken_and_does_not_stop_the_start(procs, runs, pipe, session_id, hub,
+                                                                           flowdir, storage):
+    make_switch_flow(flowdir, "sw")
+    (flowdir / "FlowState.json").write_text("{not json", encoding="utf-8")
+    with observer(pipe, "engine") as obs:
+        start_engine(procs, flowdir, runs, pipe, session_id)
+        wait_ready(obs)
+        assert flow_enabled(ask(obs, "cmd.engine.snapshot"), "sw") is False
+        assert (flowdir / "FlowState.json.broken").read_text(encoding="utf-8") == "{not json"
+        assert wait_for(lambda: any("FlowState.json is broken" in (line.get("text") or "") for line in storage.logs))
+        hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})

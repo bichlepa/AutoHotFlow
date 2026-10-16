@@ -127,11 +127,11 @@ The user starts a flow from the manager or the editor, through its default manua
 ### REQ-EXE-070 Enable and disable a flow
 
 - **v1:** yes
-- **v2:** partial (the state can be switched and is reported; triggers do not react yet; that the state survives a restart of AutoHotFlow is not checked)
+- **v2:** partial (the enabled state of each trigger is kept, switched, reported and survives a restart of AutoHotFlow; no trigger reacts yet, WI-0062)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003 (WI-0060, WI-0062), S0004 (manager)
-- **Evidence:** `tests/integration/test_engine.py::test_enable_and_disable_set_the_flag_and_report_it`
+- **Plan:** S0003 (WI-0060 done, WI-0062 arms the triggers), S0004 (manager)
+- **Evidence:** `tests/integration/test_engine.py::test_enable_and_disable_set_the_flag_and_report_it`, `tests/integration/test_engine.py::test_the_switched_state_survives_a_restart_of_the_engine`, `tests/ahk/engine_trigger_state.test.ahk`
 
 Enabling a flow activates its triggers that switch with the flow; disabling deactivates them (triggers that switch on their own: REQ-TRG-050). Running instances are not affected. The state survives a restart of AutoHotFlow. A flow file of v1 loads disabled (E0058). Decisions E0056, E0057.
 
@@ -1155,20 +1155,22 @@ When two enabled flows, or two triggers of one flow, use the same hotkey or hots
 ### REQ-TRG-030 Several triggers per flow
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (each trigger has its own enabled state and can be switched on its own; no trigger is armed yet, and the editor cannot add or switch one yet)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003, S0006
+- **Plan:** S0003 (WI-0060 done), S0006
+- **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`
 
 A flow can have several triggers. Each trigger can be enabled and disabled on its own, and can be set to switch with the flow or on its own (REQ-TRG-050). One manual trigger is the default trigger, used when the flow is started without naming a trigger.
 
 ### REQ-TRG-050 Triggers that switch with the flow or on their own
 
 - **v1:** no (every trigger switches with the flow)
-- **v2:** open
+- **v2:** partial (the engine has the option "switch with the flow" and the independent triggers, and the flow is active by the following ones only; the manager and the editor are missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0003 (WI-0060, WI-0065), S0004 (manager), S0007 (editor)
+- **Plan:** S0003 (WI-0060 done, WI-0065), S0004 (manager), S0007 (editor)
+- **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_engine.py::test_a_flow_without_a_following_trigger_answers_with_a_message`
 
 Each trigger has the option "Switch with the flow", on by default, so that a flow behaves as in v1 (decision E0056).
 
