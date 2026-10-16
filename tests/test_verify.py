@@ -131,9 +131,28 @@ def repo(tmp_path):
     root = tmp_path / "repo"
     root.mkdir()
     git(root, "init", "-q")
+    git(root, "symbolic-ref", "HEAD", "refs/heads/v2-port")     # the record branch of verify.py
     commit(root, {".gitignore": "temp/\n", "src/a.ahk": "a", "tests/t.py": "t", "tools/x.py": "x", "doc/d.md": "d"},
            "base")
     return root
+
+
+def test_a_green_run_on_a_branch_is_not_recorded(repo, tmp_path, capsys):
+    git(repo, "checkout", "-q", "-b", "wip")
+    commit(repo, {"src/a.ahk": "branch change"}, "branch change")
+    assert verify.main(["--tiers", "fast"], runner=FakeRunner(tmp_path / "runs"), repo=repo) == 0
+    assert not (repo / "temp" / "verify" / "last.json").exists()
+    out = capsys.readouterr().out
+    assert "not recorded (not on v2-port)" in out and "VERDICT: green" in out
+
+
+def test_a_green_run_of_an_ancestor_of_v2_port_is_recorded(repo, tmp_path):
+    """The base commit is an ancestor once v2-port has moved on: its green run is recorded."""
+    base_sha = verify.resolve(repo, "HEAD")
+    commit(repo, {"doc/e.md": "e"}, "v2-port moves on")
+    assert verify.main(["--ref", base_sha, "--tiers", "fast"], runner=FakeRunner(tmp_path / "runs"), repo=repo) == 0
+    state = json.loads((repo / "temp" / "verify" / "last.json").read_text(encoding="utf-8"))
+    assert state["sha"] == base_sha
 
 
 class FakeRunner:

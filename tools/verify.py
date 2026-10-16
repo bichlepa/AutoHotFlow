@@ -26,7 +26,9 @@ What it does:
   * per run it reads the result folder of run_suite (output.txt, status.json): run id, exit code, the summary line,
     INTERNALERROR in the output, and the names of the failed tests (at most 10 per run).
   * when every selected tier is green, it writes the last green state to temp/verify/last.json of the main checkout
-    (sha, tree hashes of src, tests and tools, tiers, run ids, time). The file is git-ignored.
+    (sha, tree hashes of src, tests and tools, tiers, run ids, time). The file is git-ignored. Only a sha that is
+    v2-port or an ancestor of it is written ("not recorded (not on v2-port)" otherwise): a run of a branch never
+    becomes the base of --auto.
 
 Exit code: 0 green or skipped, 1 red (a tier is not green, could not run, or shows INTERNALERROR), 2 usage or git
 error. A last green state that cannot be written is a note in the output, not a failure.
@@ -74,6 +76,7 @@ SLOW_FILES = ("tests/support/timing.py",)
 # The trees that decide whether two code states are the same (documentation is not one of them).
 TREE_DIRS = ("src", "tests", "tools")
 
+RECORD_BRANCH = "v2-port"       # only states on this branch (or its ancestors) become the last green state
 MAX_FAILED_SHOWN = 10
 EXIT_GREEN = 0
 EXIT_RED = 1
@@ -114,6 +117,13 @@ def tree_hashes(repo, sha):
 def changed_paths(repo, base, sha):
     out = git(repo, "diff", "--name-only", "%s..%s" % (base, sha))
     return [line for line in out.splitlines() if line]
+
+
+def on_record_branch(repo, sha):
+    """True when sha is RECORD_BRANCH or one of its ancestors. A run of a branch is never the base of --auto."""
+    proc = subprocess.run(["git", "merge-base", "--is-ancestor", sha, RECORD_BRANCH], cwd=str(repo),
+                          capture_output=True)
+    return proc.returncode == 0
 
 
 def state_path(repo):
@@ -339,7 +349,9 @@ def main(argv=None, runner=None, repo=REPO):
     outcomes = run_tiers(tiers, sha, runner or run_suite_runner)
     verdict, detail = verdict_of(outcomes)
     code = EXIT_GREEN if verdict == "green" else EXIT_RED
-    if verdict == "green":
+    if verdict == "green" and not on_record_branch(repo, sha):
+        notes.append("not recorded (not on %s)" % RECORD_BRANCH)
+    elif verdict == "green":
         try:
             write_state(state_file, {
                 "sha": sha, "trees": tree_hashes(repo, sha), "tiers": tiers,
