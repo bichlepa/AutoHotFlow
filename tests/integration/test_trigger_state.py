@@ -120,6 +120,11 @@ def test_an_unreadable_state_file_refuses_a_switch_until_it_can_be_read(flows):
     # The file can be read again: the next switch reads it and applies to its state.
     state_file(flows.datadir).rmdir()
     state_file(flows.datadir).write_text(json.dumps({"formatVersion": 1, "enabled": [INDEPENDENT]}), encoding="utf-8")
+    mark = flows._rec.mark()
     flows.request_ok("engine", "cmd.flow.enable", {"flowId": FLOW})
+    # The late read merged INDEPENDENT into the state: it is announced (and armed) as well, not only the switched trigger.
+    announced = {m["payload"]["elementId"] for m in flows.messages(mark) if m.get("type") == "evt.trigger.state"
+                 and m["payload"].get("enabled") is True}
+    assert announced == {TRIGGER, INDEPENDENT}, announced
     expected = {"formatVersion": 1, "enabled": sorted([TRIGGER, INDEPENDENT])}
     assert wait_for(lambda: read_state(flows.datadir) == expected), read_state(flows.datadir)

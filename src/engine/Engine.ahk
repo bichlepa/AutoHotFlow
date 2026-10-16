@@ -559,6 +559,16 @@ class Engine extends Role {
     _ReplySwitch(request, flowId, apply) {
         try {
             this.EmitFlowState(flowId)                  ; the read succeeded: the state is known now
+            ; The read enabled the triggers of the file. Arm and announce them before the switch, as the start does; else
+            ; only the switched triggers would be armed and the others stay unarmed until a restart.
+            rec := this.flows.Get(flowId)
+            merged := this.flowState.TakeMerged(flowId)
+            if (IsObject(rec) && merged.Length > 0) {
+                for triggerId in merged
+                    this.arms.Changed(rec, triggerId)
+                for triggerId in merged
+                    this.EmitTriggerState(flowId, triggerId)
+            }
             this.peer.Reply(request, apply())
         } catch as e {
             this._Log("a0", "engine", "answering a switch failed: " Type(e) ": " e.Message)

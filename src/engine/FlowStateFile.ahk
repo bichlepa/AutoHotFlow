@@ -37,6 +37,7 @@ class FlowStateFile {
         this._queue := []              ; flow IDs of the start that have no read yet
         this._reads := Map()          ; flow ID -> attempt, while a read or a retry of the flow is open
         this._known := Map()           ; flow ID -> true, the state is established
+        this._merged := Map()          ; flow ID -> IDs of the triggers that the last read enabled (TakeMerged)
         this._errors := Map()          ; flow ID -> text, the state is unknown (the file could not be read)
         this._waiters := Map()         ; flow ID -> [onReady, onFail] of a switch that waits for its read
         this._dirty := Map()           ; flow ID -> true, changed and not written yet
@@ -53,6 +54,13 @@ class FlowStateFile {
     Loaded => this._loaded
 
     ; True when the state of the flow is established (read, missing or broken, or forced).
+    ; The triggers that the last read of this flow enabled (once; empty if none). The engine arms and announces them.
+    TakeMerged(flowId) {
+        merged := this._merged.Get(flowId, [])
+        this._merged.Delete(flowId)
+        return merged
+    }
+
     IsKnown(flowId) => this._known.Has(flowId)
 
     ; The text of the read error when the state of the flow is unknown, else "".
@@ -251,7 +259,7 @@ class FlowStateFile {
         }
         rec := this._flows.Get(flowId)
         if (IsObject(rec))
-            rec.LoadEnabledTriggers(enabled)
+            this._merged[flowId] := rec.LoadEnabledTriggers(enabled)
         this._Forget(this._errors, flowId)
         this._known[flowId] := true
         this._Settle(flowId, true, "")

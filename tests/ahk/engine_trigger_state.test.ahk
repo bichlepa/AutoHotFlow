@@ -84,7 +84,7 @@ NotATriggerIsNeverEnabled() {
     Assert.Equal(rec.SetTriggerEnabled("a1", true), false, "an action cannot be switched on")
     Assert.Equal(rec.TriggerEnabled("a1"), false, "an action is not a trigger")
     Assert.Equal(rec.TriggerEnabled("nope"), false, "an unknown ID is not a trigger")
-    Assert.Equal(rec.LoadEnabledTriggers(["a1", "nope", "t1"]), 1, "only the trigger is taken from a file")
+    Assert.Equal(rec.LoadEnabledTriggers(["a1", "nope", "t1"]).Length, 1, "only the trigger is taken from a file")
     Assert.Equal(Ids(rec.EnabledTriggers()), "t1,")
 }
 
@@ -105,7 +105,7 @@ FlowWithoutFollowingTriggerSaysSo() {
 LoadedStateFromTheFileIsTakenAndMerged() {
     rec := FlowRecord("f", Flow())
     rec.SetTriggerEnabled("t3", true)
-    Assert.Equal(rec.LoadEnabledTriggers(["t1", "t2"]), 2, "t3 was already set, so two are new")
+    Assert.Equal(rec.LoadEnabledTriggers(["t1", "t2"]).Length, 2, "t3 was already set, so two are new")
     Assert.Equal(Ids(rec.EnabledTriggers()), "t1,t2,t3,")
     Assert.Equal(rec.IndependentActiveCount(), 1)
     Assert.True(rec.IsFlowEnabled())

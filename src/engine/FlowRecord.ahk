@@ -93,15 +93,15 @@ class FlowRecord {
         return changed
     }
 
-    ; Takes the enabled triggers of the file FlowStates/<flowId>.json (the IDs that are triggers of this flow). Returns the number taken.
+    ; Takes the enabled triggers of the file FlowStates/<flowId>.json (the IDs that are triggers of this flow). Returns the IDs that were newly enabled.
     LoadEnabledTriggers(triggerIds) {
-        n := 0
+        taken := []
         for triggerId in triggerIds {
             if (this.Def.ElementKind(triggerId) = "trigger" && !this._enabled.Has(triggerId)) {
                 this._enabled[triggerId] := true
-                n += 1
+                taken.Push(triggerId)
             }
         }
-        return n
+        return taken
     }
 }
