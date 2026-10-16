@@ -795,6 +795,19 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: renumber findings (dry run)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/renumber_findings.py",
+                "--dry-run"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Test: deviation catalog of the new expression language against the golden data of v1",
             "type": "shell",
             "command": "python",
