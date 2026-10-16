@@ -4,18 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **HOW-TO cleanup (owner decides; no entry is changed until then).** Candidates to merge or remove, from the split of `doc/howto/`:
-  - syntax: "A space before `;` inside a string literal starts a comment" and "A semicolon after whitespace starts a comment even inside a string" (same fact).
-  - Four entries on local variables or parameters named like functions or classes (syntax and tests).
-  - "A static method used as a callback shifts the parameters" (syntax) and "A static class method is not a callback" (error handling).
-  - "Truth values are the integers 1 and 0", "`Json.False` is true", "`Json.Parse` returns `true` as 1".
-  - Three entries on overlapped pipe I/O (processes).
-  - "Events before a subscription are lost..." and "A message sent only once does not reach a child that connects later".
-  - "Re-entry: Pump, SendFrame and handlers interrupt each other" and "A re-entry lock makes pump first ineffective".
-  - Two ctypes entries and three entries on test process output and `ahkrun.py` (tests).
-  - "The AHK interpreter does not know --version" and "32-bit interpreter: check A_PtrSize" (both already rules in AGENTS.md).
-  - Three entries on name clashes in classes (syntax, objects).
-- **Notes that exist only in the status book.** `work_items/phase3/STATUS.md`, section "Recorded only here", has 11 notes that no other document holds. For each one: move it to its proper document (OPEN-ITEMS, MIGRATION, MANUAL-CHECKS), or drop it.
+None open. The HOW-TO cleanup and the status-book notes were decided by a documentation agent (see the commits of `doc/howto/` and `doc/OPEN-ITEMS.md`).
 
 ## To know
 
