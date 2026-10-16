@@ -1141,7 +1141,7 @@ Hotkeys, hooks and timers react at once, no matter how busy the running flows ar
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003 (the hotkey trigger with real keys: owner decision)
-- **Evidence:** `tests/integration/test_time_triggers.py` (WI-0063), `tests/integration/test_trigger_arming.py` (WI-0062: an enabled trigger is armed and fires, disabling disarms it, the startup trigger fires once per start, a restart of the engine or of the host re-arms), `tests/ahk/engine_trigger_arms.test.ahk`
+- **Evidence:** `tests/integration/test_time_triggers.py` (WI-0063), `tests/integration/test_trigger_arming.py`, `tests/integration/test_hotkey_arming.py` (WI-0067: the hotkey trigger is armed, disarmed and re-armed after a restart of the trigger host; no keys are sent) (WI-0062: an enabled trigger is armed and fires, disabling disarms it, the startup trigger fires once per start, a restart of the engine or of the host re-arms), `tests/ahk/engine_trigger_arms.test.ahk`
 
 The enabled triggers are active from the start of AutoHotFlow on, and again after an internal restart (REQ-ROB-040); disabling a flow deactivates the triggers that switch with it (REQ-EXE-070).
 
