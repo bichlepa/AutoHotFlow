@@ -36,6 +36,7 @@ EXIT_BAD_ARGS = 2
 EXIT_FORCED = 5
 START_BUDGET_S = scaled(3.0)          # acceptance: all required roles ready within 3 s
 CRASH_BUDGET_S = scaled(1.0)          # acceptance: evt.process.crashed within 1 s of the death
+CRASH_LAG_NOISE_S = scaled(0.25)       # a thread of the test may stamp its time this late (F-0096)
 HANG_BUDGET_S = scaled(8.0)           # acceptance: a frozen process is hung within 8 s
 CLEAN_EXIT_BUDGET_S = scaled(2.0)     # acceptance: healthy children, exit within 2 s
 FROZEN_EXIT_SLACK_S = scaled(1.0)     # acceptance: frozen child, exit within deadline + 1 s
@@ -518,7 +519,10 @@ def test_crashed_child_is_reported_within_1s_restarted_by_policy_and_others_are_
             assert pid in deaths, "no death recorded for pid %s" % pid
             lag = t_event - deaths[pid]
             print("\ncrash of pid %s reported %.3f s after its death" % (pid, lag))
-            assert -0.05 <= lag <= CRASH_BUDGET_S, "crash reported %.3f s after the death" % lag
+            # Both times are taken by Python threads that wake up late under load (the death watcher and the event
+            # reader), so the lag has noise on both sides. The lower bound only rules out a report that comes long
+            # before the death (F-0096).
+            assert -CRASH_LAG_NOISE_S <= lag <= CRASH_BUDGET_S, "crash reported %.3f s after the death" % lag
         # the sibling was never touched
         assert alive(keep_pid)
         assert {p["name"]: p["pid"] for p in process_list(py)}["echo:keep"] == keep_pid
