@@ -255,3 +255,5 @@ Hunter run 1 (2026-10-13) worked on two entries and stopped. Candidates not look
 
 - Hunter runs are not limited to two entries per run on principle; the limit of run 1 to 3 was a choice that the procedure does not require.
 - WI-36: the golden check on Windows compares line endings; a fix is in progress on a separate workspace (see the WI-36 row).
+
+Owner's follow-up for WI-0059 (2026-10-16): the implementer (same agent, resumed) works on `wip/wi-59b` (base f7e5e93): `-m "not stress"` no longer exclusive (one shared expression function), job object with fallback (`ownTree`), recheck at the run's commit (`--ref`), synthetic-load test exclusive and run once on an idle machine. WI-0059 is not closed until that run is green. No verifier for this follow-up (owner's pause). The fast tier is measured before and after on the idle machine.
