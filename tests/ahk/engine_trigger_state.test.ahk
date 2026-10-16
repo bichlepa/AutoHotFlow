@@ -8,6 +8,7 @@
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\core\FlowDefinition.ahk
 #Include ..\..\src\engine\FlowRecord.ahk
+#Include ..\..\src\engine\FlowStateFile.ahk
 
 ; One trigger that follows the flow (t1, key missing), one independent (t2, followsFlow false), one that follows the
 ; flow written as a v1 number (t3, followsFlow 1), one trigger with the enabled key of a v1 file (t4), and an action.
@@ -145,6 +146,25 @@ FileTextDropsTheEnabledKeyOfTriggers() {
     Assert.Equal(def.Raw["allElements"]["t4"].Has("enabled"), true, "Raw is not changed")
 }
 
+; --- FlowState.json (the format of the file, PROTOCOL 4.6) -------------------------------------------------------------
+
+ParseReadsTheEntriesOfTheFile() {
+    m := FlowStateFile.Parse('{"formatVersion":1,"flows":{"f":["t1","t2"],"g":[]}}')
+    Assert.Equal(m.Count, 2)
+    Assert.Equal(Ids(m["f"]), "t1,t2,")
+    Assert.Equal(m["g"].Length, 0, "a flow with an empty list")
+}
+
+ParseWithoutFlowsIsNothingEnabled() {
+    Assert.Equal(FlowStateFile.Parse('{"formatVersion":1}').Count, 0)
+}
+
+ParseRefusesEverythingElse() {
+    for text in ['{"formatVersion":2,"flows":{}}', '[1]', '{"flows":{}}', '{"formatVersion":1,"flows":[]}'
+        , '{"formatVersion":1,"flows":{"f":"t1"}}', '{"formatVersion":1,"flows":{"f":[{}]}}', '{broken']
+        Assert.Throws(() => FlowStateFile.Parse(text), , "refused: " text)
+}
+
 TestRun.Init()
 
 TestRun.Case("Trigger state: a new flow has nothing enabled, a v1 enabled key does not count", NewFlowHasNothingEnabled)
@@ -157,5 +177,9 @@ TestRun.Case("Trigger state: a flow without a following trigger has nothing to s
 TestRun.Case("Trigger state: the state from FlowState.json is merged into the flow", LoadedStateFromTheFileIsTakenAndMerged)
 TestRun.Case("Trigger state: followsFlow is read as true or false, missing means true", FollowsFlowReadsTheKey)
 TestRun.Case("Trigger state: the file text has no enabled key at a trigger and keeps followsFlow", FileTextDropsTheEnabledKeyOfTriggers)
+
+TestRun.Case("FlowState.json: the entries of the file are read", ParseReadsTheEntriesOfTheFile)
+TestRun.Case("FlowState.json: without flows nothing is enabled", ParseWithoutFlowsIsNothingEnabled)
+TestRun.Case("FlowState.json: other formats are refused (the engine keeps the file as broken)", ParseRefusesEverythingElse)
 
 TestRun.Finish()
