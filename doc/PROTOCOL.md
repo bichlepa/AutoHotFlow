@@ -101,7 +101,7 @@ All payloads are objects. `flowId`, `elementId`, `connectionId` are the identifi
 |---|---|
 | 4.2 Engine commands | `cmd.flow.create`, `cmd.flow.delete`, `cmd.flow.meta.update`, `cmd.trigger.enable`, `cmd.trigger.disable`, `cmd.category.*`, `cmd.settings.get/set` |
 | 4.3 Engine events | `evt.flow.committed`, `evt.connection.state`, `evt.settings.changed` |
-| 4.4 Engine ↔ trigger host | all (`cmd.trigger.arm`, `cmd.trigger.disarm`, `evt.trigger.fired`, `evt.trigger.error`); the trigger host (WI-0014, optional) is not built, the role `triggerhost` is a placeholder |
+| 4.4 Engine ↔ trigger host | all (`cmd.trigger.arm`, `cmd.trigger.disarm`, `cmd.trigger.reset`, `evt.trigger.fired`, `evt.trigger.error`); the trigger host is built (WI-0061), the engine side follows (WI-0062) |
 | 4.6 | `cmd.storage.settings.get/set` (already listed there as "not yet implemented") |
 | 4.7 Dialogs | `evt.ui.notice`, `cmd.ui.confirmDeleteFlowFile` |
 
@@ -245,12 +245,21 @@ Each event carries `seq` (increasing per engine epoch) and `epoch`.
 
 | Type | From → To | Payload | Response |
 |---|---|---|---|
-| `cmd.trigger.arm` | engine → triggerhost | `{ triggerKey, flowId, elementId, class, params }` (`params` already evaluated) | `{ ok, message? }` (errors e.g. "hotkey cannot be set") |
-| `cmd.trigger.disarm` | engine → triggerhost | `{ triggerKey }` | `{ ok }` |
-| `evt.trigger.fired` | triggerhost → engine (`to: "engine"`) | `{ triggerKey, flowId, elementId, data }` | none, the engine decides according to the execution policy |
-| `evt.trigger.error` | triggerhost → engine | `{ triggerKey, message }` | – |
+| `cmd.trigger.arm` | engine → triggerhost | `{ triggerKey, gen, flowId, elementId, class, params, context }` (`params` already evaluated, `gen` an integer, `context` a text: `""` or the start context, e.g. `ahfStartup`) | `{ ok: true, message? }`; an error of the element: `{ ok: false, message }`, the trigger is not armed; unknown class: error `not_found` |
+| `cmd.trigger.disarm` | engine → triggerhost | `{ triggerKey }` | `{ ok: true }`, also for an unknown key |
+| `cmd.trigger.reset` | engine → triggerhost | `{}` | `{ ok: true }`: disarms every trigger of the host |
+| `evt.trigger.fired` | triggerhost → engine (`to: "engine"`) | `{ triggerKey, gen, flowId, elementId, data }` (`data`: a Map of texts and numbers, `{}` if none) | none, the engine decides according to the execution policy |
+| `evt.trigger.error` | triggerhost → engine | `{ triggerKey, gen, message }`: an error in a callback of an armed trigger (timer, hotkey); the trigger stays armed | – |
 
-`triggerKey` = `<flowId>/<elementId>`. `class` is the qualified ID of the element class, `<package>.<class>` (E0045, WI-0047), for example `Default.Trigger_Hotkey`: the package of the flow element (a missing one is `Default`) and its class, in the spelling of the registered class. On `evt.engine.restarted` the engine re-arms all triggers; the trigger host discards all known ones beforehand.
+`triggerKey` = `<flowId>/<elementId>`. `class` is the qualified ID of the element class, `<package>.<class>` (E0045, WI-0047), for example `Default.Trigger_Hotkey`: the package of the flow element (a missing one is `Default`) and its class, in the spelling of the registered class.
+
+Rules of the trigger host (WI-0061):
+
+- `gen` is the generation of the arming; the host sends it back with every event, so the engine can drop an event of an older generation. Arming a `triggerKey` that is armed already disarms the old trigger first: one trigger per key, never two.
+- The host sends `evt.trigger.fired` and `evt.trigger.error` only for an armed trigger. After `cmd.trigger.disarm`, `cmd.trigger.reset` or `sys.shutdown` it sends nothing more for that trigger. An event sent before may still arrive; the engine drops it by its generation.
+- The engine sends `cmd.trigger.reset` before it arms: at its first start, after its own restart and after a restart of the trigger host. The host does not discard its triggers on `evt.engine.restarted` by itself (WI-0062 decides the re-arming).
+- An event sent while the connection to the hub is down is lost (`Peer.Send`); the reset and the arming after a restart replace it.
+- `sys.shutdown`: the host disarms every trigger, then sends `sys.bye` (ARCHITECTURE 6.3).
 
 ### 4.5 Engine ↔ worker
 
