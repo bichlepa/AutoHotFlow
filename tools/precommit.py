@@ -79,7 +79,9 @@ def run(repo=REPO, regen=regenerate, partial=None, out=None):
             print("pre-commit: an index is outdated or a requirement check fails; "
                   "run python tools/doc_index.py and commit the indexes", file=out)
         return 0
-    unstaged = set(git(repo, "diff", "--name-only").split())
+    # untracked documents count too: a new how-to entry that is not part of the commit would be listed in the index
+    unstaged = set(git(repo, "diff", "--name-only").split()) | set(
+        git(repo, "ls-files", "--others", "--exclude-standard").split())
     dirty = sorted(unstaged & (index_inputs(repo) | set(INDEXES)))
     if dirty:
         if regen(repo, True) != 0:

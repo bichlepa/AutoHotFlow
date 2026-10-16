@@ -114,3 +114,15 @@ def test_partial_commit_is_recognized_by_the_index_file_name(monkeypatch):
     assert not precommit.is_partial_commit()
     monkeypatch.delenv("GIT_INDEX_FILE")
     assert not precommit.is_partial_commit()
+
+
+def test_an_untracked_input_document_only_checks(tmp_path, capsys):
+    repo, regen = make_repo(tmp_path), FakeRegen()
+    (repo / "doc" / "howto").mkdir()
+    (repo / "doc" / "howto" / "NEW.md").write_bytes(b"# new entry\n")     # not added: not part of the commit
+    (repo / "notes.txt").write_bytes(b"y\n")
+    git(repo, "add", "notes.txt")
+    assert precommit.run(repo, regen, partial=False) == 0
+    assert regen.calls == [True]
+    assert (repo / INDEX).read_bytes() == b"index v1\n"
+    assert "doc/howto/NEW.md" in capsys.readouterr().out
