@@ -147,7 +147,7 @@ Each entry carries `name` (the name under which the child was started, e.g. `eng
 | `evt.process.hung` | `{ name, reason }` | no pong (3 pings × 2 s) or no `sys.hello` within 10 s. The supervisor sends `sys.shutdown` with `deadlineMs` 2000, after 2 s `TerminateProcess` |
 | `evt.process.crashed` | `{ name, pid, reason: "exited"/"hung", exitCode, restart: bool }` | unexpected end (also after a hang). `restart` true if a restart is performed |
 | `evt.process.exited` | `{ name, pid, clean: bool, exitCode, reason? }` | end after request (termination). `reason` is only set for a planned end of a worker: `"killed"` for `cmd.process.kill`, `"engine gone"` if the supervisor terminated the live `worker:*` because the engine ended (E0010, WI-0033; no `crashed`, does not count for exit code 5, no restart). The fields `clean` and `exitCode` apply since WI-0022/23 (not listed here before) |
-| `evt.process.restarted` | `{ name, attempt }` | restart according to policy (automatic only for `storage` and `engine`; with `--test-roles` additionally `crasher`) |
+| `evt.process.restarted` | `{ name, attempt }` | restart according to policy (automatic only for `storage`, `engine` and `triggerhost`; with `--test-roles` additionally `crasher`) |
 
 **Timing of `evt.process.exited` and `evt.process.crashed` (WI-0030):** The supervisor reports the end of a process only when it has read the connection of that process to its end (a `sys.bye` has then been processed safely and `clean` is correct), at the latest 500 ms after the process end (`Children.EXIT_GRACE_MS`; for a child without a connection immediately). The message can therefore arrive up to 500 ms after the process end; normally it arrives in the same tick (200 ms).
 
