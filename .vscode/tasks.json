@@ -767,6 +767,18 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: document index (doc_index.py)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/doc_index.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Test: deviation catalog of the new expression language against the golden data of v1",
             "type": "shell",
             "command": "python",
