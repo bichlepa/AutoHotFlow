@@ -127,7 +127,7 @@ L69-89 Method
 L91-111 Not measured
 ```
 
-## doc/CONVENTIONS.md (8.4 KB, 63 lines)
+## doc/CONVENTIONS.md (8.3 KB, 63 lines)
 ```text
 L5-13 1. Files and structure
 L15-19 2. Names
