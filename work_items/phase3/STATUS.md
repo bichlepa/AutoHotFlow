@@ -46,7 +46,7 @@ Step S0003 (trigger host and triggers), detailed on 2026-10-16 (E0056 to E0062).
 | WI-0061 | Role `triggerhost` | done, verified (slow: F-0101 once more, green alone) | haiku (review sonnet) | 8bfb58b–36480c0 | 2026-10-16 | reviewer approved; supervisor restarts it (owner decision pending) |
 | WI-0062 | Engine: arming, fired events, TriggerVariables | done, verified | haiku (review sonnet) | 41d8bdb–e6aed49 | 2026-10-16 | reviewer approved; M-0069 done |
 | WI-0063 | Periodic timer and start-up triggers | done, verified | haiku (review sonnet) | 436aeb4–1f8e62c | 2026-10-16 | reviewer approved; M-0071; provisional F-9000* is F-0111 |
-| WI-0064 | Hotkey trigger with window conditions | running (spike first, E0059) | haiku | | | |
+| WI-0064 | Hotkey trigger with window conditions | integrated, input tests pending (owner decision) | haiku (review sonnet) | 2f5faea–8e37e0b | 2026-10-17 | spike not conclusive (escalated); F-0114 (provisional F-9000*) |
 | WI-0065 | Set_Flow_Status, Condition_Flow_Enabled | done, verified | haiku (review sonnet) | 5adfc6b–1bcbb127 | 2026-10-16 | reviewer approved; M-0072 to M-0074 (M-0072 confirmed by the owner) |
 | WI-0066 | Guard against runaway flows | integrated and verified (fast and foundation green; slow and stress by the author) | haiku (review sonnet) | ed35b78–0941cda | 2026-10-17 | default limit is the owner's decision (NEEDS-ATTENTION) |
 | WI-0067 | Acceptance S0003 | open | | | | |
@@ -65,6 +65,8 @@ None.
 None. The manual-check start path (section 3 of MANUAL-CHECKS) is integrated; the owner runs it.
 
 ## Last verified state
+
+Commit `8e37e0b8` (WI-0064 integrated, without the input tests) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261017-001911-8e37e0b8` (1224 passed, 1 skipped).
 
 Commit `0941cda8` (WI-0066 integrated) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261017-001338-0941cda8` (1208 passed, 1 skipped), foundation run `20261017-001338-0941cda8-2` (466 passed, 1 skipped).
 
