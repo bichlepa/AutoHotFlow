@@ -18,8 +18,8 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 |---|---|---|---|
 | F-0073 | The stress test with 200 big flows fails its snapshot budget (largest snapshot answer during loading 2326 ms, budget 1000 ms); every flow file is parsed twice in the engine (F-0020 merged in) | budget raised to 3 s (E0042, owner 2026-10-15); stays open as an optimization after the port (pre-filter for inactive flows, one parse instead of two); measurements in WI-0046 | yes |
 | F-0101 | Slow tier: `test_start_stop_storm_leaves_a_consistent_engine[smoke]` saw the engine's handle count grow by 19 (limit 5) | observed, red twice in a row and once alone, green since; the same 145 to 164 as F-0092; cause not known; open, watch the history | |
-| F-9000* | `FlowState.json`: a temp file of an interrupted write (`FlowState.json.ahf-<pid>.tmp`) in the data folder is not removed at start | observed by reading the code (not reproduced); open, low | |
-| F-9001* | Foundation tier: `test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` found the storage process still alive after the session ended (the symptom of F-0095) | observed once under load, run 20261016-211715-c03b628b on `c03b628`; not reproduced; the engine's shutdown adds no request to storage in this scenario (the trigger state is not marked); open, watch |  |
+| F-0109 | `FlowState.json`: a temp file of an interrupted write (`FlowState.json.ahf-<pid>.tmp`) in the data folder is not removed at start | observed by reading the code (not reproduced); open, low | |
+| F-0110 | Foundation tier: `test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` found the storage process still alive after the session ended (the symptom of F-0095) | observed once under load, run 20261016-211715-c03b628b on `c03b628`; not reproduced; the engine's shutdown adds no request to storage in this scenario (the trigger state is not marked); open, watch |  |
 
 ## Findings
 
@@ -41,14 +41,14 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Evidence:** runs 20261016-172834-c27ff8f4-3 (red) and its recheck at 17:36 (red alone), in the run history of the main checkout.
 **Update 2026-10-16 (cleanup of the open items):** green in every run since (6 runs from 17:36 on, run history). The numbers are exactly those of F-0092 (closed): 145 handles before, 164 after, the 19 handles that the first instance of a flow opens once. The churn test was fixed there by a warm-up instance before the baseline; the storm test already has a warm-up of 20 cycles (`WARMUP_CYCLES`) and still saw 145 in the two red runs, so the 19 handles do not always come with the first instance (assumed: something opened lazily, later than the warm-up; not checked). Next step if it fails again: answer the open question of F-0092, which 19 handles these are (handle types of the engine before and after).
 
-### F-9000*: a temp file of an interrupted FlowState.json write stays in the data folder
+### F-0109: a temp file of an interrupted FlowState.json write stays in the data folder
 
 **What:** The start cleanup of storage (`AtomicFile.RemoveStaleTemps`, `Storage._QueueTempCleanup`) looks only into `Flows/` and `Variables/`. A write of `FlowState.json` (WI-0060) that is cut off by a crash leaves `FlowState.json.ahf-<pid>.tmp` in the data folder, which is never removed. The file is not read, so nothing breaks; it only stays.
 **Status:** assumed from reading `src/storage/Storage.ahk` and `src/storage/AtomicFile.ahk`; not reproduced.
 **Action:** add the data folder root (non-recursive, or the single name pattern) to the start cleanup. Provisional ID, renumbered by `tools/renumber_findings.py` before the cherry-pick.
 **Evidence:** code reading only.
 
-### F-9001*: storage still alive after a session with a child that says hello during the shutdown
+### F-0110: storage still alive after a session with a child that says hello during the shutdown
 
 **What:** `tests/fault/test_shutdown.py::test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` failed in the foundation tier: the storage process (started 21:18:10) was still running when the check ran after the session had exited with the expected code. It is the same symptom as F-0095 (storage alive after the end of a session, under load), in a sibling test.
 **Status:** observed once (run 20261016-211715-c03b628b, commit `c03b628`, 1 failed of 461). Not reproduced in the same run's other foundation tests. Not caused by WI-0060 as far as the code shows: the engine writes FlowState.json at shutdown only when a switch is pending, which this scenario does not do.
