@@ -42,9 +42,9 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Evidence:** runs 20261016-172834-c27ff8f4-3 (red) and its recheck at 17:36 (red alone), in the run history of the main checkout.
 **Update 2026-10-16 (cleanup of the open items):** green in every run since (6 runs from 17:36 on, run history). The numbers are exactly those of F-0092 (closed): 145 handles before, 164 after, the 19 handles that the first instance of a flow opens once. The churn test was fixed there by a warm-up instance before the baseline; the storm test already has a warm-up of 20 cycles (`WARMUP_CYCLES`) and still saw 145 in the two red runs, so the 19 handles do not always come with the first instance (assumed: something opened lazily, later than the warm-up; not checked). Next step if it fails again: answer the open question of F-0092, which 19 handles these are (handle types of the engine before and after).
 
-### F-0109: a temp file of an interrupted FlowState.json write stays in the data folder
+### F-0109: a temp file of an interrupted FlowStates write stays in the data folder
 
-**What:** The start cleanup of storage (`AtomicFile.RemoveStaleTemps`, `Storage._QueueTempCleanup`) looks only into `Flows/` and `Variables/`. A write of `FlowState.json` (WI-0060) that is cut off by a crash leaves `FlowState.json.ahf-<pid>.tmp` in the data folder, which is never removed. The file is not read, so nothing breaks; it only stays.
+**What:** The start cleanup of storage (`AtomicFile.RemoveStaleTemps`, `Storage._QueueTempCleanup`) looks only into `Flows/` and `Variables/`. A write of a file in `FlowStates/` (WI-0060, E0063) that is cut off by a crash leaves `<flowId>.json.ahf-<pid>.tmp` there, which is never removed. The file is not read, so nothing breaks; it only stays.
 **Status:** assumed from reading `src/storage/Storage.ahk` and `src/storage/AtomicFile.ahk`; not reproduced.
 **Action:** add the data folder root (non-recursive, or the single name pattern) to the start cleanup. Provisional ID, renumbered by `tools/renumber_findings.py` before the cherry-pick.
 **Evidence:** code reading only.
