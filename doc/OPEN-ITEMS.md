@@ -47,7 +47,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0104 | Ping test: the three `sys.ping` requests of `test_pings_are_answered_while_a_blocking_element_runs` use a fixed timeout of 1.0 s while the block time is scaled | assumed (read in the code), not reproduced | |
 | F-0105 | A role's summary line is written lazily: after a burst of log lines it can come late or not at all | assumed, not checked | |
 | F-0106 | The header of a slow-run output in `run_suite` named another commit than the run folder | observed once, not reproduced, not checked | |
-| F-0107 | S0002 acceptance (WI-0058): the README names a core set of 29 elements, the table of the core set lists 27 classes; `Action_Sleep` is registered and used by the tests but is in no row of the table | observed, not checked which list is meant; owner decides the count | |
 | F-0108 | Fast tier takes about twice its budget (about 45 s): 91 s with 4 workers, 306 s serial (WI-0058, sum of test times 214 s); the largest parts are the 584 AHK cases of `test_ahk_runner.py` (33 s) and `test_core_e_dialogs.py` (29 s) | verified (run times of the runs in WI-0058); fixed: part of the slow cases moved to the slow tier, fast tier 52 s (measured 2026-10-16) | |
 
 ## Findings
@@ -311,13 +310,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **What:** The header of the output of one slow run named another commit than the run folder. Reading `tools/run_suite.py` (lines 189 to 195), the header label and the run folder both come from the commit that `--ref` resolves to, so the reading does not explain the mismatch.
 **Status:** observed once, not reproduced, not checked.
 **Action:** On the next slow run compare the header with the run record (`sha`) for a plain `--ref` run and for a `--with-changes` run.
-
-### F-0107: the core set of S0002 has 27 classes in the table, the README says 29
-
-**What:** `work_items/phase3/README.md` (S0002) names "a core set of 29 elements". The core set table lists 27 classes (variables and conditions 9, lists 7, loops 4, flow control 3, dialogs and worker 4). `Action_Sleep` is registered and used by the tests of WI-0052 and WI-0055, but it is in no row of the table.
-**Status:** observed by counting the README table; which list the count means is not checked. Open.
-**Action:** the project owner decides whether `Action_Sleep` belongs to the core set and which count stands; then correct the count in the README in the same commit.
-**Evidence:** WI-0058 check of the criteria (`work_items/phase3/WI-0058-acceptance-s2.md`, Result).
 
 ### F-0108: the fast tier takes about twice its budget
 

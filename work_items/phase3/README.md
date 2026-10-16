@@ -174,6 +174,8 @@ WI-0036 and WI-0037 can run in parallel. WI-0036 starts only after WI-0034 (it c
 | Dialogs and worker | `Action_Message_Box`, `Condition_Confirmation_Dialog`, `Condition_Debug_Dialog`, `Action_Tooltip` | WI-0056 |
 | Already there, completed | `Action_Sleep`, `Trigger_Manual` (from `skeleton/` to `Default`, parameters as in v1) | WI-0047 |
 
+Count: 27 classes in the groups above + 2 in the last row (`Action_Sleep`, `Trigger_Manual`) = 29 elements.
+
 The trace points are in the first group on purpose: they record the path through a flow and serve as instrumentation for every later e2e test.
 
 ### Packages

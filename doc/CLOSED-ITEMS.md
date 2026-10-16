@@ -41,6 +41,7 @@ This document lists findings that are closed or accepted. Moved from doc/OPEN-IT
 
 | F-0090 | Fast tier: persistence test got no `evt.engine.ready` of the second chain within 20 s | closed 2026-10-15 | |
 | F-0012 | Unprotected check-then-act spots in the engine | closed 2026-10-16 by the owner: `_ElementStarted`/`_ElementStopped` (Critical-guarded, no test) accepted without a stress run; `WorkerBridge` and `Executor` fixes verified by test | |
+| F-0107 | S0002 core set: the README names 29 elements, the table lists 27 classes | closed 2026-10-16 by the owner: 29 elements stay; the table counts 27 + 2 = 29 | |
 
 ## Findings
 
@@ -386,3 +387,11 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 
 **Closed by the owner (2026-10-16):** the Critical-guarded counters `_ElementStarted` and `_ElementStopped` are accepted without a test; no stress run required.
 
+### F-0107: the core set of S0002 has 27 classes in the table, the README says 29
+
+**What:** `work_items/phase3/README.md` (S0002) names "a core set of 29 elements". The core set table lists 27 classes (variables and conditions 9, lists 7, loops 4, flow control 3, dialogs and worker 4). `Action_Sleep` is registered and used by the tests of WI-0052 and WI-0055, but it is in no row of the table.
+**Status:** observed by counting the README table; which list the count means is not checked. Closed by the owner, see below.
+**Action:** the project owner decides whether `Action_Sleep` belongs to the core set and which count stands; then correct the count in the README in the same commit.
+**Evidence:** WI-0058 check of the criteria (`work_items/phase3/WI-0058-acceptance-s2.md`, Result).
+
+**Closed by the owner (2026-10-16):** 29 elements stay; the table counts 27 + 2 = 29.
