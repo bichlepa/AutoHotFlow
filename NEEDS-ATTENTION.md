@@ -9,7 +9,8 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Manual checks
 
-- **DPI check of the dialog windows (REQ-USE-090).** The windows set per-monitor DPI awareness on their thread; the sizes are fixed pixel values and this is untested. Please run the check at 100 %, 125 % and 150 % once the guide is in `doc/MANUAL-CHECKS.md` (section 3, being written now).
+- **DPI check of the dialog windows (REQ-USE-090): no start path yet.** The guide is in `doc/MANUAL-CHECKS.md` section 3 (16 steps, scales 100, 125 and 150 %). It cannot be run, because no flow in the test data shows a dialog element and no start task exists for one. Recommendation: a small manual-check flow with Message_Box, Confirmation_Dialog, the debug dialog and the tooltip, started by a `Start:` task through `tools/manual_check.py`. Please confirm, then it is a small work item.
+- **Scope of the DPI section (to confirm):** the section says that the dialog-box rule (window class `#32770`) does not cover these GUI windows. Please confirm that wording.
 
 ## To know
 
