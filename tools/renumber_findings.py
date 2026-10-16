@@ -4,6 +4,7 @@ Usage (in a workspace whose branch is already rebased onto the current v2-port):
     python tools/renumber_findings.py --dry-run     # show the mapping and the files, change nothing
     python tools/renumber_findings.py               # change the files
     python tools/renumber_findings.py --commit      # change the files and commit them
+    python tools/renumber_findings.py --base <ref>  # the branch is HEAD against <ref> (default v2-port)
 
 What it does:
   * a provisional ID is F-9 followed by three digits, with or without a trailing star (written here as F-9nnn and
@@ -11,11 +12,14 @@ What it does:
     doc/CLOSED-ITEMS.md ("### F-9nnn*: Title").
   * the final number of a provisional ID is the highest final number (F-0001 to F-8999) in the headings of both files
     plus one, counting up in the order of the first heading (OPEN-ITEMS first, then CLOSED-ITEMS).
-  * every reference to the provisional ID in the tracked text files (git ls-files, except v1/) becomes the final ID
-    without the star. Bytes other than the ID are not touched: line endings and encoding stay as they are. Binary
+  * the files of the branch are the files that differ from the base (git diff --name-only <base>...HEAD), without
+    v1/ and without binary files. Every reference to the provisional ID in those files becomes the final ID without
+    the star. Provisional IDs in files the branch did not change (old text, examples in the documents) are not
+    touched and do not cause a refusal. Bytes other than the ID are not touched: line endings and encoding stay as they are. Binary
     files (NUL bytes) are skipped.
   * before anything is written it checks: the working tree has no changes to tracked files; every provisional ID that
-    is referenced has a heading; each new number is not used anywhere in the tracked files (git grep, v1 included);
+    is referenced in a changed file has a heading; each new number is not used anywhere in the tracked files (git
+    grep, v1 included);
     the resulting headings pass the rules of tests/test_open_items_ids.py (no provisional heading left, no gap or
     duplicate from F-0086 on). A failed check changes nothing.
   * with no provisional heading it prints "nothing to renumber" and exits 0. References to provisional IDs that have
@@ -41,6 +45,7 @@ CLOSED_ITEMS = "doc/CLOSED-ITEMS.md"
 DENSE_FROM = 86            # same as tests/test_open_items_ids.py
 MAX_FINAL = 8999
 REFERENCE_FOLDER = "v1"          # the v1 reference tree, removed after the port
+DEFAULT_BASE = "v2-port"
 EXCLUDED_PREFIX = (REFERENCE_FOLDER + "/").encode()
 
 HEADING = re.compile(rb"^### (F-(\d{4}))\*?:", re.MULTILINE)
@@ -63,11 +68,6 @@ def git(repo, *args, check=True, input_bytes=None):
     return proc
 
 
-def tracked_files(repo):
-    out = git(repo, "ls-files", "-z").stdout
-    return [raw for raw in out.split(b"\0") if raw]
-
-
 def is_binary(data):
     return b"\0" in data
 
@@ -88,7 +88,15 @@ def check_dense(numbers):
         raise Refused("finding IDs from F-%04d on have a gap after the renumbering: %s" % (DENSE_FROM, above))
 
 
-def plan(repo):
+def changed_files(repo, base):
+    """Paths that differ between the base and HEAD (raw bytes, NUL-separated git output)."""
+    proc = git(repo, "diff", "--name-only", "-z", "%s...HEAD" % base, check=False)
+    if proc.returncode != 0:
+        raise RuntimeError("git diff against %s failed: %s" % (base, proc.stderr.decode("utf-8", "replace").strip()))
+    return [raw for raw in proc.stdout.split(b"\0") if raw]
+
+
+def plan(repo, base):
     """Returns None when there is nothing to renumber, else (mapping, changes) where mapping is {b"9090": "F-0101"}
     and changes is {relative path bytes: (new bytes, replacement count)} for the files that change.
     Raises Refused when a check fails."""
@@ -114,7 +122,7 @@ def plan(repo):
         raise Refused("no free final numbers left (F-%04d is the last)" % MAX_FINAL)
     mapping = {d.encode(): "F-%04d" % (first + i) for i, d in enumerate(provisional)}
 
-    files = [raw for raw in tracked_files(repo) if not raw.startswith(EXCLUDED_PREFIX)]
+    files = [raw for raw in changed_files(repo, base) if not raw.startswith(EXCLUDED_PREFIX)]
     orphans = []
     texts = {}
     for raw in files:
@@ -167,12 +175,12 @@ def working_tree_clean(repo):
     return not git(repo, "status", "--porcelain", "--untracked-files=no").stdout.strip()
 
 
-def run(repo, dry_run=False, commit=False, out=print):
+def run(repo, base=DEFAULT_BASE, dry_run=False, commit=False, out=print):
     if not working_tree_clean(repo):
         out("refused: the working tree has changes to tracked files (commit or stash them first)")
         return EXIT_USAGE
     try:
-        result = plan(repo)
+        result = plan(repo, base)
     except Refused as e:
         out("refused: %s" % e)
         return EXIT_REFUSED
@@ -204,12 +212,13 @@ def main(argv=None, repo=REPO):
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--dry-run", action="store_true", help="show the mapping and the files, change nothing")
     parser.add_argument("--commit", action="store_true", help="commit the change (message: the mapping)")
+    parser.add_argument("--base", default=DEFAULT_BASE, help="base of the branch (default %s)" % DEFAULT_BASE)
     args = parser.parse_args(argv)
     if args.dry_run and args.commit:
         print("--dry-run and --commit exclude each other", file=sys.stderr)
         return EXIT_USAGE
     try:
-        return run(repo, dry_run=args.dry_run, commit=args.commit)
+        return run(repo, base=args.base, dry_run=args.dry_run, commit=args.commit)
     except RuntimeError as e:
         print("tool error: %s" % e, file=sys.stderr)
         return EXIT_USAGE
