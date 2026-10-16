@@ -328,3 +328,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Inside the class body, refer to the class as `this`, also in a lambda of a static method; the lambda keeps it. The class name itself is no global name there (the element files say so, `doc/ELEMENT-API-V2.md` section 2).
 - **Status:** verified (`tests/elements/Test/Triggers/Trigger_TestTimer.ahk` and `Trigger_TestCallbackThrows.ahk`; `tests/integration/test_triggerhost.py` runs the chains)
 - **Source:** `tests/elements/Test/Triggers/Trigger_TestTimer.ahk`
+
+### A timer period is limited to 2^31 - 1 milliseconds
+
+- **Problem:** A periodic timer with an interval given in minutes (60000 minutes) is 3.6 * 10^9 ms, more than a timer period can hold. The arithmetic is exact (64-bit integers), so the limit shows only as the period that `SetTimer` cannot take.
+- **Right:** Check the period before `SetTimer`: refuse a value above `0x7FFFFFFF` with the element's own error text, and round the rest to an integer with at least 1 ms (`Trigger_Periodic_Timer.PeriodMs`).
+- **Status:** verified that the element refuses such a period (`src/elements/Default/Triggers/Trigger_Periodic_Timer.ahk`); the behaviour of `SetTimer` itself with such a value was not checked.
+- **Source:** `src/elements/Default/Triggers/Trigger_Periodic_Timer.ahk`

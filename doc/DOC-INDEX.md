@@ -220,7 +220,7 @@ L342-348 A race test must hook the access the fixed code makes, not the old one 
 L351-357 An event of a trigger can arrive before the answer that arms it (verified)
 ```
 
-## doc/howto/syntax-and-language.md (33.5 KB, 330 lines)
+## doc/howto/syntax-and-language.md (34.3 KB, 337 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -262,6 +262,7 @@ L305-309 A multi-statement function in an argument is `() {` ... `}`, not `() =>
 L311-315 A helper function of a test file is a global name: `Owner()` turns every local `owner` into a warning (verified)
 L317-323 A class used by an element without its #Include: a warning dialog and a wrong local (verified)
 L325-330 A lambda in a static method of a class: `this` is the class (verified)
+L332-337 A timer period is limited to 2^31 - 1 milliseconds (partly verified)
 ```
 
 ## doc/howto/tests-and-tools.md (39.6 KB, 395 lines)
