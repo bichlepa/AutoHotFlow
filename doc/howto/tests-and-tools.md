@@ -368,3 +368,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Write source files with the editor tool, or in Python through raw strings or bytes; check for non-ASCII bytes after the edit (decode the file and look for characters above 127).
 - **Status:** verified (WI-0056, `tests/ahk/element_debug_ops.test.ahk`, fixed by byte replacement)
 - **Source:** `tests/ahk/element_debug_ops.test.ahk`
+
+### A stub that records a request before it does the work makes the test race
+
+- **Problem:** A Python stand-in for storage appended the request to its list, then wrote the file. The test waited for the list entry and read the file at once, and got an empty file on a loaded machine (`JSONDecodeError` in `test_the_switched_state_survives_a_restart_of_the_engine`).
+- **Wrong:** `self.state_writes.append(text)` followed by `target.write_text(text)` in the stub's handler, with a test that polls the list.
+- **Right:** Do the work first, then record it, so that a test that sees the record also sees the effect. Check the stub for every request type the role sends: a request the stub does not answer waits for its deadline (here the engine would wait 30 s before it is ready).
+- **Status:** verified (the failure in the run log of 20261016-210338-860; the fix is in `tests/integration/test_engine.py`)
+- **Source:** `tests/integration/test_engine.py` (`StorageStub._handle`)

@@ -101,3 +101,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Bind a small separate object that holds only the changing data (`at := {param: ""}`; `src.at := at`; `ObjBindMethod(this, "_EvalLog", at)`). `at` does not hold `src`, so there is no cycle. See also "Reference cycle via `ObjBindMethod(this, ...)` in a field".
 - **Status:** assumed (seen in review before it ran; the leak itself was not measured)
 - **Source:** `src/elements/base/ExecContext.ahk` (`EvalSource`)
+
+### Json.True and Json.False are objects: test them before IsObject
+
+- **Problem:** The JSON singletons `Json.True` and `Json.False` are objects. A test of the form `IsObject(v)` (or a catch-all "object means a list or map") is true for `Json.False` too, so a `followsFlow` of `false` read as "follows" (found while writing `FlowDefinition.FollowsFlow`, before any test ran).
+- **Wrong:** `if (IsObject(v)) return true` placed before `if (v == Json.False) return false`.
+- **Right:** Compare with `==` against `Json.False`, `Json.True` and `Json.Null` first, then test `IsObject`. The parser gives true and false as 1 and 0 inside a parsed file, so a value from a file needs both forms.
+- **Status:** verified (unit test `FollowsFlowReadsTheKey` in `tests/ahk/engine_trigger_state.test.ahk` covers the order)
+- **Source:** `src/engine/core/FlowDefinition.ahk` (`FollowsFlow`)
