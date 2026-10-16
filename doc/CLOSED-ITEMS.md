@@ -234,6 +234,11 @@ This document lists findings that are closed or accepted. Entries are moved here
 **What:** `Action_Execute_Flow` needs the trigger it calls to be enabled. Until WI-0060 the engine took a trigger as enabled when its flow was, and the flag of a flow was not loaded or kept after a start.
 **Closed (WI-0060, 2026-10-16):** `FlowRecord` keeps the target state per trigger (E0056); `Executor.IsTriggerEnabled` reads it; the states are kept in `FlowState.json` (E0057, written through storage, read at start). Evidence: `tests/ahk/engine_trigger_state.test.ahk` (every transition), `tests/integration/test_engine.py::test_the_switched_state_survives_a_restart_of_the_engine`, `tests/integration/test_trigger_state.py::test_the_switched_state_survives_a_session_restart`, and the WI-0055 test `tests/integration/test_core_d_flows.py::test_disabled_and_missing_flows` (still green).
 
+### F-0109: A temp file of an interrupted write of the state files stays in the data folder
+
+**What:** An interrupted write of a state file leaves a temp file (`<name>.ahf-<pid>.tmp`) in the data folder, and nothing removed it at the next start.
+**Closed (WI-0068, 2026-10-16):** the start cleanup covers `FlowStates/` as well; a temp file of a live process is kept. Evidence: test `test_temp_files_of_dead_processes_are_removed_at_start_and_those_of_live_ones_stay`.
+
 ## Sources
 
 All sources are at the tag `v2-phase2-final` and can be read with `git show v2-phase2-final:<path>`:
