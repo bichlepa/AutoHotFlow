@@ -73,13 +73,13 @@ A connection has a type: `normal` (after an action), `yes` and `no` (after a con
 ### REQ-EXE-030 Loops with head, tail and break
 
 - **v1:** yes
-- **v2:** partial (the loop mechanics work; the loop elements and the break entry are missing)
+- **v2:** done
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0054)
-- **Evidence:** `tests/ahk/engine_scheduler.test.ahk` (`Loop:` cases)
+- **Evidence:** `tests/ahk/engine_scheduler.test.ahk` (`Loop:` cases), `tests/ahk/element_loops.test.ahk`, `tests/integration/test_core_c_loops.py::test_break_in_the_first_a_middle_and_the_last_pass`, `tests/integration/test_core_c_loops.py::test_nested_loops_with_the_same_variable_names`, `tests/integration/test_core_c_loops.py::test_a_loop_left_through_exception_restores_the_variables_of_the_outer_loop`, `tests/integration/test_core_c_loops.py::test_a_stop_ends_a_loop_whose_body_waits`
 
-A loop element has connection points: the head starts an iteration, a connection back to the tail starts the next one, a connection to the break point ends the loop. The loop variables (`A_Index` and the variables of the loop element) are visible inside the loop and restored when it is left, also with nested loops and when it is left through `exception` (MIGRATION M-0019).
+A loop element has connection points: the head starts an iteration, a connection back to the tail starts the next one, a connection to the break point ends the loop. The loop variables (`A_Index` and the variables of the loop element) are visible inside the loop and restored when it is left, also with nested loops and when the loop element itself ends with `exception` (MIGRATION M-0019). An element in the body whose `exception` connection leads out of the loop does not restore them, as in v1 (ELEMENT-API-V2 7.1).
 
 ### REQ-EXE-040 Instances and parallel branches
 
@@ -802,20 +802,21 @@ The differences from v1 that the list elements bring are in MIGRATION M-0057 and
 ### REQ-ELM-240 Loops
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the four loops of the core set are done in S0002; `Loop_Loop_Through_Files` is S0008)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0054), S0008
+- **Evidence:** `tests/integration/test_core_c_loops.py::test_every_loop_makes_its_passes_and_removes_its_variables`, `tests/integration/test_core_c_loops.py::test_simple_loop_counts`, `tests/integration/test_core_c_loops.py::test_condition_loop`, `tests/integration/test_core_c_loops.py::test_condition_loop_converts_the_v1_text_on_load`, `tests/integration/test_core_c_loops.py::test_list_loop`, `tests/integration/test_core_c_loops.py::test_list_loop_works_through_the_copy_it_made_at_the_start`, `tests/integration/test_core_c_loops.py::test_parse_loop`, `tests/ahk/element_loops.test.ahk`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Loop_SimpleLoop` | yes | open | S0002 (WI-0054) |
-| `Loop_Condition` | yes | open | S0002 (WI-0054) |
-| `Loop_Parse_A_String` | yes | open | S0002 (WI-0054) |
-| `Loop_Work_through_a_list` | yes | open | S0002 (WI-0054) |
+| `Loop_SimpleLoop` | yes | done | S0002 (WI-0054) |
+| `Loop_Condition` | yes | done | S0002 (WI-0054) |
+| `Loop_Parse_A_String` | yes | done | S0002 (WI-0054) |
+| `Loop_Work_through_a_list` | yes | done | S0002 (WI-0054) |
 | `Loop_Loop_Through_Files` | yes | open | S0008 |
 
-Connection points and loop variables: REQ-EXE-030.
+Connection points and loop variables: REQ-EXE-030. The differences from v1 are in MIGRATION M-0059 to M-0061. A pass of a loop costs about 0.3 ms in the engine (MEASUREMENTS MS-0034); a loop of 100,000 passes does not block the engine, other flows and requests are served meanwhile.
 
 ### REQ-ELM-250 Flow control
 

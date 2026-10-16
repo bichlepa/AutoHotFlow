@@ -7,11 +7,11 @@ run the tool. The legend of the columns is at the top of the source.
 
 | Area | Total | done | implemented | partial | open | dropped | in doubt |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| [Flows and execution (EXE)](#flows-and-execution-exe) | 16 | 7 | 0 | 6 | 3 | 0 | 1 |
+| [Flows and execution (EXE)](#flows-and-execution-exe) | 16 | 8 | 0 | 5 | 3 | 0 | 1 |
 | [Expressions and variables (VAR)](#expressions-and-variables-var) | 15 | 8 | 0 | 3 | 4 | 0 | 2 |
 | [Script language (SCR)](#script-language-scr) | 15 | 0 | 0 | 3 | 12 | 0 | 1 |
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
-| [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 4 | 18 | 0 | 0 |
+| [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 5 | 17 | 0 | 0 |
 | [Triggers (TRG)](#triggers-trg) | 13 | 0 | 0 | 1 | 12 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 14 | 0 | 0 | 2 | 12 | 0 | 0 |
 | [Editor (EDT)](#editor-edt) | 23 | 0 | 0 | 1 | 22 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 2 | 1 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 0 | 0 | 1 | 9 | 0 | 0 |
-| **All** | **217** | **55** | **1** | **34** | **126** | **1** | **6** |
+| **All** | **217** | **56** | **1** | **34** | **125** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -36,7 +36,7 @@ run the tool. The legend of the columns is at the top of the source.
 |---|---|---|---|---|---|---|
 | [REQ-EXE-010](REQUIREMENTS.md#req-exe-010-a-flow-is-a-graph-of-triggers-actions-conditions-and-loops) | A flow is a graph of triggers, actions, conditions and loops | yes | done | must | port | - |
 | [REQ-EXE-020](REQUIREMENTS.md#req-exe-020-connection-types-and-parallel-branches) | Connection types and parallel branches | yes | done | must | port | - |
-| [REQ-EXE-030](REQUIREMENTS.md#req-exe-030-loops-with-head-tail-and-break) | Loops with head, tail and break | yes | partial | must | port | S0002 (WI-0054) |
+| [REQ-EXE-030](REQUIREMENTS.md#req-exe-030-loops-with-head-tail-and-break) | Loops with head, tail and break | yes | done | must | port | S0002 (WI-0054) |
 | [REQ-EXE-040](REQUIREMENTS.md#req-exe-040-instances-and-parallel-branches) | Instances and parallel branches | yes | done | must | port | - |
 | [REQ-EXE-050](REQUIREMENTS.md#req-exe-050-execution-policy-per-flow) | Execution policy per flow | partial | partial | must | port | S0004 (global setting) |
 | [REQ-EXE-060](REQUIREMENTS.md#req-exe-060-start-and-stop-a-flow-by-hand) | Start and stop a flow by hand | yes | partial | must | port | S0004 (manager), S0006 (editor) |
@@ -113,7 +113,7 @@ run the tool. The legend of the columns is at the top of the source.
 | [REQ-ELM-210](REQUIREMENTS.md#req-elm-210-conditions-on-values) | Conditions on values | yes | done | must | port | S0002 (WI-0052) |
 | [REQ-ELM-220](REQUIREMENTS.md#req-elm-220-strings) | Strings | yes | open | must | port | S0008 |
 | [REQ-ELM-230](REQUIREMENTS.md#req-elm-230-lists) | Lists | yes | partial | must | port | S0002 (WI-0053), S0008 |
-| [REQ-ELM-240](REQUIREMENTS.md#req-elm-240-loops) | Loops | yes | open | must | port | S0002 (WI-0054), S0008 |
+| [REQ-ELM-240](REQUIREMENTS.md#req-elm-240-loops) | Loops | yes | partial | must | port | S0002 (WI-0054), S0008 |
 | [REQ-ELM-250](REQUIREMENTS.md#req-elm-250-flow-control) | Flow control | yes | partial | must | port | S0002 (WI-0047, WI-0052, WI-0055), S0003, S0008 |
 | [REQ-ELM-260](REQUIREMENTS.md#req-elm-260-trace-points) | Trace points | yes | done | must | port | S0002 (WI-0052) |
 | [REQ-ELM-270](REQUIREMENTS.md#req-elm-270-dialogs-and-notifications) | Dialogs and notifications | yes | open | must | port | S0002 (WI-0051, WI-0056), S0008 |
