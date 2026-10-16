@@ -36,6 +36,8 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0089 | Slow tier under load: three fault tests fail that pass alone: killed worker without `evt.process.crashed`, shutdown of session 1 took 6.15 s (limit 6.0), supervisor-stall test | observed once under load, run 20261015-203710-59c199ec (code of `d179825`), green alone (12 passed, run 20261015-204219-59c199ec), open | |
 
 | F-0094 | Fast tier: `test_pings_are_answered_while_a_blocking_element_runs` third ping answered after 0.808 s (limit 0.8 s) | observed once under load, run 20261015-231712-bc27cbe5 on `bc27cbe` (the commit only touches `WorkerBridge`, not used by this test); green alone, run 20261015-231824-bc27cbe5, open | |
+| F-9130* | Foundation tier: `test_a_child_that_has_not_connected_does_not_hold_storage_and_the_session_ends_with_storage_clean[0]` found the storage process still alive after the session ended | observed once under load, run 20261016-080313-0052a030 on `0052a03`; the slow tier (run 20261016-080657-0052a030) was green, open | |
+| F-9131* | Foundation tier: `test_crashed_child_is_reported_within_1s_restarted_by_policy_and_others_are_untouched`: crash reported -0.053 s after the death (lower bound -0.05 s) | observed once under load, run 20261016-080313-0052a030 on `0052a03`; the slow tier (run 20261016-080657-0052a030) was green, open | |
 
 ## Findings
 
@@ -220,6 +222,20 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **What:** `tests/integration/test_worker.py::test_pings_are_answered_while_a_blocking_element_runs` (line 259): `answered[-1][2] < BLOCK_MS / 1000.0` was 0.808 against 0.8.
 **Status:** observed once in the fast tier (844 passed, 1 failed) next to other suites; green alone. The limit equals the block time, so any scheduling delay breaks it. Assumed: load. Not checked: whether the limit is scaled (`scaled()`).
 **Action:** if it returns, scale or loosen the limit (compare against the block time plus a margin).
+
+### F-9130*: storage process still alive after the end of a session with a late child
+
+**What:** `tests/fault/test_shutdown.py::test_a_child_that_has_not_connected_does_not_hold_storage_and_the_session_ends_with_storage_clean[0]` (line 145): `assert not alive(pids["storage"])` failed (`alive(25256)` true). The earlier assertions (exit code 5, `clean` true, no "terminating storage") passed.
+**Run:** run 20261016-080313-0052a030, commit `0052a03`, `python tools/run_suite.py --ref 0052a03 -- --foundation -q -rA`, exit 1 (2 failed, 443 passed, 1 skipped, no INTERNALERROR). The same test passed in the slow tier, run 20261016-080657-0052a030 (`--all -m slow -q`, 130 passed).
+**Suspicion (assumed):** the check runs right after the supervisor exit; storage has told the supervisor `clean` but the process object is still visible for a short time on a loaded machine (4 workers, many processes). Probably a race of the test (no wait for the process end), not a product defect. Not checked.
+**Probable cause task:** none from the change under verification (it only touches `tests/support/test_procs.py`); load flake of an older test.
+
+### F-9131*: crash report lag lower bound -0.05 s too tight
+
+**What:** `tests/integration/test_supervisor.py::test_crashed_child_is_reported_within_1s_restarted_by_policy_and_others_are_untouched` (line 520): `-0.05 <= lag <= CRASH_BUDGET_S` failed with lag -0.053 s (event time before the recorded death time); the other crash was 0.056 s.
+**Run:** run 20261016-080313-0052a030, commit `0052a03`, `--foundation -q -rA`, exit 1. Green in the slow tier, run 20261016-080657-0052a030.
+**Suspicion (assumed):** the death time is measured by a watcher thread of the test (`start_watch_death`) that wakes late under load, so it can lie after the event time; the tolerance of 50 ms is below the scheduling delay of a loaded machine. A test measurement problem, not a late report. Related to F-0071/F-0089 only by being load-sensitive. Not checked.
+**Probable cause task:** none from the change under verification; load flake of an older test.
 
 ## Watch list (E0007)
 
