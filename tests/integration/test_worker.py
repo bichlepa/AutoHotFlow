@@ -248,7 +248,11 @@ def test_cancel_of_the_hang_element_reports_stopped_within_500_ms(worker):
 
 
 def test_pings_are_answered_while_a_blocking_element_runs(worker):
-    assert send_run(worker, run_payload("p1", "Action_TestBlockWorker"))["ok"]
+    # The element blocks for the scaled time and the last pong must arrive before it ends. With a fixed 800 ms a
+    # delay of the machine of a few ms broke the comparison (F-0094: 0.808 s); the block time is an upper limit
+    # of this test and goes through scaled() like the others.
+    block_s = scaled(BLOCK_MS / 1000.0)
+    assert send_run(worker, run_payload("p1", "Action_TestBlockWorker", {"Duration": str(int(block_s * 1000))}))["ok"]
     answered = []
     t0 = time.perf_counter()
     for n in (1, 2, 3):
@@ -256,7 +260,7 @@ def test_pings_are_answered_while_a_blocking_element_runs(worker):
         pong = worker.request("worker:1", "sys.ping", {"n": n}, timeout=1.0)
         answered.append((n, pong["payload"]["n"], time.perf_counter() - t0))
     assert [a[1] for a in answered] == [1, 2, 3]
-    assert answered[-1][2] < BLOCK_MS / 1000.0
+    assert answered[-1][2] < block_s, answered
     assert done_for(worker, "p1")["result"] == "normal"
 
 
