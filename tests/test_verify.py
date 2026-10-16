@@ -13,6 +13,8 @@ sys.path.insert(0, str(REPO / "tools"))
 
 import verify  # noqa: E402
 
+SHA = "abcdef12" + "3" * 32          # a fake full sha for the run folder names (its first 8 digits are "abcdef12")
+
 
 # --- choice of tiers ----------------------------------------------------------------------------------
 
@@ -31,39 +33,37 @@ import verify  # noqa: E402
     (["src/storage/x.ahk"], ["fast", "slow"]),
     (["src/worker/x.ahk"], ["fast", "slow"]),
     (["tests/test_x.py", "src/expr/y.ahk"], ["fast"]),
+    (["doc/OPEN-ITEMS.md"], ["fast"]),                    # documents are read by tests: fast tier
+    (["src/README.md"], ["fast"]),
+    ([".vscode/tasks.json"], ["fast"]),
+    (["pytest.ini"], ["fast"]),
+    (["README.md"], ["fast"]),
+    (["assets/x.png"], ["fast"]),
 ])
 def test_tiers_follow_the_changed_paths(changed, expected):
     assert verify.select_tiers(changed) == (expected, None)
 
 
 @pytest.mark.parametrize("changed, reason", [
-    (["doc/OPEN-ITEMS.md", "work_items/phase3/README.md", ".vscode/tasks.json", ".claude/x.md"], "documentation only"),
-    (["src/README.md"], "documentation only"),
+    (["work_items/phase3/README.md"], "not read by any test"),
+    (["work_items/a.md", ".claude/x.md", "NEEDS-ATTENTION.md"], "not read by any test"),
     ([], "no change"),
 ])
-def test_documentation_only_runs_nothing(changed, reason):
+def test_paths_no_test_reads_run_nothing(changed, reason):
     assert verify.select_tiers(changed) == ([], reason)
 
 
+def test_unread_paths_do_not_hide_a_source_change():
+    assert verify.decide(["work_items/x.md", "src/supervisor/s.ahk"]) == (["fast", "foundation", "slow"], None)
+
+
 def test_decide_without_a_base_runs_all_tiers():
-    assert verify.decide(None, False, []) == (["fast", "foundation", "slow"], None)
+    assert verify.decide(None) == (["fast", "foundation", "slow"], None)
 
 
-def test_decide_skips_when_trees_are_equal_and_the_tiers_were_green():
-    assert verify.decide(["tests/x.py"], True, ["fast"]) == ([], "trees equal to verified")
-
-
-def test_decide_runs_tiers_the_verified_state_did_not_have():
-    # same trees as a fast-only green state, but the change now needs foundation: not verified yet
-    assert verify.decide(["src/core/x.ahk"], True, ["fast"]) == (["fast", "foundation"], None)
-
-
-def test_decide_runs_when_the_trees_differ():
-    assert verify.decide(["tests/x.py"], False, ["fast"]) == (["fast"], None)
-
-
-def test_documentation_only_wins_over_equal_trees():
-    assert verify.decide(["doc/x.md"], True, ["fast", "foundation", "slow"]) == ([], "documentation only")
+def test_decide_skips_only_when_nothing_a_test_reads_changed():
+    assert verify.decide(["work_items/x.md"]) == ([], "not read by any test")
+    assert verify.decide(["tests/x.py"]) == (["fast"], None)
 
 
 # --- reading run_suite results ------------------------------------------------------------------------
@@ -94,30 +94,44 @@ def test_parse_folder_reads_summary_failures_and_internal_error(tmp_path):
 def test_run_outcome_reads_the_folder_named_in_the_output_line(tmp_path):
     folder = fake_folder(tmp_path, "20261016-100001-abcdef12", "967 passed, 1 skipped in 45.0s", ["ok"])
     text = "[run_suite] pytest tests -q\n[run_suite] output: %s\n[run_suite] result: exit 0" % (folder / "output.txt")
-    outcome = verify.run_outcome("fast", 0, text)
+    outcome = verify.run_outcome("fast", 0, text, SHA)
     assert outcome["run"] == "20261016-100001-abcdef12"
     assert verify.is_green(outcome)
 
 
 def test_run_outcome_takes_the_last_output_line(tmp_path):
     # the output of a failing test may echo a "[run_suite] output:" line of another run before the real one
-    folder = fake_folder(tmp_path, "real-1", "1 passed in 1.0s", ["ok"])
+    folder = fake_folder(tmp_path, "20261016-100002-abcdef12-real", "1 passed in 1.0s", ["ok"])
     lines = ["[run_suite] output: %s" % (tmp_path / "other-9" / "output.txt"),
              "[run_suite] output: %s" % (folder / "output.txt")]
     text = chr(10).join(lines) + chr(10)
-    assert verify.run_outcome("fast", 0, text)["run"] == "real-1"
+    assert verify.run_outcome("fast", 0, text, SHA)["run"] == "20261016-100002-abcdef12-real"
 
 
 def test_run_outcome_without_a_result_folder_is_not_run():
-    outcome = verify.run_outcome("slow", verify.EXIT_ADMISSION, "[run_suite] admission: timeout")
+    outcome = verify.run_outcome("slow", verify.EXIT_ADMISSION, "[run_suite] admission: timeout", SHA)
     assert outcome["run"] is None and outcome["note"].startswith("not run")
     assert not verify.is_green(outcome)
 
 
 def test_a_green_exit_with_internal_error_is_red(tmp_path):
-    folder = fake_folder(tmp_path, "r-1", "1 passed in 1.0s", ["INTERNALERROR> boom"])
-    outcome = verify.run_outcome("fast", 0, "[run_suite] output: %s" % (folder / "output.txt"))
+    folder = fake_folder(tmp_path, "20261016-100003-abcdef12", "1 passed in 1.0s", ["INTERNALERROR> boom"])
+    outcome = verify.run_outcome("fast", 0, "[run_suite] output: %s" % (folder / "output.txt"), SHA)
     assert not verify.is_green(outcome)
+
+
+def test_a_result_folder_must_name_the_sha(tmp_path):
+    folder = fake_folder(tmp_path, "20261016-100004-99999999", "1 passed in 1.0s", ["ok"])
+    outcome = verify.run_outcome("fast", 0, "[run_suite] output: %s" % (folder / "output.txt"), SHA)
+    assert not verify.is_green(outcome)
+    assert "does not name the sha abcdef12" in outcome["problem"]
+
+
+def test_a_summary_without_passed_is_red(tmp_path):
+    folder = fake_folder(tmp_path, "20261016-100005-abcdef12", "no tests ran in 0.1s", ["ok"])
+    outcome = verify.run_outcome("fast", 0, "[run_suite] output: %s" % (folder / "output.txt"), SHA)
+    assert not verify.is_green(outcome)
+    assert "summary has no 'passed'" in outcome["problem"]
 
 
 # --- the flow on a temporary repository -------------------------------------------------------------
@@ -146,24 +160,6 @@ def repo(tmp_path):
     return root
 
 
-def test_a_green_run_on_a_branch_is_not_recorded(repo, tmp_path, capsys):
-    git(repo, "checkout", "-q", "-b", "wip")
-    commit(repo, {"src/a.ahk": "branch change"}, "branch change")
-    assert verify.main(["--tiers", "fast"], runner=FakeRunner(tmp_path / "runs"), repo=repo) == 0
-    assert not (repo / "temp" / "verify" / "last.json").exists()
-    out = capsys.readouterr().out
-    assert "not recorded (not on v2-port)" in out and "VERDICT: green" in out
-
-
-def test_a_green_run_of_an_ancestor_of_v2_port_is_recorded(repo, tmp_path):
-    """The base commit is an ancestor once v2-port has moved on: its green run is recorded."""
-    base_sha = verify.resolve(repo, "HEAD")
-    commit(repo, {"doc/e.md": "e"}, "v2-port moves on")
-    assert verify.main(["--ref", base_sha, "--tiers", "fast"], runner=FakeRunner(tmp_path / "runs"), repo=repo) == 0
-    state = json.loads((repo / "temp" / "verify" / "last.json").read_text(encoding="utf-8"))
-    assert state["sha"] == base_sha
-
-
 class FakeRunner:
     """Answers each tier with a result folder under its own base; fail maps a tier to its failed test names."""
 
@@ -180,49 +176,96 @@ class FakeRunner:
         code = self.exit_codes.get(tier, 1 if tier in self.fail else 0)
         lines = ["FAILED %s" % name for name in self.fail.get(tier, [])] or ["ok"]
         summary = "%d passed in 1.0s" % self.n if not code else "1 failed in 1.0s"
-        folder = fake_folder(self.base, "run-%s-%d" % (tier, self.n), summary, lines)
+        folder = fake_folder(self.base, "20261016-000000-%s-%s-%d" % (sha[:8], tier, self.n), summary, lines)
         return code, "[run_suite] output: %s\n" % (folder / "output.txt")
 
 
-def test_green_run_writes_the_last_green_state(repo, tmp_path, capsys):
+def state_of(repo):
+    return json.loads((repo / "temp" / "verify" / "last.json").read_text(encoding="utf-8"))
+
+
+def test_full_green_run_writes_the_last_green_state(repo, tmp_path, capsys):
     runner = FakeRunner(tmp_path / "runs")
-    assert verify.main(["--tiers", "fast"], runner=runner, repo=repo) == 0
-    state = json.loads((repo / "temp" / "verify" / "last.json").read_text(encoding="utf-8"))
+    assert verify.main([], runner=runner, repo=repo) == 0
     sha = verify.resolve(repo, "HEAD")
+    state = state_of(repo)
     assert state["sha"] == sha
-    assert state["tiers"] == ["fast"]
+    assert state["tiers"] == list(verify.TIERS)
+    assert set(state["runs"]) == set(verify.TIERS)
+    assert all(sha[:8] in run for run in state["runs"].values())
     assert set(state["trees"]) == {"src", "tests", "tools"}
-    assert state["runs"] == {"fast": "run-fast-1"}
-    out = capsys.readouterr().out
-    assert "VERDICT: green  sha %s" % sha[:8] in out
+    assert "VERDICT: green  sha %s" % sha[:8] in capsys.readouterr().out
 
 
-def test_auto_runs_nothing_for_documentation_only(repo, tmp_path, capsys):
+def test_a_manual_partial_run_writes_nothing(repo, tmp_path, capsys):
+    assert verify.main(["--tiers", "fast"], runner=FakeRunner(tmp_path / "runs"), repo=repo) == 0
+    assert not (repo / "temp" / "verify" / "last.json").exists()
+    assert "not recorded (partial run)" in capsys.readouterr().out
+
+
+def test_auto_with_base_writes_nothing(repo, tmp_path):
     runner = FakeRunner(tmp_path / "runs")
-    verify.main(["--tiers", "fast"], runner=runner, repo=repo)
-    commit(repo, {"doc/e.md": "e"}, "docs")
+    verify.main([], runner=runner, repo=repo)
+    base_sha = state_of(repo)["sha"]
+    commit(repo, {"tests/t2.py": "t2"}, "test change")
+    assert verify.main(["--auto", "--base", base_sha], runner=runner, repo=repo) == 0
+    assert state_of(repo)["sha"] == base_sha
+
+
+def test_auto_skips_changes_that_no_test_reads(repo, tmp_path, capsys):
+    runner = FakeRunner(tmp_path / "runs")
+    verify.main([], runner=runner, repo=repo)
+    commit(repo, {"work_items/w.md": "w"}, "work item text")
     runner.calls.clear()
     assert verify.main(["--auto"], runner=runner, repo=repo) == 0
     assert runner.calls == []
-    assert "VERDICT: skipped (documentation only)" in capsys.readouterr().out
+    assert "VERDICT: skipped (not read by any test)" in capsys.readouterr().out
 
 
-def test_auto_picks_tiers_from_the_change_since_the_last_green_state(repo, tmp_path):
+def test_auto_without_base_writes_and_picks_tiers_from_the_change(repo, tmp_path):
     runner = FakeRunner(tmp_path / "runs")
-    verify.main(["--tiers", "fast"], runner=runner, repo=repo)
+    assert verify.main(["--auto"], runner=runner, repo=repo) == 0        # no record yet: all tiers
+    assert [tier for tier, _ in runner.calls] == list(verify.TIERS)
+    assert state_of(repo)["tiers"] == list(verify.TIERS)
     commit(repo, {"tests/t2.py": "t2"}, "test change")
     runner.calls.clear()
     assert verify.main(["--auto"], runner=runner, repo=repo) == 0
     assert [tier for tier, _ in runner.calls] == ["fast"]
+    assert state_of(repo)["tiers"] == ["fast"]
     commit(repo, {"src/supervisor/s.ahk": "s"}, "supervisor change")
     runner.calls.clear()
     assert verify.main(["--auto"], runner=runner, repo=repo) == 0
     assert [tier for tier, _ in runner.calls] == ["fast", "foundation", "slow"]
 
 
+def test_a_green_run_on_a_branch_is_not_recorded(repo, tmp_path, capsys):
+    git(repo, "checkout", "-q", "-b", "wip")
+    commit(repo, {"src/a.ahk": "branch change"}, "branch change")
+    assert verify.main([], runner=FakeRunner(tmp_path / "runs"), repo=repo) == 0
+    assert not (repo / "temp" / "verify" / "last.json").exists()
+    out = capsys.readouterr().out
+    assert "not recorded (not on v2-port)" in out and "VERDICT: green" in out
+
+
+def test_a_green_run_of_an_ancestor_of_v2_port_is_recorded(repo, tmp_path):
+    base_sha = verify.resolve(repo, "HEAD")
+    commit(repo, {"doc/e.md": "e"}, "v2-port moves on")
+    assert verify.main(["--ref", base_sha], runner=FakeRunner(tmp_path / "runs"), repo=repo) == 0
+    assert state_of(repo)["sha"] == base_sha
+
+
+def test_a_run_folder_of_another_sha_is_red_with_a_reason(repo, tmp_path, capsys):
+    folder = fake_folder(tmp_path / "runs", "20261016-000000-deadbeef-fast-1", "1 passed in 1.0s", ["ok"])
+
+    def wrong_sha(tier, sha):
+        return 0, "[run_suite] output: %s\n" % (folder / "output.txt")
+
+    assert verify.main(["--tiers", "fast"], runner=wrong_sha, repo=repo) == 1
+    assert "does not name the sha" in capsys.readouterr().out
+
+
 def test_red_run_exits_1_names_the_failed_tests_and_keeps_the_old_state(repo, tmp_path, capsys):
-    runner = FakeRunner(tmp_path / "runs")
-    verify.main(["--tiers", "fast"], runner=runner, repo=repo)
+    verify.main([], runner=FakeRunner(tmp_path / "runs"), repo=repo)
     old = (repo / "temp" / "verify" / "last.json").read_text(encoding="utf-8")
     commit(repo, {"src/a.ahk": "changed"}, "change")
     runner = FakeRunner(tmp_path / "runs2", fail={"fast": ["tests/t.py::test_a", "tests/t.py::test_b"]})
@@ -264,7 +307,7 @@ def test_unknown_ref_is_a_tool_error(repo, capsys):
 
 
 def test_provisional_ids_are_a_note_not_a_failure(repo, tmp_path, capsys):
-    commit(repo, {"doc/OPEN-ITEMS.md": "### %s: a finding\n" % ("F-" + "9001*")}, "branch finding")
+    commit(repo, {"doc/OPEN-ITEMS.md": "### %s*: a finding\n" % ("F-" + "9001")}, "branch finding")
     runner = FakeRunner(tmp_path / "runs")
     assert verify.main(["--tiers", "fast"], runner=runner, repo=repo) == 0
     assert "note: provisional finding IDs" in capsys.readouterr().out
