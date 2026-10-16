@@ -509,6 +509,43 @@ StoppedPoolAsksForNothing() {
     Assert.Equal(bridge.Usable(), false)
 }
 
+; F-0012: the answer and the deadline of one job meet. The spy map runs the deadline (_JobExpired) at the first
+; Get of the job, the place where an interrupting timer would run in the middle of OnDone. The job must end once.
+class SpyJobs extends Map {
+    __New(hook) {
+        super.__New()
+        this.CaseSense := "Off"
+        this.hook := hook
+    }
+
+    Get(key, default := "") {
+        value := super.Get(key, default)
+        if (IsObject(this.hook) && IsObject(value)) {
+            hook := this.hook
+            this.hook := ""
+            hook()
+        }
+        return value
+    }
+}
+
+AnswerAndDeadlineOfOneJobEndTheJobOnce() {
+    r := NewPool(1, 0)
+    owner := r[1]
+    bridge := r[2]
+    bridge.Want(1)
+    SpawnReady(owner, bridge)
+    got := Map("calls", 0)
+    onDone := (result, message, exports) => got["calls"] += 1
+    execId := bridge.Run("Action_X", Map(), Map(), Map(), onDone, 60000)
+    spy := SpyJobs(() => bridge._JobExpired(execId))
+    for key, rec in bridge._jobs
+        spy[key] := rec
+    bridge._jobs := spy
+    bridge.OnDone(FakeMsg("evt.worker.done", Map("execId", execId, "result", "normal", "message", "", "exports", Map())))
+    Assert.Equal(got["calls"], 1, "the job ends once, the deadline and the answer do not both call onDone")
+}
+
 TestRun.Init()
 
 TestRun.Case("Pool: the start asks for the process list first and does not grow before the answer", StartAsksForTheProcessListFirstAndDoesNotGrowBeforeTheAnswer)
@@ -536,5 +573,6 @@ TestRun.Case("Pool: an unconfirmed cancel kills the worker after the orphan time
 TestRun.Case("Pool: the job deadline ends the job, cancels and kills", JobDeadlineEndsTheJobAtOnceAndCancelsThenKills)
 TestRun.Case("Pool: a job that ends in time is not timed out", JobThatEndsBeforeItsDeadlineIsNotTimedOut)
 TestRun.Case("Pool: a stopped pool asks for nothing", StoppedPoolAsksForNothing)
+TestRun.Case("Pool: the answer and the deadline of one job end it once (F-0012)", AnswerAndDeadlineOfOneJobEndTheJobOnce)
 
 TestRun.Finish()

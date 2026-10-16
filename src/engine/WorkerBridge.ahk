@@ -215,10 +215,9 @@ class WorkerBridge {
 
     ; Stops a job (the element is stopped by the worker). Returns false if the job is unknown.
     Cancel(execId) {
-        jobRec := this._jobs.Get(execId, "")
+        jobRec := this._TakeJob(execId)
         if (!IsObject(jobRec))
             return false
-        this._ForgetJob(execId)
         this._CancelOnWorker(execId, jobRec["slot"])
         return true
     }
@@ -248,11 +247,9 @@ class WorkerBridge {
             if (slot["state"] = "busy")
                 this._SetIdle(slot)
         }
-        jobRec := this._jobs.Get(execId, "")
-        if (IsObject(jobRec)) {
-            this._ForgetJob(execId)
+        jobRec := this._TakeJob(execId)
+        if (IsObject(jobRec))
             this._Call(jobRec, result, msgText, exports, execId)
-        }
         this._owner.Kick()
     }
 
@@ -471,28 +468,32 @@ class WorkerBridge {
             return
         slotName := jobRec["slot"]
         Log.Write("a0", "engine", "job " execId " on " slotName " passed its deadline")
-        this._Finish(execId, "exception", "worker timeout")
-        this._CancelOnWorker(execId, slotName)
+        if (this._Finish(execId, "exception", "worker timeout"))
+            this._CancelOnWorker(execId, slotName)
     }
 
     ; Ends a job that the engine decides on (answer error, crash, deadline). No exports.
     _Finish(execId, result, message) {
-        jobRec := this._jobs.Get(execId, "")
+        jobRec := this._TakeJob(execId)
         if (!IsObject(jobRec))
             return false
-        this._ForgetJob(execId)
         this._Call(jobRec, result, message, Map(), execId)
         return true
     }
 
-    ; Removes the job and stops its deadline timer.
-    _ForgetJob(execId) {
-        jobRec := this._jobs.Get(execId, "")
-        if (!IsObject(jobRec))
-            return
-        this._jobs.Delete(execId)
+    ; Takes the job out of the table and stops its deadline timer. Returns its record, or "" if it is gone.
+    ; The Delete is the check and the removal in one step: of two callers that race (the answer and the
+    ; deadline timer, F-0012) only one gets the record. A Get followed by a Delete lets both get it, and the
+    ; job then ends twice.
+    _TakeJob(execId) {
+        try {
+            jobRec := this._jobs.Delete(execId)
+        } catch {
+            return ""
+        }
         if (IsObject(jobRec["deadline"]))
             SetTimer(jobRec["deadline"], 0)
+        return jobRec
     }
 
     _Call(job, result, message, exports, execId) {
