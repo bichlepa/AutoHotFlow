@@ -433,6 +433,9 @@ CheckLoopStackSharesTheSnapshot() {
     loops.Push()                                   ; enter the inner loop
     a.SetVar("A_Index", 1, "loop")
     Assert.Equal(ObjPtr(loops.Hidden["A_LoopCurrentList"]), ObjPtr(snapshot), "the inner loop sees the same snapshot")
+    seen := a.GetVar("A_LoopCurrentList", "", true)
+    Assert.Equal(seen.Count, 2000, "the inner loop sees all members")
+    Assert.Equal(seen[2000], "item2000")
     loops.Pop()                                    ; leave the inner loop
     Assert.Equal(ObjPtr(loops.Hidden["A_LoopCurrentList"]), ObjPtr(snapshot), "no copy on entry: the same object is restored")
     loops.Pop()
