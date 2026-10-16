@@ -75,18 +75,29 @@ class DialogWindow {
             c["change"].Visible := false
             c["delete"].Visible := false
         }
-        refresh.OnEvent("Click", (*) => DialogWindow._Fill(c, c["name"]))
-        c["list"].OnEvent("Change", (*) => DialogWindow._Select(c))
-        c["convert"].OnEvent("Click", (*) => DialogWindow._ShowText(c))
-        c["change"].OnEvent("Click", (*) => DialogWindow._Write(c))
-        c["delete"].OnEvent("Click", (*) => DialogWindow._Delete(c))
+        refresh.OnEvent("Click", (*) => DialogWindow._Guard(c, "_Fill", c["name"]))
+        c["list"].OnEvent("Change", (*) => DialogWindow._Guard(c, "_Select"))
+        c["convert"].OnEvent("Click", (*) => DialogWindow._Guard(c, "_ShowText"))
+        c["change"].OnEvent("Click", (*) => DialogWindow._Guard(c, "_Write"))
+        c["delete"].OnEvent("Click", (*) => DialogWindow._Guard(c, "_Delete"))
         yesBtn.OnEvent("Click", this._Pick(res, view.ReadOnly ? "close" : "yes"))
         noBtn.OnEvent("Click", this._Pick(res, "no"))
         g.OnEvent("Close", this._Pick(res, "close"))
         g.OnEvent("Escape", this._Pick(res, "close"))
-        this._Fill(c, "")
+        this._Guard(c, "_Fill", "")
         g.Show("w690 h430")
         return this._Wait(res, g, "")
+    }
+
+    ; Runs one handler of the debug window (named by name) from a GUI event or from the start. A request to the engine
+    ; that fails (timeout, the instance has ended: ElementError, WorkerContext) must not end the thread inside the event:
+    ; the error goes to the status line of the window, and the window stays usable.
+    static _Guard(c, name, args*) {
+        try {
+            DialogWindow.%name%(c, args*)
+        } catch as e {
+            c["status"].Value := "Error: " e.Message
+        }
     }
 
     ; Fills the list of the variables from view.Rows(); keepName is selected again when it is still there.
