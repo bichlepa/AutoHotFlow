@@ -35,6 +35,21 @@ Status: **partly done** (2026-10-16). All six acceptance points of S0002 are met
    - Convertible v1 fixes: `FIX_LIST` in `tests/integration/test_corpus.py` has 2 entries, both in "variable test" (Flow 1010290492, `element0000000035` and `element0000000098`), both M-0069; `doc/MIGRATION.md` has one row for WI-0057, M-0069. "List test" and "Loop test" needed no fix. A deterministic converter could produce both edits: replace `%A_ManualTriggerID%` by the name of the trigger that starts the element's path (2 of 2 edits, 1 of 1 ID). Assumed, not checked: that rule needs the flow's trigger mapping and does not hold for called flows, and no converter rule exists yet.
    - Scope of S0003 from this: the trigger host sets `A_ManualTriggerID` (M-0069 goes back to the variable), the enabled state of a trigger (F-0099, REQ-EXE-070), and the elements Set_flow_status, Condition_Flow_Enabled, Trigger_Hotkey, Trigger_Periodic_Timer and Trigger_Start_Up (the PENDING table).
 
+**Task 3 review (13 items; no fix made, no error found that was clearly wrong and trivial).**
+- `doc/ELEMENT-API-V2.md` section 8: no open S0002 point; the heading "Still to be clarified (Phase 3)" and the R0003 bullet still read as questions that E0040/E0041 answered (wording, not changed).
+- `doc/ARCHITECTURE.md` section 7: no open S0002 point; line 21 "(in S0001 to S0007 most of them, E0020)" describes a plan, not checked.
+- `doc/ARCHITECTURE.md` section 8: the tree is correct (`src/elements/`, `src/entry/generated/`), but the state paragraph "at the end of Phase 2" lacks the S0002 folders (labelled snapshot, not changed).
+- `doc/ARCHITECTURE.md` section 10: R0003 and R0004 closed with WI-0046 and WI-0050; no open point.
+- `doc/PROTOCOL.md` section 4 (status table, "end of Phase 2"): names `cmd.flow.save` and `evt.flow.saved` as not implemented, but both are in `src/engine/Engine.ahk` (WI-0039); the table needs a rewrite, not a trivial fix.
+- `doc/MIGRATION.md`: no open status; M-0069 "planned (S0003)" matches WI-0057.
+- `doc/TEST-STRATEGY.md` sections 7, 8, 8a, 9, 9a: no open S0002 point; section 6 has the S0001 runtimes only (the S0002 runtimes are in this result, not in the document).
+- `doc/TEST-STRATEGY.md` section 8 (line 265, "636 tests / 629 tests") and section 6 (line 183, "860 tests"): measured in S0001, stale; not re-measured.
+- `doc/MEASUREMENTS.md`: no open S0002 point; the "missing" list is phase 3 (editor, triggerhost); R0003 and R0004 values present.
+- `doc/CONVENTIONS.md`: no open S0002 point.
+- `AGENTS.md`: the budget line already says about 1 minute; the Phase 3 line still says S0002 is in progress (update when the owner closes WI-0058).
+- `doc/HOW-TO.md` and `doc/howto/*.md`: no open S0002 point; the DPI entry is verified by the owner.
+- `work_items/phase3/STATUS.md`: the WI-0058 row says "partly done" (update at integration).
+
 **Runs (all on commit `073b673`, `tools/run_suite.py`, 8 logical cores)**
 
 | Run | Command | Result | Time |
