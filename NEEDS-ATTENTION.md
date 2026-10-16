@@ -4,15 +4,16 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-None open.
+- **Read error of `FlowState.json` disables all writes for the session (WI-0060, decision 3).** A locked or unreadable file is reported once, and from then on no state switch is saved (the file is never overwritten). The alternative is to retry the read. Your call: keep it, or retry (the retry needs a timer).
 
 ## Manual checks
 
 None open.
 
-## Pending owner review (to be decided when you are back)
+## To know
 
-- **WI-0060 decisions** (to be listed here after its review): `cmd.flow.enable` without a following trigger answers `ok:false`; a new storage message `cmd.storage.flowstate.keepBroken`; a read error disables writes for the session.
+- **WI-0060 (enabled state of triggers) is integrated** (commits `ff6448d`–`4bbe858` on `v2-port`). Reviewer approved without changes. Decisions taken by the author and accepted by the reviewer: `cmd.flow.enable`/`disable` without a following trigger answer `{ok:false, message}` and change nothing; new storage message `cmd.storage.flowstate.keepBroken` (storage renames a file the engine cannot parse); the engine does not wait for that answer before `ready`; writes come at most once per second.
+- **Open point from the review:** a trigger removed by `cmd.flow.save` keeps its enabled entry in memory, so it comes back enabled if the editor adds it again with the same ID. Relevant for S0006, not tested.
 
 ## To know
 
