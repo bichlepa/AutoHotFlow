@@ -155,6 +155,7 @@ TestRun.Case("Children: the end of the engine ends its workers at once, as a pla
 TestRun.Case("Children: a worker is not ended when the engine ends during the shutdown (E0010, WI-0033)", EngineEndDuringShutdownKeepsTheWorkers)
 TestRun.Case("Children: a kill request for a worker whose process has already ended does not turn its crash into a planned exit (F-0042, WI-0035)", KillOfAnEndedWorkerStaysACrash)
 TestRun.Case("Children: a kill request for a running worker ends it as a planned exit with the reason killed (WI-0035)", KillOfARunningWorkerIsAPlannedExit)
+TestRun.Case("Children: a kill request for a worker whose connection has ended without goodbye leaves its end a crash (F-0071, F-0089)", KillOfAWorkerWithALostLinkStaysACrash)
 TestRun.Case("Children: the end of the engine does not relabel a worker that has ended already (F-0042, WI-0035)", EngineEndKeepsTheCrashOfAnEndedWorker)
 TestRun.Case("Heartbeat: a child without pong for 6 s of regular ticks is hung", SilentChildIsHung)
 TestRun.Case("Heartbeat: a stand-still of the supervisor does not make a ready child hung", StallDoesNotHangReadyChild)
@@ -719,14 +720,32 @@ KillOfARunningWorkerIsAPlannedExit() {
     kids := NewKids(hubStub)
     t0 := 100000
     w := AddWorker(kids, "worker:1", t0)
+    hubStub.links["worker:1"] := true                    ; connected
     kids.KillWorker("worker:1", "test")
     Assert.Equal(w["killReason"], "killed")
     WaitForEnd(w["handle"])
+    hubStub.links.Delete("worker:1")                     ; the hub has read the end of the connection
     kids.Tick(t0 + 200)
     ev := hubStub.Find("evt.process.exited")
     Assert.True(IsObject(ev), "evt.process.exited")
     Assert.Equal(ev["payload"]["reason"], "killed")
     Assert.Equal(hubStub.Count("evt.process.crashed"), 0)
+}
+
+; F-0071/F-0089: the pipe of a killed process ends before its process handle is signalled. The engine, told by the hub
+; (peer_gone), asks for the kill in that gap: the process is not seen as ended yet, but its connection is gone.
+KillOfAWorkerWithALostLinkStaysACrash() {
+    hubStub := FakeHub()
+    kids := NewKids(hubStub)
+    t0 := 100000
+    w := AddWorker(kids, "worker:1", t0)                 ; handle not signalled, no link in the hub
+    kids.KillWorker("worker:1", "run not accepted: peer_gone")
+    Assert.Equal(w["state"], "ready", "not relabelled as stopping")
+    Assert.Equal(w.Get("killReason", ""), "")
+    WaitForEnd(w["handle"])
+    kids.Tick(t0 + 200)
+    Assert.Equal(hubStub.Count("evt.process.crashed"), 1, "judged as a crash")
+    Assert.Equal(hubStub.Count("evt.process.exited"), 0, "not as a planned exit")
 }
 
 EngineEndKeepsTheCrashOfAnEndedWorker() {

@@ -176,6 +176,15 @@ class Children {
             Log.Write("a1", "children", name " has ended already, its end is judged as its own (kill request: " reason ")")
             return
         }
+        ; Its connection has ended and it never said goodbye: it is dying on its own, only the process handle is not
+        ; signalled yet. The end of the pipe comes about 1 ms (more under load) BEFORE the process handle, so the
+        ; request of the engine (triggered by peer_gone) can overtake the death. Then the end is a crash, not a planned
+        ; exit "killed" (F-0071, F-0089). The kill below still makes sure that the process ends.
+        if (rec["state"] = "ready" && !rec["bye"] && !this.hub.HasLink(name)) {
+            Log.Write("a1", "children", name " has lost its connection without goodbye, its end is judged as its own (kill request: " reason ")")
+            this.Terminate(name, false)
+            return
+        }
         Log.Write("a1", "children", "killing " name " on request: " reason)
         if (rec["state"] != "hung") {
             rec["state"] := "stopping"
