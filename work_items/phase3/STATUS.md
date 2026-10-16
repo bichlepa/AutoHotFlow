@@ -47,7 +47,7 @@ Step S0003 (trigger host and triggers), detailed on 2026-10-16 (E0056 to E0062).
 | WI-0062 | Engine: arming, fired events, TriggerVariables | done, verified | haiku (review sonnet) | 41d8bdb–e6aed49 | 2026-10-16 | reviewer approved; M-0069 done |
 | WI-0063 | Periodic timer and start-up triggers | done, verified | haiku (review sonnet) | 436aeb4–1f8e62c | 2026-10-16 | reviewer approved; M-0071; provisional F-9000* is F-0111 |
 | WI-0064 | Hotkey trigger with window conditions | running (spike first, E0059) | haiku | | | |
-| WI-0065 | Set_Flow_Status, Condition_Flow_Enabled | done, verified | haiku (review sonnet) | 63fb03b–1bcbb127 | 2026-10-16 | reviewer approved; M-0072 to M-0074 (M-0072 confirmed by the owner) |
+| WI-0065 | Set_Flow_Status, Condition_Flow_Enabled | done, verified | haiku (review sonnet) | 5adfc6b–1bcbb127 | 2026-10-16 | reviewer approved; M-0072 to M-0074 (M-0072 confirmed by the owner) |
 | WI-0066 | Guard against runaway flows | implemented, integration pending (rebase) | haiku | | | default limit is the owner's decision (NEEDS-ATTENTION) |
 | WI-0067 | Acceptance S0003 | open | | | | |
 | WI-0068 | Enabled state per flow file (E0063, answer to the FlowState read error) | done, verified (stress test 200 flows green) | haiku (review sonnet) | a313d3b–8d2eb98 | 2026-10-16 | reviewer approved after a fix (late read arms the merged triggers); F-0109 closed |
