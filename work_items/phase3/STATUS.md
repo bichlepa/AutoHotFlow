@@ -52,6 +52,8 @@ None. The manual-check start path (section 3 of MANUAL-CHECKS) is integrated; th
 
 ## Last verified state
 
+Commit `da2f2ef` (DPI fix of the dialog windows, REQ-USE-090 for the dialogs) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-191518-da2f2efb` (1123 passed, 1 skipped). Manual check 3 passed on the owner's side (2026-10-16).
+
 Commit `c9cd4d3` (WI-0058 acceptance, result and renumbered findings) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-185723-c9cd4d36` (1123 passed, 1 skipped).
 
 Commit `f741f4d` (F-0097, loop stack shares the outer snapshot) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-184825-f741f4db` (1123 passed, 1 skipped). Timing of the flow from F-0097 not remeasured.
