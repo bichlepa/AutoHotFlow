@@ -562,8 +562,13 @@ class Executor {
             Log.Write("f2", "engine", "late finish '" result "' for removed thread " threadId, runRec["flowId"])
             return
         }
-        if (runRec["active"].Has(threadId))
+        ; One take: _StopRun may have taken the entry already (F-0012). Then the thread is stopping and Finish
+        ; answers "late" below, so the element is stopped and released once, by _StopRun.
+        try {
             runRec["active"].Delete(threadId)
+        } catch {
+            ; reason: the entry is gone, taken by _StopRun (the thread is then stopping)
+        }
         if (thr.Finish(result, msg) = "late") {
             Log.Write("f2", "engine", "late finish '" result "' for thread " threadId, runRec["flowId"])
             return
@@ -609,9 +614,15 @@ class Executor {
             thr := inst.Threads.Get(threadId, "")
             if (!IsObject(thr) || thr.State != "stopping")
                 continue
-            if (run["active"].Has(threadId)) {
-                act := run["active"][threadId]
-                run["active"].Delete(threadId)
+            ; One take (F-0012): a finish that meets this stop may have taken the entry; then the element has
+            ; ended and needs no stop. The thread is released here either way.
+            act := ""
+            try {
+                act := run["active"].Delete(threadId)
+            } catch {
+                ; reason: the entry is gone, taken by a finish of this thread (the element has ended)
+            }
+            if (IsObject(act)) {
                 if (act.Has("execId"))
                     this._owner.workers.Cancel(act["execId"])
                 else
