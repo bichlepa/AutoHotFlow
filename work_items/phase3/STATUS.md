@@ -42,7 +42,7 @@ Step S0003 (trigger host and triggers), detailed on 2026-10-16 (E0056 to E0062).
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
-| WI-0060 | Enabled state of triggers | done, verified (slow: one load flake, green alone) | haiku (review sonnet) | 7c3e41f–4bbe858 | 2026-10-16 | closes F-0099; reviewer approved |
+| WI-0060 | Enabled state of triggers | done, verified (slow: one load flake, green alone) | haiku (review sonnet) | 1326e8e–4bbe858 | 2026-10-16 | closes F-0099; reviewer approved |
 | WI-0061 | Role `triggerhost` | running | haiku | | | parallel to WI-0060 |
 | WI-0062 | Engine: arming, fired events | open | | | | |
 | WI-0063 | Periodic timer and start-up triggers | open | | | | |
