@@ -69,22 +69,22 @@ L279-299 9a. Dialog tests (E0038, WI-0051)
 L301-321 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (49.7 KB, 462 lines)
+## doc/ELEMENT-API-V2.md (50.8 KB, 464 lines)
 ```text
 L8-18 1. Guidelines
 L20-87 2. Class contract
-L89-209 3. Context `ctx`
-L130-147   3.1 Parameter evaluation (WI-0042)
-L149-159   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
-L161-167   3.3 Dialogs (E0038, WI-0051)
-L169-184   3.4 Debug view (WI-0056, REQ-DBG-060)
-L186-209   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
-L211-293 4. Example 1: `Action_Sleep` (inline, with timer)
-L295-388 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L390-430 6. Mechanical conversion rules
-L432-453 7. What stays
-L439-453   7.1 Loop elements (WI-0054)
-L455-462 8. Still to be clarified (Phase 3)
+L89-211 3. Context `ctx`
+L132-149   3.1 Parameter evaluation (WI-0042)
+L151-161   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
+L163-169   3.3 Dialogs (E0038, WI-0051)
+L171-186   3.4 Debug view (WI-0056, REQ-DBG-060)
+L188-211   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+L213-295 4. Example 1: `Action_Sleep` (inline, with timer)
+L297-390 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L392-432 6. Mechanical conversion rules
+L434-455 7. What stays
+L441-455   7.1 Loop elements (WI-0054)
+L457-464 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
