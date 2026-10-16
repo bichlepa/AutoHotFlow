@@ -720,6 +720,20 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: recheck red tests in this checkout (recheck.py --here, also for runs with uncommitted changes)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/recheck.py",
+                "${input:recheckRun}",
+                "--here"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Test: deviation catalog of the new expression language against the golden data of v1",
             "type": "shell",
             "command": "python",
@@ -751,6 +765,23 @@
             "args": [
                 "tools/golden_compare.py",
                 "--private"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: idle tier, waits for an idle machine and runs alone (-m idle, worktree)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/run_suite.py",
+                "--",
+                "tests",
+                "-q",
+                "-m",
+                "idle"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
