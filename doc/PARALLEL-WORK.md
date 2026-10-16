@@ -16,7 +16,7 @@ The tool works from the main checkout and from inside a workspace. VS Code tasks
 
 ## 2. Rules
 
-1. Work only in your own workspace. Never change the main checkout or another workspace.
+1. Work only in your own workspace. Never change the main checkout or another workspace. The one exception: the test tooling (`tests/conftest.py`, WI-0059) writes the run history into `temp/history/` of the main checkout, an ignored folder without tracked content, so that the runs of every workspace land in one place. Nothing else may write there, and nobody writes there by hand.
 2. Commit on your branch (`wip/<name>`), small commits as in AGENTS.md rule 7. Do not merge into `v2-port` yourself; the integrator does.
 3. Run tests from your workspace: the fast tier directly (`python -m pytest tests -q`), everything that takes minutes through `python tools/run_suite.py --with-changes` in the background. A second agent tests your branch with `--ref wip/<name>`.
 4. No `gui` tests and no desktop automation unless the project owner agrees: windows and focus belong to one session at a time.
@@ -59,7 +59,8 @@ python tools/new_workspace.py --remove <name>                     # worktree awa
 
 ## 5. Load and limits
 
-- `tools/run_suite.py` allows 2 runs at the same time with 4 workers each and lets a `-m stress`/`-m soak` run wait for an idle machine. This is a budget, not a guarantee: timing tests (`scaled()`) can become unstable on a loaded machine. A failure that appears only under parallel load is rerun alone before it counts. Use `--max-runs 1` for a clean comparison.
+- **Agents no longer coordinate their test runs by hand (WI-0059).** Every pytest run, direct or through `run_suite`, goes through the machine-wide admission: the workers of all runs together stay at or below `AHF_MAX_WORKERS` (default cores − 2), a run waits for free slots and says so (`[admission] waiting: ...`), and a `-m stress`/`-m soak` run waits for an idle machine and blocks the others. Details: `doc/TEST-STRATEGY.md` section 6, "Admission, load figures and run history".
+- `tools/run_suite.py` in addition allows 2 of its runs at the same time with 4 workers each (fewer when the admission has fewer free slots). This is a budget, not a guarantee: timing tests (`scaled()`) can become unstable on a loaded machine, and programs outside the test runs are not admitted. Every run prints the load of its red tests and keeps it in the history; a failure that appears only under parallel load is rerun alone before it counts (`python tools/recheck.py <run id>`), and `python tools/test_history.py --flaky` shows tests that were red and green at the same commit. Use `--max-runs 1` for a clean comparison.
 - A workspace contains only what git tracks. Everything a test needs is in `tests/data`; a run in a fresh worktree shows a missing dependency as a failure, which is the intended check.
 - Agents do not share a desktop session cleanly. GUI work (manual checks, `gui` tests) is done by one party at a time.
 - Disk: every workspace is a full checkout without history; remove finished ones.

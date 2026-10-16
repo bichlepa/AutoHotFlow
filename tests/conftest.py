@@ -5,6 +5,8 @@ Environment variables:
   AHF_TEST_KEEP  set to 1 to keep the temporary data directories after a test (failed tests keep theirs anyway,
                  see "Run log" below)
   AHF_TEST_LOGS  folder for the run logs (default: %TEMP%/ahf_testruns); the newest 15 runs are kept
+  AHF_MAX_WORKERS, AHF_ADMISSION_TIMEOUT, AHF_NO_ADMISSION, AHF_ADMITTED, AHF_HISTORY_DIR, AHF_LOAD_SAMPLER
+                 machine-wide admission, load figures and run history (WI-0059, tests/support/runrecord.py)
 
 Run log: every run writes %TEMP%/ahf_testruns/<time>-<pid>/ with summary.txt (command, counts, failed tests,
 slowest tests), results.txt (one line per test, in start order, with UTC and local start time), failures/<test>.txt

@@ -1130,3 +1130,17 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Right:** read the probes right after the run, before the next one starts (`tests/integration/test_core_a_elements.py::run_all` stores them in `run.seen`). A run that ended with an exception has no probe: `probe` then waits for its timeout, so read it only for a flow that finished.
 - **Status:** verified (WI-0052)
 - **Source:** `tests/support/flowrun.py`, `tests/integration/test_core_a_elements.py`
+
+### `psutil.cpu_percent(interval=None)` keeps its reference point per thread
+
+- **Problem:** The load sampler (WI-0059) primed `psutil.cpu_percent(interval=None)` in the main thread and read it in its own thread one second later: the first value was always `0.0`.
+- **Wrong:** Priming in one thread and reading in another, or relying on the first call of a new thread.
+- **Right:** Compute the system load from two `psutil.cpu_times()` readings (busy = total minus idle, both summed over the cores), which has no hidden state (`tests/support/loadsampler.py`).
+- **Status:** verified (by hand: main thread `21.0`, a new thread `0.0` after one second; psutil 6.1.1)
+
+### CPU of a process tree including the processes that already ended: a job object
+
+- **Problem:** A psutil walk over the children only sees processes that are alive at the moment of a sample. Test processes that live shorter than one second, and the xdist workers that end before `pytest_sessionfinish`, then count as external load.
+- **Right:** The controller assigns itself to a job object of its own (`CreateJobObjectW`, `AssignProcessToJobObject(GetCurrentProcess())`); every process started below it is in the job, and `QueryInformationJobObject(JobObjectBasicAccountingInformation)` returns the user and kernel time of all processes that were ever in it, plus the number of active ones. Set `argtypes`/`restype` for every call (64-bit handles, see above). Nested jobs need Windows 8 or later; the fallback is the psutil walk.
+- **Status:** verified (`tests/test_load_history.py::test_external_load_shows_in_the_figures_of_the_test`: burners started by the run count as own, burners from outside as external)
+- **Source:** `tests/support/loadsampler.py`
