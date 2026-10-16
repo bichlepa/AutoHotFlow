@@ -418,6 +418,52 @@ CheckLoopStackKeepsOuterLoopVariables() {
     Assert.Equal(a.HasVar("A_Index"), 0, "nothing outside the loops")
 }
 
+; F-0097: entering a loop does not copy the snapshot of the outer list loop. The snapshot is one Map of n members;
+; a copy per entry made a loop inside a list loop cost O(n) per entry. Leaving the loop restores the very object.
+CheckLoopStackSharesTheSnapshot() {
+    f := Fx()
+    a := f.access
+    loops := f.thread.Loops
+    items := []
+    loop 2000
+        items.Push("item" A_Index)
+    loops.Push()                                   ; enter the outer list loop
+    a.SetVar("A_LoopCurrentList", items, "loop", true)
+    snapshot := loops.Hidden["A_LoopCurrentList"]    ; the object itself: GetVar returns a copy
+    loops.Push()                                   ; enter the inner loop
+    a.SetVar("A_Index", 1, "loop")
+    Assert.Equal(ObjPtr(loops.Hidden["A_LoopCurrentList"]), ObjPtr(snapshot), "the inner loop sees the same snapshot")
+    loops.Pop()                                    ; leave the inner loop
+    Assert.Equal(ObjPtr(loops.Hidden["A_LoopCurrentList"]), ObjPtr(snapshot), "no copy on entry: the same object is restored")
+    loops.Pop()
+}
+
+; F-0097: the inner loop sets its own snapshot; the outer one comes back with its values, and the inner loop
+; does not see the outer values.
+CheckNestedSnapshotsStayApart() {
+    f := Fx()
+    a := f.access
+    loops := f.thread.Loops
+    loops.Push()
+    a.SetVar("A_LoopCurrentList", ["o1", "o2"], "loop", true)
+    a.SetVar("A_Index", 1, "loop")
+    loops.Push()
+    a.SetVar("A_LoopCurrentList", ["i1"], "loop", true)
+    a.SetVar("A_Index", 5, "loop")
+    inner := a.GetVar("A_LoopCurrentList", "", true)
+    Assert.Equal(inner.Count, 1, "the inner loop has its own snapshot")
+    Assert.Equal(inner[1], "i1")
+    Assert.Equal(a.GetVar("A_Index"), 5)
+    loops.Pop()
+    outer := a.GetVar("A_LoopCurrentList", "", true)
+    Assert.Equal(outer.Count, 2, "the outer snapshot is back")
+    Assert.Equal(outer[1], "o1")
+    Assert.Equal(outer[2], "o2")
+    Assert.Equal(a.GetVar("A_Index"), 1, "and the outer index")
+    loops.Pop()
+    Assert.Equal(a.HasVar("A_LoopCurrentList", true), 0, "nothing outside the loops")
+}
+
 CheckThreadCloneCopiesVariables() {
     f := Fx()
     f.thread.Vars["A_Foo"] := VarValues.Import(NewMap("k", "v"))
@@ -452,6 +498,8 @@ TestRun.Case("replace: %var% as v1 Var_replaceVariables", CheckReplace)
 TestRun.Case("JSON text of objects", CheckJsonText)
 TestRun.Case("ListVars per scope and all", CheckListVars)
 TestRun.Case("loop stack: inner loop hides and restores outer loop variables", CheckLoopStackKeepsOuterLoopVariables)
+TestRun.Case("loop stack: entering a loop shares the outer snapshot (F-0097)", CheckLoopStackSharesTheSnapshot)
+TestRun.Case("loop stack: nested snapshots stay apart (F-0097)", CheckNestedSnapshotsStayApart)
 TestRun.Case("thread clone copies its variables", CheckThreadCloneCopiesVariables)
 
 TestRun.Finish()
