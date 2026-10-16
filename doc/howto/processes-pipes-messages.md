@@ -314,3 +314,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `_EndRun` only queues `[call, outcome]` (`Executor._notes`); `Tick` hands the outcomes over first, one by one, before it dispatches threads. Each end is a flat step; the depth of a call chain costs no stack. A call is a Map with a flag `cancelled`, so a stop of the caller (`ExecContext.CancelTimers`) also drops an outcome that is already queued, and the function reference is cleared on delivery or cancel (the bound context would otherwise be a reference cycle).
 - **Status:** verified (`tests/ahk/engine_call_flow.test.ahk`, cases of the depth limit and of the stopped caller; `tests/integration/test_core_d_flows.py::test_waiting_calls_of_a_flow_to_itself_are_limited`)
 - **Source:** `src/engine/Executor.ahk` (`CallFlow`, `_EndRun`, `_Deliver`)
+
+### Take a shared entry with one `Delete`, not with `Get` and then `Delete`
+
+- **Problem:** `WorkerBridge` read a job with `Get`, checked it, and removed it with `Delete` in a later line. The deadline timer of the same job could run between the two lines and get the same record: the job ended twice (`onDone` called twice) or the `Delete` threw `Item has no value` in the other thread. Reproduced by a probe with a 1 ms deadline (5 double callbacks and 11 throws in 199,458 jobs before the fix, 0 in 234,140 after).
+- **Wrong:** `jobRec := m.Get(k, ""); if (IsObject(jobRec)) { m.Delete(k); Call(jobRec) }` in two threads.
+- **Right:** `try jobRec := m.Delete(k)` and `catch return ""`: `Delete` returns the removed record and throws when it is gone, and the builtin call is not interrupted. Only the caller that gets the record acts on it.
+- **Status:** verified (`tests/ahk/engine_worker_bridge.test.ahk`, `AnswerAndDeadlineOfOneJobEndTheJobOnce`, red before with `expected 1 but got 2`, green after; the probe above)
+- **Source:** `src/engine/WorkerBridge.ahk` (`_TakeJob`), `doc/OPEN-ITEMS.md` F-0012

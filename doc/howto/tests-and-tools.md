@@ -344,3 +344,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Keep the behavior (a flow may rely on it) and document it; a test pins it (`FieldsOf('a,"b,c",d', "CSV", "")` is three fields).
 - **Status:** verified (v1 interpreter and `tests/ahk/element_loops.test.ahk`)
 - **Source:** `src/elements/Default/Loops/Loop_Parse_A_String.ahk`
+
+### A race test without a way to interrupt: a Map subclass runs the other path inside `Get`
+
+- **Problem:** An interrupt cannot be forced between two lines of AutoHotkey code, so a race between a timer and a message handler cannot be tested by timing alone (a race that shows once in about 30,000 jobs needs minutes).
+- **Wrong:** Waiting for a race to show with a loop and a timer, or a test that only checks the final result.
+- **Right:** Give the shared container a subclass of `Map` whose `Get` runs a hook once, after the value is read and before it is returned: the hook runs the other path (for example the deadline) at the same place where the interrupt would land. `class SpyJobs extends Map { Get(key, default := "") { value := super.Get(key, default); if (IsObject(this.hook) && IsObject(value)) { h := this.hook, this.hook := "", h() }; return value } }`. Copy the entries into the spy and put it in place of the field. Old code gives 2 callbacks, the fix gives 1.
+- **Status:** verified (`AnswerAndDeadlineOfOneJobEndTheJobOnce`, red before and green after); the spy catches only a `Get` that the code does before the change, so a test of a new code path needs its own spy method.
+- **Source:** `tests/ahk/engine_worker_bridge.test.ahk`

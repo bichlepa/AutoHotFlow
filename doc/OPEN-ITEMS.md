@@ -15,7 +15,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | ID | Title | Status | Phase 3 |
 |---|---|---|---|
 | F-0002 | Pipe not ready within 2 s under load | open, observed | |
-| F-0012 | Unprotected check-then-act spots in the engine | open (counts guarded in ad6ac7d; rest read and found protected) | |
+| F-0012 | Unprotected check-then-act spots in the engine | open: `WorkerBridge` job table fixed and verified (test red before, green after); `Executor` active-thread map not yet (read, not reproduced, next step in the entry) | |
 | F-0013 | `Ids.Next` and `ExecContext.Finish` not atomic | fixed (owner agreed on 2026-10-15), verifier pending | yes |
 | F-0019 | Supervisor messages after `storage` is gone go only to stderr (narrowed: only the part that is never delivered, see the update) | decision needed, low | |
 | F-0020 | Flow file parsed twice in the engine | open, not implemented | yes |
@@ -43,6 +43,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0099 | `Action_Execute_Flow` needs an enabled trigger, but every flow is disabled after the start of the engine (the enabled state is not loaded or kept) | decided by the project owner (2026-10-16, E0053): the enabled state of a trigger comes with S0003 (REQ-EXE-070); until then a trigger counts as enabled when its flow is enabled | yes |
 | F-0100 | Slow tier: the random run of the expression oracle stopped at the F-0075 class through a subtraction (`!(ftiny - fz . (f3 < ineg))`): the guard of the generator misses `ftiny` inside an operand of the concatenation | verified (seed 411675 reproduces it), open, test generator only | |
 | F-0101 | Slow tier: `test_start_stop_storm_leaves_a_consistent_engine[smoke]` saw the engine's handle count grow by 19 (limit 5) | observed, red twice in a row and once alone, green three times on `c27ff8f`; cause not known; open, watch the history | |
+| F-9001* | `tests/test_precommit.py` writes the text `index v1`, which the v1 guard of the fast tier reads as a dependency on `v1/` | open, verified (red on the base commit); test text only | |
 
 ## Findings
 
@@ -58,12 +59,15 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 ### F-0012: Unprotected check-then-act spots in the engine
 
 **What:** Further spots that check and then change state without protection: `Executor._OnFinish`/`_StopRun`, `_ElementStarted`/`_ElementStopped`, and `WorkerBridge`.
-**Status:** Open, observed. Read in code, not reproduced.
+**Status:** Open. One spot fixed and verified (`WorkerBridge` job table, 2026-10-16). The `Executor` active-thread map is read in code and not reproduced.
 **Update 2026-10-13 (bug hunter):** Re-read `Executor` and `WorkerBridge` (verified by reading, nothing reproduced). Already protected: `_Advance`, `_DispatchWorker` (register, run, note execId), `_EndRun`, the tick flag, `ThreadState.Dispatch/Finish` (`Critical`). `_OnFinish` and `_StopRun` are safe against a late finish: `_StopRun` puts the threads into `stopping` first, and a `Finish` on such a thread answers `late`, so `_ElementStopped` is not called twice. `WorkerBridge` has no `Critical`, but its callbacks change only the slot list and the job map in short sequences with no sends between the check and the change; `Run` sets slot and job before it sends. One real spot found: `_ElementStarted` and `_ElementStopped` read, changed and stored `_counts` in separate lines; an interrupting dispatch tick for the same element could lose an update, so the count (and the `running` state shown to the UI) would be wrong for ever. Guarded with `Critical` in ad6ac7d. No test: the interruption cannot be forced. `WorkerBridge` stays unprotected on purpose; not proven to be needed. Not checked: stress runs.
+**Update 2026-10-16 (bug hunter, verified):** `WorkerBridge` took a job with `Get`, then removed it with `Delete` in a second line, in four places (`_ForgetJob`, `_Finish`, `OnDone`, `Cancel`). An interrupting deadline timer (`_JobExpired`) could run between the two lines of an answer: `onDone` then ran twice, or the `Delete` threw `Item has no value`. Reproduced without a fix: a probe with a 1 ms deadline and direct answers ran 199,458 jobs with 5 double callbacks and 11 throws (second run 142,967 jobs, 9 and 3). Fixed: `WorkerBridge._TakeJob` takes the record with one `Delete` (a builtin call is not interrupted), and every caller acts only on the record it got. Test `AnswerAndDeadlineOfOneJobEndTheJobOnce` (`tests/ahk/engine_worker_bridge.test.ahk`) puts the deadline into the first `Get` of the job (a Map subclass): red before (`expected 1 but got 2`), green after. The probe after the fix: 234,140 jobs, 0 doubles, 0 throws. Fast tier: green except F-9001*. Consequence before the fix (not checked in a role): a second `onDone` (`ExecContext.Finish` ignores it, logged as `second Finish ignored`), and an error in the message handler.
+**Update 2026-10-16 (bug hunter), remaining spot, not reproduced:** `Executor._OnFinish` checks `runRec["active"].Has(threadId)` and then `Delete`s it, and `Executor._StopRun` does `Has`, then `[threadId]`, then `Delete` in its loop. A late finish of the same thread between these lines makes the later access throw. In `_StopRun` this stops the loop half way: the threads after it are not released and `_CheckEnded` is not reached, so the instance may stay `stopping` (assumed, not reproduced). Options: (a) the same single-`Delete` take as in `WorkerBridge._TakeJob` in both places, with a test that puts a late finish into the first access (a Map subclass, as in the `WorkerBridge` test); (b) `Critical` around the active-map steps in `_StopRun` (not around the element stop call). Recommendation: (a). Not done in this round: the Executor test needs a fuller setup. Next step: do (a) with the test; then decide whether `Critical` is needed for `_ElementStopped` and the tick (already guarded in ad6ac7d). Not checked: stress runs.
+
 **Why deferred:** No failure seen; the source says "beobachten".
 **Sign that it matters:** Inconsistent engine state after parallel start and stop of instances.
-**Action:** Watch the stress runs. If a case is reproduced, protect the spot (the source suggests `Critical` in phase 3, see F-0013).
-**Evidence:** `v2-phase2-final:work_items/phase2b/WI-0021-engine-korrektheit.md`.
+**Action:** Next step: the `Executor` active-map spot (option a in the update above). Watch the stress runs.
+**Evidence:** `v2-phase2-final:work_items/phase2b/WI-0021-engine-korrektheit.md`. Test of the `WorkerBridge` fix: `tests/ahk/engine_worker_bridge.test.ahk` (`AnswerAndDeadlineOfOneJobEndTheJobOnce`).
 
 ### F-0013: `Ids.Next` and `ExecContext.Finish` not atomic (phase 3)
 
@@ -283,6 +287,13 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** observed, not reproduced in the green runs; cause not known (assumed: a handle that is released late, not a leak by a code change). Open.
 **Action:** watch the history of the test (`python tools/test_history.py --test "tests/stress/test_start_stop_storm.py::test_start_stop_storm_leaves_a_consistent_engine[smoke]"`). If it fails again alone, read the handle types of the engine process in the run log and open a work package; if it fails only under load, add it to the load flakes.
 **Evidence:** runs 20261016-172834-c27ff8f4-3 (red) and its recheck at 17:36 (red alone), in the run history of the main checkout.
+### F-9001*: `test_precommit.py` writes the text `index v1`, which the v1 guard reads as a dependency
+
+**What:** `tests/test_no_v1_dependency.py::test_no_code_or_test_reads_the_v1_folder` fails on the fast tier since the pre-commit tests were added (`tests/test_precommit.py` lines 24, 66, 80, 91, 127: the test fixture text `index v1`).
+**Status:** verified (the guard fails with the unchanged `tests/test_precommit.py`; the text is in the base commit, the file is not changed in this round). Red in the fast tier, not caused by the engine change.
+**Why deferred:** Found while running the fast tier for F-0012; not in the scope of that finding.
+**Sign that it matters:** The fast tier is red for every run until the text changes.
+**Action:** Change the fixture text (for example `index one`) in `tests/test_precommit.py`, or add the file to the guard's exceptions. A one-line test change; the owner or the agent of the pre-commit hook decides.
 
 ## Watch list (E0007)
 

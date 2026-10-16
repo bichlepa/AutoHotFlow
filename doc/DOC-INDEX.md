@@ -171,7 +171,7 @@ L86-91 A Map key `1` and `"1"` are two keys; Integer keys come before texts (ver
 L93-99 A function stored in an object that it holds is a reference cycle (assumed)
 ```
 
-## doc/howto/processes-pipes-messages.md (37.7 KB, 316 lines)
+## doc/howto/processes-pipes-messages.md (38.8 KB, 324 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L12-16 `PostMessageW` with a NULL handle reports success (verified)
@@ -213,6 +213,7 @@ L288-294 Publish a state only after its fields, under `Critical` (partly verifie
 L296-302 Waiting for a message: `Sleep(1)` returns only at the next tick of the system timer (verified)
 L304-309 A blocking wait inside a callback of the peer waits for nothing (assumed)
 L311-316 The end of a called instance goes to the caller in the next tick, not from the step that ended it (verified)
+L318-324 Take a shared entry with one `Delete`, not with `Get` and then `Delete` (verified)
 ```
 
 ## doc/howto/syntax-and-language.md (30.8 KB, 328 lines)
@@ -264,7 +265,7 @@ L318-322 A multi-statement function in an argument is `() {` ... `}`, not `() =>
 L324-328 A helper function of a test file is a global name: `Owner()` turns every local `owner` into a warning (verified)
 ```
 
-## doc/howto/tests-and-tools.md (36.6 KB, 346 lines)
+## doc/howto/tests-and-tools.md (37.8 KB, 354 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L13-19 ctypes: without `argtypes`, 64-bit handles fail intermittently (verified)
@@ -313,6 +314,7 @@ L317-323 The log of a flow is not in execution order across elements (verified)
 L325-330 Two flows or two elements whose IDs differ only in case (verified)
 L332-338 `ctx.GetVar` with a path and a default object: read one member, tell "missing" from "empty" (verified)
 L340-346 `Loop Parse` with the delimiter text "CSV" is the CSV mode (verified)
+L348-354 A race test without a way to interrupt: a Map subclass runs the other path inside `Get` (verified)
 ```
 
 ## doc/REQUIREMENTS.md
