@@ -85,7 +85,10 @@ Several agents may work at the same time only in **separate workspaces**: one gi
 
 ## Looking up AHK help online
 
-The local help file (`C:\Program Files\AutoHotkey\v2\AutoHotkey.chm`) cannot be read, so use the online docs.
+The local help file (`C:\Program Files\AutoHotkey\v2\AutoHotkey.chm`) cannot be read. Two sources:
+
+- **Local checkout of the AutoHotkey docs** (the project owner's machine): `C:\Users\bichl\Documents\git\AutoHotkeyDocs`, branch `v2` (the HTML sources). Functions and commands: `docs/lib/<Name>.htm`; overview: `docs/lib/index.htm`; language concepts: `docs/<Page>.htm`. Grep it first. Check `git branch --show-current` there: branch `v1` holds the v1 docs and must not be used for v2 code.
+- **Online docs** when the checkout is missing (see below).
 
 - Start page (table of contents): `https://www.autohotkey.com/docs/v2/`
 - Function overview (all built-ins, alphabetical): `https://www.autohotkey.com/docs/v2/lib/index.htm`
