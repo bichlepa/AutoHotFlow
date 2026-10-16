@@ -20,7 +20,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0101 | Slow tier: `test_start_stop_storm_leaves_a_consistent_engine[smoke]` saw the engine's handle count grow by 19 (limit 5) | observed, red twice in a row and once alone, green since; the same 145 to 164 as F-0092; cause not known; open, watch the history | |
 | F-0109 | `FlowState.json`: a temp file of an interrupted write (`FlowState.json.ahf-<pid>.tmp`) in the data folder is not removed at start | observed by reading the code (not reproduced); open, low | |
 | F-0110 | Foundation tier: `test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` found the storage process still alive after the session ended (the symptom of F-0095) | observed once under load, run 20261016-211715-c03b628b on `c03b628`; not reproduced; the engine's shutdown adds no request to storage in this scenario (the trigger state is not marked); open, watch |  |
-| F-9000* | Fast tier: `tests/integration/test_worker.py::test_worker_reports_busy_when_a_job_begins_and_ends` saw `[False, True, False]` as the `sys.busy` values instead of `[True, False]` | observed once (run 20261016-225151-4328, commit a3c0dad plus WI-0063 changes that do not touch workers); not reproduced; open, watch the history | |
+| F-0111 | Fast tier: `tests/integration/test_worker.py::test_worker_reports_busy_when_a_job_begins_and_ends` saw `[False, True, False]` as the `sys.busy` values instead of `[True, False]` | observed once (run 20261016-225151-4328, commit a3c0dad plus WI-0063 changes that do not touch workers); not reproduced; open, watch the history | |
 
 ## Findings
 
@@ -56,7 +56,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Action:** watch the history of the test. If it recurs, treat it together with F-0095 (the end of storage after `sys.bye`).
 **Evidence:** run 20261016-211715-c03b628b (output of the run, line 43).
 
-### F-9000*: the worker busy test sees an extra `sys.busy false` at the start
+### F-0111: the worker busy test sees an extra `sys.busy false` at the start
 
 **What:** `test_worker_reports_busy_when_a_job_begins_and_ends` expects the `sys.busy` values `[True, False]` of one job. It got `[False, True, False]`: a `false` came before the job, most likely the idle report of the worker that started with the fixture, which arrived inside the one-second window of the test.
 **Status:** observed once in the fast tier (run 20261016-225151-4328); not reproduced in the next run of the file alone (not repeated on purpose). The worker role was not changed by WI-0063; whether the test or the report is wrong is not checked.
