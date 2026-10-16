@@ -1,8 +1,8 @@
 """WI-0057: the test corpus, the acceptance of S0002 (REQ-TST-040, REQ-TST-030).
 
-Three flows of the "Automatic tests" category of v1 run headless and green: "variable test" and "Loop test" as saved
-(the first on a copy with one fix, tests/data/flows/v2_adapted/), "List test" as saved. The fixes of the copy are listed
-in FIX_LIST with their MIGRATION ID; the originals stay unchanged.
+Three flows of the "Automatic tests" category of v1 run headless and green, all three as saved: "variable test", "List
+test" and "Loop test". "variable test" needs the trigger variable A_ManualTriggerID, which the engine sets for every start
+of a trigger (TriggerVariables, WI-0062, M-0069 is done), so the old copy with its fixes is gone.
 
 Then 16 synthetic flows (flow builder, WI-0049) that use the core set wider than the v1 flows do: each flow is a chain
 of checks or steps that ends in the marker DONE; a flow that does not behave as expected goes to FAIL or ends with an
@@ -27,19 +27,8 @@ pytestmark = pytest.mark.slow          # each test starts a session (acceptance 
 
 ROOT = Path(__file__).resolve().parents[2]
 V1 = ROOT / "tests" / "data" / "flows" / "v1_examples"
-V2 = ROOT / "tests" / "data" / "flows" / "v2_adapted"
 
-# --- the fix list (the trial of an AI-assisted import: every change of a loaded v1 flow) -------------------------------
-FIX_LIST = [
-    dict(flow="Flow 1010290492", element="element0000000035", parameter="VarValue (and the name)",
-         v1="%a_manualTriggerID%", new="basic variables test", migration="M-0069",
-         reason="A_ManualTriggerID is set by the trigger host only (TriggerVariables, S0003); an instance that the engine "
-                "starts gets it empty, and WarnIfEmpty ends the element. The trigger writes its own name, as it did in v1."),
-    dict(flow="Flow 1010290492", element="element0000000098", parameter="VarValue (and the name)",
-         v1="%a_manualTriggerID%", new="variable content test", migration="M-0069",
-         reason="The same as element0000000035 for the second trigger of the flow."),
-]
-
+# --- the flows that are not in the corpus yet ---------------------------------------------------------------------
 # The v1 flow "Automatic tests" flows that are not in this corpus yet: the elements they lack and the step that brings them
 # (WI-0057 task 3). The test below keeps this table equal to the element registry.
 PENDING = {
@@ -130,11 +119,12 @@ def failing(runs_and_names):
 
 
 # --- the three v1 flows ------------------------------------------------------------------------------------------------
-def test_v1_variable_test_runs_green_from_its_start_trigger(flows):
-    """"variable test" (Flow 1010290492, the copy in v2_adapted with the fixes of FIX_LIST). The trigger "start" runs the
-    basic test, which writes its trigger name into static_results, then the content test (100 Condition_Variable_content_is
-    checks), and the flow adds its name to the global list only when both names are in the list."""
-    flow_id = flows.add_file(V2 / "Flow 1010290492.json")
+def test_v1_variable_test_runs_green_as_saved(flows):
+    """"variable test" (Flow 1010290492), as saved. The trigger "start" runs the basic test, which writes its trigger name
+    into static_results, then the content test (100 Condition_Variable_content_is checks), and the flow adds its name to
+    the global list only when both names are in the list. The two elements that write A_ManualTriggerID get it from the
+    trigger's TriggerVariables, also at a start by the engine (WI-0062)."""
+    flow_id = flows.add_file(V1 / "Flow 1010290492.json")
     flows.start()
     flows.enable(flow_id)                    # F-0099: Execute_Flow needs an enabled trigger; a loaded trigger does not enable its flow (until S0003)
     run = flows.run(flow_id, trigger="element0000000019", timeout=scaled(60))
@@ -144,14 +134,12 @@ def test_v1_variable_test_runs_green_from_its_start_trigger(flows):
     assert "element0000000027" in run.path and "element0000000101" in run.path   # the two list checks
 
 
-def test_v1_variable_test_original_is_unchanged_and_its_own_triggers_run(flows):
-    """The original (not the copy) ends with the exception of the trigger variable: that is the documented gap that the
-    copy fixes (FIX_LIST, M-0069). Its basic trigger and content trigger run to their last element as before."""
+def test_v1_variable_test_basic_trigger_runs_green(flows):
+    """The second trigger of "variable test" (the basic test) runs to its end on the original file, without exception."""
     flow_id = flows.add_file(V1 / "Flow 1010290492.json")
     flows.start()
     basic = flows.run(flow_id, trigger="element0000000002", timeout=scaled(60))
-    assert basic.reason == "exception" and basic.exceptions == ["String 'VarValue' is empty"]
-    assert basic.path[-1] == "element0000000035"
+    assert basic.reason == "finished" and not basic.exceptions, (basic.reason, basic.exceptions)
 
 
 def test_v1_list_test_runs_green(flows):

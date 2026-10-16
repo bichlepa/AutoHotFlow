@@ -53,7 +53,7 @@ L481-490   5a Events before subscription (design question, WI-0007)
 L492-496 6. Versioning and extension
 ```
 
-## doc/TEST-STRATEGY.md (51.0 KB, 321 lines)
+## doc/TEST-STRATEGY.md (51.1 KB, 321 lines)
 ```text
 L5-11 1. Principles
 L13-22 2. Levels
