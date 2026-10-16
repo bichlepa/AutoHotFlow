@@ -19,7 +19,7 @@ All points of the acceptance of S0002 are met, or an open point is recorded in `
 
 ## Result
 
-Status: **partly done** (2026-10-16). All six acceptance points of S0002 are met with evidence (below). Open: task 3 (the documents besides ELEMENT-API-V2 section 8) and task 4 (retrospective) are not done in this package; the two new findings F-0107 and F-0108 wait for the project owner. Code state tested: commit `073b673` (the code is that of `a5d5d89`, WI-0057; the later commits change documents only). Branch changes: documents only.
+Status: **done** (2026-10-16). All six acceptance points of S0002 are met with evidence (below). Tasks 3 (document review) and 4 (retrospective) were done afterwards, see items 7 and the review list. The two findings F-0107 (closed: 29 elements, 27 + 2) and F-0108 (closed: fast tier about 1 minute) were decided by the owner. Code state tested: commit `073b673` (the code is that of `a5d5d89`, WI-0057; the later commits change documents only). Branch changes: documents only.
 
 **Acceptance points (README, "Acceptance S0002")**
 
