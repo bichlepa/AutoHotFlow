@@ -902,6 +902,14 @@
             "problemMatcher": []
         },
         {
+            "label": "Start: product with --windows-startup (the engine arms its startup triggers as after a Windows start)",
+            "type": "process",
+            "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
+            "args": ["/ErrorStdOut=UTF-8", "src\\AutoHotFlow.ahk", "--windows-startup"],
+            "options": {"cwd": "${workspaceFolder}"},
+            "problemMatcher": []
+        },
+        {
             "label": "Start: product with debug window (--start=storage,engine,debug)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
