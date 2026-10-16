@@ -376,3 +376,20 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Do the work first, then record it, so that a test that sees the record also sees the effect. Check the stub for every request type the role sends: a request the stub does not answer waits for its deadline (here the engine would wait 30 s before it is ready).
 - **Status:** verified (the failure in the run log of 20261016-210338-860; the fix is in `tests/integration/test_engine.py`)
 - **Source:** `tests/integration/test_engine.py` (`StorageStub._handle`)
+
+
+### Kill tests: subscribe before the kill and wait for the restart before the next pid
+
+- **Problem:** Three mistakes in one set of fault tests: the observer subscribed to the topic `process` after the kill, so the `evt.process.crashed` never reached it; a second kill read the pid of the process list before the supervisor had restarted the child, and killed a dead process (`NoSuchProcess`); the snapshot of the engine was asked while the restarted engine was still loading the flows, which made the helper fail with "flow is not in the snapshot".
+- **Wrong:** `kill(...)` followed by `wait_message(...)` with no subscription, a loop of kills without a wait for `evt.process.ready`, and a helper that raises when a flow is missing.
+- **Right:** Subscribe to the topics right after the start. Wait for `evt.process.ready` of the child (and for `evt.engine.ready` of an engine) before the next pid is read. A helper that polls the engine returns "not yet" while the engine restarts.
+- **Status:** verified (`tests/integration/test_trigger_arming.py`, the three fault tests green after the fix)
+- **Source:** `tests/integration/test_trigger_arming.py` (`watch`, `wait_engine_ready`, `snapshot_flow`)
+
+### A test double of an engine class must have the members that the real class adds
+
+- **Problem:** `Executor` gained a call of `owner.arms.StartInfo` for every start. The test double `EngineOwner` did not have `arms`, so 127 unit tests of the executor failed with "has no property named arms". A second problem came with it: `Executor` named the class `TriggerArms` (defined in another file), which the scripts that include only `Executor.ahk` do not have ("This local variable appears to never be assigned").
+- **Wrong:** Let a shared class call a member of its owner that only the real owner has, and name a class of a sibling file in a file that is included by test scripts without it.
+- **Right:** Give the test double the same member (a stub that returns the neutral answer), and keep a shared helper in the class that uses it (`Executor.ErrorText`). Run the whole unit test set after a change of a shared class, not only the new test file.
+- **Status:** verified (`python -m pytest tests/test_ahk_runner.py -q -n 0`: 127 red before the stub, 620 green after)
+- **Source:** `tests/ahk/helpers/EngineOwner.ahk` (`NoArms`), `src/engine/Executor.ahk` (`ErrorText`, `_Start`)

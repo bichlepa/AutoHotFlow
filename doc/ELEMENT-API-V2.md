@@ -55,7 +55,7 @@ class Action_Example extends AhfElement {
     static TriggerVariables(params, data) => Map()   ; pure function, runs in the engine
 ```
 
-`TriggerVariables` replaces `Element_postTrigger_*`: it returns the thread variables (name → value) that are set after the event, and it must not have side effects (it runs in the engine, no I/O).
+`TriggerVariables` replaces `Element_postTrigger_*`: it returns the thread variables (name → value) that are set after the event, and it must not have side effects (it runs in the engine, no I/O). The engine calls it at **every start** of an instance of the trigger (WI-0062, M-0069): at an event of the trigger host with the evaluated parameters of the arming and the data of the event (a Map, see PROTOCOL 4.4); at `cmd.flow.start` and at `ctx.CallFlow` with the parameters evaluated at that start and `data` empty (`""`). Names of thread variables carry the prefix `A_`. An error is logged (`f0`) and the instance starts without them; a class without the method sets nothing.
 
 **Worker elements and blocking (WI-0027, ARCHITECTURE 6.4):** A worker element may block for any length of time within a single call (download, COM, `DllCall`, dialog). A worker with a job is never pinged and never ended as hanging. Two consequences: an abort (stop of the instance) does not reach an element that is blocked in a single call. After 2 s without an acknowledgement, the engine has the whole process terminated (only one job runs per worker, so nothing else is lost); `Stop(ctx, params)` of the element then no longer runs, so cleanup in the element is not possible there. And: without `JobTimeoutMs` the job has no deadline (v1 had none). If a class sets `JobTimeoutMs` > 0, the thread ends after this time with the result `exception` and the message "worker timeout", and the element is terminated as on an abort. The deadline is a class value, not a parameter; a flow parameter (e.g. "Timeout" for a download) remains the responsibility of the element.
 
@@ -191,7 +191,7 @@ Static and global variables change the permanent store through the variable mode
 |---|---|
 | `ctx.triggerKey`, `ctx.flowId`, `ctx.elementId` | the trigger (`triggerKey` = `<flowId>/<elementId>`) |
 | `ctx.gen` | the generation of this arming; the engine drops events of an older generation |
-| `ctx.context` | the start context of the arming: `""`, or `ahfStartup` for the first arming after the start of AutoHotFlow (WI-0062) |
+| `ctx.context` | the start context of the arming: space-separated tokens, `""` if none: `ahfStartup` for the first arming after the start of AutoHotFlow, `windowsStartup` as well with `--windows-startup` (WI-0062; test with `InStr`, both may be there) |
 | `ctx.State` | an object per armed trigger, kept until the disarm |
 | `ctx.Fire(data := "")` | sends `evt.trigger.fired`. `data`: a Map of texts and numbers. Anything else is refused (an `f0` entry) and the event goes without data. Nothing is sent after the disarm. May be called in `Enable` |
 | `ctx.Log(level, text)` | a log line of the trigger |

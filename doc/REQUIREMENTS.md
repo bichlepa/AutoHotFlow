@@ -127,11 +127,11 @@ The user starts a flow from the manager or the editor, through its default manua
 ### REQ-EXE-070 Enable and disable a flow
 
 - **v1:** yes
-- **v2:** partial (the enabled state of each trigger is kept, switched, reported and survives a restart of AutoHotFlow; no trigger reacts yet, WI-0062)
+- **v2:** partial (the enabled state of each trigger is kept, switched, reported and survives a restart of AutoHotFlow; the enabled triggers are armed and react, WI-0062; the real triggers come with WI-0063 and WI-0064, the manager with S0004)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003 (WI-0060 done, WI-0062 arms the triggers), S0004 (manager)
-- **Evidence:** `tests/integration/test_engine.py::test_enable_and_disable_set_the_flag_and_report_it`, `tests/integration/test_engine.py::test_the_switched_state_survives_a_restart_of_the_engine`, `tests/ahk/engine_trigger_state.test.ahk`
+- **Plan:** S0003 (WI-0060 and WI-0062 done, WI-0063 to WI-0066), S0004 (manager)
+- **Evidence:** `tests/integration/test_engine.py::test_enable_and_disable_set_the_flag_and_report_it`, `tests/integration/test_engine.py::test_the_switched_state_survives_a_restart_of_the_engine`, `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_trigger_arming.py::test_disabling_the_flow_disarms_the_trigger_and_no_instance_starts_after_it`
 
 Enabling a flow activates its triggers that switch with the flow; disabling deactivates them (triggers that switch on their own: REQ-TRG-050). Running instances are not affected. The state survives a restart of AutoHotFlow. A flow file of v1 loads disabled (E0058). Decisions E0056, E0057.
 
@@ -342,11 +342,11 @@ Ready-made values that a flow needs often, without an extra element: the current
 ### REQ-VAR-080 Values of the trigger reach the instance
 
 - **v1:** yes
-- **v2:** partial (`A_TriggerTime` and `A_TriggerID` are set; the values of the real triggers are missing)
+- **v2:** partial (`A_TriggerTime`, `A_TriggerID` and the values of `TriggerVariables` are set at every start, WI-0062; the values of the real triggers are missing, WI-0063 and WI-0064)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003
-- **Evidence:** `tests/ahk/vars_model.test.ahk`
+- **Evidence:** `tests/ahk/vars_model.test.ahk`, `tests/ahk/engine_trigger_arms.test.ahk` (TriggerVariables with and without the data of an event), `tests/integration/test_trigger_arming.py::test_an_enabled_trigger_is_armed_and_its_events_start_instances_with_their_variables`
 
 A new instance gets the thread variables `A_TriggerTime` and `A_TriggerID`, and the values that its trigger provides (for example the window of a window trigger).
 
@@ -1128,18 +1128,19 @@ Talking to a console program is an element of its own, because it is much more c
 - **v2:** partial
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003
-- **Evidence:** `tests/integration/test_triggerhost.py` (WI-0061: an error of one trigger is reported, the others and the host keep running)
+- **Plan:** S0003 (the measurement while the engine is busy, WI-0067)
+- **Evidence:** `tests/integration/test_triggerhost.py` (WI-0061: an error of one trigger is reported, the others and the host keep running), `tests/integration/test_trigger_arming.py` (WI-0062: the engine arms the triggers, a refused or failing trigger does not stop the others)
 
-Hotkeys, hooks and timers react at once, no matter how busy the running flows are (Windows removes a low-level hook that answers too slowly). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. How: a trigger host process, `ARCHITECTURE.md` D8. Still missing: the engine side that arms the triggers of the enabled flows (WI-0062), and the measurement of the reaction while the engine is busy (WI-0067).
+Hotkeys, hooks and timers react at once, no matter how busy the running flows are (Windows removes a low-level hook that answers too slowly). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. How: a trigger host process, `ARCHITECTURE.md` D8. The engine arms the triggers of the enabled flows (WI-0062). Still missing: the measurement of the reaction while the engine is busy (WI-0067).
 
 ### REQ-TRG-020 Triggers follow the enabled state, also after a restart
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the arming works for the test triggers, with the restarts of the engine and of the trigger host; the real triggers come with WI-0063 and WI-0064)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003
+- **Plan:** S0003 (WI-0063, WI-0064 for the real triggers)
+- **Evidence:** `tests/integration/test_trigger_arming.py` (WI-0062: an enabled trigger is armed and fires, disabling disarms it, the startup trigger fires once per start, a restart of the engine or of the host re-arms), `tests/ahk/engine_trigger_arms.test.ahk`
 
 The enabled triggers are active from the start of AutoHotFlow on, and again after an internal restart (REQ-ROB-040); disabling a flow deactivates the triggers that switch with it (REQ-EXE-070).
 
@@ -1858,7 +1859,8 @@ The user imports the flows and variables of v1 into the v2 data folder through t
 - **v2:** partial (the flow loads, the element is kept and fails with `exception` when run, WI-0047; manager and editor are missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0004 (manager), S0003 (triggers), S0005 to S0007 (editor)
+- **Plan:** S0004 (manager and the notice), S0005 to S0007 (editor)
+- **Evidence:** `tests/integration/test_trigger_arming.py::test_an_unknown_class_and_a_missing_package_are_not_armed_with_their_message` (WI-0062: the trigger carries the message of the missing package in its state)
 
 When a flow uses a package that is not installed, the flow still loads and nothing is deleted, because the package may be installed later (a flow synced from another computer). Nobody is asked whether to delete anything. The manager shows at the flow which packages are missing, without a dialog. The editor shows such an element as a placeholder with its parameters; the user can delete it like any other element. Running the element ends with `exception` and names the missing package. A trigger of a missing package does not stay off silently: enabling the flow tells the user that this trigger is not available. Saving keeps the element unchanged. (Decision of the owner 2026-10-15, MIGRATION M-0008.)
 
@@ -2197,11 +2199,11 @@ No blocking call on the message path. Every request has a timeout; a late answer
 ### REQ-ROB-040 Recovery after a crash of the flow execution
 
 - **v1:** no
-- **v2:** partial (restart and resync work; re-arming the triggers needs the trigger host)
+- **v2:** partial (restart and resync work; the triggers are armed again after a restart of the engine or of the trigger host, WI-0062; the editor shows the state again only with S0005)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003 (triggers)
-- **Evidence:** `tests/e2e/test_ui_stub.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_stub`, `tests/fault/test_worker_lifecycle.py::test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs`
+- **Plan:** S0005 (editor)
+- **Evidence:** `tests/e2e/test_ui_stub.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_stub`, `tests/fault/test_worker_lifecycle.py::test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs`, `tests/integration/test_trigger_arming.py::test_the_engine_is_restarted_and_rearms_without_the_startup_context`, `tests/integration/test_trigger_arming.py::test_the_trigger_host_is_restarted_and_its_triggers_fire_again`
 
 When the part that runs the flows (the engine) crashes, it starts again by itself. Open windows stay open and show the current state again; the triggers of enabled flows are active again. Instances that were running are lost (MIGRATION M-0001).
 
@@ -2522,11 +2524,11 @@ A smoke test covers every registered element; each element has end-to-end tests 
 ### REQ-TST-040 The v1 test flows run green
 
 - **v1:** yes (the "Automatic tests" flows)
-- **v2:** partial (three of the 16 "Automatic tests" flows run headless and green: "variable test" on a copy with one fix (M-0069), "List test" and "Loop test" as saved; the other 13 wait for S0003 and S0008, see the table PENDING)
+- **v2:** partial (three of the 16 "Automatic tests" flows run headless and green, all three as saved: "variable test" (M-0069 is done, WI-0062), "List test" and "Loop test"; the other 13 wait for S0003 and S0008, see the table PENDING)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003 and S0008 (the 13 flows of PENDING in `tests/integration/test_corpus.py`)
-- **Evidence:** `tests/integration/test_corpus.py::test_v1_variable_test_runs_green_from_its_start_trigger`, `tests/integration/test_corpus.py::test_v1_list_test_runs_green`, `tests/integration/test_corpus.py::test_v1_loop_test_runs_green`
+- **Evidence:** `tests/integration/test_corpus.py::test_v1_variable_test_runs_green_as_saved`, `tests/integration/test_corpus.py::test_v1_list_test_runs_green`, `tests/integration/test_corpus.py::test_v1_loop_test_runs_green`
 
 The "Automatic tests" flows of v1, adapted to v2 where needed, run headless and green.
 

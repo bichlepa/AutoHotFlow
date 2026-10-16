@@ -346,3 +346,12 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Hook the access that is the take in the fixed code (here `Delete`), and run the other path just before the real access. Check that the test is red on the old code and green on the fix; a test that is green on both proves nothing.
 - **Status:** verified (`tests/ahk/engine_executor.test.ahk`: the `Delete` spy is red on the old code (`Item has no value.`) and green on the fix)
 - **Source:** `tests/ahk/engine_executor.test.ahk` (`SpyActive`), `src/engine/Executor.ahk` (`_OnFinish`, `_StopRun`), `doc/OPEN-ITEMS.md` F-0012
+
+
+### An event of a trigger can arrive before the answer that arms it
+
+- **Problem:** A trigger that fires in its `Enable` sends its event before the trigger host answers the `cmd.trigger.arm`. The engine still had the trigger as not armed, so the event was dropped and no instance started (the startup trigger never fired in the first run of the e2e test).
+- **Wrong:** Accept an event only when the arm is confirmed (`armed` set by the answer).
+- **Right:** Count an arm on its way as accepted for its own generation: the entry keeps `sent` from the send until the answer. A refused arm clears it again. The instances that such an event started run on (as v1 would start them).
+- **Status:** verified (`tests/integration/test_trigger_arming.py::test_the_startup_trigger_fires_once_at_the_start_of_autohotflow` was red without the fix, `tests/ahk/engine_trigger_arms.test.ahk` covers `Accepts` before and after the answer)
+- **Source:** `src/engine/TriggerArms.ahk` (`Accepts`, `_StartArm`, `_OnArm`), `src/triggerhost/TriggerHost.ahk` (`_CmdArm`)
