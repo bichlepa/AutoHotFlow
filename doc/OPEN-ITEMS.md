@@ -44,6 +44,10 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0100 | Slow tier: the random run of the expression oracle stopped at the F-0075 class through a subtraction (`!(ftiny - fz . (f3 < ineg))`): the guard of the generator misses `ftiny` inside an operand of the concatenation | verified (seed 411675 reproduces it), open, test generator only | |
 | F-0101 | Slow tier: `test_start_stop_storm_leaves_a_consistent_engine[smoke]` saw the engine's handle count grow by 19 (limit 5) | observed, red twice in a row and once alone, green three times on `c27ff8f`; cause not known; open, watch the history | |
 | F-0102 | `tests/test_precommit.py` writes the text `index v1`, which the v1 guard of the fast tier reads as a dependency on `v1/` | open, verified (red on the base commit); test text only | |
+| F-9100 | `test_worker_reports_busy_when_a_job_begins_and_ends` failed once in a fast run; three serial reruns passed | observed once, not reproduced, not analysed | |
+| F-9101 | Ping test: the three `sys.ping` requests of `test_pings_are_answered_while_a_blocking_element_runs` use a fixed timeout of 1.0 s while the block time is scaled | assumed (read in the code), not reproduced | |
+| F-9102 | A role's summary line is written lazily: after a burst of log lines it can come late or not at all | assumed, not checked | |
+| F-9103 | The header of a slow-run output in `run_suite` named another commit than the run folder | observed once, not reproduced, not checked | |
 
 ## Findings
 
@@ -294,6 +298,30 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Why deferred:** Found while running the fast tier for F-0012; not in the scope of that finding.
 **Sign that it matters:** The fast tier is red for every run until the text changes.
 **Action:** Change the fixture text (for example `index one`) in `tests/test_precommit.py`, or add the file to the guard's exceptions. A one-line test change; the owner or the agent of the pre-commit hook decides.
+
+### F-9100: busy-report test failed once in a fast run
+
+**What:** `tests/integration/test_worker.py::test_worker_reports_busy_when_a_job_begins_and_ends` failed once in a fast run. Three serial reruns passed.
+**Status:** observed once, not reproduced. The failure text was not analysed, so the cause is not known.
+**Action:** On the next failure keep the failure text and the load of the run (`tools/test_history.py --flaky`, `--test` with the test ID). Check whether the busy report can arrive after the job has ended under load.
+
+### F-9101: ping requests of the blocking-element test use an unscaled timeout
+
+**What:** The block time of `test_pings_are_answered_while_a_blocking_element_runs` goes through `scaled()`, but each of the three `worker.request("worker:1", "sys.ping", ..., timeout=1.0)` calls in `tests/integration/test_worker.py` (about line 260) uses a fixed 1.0 s. Under load a late pong then fails as a request timeout. This is separate from the measured limit of F-0094.
+**Status:** assumed (read in the code, not reproduced under load).
+**Action:** Scale the request timeout as the block time is scaled, or state why 1.0 s is enough under load.
+
+### F-9102: the summary line of a role can come late or not at all
+
+**What:** A role writes its summary line lazily. After a burst of log lines the summary can come late or not at all. The hub's own summary line goes through the log sink; this path was not checked.
+**Status:** assumed, not checked (suspicion of an earlier session; no reproduction).
+**Action:** Write a test that sends a log burst to a role and checks its summary line. Check the summary path of the hub.
+
+### F-9103: `run_suite` slow-run header named another commit than the run folder
+
+**What:** The header of the output of one slow run named another commit than the run folder. Reading `tools/run_suite.py` (lines 189 to 195), the header label and the run folder both come from the commit that `--ref` resolves to, so the reading does not explain the mismatch.
+**Status:** observed once, not reproduced, not checked.
+**Action:** On the next slow run compare the header with the run record (`sha`) for a plain `--ref` run and for a `--with-changes` run.
 
 ## Watch list (E0007)
 
