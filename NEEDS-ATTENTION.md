@@ -4,7 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **S0002 is not fully accepted yet.** WI-0058 is partly done: the retrospective (task 4) and the review of the documents besides ELEMENT-API section 8 (task 3) are missing. I write them now that F-0108 is decided.
+None open.
 
 ## Manual checks
 
