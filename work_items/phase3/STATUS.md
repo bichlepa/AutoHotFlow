@@ -65,16 +65,5 @@ Tree hashes (`git rev-parse <commit>:<path>`): `src` `687433af`, `tests` `a26eb3
 
 ## Recorded only here
 
-These facts or observations are in no other document. Each is a short note; none is a decision.
+None. On 2026-10-16 all notes of this section were moved to `doc/OPEN-ITEMS.md` (F-9100 to F-9103), to `doc/MIGRATION.md` (owner confirmation of M-0038 to M-0048) or dropped as covered by a document (`doc/TEST-STRATEGY.md` for the corpus size, `doc/MANUAL-CHECKS.md` section 1, `doc/ORCHESTRATOR.md` section 3c, `tests/test_open_items_ids.py` for the skip in a workspace, `AGENTS.md` for the interpreter option).
 
-- Open suspicion (WI-0044 verifier, assumed, not checked): the corpus comment says `--count 3000`, the commit message says 3200 cases.
-- Open suspicion (session 4, assumed): a role's summary line is written lazily, so after a log burst it can come late or not at all; the hub's own summary line goes through the log sink and was not checked.
-- Observation (session 8, not an entry): `test_worker_reports_busy_when_a_job_begins_and_ends` failed once in a fast run of a hunter branch; it passed on three serial reruns.
-- Observation: `test_open_items_has_no_provisional_ids` was skipped in fast run `20261016-081212-b53151aa`; the reason was not read.
-- Weak spot (assumed): the three pings of the ping test use an unscaled `timeout=1.0`.
-- Tool observation (open): the header of the slow-run output of `c288632` named another commit than the run folder; check how `tools/run_suite.py` writes the header.
-- Process lesson: a pipe to `tail` hides the exit code of git. Check the exit code and the state of the worktree after each integration step.
-- Owner's note (2026-10-14): migration entries M-38 to M-48 confirmed ("Die Migrationseinträge passen").
-- Owner's manual-check notes (2026-10-14) about wording of step 1 (the debug task opens the debug window next to the stub) and the source of the step 5 exit code: not checked whether `doc/MANUAL-CHECKS.md` has them.
-- Procedure choice (orchestrator, 2026-10-13): hunter runs are not limited to two entries per run.
-- Housekeeping (2026-10-16): a scratch folder under `/tmp` was shared with another agent.
