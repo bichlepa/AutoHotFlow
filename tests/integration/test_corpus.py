@@ -136,8 +136,8 @@ def test_v1_variable_test_runs_green_from_its_start_trigger(flows):
     checks), and the flow adds its name to the global list only when both names are in the list."""
     flow_id = flows.add_file(V2 / "Flow 1010290492.json")
     flows.start()
-    flows.enable(flow_id)                    # the trigger of Execute_Flow must be enabled (until S0003 by the flow)
-    run = flows.run(flow_id, trigger="element0000000019", timeout=60)
+    flows.enable(flow_id)                    # F-0099: Execute_Flow needs an enabled trigger; a loaded trigger does not enable its flow (until S0003)
+    run = flows.run(flow_id, trigger="element0000000019", timeout=scaled(60))
     assert run.reason == "finished" and not run.exceptions, (run.reason, run.exceptions, run.names[-5:])
     assert run.path[-1] == "element0000000015" and len(run.path) == 130, (len(run.path), run.names[-3:])
     assert "element0000000098" in run.path                       # the content test ran (its last Add to list)
@@ -149,7 +149,7 @@ def test_v1_variable_test_original_is_unchanged_and_its_own_triggers_run(flows):
     copy fixes (FIX_LIST, M-0069). Its basic trigger and content trigger run to their last element as before."""
     flow_id = flows.add_file(V1 / "Flow 1010290492.json")
     flows.start()
-    basic = flows.run(flow_id, trigger="element0000000002", timeout=60)
+    basic = flows.run(flow_id, trigger="element0000000002", timeout=scaled(60))
     assert basic.reason == "exception" and basic.exceptions == ["String 'VarValue' is empty"]
     assert basic.path[-1] == "element0000000035"
 
@@ -159,7 +159,7 @@ def test_v1_list_test_runs_green(flows):
     on; the flow ends with Add to list on a list that does not exist yet (a warning)."""
     flow_id = flows.add_file(V1 / "Flow 1210127300.json")
     flows.start()
-    run = flows.run(flow_id, trigger="element0000000008", timeout=60)
+    run = flows.run(flow_id, trigger="element0000000008", timeout=scaled(60))
     assert run.reason == "finished"
     assert run.exceptions == ["The list 'russianList' does not contain the value 'asdf'."], run.exceptions
     assert run.path[-1] == "element0000000112"
@@ -298,8 +298,8 @@ def test_7_a_flow_calls_itself_recursively_with_variables(flows):
     fb.chain(call, note0, fb.probe("global_returns"))
     flow_id = flows.add(fb)
     flows.start()
-    flows.enable(flow_id)
-    run = flows.run(flow_id, timeout=60, trigger=start.id)
+    flows.enable(flow_id)    # F-0099: the flow must be enabled for Execute_Flow (until S0003)
+    run = flows.run(flow_id, timeout=scaled(60), trigger=start.id)
     assert finished(run), (run.reason, run.exceptions, run.names[-4:])
     assert shown(run, "global_returns") == ["3", "2", "1", "0"], run.seen
     assert run.names.count("DEEPEST") == 1
@@ -332,7 +332,7 @@ def test_8_a_flow_waits_for_two_called_flows_one_after_the_other(flows):
     flows.start()
     for flow_id in ids[:2]:
         flows.enable(flow_id)
-    run = flows.run(ids[2], timeout=60)
+    run = flows.run(ids[2], timeout=scaled(60))
     assert finished(run), (run.reason, run.exceptions, run.names[-4:])
     assert json.loads(run.probe("global_order").text) == ["slow", "fast"], run.probe("global_order").text
 
@@ -435,7 +435,7 @@ def test_13_a_flow_with_an_element_of_a_missing_package_loads_and_its_caller_see
     flows.start()
     flows.enable(ids[0])
     mark = flows.mark()
-    run = flows.run(ids[1], timeout=30)
+    run = flows.run(ids[1], timeout=scaled(30))
     assert run.reason == "exception", (run.reason, run.steps)            # the caller's element ends with the outcome
     assert run.exceptions and run.exceptions[0].startswith("The called flow 'missing-package' ended with an exception"),         run.exceptions
     ends = flows.ended(ids[0], mark, count=1)
@@ -455,10 +455,10 @@ def test_14_global_and_static_variables_survive_two_runs(flows):
     flows.preset_var("static_n", "0", flow_id=flow_id)
     flows.start()
     flows.enable(flow_id)
-    first = flows.run(flow_id, timeout=30)
+    first = flows.run(flow_id, timeout=scaled(30))
     assert finished(first)
     seen_first = (first.probe("global_g").text, first.probe("static_n").text)     # a run clears the probes
-    second = flows.run(flow_id, timeout=30)
+    second = flows.run(flow_id, timeout=scaled(30))
     assert finished(second)
     assert seen_first == ("6", "1")
     assert (second.probe("global_g").text, second.probe("static_n").text) == ("7", "2")
@@ -475,12 +475,12 @@ def test_15_global_and_static_variables_survive_an_engine_restart(flows):
     flows.preset_var("static_n", "0", flow_id=flow_id)
     flows.start()
     flows.enable(flow_id)
-    assert finished(flows.run(flow_id, timeout=30))
-    assert finished(flows.run(flow_id, timeout=30))
+    assert finished(flows.run(flow_id, timeout=scaled(30)))
+    assert finished(flows.run(flow_id, timeout=scaled(30)))
     flows.stop()
     flows.start()
     flows.enable(flow_id)
-    third = flows.run(flow_id, timeout=30)
+    third = flows.run(flow_id, timeout=scaled(30))
     assert finished(third)
     assert (third.probe("global_g").text, third.probe("static_n").text) == ("8", "3")
 
