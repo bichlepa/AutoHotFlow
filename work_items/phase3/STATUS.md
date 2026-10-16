@@ -43,7 +43,7 @@ Step S0003 (trigger host and triggers), detailed on 2026-10-16 (E0056 to E0062).
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
 | WI-0060 | Enabled state of triggers | done, verified (slow: one load flake, green alone) | haiku (review sonnet) | 1326e8e–4bbe858 | 2026-10-16 | closes F-0099; reviewer approved |
-| WI-0061 | Role `triggerhost` | running | haiku | | | parallel to WI-0060 |
+| WI-0061 | Role `triggerhost` | done, verified (slow: F-0101 once more, green alone) | haiku (review sonnet) | 8bfb58b–36480c0 | 2026-10-16 | reviewer approved; supervisor restarts it (owner decision pending) |
 | WI-0062 | Engine: arming, fired events | open | | | | |
 | WI-0063 | Periodic timer and start-up triggers | open | | | | |
 | WI-0064 | Hotkey trigger with window conditions | open | | | | spike first (E0059) |
@@ -61,9 +61,11 @@ None.
 
 ## Running agents
 
-WI-0061 implementer (haiku), workspace `wi-0061`, branch `wip/wi-0061`. The manual-check start path (section 3 of MANUAL-CHECKS) is integrated; the owner runs it.
+None. The manual-check start path (section 3 of MANUAL-CHECKS) is integrated; the owner runs it.
 
 ## Last verified state
+
+Commit `36480c0` (WI-0061 integrated) verified by `tools/verify.py --auto`: VERDICT red (slow) only. Fast run `20261016-214703-36480c09-2` (1137 passed, 1 skipped). Foundation run `20261016-214703-36480c09-3` (462 passed, 1 skipped). Slow run `20261016-214703-36480c09` (196 passed, 1 failed): `tests/stress/test_start_stop_storm.py::test_start_stop_storm_leaves_a_consistent_engine[smoke]`, the F-0101 symptom (handles 145 to 164). Alone at the same commit: green (recheck run `20261016-215353-20140`). Load flake.
 
 Commit `4bbe858` (WI-0060 integrated) verified by `tools/verify.py --auto`: VERDICT red (slow) only. Fast run `20261016-213054-4bbe8581-2` (1128 passed, 1 skipped). Foundation run `20261016-213054-4bbe8581-3` (461 passed, 1 skipped). Slow run `20261016-213054-4bbe8581` (195 passed, 1 failed): `tests/e2e/test_ui_stub.py::test_headless_stub_logs_every_skeleton_event_in_order`. `tools/recheck.py` alone at the same commit: green (run `20261016-213913-23872`), a load flake; recorded in the run history, no OPEN-ITEMS entry (owner rule).
 
