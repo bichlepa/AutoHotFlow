@@ -9,7 +9,8 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Manual checks
 
-None open.
+- **Manual checks 4 and 5 (WI-0067, `doc/MANUAL-CHECKS.md`):** VS Code tasks `Start: manual check 4` and `Start: manual check 5`. They run in the manual-check data folder; copy the two files there if you want the v2 data folder. Not run by an agent.
+- **Real-key tests (WI-0064, WI-0067):** the hotkey tests with real key presses and the `gui` tests of WI-0064 are waiting for the decision on how keys are delivered (see Decisions).
 
 ## To know
 
