@@ -1,12 +1,12 @@
 """WI-0057: the test corpus, the acceptance of S0002 (REQ-TST-040, REQ-TST-030).
 
 Three flows of the "Automatic tests" category of v1 run headless and green, all three as saved: "variable test", "List
-test" and "Loop test". "variable test" needs the trigger variable A_ManualTriggerID, which the engine sets for every start
+test" and "Loop test". The v1 "Trigger test" (S0003, E0061) runs headless on an adapted copy (FIX_LIST, M-0077). "variable test" needs the trigger variable A_ManualTriggerID, which the engine sets for every start
 of a trigger (TriggerVariables, WI-0062, M-0069 is done), so the old copy with its fixes is gone.
 
 Then 16 synthetic flows (flow builder, WI-0049) that use the core set wider than the v1 flows do: each flow is a chain
 of checks or steps that ends in the marker DONE; a flow that does not behave as expected goes to FAIL or ends with an
-exception. The PENDING table lists the other 13 "Automatic tests" flows with the elements that are still missing and
+exception. The PENDING table lists the other 12 "Automatic tests" flows with the elements that are still missing and
 the step that brings them (S0003 and S0008); a test keeps the table equal to the element registry in src/.
 """
 
@@ -20,13 +20,24 @@ import pytest
 from support.coreflows import run_all, setvar
 from support.dialogs import DialogScript, answer
 from support.flowbuilder import FlowBuilder
-from support.flowrun import flows  # noqa: F401  (fixture)
+from support.flowrun import FlowRunner, flows, var_value  # noqa: F401  (flows: fixture)
 from support.timing import scaled
 
 pytestmark = pytest.mark.slow          # each test starts a session (acceptance tier, `-m slow`)
 
 ROOT = Path(__file__).resolve().parents[2]
 V1 = ROOT / "tests" / "data" / "flows" / "v1_examples"
+V2 = ROOT / "tests" / "data" / "flows" / "v2_adapted"
+HOST_ROLES = "storage,engine,triggerhost"       # the trigger host (S0003); the flows fixture starts without it
+
+# --- the fix list (every change of a loaded v1 flow in the copies of v2_adapted/) ---------------------------------------
+FIX_LIST = [
+    dict(flow="Flow 884290977", element="element0000000174", parameter="element class (the whole element)",
+         v1="Action_Speech_output, text \"Hello\", engine Microsoft Hedda Desktop", new="Action_Do_nothing",
+         migration="M-0077",
+         reason="The speech output is S0008. The element is the end of the path of Trigger_Start_up, so the connection "
+                "stays and the paths of the flow stay the same; the trigger itself is kept."),
+]
 
 # --- the flows that are not in the corpus yet ---------------------------------------------------------------------
 # The v1 flow "Automatic tests" flows that are not in this corpus yet: the elements they lack and the step that brings them
@@ -57,7 +68,7 @@ PENDING = {
     "Flow 1849072261": dict(name="external script test", missing={
         "Action_AutoHotkey_Script": "S0008 (E0039: v1 code is kept as text, M-0049)"}),
     "Flow 2133155705": dict(name="Hotkey test", missing={
-        "Action_Send_Keystrokes": "S0008", "Trigger_Hotkey": "S0003"}),
+        "Action_Send_Keystrokes": "S0008"}),
     "Flow 369404488": dict(name="string test", missing={
         "Action_Search_in_a_string": "S0008", "Action_Split_a_string": "S0008",
         "Action_Substring": "S0008", "Action_Substring2": "S0008", "Action_Trim_a_string": "S0008",
@@ -71,8 +82,6 @@ PENDING = {
     "Flow 74366368": dict(name="File link test", missing={
         "Action_Delete_File": "S0008", "Action_Run": "S0008",
         "Condition_File_Exists": "S0008", "Trigger_Shortcut": "S0008"}),
-    "Flow 884290977": dict(name="Trigger test", missing={
-        "Action_Speech_Output": "S0008"}),
 }
 
 
@@ -163,6 +172,43 @@ def test_v1_loop_test_runs_green(flows):
     assert run.state_of("element0000000012") == ["finished"] and run.path[-1] == "element0000000030"
     pair = flows.wait_var("global_testResults")
     assert pair is not None and json.loads(pair[1]) == ["Loop test"], pair
+
+
+# --- the v1 "Trigger test" (S0003, E0061) -------------------------------------------------------------------------------
+@pytest.fixture
+def host_flows(procs, datadir, session_id):
+    """A FlowRunner whose session starts the trigger host as well (S0003)."""
+    runner = FlowRunner(procs, datadir, session_id, roles=HOST_ROLES)
+    yield runner
+    runner.close()
+
+
+def test_v1_trigger_test_runs_green_on_the_adapted_copy(host_flows):
+    """"Trigger test" (Flow 884290977), the copy in v2_adapted/ (FIX_LIST, M-0077). The flow is enabled at the start of the
+    session (FlowStates, E0063) through its Trigger_Start_up, which fires once at the start. Then the manual trigger
+    "black branch" runs the test: periodic timers, flow status elements, flow enabled conditions and the debug dialogs,
+    which the dialog seam answers. The end state is static_testSuccess = 1."""
+    flow_id = host_flows.add_file(V2 / "Flow 884290977.json")
+    state_dir = host_flows.datadir / "FlowStates"
+    state_dir.mkdir(exist_ok=True)
+    (state_dir / (flow_id + ".json")).write_text(
+        json.dumps({"formatVersion": 1, "enabled": ["element0000000172"]}), encoding="utf-8")
+    dialogs = DialogScript(host_flows.datadir)
+    dialogs.script(*[{"answer": "yes", "actions": []}] * 8)
+    host_flows.start()
+    startup = host_flows.wait_message(
+        lambda m: m.get("type") == "evt.instance.started" and m["payload"].get("flowId") == flow_id,
+        timeout=scaled(30))
+    assert startup is not None, host_flows.stderr_text()
+    run = host_flows.run(flow_id, trigger="element0000000001", timeout=scaled(120))
+    # The flow calls its own trigger 13 while it is disabled: that is the test of the exception connection (v1 design).
+    # The exception is caught, the flow goes on at "Set flow status: enable" and the call is repeated.
+    assert run.reason == "finished", (run.reason, run.names[-5:])
+    assert run.exceptions == ["Trigger 'element0000000013' in 'Flow 884290977' is disabled"], run.exceptions
+    assert "element0000000111" in run.path and "element0000000110" in run.path, run.names[-5:]
+    assert run.path[-1] == "element0000000130", run.names[-5:]
+    pair = host_flows.wait_var("static_testSuccess", lambda p: var_value(p) == "1", flow_id=flow_id)
+    assert pair is not None, (run.names[-5:], dialogs.requests())
 
 
 # --- the synthetic flows -----------------------------------------------------------------------------------------------
@@ -483,7 +529,7 @@ def test_16_a_chain_of_checks_uses_the_core_set_across_packages(flows):
 
 # --- the table of the other flows -------------------------------------------------------------------------------------
 def test_pending_flows_list_the_elements_that_are_still_missing():
-    """The table PENDING equals the element classes of the 13 remaining "Automatic tests" flows that have no registered
+    """The table PENDING equals the element classes of the 12 remaining "Automatic tests" flows that have no registered
     element file in src/elements. A class that arrives with S0003 or S0008 must leave the table, and a flow that
     becomes green moves to the corpus (WI-0057 task 3)."""
     registered = {os.path.basename(p)[:-4].lower()
