@@ -57,7 +57,10 @@ Case2() {
 Case3() {
     Assert.Equal(Trigger_Hotkey.ModeOf(Prm({UseWindow: "Everywhere"})), "Everywhere")
     Assert.Equal(Trigger_Hotkey.ModeOf(Prm({UseWindow: "WindowNotExists"})), "WindowNotExists")
+    Assert.Equal(Trigger_Hotkey.ModeOf(Prm({UseWindow: 2})), "WindowIsActive", "v1 stores the index of the radio")
+    Assert.Equal(Trigger_Hotkey.ModeOf(Prm({UseWindow: 1})), "Everywhere")
     Assert.Throws(() => Trigger_Hotkey.ModeOf(Prm({UseWindow: "Somewhere"})), ElementError, "unknown UseWindow")
+    Assert.Throws(() => Trigger_Hotkey.ModeOf(Prm({UseWindow: 9})), ElementError, "index out of range")
 }
 
 Case4() {

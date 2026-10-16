@@ -135,6 +135,9 @@ class Trigger_Hotkey extends AhfElement {
     ; unknown value (the v1 text for an invalid parameter value).
     static ModeOf(params) {
         value := params.HasProp("UseWindow") ? params.UseWindow : "Everywhere"
+        ; v1 stores the index of a radio when a flow does not have the parameter (1 is Everywhere).
+        if (!IsObject(value) && IsInteger(value) && value >= 1 && value <= this.WINDOW_MODES.Length)
+            return this.WINDOW_MODES[Integer(value)]
         for name in this.WINDOW_MODES {
             if (name = value)
                 return name
