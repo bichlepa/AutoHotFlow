@@ -34,8 +34,8 @@ Step S0002 (element foundation and core set), state as of `cac616b`.
 | WI-0053 | Core set B: lists | done | sonnet | 5857a59–15132a2 | 2026-10-15 | Verified |
 | WI-0054 | Core set C: loops | done | sonnet | be5c088–2467349 | 2026-10-16 | Verified; REQ-ELM-240 partial |
 | WI-0055 | Core set D: flow control | done, verified | opus | e4b368d–949afc2 | 2026-10-16 | Fix of F-0100 class open; see NEEDS-ATTENTION |
-| WI-0056 | Core dialogs (dialogs and worker) | not started | | | | Depends on WI-0050, WI-0051 (both done) |
-| WI-0057 | Test corpus | not started | | | | Depends on the core sets |
+| WI-0056 | Core dialogs (dialogs and worker) | done, verified | haiku (review sonnet) | c5db6ab–6a8ad1a | 2026-10-16 | Review approved with fixes; tooltip and A_UserAction decisions open for the owner |
+| WI-0057 | Test corpus | running | haiku | | | Started from `6a8ad1a` |
 | WI-0058 | Acceptance S0002 | not started | | | | Last item of S0002 |
 
 Step S0008 (remaining elements) is planned, not started.
@@ -50,14 +50,16 @@ None.
 
 | Slot | Role | Workspace | Model | Task |
 |---|---|---|---|---|
-| 1 | Implementer | wi-0056 | haiku | WI-0056, started from `4af717b`; waiting for its own background run |
-| 4 | Documentation helper | docs-cleanup | haiku | HOW-TO cleanup and the 11 status-book notes (owner delegated) |
+| 1 | Implementer | wi-0057 | haiku | WI-0057, started from `6a8ad1a` |
+| 1 | Writer | man-dpi | haiku | DPI section of doc/MANUAL-CHECKS.md (owner request) |
 
-F-0012 round (hunt-1) is integrated and its workspace removed; its review approved it without fixes.
+No integrations pending. Verification of `6a8ad1a` is running (see below).
 
 ## Last verified state
 
-Commit `220fbe5` verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-174506-220fbe53-3` (1083 passed, 1 skipped), foundation run `20261016-174506-220fbe53` (461 passed, 1 skipped), slow run `20261016-174506-220fbe53-2` (154 passed). The storm smoke test that failed earlier passed here (F-0101 stays open to watch).
+Commit `6a8ad1a` (WI-0056) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-175915-6a8ad1aa` (1115 passed, 1 skipped), foundation run `20261016-175915-6a8ad1aa-2` (461 passed, 1 skipped). Slow tier not in the chosen set.
+
+Before that, commit `220fbe5`: VERDICT green. Fast run `20261016-174506-220fbe53-3` (1083 passed, 1 skipped), foundation run `20261016-174506-220fbe53` (461 passed, 1 skipped), slow run `20261016-174506-220fbe53-2` (154 passed). The storm smoke test that failed earlier passed here (F-0101 stays open to watch).
 
 Earlier, commit `949afc2` (WI-0055), verified by the last verifier agent: fast run `20261016-164136-949afc21` (1006 passed, 1 skipped), foundation run `20261016-164302-949afc21` (461 passed, 1 skipped), slow run `20261016-164502-949afc21` (154 passed); architecture, requirements and include checks 0. F-0100 was not reproduced in that run. Later commits up to `cac616b` change only documents. From now on `tools/verify.py --auto` keeps the last green state (ORCHESTRATOR section 4).
 
