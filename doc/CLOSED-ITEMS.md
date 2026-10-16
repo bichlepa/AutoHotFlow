@@ -42,6 +42,7 @@ This document lists findings that are closed or accepted. Moved from doc/OPEN-IT
 | F-0090 | Fast tier: persistence test got no `evt.engine.ready` of the second chain within 20 s | closed 2026-10-15 | |
 | F-0012 | Unprotected check-then-act spots in the engine | closed 2026-10-16 by the owner: `_ElementStarted`/`_ElementStopped` (Critical-guarded, no test) accepted without a stress run; `WorkerBridge` and `Executor` fixes verified by test | |
 | F-0107 | S0002 core set: the README names 29 elements, the table lists 27 classes | closed 2026-10-16 by the owner: 29 elements stay; the table counts 27 + 2 = 29 | |
+| F-0108 | Fast tier takes about twice its budget (about 45 s): 91 s with 4 workers, 306 s serial | closed 2026-10-16 by the owner: the fast tier is about 1 minute; the dialog e2e tests run in the slow tier | |
 
 ## Findings
 
@@ -395,3 +396,12 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 **Evidence:** WI-0058 check of the criteria (`work_items/phase3/WI-0058-acceptance-s2.md`, Result).
 
 **Closed by the owner (2026-10-16):** 29 elements stay; the table counts 27 + 2 = 29.
+
+### F-0108: the fast tier takes about twice its budget
+
+**What:** The fast tier (`python -m pytest tests -q`) ran 1121 passed, 1 skipped: 91 s with 4 workers (run 20261016-184147-073b6738), 306 s serial (run 20261016-184636-073b6738). The budget in AGENTS.md is about 45 s on a loaded machine. Sum of the test times of the serial run: 214 s. Largest modules (serial run): `test_ahk_runner.py` 584 cases, 33 s; `test_core_e_dialogs.py` 20 tests, 29 s; `fault/test_var_persistence.py` 4 tests, 18 s; `integration/test_engine.py` 24 tests, 13 s.
+**Status:** fixed. The proposal (a) was based on a wrong premise: `test_ahk_runner.py` already runs one AHK process per file (the 584 items are only the cases read from the result of 59 files); 33 s are the sum of the files, of which `engine_call_flow` (10 s), `engine_worker_bridge` (5 s) and `expr_errors` (5 s) are the largest. Done instead: (b) in `test_core_e_dialogs.py` only the OK button, the cancel button and the read of a debug dialog stay in the fast tier (one case per dialog kind), the rest is `slow`; in `test_var_persistence.py` only the delayed write stays fast. Fast tier afterwards: 1103 passed in 52 s, after the `engine_call_flow` fix 50 s (before: 91 s; measured 2026-10-16 on a loaded machine, the old budget was about 45 s; the owner then set it to about 1 minute now, growing with the feature scope up to 2 minutes at the end of the port, 2026-10-16). `engine_call_flow.test.ahk` needed 10 s because one case drove an endless call chain for 50 ticks of up to 1000 dispatches each (12 s); 3 ticks are enough (the file now takes about 1 s).
+**Action:** proposal for the owner: (a) run `test_ahk_runner.py` as one AHK process per file with the results in a file, so the 584 cases are 33 cases of files, or (b) move `test_core_e_dialogs.py` and `fault/test_var_persistence.py` to the slow tier and keep their smoke case in the fast tier. Then measure again.
+**Evidence:** runs 20261016-184147-073b6738 and 20261016-184636-073b6738 (run log folders under the run tool's temp folder, history in the main checkout).
+
+**Closed by the owner (2026-10-16):** the fast tier is about 1 minute; the dialog e2e tests run in the slow tier.

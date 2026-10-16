@@ -47,7 +47,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0104 | Ping test: the three `sys.ping` requests of `test_pings_are_answered_while_a_blocking_element_runs` use a fixed timeout of 1.0 s while the block time is scaled | assumed (read in the code), not reproduced | |
 | F-0105 | A role's summary line is written lazily: after a burst of log lines it can come late or not at all | assumed, not checked | |
 | F-0106 | The header of a slow-run output in `run_suite` named another commit than the run folder | observed once, not reproduced, not checked | |
-| F-0108 | Fast tier takes about twice its budget (about 45 s): 91 s with 4 workers, 306 s serial (WI-0058, sum of test times 214 s); the largest parts are the 584 AHK cases of `test_ahk_runner.py` (33 s) and `test_core_e_dialogs.py` (29 s) | verified (run times of the runs in WI-0058); fixed: fast tier 50 s (measured 2026-10-16); owner decided the budget: about 1 minute now, up to 2 minutes at the end of the port | |
 
 ## Findings
 
@@ -310,13 +309,6 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **What:** The header of the output of one slow run named another commit than the run folder. Reading `tools/run_suite.py` (lines 189 to 195), the header label and the run folder both come from the commit that `--ref` resolves to, so the reading does not explain the mismatch.
 **Status:** observed once, not reproduced, not checked.
 **Action:** On the next slow run compare the header with the run record (`sha`) for a plain `--ref` run and for a `--with-changes` run.
-
-### F-0108: the fast tier takes about twice its budget
-
-**What:** The fast tier (`python -m pytest tests -q`) ran 1121 passed, 1 skipped: 91 s with 4 workers (run 20261016-184147-073b6738), 306 s serial (run 20261016-184636-073b6738). The budget in AGENTS.md is about 45 s on a loaded machine. Sum of the test times of the serial run: 214 s. Largest modules (serial run): `test_ahk_runner.py` 584 cases, 33 s; `test_core_e_dialogs.py` 20 tests, 29 s; `fault/test_var_persistence.py` 4 tests, 18 s; `integration/test_engine.py` 24 tests, 13 s.
-**Status:** fixed. The proposal (a) was based on a wrong premise: `test_ahk_runner.py` already runs one AHK process per file (the 584 items are only the cases read from the result of 59 files); 33 s are the sum of the files, of which `engine_call_flow` (10 s), `engine_worker_bridge` (5 s) and `expr_errors` (5 s) are the largest. Done instead: (b) in `test_core_e_dialogs.py` only the OK button, the cancel button and the read of a debug dialog stay in the fast tier (one case per dialog kind), the rest is `slow`; in `test_var_persistence.py` only the delayed write stays fast. Fast tier afterwards: 1103 passed in 52 s, after the `engine_call_flow` fix 50 s (before: 91 s; measured 2026-10-16 on a loaded machine, the old budget was about 45 s; the owner then set it to about 1 minute now, growing with the feature scope up to 2 minutes at the end of the port, 2026-10-16). `engine_call_flow.test.ahk` needed 10 s because one case drove an endless call chain for 50 ticks of up to 1000 dispatches each (12 s); 3 ticks are enough (the file now takes about 1 s).
-**Action:** proposal for the owner: (a) run `test_ahk_runner.py` as one AHK process per file with the results in a file, so the 584 cases are 33 cases of files, or (b) move `test_core_e_dialogs.py` and `fault/test_var_persistence.py` to the slow tier and keep their smoke case in the fast tier. Then measure again.
-**Evidence:** runs 20261016-184147-073b6738 and 20261016-184636-073b6738 (run log folders under the run tool's temp folder, history in the main checkout).
 
 ## Watch list (E0007)
 
