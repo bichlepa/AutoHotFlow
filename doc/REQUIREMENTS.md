@@ -2686,10 +2686,10 @@ When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the us
 ### REQ-USE-090 Sharp and correctly sized on high-resolution displays
 
 - **v1:** no (not checked)
-- **v2:** partial (dialogs only, see Plan)
+- **v2:** partial (dialogs done; manager, editor, tray icon and zoom missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** dialogs done (manual check 3, 2026-10-16); manager, editor, tray icon and zoom still S0004 to S0007
+- **Plan:** dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0006
 - **Evidence:** `doc/MANUAL-CHECKS.md` (manual check 3, steps 17 and 18, owner, 2026-10-16: dialog windows at 100 % and 225 %, DPI change with the window open, message box, debug dialog and tooltip), `src/elements/base/DialogWindow.ahk`
 
 Manager, editor, dialogs and the tray icon are sharp and have the right size with a display scaling above 100 %, also when a window moves to a screen with another scaling. The editor draws the flow sharp at every zoom.

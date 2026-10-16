@@ -350,4 +350,4 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-USE-060](REQUIREMENTS.md#req-use-060-amount-of-hints) | L2656-2664 | Amount of hints | no | open | should | later | - |
 | [REQ-USE-070](REQUIREMENTS.md#req-use-070-hints-can-be-switched-off-one-by-one) | L2666-2674 | Hints can be switched off one by one | no | open | should | later | - |
 | [REQ-USE-080](REQUIREMENTS.md#req-use-080-unhandled-errors-of-a-flow-are-noticed) | L2676-2684 | Unhandled errors of a flow are noticed | yes | open | should | port | S0004 |
-| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2686-2695 | Sharp and correctly sized on high-resolution displays | no | partial | should | port | dialogs done (manual check 3, 2026-10-16); manager, editor, tray icon and zoom still S0004 to S0007 |
+| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2686-2695 | Sharp and correctly sized on high-resolution displays | no | partial | should | port | dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0006 |
