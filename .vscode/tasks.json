@@ -977,6 +977,24 @@
             "problemMatcher": []
         },
         {
+            "label": "Start: manual check 3, dialog windows at other DPI scaling (manual_check.py)",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/manual_check.py",
+                "start",
+                "--flow",
+                "dpi_dialogs",
+                "--",
+                "--ui=stub",
+                "--start=storage,engine,manager"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Setup: fresh data folder for the manual checks (manual_check.py prepare)",
             "type": "process",
             "command": "python",
