@@ -43,7 +43,7 @@ The tool works from the main checkout and from inside a workspace. VS Code tasks
 **Integrator** (the project owner, or one agent that has been asked). The history of `v2-port` stays linear: no merge commits and no temporary branches in the graph. In the main checkout on `v2-port`:
 ```
 git rebase v2-port                                                # in the workspace of the branch, if v2-port has moved
-python tools/renumber_findings.py --commit                        # in the workspace: provisional F-9xxx* get final IDs
+python tools/renumber_findings.py --commit                        # in the workspace: provisional F-9nnn* get final IDs
 git cherry-pick v2-port..wip/<name>                               # in the main checkout (conflicts: section 4)
 python tools/new_workspace.py --remove <name>                     # worktree away, branch deleted: its patches are on v2-port
 python tools/verify.py --ref <new v2-port tip> --auto             # verification of the integrated state
@@ -54,7 +54,7 @@ python tools/verify.py --ref <new v2-port tip> --auto             # verification
 
 | File | Rule |
 |---|---|
-| `doc/OPEN-ITEMS.md`, `doc/HOW-TO.md`, `doc/howto/*.md` | new entries at the end of their section (a HOW-TO entry in its category file, its index line at the end of the category in `doc/HOW-TO.md`); new findings get provisional IDs from `F-9000*`; the integrator gives them final numbers with `tools/renumber_findings.py` (ORCHESTRATOR.md section 2) |
+| `doc/OPEN-ITEMS.md`, `doc/HOW-TO.md`, `doc/howto/*.md` | new entries at the end of their section (a HOW-TO entry in its category file, its index line at the end of the category in `doc/HOW-TO.md`); new findings get provisional IDs `F-9nnn*`; the integrator gives them final numbers with `tools/renumber_findings.py` (ORCHESTRATOR.md section 2) |
 | `doc/PROTOCOL.md` | one commit per interface change, early; the same message type is never added by two branches |
 | `.vscode/tasks.json` | new tasks at the end of their group |
 | `doc/REQUIREMENTS.md`, `doc/REQUIREMENTS-INDEX.md` | change only the requirements of the own task. The index is generated: never resolve a conflict in it by hand; resolve the source, then run `python tools/req_index.py` |

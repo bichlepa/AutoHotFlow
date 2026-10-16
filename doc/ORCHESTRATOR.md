@@ -56,13 +56,13 @@ Start agents in the background and wait for their notifications. Do not poll and
 - Read what the prompt lists (section 9), not the whole reading list of AGENTS.md rule 1. Never start `.ahk` scripts directly (`python tools/ahkrun.py`). Do not write files through shell heredocs when the content has backslashes; use the editor tools.
 - Distinguish verified, assumed, not checked. Name the test run (section 4) with every test result.
 - **Decisions.** An agent may decide itself when the solution is obvious, or when it would strongly recommend one option and is fairly sure the project owner wants it so. It lists every such decision in its report (what, why, the alternative). Only a decision that is neither obvious nor recommendable goes to the project owner: mark it (`decision needed` in OPEN-ITEMS or in the report) and continue with what does not depend on it.
-- **Bugs outside your task.** Do not go looking for them. If you come across one: when it is clear and trivial to fix, fix it in its own commit (with a test if that is cheap) and mention it in the report; otherwise add an entry to `doc/OPEN-ITEMS.md` (format of the file, provisional ID `F-9000*`, `F-9001*`, ..., with run ID and what you saw), commit it on your branch and mention it in the report.
+- **Bugs outside your task.** Do not go looking for them. If you come across one: when it is clear and trivial to fix, fix it in its own commit (with a test if that is cheap) and mention it in the report; otherwise add an entry to `doc/OPEN-ITEMS.md` (format of the file, provisional ID `F-9nnn*` (section 2 below), with run ID and what you saw), commit it on your branch and mention it in the report.
 - **Own bugs that are sporadic and stubborn** (they appear only now and then and you cannot get hold of them quickly): do not spend the task on them. Document them in OPEN-ITEMS (what you saw, run ID, what you tried) and carry on.
 - **Requirements.** A task that implements, verifies, changes or drops a feature updates its requirement in `doc/REQUIREMENTS.md` in the same commit and runs `python tools/req_index.py` (AGENTS.md rule 12). New requirements and changes of `Prio`, `Scope` or `Doubt` only by the project owner: propose them in the report.
 - No volatile names in documents, OPEN-ITEMS entries and commit messages: no branch or workspace names, no run folders; write what happened, or name the commit.
 - Private data of the project owner (`%APPDATA%\AutoHotFlow`, his flows and variables) is never copied into the repository without his check; see `tests/data/README.md`.
 
-**Finding IDs.** The final IDs form a dense series `F-0001`, `F-0002`, ... with no gap and no reuse (`tests/test_open_items_ids.py` checks it). Agents write new findings with provisional IDs `F-9000*`, `F-9001*`, ... The integrator gives them their final numbers with `python tools/renumber_findings.py --commit` in the branch's workspace, after the rebase onto `v2-port` and before the cherry-pick (section 5). Do not renumber by hand. A renumbering of the whole series is a decision of the project owner. No old-to-new mapping is kept in the documents: the history is in git.
+**Finding IDs.** The final IDs form a dense series `F-0001`, `F-0002`, ... with no gap and no reuse (`tests/test_open_items_ids.py` checks it). Agents write new findings with provisional IDs: `F-9` plus three digits plus `*`, counting up from 9000 on each branch (written `F-9nnn*` in this file). The integrator gives them their final numbers with `python tools/renumber_findings.py --commit` in the branch's workspace, after the rebase onto `v2-port` and before the cherry-pick (section 5). Do not renumber by hand. A renumbering of the whole series is a decision of the project owner. No old-to-new mapping is kept in the documents: the history is in git.
 
 ## 3. Work
 
@@ -91,7 +91,7 @@ The hunter chooses the most important eligible entry by its own judgment (risk o
 
 A hunter branch with code changes goes through review (3d) like an implementer branch; a branch that changes only the entry is integrated without review.
 
-**Review mode** (looking for undiscovered bugs in an area of `src/` by reading code and adding edge-case tests) runs **only when the input asks for it**. Then: one area per round, preferring recently changed code; a new failing test is committed as `xfail(strict=True, reason="F-9xxx* ...")`; every finding goes into OPEN-ITEMS; the review hunter does not fix. Keep the review log (area, date, commit) in `STATUS.md`.
+**Review mode** (looking for undiscovered bugs in an area of `src/` by reading code and adding edge-case tests) runs **only when the input asks for it**. Then: one area per round, preferring recently changed code; a new failing test is committed as `xfail(strict=True, reason="F-9nnn* ...")`; every finding goes into OPEN-ITEMS; the review hunter does not fix. Keep the review log (area, date, commit) in `STATUS.md`.
 
 **End.** The hunter stops when its rounds are used up, when no entry is eligible, or when the implementation part has ended. List the entries that remain open and why in the report.
 
@@ -191,7 +191,7 @@ Read (only this, more only if the task needs it): <list of section 9>.
 Task: <precise task, acceptance criteria, what not to touch>
 Rules: <section 2, the relevant ones, including the decision rule and the safety rule>
 Tests: <which short runs; big runs only if ...>; every result with run ID and commit.
-New OPEN-ITEMS entries get provisional IDs from `F-9000*` (section 2).
+New OPEN-ITEMS entries get provisional IDs `F-9nnn*`, counting up from 9000 (section 2).
 If you are stuck after two different approaches: stop and end your report with `ESCALATE: ...`.
 Report, at most 25 lines: commits, tests run (run ID, commit, counts), decisions you took (what, why, alternative), findings written, anything unexpected, what you did not check. Verified / assumed / not checked. Details belong into commit messages and OPEN-ITEMS, not into the report.
 ```
