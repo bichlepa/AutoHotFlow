@@ -867,7 +867,15 @@ def drain(obs, timeout=0.5):
 
 
 def trigger_states(msgs):
-    return [(m["payload"]["elementId"], m["payload"]["enabled"]) for m in msgs if m["type"] == "evt.trigger.state"]
+    """(elementId, enabled) of the evt.trigger.state messages. An event that only changes the arming (armed, message,
+    WI-0062) repeats the target state and is left out: the switches are checked by their target state."""
+    out = []
+    for m in msgs:
+        if m["type"] == "evt.trigger.state":
+            pair = (m["payload"]["elementId"], m["payload"]["enabled"])
+            if not out or out[-1] != pair:
+                out.append(pair)
+    return out
 
 
 def flow_states(msgs):
@@ -884,6 +892,9 @@ def test_switches_report_the_trigger_states_and_the_independent_count(procs, run
         ask(obs, "cmd.flow.enable", {"flowId": "sw"})
         got = drain(obs)
         assert trigger_states(got) == [(TRIGGER, True)] and flow_states(got) == [(True, 0)]
+        # No trigger host in this test: the trigger is enabled but not armed, and its message says so (WI-0062).
+        last = [m["payload"] for m in got if m["type"] == "evt.trigger.state"][-1]
+        assert last["armed"] is False and last["message"] == "trigger host is not running", last
         ask(obs, "cmd.trigger.enable", {"flowId": "sw", "elementId": INDEPENDENT})
         got = drain(obs)
         assert trigger_states(got) == [(INDEPENDENT, True)] and flow_states(got) == [(True, 1)]

@@ -20,7 +20,7 @@
 ; an earlier pass, and a trigger is queued at most once (entry "queued").
 ;
 ; Generation: every arm of a trigger gets a new "gen" from this engine. Events of another generation, or of a trigger
-; that is not armed, are dropped by the engine (Accepts, Reported).
+; that is neither armed nor being armed (its arm on the way), are dropped by the engine (Accepts, Reported).
 ;
 ; Failures of an arm: a parameter that cannot be evaluated, a class that is unknown or not a trigger (checked here, the
 ; host is not asked), an answer ok false (the element refused), a protocol error of the host (not_found, peer_gone,

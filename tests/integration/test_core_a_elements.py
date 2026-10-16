@@ -366,19 +366,18 @@ def test_the_v1_flow_variable_test_runs_up_to_the_first_result_list(flows):
     Action_Add_To_List that collects the result in `static_results`; the trigger "basic variables test" runs
     New_variable, Variable_is_empty and Condition_Expression up to that element. Every check before it must have
     answered as the connections of the flow expect, otherwise the instance would end earlier without a matching
-    connection. The element writes `%a_manualTriggerID%`, which only the trigger host sets (TriggerVariables, S0003);
-    a start by the engine does not, so the value is empty and the element ends with the exception of its parameter
-    (WarnIfEmpty). The list elements themselves ran before (WI-0053)."""
+    connection. The element writes `%a_manualTriggerID%`: the engine sets it at every start of the trigger through its
+    TriggerVariables (WI-0062, M-0069), so both runs go on without an exception. The list elements themselves ran before
+    (WI-0053)."""
     flow_id = flows.add_file(V1_EXAMPLES / "Flow 1010290492.json")
     flows.start()
     content = flows.run(flow_id, trigger="element0000000039")
     basic = flows.run(flow_id, trigger="element0000000002")
     assert content.path[-1] == "element0000000098" and len(content.path) == 113
     assert "element0000000434" in content.path                  # the first Action_New_List
-    assert content.exceptions == ["String 'VarValue' is empty"]
+    assert content.exceptions == [] and basic.exceptions == []
     assert basic.path[-1] == "element0000000035" and len(basic.path) == 10
-    assert basic.exceptions == ["String 'VarValue' is empty"]
-    assert content.reason == basic.reason == "exception"
+    assert content.reason == basic.reason == "finished"
 
 
 def test_the_v1_flow_numbers_runs_its_number_is_checks(flows):
