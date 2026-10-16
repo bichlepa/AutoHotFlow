@@ -1238,14 +1238,15 @@ Fires when AutoHotFlow starts; it can tell a start with Windows (REQ-SET-030) fr
 ### REQ-TRG-230 Keyboard triggers
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003, S0008
+- **Evidence:** `tests/ahk/element_hotkey.test.ahk` (WI-0064: the hotkey text of every option, the window condition of each UseWindow value, two triggers on one hotkey share it), `tests/ahk/element_window_ident.test.ahk` (the window identification). The input tests with real keys are written but not green yet (WI-0064, see the report)
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
-| `Trigger_Hotkey` | yes | open | S0003 |
+| `Trigger_Hotkey` | yes | partial | S0003 |
 | `Trigger_Hotstring` | yes | open | S0008 |
 
 A hotkey can be limited to a given window; it is disabled in the same context (MIGRATION M-0003).

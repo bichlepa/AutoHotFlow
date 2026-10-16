@@ -298,7 +298,7 @@ What stays the same: class ID, parameter IDs and schema, language keys, result s
 
 **v1** (`v1/Source_Elements/Default/Triggers/Hotkey.ahk`): `Element_enable_`, `Element_disable_`, `Element_postTrigger_`, callback `Trigger_Hotkey_Trigger` → `x_trigger(Environment)`. The hotkey is set with `hotkey, % fullHotkey, % functionObject, UseErrorLevel on`.
 
-**v2:**
+**v2** (the real class is `src/elements/Default/Triggers/Trigger_Hotkey.ahk` (WI-0064), with the window identification of `src/elements/Default/lib/WindowIdent.ahk`; the code below is the design it follows, with the differences listed after it):
 
 ```ahk
 #Requires AutoHotkey v2.0
