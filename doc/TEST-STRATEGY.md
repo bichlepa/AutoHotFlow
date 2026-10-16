@@ -96,7 +96,7 @@ python -m pytest tests -q --all -m gui -n 0      # windows and dialogs appear
 python -m pytest tests -q -m stress              # long, on request only (-m soak: minutes)
 ```
 
-**Tiers (marker-based, across the folders).** The folders say what a test checks, the markers say when it runs. Measured serial run: 752 tests, 10:44 min; 69 tests of 3 s or more took 433 s of them.
+**Tiers (marker-based, across the folders).** The folders say what a test checks, the markers say when it runs. Measured serial run: 752 tests, 10:44 min; 69 tests of 3 s or more took 433 s of them. Current serial fast tier (`-n 0`, 2026-10-16, run 20261016-184636-073b6738, commit 073b673): 1121 passed, 1 skipped, 306 s; the S0001 figure above is kept as history.
 
 | Tier | Marker | Runs | Content |
 |---|---|---|---|
