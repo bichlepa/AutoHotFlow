@@ -136,8 +136,8 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-TRG-010](REQUIREMENTS.md#req-trg-010-triggers-react-at-once-whatever-the-load) | L1126-1135 | Triggers react at once, whatever the load | no | partial | must | port | S0003 (the measurement while the engine is busy, WI-0067) |
-| [REQ-TRG-020](REQUIREMENTS.md#req-trg-020-triggers-follow-the-enabled-state-also-after-a-restart) | L1137-1146 | Triggers follow the enabled state, also after a restart | yes | partial | must | port | S0003 (WI-0063, WI-0064 for the real triggers) |
+| [REQ-TRG-010](REQUIREMENTS.md#req-trg-010-triggers-react-at-once-whatever-the-load) | L1126-1135 | Triggers react at once, whatever the load | no | partial | must | port | S0003 (the hotkey part of the measurement while the engine is busy: owner decision on keys; the rest measured, MS-0038) |
+| [REQ-TRG-020](REQUIREMENTS.md#req-trg-020-triggers-follow-the-enabled-state-also-after-a-restart) | L1137-1146 | Triggers follow the enabled state, also after a restart | yes | partial | must | port | S0003 (the hotkey trigger with real keys: owner decision) |
 | [REQ-TRG-040](REQUIREMENTS.md#req-trg-040-conflicting-hotkeys-are-reported) | L1148-1156 | Conflicting hotkeys are reported | no | open | should | later | - |
 | [REQ-TRG-030](REQUIREMENTS.md#req-trg-030-several-triggers-per-flow) | L1158-1167 | Several triggers per flow | yes | partial | must | port | S0003 (WI-0060 done), S0006 |
 | [REQ-TRG-050](REQUIREMENTS.md#req-trg-050-triggers-that-switch-with-the-flow-or-on-their-own) | L1169-1187 | Triggers that switch with the flow or on their own | no | partial | should | port | S0003 (WI-0060 done, WI-0065 done), S0004 (manager), S0007 (editor) |
@@ -297,7 +297,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 |---|---|---|---|---|---|---|---|
 | [REQ-PRF-010](REQUIREMENTS.md#req-prf-010-message-latency) | L2304-2313 | Message latency | n/a | done | must | port | - |
 | [REQ-PRF-020](REQUIREMENTS.md#req-prf-020-idle-cpu) | L2315-2324 | Idle CPU | n/a | done | must | port | - |
-| [REQ-PRF-030](REQUIREMENTS.md#req-prf-030-memory) | L2326-2335 | Memory | n/a | partial | must | port | S0003, S0004, S0008 (measure again) |
+| [REQ-PRF-030](REQUIREMENTS.md#req-prf-030-memory) | L2326-2335 | Memory | n/a | partial | must | port | S0004, S0008 (measure again with the editor and the manager) |
 | [REQ-PRF-040](REQUIREMENTS.md#req-prf-040-start-time) | L2337-2346 | Start time | n/a | done | must | port | - |
 | [REQ-PRF-050](REQUIREMENTS.md#req-prf-050-many-big-flows-load-without-blocking) | L2348-2357 | Many big flows load without blocking | n/a | done | must | port | - |
 | [REQ-PRF-060](REQUIREMENTS.md#req-prf-060-editor-redraw) | L2359-2367 | Editor redraw | n/a | open | must | port | S0005 |
@@ -325,7 +325,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-TST-010](REQUIREMENTS.md#req-tst-010-automatic-tests-at-several-levels) | L2495-2504 | Automatic tests at several levels | partial | done | must | port | - |
 | [REQ-TST-020](REQUIREMENTS.md#req-tst-020-fault-injection-and-stress) | L2506-2515 | Fault injection and stress | no | done | must | port | - |
 | [REQ-TST-030](REQUIREMENTS.md#req-tst-030-every-element-is-tested-headless) | L2517-2526 | Every element is tested headless | no | partial | must | port | S0002 (WI-0051, WI-0056, WI-0057), S0008 (the other elements) |
-| [REQ-TST-040](REQUIREMENTS.md#req-tst-040-the-v1-test-flows-run-green) | L2528-2537 | The v1 test flows run green | yes | partial | must | port | S0003 and S0008 (the 13 flows of PENDING in `tests/integration/test_corpus.py`) |
+| [REQ-TST-040](REQUIREMENTS.md#req-tst-040-the-v1-test-flows-run-green) | L2528-2537 | The v1 test flows run green | yes | partial | must | port | S0008 (the 12 flows of PENDING in `tests/integration/test_corpus.py`) |
 | [REQ-TST-050](REQUIREMENTS.md#req-tst-050-independent-oracle-for-the-expression-language) | L2539-2548 | Independent oracle for the expression language | n/a | done | must | port | - |
 | [REQ-TST-060](REQUIREMENTS.md#req-tst-060-manual-checks-of-the-user-interfaces) | L2550-2559 | Manual checks of the user interfaces | n/a | partial | must | port | S0004 to S0007 |
 

@@ -127,7 +127,7 @@ The user starts a flow from the manager or the editor, through its default manua
 ### REQ-EXE-070 Enable and disable a flow
 
 - **v1:** yes
-- **v2:** partial (the enabled state of each trigger is kept, switched, reported and survives a restart of AutoHotFlow; the enabled triggers are armed and react, WI-0062; the real triggers come with WI-0063 and WI-0064, the manager with S0004)
+- **v2:** partial (the enabled state of each trigger is kept, switched, reported and survives a restart of AutoHotFlow; the enabled triggers are armed and react, WI-0062; the real timer, start-up and hotkey triggers are in (WI-0063, WI-0064); the manager with S0004)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003 (WI-0060, WI-0062 and WI-0063 done, WI-0064 to WI-0066), S0004 (manager); the per-flow state files (E0063, WI-0068) are done
@@ -1129,19 +1129,19 @@ Talking to a console program is an element of its own, because it is much more c
 - **v2:** partial
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003 (the measurement while the engine is busy, WI-0067)
-- **Evidence:** `tests/integration/test_triggerhost.py` (WI-0061: an error of one trigger is reported, the others and the host keep running), `tests/integration/test_trigger_arming.py` (WI-0062: the engine arms the triggers, a refused or failing trigger does not stop the others)
+- **Plan:** S0003 (the hotkey part of the measurement while the engine is busy: owner decision on keys; the rest measured, MS-0038)
+- **Evidence:** `tests/stress/test_trigger_host_busy.py` (WI-0067: the host keeps its timer while the engine is blocked for 3 s; no event lost), `tests/integration/test_triggerhost.py` (WI-0061: an error of one trigger is reported, the others and the host keep running), `tests/integration/test_trigger_arming.py` (WI-0062: the engine arms the triggers, a refused or failing trigger does not stop the others)
 
-Hotkeys, hooks and timers react at once, no matter how busy the running flows are (Windows removes a low-level hook that answers too slowly). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. How: a trigger host process, `ARCHITECTURE.md` D8. The engine arms the triggers of the enabled flows (WI-0062). Still missing: the measurement of the reaction while the engine is busy (WI-0067).
+Hotkeys, hooks and timers react at once, no matter how busy the running flows are (Windows removes a low-level hook that answers too slowly). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. How: a trigger host process, `ARCHITECTURE.md` D8. The engine arms the triggers of the enabled flows (WI-0062). Measured without keys (MS-0038): while the engine is blocked for 3 s, the host keeps its timer on schedule, and the engine processes the queued events after the block. Still missing: a hotkey during the block, which waits for the owner's decision on how keys are delivered in tests.
 
 ### REQ-TRG-020 Triggers follow the enabled state, also after a restart
 
 - **v1:** yes
-- **v2:** partial (the arming works for the test triggers, with the restarts of the engine and of the trigger host; the real triggers come with WI-0063 and WI-0064)
+- **v2:** partial (the arming works for the test triggers and for the timer and start-up triggers, with the restarts of the engine and of the trigger host; the hotkey trigger with real keys waits for the owner's decision)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003 (WI-0063, WI-0064 for the real triggers)
-- **Evidence:** `tests/integration/test_trigger_arming.py` (WI-0062: an enabled trigger is armed and fires, disabling disarms it, the startup trigger fires once per start, a restart of the engine or of the host re-arms), `tests/ahk/engine_trigger_arms.test.ahk`
+- **Plan:** S0003 (the hotkey trigger with real keys: owner decision)
+- **Evidence:** `tests/integration/test_time_triggers.py` (WI-0063), `tests/integration/test_trigger_arming.py` (WI-0062: an enabled trigger is armed and fires, disabling disarms it, the startup trigger fires once per start, a restart of the engine or of the host re-arms), `tests/ahk/engine_trigger_arms.test.ahk`
 
 The enabled triggers are active from the start of AutoHotFlow on, and again after an internal restart (REQ-ROB-040); disabling a flow deactivates the triggers that switch with it (REQ-EXE-070).
 
@@ -2326,11 +2326,11 @@ Below 1 % of the whole system without running flows (E0005).
 ### REQ-PRF-030 Memory
 
 - **v1:** n/a (not measured)
-- **v2:** partial (measured without the real manager, the trigger host and the real elements)
+- **v2:** partial (measured with the real trigger host and armed timer and start-up triggers, MS-0039; without editors, the manager is the stub)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003, S0004, S0008 (measure again)
-- **Evidence:** `doc/MEASUREMENTS.md` (MS-0032, MS-0033), `tools/measure_r3.py`
+- **Plan:** S0004, S0008 (measure again with the editor and the manager)
+- **Evidence:** `doc/MEASUREMENTS.md` (MS-0032, MS-0033, MS-0039), `tools/measure_r3.py`, `tests/stress/test_trigger_host_memory.py` (WI-0067)
 
 The background processes (supervisor, storage, engine, trigger host, manager and the workers) need below 100 MB private bytes together in the normal state: small flows that run now and then, up to about three elements waiting at the same time (REQ-EXE-100). Editors are not counted. When more elements wait at the same time, the memory may exceed the budget: each one costs about 10 MB, so the default limit of 8 (REQ-SET-070) means about 115 MB (extrapolated from MS-0033, not measured). The user can lower the limit. Decision E0040, details `ARCHITECTURE.md` section 9.
 
@@ -2528,11 +2528,11 @@ A smoke test covers every registered element; each element has end-to-end tests 
 ### REQ-TST-040 The v1 test flows run green
 
 - **v1:** yes (the "Automatic tests" flows)
-- **v2:** partial (three of the 16 "Automatic tests" flows run headless and green, all three as saved: "variable test" (M-0069 is done, WI-0062), "List test" and "Loop test"; the other 13 wait for S0003 and S0008, see the table PENDING)
+- **v2:** partial (four of the 16 "Automatic tests" flows run headless and green: "variable test" (as saved, M-0069 is done, WI-0062), "List test" and "Loop test" (as saved), and "Trigger test" on a copy without its speech output (M-0077, S0003, WI-0067); the other 12 wait for S0008, see the table PENDING)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003 and S0008 (the 13 flows of PENDING in `tests/integration/test_corpus.py`)
-- **Evidence:** `tests/integration/test_corpus.py::test_v1_variable_test_runs_green_as_saved`, `tests/integration/test_corpus.py::test_v1_list_test_runs_green`, `tests/integration/test_corpus.py::test_v1_loop_test_runs_green`
+- **Plan:** S0008 (the 12 flows of PENDING in `tests/integration/test_corpus.py`)
+- **Evidence:** `tests/integration/test_corpus.py::test_v1_trigger_test_runs_green_on_the_adapted_copy`, `tests/integration/test_corpus.py::test_v1_variable_test_runs_green_as_saved`, `tests/integration/test_corpus.py::test_v1_list_test_runs_green`, `tests/integration/test_corpus.py::test_v1_loop_test_runs_green`
 
 The "Automatic tests" flows of v1, adapted to v2 where needed, run headless and green.
 
