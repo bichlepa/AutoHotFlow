@@ -140,7 +140,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-TRG-020](REQUIREMENTS.md#req-trg-020-triggers-follow-the-enabled-state-also-after-a-restart) | L1136-1145 | Triggers follow the enabled state, also after a restart | yes | partial | must | port | S0003 (WI-0063, WI-0064 for the real triggers) |
 | [REQ-TRG-040](REQUIREMENTS.md#req-trg-040-conflicting-hotkeys-are-reported) | L1147-1155 | Conflicting hotkeys are reported | no | open | should | later | - |
 | [REQ-TRG-030](REQUIREMENTS.md#req-trg-030-several-triggers-per-flow) | L1157-1166 | Several triggers per flow | yes | partial | must | port | S0003 (WI-0060 done), S0006 |
-| [REQ-TRG-050](REQUIREMENTS.md#req-trg-050-triggers-that-switch-with-the-flow-or-on-their-own) | L1168-1186 | Triggers that switch with the flow or on their own | no | partial | should | port | S0003 (WI-0060 done, WI-0065), S0004 (manager), S0007 (editor) |
+| [REQ-TRG-050](REQUIREMENTS.md#req-trg-050-triggers-that-switch-with-the-flow-or-on-their-own) | L1168-1186 | Triggers that switch with the flow or on their own | no | partial | should | port | S0003 (WI-0060 done, WI-0065 done), S0004 (manager), S0007 (editor) |
 | [REQ-TRG-200](REQUIREMENTS.md#req-trg-200-manual-trigger) | L1188-1202 | Manual trigger | yes | partial | must | port | S0002 (WI-0047) |
 | [REQ-TRG-210](REQUIREMENTS.md#req-trg-210-time-triggers) | L1204-1216 | Time triggers | yes | partial | must | port | S0003 (WI-0063 done), S0008 |
 | [REQ-TRG-220](REQUIREMENTS.md#req-trg-220-start-up-and-system-triggers) | L1218-1235 | Start-up and system triggers | yes | partial | must | port | S0003 (WI-0063 done), later |

@@ -832,11 +832,11 @@ Connection points and loop variables: REQ-EXE-030. The differences from v1 are i
 ### REQ-ELM-250 Flow control
 
 - **v1:** yes
-- **v2:** partial (`Action_Sleep`, `Action_Do_nothing`, `Condition_Do_nothing`, `Action_Execute_Flow`, `Action_Stop_Flow` and `Condition_Flow_Running` exist; `Action_Set_Flow_Status`, `Condition_Flow_Enabled` and `Action_Set_element_parameter` are open)
+- **v2:** partial (`Action_Sleep`, `Action_Do_nothing`, `Condition_Do_nothing`, `Action_Execute_Flow`, `Action_Stop_Flow` and `Condition_Flow_Running` exist; `Action_Set_Flow_Status` and `Condition_Flow_Enabled` (WI-0065) exist; `Action_Set_element_parameter` is open)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0047, WI-0052, WI-0055), S0003, S0008
-- **Evidence:** `tests/ahk/element_sleep.test.ahk`, `tests/integration/test_core_a_elements.py::test_action_do_nothing_finishes_with_normal_or_exception`, `tests/integration/test_core_a_elements.py::test_condition_do_nothing_finishes_with_the_chosen_result`, `tests/integration/test_core_d_flows.py::test_stop_flow_stops_running_and_queued_instances_and_its_own_flow`, `tests/integration/test_core_d_flows.py::test_flow_running_sees_running_and_queued_instances`, `tests/ahk/engine_call_flow.test.ahk`
+- **Evidence:** `tests/ahk/element_sleep.test.ahk`, `tests/integration/test_core_a_elements.py::test_action_do_nothing_finishes_with_normal_or_exception`, `tests/integration/test_core_a_elements.py::test_condition_do_nothing_finishes_with_the_chosen_result`, `tests/integration/test_core_d_flows.py::test_stop_flow_stops_running_and_queued_instances_and_its_own_flow`, `tests/integration/test_core_d_flows.py::test_flow_running_sees_running_and_queued_instances`, `tests/ahk/engine_call_flow.test.ahk`, `tests/integration/test_flow_status_elements.py::test_set_flow_status_every_choice_for_another_flow`, `tests/integration/test_flow_status_elements.py::test_condition_flow_enabled_every_choice`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
@@ -846,8 +846,8 @@ Connection points and loop variables: REQ-EXE-030. The differences from v1 are i
 | `Action_Execute_Flow` (REQ-EXE-120) | yes | done | S0002 (WI-0055) |
 | `Action_Stop_Flow` | yes | done | S0002 (WI-0055) |
 | `Condition_Flow_Running` | yes | done | S0002 (WI-0055) |
-| `Action_Set_Flow_Status` | yes | open | S0003 (WI-0065) |
-| `Condition_Flow_Enabled` | yes | open | S0003 (WI-0065) |
+| `Action_Set_Flow_Status` | yes | done | S0003 (WI-0065) |
+| `Condition_Flow_Enabled` | yes | done | S0003 (WI-0065) |
 | `Action_Set_element_parameter` | yes | open | S0008 |
 
 ### REQ-ELM-260 Trace points
@@ -1168,11 +1168,11 @@ A flow can have several triggers. Each trigger can be enabled and disabled on it
 ### REQ-TRG-050 Triggers that switch with the flow or on their own
 
 - **v1:** no (every trigger switches with the flow)
-- **v2:** partial (the engine has the option "switch with the flow" and the independent triggers, and the flow is active by the following ones only; the manager and the editor are missing)
+- **v2:** partial (the engine has the option "switch with the flow" and the independent triggers, and the flow is active by the following ones only; the elements Set flow status and Flow enabled switch and ask by it (WI-0065); the manager and the editor are missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0003 (WI-0060 done, WI-0065), S0004 (manager), S0007 (editor)
-- **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_engine.py::test_a_flow_without_a_following_trigger_answers_with_a_message`
+- **Plan:** S0003 (WI-0060 done, WI-0065 done), S0004 (manager), S0007 (editor)
+- **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_engine.py::test_a_flow_without_a_following_trigger_answers_with_a_message`, `tests/integration/test_flow_status_elements.py::test_set_flow_status_every_choice_for_another_flow`, `tests/integration/test_flow_status_elements.py::test_condition_flow_enabled_every_choice`
 
 Each trigger has the option "Switch with the flow", on by default, so that a flow behaves as in v1 (decision E0056).
 
