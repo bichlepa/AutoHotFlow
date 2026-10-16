@@ -24,6 +24,11 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 ## Findings
 
+### F-9000*: Load warnings in the trigger host and in `Trigger_Start_up`
+
+**What:** A local `message` (`TriggerHost._CmdArm`, `ReportCallbackError`) and a local `type` (`Trigger_Start_up.Enable`) are reported as the same name as a global variable on every start of the trigger host (seen in the engine and triggerhost logs, WI-0064). It is the same trap as in `doc/howto/gui-and-hotkeys.md` (case-insensitive names).
+**Status:** observed, not checked whether it changes behaviour. A rename of the locals removes the warnings.
+
 ### F-0073: Stress test with 200 big flows: a snapshot answer during the load takes 2.3 s (budget 1 s)
 
 **What:** `tests/stress/test_big_flows.py::test_many_big_flows_load_without_hung_and_with_a_responsive_engine[200]` failed in the stress run of the S0001 acceptance (WI-0043). Everything else in the test held (all 200 flows loaded, no `hung`, `crashed` or `restarted`, no storage error, no snapshot timeout); only the latency check failed: `n=251 median=148.45 p95=543.45 p99=1351.00 max=2325.93` ms against the budget of 1000 ms (`SNAPSHOT_BUDGET_S`, serial run, no scaling). The time until `evt.engine.ready` was 59.35 s.
