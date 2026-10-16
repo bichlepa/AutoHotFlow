@@ -8,7 +8,8 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Manual checks
 
-- **DPI check of the dialog windows (REQ-USE-090).** Confirmed by the owner: a manual-check flow with its own start task. An implementer is building it now (flow, `manual_check.py` option, task "Start: manual check 3"). Then the owner runs the guide in `doc/MANUAL-CHECKS.md` section 3 at 100, 125 and 150 %.
+- **DPI check of the dialog windows (REQ-USE-090): ready to run.** Task "Start: manual check 3, dialog windows at other DPI scaling (manual_check.py)", or in a terminal: `python tools/manual_check.py start --flow dpi_dialogs -- --ui=stub --start=storage,engine,manager`. In the stub, press Start for the flow `dpi_dialogs`. Steps: `doc/MANUAL-CHECKS.md` section 3, at 100, 125 and 150 %. Closing the debug dialog with X ends the flow at that element; then start it again.
+- **Confirm two choices of the check:** (1) you start the flow with the Start button; the tool does not start it. (2) No debug window in this check; only the dialogs are on the screen.
 
 ## To know
 
