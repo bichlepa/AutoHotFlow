@@ -179,9 +179,8 @@ def build(repo=REPO):
         out.append("```")
         out.append("")
     for rel, how in ID_DOCS.items():
-        path = repo / rel
-        _, lines = read(path)
-        out.append(size_line(path, lines, repo))
+        # no size line: these documents change with almost every task, and the index would go out of date each time
+        out.append("## %s" % rel)
         out.append(how)
         out.append("")
     return "\n".join(out).rstrip("\n") + "\n"

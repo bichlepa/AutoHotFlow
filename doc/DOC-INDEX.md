@@ -315,17 +315,17 @@ L332-338 `ctx.GetVar` with a path and a default object: read one member, tell "m
 L340-346 `Loop Parse` with the delimiter text "CSV" is the CSV mode (verified)
 ```
 
-## doc/REQUIREMENTS.md (117.7 KB, 2692 lines)
+## doc/REQUIREMENTS.md
 Entries are `### REQ-<AREA>-<NNN> <title>`: see doc/REQUIREMENTS-INDEX.md (line ranges per requirement). Find one by its ID, e.g. `grep -n REQ-ELM-240 doc/REQUIREMENTS.md`.
 
-## doc/OPEN-ITEMS.md (63.8 KB, 328 lines)
+## doc/OPEN-ITEMS.md
 Open findings `F-<NNNN>`: one row each in the summary table at the top, one entry each below. Find one with `grep -n F-0097 doc/OPEN-ITEMS.md`.
 
-## doc/CLOSED-ITEMS.md (82.5 KB, 372 lines)
+## doc/CLOSED-ITEMS.md
 Closed and accepted findings `F-<NNNN>`: one row each in the table at the top. Find one with `grep -n F-0011 doc/CLOSED-ITEMS.md`.
 
-## doc/DECISIONS.md (24.9 KB, 98 lines)
+## doc/DECISIONS.md
 Owner decisions `E<NNNN>`: one row each in the table. Find one with `grep -n E0035 doc/DECISIONS.md`.
 
-## doc/MIGRATION.md (40.9 KB, 69 lines)
+## doc/MIGRATION.md
 Deliberate deviations from v1 `M-<NNNN>`: one row each in the table. Find one with `grep -n M-0059 doc/MIGRATION.md`.
