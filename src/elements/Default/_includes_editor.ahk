@@ -7,6 +7,7 @@
 #Include ..\base\ElementRegistry.ahk
 #Include lib\ListOps.ahk
 #Include lib\DialogOps.ahk
+#Include lib\FlowSwitchOps.ahk
 #Include lib\DebugOps.ahk
 #Include lib\LoopOps.ahk
 
@@ -21,6 +22,7 @@ class Default {
     #Include Actions\Action_Message_Box.ahk
     #Include Actions\Action_New_List.ahk
     #Include Actions\Action_New_variable.ahk
+    #Include Actions\Action_Set_Flow_Status.ahk
     #Include Actions\Action_Shuffle_list.ahk
     #Include Actions\Action_Sleep.ahk
     #Include Actions\Action_Stop_Flow.ahk
@@ -31,6 +33,7 @@ class Default {
     #Include Conditions\Condition_Debug_Dialog.ahk
     #Include Conditions\Condition_Do_nothing.ahk
     #Include Conditions\Condition_Expression.ahk
+    #Include Conditions\Condition_Flow_Enabled.ahk
     #Include Conditions\Condition_Flow_Running.ahk
     #Include Conditions\Condition_List_Contains_Element.ahk
     #Include Conditions\Condition_NumberIs.ahk
@@ -55,6 +58,7 @@ ElementRegistry.Register(Default.Action_Get_List_Info)
 ElementRegistry.Register(Default.Action_Message_Box)
 ElementRegistry.Register(Default.Action_New_List)
 ElementRegistry.Register(Default.Action_New_variable)
+ElementRegistry.Register(Default.Action_Set_Flow_Status)
 ElementRegistry.Register(Default.Action_Shuffle_list)
 ElementRegistry.Register(Default.Action_Sleep)
 ElementRegistry.Register(Default.Action_Stop_Flow)
@@ -65,6 +69,7 @@ ElementRegistry.Register(Default.Condition_Confirmation_Dialog)
 ElementRegistry.Register(Default.Condition_Debug_Dialog)
 ElementRegistry.Register(Default.Condition_Do_nothing)
 ElementRegistry.Register(Default.Condition_Expression)
+ElementRegistry.Register(Default.Condition_Flow_Enabled)
 ElementRegistry.Register(Default.Condition_Flow_Running)
 ElementRegistry.Register(Default.Condition_List_Contains_Element)
 ElementRegistry.Register(Default.Condition_NumberIs)

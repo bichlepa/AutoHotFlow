@@ -36,13 +36,13 @@ PENDING = {
         "Action_Convert_String_to_List": "S0008", "Action_HTTP_Request": "S0008"}),
     "Flow 1087828277": dict(name="maths test", missing={
         "Action_Absolute_number": "S0008", "Action_Exponentiation": "S0008", "Action_Random_number": "S0008",
-        "Action_Rounding_a_number": "S0008", "Action_Set_flow_status": "S0003", "Action_Square_root": "S0008",
+        "Action_Rounding_a_number": "S0008", "Action_Square_root": "S0008",
         "Action_Trigonometry": "S0008"}),
     "Flow 130786371": dict(name="Dialog test", missing={
         "Action_Close_Window": "S0008", "Action_Convert_String_to_List": "S0008", "Action_Get_Control_Text": "S0008",
         "Action_Input_Box": "S0008", "Action_Send_Keystrokes_to_Control": "S0008", "Condition_Window_Exists": "S0008"}),
     "Flow 1333431302": dict(name="User idle test", missing={
-        "Action_Set_flow_status": "S0003", "Trigger_User_Idle_Time": "S0008"}),
+        "Trigger_User_Idle_Time": "S0008"}),
     "Flow 1384439262": dict(name="file test", missing={
         "Action_Close_Window": "S0008", "Action_Copy_File": "S0008", "Action_Copy_Folder": "S0008",
         "Action_Create_Folder": "S0008", "Action_Create_Shortcut": "S0008", "Action_Delete_File": "S0008",
@@ -57,22 +57,22 @@ PENDING = {
     "Flow 1849072261": dict(name="external script test", missing={
         "Action_AutoHotkey_Script": "S0008 (E0039: v1 code is kept as text, M-0049)"}),
     "Flow 2133155705": dict(name="Hotkey test", missing={
-        "Action_Send_Keystrokes": "S0008", "Action_Set_flow_status": "S0003", "Trigger_Hotkey": "S0003"}),
+        "Action_Send_Keystrokes": "S0008", "Trigger_Hotkey": "S0003"}),
     "Flow 369404488": dict(name="string test", missing={
-        "Action_Search_in_a_string": "S0008", "Action_Set_flow_status": "S0003", "Action_Split_a_string": "S0008",
+        "Action_Search_in_a_string": "S0008", "Action_Split_a_string": "S0008",
         "Action_Substring": "S0008", "Action_Substring2": "S0008", "Action_Trim_a_string": "S0008",
         "Condition_String_contains_text": "S0008"}),
     "Flow 561135904": dict(name="Process Test", missing={
-        "Action_Kill_Process": "S0008", "Action_Run": "S0008", "Action_Set_flow_status": "S0003",
+        "Action_Kill_Process": "S0008", "Action_Run": "S0008",
         "Condition_Process_is_running": "S0008", "Trigger_Process_closes": "S0008",
         "Trigger_Process_starts": "S0008"}),
     "Flow 65341778": dict(name="_AutomaticTest starter", missing={
-        "Action_Play_Sound": "S0008", "Action_Set_flow_status": "S0003"}),
+        "Action_Play_Sound": "S0008"}),
     "Flow 74366368": dict(name="File link test", missing={
-        "Action_Delete_File": "S0008", "Action_Run": "S0008", "Action_Set_flow_status": "S0003",
+        "Action_Delete_File": "S0008", "Action_Run": "S0008",
         "Condition_File_Exists": "S0008", "Trigger_Shortcut": "S0008"}),
     "Flow 884290977": dict(name="Trigger test", missing={
-        "Action_Set_flow_status": "S0003", "Action_Speech_Output": "S0008", "Condition_Flow_Enabled": "S0003"}),
+        "Action_Speech_Output": "S0008"}),
 }
 
 
