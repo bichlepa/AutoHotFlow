@@ -48,11 +48,18 @@ None.
 
 ## Running agents
 
-None (the session of WI-0055 has ended).
+| Slot | Role | Workspace | Model | Task |
+|---|---|---|---|---|
+| 1 | Implementer | wi-0056 | haiku | WI-0056, started from `4af717b`; waiting for its own background run |
+| 4 | Documentation helper | docs-cleanup | haiku | HOW-TO cleanup and the 11 status-book notes (owner delegated) |
+
+F-0012 round (hunt-1) is integrated and its workspace removed; its review approved it without fixes.
 
 ## Last verified state
 
-Commit `949afc2` (WI-0055), verified by the last verifier agent: fast run `20261016-164136-949afc21` (1006 passed, 1 skipped), foundation run `20261016-164302-949afc21` (461 passed, 1 skipped), slow run `20261016-164502-949afc21` (154 passed); architecture, requirements and include checks 0. F-0100 was not reproduced in that run. Later commits up to `cac616b` change only documents. From now on `tools/verify.py --auto` keeps the last green state (ORCHESTRATOR section 4).
+Commit `220fbe5` verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-174506-220fbe53-3` (1083 passed, 1 skipped), foundation run `20261016-174506-220fbe53` (461 passed, 1 skipped), slow run `20261016-174506-220fbe53-2` (154 passed). The storm smoke test that failed earlier passed here (F-0101 stays open to watch).
+
+Earlier, commit `949afc2` (WI-0055), verified by the last verifier agent: fast run `20261016-164136-949afc21` (1006 passed, 1 skipped), foundation run `20261016-164302-949afc21` (461 passed, 1 skipped), slow run `20261016-164502-949afc21` (154 passed); architecture, requirements and include checks 0. F-0100 was not reproduced in that run. Later commits up to `cac616b` change only documents. From now on `tools/verify.py --auto` keeps the last green state (ORCHESTRATOR section 4).
 
 Tree hashes (`git rev-parse <commit>:<path>`): `src` `687433af`, `tests` `a26eb334`, `tools` `7228456c`.
 
