@@ -47,3 +47,25 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Also wrong:** `Show("w.. h..")`, `Show("Center")` and even a `Show()` without options size the window again with the title bar and frame of the DPI that the process had at its start. The size is wrong whenever the DPI at the opening differs from the DPI at the process start, and right again after a DPI change. **Right:** show the window hidden (`Show("Hide Center w.. h..")`), set the outer size with `AdjustWindowRectExForDpi` and `SetWindowPos`, center it again with `Move`, and make it visible with `ShowWindow(hwnd, SW_SHOW)` and `WinActivate`, not with another `Show`.
 - **Status:** verified by the owner (manual check 3 on 2026-10-16: message box, debug dialog and tooltip at 100 % and 225 %, with the process started at either; opening and changing the DPI while the window is open; no flicker seen when opening)
 - **Source:** `src/elements/base/DialogWindow.ahk` (`_Apply`, `_OnDpiChanged`)
+
+### A local variable named like a built-in function silently calls the variable (verified)
+
+- **Problem:** In `_Register(key, full, mode, spec)` the local `hotIf` and the built-in `HotIf()` in the same function: AutoHotkey names are case-insensitive, so `HotIf()` called the local, which was `""` for "Everywhere". The error was `This value of type "String" has no method named "Call"`, far from the cause. The same name in a helper parameter (`_SetCriterion(hotIf)`) hid it again.
+- **Wrong:** Naming a local `hotIf`, `hotkey` (built-in `Hotkey`), `p` next to a global `P()` in a test. The warnings `This local variable has the same name as a global variable` are printed at load time, and the run still goes on.
+- **Right:** Name the local `criterion` (or any name that is not a built-in or a global function, compared without regard to case). Run the script once with `tools/ahkrun.py` and read the warnings of `#Warn All` before running the tests.
+- **Status:** verified (`src/elements/Default/Triggers/Trigger_Hotkey.ahk`, found by `tests/ahk/element_hotkey.test.ahk`; the warnings were printed by `tools/ahkrun.py` on the first run)
+- **Source:** `src/elements/Default/Triggers/Trigger_Hotkey.ahk` (`_Register`, `_SetCriterion`)
+
+### `contains` is a reserved word in AutoHotkey v2 (verified)
+
+- **Problem:** A unit test named a variable `contains`, and the script stopped at load time with `Unexpected reserved word`. The runner then reported every case as "not reported".
+- **Right:** Do not use `contains`, `and`, `or`, `not`, `is`, `in`, `isset` as variable names. Check the message `Unexpected reserved word` first when all cases of a file are missing.
+- **Status:** verified (`tests/ahk/element_window_ident.test.ahk`)
+- **Source:** `tests/ahk/element_window_ident.test.ahk`
+
+### An object literal with a lambda property is called with the object as an extra argument (verified)
+
+- **Problem:** A test double `{Guard: (fn) => fn}` raised `Too many parameters passed to function` when the element called `ctx.Guard(fn)`. The cause is assumed: a function object stored in an object property is called with different arguments than a method of a class.
+- **Right:** Build a small class with methods (`class FakeCtx { Guard(fn) => fn }`) for test doubles of a context.
+- **Status:** verified that the class double works (`tests/ahk/element_hotkey.test.ahk`, `FakeCtx`); the cause is assumed
+- **Source:** `tests/ahk/element_hotkey.test.ahk`
