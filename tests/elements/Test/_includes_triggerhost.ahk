@@ -8,6 +8,16 @@
 
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Test {
+    #Include Triggers\Trigger_TestCallbackThrows.ahk
+    #Include Triggers\Trigger_TestDisableThrows.ahk
+    #Include Triggers\Trigger_TestFail.ahk
+    #Include Triggers\Trigger_TestFireOnEnable.ahk
+    #Include Triggers\Trigger_TestTimer.ahk
 }
 
 ElementRegistry.RegisterPackage("Test", "1.0.0")
+ElementRegistry.Register(Test.Trigger_TestCallbackThrows)
+ElementRegistry.Register(Test.Trigger_TestDisableThrows)
+ElementRegistry.Register(Test.Trigger_TestFail)
+ElementRegistry.Register(Test.Trigger_TestFireOnEnable)
+ElementRegistry.Register(Test.Trigger_TestTimer)
