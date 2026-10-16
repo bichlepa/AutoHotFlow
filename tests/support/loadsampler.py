@@ -1,6 +1,6 @@
 """Load measurement of a test run (WI-0059 part B): a thread in the pytest controller samples once per second the
 system CPU, the CPU of the own process tree (controller, xdist workers and everything the tests started) and the
-number of registered runs. External load = system minus own tree, clamped at 0. All values are percent of the whole
+number of registered runs (refreshed every 5 s). External load = system minus own tree, clamped at 0. All values are percent of the whole
 machine (100 = every logical core busy).
 
 Own tree on Windows: the controller puts itself into a job object of its own at the start; every process started
@@ -19,6 +19,7 @@ import time
 import psutil
 
 INTERVAL_S = 1.0
+RUNS_EVERY_S = 5.0              # the registry scan costs a few ms; the number of runs changes rarely
 
 
 class Sample:
@@ -112,6 +113,9 @@ class LoadSampler:
         self.count_runs = count_runs or (lambda: 0)
         self.samples = []
         self.cost_s = 0.0               # wall time spent in sampling (for the overhead budget)
+        self.cpu_s = 0.0                # CPU time of the sampling thread spent in sampling
+        self._runs = 0
+        self._runs_at = None
         self.method = None
         self._stop = threading.Event()
         self._thread = None
@@ -155,7 +159,7 @@ class LoadSampler:
         return time.time(), busy, total, own, nprocs
 
     def sample(self):
-        t0 = time.perf_counter()
+        t0, c0 = time.perf_counter(), time.thread_time()
         now, busy, total, own_cpu, nprocs = self._read()
         p_now, p_busy, p_total, p_own, _ = self._prev
         self._prev = (now, busy, total, own_cpu, nprocs)
@@ -165,12 +169,15 @@ class LoadSampler:
         sys_cpu = min(100.0, max(0.0, 100.0 * (busy - p_busy) / d_total))
         # cpu_times are summed over the cores, so d_total is wall time x cores
         own = min(100.0, max(0.0, 100.0 * (own_cpu - p_own) / d_total))
-        try:
-            runs = int(self.count_runs())
-        except Exception:
-            runs = 0
-        self.samples.append(Sample(now, sys_cpu, own, runs, nprocs))
+        if self._runs_at is None or now - self._runs_at >= RUNS_EVERY_S:
+            try:
+                self._runs = int(self.count_runs())
+            except Exception:
+                self._runs = 0
+            self._runs_at = now
+        self.samples.append(Sample(now, sys_cpu, own, self._runs, nprocs))
         self.cost_s += time.perf_counter() - t0
+        self.cpu_s += time.thread_time() - c0
 
 
 def window_stats(samples, start, stop):

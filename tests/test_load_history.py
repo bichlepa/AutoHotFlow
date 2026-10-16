@@ -40,7 +40,9 @@ def test_run_stats_cover_the_whole_run():
 
 def test_the_sampler_measures_and_stops():
     sampler = loadsampler.LoadSampler(interval=0.1).start()
-    time.sleep(0.45)
+    deadline = time.time() + 10                       # a loaded machine delays the thread: wait for the state
+    while len(sampler.samples) < 3 and time.time() < deadline:
+        time.sleep(0.05)
     sampler.stop()
     assert len(sampler.samples) >= 3
     assert all(0.0 <= s.sys <= 100.0 and 0.0 <= s.ext <= 100.0 for s in sampler.samples)
@@ -160,6 +162,9 @@ def test_external_load_shows_in_the_figures_of_the_test(tmp_path):
     quiet, external, own = (by_name["test_probe_load_" + n] for n in ("quiet", "external", "own"))
     figures = {n: (t["sysMean"], t["extMean"]) for n, t in (("quiet", quiet), ("external", external), ("own", own))}
     print("load figures (sysMean, extMean):", figures)
+    if quiet["sysMean"] > 85:
+        pytest.skip("the machine was saturated by others during the reference test (%s): the relation cannot be "
+                    "measured now" % figures)
     assert external["extMean"] > quiet["extMean"] + 10, figures
     assert external["extMean"] > own["extMean"] + 10, figures
     assert own["sysMean"] > own["extMean"] + 10, figures         # the burners of the own tree count as own

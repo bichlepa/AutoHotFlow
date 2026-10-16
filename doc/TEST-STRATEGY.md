@@ -157,7 +157,7 @@ hand.
   a lock file left behind expires after 30 s. A pytest started by a test of a running pytest belongs to that test:
   no admission, no history record.
 - **Load figures** (`tests/support/loadsampler.py`). A thread in the controller samples once per second the system
-  CPU, the CPU of the own process tree and the number of registered runs. External load = system minus own tree,
+  CPU, the CPU of the own process tree and (every 5 s) the number of registered runs. External load = system minus own tree,
   clamped at 0; all figures are percent of the whole machine. The own tree is measured through a job object that
   the controller puts itself into: its accounting also holds processes that have already ended, so short test
   processes count as own (fallback without a job: a psutil walk, which misses processes shorter than one sample).

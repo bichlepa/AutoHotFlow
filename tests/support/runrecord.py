@@ -262,6 +262,7 @@ class RunRecorder:
         load = loadsampler.run_stats(samples)
         if load is not None:
             load["samplerCostS"] = round(self.sampler.cost_s, 3)
+            load["samplerCpuS"] = round(self.sampler.cpu_s, 3)
             load["ownMethod"] = self.sampler.method          # job (exact) or tree (psutil walk, see loadsampler)
             load["series"] = [[round(s.t - self.start, 1), round(s.sys, 1), round(s.ext, 1), s.runs, s.procs]
                               for s in samples]
