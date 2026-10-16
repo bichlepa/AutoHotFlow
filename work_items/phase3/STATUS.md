@@ -36,7 +36,7 @@ Step S0002 (element foundation and core set), state as of `cac616b`.
 | WI-0055 | Core set D: flow control | done, verified | opus | e4b368d–949afc2 | 2026-10-16 | Fix of F-0100 class open; see NEEDS-ATTENTION |
 | WI-0056 | Core dialogs (dialogs and worker) | done, verified | haiku (review sonnet) | c5db6ab–6a8ad1a | 2026-10-16 | Review approved with fixes; tooltip and A_UserAction decisions open for the owner |
 | WI-0057 | Test corpus | done, verified | haiku (review sonnet) | 7fa6b92–a5d5d89 | 2026-10-16 | 21 corpus tests, 3 v1 flows green (variable test as copy, M-0069); 13 flows pending S0003/S0008 |
-| WI-0058 | Acceptance S0002 | partly done | haiku | see git log | 2026-10-16 | All six criteria met (runs 20261016-184147-073b6738, 20261016-184636-073b6738, 20261016-184426-073b6738, 20261016-184341-356, 20261016-185151-073b6738); open: documents of task 3 besides ELEMENT-API-V2 section 8, retrospective; F-0107, F-0108 for the owner |
+| WI-0058 | Acceptance S0002 | partly done (retrospective and document review open; owner decisions F-0107, F-0108) | haiku | see git log | 2026-10-16 | All six criteria met (runs 20261016-184147-073b6738, 20261016-184636-073b6738, 20261016-184426-073b6738, 20261016-184341-356, 20261016-185151-073b6738); open: documents of task 3 besides ELEMENT-API-V2 section 8, retrospective; F-0107, F-0108 for the owner |
 
 Step S0008 (remaining elements) is planned, not started.
 
@@ -51,6 +51,8 @@ None.
 None. The manual-check start path (section 3 of MANUAL-CHECKS) is integrated; the owner runs it.
 
 ## Last verified state
+
+Commit `c9cd4d3` (WI-0058 acceptance, result and renumbered findings) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-185723-c9cd4d36` (1123 passed, 1 skipped).
 
 Commit `f741f4d` (F-0097, loop stack shares the outer snapshot) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-184825-f741f4db` (1123 passed, 1 skipped). Timing of the flow from F-0097 not remeasured.
 
