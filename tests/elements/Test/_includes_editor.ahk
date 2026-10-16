@@ -13,6 +13,7 @@
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Test {
     #Include Actions\Action_TestAskAfterStopWorker.ahk
+    #Include Actions\Action_TestBlockInline.ahk
     #Include Actions\Action_TestBlockWorker.ahk
     #Include Actions\Action_TestDialogWorker.ahk
     #Include Actions\Action_TestEchoWorker.ahk
@@ -39,6 +40,7 @@ class Test {
 
 ElementRegistry.RegisterPackage("Test", "1.0.0")
 ElementRegistry.Register(Test.Action_TestAskAfterStopWorker)
+ElementRegistry.Register(Test.Action_TestBlockInline)
 ElementRegistry.Register(Test.Action_TestBlockWorker)
 ElementRegistry.Register(Test.Action_TestDialogWorker)
 ElementRegistry.Register(Test.Action_TestEchoWorker)

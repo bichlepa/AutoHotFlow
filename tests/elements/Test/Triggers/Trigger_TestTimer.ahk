@@ -13,7 +13,10 @@ class Trigger_TestTimer extends AhfElement {
     ; The interval is a declared parameter, so a flow can set it (WI-0062 tests of the arming). Empty: 100 ms.
     static Parameters(ctx) => [{id: "Interval", content: "integer"}]
     ; The counter of the event is the thread variable A_TestCount (as a v1 trigger sets its A_ variables).
-    static TriggerVariables(params, data) => Map("A_TestCount", (IsObject(data) && data.Has("count")) ? data["count"] : 0)
+    ; A_TestTick is the A_TickCount of the trigger host at the fire (WI-0067, REQ-TRG-010): the host-side time of the
+    ; event, on the clock that the engine also reads.
+    static TriggerVariables(params, data) => Map("A_TestCount", (IsObject(data) && data.Has("count")) ? data["count"] : 0,
+        "A_TestTick", (IsObject(data) && data.Has("tick")) ? data["tick"] : 0)
 
     static Enable(ctx, params) {
         interval := params.HasProp("Interval") && params.Interval != "" ? Integer(params.Interval) : 100
@@ -30,7 +33,7 @@ class Trigger_TestTimer extends AhfElement {
 
     static _Tick(ctx, interval) {
         ctx.State.count += 1
-        ctx.Fire(Map("count", ctx.State.count))
+        ctx.Fire(Map("count", ctx.State.count, "tick", A_TickCount))
         this._Schedule(ctx, interval)
     }
 }
