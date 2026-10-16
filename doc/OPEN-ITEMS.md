@@ -46,6 +46,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0097 | A loop inside a list loop (or a parse loop) costs time proportional to the size of the outer list per entry: entering a loop copies the hidden snapshot of the outer loop (`LoopStack.Push`), leaving it restores a copy | verified (measured in WI-0054: 500, 1000 and 2000 members: 3.5, 5.5 and 9.9 ms per outer pass, a pass without the inner loop costs about 0.5 ms), open | |
 | F-0098 | A fast loop floods the subscribers of the flow topic: every element start and end is an `evt.element.state` event, so 100,000 passes of an empty loop send 200,000 events (and a loop with a body, three or more per pass) | verified for the number of events (WI-0054, MS-0034); what an editor does with them: not checked (no editor yet), open | |
 | F-9190* | `Action_Execute_Flow` needs an enabled trigger, but every flow is disabled after the start of the engine (the enabled state is not loaded or kept) | verified (read in `FlowRecord`, tested in WI-0055), open, decision with S0003 | yes |
+| F-9191* | Slow tier: the random run of the expression oracle stopped at the F-0075 class through a subtraction (`!(ftiny - fz . (f3 < ineg))`): the guard of the generator misses `ftiny` inside an operand of the concatenation | verified (seed 411675 reproduces it), open, test generator only | |
 
 ## Findings
 
@@ -270,6 +271,13 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** verified by reading `src/engine/FlowRecord.ahk` and by the tests of WI-0055, which enable the flows after the start (`flows.enable`). Not checked: whether the "Automatic tests" flows of v1 enable themselves with `Set_Flow_Status` before they call (WI-0057).
 **Action:** decide with S0003 (the enabled state per trigger, loaded from the file and kept), and for WI-0057 whether the test corpus enables its flows. Alternative: a call of "This flow" does not need the enabled state (the flow runs already); not taken, because the help text makes no exception.
 **Evidence:** WI-0055, `tests/integration/test_core_d_flows.py::test_disabled_and_missing_flows`.
+
+### F-9191*: the random oracle run finds F-0075 again through a subtraction
+
+**What:** `tests/oracle/test_expr_oracle.py::test_a_random_run_shows_no_deviation_without_an_entry` failed in the slow tier of WI-0055 (run 20261016-163117-ebcaeac2, commit `ebcaeac`) with the case `c634: !(ftiny - fz . (f3 < ineg))`: native `0`, evaluator `1`. `ftiny - fz` is the Float `1e-300`; the concatenation makes a text out of the range of Float, the class of F-0075. The guard of F-0075 ("the generator does not use `1e-300` as an operand of the concatenation") looks at the direct operand only, not at an operand that is an expression with `ftiny` in it.
+**Status:** verified: `python tools/expr_oracle.py --seed 411675 --count 20000` gives this one OPEN case on `ebcaeac` (WI-0055 does not touch `src/expr/` or the oracle). The random test therefore fails for some seeds.
+**Action:** extend the guard of the generator to any operand of `.` (and of the boolean operators) that contains `ftiny` or `fhuge`, or mark the class with the entry of F-0075. Owner of the oracle decides.
+**Evidence:** run 20261016-163117-ebcaeac2 (`%TEMP%\ahf_runs\20261016-163117-ebcaeac2\output.txt`).
 
 ## Watch list (E0007)
 
