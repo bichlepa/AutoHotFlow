@@ -4,9 +4,9 @@ The repository stores text files with LF (`.gitattributes`: `* text=auto eol=lf`
 file is an error: it shows as a changed line in every diff, and an AHK or Python file with mixed endings is a sign of
 a broken edit. Files marked `-text` (test data, language files of v1) are compared byte for byte and are exempt.
 
-Checked: the index (what is committed) for all text files, and the working tree for all text files except `v1/`.
-`v1/` is the frozen reference (AGENTS.md rule 4): its files keep the CRLF they have on disk, but the index must still
-be LF there.
+Checked: the index (what is committed) for all text files. The working tree is not checked: `.gitattributes` makes git
+convert CRLF to LF when a file is staged, so CRLF on disk never reaches the repository, and a test must not fail on the
+uncommitted edits of another agent or editor. `v1/` keeps the CRLF it has on disk (AGENTS.md rule 4); its index must be LF.
 
 The check uses `git ls-files --eol`. It is skipped when git is not available.
 """
@@ -18,10 +18,6 @@ from pathlib import Path
 import pytest
 
 REPO = Path(__file__).resolve().parents[1]
-
-# top-level folder whose working tree is not checked (the index still is)
-WORKTREE_EXEMPT_FOLDER = "v1"
-
 
 def _eol_records():
     """Yields (index_eol, worktree_eol, attr, path) for every tracked file."""
@@ -37,31 +33,14 @@ def _eol_records():
         yield index[2:], worktree[2:], attr.strip()[len("attr/"):], path
 
 
-def _cr_lines(path, limit=5):
-    """Line numbers (1-based) with a carriage return, at most `limit`."""
-    found = []
-    with open(REPO / path, "rb") as f:
-        for number, line in enumerate(f, 1):
-            if b"\r" in line:
-                found.append(number)
-                if len(found) >= limit:
-                    break
-    return found
-
-
-def test_text_files_are_lf_in_the_index_and_in_the_working_tree():
+def test_text_files_are_lf_in_the_index():
     problems = []
     for index, worktree, attr, path in _eol_records():
         if attr == "-text":
             continue  # byte for byte by design (see .gitattributes)
         if index in ("crlf", "mixed"):
             problems.append(f"{path}: index is {index} (committed with CR)")
-        if path.split("/", 1)[0] == WORKTREE_EXEMPT_FOLDER:
-            continue
-        if worktree in ("crlf", "mixed"):
-            lines = ", lines " + ", ".join(map(str, _cr_lines(path)))
-            problems.append(f"{path}: working tree is {worktree}{lines}")
-    assert not problems, "CRLF or mixed line endings in text files (expected LF):\n" + "\n".join(problems)
+    assert not problems, "CRLF or mixed line endings in the index (expected LF):\n" + "\n".join(problems)
 
 
 def test_gitattributes_forces_lf_checkout():
