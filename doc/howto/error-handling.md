@@ -40,3 +40,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `FileAppend(text, "**", "UTF-8-RAW")` writes to stderr and creates no file. This is the exception that the convention in `doc/CONVENTIONS.md` section 3 allows for stderr.
 - **Status:** verified (`test_unknown_role_exits_2_with_message_and_no_dialog`)
 - **Source:** `src/core/Role.ahk` (`Role.Console`)
+
+### A timer chain that throws must schedule its next round first
+
+- **Problem:** A repeating trigger is a chain of one-shot timers: each callback schedules the next one. If the callback throws before it schedules the next round, the chain ends, and the trigger looks armed but never fires again.
+- **Right:** Schedule the next round first, then do the work that may throw. The trigger host runs the callback under try/catch and reports the error (`evt.trigger.error`), and the chain goes on.
+- **Status:** verified for the order that works (`test_a_throwing_callback_is_reported_and_the_trigger_stays_armed`: the rounds 1 and 2 are reported); the chain that ends without the reschedule is assumed, not tested
+- **Source:** `tests/elements/Test/Triggers/Trigger_TestCallbackThrows.ahk`, `src/triggerhost/TriggerContext.ahk`

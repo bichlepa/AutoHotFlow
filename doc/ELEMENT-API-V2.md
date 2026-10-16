@@ -119,7 +119,7 @@ class Action_Example extends AhfElement {
 | `ctx.Fire(data := "")` | `x_trigger` | triggers only. Sends `evt.trigger.fired` |
 | `ctx.Log(level, text)` | `x_log` | levels `f0` to `f3` |
 | `ctx.GetImport(name, default := "")`, `ctx.Export(name, value)` | `p_VarsToImport`, `p_VarsToExport` of `x_ExecuteInNewAHKThread` | worker only: an explicit import list (empty from the engine since WI-0050, for `ctx.RunScript`, S0008) and values that the engine sets where their name says when the job ends (texts and numbers) |
-| `ctx.Request(type, payload, callback, timeoutMs := 5000)` | – (new) | A `cmd.*` request to the engine with callback, `execId` added to the payload (WI-0050). Returns at once; `callback(answerPayload)` runs later on a thread of its own (it may call the variable functions), not at all when the element has ended or was stopped. An exception in the callback ends the element with `exception`. Workers only (triggers: S0003); inline it throws. |
+| `ctx.Request(type, payload, callback, timeoutMs := 5000)` | – (new) | A `cmd.*` request to the engine with callback, `execId` added to the payload (WI-0050). Returns at once; `callback(answerPayload)` runs later on a thread of its own (it may call the variable functions), not at all when the element has ended or was stopped. An exception in the callback ends the element with `exception`. Workers only (triggers: when a trigger needs it); inline it throws. |
 | `ctx.RunScript(code, imports, exports)` | `x_ExecuteInNewAHKThread` | for AHK code elements. Always runs as a worker. |
 | `Lang(key, args*)` | `x_lang` | global function, language files unchanged |
 | `form.Disable(id, cond)`, `form.Enable(id, cond)` | `x_Par_Disable`/`x_Par_Enable` | only in `CheckSettings` |
@@ -182,6 +182,31 @@ A test entry registers a provider (`Dialogs.UseProvider`) that answers from a sc
 Static and global variables change the permanent store through the variable model (REQ-VAR-050). The element runs in a worker, so every call is a request to the engine (section 3.2).
 
 **Mode of `Action_Tooltip` (WI-0056, task 3): `worker`.** The tooltip is UI and the engine shows none (ARCHITECTURE 1). The element finishes at once, as v1 did; the removal timer runs in the worker process, so the element does not hold a pool slot for the duration. Limit and deviation: MIGRATION M-0065.
+
+### 3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+
+`Enable(ctx, params)` and `Disable(ctx)` of a trigger get their own context, one per arming, from the trigger host (`src/triggerhost/TriggerContext.ahk`). Besides the members of the table above that a trigger can use, it has:
+
+| Member | Meaning |
+|---|---|
+| `ctx.triggerKey`, `ctx.flowId`, `ctx.elementId` | the trigger (`triggerKey` = `<flowId>/<elementId>`) |
+| `ctx.gen` | the generation of this arming; the engine drops events of an older generation |
+| `ctx.context` | the start context of the arming: `""`, or `ahfStartup` for the first arming after the start of AutoHotFlow (WI-0062) |
+| `ctx.State` | an object per armed trigger, kept until the disarm |
+| `ctx.Fire(data := "")` | sends `evt.trigger.fired`. `data`: a Map of texts and numbers. Anything else is refused (an `f0` entry) and the event goes without data. Nothing is sent after the disarm. May be called in `Enable` |
+| `ctx.Log(level, text)` | a log line of the trigger |
+| `ctx.After(ms, fn)` | one-shot timer, cancelled at the disarm. Returns 0 when the trigger is not armed. A repeating trigger calls `After` again in its callback |
+| `ctx.Guard(fn)` | a function object that calls `fn` with the arguments it gets, under try/catch. For callbacks that the OS calls (hotkeys) |
+| `ctx.IsOpen` | false once the trigger is disarmed |
+
+Errors (ARCHITECTURE 6.2, REQ-TRG-010):
+
+- `Enable` throws: the arming is answered `ok: false` with the message, and the trigger is not armed. The host then calls `Disable` once, so that the element can release a handle it got before the error.
+- `Disable` throws: logged (`f0`); the trigger is dropped anyway.
+- A callback (`After`, `Guard`) throws: `evt.trigger.error {triggerKey, gen, message}` and an `f0` entry; the trigger stays armed. A repeating callback schedules its next round before it throws, otherwise its timer chain ends.
+- The message of an error is the text of an `ElementError` as it is; any other error reads `<type>: <message>`.
+
+---
 
 ## 4. Example 1: `Action_Sleep` (inline, with timer)
 

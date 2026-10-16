@@ -272,6 +272,10 @@ The expression language follows AHK v2 (E0022), so AHK v2 itself is the yardstic
 
 `tests/ahk/element_smoke.test.ahk` (L0001, fast tier) walks over `ElementRegistry` of the product (the engine block `src/entry/generated/Elements_engine.ahk`) and checks every class with `tests/ahk/lib/ElementSmoke.ahk`, without test code of the element: metadata (`Mode`, `Level`, `Stability`, `Name()`, `Category()`, `Icon`, `JobTimeoutMs`), `Parameters("")` without the editor (unique ids, known `type` and `content`, `enum`/`choices`, `contentID`), `V1Syntax`, `GenerateName("", defaults)`, the language keys (no `f3` entry), the methods of the mode, and the parameters that v1 evaluates itself (`x_EvaluateExpression`/`x_EvaluateScript` in the v1 file; as long as `v1/` exists). A failure reads `Package.Class [rule] text`. What the test cannot assign to a parameter with certainty is reported as a skip, "check by hand". The same file checks deliberately broken classes (test of the test). A new element is covered as soon as its block registers it; a rule that an element must not break is added to `ElementSmoke`.
 
+## 8b. Test triggers (WI-0061)
+
+The test package `Test` has trigger classes in `tests/elements/Test/Triggers/`, used by `tests/integration/test_triggerhost.py`: `Trigger_TestTimer` (fires every `Interval` ms with a counter), `Trigger_TestFail` (`Enable` throws), `Trigger_TestDisableThrows` (`Disable` throws, its event is due after 300 ms), `Trigger_TestCallbackThrows` (its timer callback throws every 100 ms and keeps its chain), `Trigger_TestFireOnEnable` (fires in `Enable` with the start context `ahfStartup`). The upper bound of an event count is the time divided by the interval, never scaled: a timer cannot fire faster than its interval.
+
 ## 9a. Dialog tests (E0038, WI-0051)
 
 Dialog elements run headless: the elements call `Dialogs.*` (`doc/ELEMENT-API-V2.md` section 3.3), the test entries (`tests/integration/helpers/AutoHotFlowTest.ahk`, `helpers/entry/engine.ahk`, `helpers/entry/worker.ahk`) register `TestDialogProvider`, which answers from a script. No window opens, so these tests belong to the fast or slow tier, not to `gui`.

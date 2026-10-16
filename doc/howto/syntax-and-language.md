@@ -321,3 +321,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Every element file includes what it uses, or calls a helper of its own package's `lib/` (here `DialogOps.Truthy`, which needs no include of the expression files). The generated-block tests (`tests/test_element_includes.py`) catch it.
 - **Status:** verified (WI-0056: `tests/test_element_includes.py` failed for the editor and worker blocks, passed after the change)
 - **Source:** `src/elements/Default/Actions/Action_Message_Box.ahk`
+
+### A lambda in a static method of a class: `this` is the class
+
+- **Problem:** The test triggers schedule their next callback from a static method (`static _Schedule(ctx)`) with `ctx.After(ms, () => this._Tick(ctx))`. It is not obvious that the lambda can use `this` of the static method, and that the class has no global name inside its own package.
+- **Right:** Inside the class body, refer to the class as `this`, also in a lambda of a static method; the lambda keeps it. The class name itself is no global name there (the element files say so, `doc/ELEMENT-API-V2.md` section 2).
+- **Status:** verified (`tests/elements/Test/Triggers/Trigger_TestTimer.ahk` and `Trigger_TestCallbackThrows.ahk`; `tests/integration/test_triggerhost.py` runs the chains)
+- **Source:** `tests/elements/Test/Triggers/Trigger_TestTimer.ahk`
