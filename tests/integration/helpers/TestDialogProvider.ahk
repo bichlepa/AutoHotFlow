@@ -67,8 +67,76 @@ class TestDialogProvider {
         return this._Dialog("DirSelect", Map("root", root, "options", options, "prompt", prompt), "")
     }
 
-    ; Takes the next answer entry, logs the request, waits as the entry says and returns the answer.
-    _Dialog(kind, args, options) {
+    ; The window of Dialogs.Window (WI-0056): the answer is the id of a button, "close" or "timeout". A dialog that nobody
+    ; answers returns "timeout" after the timeoutMs of its spec (as the real window), otherwise it waits for ever.
+    Window(spec) {
+        timeoutMs := spec.Get("timeoutMs", 0)
+        args := Map("title", spec.Get("title", ""), "text", spec.Get("text", ""), "buttons", spec.Get("buttons", []),
+            "timeoutMs", timeoutMs, "defaultId", spec.Get("defaultId", ""))
+        return this._Dialog("Window", args, "", timeoutMs)
+    }
+
+    ; The debug window (REQ-DBG-060, WI-0056). The answer entry may have "actions", applied to the view before the answer
+    ; ("yes", "no" or "close"; none = "close"): {"op": "set", "name", "value", "object", "convert"} (Write; the result is
+    ; the error text), {"op": "delete", "name"}, {"op": "read", "name"} and {"op": "rows"}. The log row keeps what the
+    ; window showed at the start (rows: name and scope), readOnly, and the result of every action (results).
+    DebugWindow(view) {
+        index := this._Count()
+        entries := this._Entries()
+        if (index >= entries.Length) {
+            this._Log("Debug", Map(), false, "no answer scripted")
+            throw AhfError("test dialog: no answer scripted for dialog " (index + 1) " (Debug)", ErrCode.NOT_FOUND)
+        }
+        entry := entries[index + 1]
+        if (entry.Has("kind") && entry["kind"] != "Debug") {
+            this._Log("Debug", Map(), true, "wrong kind, entry is for " entry["kind"])
+            throw AhfError("test dialog: dialog " (index + 1) " is a Debug, the script has " entry["kind"], ErrCode.BAD_PAYLOAD)
+        }
+        rows := []
+        for row in view.Rows() {
+            if (row["name"] != "")
+                rows.Push(Map("name", row["name"], "scope", row["scope"]))
+        }
+        args := Map("rows", rows, "readOnly", view.ReadOnly ? 1 : 0, "results", this._RunActions(entry.Get("actions", []), view))
+        this._Log("Debug", args, true, "")
+        return entry.Has("answer") ? entry["answer"] : "close"
+    }
+
+    _RunActions(actions, view) {
+        results := []
+        for action in actions {
+            name := action.Get("name", "")
+            switch action["op"], "Off" {
+                case "set":
+                    err := view.Write(name, action.Get("value", ""), TestDialogProvider._Flag(action.Get("object", 0)),
+                        TestDialogProvider._Flag(action.Get("convert", 0)))
+                    results.Push(Map("op", "set", "name", name, "error", err))
+                case "delete":
+                    results.Push(Map("op", "delete", "name", name, "existed", view.Delete(name)))
+                case "read":
+                    results.Push(Map("op", "read", "name", name, "type", view.Type(name), "text", view.Text(name, 0)))
+                case "rows":
+                    names := []
+                    for row in view.Rows() {
+                        if (row["name"] != "")
+                            names.Push(row["name"])
+                    }
+                    results.Push(Map("op", "rows", "names", names))
+                default:
+                    throw AhfError("test dialog: unknown debug action '" action["op"] "'", ErrCode.BAD_PAYLOAD)
+            }
+        }
+        return results
+    }
+
+    ; A JSON true or false of an action (parsed as Json.True / Json.False) as 1 or 0.
+    static _Flag(value) {
+        return (value == Json.True || value == 1) ? 1 : 0
+    }
+
+    ; Takes the next answer entry, logs the request, waits as the entry says and returns the answer. timeoutMs: the
+    ; timeout of a window (Window) that nobody answers; 0 for the other dialogs.
+    _Dialog(kind, args, options, timeoutMs := 0) {
         index := this._Count()
         entries := this._Entries()
         if (index >= entries.Length) {
@@ -85,6 +153,10 @@ class TestDialogProvider {
         if (delay > 0)
             Sleep(delay)
         if (entry.Get("noAnswer", 0)) {
+            if (timeoutMs > 0) {
+                Sleep(timeoutMs)
+                return "timeout"
+            }
             if (RegExMatch(options, "i)(?:^|\s)T(\d+(?:\.\d+)?)", &m)) {
                 Sleep(Integer(Float(m[1]) * 1000))
                 return kind = "InputBox" ? Map("result", "Timeout", "value", "") : "Timeout"

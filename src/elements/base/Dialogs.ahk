@@ -1,4 +1,5 @@
 #Requires AutoHotkey v2.0
+#Include DialogWindow.ahk     ; the real windows of Window and DebugWindow (WI-0056)
 
 ; The indirection for the dialogs of elements (E0038, WI-0051). An element never calls MsgBox, InputBox, ToolTip, FileSelect
 ; or DirSelect itself, it calls Dialogs.<name> with the arguments and the return value of the AutoHotkey function of the
@@ -45,6 +46,20 @@ class Dialogs {
         return Dialogs._Provider().DirSelect(root, options, prompt)
     }
 
+    ; A window with a text and buttons (WI-0056: Message_Box, Confirmation_Dialog). spec is a Map: title, text, buttons
+    ; (an Array of Maps id and label, in the order shown), width, height, timeoutMs (0 = none), defaultId ("" = none).
+    ; Returns the id of the button that was pressed, "close" (close button or Escape) or "timeout".
+    static Window(spec) {
+        return Dialogs._Provider().Window(spec)
+    }
+
+    ; The debug window (REQ-DBG-060, WI-0056). view is the object of the element (lib/DebugOps.ahk of the package Default):
+    ; Rows(), Text(name, convert), Type(name), Write(name, text, asObject, convert), Delete(name) and ReadOnly.
+    ; Returns "yes", "no" or "close".
+    static DebugWindow(view) {
+        return Dialogs._Provider().DebugWindow(view)
+    }
+
     static _Provider() {
         if (IsObject(Dialogs.provider))
             return Dialogs.provider
@@ -74,6 +89,14 @@ class Dialogs {
 
         DirSelect(root, options, prompt) {
             return DirSelect(root, options, prompt)
+        }
+
+        Window(spec) {
+            return DialogWindow.Message(spec)
+        }
+
+        DebugWindow(view) {
+            return DialogWindow.Debug(view)
         }
     }
 }
