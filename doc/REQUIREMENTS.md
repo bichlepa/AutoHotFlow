@@ -1204,27 +1204,29 @@ Started by the user, by another flow (REQ-EXE-120) or through the command line (
 ### REQ-TRG-210 Time triggers
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the periodic timer; the time of day is missing)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003, S0008
+- **Plan:** S0003 (WI-0063 done), S0008
+- **Evidence:** `tests/integration/test_time_triggers.py` (WI-0063: the periodic timer fires about every interval, never faster, stops on disable, and refuses a bad interval or unit with the v1 text)
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
-| `Trigger_Periodic_Timer` | yes | open | S0003 |
+| `Trigger_Periodic_Timer` | yes | done (WI-0063) | S0003 (WI-0063 done) |
 | `Trigger_Time_of_Day` (with week days) | yes | open | S0008 |
 
 ### REQ-TRG-220 Start-up and system triggers
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the start-up trigger of AutoHotFlow and of Windows; the system triggers are later)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003
+- **Plan:** S0003 (WI-0063 done), later
+- **Evidence:** `tests/integration/test_time_triggers.py` (WI-0063: Trigger_Start_up fires once per start of AutoHotFlow, the Windows type only with --windows-startup, not when enabled later, and not after a restart of the trigger host)
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
-| `Trigger_Start_up` | yes | open | S0003 |
+| `Trigger_Start_up` | yes | done (WI-0063) | S0003 (WI-0063 done) |
 | Windows resumes from standby or hibernation | no | open | later |
 | Windows shuts down or the user logs off (the flow runs before) | no | open | later |
 | A USB device or a drive is connected or removed | no | open | later |
