@@ -46,9 +46,9 @@ Step S0003 (trigger host and triggers), detailed on 2026-10-16 (E0056 to E0062).
 | WI-0061 | Role `triggerhost` | done, verified (slow: F-0101 once more, green alone) | haiku (review sonnet) | 8bfb58b–36480c0 | 2026-10-16 | reviewer approved; supervisor restarts it (owner decision pending) |
 | WI-0062 | Engine: arming, fired events, TriggerVariables | done, verified | haiku (review sonnet) | 41d8bdb–e6aed49 | 2026-10-16 | reviewer approved; M-0069 done |
 | WI-0063 | Periodic timer and start-up triggers | done, verified | haiku (review sonnet) | 436aeb4–1f8e62c | 2026-10-16 | reviewer approved; M-0071; provisional F-9000* is F-0111 |
-| WI-0064 | Hotkey trigger with window conditions | open | | | | spike first (E0059) |
-| WI-0065 | Set_Flow_Status, Condition_Flow_Enabled | open | | | | |
-| WI-0066 | Guard against runaway flows | open | | | | sets the defaults from its measurement (E0062) |
+| WI-0064 | Hotkey trigger with window conditions | running (spike first, E0059) | haiku | | | |
+| WI-0065 | Set_Flow_Status, Condition_Flow_Enabled | done, verified | haiku (review sonnet) | 63fb03b–1bcbb127 | 2026-10-16 | reviewer approved; M-0072 to M-0074 (M-0072 confirmed by the owner) |
+| WI-0066 | Guard against runaway flows | implemented, integration pending (rebase) | haiku | | | default limit is the owner's decision (NEEDS-ATTENTION) |
 | WI-0067 | Acceptance S0003 | open | | | | |
 | WI-0068 | Enabled state per flow file (E0063, answer to the FlowState read error) | done, verified (stress test 200 flows green) | haiku (review sonnet) | a313d3b–8d2eb98 | 2026-10-16 | reviewer approved after a fix (late read arms the merged triggers); F-0109 closed |
 
@@ -65,6 +65,8 @@ None.
 None. The manual-check start path (section 3 of MANUAL-CHECKS) is integrated; the owner runs it.
 
 ## Last verified state
+
+Commit `1bcbb127` (WI-0065 integrated) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-234518-1bcbb127-2` (1187 passed, 1 skipped), foundation run `20261016-234518-1bcbb127-3` (466 passed, 1 skipped), slow run `20261016-234518-1bcbb127` (197 passed).
 
 Commit `8d2eb98` (WI-0068 integrated, last code change `8d2eb98`) verified by `tools/verify.py --auto`: fast red (one test, alone green: `test_worker_reports_busy_when_a_job_begins_and_ends`, recheck `20261016-232414`), foundation green (`20261016-231808-8d2eb981-3`, 466 passed), slow green (`20261016-231808-8d2eb981-2`, 197 passed). Stress test `tests/stress/test_big_flows.py` green on `8d2eb98` (run `20261016-232423-8d2eb981`, 2 passed).
 
