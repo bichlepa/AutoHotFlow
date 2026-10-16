@@ -99,6 +99,15 @@ def test_run_outcome_reads_the_folder_named_in_the_output_line(tmp_path):
     assert verify.is_green(outcome)
 
 
+def test_run_outcome_takes_the_last_output_line(tmp_path):
+    # the output of a failing test may echo a "[run_suite] output:" line of another run before the real one
+    folder = fake_folder(tmp_path, "real-1", "1 passed in 1.0s", ["ok"])
+    lines = ["[run_suite] output: %s" % (tmp_path / "other-9" / "output.txt"),
+             "[run_suite] output: %s" % (folder / "output.txt")]
+    text = chr(10).join(lines) + chr(10)
+    assert verify.run_outcome("fast", 0, text)["run"] == "real-1"
+
+
 def test_run_outcome_without_a_result_folder_is_not_run():
     outcome = verify.run_outcome("slow", verify.EXIT_ADMISSION, "[run_suite] admission: timeout")
     assert outcome["run"] is None and outcome["note"].startswith("not run")

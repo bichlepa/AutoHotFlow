@@ -115,7 +115,7 @@ def tree_hashes(repo, sha):
 
 
 def changed_paths(repo, base, sha):
-    out = git(repo, "diff", "--name-only", "%s..%s" % (base, sha))
+    out = git(repo, "diff", "--name-only", "--no-renames", "%s..%s" % (base, sha))
     return [line for line in out.splitlines() if line]
 
 
@@ -198,12 +198,14 @@ def decide(changed, trees_equal, verified_tiers):
 
 def run_outcome(tier, code, text):
     """What one run_suite call produced. text is its stdout (it names the result folder of the run)."""
-    match = OUTPUT_LINE.search(text or "")
+    # the last line: pytest output echoed by run_suite (a failing test of the run_suite tests) may contain the same text
+    found = OUTPUT_LINE.findall(text or "")
+    match = found[-1] if found else None
     if code in (EXIT_TOOL_FAILED, EXIT_ADMISSION) or match is None:
         note = "not run (run_suite exit %d)" % code if code else "not run (no result folder)"
         return {"tier": tier, "exit": code, "run": None, "folder": None, "summary": "", "failed": [],
                 "failedCount": 0, "internalError": False, "note": note}
-    folder = Path(match.group(1)).parent          # the line names output.txt, the folder is its parent
+    folder = Path(match).parent          # the line names output.txt, the folder is its parent
     return dict(parse_folder(folder), tier=tier, exit=code)
 
 
