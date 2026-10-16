@@ -183,7 +183,7 @@ A stopped instance ends at once, also while one of its elements waits for a dial
 ### REQ-EXE-120 Run another flow from a flow
 
 - **v1:** yes
-- **v2:** done (MIGRATION M-0062; until S0003 a trigger counts as enabled when its flow is enabled)
+- **v2:** done (MIGRATION M-0063; until S0003 a trigger counts as enabled when its flow is enabled)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0055)
