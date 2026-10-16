@@ -42,6 +42,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-0098 | A fast loop floods the subscribers of the flow topic: every element start and end is an `evt.element.state` event, so 100,000 passes of an empty loop send 200,000 events (and a loop with a body, three or more per pass) | accepted (project owner, 2026-10-16): both events stay | |
 | F-0099 | `Action_Execute_Flow` needs an enabled trigger, but every flow is disabled after the start of the engine (the enabled state is not loaded or kept) | decided by the project owner (2026-10-16, E0053): the enabled state of a trigger comes with S0003 (REQ-EXE-070); until then a trigger counts as enabled when its flow is enabled | yes |
 | F-0100 | Slow tier: the random run of the expression oracle stopped at the F-0075 class through a subtraction (`!(ftiny - fz . (f3 < ineg))`): the guard of the generator misses `ftiny` inside an operand of the concatenation | verified (seed 411675 reproduces it), open, test generator only | |
+| F-0101 | Slow tier: `test_start_stop_storm_leaves_a_consistent_engine[smoke]` saw the engine's handle count grow by 19 (limit 5) | observed, red twice in a row and once alone, green three times on `c27ff8f`; cause not known; open, watch the history | |
 
 ## Findings
 
@@ -276,7 +277,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Action:** extend the guard of the generator to any operand of `.` (and of the boolean operators) that contains `ftiny` or `fhuge`, or mark the class with the entry of F-0075. Owner of the oracle decides.
 **Evidence:** run 20261016-163117-ebcaeac2 (`%TEMP%\ahf_runs\20261016-163117-ebcaeac2\output.txt`).
 
-### F-0102: the storm smoke test sees the engine's handle count grow now and then
+### F-0101: the storm smoke test sees the engine's handle count grow now and then
 
 **What:** `tests/stress/test_start_stop_storm.py::test_start_stop_storm_leaves_a_consistent_engine[smoke]` failed in the slow tier with the engine's handle count rising from 145 to 164 (limit +5). It failed twice in a row, and once alone; then it was green three times on `9f1d403` and `c27ff8f`, whose code changes do not touch the engine.
 **Status:** observed, not reproduced in the green runs; cause not known (assumed: a handle that is released late, not a leak by a code change). Open.
