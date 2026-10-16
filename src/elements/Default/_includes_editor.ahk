@@ -6,6 +6,7 @@
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
 #Include lib\ListOps.ahk
+#Include lib\LoopOps.ahk
 
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Default {
@@ -26,6 +27,10 @@ class Default {
     #Include Conditions\Condition_NumberIs.ahk
     #Include Conditions\Condition_Variable_content_is.ahk
     #Include Conditions\Condition_Variable_Is_Empty.ahk
+    #Include Loops\Loop_Condition.ahk
+    #Include Loops\Loop_Parse_A_String.ahk
+    #Include Loops\Loop_SimpleLoop.ahk
+    #Include Loops\Loop_Work_through_a_list.ahk
     #Include Triggers\Trigger_Manual.ahk
 }
 
@@ -47,4 +52,8 @@ ElementRegistry.Register(Default.Condition_List_Contains_Element)
 ElementRegistry.Register(Default.Condition_NumberIs)
 ElementRegistry.Register(Default.Condition_Variable_content_is)
 ElementRegistry.Register(Default.Condition_Variable_Is_Empty)
+ElementRegistry.Register(Default.Loop_Condition)
+ElementRegistry.Register(Default.Loop_Parse_A_String)
+ElementRegistry.Register(Default.Loop_SimpleLoop)
+ElementRegistry.Register(Default.Loop_Work_through_a_list)
 ElementRegistry.Register(Default.Trigger_Manual)

@@ -94,6 +94,7 @@ class Action_Example extends AhfElement {
 | `ctx.EvalParams(params, skipList := "")` | `x_AutoEvaluateParameters` (with `p_skipList`) | Returns the evaluated parameters as an object with case-insensitive properties; throws `ElementError` with the v1 text at the first error (no `_error`). Rules: section 3.1. `skipList`: an Array of ids or a text with commas; skipped parameters are not in the result. In a worker: the values that the engine evaluated before the job (E0026). |
 | `ctx.EvalMoreParams(evaluated, params, names)` | `x_AutoEvaluateAdditionalParameters` | Evaluates the parameters `names` (Array or text with commas) into `evaluated` and returns it (a new object if `evaluated` is not one). Errors as `EvalParams`. |
 | `ctx.Finish(result, msg := "")` | `x_finish` | `result`: `normal`, `yes`, `no`, `exception`, `head`, `tail` |
+| `ctx.entryPoint` | `x_getEntryPoint` | Loops only: the part of the loop element that the incoming connection ends at, `head`, `tail` or `break` (the spelling of the flow file, so compare without case; `""` if the connection names no part). Section 7.1 |
 | `ctx.SetVar(name, value, scope := "", hidden := false)` | `x_SetVariable` | The name decides the scope as in v1 (WI-0040, doc/EXPRESSION-LANGUAGE.md section 18.2): `A_` names are loop or thread variables and need `scope` `"thread"` or `"loop"`; `global_` and `static_` names are global and static; any other name is an instance variable. Returns 1, or 0 if refused (logged `f0` with the v1 text). The value is copied; an Array becomes a `Map` with the keys 1..n. Worker: through the engine (section 3.2). |
 | `ctx.GetVar(name, default := "", hidden := false)` | `x_GetVariable` | Reads a variable or a member (`"list.1"`) where its name says (an `A_` name: loop, thread, then built-in). Returns a copy, or `default` if it does not exist (no log). Worker: through the engine (section 3.2), every kind of variable. |
 | `ctx.DeleteVar(name, hidden := false)` | `x_DeleteVariable` | Deletes a variable or a member; 1 if it existed. Built-in variables cannot be deleted. |
@@ -386,6 +387,22 @@ A converter (`tools/convert_element.py`, at the start of S0008, E0036; the core 
 - Class IDs, parameter IDs, result strings, language keys, package name and version in flow files.
 - The semantics of the loop entry points (`head`/`tail`; `x_getEntryPoint` becomes `ctx.entryPoint`).
 - Loop variables (`A_Index` etc.) via `ctx.SetVar(..., "loop")`.
+
+### 7.1 Loop elements (WI-0054)
+
+A loop element (`Loop_...` in `Loops/`, a flow element of the kind `loop`) has three entry points and two exits. The entry point is `ctx.entryPoint`: a connection that ends at the head part, the tail part or the break part of the element (`toPart`). The exit is the result: `head` follows the connections that leave the head part (`fromPart`), `tail` the ones that leave the tail part, `exception` the normal exception connection.
+
+| Entry | Meaning | What the element does |
+|---|---|---|
+| `head` | the flow enters the loop | the engine has pushed the loop variables already (Scheduler); the element sets up the loop and starts the first pass (`Finish("head")`) or leaves at once (`Finish("tail")`) |
+| `tail` | the end of the body | starts the next pass (`head`) or leaves (`tail`) |
+| `break` | a connection to the break part | leaves (`tail`), without evaluating anything |
+
+An entry that is none of the three (the connection names no part) ends with `exception` "No information whether the connection leads to head or tail". The element is stateless: what a loop needs between two passes is in loop variables (`ctx.SetVar(name, value, "loop")`; a `hidden` loop variable is invisible to expressions). Leaving with `tail` or `exception` pops the loop variables, once, whatever the number of connections (MIGRATION M-0019); entering at `head` pushes them. So after the loop `A_Index` and the other variables are those of the outer loop again, or gone. The push does not clear: a variable that the inner loop does not set (`A_LoopKey` of a `Loop_Parse_A_String` inside a list loop) keeps the value of the outer loop inside the inner one, as in v1.
+
+A pass that fails in the body does not restore the loop variables: they are popped only when the loop element itself finishes with `tail` or `exception` (as in v1). A body element whose `exception` connection leads out of the loop leaves the variables of that loop in the thread. The engine cannot tell what is "inside" a loop (a flow is a graph); route the exception back to the loop (its tail or break part) if the variables matter.
+
+The package Default has `Loop_SimpleLoop` (A_Index), `Loop_Condition` (A_Index), `Loop_Work_through_a_list` (A_Index, A_LoopKey, A_LoopField) and `Loop_Parse_A_String` (A_Index, A_LoopField); `Loop_Loop_Through_Files` follows in S0008. The shared code is `lib/LoopOps.ahk`. The two list loops work through a copy of the list that they make at the head (hidden loop variable `A_LoopCurrentList`, one member read per pass), so a change of the list in the body does not change the passes and the cost of a pass does not grow with the size of the list. Each entry reads the parameters from the newest revision of the flow (E0001), so the count of a running loop can be changed.
 
 ## 8. Still to be clarified (Phase 3)
 
