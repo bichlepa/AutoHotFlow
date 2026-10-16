@@ -93,6 +93,8 @@ Notes on the table:
 
 **Variable requests of a worker (WI-0050).** `tests/integration/test_worker_vars.py::test_round_trip_of_a_variable_request_from_a_worker` (VS Code task "Tool: variable request round trip from a worker"): the test element `Action_TestVarBenchWorker` (`tests/elements/`) calls `ctx.GetVar` 300 times in a worker and measures every call with `QueryPerformanceCounter` inside the worker; the path is worker, hub, engine, hub, worker, in a session of the flow runner (supervisor, storage, engine, warm worker). Serial, nothing else of the tests running.
 
+**Unassigned keys for input tests (WI-0064 spike, E0059).** A script registers `vk97` (plain), `$vk98` (keyboard hook), `~vk99` (hook, key passes on) and `vk9F` (plain). A second process sends each key with `SendInput` (key down and up, `wVk` only, scan code 0), 0.4 s apart, while the listener runs (`tools/ahkrun.py`, AutoHotkey 2.0.30, interactive session, no window of the test). Result of 4 runs: in runs 2 to 4 every key fired once; a second listener variant (`$vk98`, `$*vk9A`, `$vk9B`, `vk9C`, with an `InputHook` for the keys) fired every key too. The plain keys fired in every run. In run 1 the two hook keys (`$vk98`, `~vk99`) did not fire, the plain ones did. The cause is not known (not reproduced in the three later runs). Verified: these 4 runs of the spike (not the test suite). Consequence: the input tests must not treat one miss as proof either way.
+
 ## Not measured
 
 These points are missing from the measurements. The first group is listed in the source as "not measured" or "not checked".
