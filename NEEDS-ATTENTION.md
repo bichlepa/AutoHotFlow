@@ -1,17 +1,17 @@
 # Needs attention (project owner)
 
-Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits for the project owner: a decision, a manual check, or a fact the owner must know. Last update: 2026-10-15, after the owner's decisions of the same day.
+Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits for the project owner: a decision, a manual check, or a fact the owner must know. Last update: 2026-10-16 (session 8).
 
 ## Decisions
 
-Other decisions of 2026-10-15 are in `doc/DECISIONS.md` (E0046 to E0051).
-
-## Decisions
-
-- **Test admission and run history (WI-0059), done.** Your decisions are implemented (`1120c28`, `ce1024f` and the commits before them): `AHF_MAX_WORKERS` stays cores − 2 (fast tier on an idle machine: 44.7 s with 6 workers, 41.2 s with 8, before the change; 48.2 s and 41.0 s after); `-m "not stress"` is not exclusive any more; the job object only counts, with a psutil fallback recorded as `ownTree`; the tooling tests are split; recheck runs at the commit of the run. The synthetic-load test ran green on the idle machine (run 20261016-083827-7ec528a4). **Note:** this follow-up was integrated without a verifier, because verifiers are paused; the implementer ran the fast tier and the foundation tier itself (foundation run 20261016-084047-7ec528a4, 460 passed).
-- **F-0090 may be back.** The persistence test failed twice (`evt.engine.ready #1 missing`) under high external load, in runs on an older base. Not yet confirmed on the final tip; see `work_items/phase3/STATUS.md`.
+- **Nested list loops copy the outer snapshot (F-0097).** A loop inside a list loop copies the outer loop's snapshot at every entry. Measured: 500 / 1000 / 2000 members take 3.5 / 5.5 / 9.9 ms per outer pass, against about 0.5 ms without the inner loop. v1 behaved the same. Proposal: share one hidden snapshot between the levels of the loop stack. Options: (a) share the snapshot (recommended), (b) keep the copy and document the cost. Full text: `doc/OPEN-ITEMS.md`.
+- **Fast loops flood the flow topic (F-0098).** A fast loop sends two `evt.element.state` events per pass to every subscriber. Relevant for the editor (S0005). Options: (a) coalesce the events of fast elements, (b) subscribers that only need counts subscribe to a count topic (recommended with the editor design). Full text: `doc/OPEN-ITEMS.md`.
+- **`Loop_Condition` sets `A_Index` before the first check (M-0059).** v1 set the index only after the check, so the help text (`a_index <= 10` makes 10 passes) and v1 differed. The port follows the help text. Please confirm, or ask for the v1 order.
 
 ## To know
 
-- **Lost log line under load (F-0088 closed 2026-10-15, F-0089 open).** F-0088 is fixed and verified (`doc/CLOSED-ITEMS.md`). F-0089 (three fault tests that fail only under load) is still open and not analysed.
-- **Integration of `wip/requirements`** was done on 2026-10-15 (19 commits, rebased, index regenerated).
+- **Test admission and run history (WI-0059) is done.** Integrated as `9cefa8c` to `1120c28` and `00a8816`. Your decisions are implemented: default `AHF_MAX_WORKERS` stays cores − 2 (fast tier on the idle machine: 44.7 s with 6 workers, 41.2 s with 8 before the change; 48.2 s and 41.0 s after); `-m "not stress"` is not exclusive any more; the job object only counts, with a psutil fallback recorded as `ownTree`; the tooling tests are split; recheck runs at the commit of the run. The synthetic-load test ran green on the idle machine (run 20261016-083827-7ec528a4). The last follow-up was integrated without a verifier, because verifiers were paused; the implementer ran the fast and foundation tiers itself (foundation run 20261016-084047-7ec528a4, 460 passed).
+- **WI-0054 (loops) is integrated** as `be5c088` to `2467349`. A verifier is running on `2467349`.
+- **WI-0055 (flow control, the first work item with engine changes and a new protocol message) is running.** Its questions will follow in its report. WI-0056 (dialogs) is next.
+- **F-0090 may be back.** The persistence test failed twice (`evt.engine.ready #1 missing`) under high external load, in runs on an older base. The verifier of `2467349` checks it on the final tip; see `work_items/phase3/STATUS.md`.
+- **F-0089 is still open:** three fault tests that fail only under load. The supervisor fix for the kill case (F-0071) is verified and stays open until repeated slow runs are clean.
