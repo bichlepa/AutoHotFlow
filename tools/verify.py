@@ -193,7 +193,7 @@ def run_outcome(tier, code, text):
         note = "not run (run_suite exit %d)" % code if code else "not run (no result folder)"
         return {"tier": tier, "exit": code, "run": None, "folder": None, "summary": "", "failed": [],
                 "failedCount": 0, "internalError": False, "note": note}
-    folder = Path(match.group(1))
+    folder = Path(match.group(1)).parent          # the line names output.txt, the folder is its parent
     return dict(parse_folder(folder), tier=tier, exit=code)
 
 

@@ -93,7 +93,7 @@ def test_parse_folder_reads_summary_failures_and_internal_error(tmp_path):
 
 def test_run_outcome_reads_the_folder_named_in_the_output_line(tmp_path):
     folder = fake_folder(tmp_path, "20261016-100001-abcdef12", "967 passed, 1 skipped in 45.0s", ["ok"])
-    text = "[run_suite] pytest tests -q\n[run_suite] output: %s\n[run_suite] result: exit 0" % folder
+    text = "[run_suite] pytest tests -q\n[run_suite] output: %s\n[run_suite] result: exit 0" % (folder / "output.txt")
     outcome = verify.run_outcome("fast", 0, text)
     assert outcome["run"] == "20261016-100001-abcdef12"
     assert verify.is_green(outcome)
@@ -107,7 +107,7 @@ def test_run_outcome_without_a_result_folder_is_not_run():
 
 def test_a_green_exit_with_internal_error_is_red(tmp_path):
     folder = fake_folder(tmp_path, "r-1", "1 passed in 1.0s", ["INTERNALERROR> boom"])
-    outcome = verify.run_outcome("fast", 0, "[run_suite] output: %s" % folder)
+    outcome = verify.run_outcome("fast", 0, "[run_suite] output: %s" % (folder / "output.txt"))
     assert not verify.is_green(outcome)
 
 
@@ -153,7 +153,7 @@ class FakeRunner:
         lines = ["FAILED %s" % name for name in self.fail.get(tier, [])] or ["ok"]
         summary = "%d passed in 1.0s" % self.n if not code else "1 failed in 1.0s"
         folder = fake_folder(self.base, "run-%s-%d" % (tier, self.n), summary, lines)
-        return code, "[run_suite] output: %s\n" % folder
+        return code, "[run_suite] output: %s\n" % (folder / "output.txt")
 
 
 def test_green_run_writes_the_last_green_state(repo, tmp_path, capsys):
