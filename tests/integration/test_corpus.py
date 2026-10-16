@@ -64,7 +64,7 @@ PENDING = {
         "Condition_String_contains_text": "S0008"}),
     "Flow 561135904": dict(name="Process Test", missing={
         "Action_Kill_Process": "S0008", "Action_Run": "S0008", "Action_Set_flow_status": "S0003",
-        "Condition_Process_is_running": "S0008", "Trigger_Periodic_Timer": "S0003", "Trigger_Process_closes": "S0008",
+        "Condition_Process_is_running": "S0008", "Trigger_Process_closes": "S0008",
         "Trigger_Process_starts": "S0008"}),
     "Flow 65341778": dict(name="_AutomaticTest starter", missing={
         "Action_Play_Sound": "S0008", "Action_Set_flow_status": "S0003"}),
@@ -72,8 +72,7 @@ PENDING = {
         "Action_Delete_File": "S0008", "Action_Run": "S0008", "Action_Set_flow_status": "S0003",
         "Condition_File_Exists": "S0008", "Trigger_Shortcut": "S0008"}),
     "Flow 884290977": dict(name="Trigger test", missing={
-        "Action_Set_flow_status": "S0003", "Action_Speech_Output": "S0008", "Condition_Flow_Enabled": "S0003",
-        "Trigger_Periodic_Timer": "S0003", "Trigger_Start_Up": "S0003"}),
+        "Action_Set_flow_status": "S0003", "Action_Speech_Output": "S0008", "Condition_Flow_Enabled": "S0003"}),
 }
 
 
