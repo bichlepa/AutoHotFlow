@@ -105,6 +105,7 @@ python -m pytest tests -q -m stress              # long, on request only (-m soa
 | slow | `slow` | `-m slow` or `--all`; at the end of a package that touches timing, supervisor, worker or storage, and at the end of every block | tests that wait for deadlines (hang detection, idle times, reconnect budgets, restarts in a row), about 3 s or more including the setup. Smoke variants in `tests/stress/` count as slow automatically |
 | gui | `gui` | `-m gui` or `--all`; rarely, by hand, when the owner does not use the PC | tests that open a window or provoke a dialog on the desktop (debug window, `ahkrun` dialog guard with a real `MsgBox`) |
 | stress / soak | `stress`, `soak` | `-m stress`, `-m soak`, serial | unchanged, see section 3 |
+| idle | `idle` | `-m idle`, serial and alone (the admission waits for an idle machine) | tests that need a quiet machine as their reference, e.g. the synthetic-load test of the load figures (`tests/test_runtool_runs.py`). Like stress and soak never part of `--all` or `--foundation` |
 
 - A new test that waits for a deadline of the product or takes about 3 s or more gets `@pytest.mark.slow`. A test that must show a window gets `@pytest.mark.gui` (not `slow` at the same time: `-m gui` would drop it). Tests of windows stay `--headless` wherever the window itself is not the subject.
 - `-m` only names the groups to switch on (conftest). Without `--all`, `slow`, `foundation` and `gui` are deselected unless named in `-m`. A test in several tiers runs only when all of them are on, so use `--all -m fault`, `--all -m slow`, `--all -m gui`. `--foundation` is the short form for the foundation tier including its slow tests (without gui).
@@ -119,7 +120,7 @@ python -m pytest tests -q -m stress              # long, on request only (-m soa
 
 **Parallel (default since WI-0018).** `pytest.ini` sets `addopts = -n auto --dist loadgroup` (pytest-xdist; since WI-0059 the admission turns `auto` into cores − 2, 6 workers on this machine, fewer when other runs hold slots; see "Admission" below; the times in this paragraph were measured with 8 workers). `python -m pytest tests -q` (fast tier) thus runs in about 16 s with 8 workers (about 12 s with `-n 16`; the work adds up to about 100 s of test time). `--foundation` takes about 55 s, `--all` about 90 s (serial about 640 s). Serial: `-n 0`. Rules for this:
 
-- Runs with `-m stress` or `-m soak` are switched to a single process by `tests/conftest.py` (`pytest_cmdline_main`) itself. Measurements (idle CPU, latency, memory) must never run in parallel with other load.
+- Runs whose `-m` expression can select stress, soak or idle tests are switched to a single process by `tests/conftest.py` (`pytest_cmdline_main`) itself, and the admission runs them alone. Measurements (idle CPU, latency, memory) must never run in parallel with other load. One function decides this for the conftest, the admission and `run_suite.py`: `admission.selects_exclusive(expr)`. It is true only if the expression can be satisfied with an exclusive marker true; exclusive markers the expression does not name stay false, because the conftest drops those tests anyway. `-m stress`, `-m soak`, `-m idle`, `-m "slow or stress"` are exclusive; `-m "not stress"`, `-m "not (stress or soak)"`, `-m "slow and not stress"`, `-m "not slow"` and no `-m` are not (until WI-0059 a substring check made `-m "not stress"` serial and exclusive). It evaluates the expression with pytest's own parser (`_pytest.mark.expression`, an internal API; `tests/test_admission.py` guards it).
 - The marker for groups is `@pytest.mark.xdist_group("name")` (with `--dist loadgroup`, tests of the same group run one after another on the same worker). `tests/test_ahk_runner.py` puts all items of one `.test.ahk` file into one group: its result cache is per process, without the group every worker that gets one case would run the whole file again (30 files were run up to 8 times each; the default run took 42 s instead of 32 s).
 - **Time limits (WI-0032).** An upper time limit that checks a promise of the product ("the role ends within 1 s", "crash reported within 1 s") runs through `support.timing.scaled()`: in the serial run (`-n 0`, `-m stress`, `-m soak`) it applies unchanged (this is the reference); in a parallel run (xdist worker) it is multiplied by the factor 3 (`AHF_TIMING_FACTOR` overrides it, `1` is strict). Only **upper** limits are scaled, never lower ones (a timeout must not fire too early), never counts or results. A red test in the parallel run then means "far too slow", not "somewhat slow on a loaded machine". A new time limit that checks a product promise must go through `scaled()`; measurements with fixed numbers (throughput, latency distribution) belong in `-m stress`.
 - **The parallel run is not the reference (WI-0034, E0017).** Because `scaled()` relaxes the upper limits by the factor 3 in the parallel run, this run no longer detects a deterioration of latency up to this factor. The factor 3 stays. Therefore: **the serial run (`-n 0`) and `python -m pytest tests -m stress` are run at least at the end of every package that changes timing behavior, and at the end of every block.** They are the strict reference, their result counts. Waits for events that lie close to deadlines of the product (restart, end of a worker, detected hang) also run through `scaled()`; a fixed `timeout=` with a number next to such a deadline is a finding (F-0038).
@@ -134,7 +135,7 @@ python -m pytest tests -q -m stress              # long, on request only (-m soa
 long run goes on, and the result belongs to exactly one code state. Output, `result.json` and the run log are in
 `%TEMP%\ahf_runs\<id>\` (last 20 runs). Load budget: 4 xdist workers per run (fewer when the admission below has fewer
 free slots), 2 runs of `run_suite` at the same time; a run with
-`-m stress` or `-m soak` waits until no other run is active and blocks the start of others. Measurements therefore
+`-m stress`, `-m soak` or `-m idle` waits until no other run is active and blocks the start of others. Measurements therefore
 stay comparable. Timing tests (`scaled()`) can still become flaky when other programs load the machine; for a
 clean comparison use `--max-runs 1`. The run needs everything in the commit: a dependency on an untracked or
 ignored file shows up as a failure here (this is how the `v1/AppData/Variables` dependency was found).
@@ -148,7 +149,8 @@ hand.
   `run_suite`/`recheck` has `<id>\status.json`, a direct run `direct\<id>\status.json`. Slots are workers: the
   workers of all running runs together stay at or below `AHF_MAX_WORKERS` (default: logical cores − 2, at least 1;
   a serial run counts as 1). A run gets `min(requested, free)` workers, at least 1; `-n auto` asks for cores − 2.
-  A run with `-m stress`/`-m soak` waits for an idle machine and blocks every other start while it runs. Waiting has
+  A run whose `-m` selects stress, soak or idle tests (`selects_exclusive`, above) waits for an idle machine and
+  blocks every other start while it runs. Waiting has
   no time limit (`AHF_ADMISSION_TIMEOUT=<s>` sets one; exit code 75 then) and prints
   `[admission] waiting: 2 run(s) active, 6/6 workers` at once and every 30 s; the time waited goes into the history.
   `run_suite.py` admits its run itself (and keeps `--max-runs`) and sets `AHF_ADMITTED=<run id>`, so the pytest inside
@@ -157,10 +159,14 @@ hand.
   a lock file left behind expires after 30 s. A pytest started by a test of a running pytest belongs to that test:
   no admission, no history record.
 - **Load figures** (`tests/support/loadsampler.py`). A thread in the controller samples once per second the system
-  CPU, the CPU of the own process tree and (every 5 s) the number of registered runs. External load = system minus own tree,
-  clamped at 0; all figures are percent of the whole machine. The own tree is measured through a job object that
-  the controller puts itself into: its accounting also holds processes that have already ended, so short test
-  processes count as own (fallback without a job: a psutil walk, which misses processes shorter than one sample).
+  CPU, the CPU of the own process tree and (every 5 s) the number of registered runs. External load = system minus
+  own tree, clamped at 0; all figures are percent of the whole machine. The own tree is measured through a job object
+  that the controller puts itself into: its accounting also holds processes that have already ended, so short test
+  processes count as own. The job only counts: it gets no limit flags (no `KILL_ON_JOB_CLOSE`). If the job cannot be
+  created, assigned or read (for example inside a job that forbids nesting), the sampler falls back to a psutil walk,
+  which misses processes shorter than one sample; the run never aborts because of it, and the record says which
+  method was used (`load.ownTree`: `job` or `psutil`). Processes outside the job (a child that asks to break away is
+  refused by Windows; services, COM servers) count as external: `doc/HOW-TO.md`.
   For every test the record keeps mean and peak of system and external CPU over its window (setup start to
   teardown end) and the maximum of concurrent runs. The terminal summary prints these figures for every red test,
   without a threshold and without a classification. `AHF_LOAD_SAMPLER=0` switches the sampler off (to measure its
@@ -178,15 +184,22 @@ hand.
 - **Reading it:** `python tools/test_history.py` (`--last N`, `--flaky [--since DATE]`, `--test <node id>`, `--load`,
   `--durations`). `--flaky` lists tests that were red and green at the same commit in clean runs, with the load of
   the red runs next to that of the green runs: the strongest signal that a failure depends on the load.
-- **Recheck:** `python tools/recheck.py <run id | latest>` runs the red tests of one run once more, serially (`-n 0`)
-  with the tier options of the run, under an exclusive admission, and says per test "green again" (consistent with a
-  load-induced failure) or "red again" (a real defect or a test problem, classified as before). The first result
-  stays in the history; the recheck is a run of its own (`recheckOf`). **This is not the forbidden automatic rerun:**
+- **Recheck:** `python tools/recheck.py <run id | latest> [--here]` runs the red tests of one run once more, serially
+  (`-n 0`) with the tier options of the run, under an exclusive admission, and says per test "green again"
+  (consistent with a load-induced failure) or "red again" (a real defect or a test problem, classified as before). It
+  runs at the commit of the run, in a worktree of that commit (the worktree functions of `run_suite.py`), so it tests
+  the same code. A run with uncommitted changes (`dirty: true`) cannot be reproduced from its commit: recheck stops
+  with a message (exit 3). `--here` runs in the current checkout instead, also for a dirty run; its record then
+  carries `recheckAt: "working tree"` instead of the commit. The first result stays in the history; the recheck is a
+  run of its own (`recheckOf`, `recheckAt`). **This is not the forbidden automatic rerun:**
   it is started by a person, runs once under defined reference conditions, and its result is a second data point
   next to the first, never a replacement that turns a red run green.
-- Tests of this tooling start a pytest of their own with a private registry, history and run-log folder
-  (`tests/support/innerpytest.py`, probe tests in `tests/support/runtool_probes.py`): `tests/test_admission.py`,
-  `tests/test_load_history.py`, `tests/test_history_tools.py`.
+- Tests of this tooling, split by cost. Pure unit tests (fake registry, history writer and readers, the expression
+  function, the sampler fallback) are in the fast tier: `tests/test_admission.py`, `tests/test_load_history.py`,
+  `tests/test_history_tools.py`, `tests/test_run_suite.py` (70 tests, about 1.3 s of test time serially). Everything
+  that starts a real pytest run, run_suite, recheck, a job object or CPU burners is in `tests/test_runtool_runs.py`
+  (foundation; its synthetic-load test is `idle`). Those start a pytest of their own with a private registry,
+  history and run-log folder (`tests/support/innerpytest.py`, probe tests in `tests/support/runtool_probes.py`).
 
 Environment variables: `AHF_AHK2_EXE` (path to the interpreter), `AHF_TEST_KEEP=1` (keep data directories after the test), `AHF_MAX_WORKERS`, `AHF_ADMISSION_TIMEOUT`, `AHF_NO_ADMISSION`, `AHF_ADMITTED`, `AHF_HISTORY_DIR`, `AHF_LOAD_SAMPLER` (admission and history, see above). `AHF_DATA_DIR` is set by `conftest.py` to the guard directory (product variable: data directory when `--data` is missing).
 

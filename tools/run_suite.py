@@ -16,7 +16,8 @@ What it does:
   * limits the load through the machine-wide admission (tests/support/admission.py, shared with direct pytest runs):
     pytest gets --workers N (default 4) worker processes, fewer when the other runs hold the free worker slots
     (AHF_MAX_WORKERS), at most --max-runs (default 2) runs of run_suite go at the same time, a run that asks for
-    stress or soak tests (-m stress / -m soak) waits until no other run is active and blocks the start of others
+    stress, soak or idle tests (-m stress / -m soak / -m idle; admission.selects_exclusive) waits until no other run is
+    active and blocks the start of others
     while it measures. The pytest run inside registers no second time (AHF_ADMITTED),
   * keeps the result in <temp>\\ahf_runs\\<id>\\: output.txt (everything pytest printed), result.json, and
     pytest-log\\ (the run log of tests/conftest.py: summary, failures, data of failed tests). The last 20 runs are kept.
