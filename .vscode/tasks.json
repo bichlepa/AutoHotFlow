@@ -251,6 +251,21 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: acceptance corpus (three v1 flows and synthetic flows, slow tier)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/integration/test_corpus.py",
+                "-q",
+                "-m",
+                "slow"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Test: integration (tests/integration)",
             "type": "shell",
             "command": "python",
