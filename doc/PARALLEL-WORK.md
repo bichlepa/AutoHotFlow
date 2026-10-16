@@ -1,6 +1,6 @@
 # Parallel work
 
-Status: 2026-10-13. The tools are tested (`tests/test_new_workspace.py`, `tests/test_run_suite.py`). The procedure has not yet been tried with several real agents at the same time, and the load of three parallel activities on one PC has not been measured. Findings from the first real use go into this document.
+Status: 2026-10-16. The tools are tested (`tests/test_new_workspace.py`, `tests/test_run_suite.py`). The procedure has run in eight orchestrator sessions with up to four agents at the same time (`doc/ORCHESTRATOR.md`). Lessons from that use go into section 7.
 
 ## 1. Principle
 
@@ -34,15 +34,19 @@ The tool works from the main checkout and from inside a workspace. VS Code tasks
 3. Find the introducing commit: in the own workspace `git bisect start <bad> <good>` and `git bisect run python -m pytest <test> -q -n 0` (the workspace is yours, bisect may move its HEAD).
 4. Report: symptom, repro command, failure rate, cause (verified / assumed), first bad commit, proposed fix. Appending the entry to `doc/OPEN-ITEMS.md` is part of the branch.
 
-**Verifier.** Verifies the integrated state of `v2-port` (ORCHESTRATOR section 3d). Gets its own workspace, created from the tip it verifies (`python tools/new_workspace.py ver-<name>`), and runs its suites there with `python tools/run_suite.py --ref <that commit>`. Other commits that land on `v2-port` while it runs do not change its state. Result: counts, run IDs, findings. Findings go to its branch and are integrated by the integrator; the verifier does not fix code.
+**Reviewer.** Reviews a finished branch before it is integrated (ORCHESTRATOR section 3d): the diff against `v2-port`, the task and the author's report. It works in the branch's workspace after the author has finished, fixes small local findings itself (commit `Review fix: ...`) and gives larger ones back to the author. Result: `APPROVED`, `APPROVED WITH FIXES` or `CHANGES REQUESTED` with a list.
 
-**Tester.** Runs suites on branches and on the base for comparison, with the same arguments: `python tools/run_suite.py --ref v2-port -- tests -q --all` and `... --ref wip/<name> ...`. A failed test is run again serially (`-n 0`) before it is reported, and a failure that also occurs on the base is not a regression of the branch. Report: commit, command, counts, the failures with the run log folder (`%TEMP%\ahf_runs\<id>\pytest-log`).
+**Verification** of the integrated state is a script, not a role: `python tools/verify.py --ref <commit> --auto` runs the tiers that the changed paths need through `run_suite.py` on the frozen commit and prints a verdict (ORCHESTRATOR section 4). New commits on `v2-port` during the runs do not change the tested state.
+
+**Tester.** Runs suites on branches and on the base for comparison, with the same arguments: `python tools/run_suite.py --ref v2-port -- tests -q --all` and `... --ref wip/<name> ...`. A failed test is run again alone (`python tools/recheck.py <run id>`) before it is reported, and a failure that also occurs on the base is not a regression of the branch. Report: commit, command, counts, the failures with the run log folder (`%TEMP%\ahf_runs\<id>\pytest-log`).
 
 **Integrator** (the project owner, or one agent that has been asked). The history of `v2-port` stays linear: no merge commits and no temporary branches in the graph. In the main checkout on `v2-port`:
 ```
-python tools/run_suite.py --ref wip/<name> -- tests -q --all      # green, or the known failures of the base only
-git cherry-pick v2-port..wip/<name>                               # copies the commits of the branch (conflicts: section 4)
+git rebase v2-port                                                # in the workspace of the branch, if v2-port has moved
+python tools/renumber_findings.py --commit                        # in the workspace: provisional F-9xxx* get final IDs
+git cherry-pick v2-port..wip/<name>                               # in the main checkout (conflicts: section 4)
 python tools/new_workspace.py --remove <name>                     # worktree away, branch deleted: its patches are on v2-port
+python tools/verify.py --ref <new v2-port tip> --auto             # verification of the integrated state
 ```
 `git cherry-pick` is used instead of `git rebase` because the branch is checked out in its workspace and git does not rebase a branch that another worktree holds. Branches are taken over one after another; the next one is tested again on the new `v2-port` (a cherry-pick can succeed without a conflict and still break a test), because its earlier result was for a different base. When the tree of `v2-port` after the cherry-picks equals the tree that was tested (`git rev-parse HEAD^{tree}`), that result still holds.
 
@@ -50,7 +54,7 @@ python tools/new_workspace.py --remove <name>                     # worktree awa
 
 | File | Rule |
 |---|---|
-| `doc/OPEN-ITEMS.md`, `doc/HOW-TO.md` | new entries at the end of their section; new findings get provisional IDs from `F-9000*`; the integrator gives them the next free final number of the dense series before the commit (ORCHESTRATOR.md section 2) |
+| `doc/OPEN-ITEMS.md`, `doc/HOW-TO.md`, `doc/howto/*.md` | new entries at the end of their section (a HOW-TO entry in its category file, its index line at the end of the category in `doc/HOW-TO.md`); new findings get provisional IDs from `F-9000*`; the integrator gives them final numbers with `tools/renumber_findings.py` (ORCHESTRATOR.md section 2) |
 | `doc/PROTOCOL.md` | one commit per interface change, early; the same message type is never added by two branches |
 | `.vscode/tasks.json` | new tasks at the end of their group |
 | `doc/REQUIREMENTS.md`, `doc/REQUIREMENTS-INDEX.md` | change only the requirements of the own task. The index is generated: never resolve a conflict in it by hand; resolve the source, then run `python tools/req_index.py` |
@@ -71,16 +75,15 @@ python tools/new_workspace.py --remove <name>                     # worktree awa
 - Nothing prevents an agent from breaking rule 1; the tools do not enforce it.
 - The load of an implementer, a bug hunter and a tester at the same time on one machine is unmeasured beyond the first trial (section 7).
 
-## 7. First trial (2026-10-13)
+## 7. Lessons from use (2026-10-13 to 2026-10-16)
 
-One implementer (`bigflows` duplicates removed) and one bug hunter (F-0061) worked in their own workspaces at the same time, the tester reviewed both branches, the integrator merged four branches in a throw-away workspace and ran the whole suite on the result (782 passed, 1 skipped, exit 0, 3 workers). No file conflicts: the branches touched different files.
+The first trial (2026-10-13: one implementer, one bug hunter, a tester, four branches integrated, 782 passed) and eight orchestrator sessions showed:
 
-What the trial showed:
-
-- **A test failure under load can end the whole run.** A timing test failed during a `--all` run with 3 workers next to two other runs, and the diagnosis collection of `conftest.py` raised inside the report hook. xdist then stopped (INTERNALERROR, exit 3, about 80 tests did not run). Fixed in `tests/conftest.py`; this was found by the tester only because the run was read, not just its last line: **look at the exit code and at `INTERNALERROR` in `output.txt`, not only at the counts.**
+- **A test failure under load can end the whole run.** Once the diagnosis collection of `conftest.py` raised inside the report hook, xdist stopped (INTERNALERROR, exit 3) and about 80 tests did not run (fixed). **Look at the exit code and at `INTERNALERROR` in `output.txt`, not only at the counts.**
 - **Git stores `tests/data/flows` byte-exact (CRLF), the older folders normalized (LF).** Comparing git blobs of a moved file shows a difference although the content is the same; compare working-tree files or normalize line ends first.
-- **Scripted edits.** Heredoc code and CRLF files: a replace string with `\n` does not match a file with `\r\n`. Use the editor tool, or read and write with `newline=""`.
+- **Scripted edits.** A replace string with `\n` does not match a file with `\r\n`. Use the editor tool, or read and write with `newline=""`.
 - **Loops in the background.** A shell loop started with `&` in the tool shell ended with the command that started it. Put repeated runs in a script file and run it in the foreground (with a timeout) or as a background task of its own.
-- **`-n`.** `run_suite.py` puts its own `-n 4` before the pytest arguments, so a later `-n 0` of the caller wins. This is intended; the printed command shows both.
-- **Load was too low to provoke the F-0061 race.** The original failure needed heavy load; in the trial 3 to 4 s runs did not fail. A race is therefore shown with a deterministic test (freeze the dependency), not with load.
-- **The saved run log of a failure can disappear** (`%TEMP%\ahf_testruns_keep` was gone). Copy the evidence of a finding into the finding entry.
+- **`-n`.** `run_suite.py` puts its own `-n 4` before the pytest arguments, so a later `-n 0` of the caller wins. This is intended.
+- **A race is shown with a deterministic test** (freeze the dependency), not with load: load in a trial is rarely high enough to provoke it.
+- **The saved run log of a failure can disappear.** Copy the evidence of a finding into the finding entry.
+- **Budget.** Cold starts of agents (each read about 60k tokens of documents), verifier agents whose runs were almost always green, bug-hunter rounds about timing tolerances under load, and a status log that grew to 59 KB used much of the budget. Hence ORCHESTRATOR version 2: short reading lists, `verify.py`, hunters only on real risks, a status book with the current state only, haiku by default with a sonnet review.
