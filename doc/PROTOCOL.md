@@ -99,8 +99,8 @@ All payloads are objects. `flowId`, `elementId`, `connectionId` are the identifi
 
 | Area | Not yet implemented |
 |---|---|
-| 4.2 Engine commands | `cmd.flow.create`, `cmd.flow.delete`, `cmd.flow.meta.update`, `cmd.flow.save`, `cmd.trigger.enable`, `cmd.trigger.disable`, `cmd.category.*`, `cmd.settings.get/set` |
-| 4.3 Engine events | `evt.flow.committed`, `evt.flow.saved`, `evt.connection.state`, `evt.settings.changed` |
+| 4.2 Engine commands | `cmd.flow.create`, `cmd.flow.delete`, `cmd.flow.meta.update`, `cmd.trigger.enable`, `cmd.trigger.disable`, `cmd.category.*`, `cmd.settings.get/set` |
+| 4.3 Engine events | `evt.flow.committed`, `evt.connection.state`, `evt.settings.changed` |
 | 4.4 Engine ↔ trigger host | all (`cmd.trigger.arm`, `cmd.trigger.disarm`, `evt.trigger.fired`, `evt.trigger.error`); the trigger host (WI-0014, optional) is not built, the role `triggerhost` is a placeholder |
 | 4.6 | `cmd.storage.settings.get/set` (already listed there as "not yet implemented") |
 | 4.7 Dialogs | `evt.ui.notice`, `cmd.ui.confirmDeleteFlowFile` |
