@@ -27,8 +27,8 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Security (SEC)](#security-sec) | 7 | 2 | 1 | 0 | 3 | 1 | 1 |
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
-| [Usability (USE)](#usability-use) | 10 | 1 | 0 | 1 | 8 | 0 | 0 |
-| **All** | **217** | **58** | **1** | **37** | **120** | **1** | **6** |
+| [Usability (USE)](#usability-use) | 10 | 0 | 0 | 2 | 8 | 0 | 0 |
+| **All** | **217** | **57** | **1** | **38** | **120** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -350,4 +350,4 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-USE-060](REQUIREMENTS.md#req-use-060-amount-of-hints) | L2656-2664 | Amount of hints | no | open | should | later | - |
 | [REQ-USE-070](REQUIREMENTS.md#req-use-070-hints-can-be-switched-off-one-by-one) | L2666-2674 | Hints can be switched off one by one | no | open | should | later | - |
 | [REQ-USE-080](REQUIREMENTS.md#req-use-080-unhandled-errors-of-a-flow-are-noticed) | L2676-2684 | Unhandled errors of a flow are noticed | yes | open | should | port | S0004 |
-| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2686-2695 | Sharp and correctly sized on high-resolution displays | no | done | should | port | dialogs done (manual check 3, 2026-10-16); manager, editor, tray icon and zoom still S0004 to S0007 |
+| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2686-2695 | Sharp and correctly sized on high-resolution displays | no | partial | should | port | dialogs done (manual check 3, 2026-10-16); manager, editor, tray icon and zoom still S0004 to S0007 |

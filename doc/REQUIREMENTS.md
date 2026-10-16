@@ -2686,7 +2686,7 @@ When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the us
 ### REQ-USE-090 Sharp and correctly sized on high-resolution displays
 
 - **v1:** no (not checked)
-- **v2:** done (dialogs only, see Plan)
+- **v2:** partial (dialogs only, see Plan)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** dialogs done (manual check 3, 2026-10-16); manager, editor, tray icon and zoom still S0004 to S0007
