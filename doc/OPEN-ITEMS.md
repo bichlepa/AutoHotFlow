@@ -63,6 +63,13 @@ Entries that the bug hunter does not take (`doc/ORCHESTRATOR.md` 3c): they were 
 
 None at the moment.
 
+### F-9001*: storage still alive after a session with a child that says hello during the shutdown
+
+**What:** `tests/fault/test_shutdown.py::test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` failed in the foundation tier: the storage process (started 21:18:10) was still running when the check ran after the session had exited with the expected code. It is the same symptom as F-0095 (storage alive after the end of a session, under load), in a sibling test.
+**Status:** observed once (run 20261016-211715-c03b628b, commit `c03b628`, 1 failed of 461). Not reproduced in the same run's other foundation tests. Not caused by WI-0060 as far as the code shows: the engine writes FlowState.json at shutdown only when a switch is pending, which this scenario does not do.
+**Action:** watch the history of the test (`python tools/test_history.py --test` with its node ID). If it recurs, treat it together with F-0095 (the end of storage after `sys.bye`).
+**Evidence:** run 20261016-211715-c03b628b (`%TEMP%hf_runs61016-211715-c03b628b\output.txt`, line 43).
+
 ## Watch list (E0007)
 
 These items were deliberately not fixed in phase 2b. Closed items (F-0004, F-0006, F-0010, F-0015, F-0018 and others) are not listed. The findings above are not repeated here.
