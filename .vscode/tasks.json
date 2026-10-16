@@ -770,6 +770,31 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: verify (verify.py --auto)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/verify.py",
+                "--auto"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: verify all tiers (verify.py)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/verify.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Test: deviation catalog of the new expression language against the golden data of v1",
             "type": "shell",
             "command": "python",
