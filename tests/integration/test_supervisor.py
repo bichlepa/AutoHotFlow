@@ -12,6 +12,7 @@ between supervisor and child (exits, hangs, crashes) do not.
 Exit codes of the supervisor: 0 clean, 1 start failed, 2 bad arguments, 5 a child was terminated.
 """
 
+import re
 import subprocess
 import sys
 import threading
@@ -549,7 +550,7 @@ def test_frozen_child_is_hung_within_8s_and_ended_like_a_crash(started, session_
         crashed = watch.wait(event("evt.process.crashed", name="hanger"), timeout=10)
         assert crashed is not None and crashed[1]["payload"]["reason"] == "hung", sup.text()
         assert crashed[1]["payload"]["restart"] is False           # hanger is not auto-restarted
-        assert crashed[0] - hung[0] <= 4.0, "terminated %.2f s after the hang" % (crashed[0] - hung[0])
+        terminated_after = crashed[0] - hung[0]
         proc.wait(timeout=5)                                      # the process really ended
         assert not alive(pid)
     finally:
@@ -558,6 +559,44 @@ def test_frozen_child_is_hung_within_8s_and_ended_like_a_crash(started, session_
         py.close()
     # a child was terminated: the exit is reported as forced
     assert sup.wait_exit(timeout=20) == EXIT_FORCED, sup.text()
+    # F-0084: when the supervisor itself stood still (load), it moves the kill time by the length of the stand-still
+    # (Children.OnStall), so the wall clock budget grows by the stand-still the supervisor reports in its log.
+    stood_still_s = sum(int(n) for n in re.findall(r"supervisor stood still for (\d+) ms", sup.text())) / 1000.0
+    assert terminated_after <= 4.0 + stood_still_s, "terminated %.2f s after the hang (stand-still %.2f s)" % (
+        terminated_after, stood_still_s)
+
+
+@pytest.mark.slow
+def test_a_stand_still_of_the_supervisor_moves_the_kill_time_of_a_hung_child(started, session_id):
+    """F-0084: the kill time of a hung child is extended by a stand-still of the supervisor (Children.OnStall). The child
+    is terminated no sooner than 1 s after the thaw, although its kill time (2 s after the hang) passed during the freeze."""
+    sup = started("--start=hanger", "--test-roles")
+    py = connect(sup.pipe, "py")
+    watch = watch_for(py)
+    thaw = None
+    try:
+        ready = wait_ready(py, ("hanger",))
+        assert ready is not None, sup.text()
+        psutil.Process(ready["hanger"][1]).suspend()
+        hung = watch.wait(event("evt.process.hung", name="hanger"), timeout=HANG_BUDGET_S + 4)
+        assert hung is not None, "frozen child not reported as hung"
+        sup_proc = next(c for c in psutil.Process(sup.proc.pid).children(recursive=False)
+                        if "autohotkey" in c.name().lower())   # the interpreter below ahkrun
+        sup_proc.suspend()
+        try:
+            time.sleep(3.5)                                       # longer than the kill time (2 s) and than Stall.MIN_GAP_MS
+        finally:
+            sup_proc.resume()
+            thaw = time.perf_counter()
+        crashed = watch.wait(event("evt.process.crashed", name="hanger"), timeout=10)
+        assert crashed is not None, sup.text()
+    finally:
+        watch.stop()
+        request_ok(py, "supervisor", "cmd.app.exit", {})
+        py.close()
+    assert sup.wait_exit(timeout=20) == EXIT_FORCED, sup.text()
+    assert "supervisor stood still" in sup.text(), sup.text()
+    assert crashed[0] - thaw >= 1.0, "terminated %.2f s after the thaw: kill time not extended" % (crashed[0] - thaw)
 
 
 # --- shutdown -----------------------------------------------------------------------------------------
