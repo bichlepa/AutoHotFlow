@@ -59,7 +59,7 @@ def run_role_entry(procs, datadir, entry, *args):
     return code, out.read_bytes().decode("utf-8", "replace")
 
 
-@pytest.mark.parametrize("role", ["triggerhost", "editor"])
+@pytest.mark.parametrize("role", ["editor"])
 def test_the_placeholder_entries_start_and_say_that_they_are_not_implemented(procs, datadir, session_id, role):
     code, text = run_role_entry(procs, datadir, ENTRY_DIR / (role + ".ahk"), "--role=" + role,
                                 "--session=" + session_id, "--hub=ahf." + session_id + ".hub", "--data=" + str(datadir))

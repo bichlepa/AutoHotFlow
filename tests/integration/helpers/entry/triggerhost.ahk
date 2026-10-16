@@ -8,9 +8,9 @@
 ; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
 #Warn All, StdOut
 #Include ..\..\..\..\src\AhfBoot.ahk
-#Include ..\..\..\..\src\core\PlaceholderRole.ahk
+#Include ..\..\..\..\src\triggerhost\TriggerHost.ahk
 #Include ..\..\..\..\src\entry\generated\Elements_triggerhost.ahk
 #Include generated\TestElements_triggerhost.ahk
 
-RoleRegistry.Register("triggerhost", PlaceholderRole)
+RoleRegistry.Register("triggerhost", TriggerHost)
 AhfMain()

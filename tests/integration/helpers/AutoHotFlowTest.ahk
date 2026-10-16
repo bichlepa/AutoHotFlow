@@ -18,6 +18,7 @@
 #Include ..\..\..\src\storage\Storage.ahk
 #Include ..\..\..\src\manager\StubManager.ahk
 #Include ..\..\..\src\debugview\DebugView.ahk
+#Include ..\..\..\src\triggerhost\TriggerHost.ahk
 #Include ..\..\..\src\core\PlaceholderRole.ahk
 #Include ..\..\..\src\entry\generated\Elements_engine.ahk
 #Include entry\generated\TestElements_engine.ahk
@@ -34,7 +35,7 @@ RoleRegistry.Register("worker", Worker)
 RoleRegistry.Register("storage", Storage)
 RoleRegistry.Register("manager", StubManager)
 RoleRegistry.Register("debug", DebugView)
-RoleRegistry.Register("triggerhost", PlaceholderRole)
+RoleRegistry.Register("triggerhost", TriggerHost)
 RoleRegistry.Register("editor", PlaceholderRole)
 AhfTestRolesFn := AhfRegisterTestRoles
 
