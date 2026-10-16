@@ -16,11 +16,11 @@ HiddenWindow(title) {
 
 ; The parameters as the engine delivers them: an object with the names of the parameters.
 P(opts := {}) {
-    p := {TitleMatchMode: 1, Wintitle: "", excludeTitle: "", winText: "", ExcludeText: "", ahk_class: "", ahk_exe: ""
+    prm := {TitleMatchMode: 1, Wintitle: "", excludeTitle: "", winText: "", ExcludeText: "", ahk_class: "", ahk_exe: ""
         , ahk_id: "", ahk_pid: "", FindHiddenText: 0, FindHiddenWindow: 0}
     for key, value in opts.OwnProps()
-        p.%key% := value
-    return p
+        prm.%key% := value
+    return prm
 }
 
 Case1() {
