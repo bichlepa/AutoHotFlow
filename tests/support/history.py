@@ -77,6 +77,19 @@ def history_dir(cwd=None, common_dir=None):
     return folder
 
 
+def history_dir_to_read(cwd):
+    """The history folder for the readers (tools/test_history.py, tools/recheck.py), without creating anything."""
+    override = os.environ.get("AHF_HISTORY_DIR")
+    if override:
+        return Path(override)
+    common = git_info(cwd)[3]
+    if common and Path(common).name == ".git":
+        folder = Path(common).parent / "temp" / "history"
+        if folder.is_dir():
+            return folder
+    return admission.runs_dir() / "history"
+
+
 def file_name(record):
     run = record["run"]
     stamp = time.strftime("%Y%m%d-%H%M%S", time.localtime(run.get("startEpoch") or time.time()))
@@ -84,6 +97,7 @@ def file_name(record):
 
 
 def write_record(folder, record):
+    Path(folder).mkdir(parents=True, exist_ok=True)
     path = Path(folder) / file_name(record)
     admission.write_json_atomic(path, record)
     return path
