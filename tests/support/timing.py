@@ -10,6 +10,7 @@ Therefore every upper limit that states a product promise goes through `scaled()
   - parallel run (pytest-xdist worker): factor PARALLEL_FACTOR. A red test then means "much too slow", not "a bit
     slow on a busy machine".
 Only UPPER limits are scaled. Lower limits (a timeout must not fire early), counts and results are never relaxed.
+One exception, decided by the project owner (2026-10-16, M-0062): the lower bound of the crash-report lag in `test_supervisor.py` tolerates `scaled(0.25)` s of negative lag, because two test threads stamp the times (F-0096).
 
 AHF_TIMING_FACTOR overrides the factor (a number, e.g. 1 to be strict in a parallel run, or 5 on a slow machine).
 """
