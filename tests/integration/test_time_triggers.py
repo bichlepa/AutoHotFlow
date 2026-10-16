@@ -142,19 +142,22 @@ def test_disabling_the_flow_stops_the_periodic_timer(host_flows):
     assert started(host_flows, fid, since) == [], "a tick after the disable"
 
 
-def test_a_bad_interval_or_unit_is_not_armed_and_gives_the_v1_text(host_flows):
-    fb = FlowBuilder("Bad periodic timers")
+def test_a_bad_parameter_of_a_time_trigger_is_not_armed_and_gives_the_v1_text(host_flows):
+    fb = FlowBuilder("Bad time triggers")
     zero = fb.trigger("Trigger_Periodic_Timer", Interval="0", Unit="Seconds")
     unit = fb.trigger("Trigger_Periodic_Timer", Interval="5", Unit="Hours")
+    kind = fb.trigger("Trigger_Start_up", startupType="Shutdown")
     fid = host_flows.add(fb)
     host_flows.start()
     host_flows.enable(fid)
-    state = wait_state(host_flows, fid, zero.id, lambda s: s["message"] != "")
+    # The message before the arming is "trigger host is not running", so the wait is for the v1 text itself.
+    state = wait_state(host_flows, fid, zero.id, lambda s: s["message"] == "Parameter 'interval' has invalid value: 0")
     assert state is not None and state["armed"] is False and state["enabled"] is True, state
-    assert state["message"] == "Parameter 'interval' has invalid value: 0", state["message"]
-    state = wait_state(host_flows, fid, unit.id, lambda s: s["message"] != "")
+    state = wait_state(host_flows, fid, unit.id, lambda s: s["message"] == "Parameter 'Unit' has invalid value: Hours")
     assert state is not None and state["armed"] is False, state
-    assert state["message"] == "Parameter 'Unit' has invalid value: Hours", state["message"]
+    state = wait_state(host_flows, fid, kind.id,
+                       lambda s: s["message"] == "Parameter 'startupType' has invalid value: Shutdown")
+    assert state is not None and state["armed"] is False, state
     assert host_flows.request_ok("engine", "cmd.engine.snapshot", {})["ready"] is True
 
 
