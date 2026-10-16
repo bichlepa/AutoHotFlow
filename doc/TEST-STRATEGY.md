@@ -276,6 +276,8 @@ The expression language follows AHK v2 (E0022), so AHK v2 itself is the yardstic
 
 The test package `Test` has trigger classes in `tests/elements/Test/Triggers/`, used by `tests/integration/test_triggerhost.py`: `Trigger_TestTimer` (fires every `Interval` ms with a counter), `Trigger_TestFail` (`Enable` throws), `Trigger_TestDisableThrows` (`Disable` throws, its event is due after 300 ms), `Trigger_TestCallbackThrows` (its timer callback throws every 100 ms and keeps its chain), `Trigger_TestFireOnEnable` (fires in `Enable` with the start context `ahfStartup`). The upper bound of an event count is the time divided by the interval, never scaled: a timer cannot fire faster than its interval.
 
+The test element `Action_TestBlockInline` (inline, WI-0067) blocks the engine for `Duration` ms, the one deliberate block of an engine element. `Trigger_TestTimer` writes the host time of every fire (`A_TestTick`, the host's `A_TickCount`), so that a test compares the host times with the engine's processing times on one clock. The two stress measurements of S0003 (`tests/stress/test_trigger_host_busy.py`: the host while the engine is blocked, MS-0038; `tests/stress/test_trigger_host_memory.py`: memory with armed triggers, MS-0039) run serially and alone. The hotkey part of the first one (keys) is not in the repository yet, see MANUAL-CHECKS section 6.
+
 ## 9a. Dialog tests (E0038, WI-0051)
 
 Dialog elements run headless: the elements call `Dialogs.*` (`doc/ELEMENT-API-V2.md` section 3.3), the test entries (`tests/integration/helpers/AutoHotFlowTest.ahk`, `helpers/entry/engine.ahk`, `helpers/entry/worker.ahk`) register `TestDialogProvider`, which answers from a script. No window opens, so these tests belong to the fast or slow tier, not to `gui`.
