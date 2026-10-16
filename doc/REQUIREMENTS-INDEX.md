@@ -25,10 +25,10 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Robustness (ROB)](#robustness-rob) | 12 | 10 | 0 | 1 | 1 | 0 | 1 |
 | [Performance and resources (PRF)](#performance-and-resources-prf) | 10 | 7 | 0 | 1 | 2 | 0 | 0 |
 | [Security (SEC)](#security-sec) | 7 | 2 | 1 | 0 | 3 | 1 | 1 |
-| [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 2 | 1 | 0 | 0 |
+| [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 0 | 0 | 1 | 9 | 0 | 0 |
-| **All** | **217** | **57** | **1** | **36** | **122** | **1** | **6** |
+| **All** | **217** | **57** | **1** | **37** | **121** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -322,32 +322,32 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 |---|---|---|---|---|---|---|---|
 | [REQ-TST-010](REQUIREMENTS.md#req-tst-010-automatic-tests-at-several-levels) | L2459-2468 | Automatic tests at several levels | partial | done | must | port | - |
 | [REQ-TST-020](REQUIREMENTS.md#req-tst-020-fault-injection-and-stress) | L2470-2479 | Fault injection and stress | no | done | must | port | - |
-| [REQ-TST-030](REQUIREMENTS.md#req-tst-030-every-element-is-tested-headless) | L2481-2490 | Every element is tested headless | no | partial | must | port | S0002 (WI-0051, WI-0056) |
-| [REQ-TST-040](REQUIREMENTS.md#req-tst-040-the-v1-test-flows-run-green) | L2492-2500 | The v1 test flows run green | yes | open | must | port | S0002 (three flows, WI-0057), S0008 (all) |
-| [REQ-TST-050](REQUIREMENTS.md#req-tst-050-independent-oracle-for-the-expression-language) | L2502-2511 | Independent oracle for the expression language | n/a | done | must | port | - |
-| [REQ-TST-060](REQUIREMENTS.md#req-tst-060-manual-checks-of-the-user-interfaces) | L2513-2522 | Manual checks of the user interfaces | n/a | partial | must | port | S0004 to S0007 |
+| [REQ-TST-030](REQUIREMENTS.md#req-tst-030-every-element-is-tested-headless) | L2481-2490 | Every element is tested headless | no | partial | must | port | S0002 (WI-0051, WI-0056, WI-0057), S0008 (the other elements) |
+| [REQ-TST-040](REQUIREMENTS.md#req-tst-040-the-v1-test-flows-run-green) | L2492-2501 | The v1 test flows run green | yes | partial | must | port | S0003 and S0008 (the 13 flows of PENDING in `tests/integration/test_corpus.py`) |
+| [REQ-TST-050](REQUIREMENTS.md#req-tst-050-independent-oracle-for-the-expression-language) | L2503-2512 | Independent oracle for the expression language | n/a | done | must | port | - |
+| [REQ-TST-060](REQUIREMENTS.md#req-tst-060-manual-checks-of-the-user-interfaces) | L2514-2523 | Manual checks of the user interfaces | n/a | partial | must | port | S0004 to S0007 |
 
 ## Maintainability (MNT)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-MNT-010](REQUIREMENTS.md#req-mnt-010-english-repository) | L2526-2535 | English repository | yes | done | must | port | - |
-| [REQ-MNT-020](REQUIREMENTS.md#req-mnt-020-stock-autohotkey-v2) | L2537-2546 | Stock AutoHotkey v2 | no | done | must | port | - |
-| [REQ-MNT-030](REQUIREMENTS.md#req-mnt-030-architecture-rules-are-checked-automatically) | L2548-2555 | Architecture rules are checked automatically | no | done | must | port | - |
-| [REQ-MNT-040](REQUIREMENTS.md#req-mnt-040-elements-can-be-ported-largely-mechanically) | L2557-2565 | Elements can be ported largely mechanically | n/a | open | should | port | S0008 (E0036) |
-| [REQ-MNT-050](REQUIREMENTS.md#req-mnt-050-deliberate-changes-are-documented) | L2567-2576 | Deliberate changes are documented | n/a | done | must | port | - |
+| [REQ-MNT-010](REQUIREMENTS.md#req-mnt-010-english-repository) | L2527-2536 | English repository | yes | done | must | port | - |
+| [REQ-MNT-020](REQUIREMENTS.md#req-mnt-020-stock-autohotkey-v2) | L2538-2547 | Stock AutoHotkey v2 | no | done | must | port | - |
+| [REQ-MNT-030](REQUIREMENTS.md#req-mnt-030-architecture-rules-are-checked-automatically) | L2549-2556 | Architecture rules are checked automatically | no | done | must | port | - |
+| [REQ-MNT-040](REQUIREMENTS.md#req-mnt-040-elements-can-be-ported-largely-mechanically) | L2558-2566 | Elements can be ported largely mechanically | n/a | open | should | port | S0008 (E0036) |
+| [REQ-MNT-050](REQUIREMENTS.md#req-mnt-050-deliberate-changes-are-documented) | L2568-2577 | Deliberate changes are documented | n/a | done | must | port | - |
 
 ## Usability (USE)
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-USE-010](REQUIREMENTS.md#req-use-010-user-level-hides-advanced-elements) | L2580-2588 | User level hides advanced elements | yes | open | should | port | S0004 (setting), S0007 (element list) |
-| [REQ-USE-020](REQUIREMENTS.md#req-use-020-experimental-elements-are-marked) | L2590-2598 | Experimental elements are marked | yes | open | could | port | S0007 |
-| [REQ-USE-030](REQUIREMENTS.md#req-use-030-messages-reach-the-user-without-blocking-dialogs) | L2600-2608 | Messages reach the user without blocking dialogs | partial | open | must | port | S0004 |
-| [REQ-USE-040](REQUIREMENTS.md#req-use-040-the-user-interface-stays-responsive) | L2610-2618 | The user interface stays responsive | no | partial | must | port | S0004 to S0007 |
-| [REQ-USE-100](REQUIREMENTS.md#req-use-100-setup-assistant-at-the-first-start) | L2620-2635 | Setup assistant at the first start | no | open | should | later | - |
-| [REQ-USE-050](REQUIREMENTS.md#req-use-050-the-setup-assistant-asks-for-the-users-experience) | L2637-2653 | The setup assistant asks for the user's experience | no | open | should | later | - |
-| [REQ-USE-060](REQUIREMENTS.md#req-use-060-amount-of-hints) | L2655-2663 | Amount of hints | no | open | should | later | - |
-| [REQ-USE-070](REQUIREMENTS.md#req-use-070-hints-can-be-switched-off-one-by-one) | L2665-2673 | Hints can be switched off one by one | no | open | should | later | - |
-| [REQ-USE-080](REQUIREMENTS.md#req-use-080-unhandled-errors-of-a-flow-are-noticed) | L2675-2683 | Unhandled errors of a flow are noticed | yes | open | should | port | S0004 |
-| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2685-2693 | Sharp and correctly sized on high-resolution displays | no | open | should | port | S0004 to S0007 |
+| [REQ-USE-010](REQUIREMENTS.md#req-use-010-user-level-hides-advanced-elements) | L2581-2589 | User level hides advanced elements | yes | open | should | port | S0004 (setting), S0007 (element list) |
+| [REQ-USE-020](REQUIREMENTS.md#req-use-020-experimental-elements-are-marked) | L2591-2599 | Experimental elements are marked | yes | open | could | port | S0007 |
+| [REQ-USE-030](REQUIREMENTS.md#req-use-030-messages-reach-the-user-without-blocking-dialogs) | L2601-2609 | Messages reach the user without blocking dialogs | partial | open | must | port | S0004 |
+| [REQ-USE-040](REQUIREMENTS.md#req-use-040-the-user-interface-stays-responsive) | L2611-2619 | The user interface stays responsive | no | partial | must | port | S0004 to S0007 |
+| [REQ-USE-100](REQUIREMENTS.md#req-use-100-setup-assistant-at-the-first-start) | L2621-2636 | Setup assistant at the first start | no | open | should | later | - |
+| [REQ-USE-050](REQUIREMENTS.md#req-use-050-the-setup-assistant-asks-for-the-users-experience) | L2638-2654 | The setup assistant asks for the user's experience | no | open | should | later | - |
+| [REQ-USE-060](REQUIREMENTS.md#req-use-060-amount-of-hints) | L2656-2664 | Amount of hints | no | open | should | later | - |
+| [REQ-USE-070](REQUIREMENTS.md#req-use-070-hints-can-be-switched-off-one-by-one) | L2666-2674 | Hints can be switched off one by one | no | open | should | later | - |
+| [REQ-USE-080](REQUIREMENTS.md#req-use-080-unhandled-errors-of-a-flow-are-noticed) | L2676-2684 | Unhandled errors of a flow are noticed | yes | open | should | port | S0004 |
+| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2686-2694 | Sharp and correctly sized on high-resolution displays | no | open | should | port | S0004 to S0007 |

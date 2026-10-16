@@ -2481,21 +2481,22 @@ Processes are killed, frozen and cut off on purpose; the system stays usable and
 ### REQ-TST-030 Every element is tested headless
 
 - **v1:** no
-- **v2:** partial (the flow builder, the headless flow runner and the smoke test of every registered element and the dialog test provider exist; e2e tests exist for the dialog elements (WI-0056) and the core sets; the other elements are still missing)
+- **v2:** partial (the flow builder, the headless flow runner and the smoke test of every registered element and the dialog test provider exist; e2e tests exist for the core set (A to E, WI-0052 to WI-0056) and the test corpus (WI-0057); the other elements are still missing)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0051, WI-0056)
-- **Evidence:** `tests/support/test_flowbuilder.py`, `tests/integration/test_flowrun.py`, `tests/ahk/element_smoke.test.ahk`, `tests/integration/test_dialogs.py`, `tests/integration/test_core_e_dialogs.py`
+- **Plan:** S0002 (WI-0051, WI-0056, WI-0057), S0008 (the other elements)
+- **Evidence:** `tests/support/test_flowbuilder.py`, `tests/integration/test_flowrun.py`, `tests/ahk/element_smoke.test.ahk`, `tests/integration/test_dialogs.py`, `tests/integration/test_core_a_elements.py`, `tests/integration/test_core_b_lists.py`, `tests/integration/test_core_c_loops.py`, `tests/integration/test_core_d_flows.py`, `tests/integration/test_core_e_dialogs.py`, `tests/integration/test_corpus.py`
 
 A smoke test covers every registered element; each element has end-to-end tests built with the flow builder and run by the headless flow runner; dialog elements are answered by a test provider (E0038).
 
 ### REQ-TST-040 The v1 test flows run green
 
 - **v1:** yes (the "Automatic tests" flows)
-- **v2:** open
+- **v2:** partial (three of the 16 "Automatic tests" flows run headless and green: "variable test" on a copy with one fix (M-0069), "List test" and "Loop test" as saved; the other 13 wait for S0003 and S0008, see the table PENDING)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (three flows, WI-0057), S0008 (all)
+- **Plan:** S0003 and S0008 (the 13 flows of PENDING in `tests/integration/test_corpus.py`)
+- **Evidence:** `tests/integration/test_corpus.py::test_v1_variable_test_runs_green_from_its_start_trigger`, `tests/integration/test_corpus.py::test_v1_list_test_runs_green`, `tests/integration/test_corpus.py::test_v1_loop_test_runs_green`
 
 The "Automatic tests" flows of v1, adapted to v2 where needed, run headless and green.
 
