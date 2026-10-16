@@ -393,3 +393,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Give the test double the same member (a stub that returns the neutral answer), and keep a shared helper in the class that uses it (`Executor.ErrorText`). Run the whole unit test set after a change of a shared class, not only the new test file.
 - **Status:** verified (`python -m pytest tests/test_ahk_runner.py -q -n 0`: 127 red before the stub, 620 green after)
 - **Source:** `tests/ahk/helpers/EngineOwner.ahk` (`NoArms`), `src/engine/Executor.ahk` (`ErrorText`, `_Start`)
+
+### A timer trigger in an integration test needs the trigger host role
+
+- **Problem:** A flow with `Trigger_Periodic_Timer` enabled in a session with the roles `storage,engine` never fired; its `evt.trigger.state` said `trigger host is not running`, so no instance started. The test looked like a guard bug at first.
+- **Right:** Start the session with the trigger host as well (`roles="storage,engine,triggerhost"`, as `tests/integration/test_time_triggers.py` does with its `host_flows` fixture). Manual triggers need no host.
+- **Status:** verified (the failing run of `test_a_flood_of_refused_starts_is_answered_and_logged_a_few_times`, then green with the host role)
+- **Source:** `tests/integration/test_runaway.py`

@@ -335,3 +335,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Check the period before `SetTimer`: refuse a value above `0x7FFFFFFF` with the element's own error text, and round the rest to an integer with at least 1 ms (`Trigger_Periodic_Timer.PeriodMs`).
 - **Status:** verified that the element refuses such a period (`src/elements/Default/Triggers/Trigger_Periodic_Timer.ahk`); the behaviour of `SetTimer` itself with such a value was not checked.
 - **Source:** `src/elements/Default/Triggers/Trigger_Periodic_Timer.ahk`
+
+### A sliding window of counts costs one increment per count
+
+- **Problem:** The runaway guard (WI-0066) must count every element execution of a flow over the last 60 s. Summing 60 buckets per count is too expensive for every element.
+- **Right:** Keep 60 buckets (one per second, with the second they belong to) and the total of the valid buckets. A count adds to the bucket of the current second and to the total. The buckets are cleared only when the second changes (at most 60 checks per second), and a bucket of the same index that holds an older second is taken out of the total before it is reused. `RunawayGuard.Count` in `src/engine/core/RunawayGuard.ahk`.
+- **Status:** verified (`tests/ahk/engine_runaway.test.ahk`: the window forgets after 60 s, a reused bucket does not keep its old count, a long gap clears everything)
+- **Source:** `src/engine/core/RunawayGuard.ahk`
