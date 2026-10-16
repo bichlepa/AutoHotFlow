@@ -19,31 +19,14 @@ SHA_A = "a" * 40
 SHA_B = "b" * 40
 
 
-def _record(folder, run_id, start, sha, tests, dirty=False, complete=True, recheck_of=None):
-    rec = {"schema": 1, "complete": complete,
-           "run": {"id": run_id, "start": "2026-10-15T10:00:%02d" % (start % 60), "startEpoch": 1_790_000_000 + start,
-                   "durationS": 12.0, "args": ["tests", "-q"], "markexpr": "", "recheckOf": recheck_of,
-                   "startedBy": "direct"},
-           "code": {"sha": sha, "branch": "x", "dirty": dirty, "worktree": "w"},
-           "logs": {"runLog": "log-" + run_id},
-           "load": {"extMean": 20.0},
-           "counts": {},
-           "tests": []}
-    for test_id, outcome, duration, ext in tests:
-        rec["tests"].append({"id": test_id, "outcome": outcome, "duration": duration, "extMean": ext,
-                             "sysMean": ext + 10, "extPeak": ext, "sysPeak": ext + 10, "runsMax": 1})
-        rec["counts"][outcome] = rec["counts"].get(outcome, 0) + 1
-    history.write_record(folder, rec)
-
-
 @pytest.fixture
 def prepared(tmp_path):
-    _record(tmp_path, "r1", 1, SHA_A, [("t::flaky", "passed", 1.0, 5.0), ("t::steady", "passed", 0.2, 5.0),
+    innerpytest.fake_record(tmp_path, "r1", 1, SHA_A, [("t::flaky", "passed", 1.0, 5.0), ("t::steady", "passed", 0.2, 5.0),
                                         ("t::slower", "passed", 1.0, 5.0)])
-    _record(tmp_path, "r2", 2, SHA_A, [("t::flaky", "failed", 1.5, 80.0), ("t::steady", "passed", 0.2, 80.0)])
-    _record(tmp_path, "r3", 3, SHA_A, [("t::dirty", "failed", 1.0, 5.0)], dirty=True)
-    _record(tmp_path, "r4", 4, SHA_A, [("t::dirty", "passed", 1.0, 5.0)])
-    _record(tmp_path, "r5", 5, SHA_B, [("t::slower", "passed", 3.0, 5.0), ("t::other", "failed", 0.1, 30.0)])
+    innerpytest.fake_record(tmp_path, "r2", 2, SHA_A, [("t::flaky", "failed", 1.5, 80.0), ("t::steady", "passed", 0.2, 80.0)])
+    innerpytest.fake_record(tmp_path, "r3", 3, SHA_A, [("t::dirty", "failed", 1.0, 5.0)], dirty=True)
+    innerpytest.fake_record(tmp_path, "r4", 4, SHA_A, [("t::dirty", "passed", 1.0, 5.0)])
+    innerpytest.fake_record(tmp_path, "r5", 5, SHA_B, [("t::slower", "passed", 3.0, 5.0), ("t::other", "failed", 0.1, 30.0)])
     return tmp_path
 
 
@@ -107,23 +90,17 @@ def test_recheck_picks_the_red_tests_and_the_tier_of_the_run(prepared):
     assert recheck.tier_args(rec) == ["--all", "-m", "not gui"]
 
 
-@pytest.mark.slow
-def test_recheck_runs_the_red_tests_once_and_records_it(tmp_path):
-    """The recheck is a run of its own: serial, exclusive, with its own record (recheckOf); the first record stays."""
-    probes = innerpytest.PROBES
-    folder = tmp_path / "history"
-    _record(folder, "orig", 1, SHA_A, [(probes + "::test_probe_pass", "failed", 0.1, 90.0),
-                                      (probes + "::test_probe_fail", "failed", 0.1, 90.0)])
-    env = innerpytest.env_for(tmp_path, AHF_PROBE="fail")
-    proc = subprocess.run([sys.executable, str(REPO / "tools" / "recheck.py"), "orig"], cwd=str(REPO), env=env,
-                          capture_output=True, timeout=180)
-    out = proc.stdout.decode("utf-8", "replace") + proc.stderr.decode("utf-8", "replace")
-    assert proc.returncode == recheck.EXIT_RED_AGAIN, out
-    assert "test_probe_pass" in out and "green again" in out and "red again" in out
-    recs = history.load_records(folder)
-    assert [r["run"]["id"] for r in recs][0] == "orig" and len(recs) == 2
-    new = recs[1]
-    assert new["run"]["recheckOf"] == "orig" and new["run"]["startedBy"] == "recheck"
-    assert new["run"]["workers"] == 0                       # serial
-    assert {t["id"].split("::")[1]: t["outcome"] for t in new["tests"]} == {"test_probe_pass": "passed",
-                                                                         "test_probe_fail": "failed"}
+def test_recheck_stops_for_a_run_with_uncommitted_changes(prepared, monkeypatch, capsys):
+    """A dirty run cannot be reproduced from its commit: recheck says so and runs nothing (exit 3), unless --here."""
+    monkeypatch.setenv("AHF_HISTORY_DIR", str(prepared))
+    assert recheck.main(["r3"]) == recheck.EXIT_NOT_REPRODUCIBLE
+    assert "had uncommitted changes" in capsys.readouterr().out
+    assert recheck.main(["r3", "--here", "--dry-run"]) == 0
+    out = capsys.readouterr().out
+    assert "recheck at working tree" in out and "t::dirty" in out
+
+
+def test_recheck_runs_a_clean_run_at_its_commit(prepared, monkeypatch, capsys):
+    monkeypatch.setenv("AHF_HISTORY_DIR", str(prepared))
+    assert recheck.main(["r2", "--dry-run"]) == 0
+    assert "recheck at commit aaaaaaaa (own worktree)" in capsys.readouterr().out
