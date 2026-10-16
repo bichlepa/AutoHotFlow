@@ -337,3 +337,12 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `try jobRec := m.Delete(k)` and `catch return ""`: `Delete` returns the removed record and throws when it is gone, and the builtin call is not interrupted. Only the caller that gets the record acts on it.
 - **Status:** verified (`tests/ahk/engine_worker_bridge.test.ahk`, `AnswerAndDeadlineOfOneJobEndTheJobOnce`, red before with `expected 1 but got 2`, green after; the probe above)
 - **Source:** `src/engine/WorkerBridge.ahk` (`_TakeJob`), `doc/OPEN-ITEMS.md` F-0012
+
+
+### A race test must hook the access the fixed code makes, not the old one
+
+- **Problem:** The first race test for `Executor` hooked `Has` on the active-thread map, the check of the old code. After the fix (one `Delete` with `try`, no `Has`) the hook never ran: the stop counts of the test were wrong (0 and 1), and the first draft of the test showed nothing about the fix.
+- **Wrong:** A spy that runs the other path inside one specific method (`Has`, `Get`) of the old code.
+- **Right:** Hook the access that is the take in the fixed code (here `Delete`), and run the other path just before the real access. Check that the test is red on the old code and green on the fix; a test that is green on both proves nothing.
+- **Status:** verified (`tests/ahk/engine_executor.test.ahk`: the `Delete` spy is red on the old code (`Item has no value.`) and green on the fix)
+- **Source:** `tests/ahk/engine_executor.test.ahk` (`SpyActive`), `src/engine/Executor.ahk` (`_OnFinish`, `_StopRun`), `doc/OPEN-ITEMS.md` F-0012

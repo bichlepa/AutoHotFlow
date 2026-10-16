@@ -171,7 +171,7 @@ L89-94 A Map key `1` and `"1"` are two keys; Integer keys come before texts (ver
 L97-103 A function stored in an object that it holds is a reference cycle (assumed)
 ```
 
-## doc/howto/processes-pipes-messages.md (38.6 KB, 339 lines)
+## doc/howto/processes-pipes-messages.md (39.6 KB, 348 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L13-17 `PostMessageW` with a NULL handle reports success (verified)
@@ -211,6 +211,7 @@ L308-314 Waiting for a message: `Sleep(1)` returns only at the next tick of the 
 L317-322 A blocking wait inside a callback of the peer waits for nothing (assumed)
 L325-330 The end of a called instance goes to the caller in the next tick, not from the step that ended it (verified)
 L333-339 Take a shared entry with one `Delete`, not with `Get` and then `Delete` (verified)
+L342-348 A race test must hook the access the fixed code makes, not the old one (verified)
 ```
 
 ## doc/howto/syntax-and-language.md (32.7 KB, 323 lines)
