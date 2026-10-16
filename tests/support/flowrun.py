@@ -239,10 +239,11 @@ def kill_session(session):
 class FlowRunner:
     """One data folder, flows, and a session (supervisor with storage and engine) that is started on demand."""
 
-    def __init__(self, procs, datadir, session_id):
+    def __init__(self, procs, datadir, session_id, roles=START_ROLES):
         self.procs = procs
         self.datadir = Path(datadir)
         self.base_session = session_id
+        self.roles = roles              # the roles the supervisor starts (WI-0062 starts triggerhost too)
         self.sessions = []              # every session id that was started
         self.flows = {}                 # flow id -> builder or None (added as a file)
         self._names = {}                # flow id -> {element id: name}
@@ -295,7 +296,7 @@ class FlowRunner:
         self.sessions.append(session)
         self._err = open(self.datadir / ("flowrun-%d.stderr" % len(self.sessions)), "wb")
         args = [sys.executable, str(AHKRUN), "--timeout", "300", str(ENTRY), "--session=" + session,
-                "--data=" + str(self.datadir), "--start=" + START_ROLES]
+                "--data=" + str(self.datadir), "--start=" + self.roles]
         self._sup = self.procs.start(args, stdout=self._err, stderr=self._err, cwd=str(ROOT))
         pipe = pipenames.hub_pipe(session)
         deadline = time.monotonic() + scaled(START_TIMEOUT_S)
@@ -480,6 +481,15 @@ class FlowRunner:
     def mark(self):
         """The position in the stream of events of the observer, for `ended` (needs a started session)."""
         return self._rec.mark()
+
+    def wait_message(self, pred, timeout=RUN_TIMEOUT_S, since=0):
+        """The first message of the observer from the position `since` on that satisfies pred: (index, message) or None.
+        The messages are kept for the whole session (mark gives positions)."""
+        return self._rec.wait(pred, scaled(timeout), since)
+
+    def messages(self, since=0):
+        """The messages of the observer from the position `since` on."""
+        return self._rec.slice(since, self._rec.mark())
 
     def ended(self, flow_id, since=0, count=1, timeout=RUN_TIMEOUT_S):
         """The payloads of `evt.instance.ended` of a flow from the position `since` on, in order, after waiting until
