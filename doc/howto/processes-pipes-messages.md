@@ -355,3 +355,12 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Count an arm on its way as accepted for its own generation: the entry keeps `sent` from the send until the answer. A refused arm clears it again. The instances that such an event started run on (as v1 would start them).
 - **Status:** verified (`tests/integration/test_trigger_arming.py::test_the_startup_trigger_fires_once_at_the_start_of_autohotflow` was red without the fix, `tests/ahk/engine_trigger_arms.test.ahk` covers `Accepts` before and after the answer)
 - **Source:** `src/engine/TriggerArms.ahk` (`Accepts`, `_StartArm`, `_OnArm`), `src/triggerhost/TriggerHost.ahk` (`_CmdArm`)
+
+### An error in a request callback ends that request, the step after it never runs
+
+- **Problem:** `Peer._Finish` runs the callback of a request in a `try`. An exception there is only written as an `a0` line (`callback for <type> failed`) and the request counts as finished. A start that waits in such a callback then never reaches its next step: `evt.engine.ready` does not come, and the test reports only the timeout.
+- **Wrong:** Reading only the test output when a start times out.
+- **Right:** When a start times out, first read the `a0` lines of the engine's log (`callback for` and the exception text), then the callback that is named there. Keep callbacks short and guard every `Delete` (see the entry about `Map.Delete`).
+- **Status:** verified (`src/core/ipc/Peer.ahk` read). Not verified: the `a0` line itself; the WI-0068 hang was found by reading the code, the test output showed only the timeout.
+- **Source:** `src/core/ipc/Peer.ahk` (`_Finish`), `src/engine/FlowStateFile.ahk`
+

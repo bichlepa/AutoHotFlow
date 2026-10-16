@@ -159,7 +159,7 @@ L34-40 A Gui window needs a DPI awareness set before it is created (assumed) (as
 L42-49 Per-monitor DPI awareness scales only the title bar, not the controls (verified by the owner, fix assumed) (verified)
 ```
 
-## doc/howto/objects-maps-arrays.md (8.6 KB, 111 lines)
+## doc/howto/objects-maps-arrays.md (9.6 KB, 119 lines)
 ```text
 L5-9 Map with `CaseSense "Off"` keeps the spelling of the first insertion (verified)
 L12-17 Copy keys into an array before deleting from a Map (not checked)
@@ -174,9 +174,10 @@ L80-86 A subclass method silently replaces a same-named base class method (verif
 L89-94 A Map key `1` and `"1"` are two keys; Integer keys come before texts (verified)
 L97-103 A function stored in an object that it holds is a reference cycle (assumed)
 L105-111 Json.True and Json.False are objects: test them before IsObject (verified)
+L113-119 `Map.Delete` of a missing key throws: check `Has` first, or the callback dies silently (verified)
 ```
 
-## doc/howto/processes-pipes-messages.md (40.7 KB, 357 lines)
+## doc/howto/processes-pipes-messages.md (41.6 KB, 366 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L13-17 `PostMessageW` with a NULL handle reports success (verified)
@@ -218,6 +219,7 @@ L325-330 The end of a called instance goes to the caller in the next tick, not f
 L333-339 Take a shared entry with one `Delete`, not with `Get` and then `Delete` (verified)
 L342-348 A race test must hook the access the fixed code makes, not the old one (verified)
 L351-357 An event of a trigger can arrive before the answer that arms it (verified)
+L359-365 An error in a request callback ends that request, the step after it never runs (verified)
 ```
 
 ## doc/howto/syntax-and-language.md (34.3 KB, 337 lines)

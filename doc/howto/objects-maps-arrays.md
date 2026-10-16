@@ -109,3 +109,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Compare with `==` against `Json.False`, `Json.True` and `Json.Null` first, then test `IsObject`. The parser gives true and false as 1 and 0 inside a parsed file, so a value from a file needs both forms.
 - **Status:** verified (unit test `FollowsFlowReadsTheKey` in `tests/ahk/engine_trigger_state.test.ahk` covers the order)
 - **Source:** `src/engine/core/FlowDefinition.ahk` (`FollowsFlow`)
+
+### `Map.Delete` of a missing key throws: check `Has` first, or the callback dies silently
+
+- **Problem:** `Map.Delete(key)` raises `Item has no value` when the key is absent. In the flow state code (WI-0068) the error entry of a flow was deleted on the normal read path, where it had never been set. The exception ended the read callback, so the start never finished. The test said only `no evt.engine.ready within 15 s`; the peer logs the exception as an `a0` line (read in `Peer._Finish`, not seen in a log file yet).
+- **Wrong:** `this._errors.Delete(flowId)` on a path where the key may not exist.
+- **Right:** `if (map.Has(flowId)) map.Delete(flowId)`, in one helper (`_Forget`) for all such maps. Delete without a check only where the key was set on the same path.
+- **Status:** verified (the start tests went from red to green with the helper; `tests/integration/test_engine.py`, the flow state tests)
+- **Source:** `src/engine/FlowStateFile.ahk` (`_Forget`), `src/core/ipc/Peer.ahk` (`_Finish`, the callback is run in a `try`)
