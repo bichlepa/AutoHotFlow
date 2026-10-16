@@ -291,6 +291,36 @@ def test_missing_flow_read_reports_storage_error_to_the_engine_topic(storage, pi
         engine.close()
 
 
+# --- FlowState.json (WI-0060) -----------------------------------------------------------------------
+
+def test_flow_state_is_missing_until_written_then_reads_back_unchanged(storage, flowdir):
+    _, _, client = storage
+    assert not ask_ok(client, "cmd.storage.flowstate.read")["exists"]
+    state = {"formatVersion": 1, "flows": {"skeleton": ["element0000000001"]}}
+    ask_ok(client, "cmd.storage.flowstate.write", {"text": json.dumps(state, indent=2)})
+    answer = ask_ok(client, "cmd.storage.flowstate.read")
+    assert answer["exists"] is True and same(json.loads(answer["text"]), state)
+    assert (flowdir / "FlowState.json").read_bytes().count(b"\r\n") > 0      # CRLF as in the other files
+
+
+def test_broken_flow_state_is_kept_as_broken_file_and_a_missing_one_is_no_error(storage, flowdir):
+    _, _, client = storage
+    target = flowdir / "FlowState.json"
+    target.write_text("{not json", encoding="utf-8")
+    ask_ok(client, "cmd.storage.flowstate.keepBroken")
+    assert not target.exists()
+    assert (flowdir / "FlowState.json.broken").read_text(encoding="utf-8") == "{not json"
+    ask_ok(client, "cmd.storage.flowstate.keepBroken")          # nothing to keep: still ok
+    assert not ask_ok(client, "cmd.storage.flowstate.read")["exists"]
+
+
+def test_flow_state_write_rejects_a_value_that_is_not_text(storage, flowdir):
+    _, _, client = storage
+    answer = ask(client, "cmd.storage.flowstate.write", {"text": {"formatVersion": 1}})
+    assert not answer["ok"] and answer["error"]["code"] == "bad_payload"
+    assert not (flowdir / "FlowState.json").exists()
+
+
 # --- variables --------------------------------------------------------------------------------------
 
 def test_v1_variables_are_read_as_stored(procs, datadir, runs, pipe, session_id, hub):

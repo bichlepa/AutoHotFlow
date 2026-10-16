@@ -12,6 +12,7 @@
 #Include VarFiles.ahk
 #Include LogSink.ahk
 #Include ReportFiles.ahk
+#Include StateFiles.ahk
 
 ; Storage role (WI-0012, ARCHITECTURE D0007 and 4, PROTOCOL 4.6). The only process that touches files
 ; under the data directory: flows, variables and logs. Requests are queued (WriteQueue) and answered
@@ -71,6 +72,9 @@ class Storage extends Role {
         this.On("cmd.storage.var.set", (msg) => this._CmdVarSet(msg))
         this.On("cmd.storage.var.delete", (msg) => this._CmdVarDelete(msg))
         this.On("cmd.storage.var.list", (msg) => this._CmdVarList(msg))
+        this.On("cmd.storage.flowstate.read", (msg) => this._CmdFlowStateRead(msg))
+        this.On("cmd.storage.flowstate.write", (msg) => this._CmdFlowStateWrite(msg))
+        this.On("cmd.storage.flowstate.keepBroken", (msg) => this._CmdFlowStateKeepBroken(msg))
         this.On("cmd.storage.report.write", (msg) => this._CmdReportWrite(msg))
         this.On("evt.log.append", (msg) => this._EvtLogAppend(msg))
     }
@@ -151,6 +155,22 @@ class Storage extends Role {
         scope := msg.payload.Get("scope", "global")
         flowId := msg.payload.Get("flowId", "")
         return this._Defer(msg, "var.list", flowId, () => VarFiles.List(this.dataDir, scope, flowId))
+    }
+
+    ; cmd.storage.flowstate.* (WI-0060, PROTOCOL 4.6): FlowState.json, the enabled state of the triggers (StateFiles).
+    _CmdFlowStateRead(msg) {
+        return this._Defer(msg, "flowstate.read", StateFiles.FILE_NAME, () => StateFiles.Read(this.dataDir))
+    }
+
+    _CmdFlowStateWrite(msg) {
+        text := msg.payload.Get("text", "")
+        return this._Defer(msg, "flowstate.write", StateFiles.FILE_NAME
+            , () => StateFiles.Write(this.dataDir, text))
+    }
+
+    _CmdFlowStateKeepBroken(msg) {
+        return this._Defer(msg, "flowstate.keepBroken", StateFiles.FILE_NAME
+            , () => StateFiles.KeepBroken(this.dataDir))
     }
 
     ; cmd.storage.report.write (WI-0028, PROTOCOL 4.9): only the supervisor builds reports. The contents are checked
