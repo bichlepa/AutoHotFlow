@@ -4,7 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-None open.
+- **Crash-lag tolerance in parallel runs (F-0096).** You confirmed 0.25 s. The test uses `scaled(0.25)`, so a parallel run (factor 3) tolerates 0.75 s, a serial run 0.25 s. The verifier of `eaac300` found this. Should the tolerance be a fixed 0.25 s (as confirmed), or do you accept the scaled 0.75 s in parallel runs?
 
 ## To know
 
