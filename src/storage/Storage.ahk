@@ -157,20 +157,21 @@ class Storage extends Role {
         return this._Defer(msg, "var.list", flowId, () => VarFiles.List(this.dataDir, scope, flowId))
     }
 
-    ; cmd.storage.flowstate.* (WI-0060, PROTOCOL 4.6): FlowState.json, the enabled state of the triggers (StateFiles).
+    ; cmd.storage.flowstate.* (WI-0060, E0063, PROTOCOL 4.6): FlowStates/<flowId>.json, the enabled triggers of one flow.
     _CmdFlowStateRead(msg) {
-        return this._Defer(msg, "flowstate.read", StateFiles.FILE_NAME, () => StateFiles.Read(this.dataDir))
+        flowId := msg.payload.Get("flowId", "")
+        return this._Defer(msg, "flowstate.read", flowId, () => StateFiles.Read(this.dataDir, flowId))
     }
 
     _CmdFlowStateWrite(msg) {
+        flowId := msg.payload.Get("flowId", "")
         text := msg.payload.Get("text", "")
-        return this._Defer(msg, "flowstate.write", StateFiles.FILE_NAME
-            , () => StateFiles.Write(this.dataDir, text))
+        return this._Defer(msg, "flowstate.write", flowId, () => StateFiles.Write(this.dataDir, flowId, text))
     }
 
     _CmdFlowStateKeepBroken(msg) {
-        return this._Defer(msg, "flowstate.keepBroken", StateFiles.FILE_NAME
-            , () => StateFiles.KeepBroken(this.dataDir))
+        flowId := msg.payload.Get("flowId", "")
+        return this._Defer(msg, "flowstate.keepBroken", flowId, () => StateFiles.KeepBroken(this.dataDir, flowId))
     }
 
     ; cmd.storage.report.write (WI-0028, PROTOCOL 4.9): only the supervisor builds reports. The contents are checked
@@ -405,6 +406,7 @@ class Storage extends Role {
     _RunTempCleanup() {
         removed := AtomicFile.RemoveStaleTemps(StoragePaths.FlowsDir(this.dataDir))
         removed += AtomicFile.RemoveStaleTemps(StoragePaths.VarsDir(this.dataDir))
+        removed += AtomicFile.RemoveStaleTemps(StoragePaths.StatesDir(this.dataDir))
         return Map("removed", removed)
     }
 
@@ -419,7 +421,7 @@ class Storage extends Role {
 
     _EnsureFolders() {
         for dirPath in [StoragePaths.FlowsDir(this.dataDir), StoragePaths.VarsDir(this.dataDir)
-            , StoragePaths.LogDir(this.dataDir)] {
+            , StoragePaths.LogDir(this.dataDir), StoragePaths.StatesDir(this.dataDir)] {
             try {
                 DirCreate(dirPath)
             } catch as e {

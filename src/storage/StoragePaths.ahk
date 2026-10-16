@@ -12,6 +12,7 @@ class StoragePaths {
     static FlowsDir(dataDir) => dataDir "\Flows"
     static VarsDir(dataDir) => dataDir "\Variables"
     static LogDir(dataDir) => dataDir "\Log"
+    static StatesDir(dataDir) => dataDir "\FlowStates"
 
     ; Absolute path of a flow file given as "Flows/<name>.json".
     static Flow(dataDir, flowPath) {

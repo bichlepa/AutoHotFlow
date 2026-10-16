@@ -2,33 +2,38 @@
 #Include ..\core\Errors.ahk
 #Include ..\core\Json.ahk
 #Include AtomicFile.ahk
+#Include StoragePaths.ahk
 
-; FlowState.json (WI-0060, E0057, PROTOCOL 4.6): the enabled state of the triggers, in the data folder. The engine owns
-; the content and only asks for the file; storage reads it as text, writes it atomically and renames a broken one.
+; FlowStates/<flowId>.json (WI-0060, E0057, E0063, PROTOCOL 4.6): the enabled triggers of one flow, in the data folder.
+; The engine owns the content and only asks for the file; storage reads it as text, writes it atomically and renames a
+; broken one. One file per flow: a file that cannot be read affects that flow only.
 class StateFiles {
-    static FILE_NAME := "FlowState.json"
+    static EXT := ".json"
 
-    static Path(dataDir) => dataDir "\" StateFiles.FILE_NAME
+    ; Absolute path of the state file of one flow. The flow ID is a flow file name: StoragePaths checks it.
+    static Path(dataDir, flowId) => StoragePaths.StatesDir(dataDir) "\" StoragePaths.CheckName(flowId, "flow ID") StateFiles.EXT
 
     ; Map(exists, text): exists is Json.False when the file is missing (text is then absent).
-    static Read(dataDir) {
-        path := StateFiles.Path(dataDir)
+    static Read(dataDir, flowId) {
+        path := StateFiles.Path(dataDir, flowId)
         if (FileExist(path) = "")
             return Map("exists", Json.False)
         return Map("exists", Json.True, "text", AtomicFile.ReadText(path))
     }
 
-    ; Replaces the whole file (atomic, CRLF as in the other JSON files of the data folder).
-    static Write(dataDir, text) {
+    ; Replaces the whole file of one flow (atomic, CRLF as in the other JSON files of the data folder).
+    static Write(dataDir, flowId, text) {
         if (IsObject(text))
-            throw AhfError("FlowState.json content must be text", ErrCode.BAD_PAYLOAD)
-        AtomicFile.Write(StateFiles.Path(dataDir), AtomicFile.Crlf(String(text)))
+            throw AhfError("FlowStates content must be text", ErrCode.BAD_PAYLOAD)
+        path := StateFiles.Path(dataDir, flowId)
+        DirCreate(StoragePaths.StatesDir(dataDir))
+        AtomicFile.Write(path, AtomicFile.Crlf(String(text)))
         return Map()
     }
 
-    ; Renames the file to FlowState.json.broken; an older broken file is replaced. Nothing to do when the file is missing.
-    static KeepBroken(dataDir) {
-        path := StateFiles.Path(dataDir)
+    ; Renames the file to <flowId>.json.broken; an older broken file is replaced. Nothing to do when the file is missing.
+    static KeepBroken(dataDir, flowId) {
+        path := StateFiles.Path(dataDir, flowId)
         if (FileExist(path) = "")
             return Map()
         try {
