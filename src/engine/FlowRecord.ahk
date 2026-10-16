@@ -93,6 +93,28 @@ class FlowRecord {
         return changed
     }
 
+    ; The triggers of a scope (WI-0065, the choices of the elements Set flow status and Flow enabled): "following" (they
+    ; switch with the flow), "independent" (they do not) or "all". An Array in the order of the flow, possibly empty.
+    TriggersOf(scope) {
+        out := []
+        for triggerId in this.Def.Triggers() {
+            follows := this.Def.FollowsFlow(triggerId)
+            if (scope = "all" || (scope = "following" && follows) || (scope = "independent" && !follows))
+                out.Push(triggerId)
+        }
+        return out
+    }
+
+    ; Sets the target state of the given triggers. Returns the IDs whose state changed (an Array, possibly empty).
+    SetEnabledOf(triggerIds, enabled) {
+        changed := []
+        for triggerId in triggerIds {
+            if (this.SetTriggerEnabled(triggerId, enabled))
+                changed.Push(triggerId)
+        }
+        return changed
+    }
+
     ; Takes the enabled triggers of the file FlowStates/<flowId>.json (the IDs that are triggers of this flow). Returns the IDs that were newly enabled.
     LoadEnabledTriggers(triggerIds) {
         taken := []

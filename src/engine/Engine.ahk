@@ -584,6 +584,28 @@ class Engine extends Role {
         }
     }
 
+    ; A switch of an inline element (WI-0065, ctx.SetTriggers, ctx.SetTriggerEnabled): the same switch as the commands,
+    ; without a reply. scope "one" switches the trigger triggerId; the other scopes are those of FlowRecord.TriggersOf.
+    ; Returns the number of triggers of the scope. Unlike a command, an element cannot wait for the read of a state that
+    ; is not known yet (E0063): such a switch is refused at once and changes nothing. The caller turns AhfError into an
+    ; exception of the element.
+    SwitchFromElement(flowId, scope, enabled, triggerId := "") {
+        rec := this.flows.Get(flowId)
+        if (!IsObject(rec))
+            throw AhfError("flow '" flowId "' is not loaded", ErrCode.NOT_FOUND)
+        if (!this.flowState.IsKnown(flowId))
+            throw AhfError("the state of flow '" flowId "' cannot be read; nothing changed", ErrCode.DENIED)
+        if (scope = "one") {
+            if (rec.Def.ElementKind(triggerId) != "trigger")
+                throw AhfError("element '" triggerId "' is not a trigger of flow '" flowId "'", ErrCode.BAD_PAYLOAD)
+            this._SwitchTriggers(rec, rec.SetEnabledOf([triggerId], enabled))
+            return 1
+        }
+        ids := rec.TriggersOf(scope)
+        this._SwitchTriggers(rec, rec.SetEnabledOf(ids, enabled))
+        return ids.Length
+    }
+
     ; Arms or disarms the switched triggers (WI-0062), sends evt.trigger.state for each of them, then evt.flow.state, and
     ; marks the state of this flow for its file (WI-0060, E0063). Nothing is sent when nothing changed.
     _SwitchTriggers(rec, changed) {

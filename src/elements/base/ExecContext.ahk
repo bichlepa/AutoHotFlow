@@ -208,8 +208,42 @@ class ExecContext {
     ; The ID of the default manual trigger of the flow, "" if it has none.
     DefaultTrigger(flowId) => this._Host().DefaultTriggerOf(String(flowId))
 
-    ; True if the trigger of the flow is enabled. Until S0003 a trigger is enabled when its flow is enabled.
+    ; True if the trigger of the flow is enabled (its target state, E0056; whether it is armed does not count).
     IsTriggerEnabled(flowId, triggerId) => this._Host().IsTriggerEnabled(String(flowId), String(triggerId)) ? true : false
+
+    ; Trigger switches of a flow (WI-0065, v1 x_flowEnable, x_flowDisable, x_triggerEnable, x_triggerDisable,
+    ; x_isFlowEnabled). The scope names the triggers: "following" (they switch with the flow, E0056), "independent"
+    ; (they do not) or "all". CountTriggers returns Map("total", n, "enabled", m) for a scope. IsFlowEnabled is true
+    ; when a trigger that switches with the flow is enabled (the v1 meaning of "flow enabled").
+    ; SetTriggers switches every trigger of a scope and returns their number (0: nothing changed); SetTriggerEnabled
+    ; switches one trigger. The switch is saved and armed by the engine like the commands of the editor (WI-0060,
+    ; WI-0062). Switching does not stop running instances. Throws ElementError: no such flow, the state of the flow
+    ; cannot be read (E0063), or no trigger of the flow with that ID. Inline only.
+    CountTriggers(flowId, scope) {
+        try {
+            return this._Host().CountTriggers(String(flowId), String(scope))
+        } catch AhfError as e {
+            throw ElementError(e.Message)
+        }
+    }
+
+    IsFlowEnabled(flowId) => this.CountTriggers(flowId, "following")["enabled"] > 0
+
+    SetTriggers(flowId, scope, enabled) {
+        try {
+            return this._Host().SetTriggers(String(flowId), String(scope), enabled ? true : false)
+        } catch AhfError as e {
+            throw ElementError(e.Message)
+        }
+    }
+
+    SetTriggerEnabled(flowId, triggerId, enabled) {
+        try {
+            this._Host().SetTriggers(String(flowId), "one", enabled ? true : false, String(triggerId))
+        } catch AhfError as e {
+            throw ElementError(e.Message)
+        }
+    }
 
     ; Starts an instance of a flow at a trigger ("" = the first trigger of the flow), with the instance variables vars (a
     ; Map name -> value, copied; "" = none). Without onEnd the element does not wait. With onEnd the element waits:

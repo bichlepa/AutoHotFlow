@@ -191,6 +191,34 @@ class Executor {
         return IsObject(rec) && rec.TriggerEnabled(triggerId) && this.HasTrigger(flowId, triggerId)
     }
 
+    ; The triggers of a scope of a flow and how many of them are enabled (WI-0065, ctx.CountTriggers): Map("total", n,
+    ; "enabled", m). The scopes are those of FlowRecord.TriggersOf. Throws AhfError if the flow is not loaded.
+    CountTriggers(flowId, scope) {
+        rec := this._LoadedFlow(flowId)
+        ids := rec.TriggersOf(scope)
+        enabled := 0
+        for triggerId in ids {
+            if (rec.TriggerEnabled(triggerId))
+                enabled += 1
+        }
+        return Map("total", ids.Length, "enabled", enabled)
+    }
+
+    ; Switches the triggers of a scope of a flow, or the one trigger triggerId (scope "one"), as cmd.flow.enable/disable and
+    ; cmd.trigger.enable/disable do (WI-0065, E0056, E0063): the engine arms, announces and saves them. Returns the number
+    ; of triggers of the scope. Throws AhfError if the flow is not loaded, its state is not known, or triggerId is no
+    ; trigger of the flow (ctx.SetTriggers and ctx.SetTriggerEnabled turn it into ElementError).
+    SetTriggers(flowId, scope, enabled, triggerId := "") {
+        return this._owner.SwitchFromElement(String(flowId), String(scope), enabled ? true : false, String(triggerId))
+    }
+
+    _LoadedFlow(flowId) {
+        rec := this._owner.flows.Get(flowId)
+        if (!IsObject(rec))
+            throw AhfError("flow '" flowId "' is not loaded", ErrCode.NOT_FOUND)
+        return rec
+    }
+
     ; StartFlow and CallFlow. call: the Map of a waiting call or "". vars: initial instance variables or "". depth: the
     ; number of waiting calls that lead to this instance (0 for a start that nobody waits for).
     _Start(rec, triggerId, call, vars, depth, fired) {
