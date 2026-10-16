@@ -8,12 +8,14 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Yes. The first insertion fixes the spelling; a later insertion in another spelling only replaces the value. Enumeration is sorted (`apple`, `mango`, `zebra`). Two keys that differ only in spelling become one, which `Json.Parse` rejects.
 - **Status:** verified (`tests/ahk/json.test.ahk`). The sorted enumeration is observed, not documented.
 
+
 ### Copy keys into an array before deleting from a Map
 
 - **Problem:** When an instance stops, threads are removed from a `Map` while iterating over it.
 - **Right:** First copy the keys into an array, then iterate over the array (`Instance.Stop`).
 - **Status:** not checked (whether deleting during a `for` loop over a Map works was not tested; the copy avoids the question)
 - **Source:** `src/engine/core/Instance.ahk`
+
 
 ### Static method `Name()` shadows the `.Name` property of a class
 
@@ -23,12 +25,14 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (probe: `cls.Name` gives `Func`, `Type(cls())` gives the class name; `tests/ahk/element_registry.test.ahk`)
 - **Source:** `src/elements/base/ElementRegistry.ahk`
 
+
 ### `static __New()` sets the key spelling of a static Map
 
 - **Problem:** A `static` Map should find keys regardless of case. `CaseSense` cannot be set in the class line.
 - **Right:** `static __New() { this.classes.CaseSense := "Off" }` runs when the class is loaded, before first use. Afterwards `Has("TRIGGER_MANUAL")` finds `Trigger_Manual`.
 - **Status:** verified (probe; `tests/ahk/element_registry.test.ahk`, case "lookup is case-insensitive")
 - **Source:** `src/elements/base/ElementRegistry.ahk`
+
 
 ### Callback with state: `ObjBindMethod` instead of a lambda in a loop
 
@@ -38,6 +42,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (`tests/integration/test_engine.py`, loading of two flow files and an error file)
 - **Source:** `src/engine/Engine.ahk` (`_OnFlowList`)
 
+
 ### Parameter of an element as an object with property access
 
 - **Problem:** `Action_Sleep` reads `params.Duration` (property access, as in v1), but the flow file delivers the parameters as a `Map`.
@@ -46,6 +51,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (Sleep with Duration 200 in `tests/integration/test_engine.py`). Whether a `Map` with `HasProp` would behave the same was not checked.
 - **Source:** `src/engine/Executor.ahk` (`_Params`)
 
+
 ### Clone only after the change: the clone inherits it
 
 - **Problem:** `Scheduler.Advance` cloned the thread for the second connection after the first thread had received the loop element and the loop stack push. The clone inherited the push (depth 1 instead of 0), and the second rollback of the stack threw.
@@ -53,12 +59,14 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (tests `Advance: branching into a loop pushes only the loop thread` and `Loop: two tail connections pop the loop stack once` were red before the fix)
 - **Source:** `src/engine/core/Scheduler.ahk`
 
+
 ### A Map orders by keys, not by insertion: FIFO needs an array
 
 - **Problem:** The instances were kept in a `Map` with keys `inst-<n>`. Enumeration is sorted by key, not by start time, so it cannot serve as the FIFO queue of the policy `wait`.
 - **Right:** Use a dedicated queue: an `Array` per flow, `Push` at the end, `RemoveAt(1)` at the beginning.
 - **Status:** sorting by key verified (documentation and code); that `inst-10` sorts before `inst-2` is assumed (not measured).
 - **Source:** `src/engine/Executor.ahk` (`_waiting`)
+
 
 ### `Map.Delete` on a missing key throws
 
@@ -68,6 +76,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (`test_killed_worker_ends_its_element_with_worker_crashed_and_the_pool_has_a_replacement`, red with this log line, green after the fix)
 - **Source:** `src/engine/WorkerBridge.ahk` (`OnProcessEvent`)
 
+
 ### A subclass method silently replaces a same-named base class method
 
 - **Problem:** `Role` got a method `_CmdSnapshot` for `cmd.diag.snapshot`, but the engine already had a private method `_CmdSnapshot`. The subclass method replaced the base method without a warning, and the engine's call ran the wrong code.
@@ -76,12 +85,6 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (red with `KeyError: 'snapshot'` for the engine; green after renaming)
 - **Source:** `src/core/Role.ahk`
 
-### `Json.Parse` returns `true` as 1, not as `Json.True`
-
-- **Problem:** `Json.True` and `Json.False` are for writing. A parsed `true` is the Integer 1, so `value == Json.True` is false for a marker that was read from a file.
-- **Right:** Compare a parsed truth value with `1` (and accept `"1"` and `"true"` where a file may have been edited by hand), as `FlowExprConvert.IsMarked` does. `Json.Stringify` writes `Json.True` as `true`.
-- **Status:** verified (unit test `tests/ahk/engine_flow_convert.test.ahk`)
-- **Source:** `src/engine/core/FlowExprConvert.ahk`
 
 ### A Map key `1` and `"1"` are two keys; Integer keys come before texts
 
@@ -89,6 +92,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Normalize keys when storing and looking up (`VarValues.NormKey`: a text of decimal digits becomes the Integer). A `Map` enumerates its Integer keys in ascending order first, then its text keys sorted (with `CaseSense "Off"` without case: `_` before `A` before `b`). That is the order of v1 objects, so no own sort is needed.
 - **Status:** verified (probe with `ahkrun.py`: `-3, 2, 10, "1.5", "1x", "_", "A", "b", "Z"`; golden case `objects.dict.whole`)
 - **Source:** `src/engine/vars/VarValues.ahk`
+
 
 ### A function stored in an object that it holds is a reference cycle
 

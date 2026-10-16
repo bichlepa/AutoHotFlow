@@ -2,19 +2,12 @@
 
 Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW-TO.md).
 
-### A static class method is not a callback (`OnError`, `SetTimer`)
-
-- **Problem:** `OnError(TestRun.OnUnhandled)` with a static method aborted with "Invalid callback function" during init, and the script ended without a result file. `SetTimer(Role.Run, -1)` with a static method opened the same kind of dialog.
-- **Wrong:** `OnError(Class.Method)` or `SetTimer(Class.Method, ...)`.
-- **Right:** For `OnError`, pass a free function (`AhfUnhandledError(e, mode)`, which writes a fatal line and calls `ExitApp(2)`). For `SetTimer`, use a function-object property (`static RunFn := (*) => Role.Run()`) or `ObjBindMethod(Role, "Run")`. Pass the same object again to switch the timer off (`SetTimer(fn, 0)`).
-- **Status:** verified (`tests/ahk/lib/Assert.ahk`, `test_unhandled_error_ends_run_without_dialog`; dialog text in the guard folder)
-- **Source:** `tests/ahk/lib/Assert.ahk`
-
 ### A script without a summary line ends with exit code 0
 
 - **Problem:** A script that ends before `TestRun.Finish()` (e.g. after a silent load error) returns exit code 0 and no summary. The exit code alone does not reveal the error.
 - **Right:** The test runner requires the summary line in addition to exit code 0.
 - **Status:** verified (`test_script_without_finish_has_no_summary`)
+
 
 ### A callback that throws does not abort the state machine
 
@@ -23,12 +16,14 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (test "a throwing callback is logged, not raised" in `tests/ahk/engine_states.test.ahk`)
 - **Source:** `src/engine/core/ThreadState.ahk`
 
+
 ### `OnError` handler: return 1 keeps the process alive
 
 - **Problem:** An error in a timer must not end a role, and the standard dialog must not appear.
 - **Right:** The handler returns `1`: the error counts as handled, no dialog appears, and the process keeps running. The second parameter `mode` tells the kind of error: `"Return"`, `"Exit"` (how an error from a timer arrives) or `"ExitApp"`. `Role._OnUnexpected` counts errors and calls `ExitApp(6)` when the threshold is exceeded.
 - **Status:** verified for `"Exit"` (test `test_error_in_a_timer_is_logged_and_the_role_keeps_running`). Return values other than 1, and the modes `"Return"` and `"ExitApp"`, were not tested individually.
 - **Source:** `src/core/Role.ahk`
+
 
 ### Console output is best effort and must not block shutdown
 
@@ -37,6 +32,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Wrap console writes in `try/catch`. Before every `ExitApp` in the shutdown path, call nothing that can throw, or catch it. Test the orphan case with the real supervisor.
 - **Status:** verified (error seen with `AHF_TEST_KEEP=1` in `Log_role.txt`; after the fix exit 4 after 3.3 s, 20 of 20 runs)
 - **Source:** `src/core/Role.ahk` (`Console`, `_Exit`), `tests/fault/test_orphans.py`
+
 
 ### `FileAppend` to `**` writes to stderr without creating a file
 

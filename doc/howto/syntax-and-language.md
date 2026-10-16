@@ -9,6 +9,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `throw` is a statement, not an expression. Use a named function that throws, and pass that function.
 - **Status:** verified (editor diagnostic and load error in `tests/ahk/selfcheck.test.ahk`)
 
+
 ### FileAppend writes a BOM for a new file; strip the BOM when reading
 
 - **Problem:** Files written with `"UTF-8"` start with a UTF-8 BOM. A Python reader using `utf-8` gets `﻿` in front of the first JSON object. v1 variable files also start with a BOM, which breaks `Json.Parse`.
@@ -17,6 +18,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (BOM seen in output; `UTF-8-RAW` output without BOM in `tests/test_json_flows.py`; BOM strip in `AtomicFile.ReadText`). Whether AHK itself strips the BOM on read with `"UTF-8"` was not checked.
 - **Source:** `src/storage/AtomicFile.ahk`
 
+
 ### `#Include` is relative to the including file
 
 - **Problem:** Test scripts include `lib\Assert.ahk`. It was unclear which directory the path refers to.
@@ -24,19 +26,22 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (tests with scripts in the data directory and in `tests/ahk/`)
 - **Source:** https://www.autohotkey.com/docs/v2/lib/_Include.htm
 
-### A static method used as a callback shifts the parameters
 
-- **Problem:** `Log.Configure(Log.Memory)` with `static Memory(level, source, text, flowId)` received the second argument as `level`. A sink called as `this.sink(...)` received the object as an extra first argument. Both errors were silently swallowed, which made the cause hard to see.
-- **Wrong:** Passing a static method as a sink, or calling `this.sink(level, ...)` where `sink` is a method.
-- **Right:** Store the callback as a function property, `static Memory := (level, source, text, flowId := "") => ...`. Call it through a local copy: `sink := this.sink`, then `sink(level, ...)`. The function then receives exactly the arguments passed.
-- **Status:** verified (`tests/ahk/core_log.test.ahk`, cases "custom sink function" and "sink receives level, source, text and flowId")
-- **Source:** `src/core/Log.ahk`
+### A static method is not a callback: pass a function object
+
+- **Problem:** Three cases failed, two of them silently. (1) `Log.Configure(Log.Memory)` with `static Memory(level, source, text, flowId)` received the second argument as `level`; a sink called as `this.sink(...)` received the object as an extra first argument. Both errors were silently swallowed, which made the cause hard to see. (2) `OnError(TestRun.OnUnhandled)` with a static method aborted with "Invalid callback function" during init, and the script ended without a result file. (3) `SetTimer(Role.Run, -1)` with a static method opened the same kind of dialog.
+- **Wrong:** Passing a static method as a sink or as a callback (`Log.Configure(Log.Memory)`, `OnError(Class.Method)`, `SetTimer(Class.Method, ...)`), or calling `this.sink(level, ...)` where `sink` is a method.
+- **Right:** Store the callback as a function property, `static Memory := (level, source, text, flowId := "") => ...`, and call it through a local copy: `sink := this.sink`, then `sink(level, ...)`; the function then receives exactly the arguments passed. For `OnError`, pass a free function (`AhfUnhandledError(e, mode)`, which writes a fatal line and calls `ExitApp(2)`). For `SetTimer`, use a function-object property (`static RunFn := (*) => Role.Run()`) or `ObjBindMethod(Role, "Run")`; pass the same object again to switch the timer off (`SetTimer(fn, 0)`).
+- **Status:** verified (`tests/ahk/core_log.test.ahk`, cases "custom sink function" and "sink receives level, source, text and flowId"; the `OnError` case `test_unhandled_error_ends_run_without_dialog` in `tests/ahk/lib/Assert.ahk`, dialog text in the guard folder)
+- **Source:** `src/core/Log.ahk`, `tests/ahk/lib/Assert.ahk`
+
 
 ### Backslash is not an escape character in AHK v2
 
 - **Problem:** When writing JSON test texts, the length did not match, because `"\\"` yields two backslashes.
 - **Right:** `"\"` is one backslash, `"\\"` is two. The escape character is the backtick: `` `n ``, `` `t ``, `` `r ``. Inside `"..."` a quotation mark is `""`; inside `'...'` it is a plain `"`. Write JSON text with escapes in single quotes: `'"é"'`.
 - **Status:** verified (`tests/ahk/json.test.ahk`, cases for control characters and escapes)
+
 
 ### `<` compares strings numerically, `Sort` sorts only text
 
@@ -45,12 +50,14 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Compare text order with `Ord()` of the characters (see `Json.Less` in `src/core/Json.ahk`). `Sort` works only on text with delimiters, not on arrays.
 - **Status:** verified (observed in experiments; `Json.SortedKeys` in the tests)
 
+
 ### `=` and `!=` compare strings case-insensitively
 
 - **Problem:** A literal check should not accept `True` as `true`.
 - **Wrong:** `SubStr(text, pos, 4) != "true"`.
 - **Right:** `!==` (and `==`) compare case-sensitively. `Json.ParseLiteral` uses `!==`.
 - **Status:** verified for `!==` (test "invalid literal is rejected" with `[True]`). `!=` itself was not tested separately; behavior taken from the documentation.
+
 
 ### Float as text: precision and form
 
@@ -59,11 +66,13 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `Format("{:.15g}", f)`; if `Float(s) != f`, use `Format("{:.17g}", f)`. If neither `.` nor `e` is present, append `.0`. `Float("1e400")` returns `inf`, which must be rejected beforehand (`f - f != 0`).
 - **Status:** verified (`Format` outputs such as `1/3` giving `0.33333333333333331` and `1.0` giving `1`; precision tests). The default float-to-text conversion was not checked.
 
+
 ### Nested class with a static singleton
 
 - **Problem:** `Json.Null` should be a singleton of its own class, without a second class in the same file.
 - **Right:** `class Json { class NullValue {} static Null := Json.NullValue() }`. `Type()` returns `Json.NullValue`. The nested class must come before the static line.
 - **Status:** verified (`tests/ahk/json.test.ahk`, case "Json.Null is a singleton")
+
 
 ### Performance: calls per character are expensive
 
@@ -72,6 +81,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (measured, values vary per run)
 - **Source:** `src/core/Json.ahk`
 
+
 ### Reserved word `loop` must not be used as a variable name
 
 - **Problem:** A test variable named `loop` produced "The following reserved word 'loop' must not be used as a variable name", plus follow-up errors such as "Missing operand".
@@ -79,19 +89,24 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Choose another name (`loopThread`). The word inside a string (`"type":"loop"`) is harmless. Read the editor diagnostics before the first run.
 - **Status:** verified (editor diagnostic in `tests/ahk/engine_scheduler.test.ahk`)
 
-### Truth values are the integers 1 and 0
 
-- **Problem:** A method that returns `true` or `false` returns an integer. `Assert.Equal(x, false)` therefore compares integers, and the message shows "expected 0 (Integer)".
-- **Right:** For return values such as `TryTransition`, use `Assert.Equal(ok, false)` or `Assert.True(ok)`. For values that go over the wire, see "`Json.False` is true in AHK".
-- **Status:** verified (`tests/ahk/engine_states.test.ahk`)
+### There is no Bool type: `true` and `false` are the integers 1 and 0, or objects
 
-### Local variable with the name of a class shadows the class
+- **Problem:** AHK v2 has no Bool type, and three things stand in for it. (1) A method that returns `true` or `false` returns an integer, so `Assert.Equal(x, false)` compares integers, and the message shows "expected 0 (Integer)". (2) `Json.True` and `Json.False` are objects, so `if Json.False` is true, because every object is true: keeping such a value in program state and checking it with `if` is a silent error. (3) `Json.Parse` returns a parsed `true` as the Integer 1, not as `Json.True`, so `value == Json.True` is false for a marker that was read from a file.
+- **Wrong:** `payload["ok"] := Json.False` and later `if (payload["ok"])`; `value == Json.True` for a value that came from `Json.Parse`.
+- **Right:** For return values such as `TryTransition`, use `Assert.Equal(ok, false)` or `Assert.True(ok)`. Use `Json.True`, `Json.False` or `Json.Bool(x)` only when building a message, right before sending: `Message.Serialize` converts `ok` on a copy. When forwarding a parsed payload, set the boolean fields again with `Json.Bool`, because parsing yields `1`/`0` and a report built from parsed replies would otherwise write `1` instead of `true`. Compare a parsed truth value with `1` (and accept `"1"` and `"true"` where a file may have been edited by hand), as `FlowExprConvert.IsMarked` does. In AHK tests compare with `value == Json.False`; Python tests check `is True` / `is False` (`tests/support/wirebool.py`).
+- **Status:** verified (`tests/ahk/engine_states.test.ahk`; `tests/ahk/json.test.ahk`, `tests/ahk/message.test.ahk`; the report case was found by the Python guard in `tests/conftest.py`; the parsed marker: unit test `tests/ahk/engine_flow_convert.test.ahk`)
+- **Source:** `src/engine/core/FlowExprConvert.ahk`, `src/core/Json.ahk`, `src/core/ipc/Message.ahk`, `doc/PROTOCOL.md` section 2
 
-- **Problem:** Identifiers in AHK v2 are not case-sensitive. A local variable `role := ...` shadows the class `Role` in the whole function, and a later `Role.ConsoleFn(...)` fails with "This local variable has not been assigned a value". The same happened with `children`/`Children`, `log`/`Log` (a parameter) and `hub`/`Hub`. With the parameter `log`, the error showed up only as a hub log line "no handler for ...", because the dispatcher wraps handler exceptions.
-- **Wrong:** `role := Role.Current`, `Log.Write(...)` in a function with a parameter `log`.
-- **Right:** Name variables and parameters differently (`owner`, `doLog`, `theHub`, `kids`). Do not name a local like a class.
-- **Status:** verified (each case reproduced; dialogs at start, green after renaming)
-- **Source:** `src/AutoHotFlow.ahk`, `src/supervisor/DiagLog.ahk`
+
+### A local variable or parameter must not have the name of a function or class
+
+- **Problem:** Names of variables, parameters, functions and classes are one case-insensitive namespace, so a local hides the global name in the whole function. (a) A local `role := ...` shadows the class `Role`: a later `Role.ConsoleFn(...)` fails with "This local variable has not been assigned a value". The same happened with `children`/`Children`, `hub`/`Hub` and a parameter `log`/`Log`; with the parameter `log`, the error showed only as a hub log line "no handler for ...", because the dispatcher wraps handler exceptions. (b) A function `Lines(...)` of a test file and a local `lines := []` in another function are the same name: the call fails with "has no method"; a local `log := []` made `Log.Configure(...)` a call on the Array. (c) A parameter `random` (`Shuffle(m, random := "")` with `random := (lo, hi) => Random(lo, hi)`) made the lambda call itself until "Function recursion limit exceeded" ended the script. (d) A local `type` hid the function `Type(e)` in a `catch` block: "This value of type "String" has no method named "Call"" appeared only when that path ran; the warning type `LocalSameAsGlobal` finds such clashes, but it is not part of the default. (e) The package `Default` is the global class `Default`: a local or parameter `default` (`Get(key, default := "")`) makes `Default.Action_Sleep` read the local variable. (f) A helper function `Owner(flows)` of a test file made every local `owner` a warning under `#Warn All`, and the script ended with exit 1; a function name is global, so it clashes with locals in the included `src/` files too.
+- **Wrong:** `role := Role.Current`; `log := []` in a function that also uses `Log.Configure(...)`; `type := ...` next to `Type(e)` in a `catch`; `Shuffle(m, random := "")`; a test helper named `Owner`.
+- **Right:** Name the local after what it holds (`owner`, `entries`, `doLog`, `reqType`, `rng`, `idList`), never after a function or a class, whatever the spelling. Name helper functions so that no local can have the name (`Owners`, `EndsOf`, `CondEl`); before adding one, grep the included code for the lowercase name as a local. Do not refer to a package class in a function with a local of the same name; code outside the elements reaches classes through `ElementRegistry` anyway. `default` is not a reserved word: `class Default` loads, and `switch ... default:` still works. In a helper file, state in its header which class it needs and through which file it is included (for example `Engine._ErrorText` needs `Engine.ahk`). For a script of your own use `#Warn VarUnset, StdOut` (and `Unreachable`), so a warning is a text line in the output, not a dialog; `#Warn All` also switches on `LocalSameAsGlobal`.
+- **Status:** verified (each case reproduced: `tests/ahk/engine_flow_convert.test.ahk`; `tests/ahk/element_list_ops.test.ahk` (the recursion error and the fix); `tests/ahk/engine_call_flow.test.ahk` (31 warnings, then none after the rename); the test `worker: a request that cannot be sent gives an ElementError` in `WorkerContext._Ask` (red before, green after the rename); the warnings for `default` and nested classes in probe scripts of 2026-10-15)
+- **Source:** `src/AutoHotFlow.ahk`, `src/supervisor/DiagLog.ahk`, `src/worker/WorkerContext.ahk`, `src/engine/vars/VarLoader.ahk`, `src/elements/base/ElementRegistry.ahk`, `doc/OPEN-ITEMS.md` F-0078
+
 
 ### Function in a property: calling with a dot passes the class as the first argument
 
@@ -101,26 +116,22 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (dialog at start, green afterwards). Why AHK passes the class was not looked up: assumed.
 - **Source:** `src/core/Role.ahk`
 
-### Field and method with the same name
 
-- **Problem:** A class had a field and a method whose names differ only in capitalization (`_loaded` and `_Loaded()`). Access to the field failed with "Property is read-only", because identifiers are case-insensitive.
-- **Right:** Name fields and methods so that they differ in more than capitalization. Before naming a method `_X()`, check whether a field `_x` already exists.
-- **Status:** verified (role start failed with exit 2 and this message; green after renaming the field to `_flowsLoaded`). It came back in WI-0041 (`_failed` in `VarWriter` against the method `_Failed()`): the engine then ended with exit 2 "bad arguments: Property is read-only" before any other test could say why; see the entry "An error in a constructor of a role shows only as exit 2" below.
-- **Source:** `src/engine/Engine.ahk`
+### Member names are case-insensitive: fields, methods and nested classes must differ in more than case
 
-### `Json.False` is true in AHK
+- **Problem:** Names of members and nested classes are case-insensitive and share one namespace. (a) A class had a field and a method whose names differ only in capitalization (`_loaded` and `_Loaded()`); access to the field failed with "Property is read-only". The same clash came back in WI-0041 (`_failed` in `VarWriter` against the method `_Failed()`): the engine then ended with exit 2 "bad arguments: Property is read-only" before any other test could say why; see "An error in the constructor of a role shows only as exit 2 "bad arguments"" in the tests category. (b) `static _table := ""` and `static _Table() {...}` in one class failed at the initializer with "Property is read-only. Specifically: _table", because the method replaced the property. (c) `Dialogs` had the nested class `Real` and a `static real := ""`: "Duplicate declaration. Specifically: Real".
+- **Wrong:** A field `_loaded` and a method `_Loaded()` in one class; a static property `_table` and a method `_Table()`; a static property `real` and a nested class `Real`.
+- **Right:** Name fields, methods and nested classes so that they differ in more than capitalization (`_flowsLoaded`, `_entries` with `_Table()`, `_realDialogs`). Before naming a method `_X()`, check whether a field `_x` already exists.
+- **Status:** verified (a: role start failed with exit 2 and this message, green after renaming the field to `_flowsLoaded`; b and c: load errors in the script and in the session, 2026-10-15)
+- **Source:** `src/engine/Engine.ahk`, `src/expr/ExprFunctions.ahk`, `src/elements/base/Dialogs.ahk`
 
-- **Problem:** AHK v2 has no Bool type, and every object is true. `Json.True` and `Json.False` are objects, so that `Stringify` can write `true`/`false`. Therefore `if Json.False` is true. Keeping such a value in program state and checking it with `if` is a silent error.
-- **Wrong:** `payload["ok"] := Json.False` and later `if (payload["ok"])`.
-- **Right:** Use `Json.True`, `Json.False` or `Json.Bool(x)` only when building a message, right before sending. `Message.Serialize` converts `ok` on a copy. When forwarding a parsed payload, set the boolean fields again with `Json.Bool`: parsing yields `1`/`0`, so a report built from parsed replies would otherwise write `1` instead of `true`. In AHK tests compare with `value == Json.False`. Python tests check `is True` / `is False` (`tests/support/wirebool.py`).
-- **Status:** verified (`tests/ahk/json.test.ahk`, `tests/ahk/message.test.ahk`; the report case was found by the Python guard in `tests/conftest.py`)
-- **Source:** `src/core/Json.ahk`, `src/core/ipc/Message.ahk`, `doc/PROTOCOL.md` section 2
 
 ### `Round(x, 1)` returns a string
 
 - **Problem:** A measured value with `Round(ms, 1)` ended up in a JSON file as `"14.1"`, and the Python test compared it with a number.
 - **Right:** `Round(x, n)` with `n > 0` returns a `String`; `Round(x)` returns an `Integer`. For a number, write `Round(x, 1) + 0`.
 - **Status:** verified (`Type(Round(3.14159, 1))` returns `String`)
+
 
 ### `===` does not exist; `ObjPtr("")` throws
 
@@ -130,6 +141,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (syntax error at load time; the identity check is used in the peer teardown path)
 - **Source:** `src/engine/Executor.ahk` (`_DispatchWorker`)
 
+
 ### Class used from a file that is not included: load-time dialog
 
 - **Problem:** `src/manager/StubManager.ahk` called `StubGui(this)`, but `StubGui.ahk` was not included. AHK reports this at load time as a warning dialog ("This local variable appears to never be assigned a value. Specifically: StubGui"). Without a guard the process hangs.
@@ -137,11 +149,13 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (dialog captured at role start; green after adding the `#Include`)
 - **Source:** `src/manager/StubManager.ahk`
 
+
 ### Do not override built-in AHK v2 class names
 
 - **Problem:** `class TimeoutError extends AhfError` reports "This class declaration conflicts with an existing Class" at load time and blocks with a dialog.
 - **Right:** Use your own names with a prefix (`AhfTimeoutError`). Built-in names include `Error`, `TimeoutError`, `ValueError`, `TypeError`, `OSError`, `MemberError`, `PropertyError`, `MethodError`, `IndexError`, `KeyError`, `UnsetError`, `TargetError`, `MemoryError`, `ZeroDivisionError`.
 - **Status:** verified for `TimeoutError`; the rest of the list is from the documentation, not checked individually.
+
 
 ### Code at file level runs at load time, before `AhfMain` and before any `OnError`
 
@@ -150,12 +164,14 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** behavior verified (`tests/integration/test_entry.py::test_error_while_loading_files_shows_no_dialog_and_ends_with_exit_1`: before exit 97, afterwards exit 1 with a message on stderr). The order of handlers: assumed.
 - **Source:** `src/AutoHotFlow.ahk`, `tests/integration/helpers/RegisterFailure.ahk`
 
+
 ### 32-bit interpreter: check `A_PtrSize` before anything else
 
 - **Problem:** Starting the entry point with `AutoHotkey32.exe` ran a supervisor that then failed in `DllCall` structures, because pointer sizes differ.
 - **Right:** `if (A_PtrSize != 8)` as the first statement, before the `#Include` lines: message on stderr, `ExitApp(2)`.
 - **Status:** verified (red before: timeout; green afterwards: exit 2 without dialog)
 - **Source:** `src/AutoHotFlow.ahk`, `tests/integration/test_entry.py`
+
 
 ### A closure without a captured variable is always the same function object
 
@@ -164,13 +180,15 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (`tests/fault/test_diagnose.py::test_too_many_unhandled_errors_end_the_role_with_exit_6`)
 - **Source:** `tests/integration/helpers/EchoRole.ahk`
 
-### A space before `;` inside a string literal starts a comment
 
-- **Problem:** In the AHK source, `"a ; b"` or `'x ; y'` is cut at the `;` and the file fails to load with `Missing """`.
-- **Wrong:** `Assert.Equal(S("x := 1 ; c"), ...)` in a test file.
-- **Right:** Write the semicolon escaped: ``"x := 1 `; c"``. A `;` without whitespace in front (`"a;b"`) is fine.
-- **Status:** verified
+### A semicolon inside a string literal starts a comment
+
+- **Problem:** In an AHK source file, a `;` after whitespace starts a comment even inside a quoted string: `"a ; b"` or `'x ; y'` is cut at the `;`, and the file fails to load with `Missing """`. The same happens with `"  ; comment"`. A `;` directly behind the opening quote (`"; comment"`) and a `;` without whitespace in front (`"a;b"`) are fine.
+- **Wrong:** `Assert.Equal(S("x := 1 ; c"), ...)` in a test file; `"  ; comment"` in a double-quoted string.
+- **Right:** Escape the semicolon with a backtick: ``"x := 1 `; c"``, or build the text: `"  " Chr(59) " comment"`.
+- **Status:** verified (load errors and fixes in `tests/ahk/expr_*.test.ahk` and `tests/ahk/expr_eval_vars.test.ahk`)
 - **Source:** `tests/ahk/expr_*.test.ahk`
+
 
 ### Call stack overflow ends the whole process
 
@@ -180,6 +198,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (`F(n)` recursion test with `ahkrun.py`)
 - **Source:** `src/expr/ExprParser.ahk`
 
+
 ### PCRE in AHK: characters above U+FFFF and a start position inside a surrogate pair
 
 - **Problem:** `[\x{80}-\x{FFFF}]` does not match an emoji (one code point above U+FFFF, two UTF-16 units). `RegExMatch` with a start position in the middle of a surrogate pair stops with `PCRE execution error`.
@@ -187,12 +206,14 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified
 - **Source:** `src/expr/ExprTokenizer.ahk`, test `random input never throws and always gives consistent results`
 
+
 ### `Integer("12345678901234567890")` wraps around
 
 - **Problem:** A decimal text beyond 63 bits does not throw; it returns a wrapped negative number (`-6101065172474983726`). `Integer("0xFFFFFFFFFFFFFFFFF")` gives `-1`.
 - **Right:** Check the digit count (and compare to `"9223372036854775807"`) before converting; use `Float()` or report an error.
 - **Status:** verified
 - **Source:** `src/expr/ExprTokenizer.ahk`
+
 
 ### `MinInt // -1` and `Mod(MinInt, -1)` end the whole process
 
@@ -202,20 +223,6 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (the cases above run with `ahkrun.py`; the dialog was caught)
 - **Source:** `src/expr/ExprEvaluator.ahk` (`FloorDivide`, `Divide`), `src/expr/ExprFunctions.ahk` (`_Mod`)
 
-### A property and a method that differ only in case are the same name
-
-- **Problem:** `static _table := ""` and `static _Table() {...}` in one class: the load of the script fails with "Property is read-only. Specifically: _table" at the initializer, because the method of the same (case-insensitive) name replaced the property.
-- **Wrong:** a field `_table` and a method `_Table()` in one class.
-- **Right:** Names of members are case-insensitive; give the field and the accessor different names (`_entries` / `_Table()`).
-- **Status:** verified
-- **Source:** `src/expr/ExprFunctions.ahk`
-
-### A semicolon after whitespace starts a comment even inside a string in the source
-
-- **Problem:** `Assert.Equal(EvalCheck.Value("  ; comment"), "")` fails to load with `Missing """`: the text from ` ;` on was cut off as a comment.
-- **Wrong:** `"  ; comment"` in a double-quoted string in a script file.
-- **Right:** Build the text: `"  " Chr(59) " comment"` (or escape the semicolon with a backtick). A `;` directly behind the opening quote (`"; comment"`) is fine.
-- **Status:** verified (load error and fix in `tests/ahk/expr_eval_vars.test.ahk`)
 
 ### Comparing two characters with `>=` or `<=` throws a TypeError
 
@@ -225,13 +232,6 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified
 - **Source:** `src/expr/V1ExprConverter.ahk` (`_IsDigit`)
 
-### A local variable has the name of a function or class: `lines`, `log`
-
-- **Problem:** Names ignore case. A function `Lines(...)` of a test file and a local variable `lines := []` in another function are the same name; the call `Lines(...)` then fails with "has no method" or "not assigned a value". The same for `log := []` and the class `Log`: `Log.Configure(...)` was called on the Array.
-- **Wrong:** `log := []` in a function that also uses `Log.Configure(...)`.
-- **Right:** Other names for locals (`entries`, `output`). When a call says "This value of type Array has no method named Configure", look for a local with the name of the class.
-- **Status:** verified
-- **Source:** `tests/ahk/engine_flow_convert.test.ahk`
 
 ### `String(0.1)` is `0.10000000000000001`: a decimal literal rarely reads back as it was written
 
@@ -239,6 +239,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** For the text of a decimal that the user typed, keep the string; for calculations the number is fine.
 - **Status:** verified (`String(Number(t))` for 9 spellings; golden cases)
 - **Source:** `src/expr/V1ExprConverter.ahk` (`_CheckLiteral`), E0032
+
 
 ### A backtick before an apostrophe in a single-quoted AHK string is an escape
 
@@ -248,6 +249,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified
 - **Source:** `tests/ahk/expr_v1convert.test.ahk`
 
+
 ### `StrSplit("", ".")` gives an empty Array, not `[""]`
 
 - **Problem:** The variable access split a name at the dots and took `parts[1]` as the root. For the empty name the harness failed with `IndexError: Invalid index`.
@@ -256,12 +258,14 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (probe with `ahkrun.py`)
 - **Source:** `src/engine/vars/VarAccess.ahk` (`_Find`)
 
+
 ### `IsNumber` of AutoHotkey v2 is not v1 `is number`: `"1e3"`
 
 - **Problem:** The number checks of the parameter evaluation port v1 `if x is number` / `is integer`. It was unclear whether `IsNumber`/`IsInteger` give the same answers.
 - **Right:** For 14 texts (`"5"`, `" 5 "`, `"5."`, `".5"`, `"0x10"`, `"1e3"`, `"abc"`, `"-3"`, `"+3"`, `"1.5"`, `"007"`, `"-abc"`, `"1,5"`, `"5 x"`) the answers are the same, spaces around a number included, except `"1e3"`: a number in v2 (`IsFloat`), not in v1. A Float such as `4.0` is no integer (`IsInteger(4.0)` is 0). v1 `x >= 1` with a text that is not a number compares alphabetically (`"abc" >= 1` is true, `"-abc" >= 1` false); `StrCompare(text, "1") >= 0` gives the same.
 - **Status:** verified (probe scripts in the v1 interpreter and in v2 with `ahkrun.py`); MIGRATION M-0048
 - **Source:** `src/elements/base/ParamEvaluator.ahk` (`V1AtLeast`)
+
 
 ### A nested class has no global name: inside an element class use `this`
 
@@ -271,6 +275,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (probe script, 2026-10-15; test case in `tests/test_element_includes.py`)
 - **Source:** `src/elements/Default/Actions/Action_Sleep.ahk`
 
+
 ### `#Include` inside a class body: a file is included only once, so include it before the class
 
 - **Problem:** The package class includes the element files in its body. An element file itself includes `AhfElement.ahk` and shared code. An `#Include` of a file that was not included before would put that file into the class body: a class there becomes a nested class (`Default.AhfElement`), code at file level a load error.
@@ -278,19 +283,6 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (probe script with `#Include ..\..\base\Base.ahk` inside a class body after the same file at file level, 2026-10-15)
 - **Source:** `tools/gen_element_includes.py`, `src/elements/Default/_includes_engine.ahk`
 
-### A package class is a global name: a local variable `default` shadows `Default`
-
-- **Problem:** The package `Default` is the global class `Default`. A local variable or parameter `default` (common in code: `Get(key, default := "")`) is the same identifier (not case-sensitive). In that function `Default.Action_Sleep` then reads the local variable. With `#Warn All` an assigned local `default` gives the warning "This local variable has the same name as a global variable" (a parameter does not).
-- **Right:** Do not refer to a package class in a function with a local of the same name; code outside the elements reaches classes through `ElementRegistry` (by qualified ID) anyway. `default` is not a reserved word: `class Default` loads, `switch ... default:` still works.
-- **Status:** verified (probe script with `#Warn All, StdOut`, 2026-10-15)
-- **Source:** `src/elements/base/ElementRegistry.ahk`
-
-### A static property and a nested class share one namespace, ignoring case
-
-- **Problem:** `Dialogs` has the nested class `Real` and a `static real := ""` for the instance. The script did not load: "Duplicate declaration. Specifically: Real".
-- **Right:** Names of members and nested classes are not case-sensitive and live in one namespace: give the property another name (`_realDialogs`).
-- **Status:** verified (load error in the session, 2026-10-15)
-- **Source:** `src/elements/base/Dialogs.ahk`
 
 ### `IsDigit`, `IsAlpha` and the like need a String: an Integer is a TypeError
 
@@ -300,6 +292,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (probe script with `ahkrun.py`, 2026-10-15; the v1 interpreter compared for 22 texts, MIGRATION M-0053)
 - **Source:** `src/elements/Default/Conditions/Condition_Variable_content_is.ahk`
 
+
 ### `StrSplit(text, "ab")` has ONE delimiter of two characters
 
 - **Problem:** The delimiters of the list elements ("," and ";" and a space) were passed as a string `",;"`. The text `a,b;c` came back as `a,b;c`, one piece: a string is a single delimiter, not a set of characters.
@@ -308,21 +301,9 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (`tests/ahk/element_list_ops.test.ahk`, case "Split")
 - **Source:** `src/elements/Default/lib/ListOps.ahk`; https://www.autohotkey.com/docs/v2/lib/StrSplit.htm
 
-### A parameter named `random` hides the function `Random` (names ignore case)
-
-- **Problem:** `Shuffle(m, random := "")` with `random := (lo, hi) => Random(lo, hi)` as the default: inside the lambda `Random` is the parameter `random` (variable names ignore case), so the function called itself until "Function recursion limit exceeded" ended the script (a fatal error, no dialog under `ahkrun`).
-- **Wrong:** A local or parameter with the name of a built-in function (`random`, `number`, `default`) when the function is also used in the body. For a local that is only assigned, `#Warn All` reports it ("same name as a global variable"), for a parameter it does not.
-- **Right:** Another name (`rng`).
-- **Status:** verified (the recursion error and the fix in `tests/ahk/element_list_ops.test.ahk`; the warning for `number` in the log of the engine)
 
 ### A multi-statement function in an argument is `() {` ... `}`, not `() => {`
 
 - **Problem:** In a test file `TestRun.Case("name", () => { ...statements... })` is no function body: `=> {` starts an object literal, and the load fails with "Unexpected reserved word" at the first `for`.
 - **Right:** `() { ... }` for a body with statements (or a named function); `() => expression` for one expression (a comma list in parentheses `() => (a, b)` is one expression).
 - **Status:** verified (load error and fix in `tests/ahk/element_list_ops.test.ahk`)
-
-### A helper function of a test file is a global name: `Owner()` turns every local `owner` into a warning
-
-- **Problem:** A test file defined the helpers `Owner(flows)`, `Ends(owner, id)` and `Cond(id, expr)`. With `#Warn All, StdOut` every function with a local `owner` or `ends` (in the test file, in `helpers/ExecutorKit.ahk`), and even `ExprParser._If` with its local `cond`, reported "This local variable has the same name as a global variable", and the script ended with exit 1. A function name is global and names ignore case, so it clashes with locals everywhere in the script, also in `src/` files the test includes.
-- **Right:** Name helper functions so that no local can have the name (`Owners`, `EndsOf`, `CondEl`); before adding one, grep the included code for the lowercase name as a local.
-- **Status:** verified (WI-0055, `tests/ahk/engine_call_flow.test.ahk`: 31 warnings, then none after the rename)
