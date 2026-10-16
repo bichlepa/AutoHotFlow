@@ -1,13 +1,16 @@
 """Load measurement of a test run (WI-0059 part B): a thread in the pytest controller samples once per second the
 system CPU, the CPU of the own process tree (controller, xdist workers and everything the tests started) and the
-number of registered runs (refreshed every 5 s). External load = system minus own tree, clamped at 0. All values are percent of the whole
-machine (100 = every logical core busy).
+number of registered runs (refreshed every 5 s). External load = system minus own tree, clamped at 0. All values are
+percent of the whole machine (100 = every logical core busy).
 
 Own tree on Windows: the controller puts itself into a job object of its own at the start; every process started
 below it is in that job, and the accounting of the job includes processes that have already ended, so a test
-process that lives shorter than one sample still counts as own (one system call per sample). Fallback when the job
-cannot be created: a psutil walk over the child processes, which does not see a process that starts and ends between
-two samples (its CPU then counts as external).
+process that lives shorter than one sample still counts as own (one system call per sample). The job has no limit
+flags at all (no SetInformationJobObject call: no KILL_ON_JOB_CLOSE, no BREAKAWAY_OK); it only counts. Fallback when
+the job cannot be created, assigned or read (for example when the controller already runs in a job that forbids
+nesting): a psutil walk over the child processes, which does not see a process that starts and ends between two
+samples (its CPU then counts as external). `method` says which one was used ("job" or "psutil"; "psutil" also when
+the job failed during the run); the run never aborts because of it. Limits: doc/HOW-TO.md.
 """
 
 import ctypes
@@ -31,7 +34,15 @@ class Sample:
 
 
 class _JobCpu:
-    """CPU seconds of every process ever in a job object that contains this process and its descendants."""
+    """CPU seconds of every process ever in a job object that contains this process and its descendants. Only
+    counting: no limit is ever set on the job."""
+
+    class _BasicLimits(ctypes.Structure):
+        _fields_ = [("PerProcessUserTimeLimit", ctypes.c_int64), ("PerJobUserTimeLimit", ctypes.c_int64),
+                    ("LimitFlags", ctypes.c_uint32), ("MinimumWorkingSetSize", ctypes.c_size_t),
+                    ("MaximumWorkingSetSize", ctypes.c_size_t), ("ActiveProcessLimit", ctypes.c_uint32),
+                    ("Affinity", ctypes.c_size_t), ("PriorityClass", ctypes.c_uint32),
+                    ("SchedulingClass", ctypes.c_uint32)]
 
     class _Accounting(ctypes.Structure):
         _fields_ = [("TotalUserTime", ctypes.c_int64), ("TotalKernelTime", ctypes.c_int64),
@@ -64,6 +75,13 @@ class _JobCpu:
                                                    ctypes.sizeof(self._info), None):
             raise OSError(ctypes.get_last_error(), "QueryInformationJobObject failed")
         return (self._info.TotalUserTime + self._info.TotalKernelTime) / 1e7, self._info.ActiveProcesses
+
+    def limit_flags(self):
+        """LimitFlags of the job (JobObjectBasicLimitInformation); 0 means no limit. For the tests."""
+        limits = self._BasicLimits()
+        if not self._k32.QueryInformationJobObject(self._job, 2, ctypes.byref(limits), ctypes.sizeof(limits), None):
+            raise OSError(ctypes.get_last_error(), "QueryInformationJobObject failed")
+        return limits.LimitFlags
 
 
 class _TreeCpu:
@@ -124,14 +142,21 @@ class LoadSampler:
         if use_job and sys.platform == "win32":
             try:
                 self._own, self.method = _JobCpu(), "job"
-            except OSError:
+            except Exception:           # no job (already in one that forbids nesting, no rights): fall back
                 self._own = None
         if self._own is None:
-            self._own, self.method = _TreeCpu(os.getpid()), "tree"
+            self._fall_back()
         self._prev = None               # (time, busy, total, own cpu)
 
+    def _fall_back(self):
+        self._own, self.method = _TreeCpu(os.getpid()), "psutil"
+
     def start(self):
-        self._prev = self._read()
+        try:
+            self._prev = self._read()
+        except Exception:               # the job cannot be read: psutil from here on
+            self._fall_back()
+            self._prev = self._read()
         self._thread = threading.Thread(target=self._run, name="ahf-load-sampler", daemon=True)
         self._thread.start()
         return self
@@ -160,7 +185,14 @@ class LoadSampler:
 
     def sample(self):
         t0, c0 = time.perf_counter(), time.thread_time()
-        now, busy, total, own_cpu, nprocs = self._read()
+        try:
+            now, busy, total, own_cpu, nprocs = self._read()
+        except Exception:
+            if self.method == "psutil":
+                raise
+            self._fall_back()           # the job failed during the run: psutil from here on, new reference point
+            self._prev = self._read()
+            return
         p_now, p_busy, p_total, p_own, _ = self._prev
         self._prev = (now, busy, total, own_cpu, nprocs)
         d_total = total - p_total

@@ -1,14 +1,11 @@
 """Load figures and run history (WI-0059 parts B and C: tests/support/loadsampler.py, history.py, runrecord.py).
-Every pytest started here uses its own registry, history and run log folder (tests/support/innerpytest.py)."""
+Pure unit tests, no job object and no pytest of their own; those are in tests/test_runtool_runs.py (foundation)."""
 
-import os
 import subprocess
 import time
 from pathlib import Path
 
-import pytest
-
-from support import history, innerpytest, loadsampler, runtool_probes
+from support import history, loadsampler
 from support.loadsampler import Sample
 
 
@@ -36,17 +33,6 @@ def test_external_load_is_clamped_at_zero():
 def test_run_stats_cover_the_whole_run():
     stats = loadsampler.run_stats(_samples([(10, 5), (50, 10), (90, 10)]))
     assert stats["sysMean"] == 50.0 and stats["extPeak"] == 80.0 and stats["samples"] == 3 and stats["procsPeak"] == 3
-
-
-def test_the_sampler_measures_and_stops():
-    sampler = loadsampler.LoadSampler(interval=0.1).start()
-    deadline = time.time() + 10                       # a loaded machine delays the thread: wait for the state
-    while len(sampler.samples) < 3 and time.time() < deadline:
-        time.sleep(0.05)
-    sampler.stop()
-    assert len(sampler.samples) >= 3
-    assert all(0.0 <= s.sys <= 100.0 and 0.0 <= s.ext <= 100.0 for s in sampler.samples)
-    assert sampler.method in ("job", "tree")
 
 
 def _git(cwd, *args):
@@ -94,77 +80,39 @@ def test_broken_history_files_are_skipped(tmp_path):
     assert [r["run"]["id"] for r in history.load_records(tmp_path)] == ["ok"]
 
 
-def _check_record(rec):
-    assert rec["schema"] == history.SCHEMA
-    assert len(rec["code"]["sha"]) == 40 and isinstance(rec["code"]["dirty"], bool) and rec["code"]["worktree"]
-    assert rec["logs"]["runLog"] and Path(rec["logs"]["runLog"]).is_dir()
-    assert rec["load"] is not None and rec["load"]["samples"] >= 1 and "extMean" in rec["load"]
-    assert rec["run"]["host"] and rec["run"]["logicalCores"] and rec["run"]["maxWorkers"] >= 1
+def _wait_samples(sampler, n=3):
+    deadline = time.time() + 10                       # a loaded machine delays the thread: wait for the state
+    while len(sampler.samples) < n and time.time() < deadline:
+        time.sleep(0.02)
+    sampler.stop()
 
 
-@pytest.mark.parametrize("probe, test, exit_code, outcome", [
-    ("", "test_probe_pass", 0, "passed"),
-    ("fail", "test_probe_fail", 1, "failed"),
-    ("interrupt", "test_probe_interrupt", 2, None),
-])
-def test_every_run_leaves_one_valid_record(tmp_path, probe, test, exit_code, outcome):
-    """Acceptance criterion of WI-0059: green, red and interrupted runs each leave one valid JSON file with commit,
-    dirty flag, log path and load figures."""
-    code, out, err = innerpytest.run(tmp_path, innerpytest.PROBES + "::" + test, "-q", "-n", "0",
-                                     AHF_PROBE=probe)
-    assert code == exit_code, out + err
-    (rec,) = innerpytest.records(tmp_path)
-    _check_record(rec)
-    assert rec["complete"] is (exit_code != 2)
-    assert rec["run"]["exitStatus"] == exit_code
-    assert "History: " in out
-    if outcome:
-        (item,) = rec["tests"]
-        assert item["outcome"] == outcome and "extMean" in item and item["duration"] >= 0
-        if outcome == "failed":
-            assert "probe failure on request" in item["failure"]
-            assert rec["counts"] == {"failed": 1}
-            assert "load of the red tests" in out and "test_probe_fail  sys " in out
-    else:
-        assert rec["counts"].get("passed", 0) == 0
+class _NoJob:
+    def __init__(self):
+        raise OSError(5, "AssignProcessToJobObject failed (simulated: already in a job that forbids nesting)")
 
 
-@pytest.mark.slow
-def test_external_load_shows_in_the_figures_of_the_test(tmp_path):
-    """Acceptance criterion of WI-0059: with synthetic load from outside the run (a helper burns every core during
-    one test) the external CPU of that test is clearly higher than for the same kind of test without load, and a test
-    that burns the cores itself (own process tree) does not count as external load. The burners run at idle priority,
-    so they take only CPU nobody else wants; the test checks the relation, not absolute numbers."""
-    signals = tmp_path / "signals"
-    signals.mkdir()
-    proc = innerpytest.start(tmp_path, innerpytest.PROBES + "::test_probe_load_quiet",
-                             innerpytest.PROBES + "::test_probe_load_external",
-                             innerpytest.PROBES + "::test_probe_load_own", "-q", "-n", "0",
-                             AHF_PROBE="load=%s" % signals)
-    burners = []
-    try:
-        deadline = time.time() + 60
-        while not (signals / "external.request").exists():
-            assert proc.poll() is None and time.time() < deadline, "the probe run ended early"
-            time.sleep(0.05)
-        burners = runtool_probes.burners(os.cpu_count() or 2)
-        time.sleep(0.5)                                   # let them reach full speed before the window starts
-        (signals / "external.running").write_text("1", encoding="utf-8")
-        while not (signals / "external.done").exists():
-            assert proc.poll() is None and time.time() < deadline, "the probe run ended early"
-            time.sleep(0.05)
-    finally:
-        runtool_probes.stop_burners(burners)
-    out, err = proc.communicate(timeout=60)
-    assert proc.returncode == 0, out.decode("utf-8", "replace") + err.decode("utf-8", "replace")
-    (rec,) = innerpytest.records(tmp_path)
-    by_name = {t["id"].split("::")[-1]: t for t in rec["tests"]}
-    quiet, external, own = (by_name["test_probe_load_" + n] for n in ("quiet", "external", "own"))
-    figures = {n: (t["sysMean"], t["extMean"]) for n, t in (("quiet", quiet), ("external", external), ("own", own))}
-    print("load figures (sysMean, extMean):", figures)
-    if quiet["sysMean"] > 85:
-        pytest.skip("the machine was saturated by others during the reference test (%s): the relation cannot be "
-                    "measured now" % figures)
-    assert external["extMean"] > quiet["extMean"] + 10, figures
-    assert external["extMean"] > own["extMean"] + 10, figures
-    assert own["sysMean"] > own["extMean"] + 10, figures         # the burners of the own tree count as own
+class _JobThatBreaks:
+    calls = 0
+
+    def read(self):
+        type(self).calls += 1
+        if type(self).calls > 2:
+            raise OSError(6, "QueryInformationJobObject failed (simulated)")
+        return float(type(self).calls), 1
+
+
+def test_without_a_job_the_sampler_falls_back_to_psutil(monkeypatch):
+    """Owner's condition for the job object (WI-0059 follow-up): if the job cannot be created or assigned, the sampler
+    measures the own tree with psutil and says so (history field load.ownTree); the run does not abort."""
+    monkeypatch.setattr(loadsampler, "_JobCpu", _NoJob)
+    sampler = loadsampler.LoadSampler(interval=0.05).start()
+    _wait_samples(sampler)
+    assert sampler.method == "psutil" and len(sampler.samples) >= 3
+
+
+def test_a_job_that_fails_during_the_run_switches_to_psutil(monkeypatch):
+    monkeypatch.setattr(loadsampler, "_JobCpu", _JobThatBreaks)
+    sampler = loadsampler.LoadSampler(interval=0.05).start()
+    _wait_samples(sampler)
+    assert sampler.method == "psutil" and len(sampler.samples) >= 2

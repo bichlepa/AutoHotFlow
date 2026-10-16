@@ -121,6 +121,7 @@ class RunRecorder:
                 self.mode = self.status.get("tool") or "run_suite"
                 self.run_id, self.run_dir = admitted, run_dir
                 self.waited = float(self.status.get("waited") or 0.0)
+                self.exclusive = bool(self.status.get("exclusive", self.exclusive))      # as admitted by the tool
                 granted = int(self.status.get("workers") or 0)
                 if self.requested > granted:          # the admission is authoritative, a later -n cannot raise it
                     self._set_workers(granted)
@@ -156,7 +157,11 @@ class RunRecorder:
                 self._set_workers(self.granted)
             os.environ["AHF_ADMITTED"] = self.run_id      # nested runs and the workers register no second time
         if os.environ.get("AHF_LOAD_SAMPLER", "1") != "0":
-            self.sampler = loadsampler.LoadSampler(count_runs=lambda: len(admission.active_runs(base))).start()
+            try:
+                self.sampler = loadsampler.LoadSampler(count_runs=lambda: len(admission.active_runs(base))).start()
+            except Exception as e:      # no load figures is better than no test run
+                self.sampler = None
+                _say("no load figures: %s: %s" % (type(e).__name__, e))
         return None
 
     def _set_workers(self, n):
@@ -263,7 +268,7 @@ class RunRecorder:
         if load is not None:
             load["samplerCostS"] = round(self.sampler.cost_s, 3)
             load["samplerCpuS"] = round(self.sampler.cpu_s, 3)
-            load["ownMethod"] = self.sampler.method          # job (exact) or tree (psutil walk, see loadsampler)
+            load["ownTree"] = self.sampler.method            # job (exact) or psutil (walk, see loadsampler)
             load["series"] = [[round(s.t - self.start, 1), round(s.sys, 1), round(s.ext, 1), s.runs, s.procs]
                               for s in samples]
             load["seriesFields"] = ["t", "sys", "ext", "runs", "procs"]
@@ -289,6 +294,7 @@ class RunRecorder:
                 "workers": workers if isinstance(workers, int) else None,
                 "admission": self.mode, "startedBy": {"run_suite": "run_suite", "recheck": "recheck"}.get(
                     self.mode, "direct"), "exclusive": self.exclusive, "recheckOf": self.status.get("recheckOf"),
+                "recheckAt": self.status.get("recheckAt"),
                 "args": list(config.invocation_params.args), "markexpr": config.getoption("markexpr", "") or "",
                 "tier": _tier(config), "exitStatus": exitstatus,
             },
