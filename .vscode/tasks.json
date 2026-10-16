@@ -52,6 +52,24 @@
             "type": "promptString",
             "description": "Name des Workspaces (Branch wip/<Name>, Ordner neben dem Repo)",
             "default": "bugfix-1"
+        },
+        {
+            "id": "historyMode",
+            "type": "pickString",
+            "description": "What to show from the test run history",
+            "options": [
+                "--last=20",
+                "--flaky",
+                "--load",
+                "--durations"
+            ],
+            "default": "--last=20"
+        },
+        {
+            "id": "recheckRun",
+            "type": "promptString",
+            "description": "Run id from the test run history (test_history.py --last), or latest",
+            "default": "latest"
         }
     ],
     "tasks": [
@@ -669,6 +687,32 @@
             "command": "python",
             "args": [
                 "tools/ahf_processes.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: test history (test_history.py)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/test_history.py",
+                "${input:historyMode}"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: recheck red tests (recheck.py)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/recheck.py",
+                "${input:recheckRun}"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
