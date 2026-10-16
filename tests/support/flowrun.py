@@ -312,12 +312,15 @@ class FlowRunner:
         self._rec = Recorder(self._obs)
 
         def loaded():
+            # "ready" is true only when the flows, the variables and the trigger state are loaded (PROTOCOL 4.2);
+            # before that a snapshot lists the flows loaded so far.
             try:
                 answer = self._obs.request("engine", "cmd.engine.snapshot", {}, timeout=2)
                 have = {f["flowId"] for f in answer["payload"]["flows"]}
+                ready = answer["payload"].get("ready", False)
             except Exception:
                 return False
-            return set(self.flows) <= have
+            return bool(ready) and set(self.flows) <= have
         if not _wait_until(loaded, scaled(START_TIMEOUT_S)):
             raise AssertionError("the engine did not load %s:\n%s" % (sorted(self.flows), self.stderr_text()))
         # The variables are loaded after the flows (evt.engine.ready follows them). evt.engine.ready can be missed by

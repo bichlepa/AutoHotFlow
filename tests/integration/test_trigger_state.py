@@ -50,13 +50,24 @@ def enabled_in_snapshot(flows, flow_id):
     return [f["enabled"] for f in snap["flows"] if f["flowId"] == flow_id][0]
 
 
-def wait_for_file(path, timeout=FILE_WAIT_S):
+def read_state(datadir):
+    path = datadir / "FlowState.json"
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8-sig"))
+
+
+def wait_for(predicate, timeout=FILE_WAIT_S):
     deadline = time.monotonic() + timeout
-    while not path.exists():
+    while not predicate():
         if time.monotonic() > deadline:
             return False
         time.sleep(0.05)
     return True
+
+
+def wait_for_file(path, timeout=FILE_WAIT_S):
+    return wait_for(path.exists, timeout)
 
 
 def test_the_switched_state_survives_a_session_restart(flows):
@@ -64,9 +75,9 @@ def test_the_switched_state_survives_a_session_restart(flows):
     flows.start()
     flows.enable(FLOW)
     flows.request_ok("engine", "cmd.trigger.enable", {"flowId": FLOW, "elementId": INDEPENDENT})
-    assert wait_for_file(flows.datadir / "FlowState.json"), "storage did not write FlowState.json"
-    stored = json.loads((flows.datadir / "FlowState.json").read_text(encoding="utf-8-sig"))
-    assert stored == {"formatVersion": 1, "flows": {FLOW: sorted([TRIGGER, INDEPENDENT])}}
+    # The first write follows the first switch at once; the second switch comes within the interval and is written after it.
+    expected = {"formatVersion": 1, "flows": {FLOW: sorted([TRIGGER, INDEPENDENT])}}
+    assert wait_for(lambda: read_state(flows.datadir) == expected),         "storage did not write the state: %s" % read_state(flows.datadir)
     flows.stop()                                    # the regular end of the session (cmd.app.exit)
     flows.start()
     assert enabled_in_snapshot(flows, FLOW) is True, "the enabled state was not loaded"
@@ -85,4 +96,6 @@ def test_a_broken_flow_state_file_is_kept_and_the_session_starts(flows):
     (flows.datadir / "FlowState.json").write_text("{broken", encoding="utf-8")
     flows.start()
     assert enabled_in_snapshot(flows, FLOW) is False
+    # Storage renames the file on the request of the engine; the engine does not wait for that answer.
+    assert wait_for_file(flows.datadir / "FlowState.json.broken"), "the broken file was not kept"
     assert (flows.datadir / "FlowState.json.broken").read_text(encoding="utf-8") == "{broken"

@@ -972,6 +972,7 @@ def test_a_broken_flow_state_is_kept_as_broken_and_does_not_stop_the_start(procs
         start_engine(procs, flowdir, runs, pipe, session_id)
         wait_ready(obs)
         assert flow_enabled(ask(obs, "cmd.engine.snapshot"), "sw") is False
+        assert wait_for(lambda: (flowdir / "FlowState.json.broken").exists()), "the broken file was not kept"
         assert (flowdir / "FlowState.json.broken").read_text(encoding="utf-8") == "{not json"
         assert wait_for(lambda: any("FlowState.json is broken" in (line.get("text") or "") for line in storage.logs))
         hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
