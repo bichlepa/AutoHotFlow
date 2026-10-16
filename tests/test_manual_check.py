@@ -47,3 +47,48 @@ def test_start_uses_the_manual_session_and_the_data_folder():
     assert cmd[1] == "/ErrorStdOut=UTF-8"
     assert cmd[2].endswith(os.path.join("src", "AutoHotFlow.ahk"))
     assert cmd[3:] == ["--session=manual", r"--data=C:\data", "--ui=stub", "--start=storage,engine,manager,debug"]
+
+
+DPI_FLOW = "dpi_dialogs"
+
+
+def test_prepare_with_a_flow_copies_the_flow_next_to_the_skeleton(tmp_path):
+    folder = tmp_path / "manual"
+    mc.prepare(str(folder), DPI_FLOW)
+    copied = folder / "Flows" / (DPI_FLOW + ".json")
+    assert copied.read_bytes() == open(mc.flow_source(DPI_FLOW), "rb").read()
+    assert (folder / "Flows" / "skeleton.json").is_file()
+
+
+def test_an_unknown_or_bad_flow_name_is_refused_before_the_folder_is_touched(tmp_path, monkeypatch):
+    folder = tmp_path / "manual"
+    started = []
+    monkeypatch.setattr(mc.subprocess, "run", lambda *a, **k: started.append(a))
+    assert mc.main(["start", "--flow", "no_such_flow", "--dir", str(folder)]) == 1
+    assert mc.main(["start", "--flow", "../skeleton", "--dir", str(folder)]) == 1
+    assert not folder.exists() and started == []
+
+
+def test_start_with_a_flow_copies_it_and_builds_the_start_command(tmp_path, monkeypatch):
+    folder = tmp_path / "manual"
+    calls = []
+
+    class Done:
+        returncode = 0
+
+    def fake_run(cmd, cwd=None):
+        # the flow is in place before the application starts
+        assert (folder / "Flows" / (DPI_FLOW + ".json")).is_file()
+        calls.append((cmd, cwd))
+        return Done()
+
+    monkeypatch.setattr(mc, "find_ahk_exe", lambda: ("ahk.exe", None))
+    monkeypatch.setattr(mc.subprocess, "run", fake_run)
+    code = mc.main(["start", "--flow", DPI_FLOW, "--dir", str(folder), "--",
+                    "--ui=stub", "--start=storage,engine,manager"])
+    assert code == 0
+    (cmd, cwd), = calls
+    assert cmd[0] == "ahk.exe" and cmd[1] == "/ErrorStdOut=UTF-8"
+    assert cmd[2].endswith(os.path.join("src", "AutoHotFlow.ahk"))
+    assert cmd[3:] == ["--session=manual", "--data=" + str(folder), "--ui=stub", "--start=storage,engine,manager"]
+    assert cwd == mc.ROOT
