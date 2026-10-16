@@ -35,7 +35,7 @@ Step S0002 (element foundation and core set), state as of `cac616b`.
 | WI-0054 | Core set C: loops | done | sonnet | be5c088–2467349 | 2026-10-16 | Verified; REQ-ELM-240 partial |
 | WI-0055 | Core set D: flow control | done, verified | opus | e4b368d–949afc2 | 2026-10-16 | Fix of F-0100 class open; see NEEDS-ATTENTION |
 | WI-0056 | Core dialogs (dialogs and worker) | done, verified | haiku (review sonnet) | c5db6ab–6a8ad1a | 2026-10-16 | Review approved with fixes; tooltip and A_UserAction decisions open for the owner |
-| WI-0057 | Test corpus | running | haiku | | | Started from `6a8ad1a` |
+| WI-0057 | Test corpus | done, verified | haiku (review sonnet) | 7fa6b92–a5d5d89 | 2026-10-16 | 21 corpus tests, 3 v1 flows green (variable test as copy, M-0069); 13 flows pending S0003/S0008 |
 | WI-0058 | Acceptance S0002 | not started | | | | Last item of S0002 |
 
 Step S0008 (remaining elements) is planned, not started.
@@ -48,16 +48,13 @@ None.
 
 ## Running agents
 
-| Slot | Role | Workspace | Model | Task |
-|---|---|---|---|---|
-| 1 | Implementer | wi-0057 | haiku | WI-0057, started from `6a8ad1a` |
-| 1 | Writer | man-dpi | haiku | DPI section of doc/MANUAL-CHECKS.md (owner request) |
-
-No integrations pending. Verification of `6a8ad1a` is running (see below).
+None. The manual-check start path (section 3 of MANUAL-CHECKS) is integrated; the owner runs it.
 
 ## Last verified state
 
-Commit `6a8ad1a` (WI-0056) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-175915-6a8ad1aa` (1115 passed, 1 skipped), foundation run `20261016-175915-6a8ad1aa-2` (461 passed, 1 skipped). Slow tier not in the chosen set.
+Commit `a5d5d89` (WI-0057) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-183314-a5d5d89b` (1121 passed, 1 skipped). The corpus module is `slow` and was run by its own runs on the branch (21 passed, serial and parallel).
+
+Before that, commit `6a8ad1a` (WI-0056) verified: VERDICT green. Fast run `20261016-175915-6a8ad1aa` (1115 passed, 1 skipped), foundation run `20261016-175915-6a8ad1aa-2` (461 passed, 1 skipped).
 
 Before that, commit `220fbe5`: VERDICT green. Fast run `20261016-174506-220fbe53-3` (1083 passed, 1 skipped), foundation run `20261016-174506-220fbe53` (461 passed, 1 skipped), slow run `20261016-174506-220fbe53-2` (154 passed). The storm smoke test that failed earlier passed here (F-0101 stays open to watch).
 
