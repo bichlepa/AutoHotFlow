@@ -65,8 +65,9 @@ EDGE_VARS = ["imax", "imin"]
 TEXT_VARS = ["sabc", "shello", "supper", "smix", "sempty"]
 BIG_VARS = {"imax", "imin", "ibig"}
 # Floats whose text becomes a number outside the range of Float when digits are appended (F-0075): not used where a text or
-# a truth value is made of them
+# a truth value is made of them, and no concatenation has them anywhere in its operands (F-0100, Gen.case)
 RANGE_VARS = {"ftiny", "fhuge"}
+RANGE_LITERALS = {"1e308"}
 KEYS = ["k", "s", "f", "K", "k", "s", "f", "zz"]       # "zz" does not exist
 MISSING_VAR = "nothere"            # not in ENV: a variable that does not exist
 
@@ -186,6 +187,18 @@ def has_unsafe_divide(n):
                or (m.kind == "call" and m.name == "Mod") for m in walk(n))
 
 
+def concats_a_range_value(n):
+    """A concatenation with `ftiny`, `fhuge` or the literal `1e308` anywhere in its operands (not only as the direct
+    operand: `(ftiny - fz) . x` is the same text): it can make a number text outside the range of Float (F-0075,
+    F-0100)."""
+    for m in walk(n):
+        if (m.kind == "bin" and m.op == ".") or (m.kind == "asg" and m.op == ".="):
+            for o in walk(m):
+                if (o.kind == "var" and o.name in RANGE_VARS) or (o.kind == "lit" and o.text in RANGE_LITERALS):
+                    return True
+    return False
+
+
 # ------------------------------------------------------------------------------------------------ generator
 
 NUM_LITERALS = [("0", 0), ("1", 1), ("2", 2), ("7", 7), ("10", 10), ("100", 100), ("0x10", 16), ("0xFF", 255),
@@ -299,6 +312,8 @@ class Gen:
         while True:
             tree = self.top()
             if uses_big(tree) and has_unsafe_divide(tree):
+                continue
+            if concats_a_range_value(tree):
                 continue
             return tree
 
