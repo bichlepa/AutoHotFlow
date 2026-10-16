@@ -70,7 +70,7 @@ L281-301 9a. Dialog tests (E0038, WI-0051)
 L303-323 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (51.0 KB, 464 lines)
+## doc/ELEMENT-API-V2.md (51.4 KB, 465 lines)
 ```text
 L8-18 1. Guidelines
 L20-87 2. Class contract
@@ -85,7 +85,7 @@ L297-390 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
 L392-432 6. Mechanical conversion rules
 L434-455 7. What stays
 L441-455   7.1 Loop elements (WI-0054)
-L457-464 8. Still to be clarified (Phase 3)
+L457-465 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
