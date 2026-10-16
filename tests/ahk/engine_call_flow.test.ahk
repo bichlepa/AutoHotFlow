@@ -395,7 +395,7 @@ NoWaitThroughAnotherFlowIsQueued() {
     owner := Owners(Map("f", CallText([Exec("E", ExecPars("g", "t0", 1)), Cnt("z")], [Conn("c1", "t0", "E"), Conn("c2", "E", "z")]
         , "wait"), "g", CallText([Exec("G", ExecPars("f", "t0", 0)), Cnt("q")], [Conn("c1", "t0", "G"), Conn("c2", "G", "q")])))
     owner.executor.StartFlow(owner.flows.Get("f"))
-    DriveAll(owner, 50)
+    DriveAll(owner, 3)      ; the chain f -> g -> f never ends; one tick already dispatches up to Executor.TICK_BATCH (1000)
     Assert.True(Probe.Count("z") >= 2, "both instances of f went on behind E")
 }
 
