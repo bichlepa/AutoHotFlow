@@ -130,8 +130,8 @@ The user starts a flow from the manager or the editor, through its default manua
 - **v2:** partial (the enabled state of each trigger is kept, switched, reported and survives a restart of AutoHotFlow; the enabled triggers are armed and react, WI-0062; the real triggers come with WI-0063 and WI-0064, the manager with S0004)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003 (WI-0060 and WI-0062 done, WI-0063 to WI-0066), S0004 (manager)
-- **Evidence:** `tests/integration/test_engine.py::test_enable_and_disable_set_the_flag_and_report_it`, `tests/integration/test_engine.py::test_the_switched_state_survives_a_restart_of_the_engine`, `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_trigger_arming.py::test_disabling_the_flow_disarms_the_trigger_and_no_instance_starts_after_it`
+- **Plan:** S0003 (WI-0060, WI-0062 and WI-0063 done, WI-0064 to WI-0066), S0004 (manager); the per-flow state files (E0063, WI-0068) are done
+- **Evidence:** `tests/integration/test_trigger_state.py::test_an_unreadable_state_file_refuses_a_switch_until_it_can_be_read`, `tests/integration/test_engine.py::test_enable_and_disable_set_the_flag_and_report_it`, `tests/integration/test_engine.py::test_the_switched_state_survives_a_restart_of_the_engine`, `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_trigger_arming.py::test_disabling_the_flow_disarms_the_trigger_and_no_instance_starts_after_it`
 
 Enabling a flow activates its triggers that switch with the flow; disabling deactivates them (triggers that switch on their own: REQ-TRG-050). Running instances are not affected. The state survives a restart of AutoHotFlow. A flow file of v1 loads disabled (E0058). Decisions E0056, E0057.
 
