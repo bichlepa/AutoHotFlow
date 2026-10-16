@@ -4,8 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **Tooltip as a worker element (WI-0056).** `Action_Tooltip` runs in the worker with a timer that removes it; it holds no pool slot. Consequence: a flow stop no longer removes the tooltip, only its time or a worker crash does (M-0065). Alternative: hold the slot for the tooltip's duration. Please confirm or choose the alternative.
-- **Values of `A_UserAction` (WI-0056).** The debug and message dialogs set lower-case values (`ok`, `close`, `yes`, ...). The v1 values are upper-case. AHK `=` ignores case, so v1 flows should not break; please confirm this spelling (M-0067).
+None open. Tooltip and `A_UserAction` were decided by the owner (2026-10-16), see M-0065 and M-0067.
 
 ## Manual checks
 
