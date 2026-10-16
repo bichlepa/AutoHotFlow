@@ -49,7 +49,11 @@ def clients():
             pass
 
 
-def ask(client, to, type_, payload=None, timeout=5.0):
+def ask(client, to, type_, payload=None, timeout=None):
+    # The wait for an answer is an upper limit, so it goes through scaled() (F-0060): under load a worker
+    # can be descheduled for seconds without any defect.
+    if timeout is None:
+        timeout = scaled(5.0)
     return client.request(to, type_, payload or {}, timeout=timeout)["payload"]
 
 
