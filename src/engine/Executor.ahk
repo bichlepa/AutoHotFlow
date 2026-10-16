@@ -8,6 +8,7 @@
 #Include ..\elements\base\ParamEvaluator.ahk
 #Include core\ExecutionPolicy.ahk
 #Include core\FlowDefinition.ahk
+#Include core\RunawayGuard.ahk
 #Include core\Instance.ahk
 #Include core\Scheduler.ahk
 #Include core\ThreadState.ahk
@@ -58,6 +59,10 @@
 ; element is stopped); the called instance then runs on. A waiting call that could never end (the called flow has the
 ; policy wait and one of its instances waits for the caller) is refused, and so is a chain of waiting calls deeper than
 ; MAX_CALL_DEPTH.
+; Runaway guard (WI-0066, REQ-EXE-170, RunawayGuard): every element start is counted here (_ElementStarted, the one counting
+; point; the start of a trigger of a new instance passes it too). A flow over its executions per minute is stopped at the
+; next dispatch, its triggers are disabled by the engine (LimitReached). A start over the limit of waiting or running
+; instances is refused in _Start with the error code limit; a refusal is logged at most every 10 s per flow.
 class Executor {
     static TICK_BATCH := 1000
     static DIAG_INSTANCES := 100
@@ -70,6 +75,8 @@ class Executor {
         this._runs := Map()       ; instanceId -> run (Map, see _NewRun)
         this._counts := Map()     ; "flowId/elementId" -> countRuns (v1 semantics)
         this._lastRun := Map()    ; "flowId/elementId" -> "yyyy-MM-dd HH:mm:ss" of the last start
+        this._guard := RunawayGuard()  ; the runaway limits: counts of element executions per flow (WI-0066)
+        this._overLimit := Map()  ; flowId -> limit exceeded, the flow is stopped at the next dispatch (WI-0066)
         this._waiting := Map()    ; flowId -> Array of instance IDs in the order they were queued (policy wait)
         this._waiting.CaseSense := "Off"
         this._wantPromote := Map() ; flowId -> true: an instance ended, a waiting one may start (see Tick)
@@ -242,6 +249,7 @@ class Executor {
         if (decision = "wait" && IsObject(call) && this._WaitsFor(flowId, call["caller"]))
             throw AhfError("flow '" flowId "' was not started: its execution policy is wait and one of its instances "
                 . "waits for the calling element, so the call would never end", ErrCode.DENIED)
+        this._CheckStartLimits(flowId, def, decision)
         if (decision = "stop_and_start")
             this.StopFlow(flowId, "policy stop")
 
@@ -269,6 +277,69 @@ class Executor {
         this._Launch(runRec, true)
         this._owner.Kick()
         return instId
+    }
+
+    ; The limits of waiting and running instances (WI-0066, REQ-EXE-170): a start over the limit is refused like skip, with
+    ; ErrCode.LIMIT. A start that waits counts the queue; a start that runs now counts the running instances. A stop_and_start
+    ; stops the running ones first, so it is not checked.
+    _CheckStartLimits(flowId, def, decision) {
+        if (decision = "wait") {
+            cap := RunawayGuard.LimitOf(def, "maxWaitingInstances", RunawayGuard.DEFAULT_WAITING)
+            queued := this._waiting.Has(flowId) ? this._waiting[flowId].Length : 0
+            if (cap > 0 && queued >= cap)
+                this._RefuseStart(flowId, "waiting", "maxWaitingInstances", cap)
+        } else if (decision = "start") {
+            cap := RunawayGuard.LimitOf(def, "maxParallelInstances", RunawayGuard.DEFAULT_PARALLEL)
+            if (cap > 0 && this._CountRunning(flowId) >= cap)
+                this._RefuseStart(flowId, "running", "maxParallelInstances", cap)
+        }
+    }
+
+    ; Throws the refusal (ErrCode.LIMIT). The log line is written at most once per 10 s and flow (RunawayGuard.Refused), so a
+    ; trigger that fires fast does not flood the log; the trigger callers do not log the refusal again (_OnTriggerFired).
+    _RefuseStart(flowId, what, key, cap) {
+        limitText := "the limit of " cap " " what " instances (flowSettings." key ") is reached"
+        line := this._guard.Refused(flowId, limitText)
+        if (line != "")
+            Log.Write("f1", "engine", line, flowId)
+        throw AhfError("flow '" flowId "' was not started: " limitText, ErrCode.LIMIT)
+    }
+
+    ; The instances of the flow that run or stop (not the waiting ones).
+    _CountRunning(flowId) {
+        n := 0
+        for _, runRec in this._runs {
+            if (runRec["flowId"] = flowId && runRec["inst"].State != "waiting")
+                n += 1
+        }
+        return n
+    }
+
+    ; Counts one element execution against the runaway limit of its flow (WI-0066). Over the limit, the flow is marked; it is
+    ; stopped at the next dispatch (_EnforceLimits), so the element that crossed the limit does not start more work.
+    _CountExecution(run) {
+        flowId := run["flowId"]
+        def := this._DefOf(run)
+        if (!IsObject(def))
+            return
+        limit := RunawayGuard.LimitOf(def, "maxExecutionsPerMinute", RunawayGuard.DEFAULT_PER_MINUTE)
+        if (limit = 0)
+            return
+        if (this._guard.Count(flowId) > limit && !this._overLimit.Has(flowId))
+            this._overLimit[flowId] := limit
+    }
+
+    ; Stops the flows that exceeded their limit (WI-0066): all their instances end with reason limit, then the engine disables
+    ; their triggers and reports evt.flow.limit (LimitReached). Called by Tick before and after each dispatch.
+    _EnforceLimits() {
+        if (this._overLimit.Count = 0)
+            return
+        for flowId in Executor._Keys(this._overLimit) {
+            limit := this._overLimit.Get(flowId, 0)
+            this._overLimit.Delete(flowId)
+            this.StopFlow(flowId, "limit")
+            this._owner.LimitReached(flowId, "executionsPerMinute", limit)
+        }
     }
 
     ; Starts a new or waiting instance: creates the trigger thread, reports the start and moves the trigger
@@ -369,6 +440,9 @@ class Executor {
     ; The flow is deleted: stops all its instances (ARCHITECTURE 4.2). Returns the number of instances stopped.
     ; A stop does not wait for acknowledgements (see _StopRun), so deleting never has to give up like v1 does.
     FlowDeleted(flowId) {
+        this._guard.Forget(flowId)
+        if (this._overLimit.Has(flowId))
+            this._overLimit.Delete(flowId)
         return this.StopFlow(flowId, "flow.deleted")
     }
 
@@ -422,6 +496,7 @@ class Executor {
         budget := Executor.TICK_BATCH
         progress := true
         waitCount := 0
+        this._EnforceLimits()
         while (progress) {
             progress := false
             waitCount := 0
@@ -463,6 +538,7 @@ class Executor {
                         continue
                     }
                     this._Dispatch(runRec, thr, def)
+                    this._EnforceLimits()
                     progress := true
                     budget -= 1
                     if (budget <= 0) {
@@ -769,6 +845,7 @@ class Executor {
         n := this._counts.Get(key, 0) + 1
         this._counts[key] := n
         this._lastRun[key] := FormatTime(A_NowUTC, "yyyy-MM-dd HH:mm:ss")
+        this._CountExecution(run)      ; the runaway guard (WI-0066): the one counting point of an element execution
         Critical(prev)
         this._EmitElement(run["flowId"], elementId, "running", n, "")
     }

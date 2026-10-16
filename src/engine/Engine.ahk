@@ -606,6 +606,17 @@ class Engine extends Role {
         return ids.Length
     }
 
+    ; The runaway guard stopped the flow (WI-0066, REQ-EXE-170, E0062; called by the Executor after its instances ended): all
+    ; triggers of the flow are disabled, independent ones too, and the state is saved (WI-0060). The users are told by
+    ; evt.flow.limit, the log has an a0 entry. Nothing here waits.
+    LimitReached(flowId, kind, limit) {
+        this._Log("a0", "engine", "flow '" flowId "' stopped: more than " limit " " kind " (runaway guard); all its triggers are disabled")
+        this.Emit("topic:flow:" flowId, "evt.flow.limit", Map("flowId", flowId, "kind", kind, "limit", limit))
+        rec := this.flows.Get(flowId)
+        if (IsObject(rec))
+            this._SwitchTriggers(rec, rec.SetFollowingEnabled(false, true))
+    }
+
     ; Arms or disarms the switched triggers (WI-0062), sends evt.trigger.state for each of them, then evt.flow.state, and
     ; marks the state of this flow for its file (WI-0060, E0063). Nothing is sent when nothing changed.
     _SwitchTriggers(rec, changed) {
@@ -696,6 +707,10 @@ class Engine extends Role {
         try {
             this.executor.StartFlow(rec, elementId, Map("params", this.arms.ParamsOf(key), "data", data))
         } catch as e {
+            ; A refusal by the runaway guard is logged by the executor, at most once per 10 s (WI-0066): not here, or a
+            ; flood of fired triggers would flood the log.
+            if (e is AhfError && e.code = ErrCode.LIMIT)
+                return
             ; busy (policy skip) and similar: the event is lost, as in v1, and the reason is in the log
             Log.Write("f1", "engine", "trigger '" elementId "' did not start an instance: " Executor.ErrorText(e), flowId)
         }

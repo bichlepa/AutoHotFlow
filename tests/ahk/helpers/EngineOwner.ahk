@@ -100,6 +100,12 @@ class EngineOwner {
         this.kicks += 1
     }
 
+    ; The runaway guard stopped a flow (Engine.LimitReached, WI-0066): the stand-in records it.
+    LimitReached(flowId, kind, limit) {
+        this.limits := this.HasProp("limits") ? this.limits : []
+        this.limits.Push(Map("flowId", flowId, "kind", kind, "limit", limit))
+    }
+
     ; Dispatches until nothing is ready (one Tick does that, up to Executor.TICK_BATCH).
     Drive() {
         this.executor.Tick()

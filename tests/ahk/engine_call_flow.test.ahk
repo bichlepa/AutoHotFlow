@@ -368,7 +368,11 @@ SelfCallWithPolicyStop() {
 
 ; f calls itself and waits, without an end: the 101st call is refused and the exception goes back up the chain.
 RecursionDepthIsLimited() {
-    owner := Owners(Map("f", CallText([Exec("E", ExecPars("", "t0", 1))], [Conn("c1", "t0", "E")])))
+    ; The parallel limit of the runaway guard (default 100, WI-0066) would refuse the 101st running call first: it is
+    ; switched off here, so that the depth limit itself is tested.
+    text := CallText([Exec("E", ExecPars("", "t0", 1))], [Conn("c1", "t0", "E")])
+    text := StrReplace(text, '"flowSettings":{', '"flowSettings":{"maxParallelInstances":0,')
+    owner := Owners(Map("f", text))
     owner.executor.StartFlow(owner.flows.Get("f"))
     DriveAll(owner, 2000)
     ends := EndsOf(owner, "f")
