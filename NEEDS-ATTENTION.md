@@ -4,7 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-None open.
+- **Default limit of executions per minute for the runaway guard (WI-0066, F-9000 provisional).** Proposed: 50,000 executions per minute, 100 waiting and 100 parallel instances. At 50,000 a runaway flow is stopped after about 8 to 11 seconds; a 10,000-member loop with up to four body elements passes. The alternative, 25,000, would stop a 10,000-member loop with two body elements. Your call: 50,000, 25,000, or another value. Measurements: MS-0036 and MS-0037 in `doc/MEASUREMENTS.md`.
 
 ## Manual checks
 
