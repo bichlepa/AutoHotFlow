@@ -99,7 +99,7 @@ A hunter branch with code changes goes through review (3d) like an implementer b
 
 After every implementation round whose branch **changed source code** (`src/`, `tests/`, `tools/`, `.ahk` and `.py` files anywhere), and before the integration, start a `sonnet` reviewer in the branch's workspace. A branch that changed only documentation, comments, prompts, `.vscode/` or `.claude/` gets no review; look at its diff yourself.
 
-The reviewer gets: the task (work item file or wish), the author's report, and the diff `git diff v2-port...<branch>`. It reads the changed files and what they call, as far as needed, and the HOW-TO index for the touched area; not the whole reading list. It checks:
+The reviewer gets: the task (work item file or wish), the author's report, and the diff `git diff v2-port...<branch>`. It reads the changed files and what they call, as far as needed, and the HOW-TO entries of the touched area (through `doc/DOC-INDEX.md`); not the whole reading list. It checks:
 
 - the acceptance criteria are met, and the tests really test what the report claims (a test that cannot fail is a finding);
 - the rules of AGENTS.md: no blocking call on the message path, timeouts on requests, element code under `try/catch`, `doc/PROTOCOL.md` updated with an interface change, requirements updated with evidence that exists, MIGRATION IDs for deviations, no volatile names, English only;
@@ -136,7 +136,7 @@ When a branch is approved by the review (or needs no review), in the main checko
 
 1. Look at the diff (`git diff --stat v2-port...<branch>`), the commit messages, the decisions listed in the report and the review, and whether the report names run IDs. A branch whose report says `ESCALATE` is not integrated; handle it as in section 1.
 2. **Check the documents in the diff for volatile names** (branch names such as `wip/...`, workspace names, run folders, temporary paths). Have them corrected in the agent's workspace, or correct them yourself in one extra commit there.
-3. **Bring the branch up to date in its own workspace:** if `git merge-base --is-ancestor v2-port <branch>` fails, run `git rebase v2-port` in the workspace. Conflicts only in append-only files (`doc/OPEN-ITEMS.md`, `doc/HOW-TO.md` and `doc/howto/*`, `doc/MIGRATION.md`, summary tables, `.vscode/tasks.json`): keep both sides; for `doc/REQUIREMENTS-INDEX.md` take either side and run `python tools/req_index.py`. Any other conflict: `git rebase --abort` and give the rebase to the branch's author with SendMessage, or to a new `haiku` agent in the workspace (escalate to `sonnet` if it reports `ESCALATE`). Conflicts are resolved in the workspace, never in the main checkout. If the rebase changed code, the agent runs its short tests again.
+3. **Bring the branch up to date in its own workspace:** if `git merge-base --is-ancestor v2-port <branch>` fails, run `git rebase v2-port` in the workspace. Conflicts only in append-only files (`doc/OPEN-ITEMS.md`, `doc/howto/*`, `doc/MIGRATION.md`, summary tables, `.vscode/tasks.json`): keep both sides; for the generated `doc/REQUIREMENTS-INDEX.md` and `doc/DOC-INDEX.md` take either side and run `python tools/req_index.py` and `python tools/doc_index.py`. Any other conflict: `git rebase --abort` and give the rebase to the branch's author with SendMessage, or to a new `haiku` agent in the workspace (escalate to `sonnet` if it reports `ESCALATE`). Conflicts are resolved in the workspace, never in the main checkout. If the rebase changed code, the agent runs its short tests again.
 4. **Renumber:** `python tools/renumber_findings.py --commit` in the workspace (it prints `nothing to renumber` when there is nothing to do).
 5. `git cherry-pick v2-port..<branch>` in the main checkout. **No merge commits**, no temporary branches stay (`python tools/new_workspace.py --remove <name>` deletes the branch when its patches are on `v2-port`).
 6. If the cherry-pick still stops with a conflict (a commit arrived in the meantime): `git cherry-pick --abort`, go back to step 3. If it is refused because of the project owner's local changes, see section 5a: that needs `git cherry-pick --quit`, not `--abort`.
@@ -175,13 +175,13 @@ Stop early and report when: a run is aborted by an `INTERNALERROR` that you cann
 
 ## 9. Prompt skeleton for a sub-agent
 
-Give every agent a **short reading list**; reading costs budget. The documents below are the maximum, not a must: the agent reads more only when its task needs it.
+Give every agent a **short reading list**; reading costs budget. The documents below are the maximum, not a must: the agent reads more only when its task needs it. Sections of large documents and HOW-TO entries are found through `doc/DOC-INDEX.md` (grep it, then read only the listed lines; AGENTS.md rule 1); name the sections, not whole documents, where you can.
 
 | Role | Reads |
 |---|---|
-| Implementer | `AGENTS.md`; the work item and its "Read first"; `doc/CONVENTIONS.md`; the sections of `doc/ARCHITECTURE.md` the work item names; the HOW-TO index and the category files of the touched area |
-| Bug hunter | `AGENTS.md`; the summary table of `doc/OPEN-ITEMS.md` and the entry it takes; the code and tests of that entry; the HOW-TO index |
-| Reviewer | the task, the author's report, the diff, the changed files; `AGENTS.md` rules 2 to 12; the HOW-TO index |
+| Implementer | `AGENTS.md`; the work item and its "Read first"; `doc/CONVENTIONS.md`; the sections of `doc/ARCHITECTURE.md` the work item names; the HOW-TO entries of the touched area |
+| Bug hunter | `AGENTS.md`; the summary table of `doc/OPEN-ITEMS.md` and the entry it takes; the code and tests of that entry; the HOW-TO entries of that area |
+| Reviewer | the task, the author's report, the diff, the changed files; `AGENTS.md` rules 2 to 12; the HOW-TO entries of the touched area |
 | Helper (rebase, command) | only the files it changes or the command it runs |
 
 ```
