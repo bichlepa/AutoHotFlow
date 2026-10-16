@@ -52,11 +52,11 @@ None. The manual-check start path (section 3 of MANUAL-CHECKS) is integrated; th
 
 ## Last verified state
 
-Commit `a5d5d89` (WI-0057) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-183314-a5d5d89b` (1121 passed, 1 skipped). The corpus module is `slow` and was run by its own runs on the branch (21 passed, serial and parallel).
+Commit `f741f4d` (F-0097, loop stack shares the outer snapshot) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-184825-f741f4db` (1123 passed, 1 skipped). Timing of the flow from F-0097 not remeasured.
+
+Before that, commit `a5d5d89` (WI-0057) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261016-183314-a5d5d89b` (1121 passed, 1 skipped). The corpus module is `slow` and was run by its own runs on the branch (21 passed, serial and parallel).
 
 Before that, commit `6a8ad1a` (WI-0056) verified: VERDICT green. Fast run `20261016-175915-6a8ad1aa` (1115 passed, 1 skipped), foundation run `20261016-175915-6a8ad1aa-2` (461 passed, 1 skipped).
-
-Before that, commit `220fbe5`: VERDICT green. Fast run `20261016-174506-220fbe53-3` (1083 passed, 1 skipped), foundation run `20261016-174506-220fbe53` (461 passed, 1 skipped), slow run `20261016-174506-220fbe53-2` (154 passed). The storm smoke test that failed earlier passed here (F-0101 stays open to watch).
 
 Earlier, commit `949afc2` (WI-0055), verified by the last verifier agent: fast run `20261016-164136-949afc21` (1006 passed, 1 skipped), foundation run `20261016-164302-949afc21` (461 passed, 1 skipped), slow run `20261016-164502-949afc21` (154 passed); architecture, requirements and include checks 0. F-0100 was not reproduced in that run. Later commits up to `cac616b` change only documents. From now on `tools/verify.py --auto` keeps the last green state (ORCHESTRATOR section 4).
 
