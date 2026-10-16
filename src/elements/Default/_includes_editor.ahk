@@ -41,6 +41,8 @@ class Default {
     #Include Loops\Loop_SimpleLoop.ahk
     #Include Loops\Loop_Work_through_a_list.ahk
     #Include Triggers\Trigger_Manual.ahk
+    #Include Triggers\Trigger_Periodic_Timer.ahk
+    #Include Triggers\Trigger_Start_up.ahk
 }
 
 ElementRegistry.RegisterPackage("Default", "1.2.1")
@@ -73,3 +75,5 @@ ElementRegistry.Register(Default.Loop_Parse_A_String)
 ElementRegistry.Register(Default.Loop_SimpleLoop)
 ElementRegistry.Register(Default.Loop_Work_through_a_list)
 ElementRegistry.Register(Default.Trigger_Manual)
+ElementRegistry.Register(Default.Trigger_Periodic_Timer)
+ElementRegistry.Register(Default.Trigger_Start_up)

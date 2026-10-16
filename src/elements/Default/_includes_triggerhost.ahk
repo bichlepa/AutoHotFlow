@@ -9,7 +9,11 @@
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Default {
     #Include Triggers\Trigger_Manual.ahk
+    #Include Triggers\Trigger_Periodic_Timer.ahk
+    #Include Triggers\Trigger_Start_up.ahk
 }
 
 ElementRegistry.RegisterPackage("Default", "1.2.1")
 ElementRegistry.Register(Default.Trigger_Manual)
+ElementRegistry.Register(Default.Trigger_Periodic_Timer)
+ElementRegistry.Register(Default.Trigger_Start_up)
