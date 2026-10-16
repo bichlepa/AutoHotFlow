@@ -8,10 +8,6 @@ None open.
 
 ## To know
 
-- **F-0097 (nested list loops copy the outer snapshot): option A decided.** Share the hidden snapshot between the levels of the loop stack. The fix is scheduled after WI-0055 (flow control), because both touch the loop stack.
-- **F-0096: the 0.25 s tolerance in the crash-lag test is confirmed** (`eaac300`). Recorded in `doc/MIGRATION.md` as M-0062 (a test-only deviation), and as the one exception in the docstring of `tests/support/timing.py`.
-- **F-0098: both events stay** (confirmed by the owner, 2026-10-16). Recorded as `accepted` in `doc/OPEN-ITEMS.md`.
-- **WI-0054 (loops)** is integrated and verified (`be5c088` to `2467349`).
-- **WI-0059 (test admission, load figures, run history)** is done and integrated; see `work_items/phase3/STATUS.md`.
-- **WI-0055 (flow control)** is integrated and verified (`e4b368d` to `949afc2`); its questions are under Decisions. WI-0056 (dialogs) is next.
-- **F-0089 is still open:** three fault tests that fail only under load. The supervisor fix for the kill case (F-0071) is verified and stays open until repeated slow runs are clean.
+- **F-0097 (nested list loops copy the outer snapshot):** option A decided (share the hidden snapshot between the levels of the loop stack). The fix is not done yet; it is now due, since WI-0055 touched the same stack and is integrated.
+- **F-0100 (random expression oracle run):** one failure in a slow run (seed 411675, class F-0075), not reproduced by the verifier. Open until a seed of that failure is found.
+- **F-0089 and F-0084, F-0079, F-0086, F-0071:** load-dependent fault tests; open until repeated slow runs are clean.
