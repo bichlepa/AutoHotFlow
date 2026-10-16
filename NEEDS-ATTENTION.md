@@ -4,12 +4,11 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **F-0012: may it close without a test for `_ElementStarted` and `_ElementStopped`?** Both count the running elements of the executor. They are guarded by `Critical` (commit `ad6ac7d`, verified by reading only). The interruption cannot be forced in a test, and a spy on the counter would be the same pattern as the other fixes. Recommendation: accept them as guarded, and close F-0012 after one stress run of the engine (not yet done). Please answer yes or no.
+None open. F-0012 accepted by the owner (2026-10-16); the entry is closed.
 
 ## Manual checks
 
-- **DPI check of the dialog windows (REQ-USE-090): ready to run.** Task "Start: manual check 3, dialog windows at other DPI scaling (manual_check.py)", or in a terminal: `python tools/manual_check.py start --flow dpi_dialogs -- --ui=stub --start=storage,engine,manager`. In the stub, press Start for the flow `dpi_dialogs`. Steps: `doc/MANUAL-CHECKS.md` section 3, at 100, 125 and 150 %. Closing the debug dialog with X ends the flow at that element; then start it again.
-- **Confirm two choices of the check:** (1) you start the flow with the Start button; the tool does not start it. (2) No debug window in this check; only the dialogs are on the screen.
+- **DPI check of the dialog windows (REQ-USE-090): the owner is fixing the dialog DPI problem with a separate agent.** The check guide and start path stay as they are (`doc/MANUAL-CHECKS.md` section 3; task "Start: manual check 3").
 
 ## To know
 
