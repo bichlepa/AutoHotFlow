@@ -35,6 +35,8 @@
 ;               lets the tests restart a child many times (handle leaks).
 ;   --worker-limit  (only with --test-roles) most workers alive at once, default Children.WORKER_LIMIT (16).
 ;   --ui=<word>, --headless, --stub-cancel-exit  passed on to every role (WI-0013: --ui=stub for the manager stub).
+;   --windows-startup  passed on to every role; the engine arms the triggers with the start context windowsStartup
+;               in its first pass (WI-0062, PROTOCOL 4.4). The autostart entry of S0004 sets it.
 ;   --log-level=<0..3>  highest log level that is forwarded to storage (default 2; level 3 stays in the ring of
 ;               Log only). Valid for the supervisor and passed on to every role (WI-0023).
 ;
@@ -449,6 +451,8 @@ class Supervisor {
         }
         if (opts.Has("headless"))
             text .= " --headless"
+        if (opts.Has("windows-startup"))
+            text .= " --windows-startup"
         ; Pool options of the engine (WI-0027); the engine checks the values and exits with 2 on a bad one.
         ; Options of the variable files (WI-0041), same check.
         for key in ["workers", "warm-workers", "worker-idle-ms", "var-write-delay-ms", "var-write-timeout-ms"] {
