@@ -818,6 +818,26 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: tray menu probe (thread running, tray menu open 6 s, Esc)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/tray_menu_probe.py",
+                "--mode",
+                "thread",
+                "--run-ms",
+                "15000",
+                "--menu-at",
+                "3000",
+                "--hold-ms",
+                "6000"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: indexes (doc_index.py)",
             "type": "shell",
             "command": "python",
