@@ -724,10 +724,13 @@ def test_wait_policy_queues_the_starts_and_runs_them_one_after_the_other(pipe, f
         queued = [m["payload"]["position"] for _, m in got if m["type"] == "evt.instance.queued"]
         assert queued == [1, 2]
         check_seq(got)
-        # The flow is executing until the last instance has ended; evt.flow.state 0 follows the last ended.
-        flow_states = [m["payload"]["executing"] for _, m in got if m["type"] == "evt.flow.state"]
-        assert flow_states == [1, 1, 1], flow_states
-        assert obs.wait_event("evt.flow.state", timeout=5)["payload"]["executing"] == 0
+        # evt.flow.state follows every start and every end (E0079: the count of running instances changes at each of
+        # them). The instances run one after the other, so the count is 1, 0, 1, 0, 1 and executing stays 1 while
+        # waiting instances exist. The state after the last ended (executing 0) comes after the collected events.
+        states = [(m["payload"]["executing"], m["payload"]["instances"]) for _, m in got if m["type"] == "evt.flow.state"]
+        assert states == [(1, 1), (1, 0), (1, 1), (1, 0), (1, 1)], states
+        last = obs.wait_event("evt.flow.state", timeout=5)["payload"]
+        assert (last["executing"], last["instances"]) == (0, 0)
 
 
 def test_wait_policy_stop_ends_the_running_and_the_waiting_instances(pipe, flowdir, engine):
