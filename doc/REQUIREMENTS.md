@@ -1345,10 +1345,11 @@ Names are checked: no forbidden characters, no second flow with the same name. D
 ### REQ-MGR-030 Manage categories
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the engine part: categories, their order and the empty categories survive a restart, with tests; the manager's tree and drag and drop are missing)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
+- **Evidence:** `tests/integration/test_categories.py` (`test_the_order_and_an_empty_category_survive_a_restart`, `test_rename_writes_every_flow_file_and_keeps_the_place`, `test_delete_moves_the_flows_first_and_then_removes_the_category`, `test_a_broken_file_is_kept_and_the_order_is_built_from_the_flows`), `tests/ahk/engine_categories.test.ahk`
 
 Create, rename and delete categories; move flows to another category. When a category is deleted, its flows move to a category the user chooses. An empty category stays until the user deletes it, also across a restart. The user orders the categories and the flows inside a category freely (drag and drop); a command sorts them alphabetically once; a new flow comes at the end of its category (E0067; v1 sorted automatically).
 

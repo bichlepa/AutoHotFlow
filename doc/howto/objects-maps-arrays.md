@@ -117,3 +117,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `if (map.Has(flowId)) map.Delete(flowId)`, in one helper (`_Forget`) for all such maps. Delete without a check only where the key was set on the same path.
 - **Status:** verified (the start tests went from red to green with the helper; `tests/integration/test_engine.py`, the flow state tests)
 - **Source:** `src/engine/FlowStateFile.ahk` (`_Forget`), `src/core/ipc/Peer.ahk` (`_Finish`, the callback is run in a `try`)
+
+### `Array` has no `Sort` method in AHK v2
+
+- **Problem:** Sorting an Array by a comparator (the category order, WI-0071) failed at run time with `This value of type "Array" has no method named "Sort"`. The method is not part of the v2 Array.
+- **Wrong:** `names.Sort((a, b) => ...)`.
+- **Right:** A small insertion sort in place (`FlowOrder._Sort(items, cmp)`), the lists are short. The comparator returns an integer; combine two keys with `c := ...` and `return c ? c : ...`, not with `||`.
+- **Status:** verified (the failing unit test `tests/ahk/engine_categories.test.ahk` went green with the insertion sort)
+- **Source:** `src/engine/core/FlowOrder.ahk` (`_Sort`, `_CompareIds`)
+
+### `Map` keys are case-sensitive by default; compare names with `==` when the case matters
+
+- **Problem:** Category names `Alpha` and `alpha` in the flow files were two different groups in the order model, and the unit test expected one. The text comparison `=` ignores case, the Map lookup does not, so the two checks disagreed.
+- **Wrong:** Relying on `=` for a name and on a Map key for the same name without saying which one counts.
+- **Right:** Set `map.CaseSense := "On"` explicitly where the case is part of the key (the order model does), and check names that must be unique ignoring case with `StrLower` (`FlowCategories._CheckName`).
+- **Status:** verified (`tests/ahk/engine_categories.test.ahk`, the case test of the fresh order)
+- **Source:** `src/engine/core/FlowOrder.ahk` (`__New`, `Load`, `Reconcile`)

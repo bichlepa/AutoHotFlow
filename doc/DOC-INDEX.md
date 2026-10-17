@@ -168,7 +168,7 @@ L82-94 Standard dialogs (`FileSelect`, `DirSelect`, `MsgBox`) keep the message h
 L96-101 A Gui created and closed without Show leaves no window and no remembered place (verified) (verified)
 ```
 
-## doc/howto/objects-maps-arrays.md (9.6 KB, 119 lines)
+## doc/howto/objects-maps-arrays.md (11.0 KB, 135 lines)
 ```text
 L5-9 Map with `CaseSense "Off"` keeps the spelling of the first insertion (verified)
 L12-17 Copy keys into an array before deleting from a Map (not checked)
@@ -184,6 +184,8 @@ L89-94 A Map key `1` and `"1"` are two keys; Integer keys come before texts (ver
 L97-103 A function stored in an object that it holds is a reference cycle (assumed)
 L105-111 Json.True and Json.False are objects: test them before IsObject (verified)
 L113-119 `Map.Delete` of a missing key throws: check `Has` first, or the callback dies silently (verified)
+L121-127 `Array` has no `Sort` method in AHK v2 (verified)
+L129-135 `Map` keys are case-sensitive by default; compare names with `==` when the case matters (verified)
 ```
 
 ## doc/howto/processes-pipes-messages.md (41.6 KB, 366 lines)

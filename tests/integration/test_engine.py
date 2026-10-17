@@ -101,6 +101,21 @@ class StorageStub:
             if target.is_file():
                 target.replace(target.with_name(target.name + ".broken"))
             self.client.reply(msg, {"ok": True})
+        elif type_ == "cmd.storage.categories.read":
+            # WI-0071: Categories.json of the data folder, as storage keeps it (the engine reads it before the start).
+            target = self.datadir / "Categories.json"
+            if target.is_file():
+                self.client.reply(msg, {"ok": True, "exists": True, "text": target.read_text(encoding="utf-8")})
+            else:
+                self.client.reply(msg, {"ok": True, "exists": False})
+        elif type_ == "cmd.storage.categories.write":
+            (self.datadir / "Categories.json").write_text(payload.get("text", ""), encoding="utf-8")
+            self.client.reply(msg, {"ok": True})
+        elif type_ == "cmd.storage.categories.keepBroken":
+            target = self.datadir / "Categories.json"
+            if target.is_file():
+                target.replace(target.with_name(target.name + ".broken"))
+            self.client.reply(msg, {"ok": True})
         elif type_ == "cmd.storage.flow.read":
             path = payload.get("path", "")
             self.read_calls.append(path)

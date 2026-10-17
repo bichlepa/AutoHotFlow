@@ -182,6 +182,7 @@ def test_rename_that_only_changes_the_case_of_the_own_name_is_allowed(flows):
 def test_category_is_written_and_the_name_stays(flows):
     add_skeleton(flows)
     flows.start()
+    flows.request_ok("engine", "cmd.category.create", {"name": "Tests"})
     before = name_of(flows, FLOW)
     flows.request_ok("engine", "cmd.flow.meta.update", {"flowId": FLOW, "category": "Tests"})
     text = on_disk(flows.datadir, FLOW)
