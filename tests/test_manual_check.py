@@ -92,3 +92,25 @@ def test_start_with_a_flow_copies_it_and_builds_the_start_command(tmp_path, monk
     assert cmd[2].endswith(os.path.join("src", "AutoHotFlow.ahk"))
     assert cmd[3:] == ["--session=manual", "--data=" + str(folder), "--start=storage,engine,manager"]
     assert cwd == mc.ROOT
+
+
+def test_copy_v1_copies_the_v1_folder_and_leaves_the_original(tmp_path):
+    source = tmp_path / "AutoHotFlow"
+    (source / "Saved Flows").mkdir(parents=True)
+    (source / "Saved Flows" / "Flow 1.json").write_text("{}", encoding="utf-8")
+    target = tmp_path / "copy"
+    assert mc.main(["copy-v1", "--v1-source", str(source), "--v1-dir", str(target)]) == 0
+    assert (target / "Saved Flows" / "Flow 1.json").read_text(encoding="utf-8") == "{}"
+    assert not (source / mc.MARKER).exists()
+    assert (source / "Saved Flows" / "Flow 1.json").is_file()
+
+
+def test_copy_v1_refuses_a_missing_source_and_a_target_it_did_not_make(tmp_path):
+    assert mc.main(["copy-v1", "--v1-source", str(tmp_path / "none"), "--v1-dir", str(tmp_path / "t")]) == 1
+    target = tmp_path / "someone"
+    target.mkdir()
+    (target / "keep.txt").write_text("keep", encoding="utf-8")
+    source = tmp_path / "src"
+    source.mkdir()
+    assert mc.main(["copy-v1", "--v1-source", str(source), "--v1-dir", str(target)]) == 1
+    assert (target / "keep.txt").read_text(encoding="utf-8") == "keep"

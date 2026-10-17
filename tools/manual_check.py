@@ -2,6 +2,7 @@
 
     python tools/manual_check.py prepare [--flow <name>] a fresh data folder with the skeleton flow
     python tools/manual_check.py start [--fresh] [--flow <name>] [-- <options of AutoHotFlow.ahk>]
+    python tools/manual_check.py copy-v1 [--v1-dir <folder>] a copy of the v1 data folder for the import check (WI-0076)
 
 The manual checks run in their own data folder (default %TEMP%\\ahf_manual_check) and their own session
 ("manual"), so they neither touch the default folder %APPDATA%\\AutoHotFlow v2 nor meet an instance that runs
@@ -90,6 +91,29 @@ def prepare(folder, flow=None):
             shutil.copyfile(state, os.path.join(folder, "FlowStates", flow + ".json"))
 
 
+def copy_v1(source, target):
+    """Copies the v1 data folder source (default %APPDATA%\\AutoHotFlow, only read) to target (default
+    %TEMP%\ahf_manual_check_v1), which is replaced when this tool made it before. The import of the manager takes the copy:
+    the original stays as it is (REQ-MIG-060)."""
+    if not os.path.isdir(source):
+        raise Refused("no v1 data folder at %s" % source)
+    if os.path.lexists(target):
+        if not os.path.isfile(os.path.join(target, MARKER)):
+            raise Refused("%s exists and was not made by this tool (no %s); not deleted" % (target, MARKER))
+        shutil.rmtree(target)
+    shutil.copytree(source, target)
+    with open(os.path.join(target, MARKER), "w", encoding="utf-8") as f:
+        f.write("Copy of a v1 data folder for the manual check of the import (tools/manual_check.py copy-v1).\n")
+
+
+def default_v1_source():
+    return os.path.join(os.environ.get("APPDATA") or os.path.expanduser("~"), "AutoHotFlow")
+
+
+def default_v1_target():
+    return os.path.join(os.environ.get("TEMP") or os.path.expanduser("~"), "ahf_manual_check_v1")
+
+
 def command_line(exe, folder, options):
     return [exe, "/ErrorStdOut=UTF-8", PRODUCT, "--session=" + SESSION, "--data=" + folder, *options]
 
@@ -100,13 +124,25 @@ def main(argv):
         cut = argv.index("--")
         argv, options = argv[:cut], argv[cut + 1:]
     ap = argparse.ArgumentParser(description="Data folder and start of the application for the manual checks.")
-    ap.add_argument("action", choices=["prepare", "start"])
+    ap.add_argument("action", choices=["prepare", "start", "copy-v1"])
+    ap.add_argument("--v1-dir", default=default_v1_target(), help="copy-v1: the copy (default %%TEMP%%\ahf_manual_check_v1)")
+    ap.add_argument("--v1-source", default=default_v1_source(), help="copy-v1: the v1 data folder (default %%APPDATA%%\\AutoHotFlow)")
     ap.add_argument("--dir", default=default_dir(), help="data folder (default: %%TEMP%%\\ahf_manual_check)")
     ap.add_argument("--fresh", action="store_true", help="start: prepare a fresh data folder first")
     ap.add_argument("--flow", help="copy the manual-check flow <name> (tests/data/manual/<name>.json) into a fresh folder")
     args = ap.parse_args(argv)
     if args.action == "prepare" and options:
         ap.error("prepare takes no options of AutoHotFlow.ahk")
+    if args.action == "copy-v1":
+        if options:
+            ap.error("copy-v1 takes no options of AutoHotFlow.ahk")
+        try:
+            copy_v1(os.path.abspath(args.v1_source), os.path.abspath(args.v1_dir))
+        except Refused as e:
+            print("refused: %s" % e, file=sys.stderr)
+            return 1
+        print("copy of the v1 data folder: %s (the import takes it; the original is only read)" % os.path.abspath(args.v1_dir))
+        return 0
     folder = os.path.abspath(args.dir)
     try:
         if args.action == "prepare" or args.fresh or args.flow or not os.path.isdir(folder):
