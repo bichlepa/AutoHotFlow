@@ -194,6 +194,7 @@ Task: <precise task, acceptance criteria, what not to touch>
 Rules: <section 2, the relevant ones, including the decision rule and the safety rule>
 Tests: <which short runs; big runs only if ...>; every result with run ID and commit.
 New OPEN-ITEMS entries get provisional IDs `F-9nnn*`, counting up from 9000 (section 2).
+Waiting: run each test tier in the foreground (timeout up to 600000 ms), or poll once per turn with one bounded command. No Monitor or sleep loops for long waits (every ended monitor wakes you up again). Send the final report once; when sending succeeds, end the turn and do not send it again.
 If you are stuck after two different approaches: stop and end your report with `ESCALATE: ...`.
 Report, at most 25 lines: commits, tests run (run ID, commit, counts), decisions you took (what, why, alternative), findings written, anything unexpected, what you did not check. Verified / assumed / not checked. Details belong into commit messages and OPEN-ITEMS, not into the report.
 ```
