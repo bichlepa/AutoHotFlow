@@ -1,6 +1,6 @@
 # Needs attention (project owner)
 
-Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits for the project owner: a decision, a manual check, or a fact the owner must know. Last update: 2026-10-17 (end of the session).
+Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits for the project owner: a decision, a manual check, or a fact the owner must know. Last update: 2026-10-17 (WI-0075 integrated, WI-0076 running).
 
 ## Decisions
 
@@ -9,6 +9,7 @@ Nothing waits for a decision now. (F-0116 decided: keep the drop, E0082; the tes
 ## Manual checks
 
 - **Manager tree (WI-0074):** context menus, drag and drop onto a category, Ctrl-click multi-selection (shows the focused item only, F-0119), ask dialogs (delete, unknown state, limit), trigger-not-available notice, state marks. Only the window tests ran (they now include drag and drop); the rest was never seen on screen. Review the German texts too.
+- **Notices (WI-0075):** the real tray balloon (TrayTip) was never seen on a desktop; tree mark and limit value in a real window; the notice list was checked once by a GUI test. Review the German texts (`assets/language/manager/de.ini`). The notice for a storage error has no test (F-0125).
 - **Log window (WI-0080):** never shown by an agent (only the class load and the window tests run). Check it with WI-0082 or earlier: open it, filters, a flood of lines, DPI. Review the German texts in `assets/language/manager/de.ini`.
 
 ## To know
