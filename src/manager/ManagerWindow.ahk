@@ -33,6 +33,7 @@ class ManagerWindow {
     static TVN_BEGINDRAG := -456     ; TVN_BEGINDRAGW (commctrl.h): the drag of the left button starts
     static TVM_HITTEST := 0x1111     ; TV_FIRST + 17
     static WM_NOTIFY := 0x4E
+    static WM_DROPFILES := 0x233     ; a file is dropped on the window (DragAcceptFiles, WI-0081)
     ; Button name -> [x, y, w, label key]; the name is the key of ManagerModel.ButtonStates.
     static BUTTONS := [
         ["NewCategory", 328, 12, 200, "New_category"], ["NewFlow", 538, 12, 200, "New_flow"],
@@ -56,7 +57,11 @@ class ManagerWindow {
         , "categoryNew", ["New_category", "Ask_category_new_text"]
         , "categoryRename", ["Rename_category", "Ask_category_rename_text"]
         , "importCopies", ["Import_from_v1", "Ask_import_copies_text", "no"]
-        , "autostartV1", ["Import_from_v1", "Ask_autostart_v1_text", "no"])
+        , "autostartV1", ["Import_from_v1", "Ask_autostart_v1_text", "no"]
+        , "importWarning", ["Import_file_title", "Archive_warning_dialog", "no"]     ; WI-0081: preselection No
+        , "importConflict", ["Import_conflict_title", "Archive_conflict_text"]
+        , "importName", ["Import_name_title", "Archive_name_text"]
+        , "importExport", ["Import_and_export", "Archive_choose_text"])
 
     __New(model, role := "") {
         this.model := model
@@ -107,6 +112,10 @@ class ManagerWindow {
         OnMessage(ManagerWindow.WM_NOTIFY, this.notifyFn)
         this.timerOn := false
         this.win.onHide := () => this._StopTimer()
+        ; An .ahf file dropped on the window starts the import (WI-0081): the window accepts files, the message says which.
+        DllCall("shell32\DragAcceptFiles", "ptr", this.win.Hwnd, "int", true)
+        this.dropFn := (wp, lp, msg, hwnd) => this._OnDropFiles(wp, hwnd)
+        OnMessage(ManagerWindow.WM_DROPFILES, this.dropFn)
     }
 
     ; The list of notices (WI-0075): made at the first call, then shown. The model is changed by the role (OpenNotices).
@@ -251,7 +260,71 @@ class ManagerWindow {
                 this.role.OpenNotices()
             case "ImportV1":
                 this._ImportV1()
+            case "ImportExport":
+                this._ImportExport()
         }
+    }
+
+    ; Import and export of .ahf files (WI-0081): the user chooses the direction, then the file dialog of the choice. The
+    ; dialogs are only opened by these clicks (E0076).
+    _ImportExport() {
+        items := [[1, Lang("Archive_export_action")], [2, Lang("Archive_import_action")]]
+        this.Choose("importExport", items, (idx) => this._ExportOrImport(idx))
+    }
+
+    _ExportOrImport(idx) {
+        if (idx = 1) {
+            flowIds := this.model.SelectedFlows()
+            if (flowIds.Length = 0) {
+                this.ShowImport(Lang("Archive_export_none"))
+                return
+            }
+            path := UiFileDialogs.File(this.win.Hwnd, "S24", "", Lang("Archive_export_title"), Lang("Archive_file_filter"))
+            if (path = "")
+                return
+            if (!RegExMatch(path, "i)\.ahf$"))
+                path .= ".ahf"
+            this.role.ExportFlows(flowIds, path, (res) => this._ExportDone(res))
+        } else if (idx = 2) {
+            path := UiFileDialogs.File(this.win.Hwnd, "1", "", Lang("Archive_import_title"), Lang("Archive_file_filter"))
+            if (path = "")
+                return
+            this.role.ImportFile(path, (res) => 0)
+        }
+    }
+
+    _ExportDone(res) {
+        if (res["ok"])
+            this.ShowImport(Lang("Archive_export_done", res["count"], res["path"]))
+        else
+            this.ShowImport(Lang("Archive_export_error", res["error"]))
+    }
+
+    ; A file dropped on the window: the first one; an .ahf file starts the import, any other file is refused with a text.
+    ; The handler only checks the window and starts the chain (no dialog is opened here).
+    _OnDropFiles(hDrop, hwnd) {
+        if (hwnd != this.win.Hwnd)
+            return
+        count := DllCall("shell32\DragQueryFileW", "ptr", hDrop, "uint", 0xFFFFFFFF, "ptr", 0, "uint", 0, "uint")
+        path := ""
+        if (count > 0) {
+            len := DllCall("shell32\DragQueryFileW", "ptr", hDrop, "uint", 0, "ptr", 0, "uint", 0, "uint")
+            buf := Buffer((len + 1) * 2, 0)
+            DllCall("shell32\DragQueryFileW", "ptr", hDrop, "uint", 0, "ptr", buf, "uint", len + 1, "uint")
+            path := StrGet(buf, "UTF-16")
+        }
+        DllCall("shell32\DragFinish", "ptr", hDrop)
+        if (path = "")
+            return
+        if (count > 1) {
+            this.ShowImport(Lang("Archive_drop_many"))
+            return
+        }
+        if (!RegExMatch(path, "i)\.ahf$")) {
+            this.ShowImport(Lang("Archive_not_ahf", path))
+            return
+        }
+        this.role.ImportFile(path, (res) => 0)
     }
 
     ; Import from v1 (WI-0076): the folder dialog of the user (default: the data folder of v1), then the import. The dialog is
@@ -316,9 +389,10 @@ class ManagerWindow {
             done("")
     }
 
-    Choose(kind, items, done) {
+    ; args: the arguments of the text (WI-0081: the name of the conflicting flow).
+    Choose(kind, items, done, args*) {
         keys := ManagerWindow.ASK[kind]
-        opened := UiDialogs.Choose(this.win.Hwnd, keys[1], keys[2], items, (answered, id) => done(answered ? id : 0))
+        opened := UiDialogs.Choose(this.win.Hwnd, keys[1], keys[2], items, (answered, id) => done(answered ? id : 0), args*)
         if (!opened)
             done(0)
     }

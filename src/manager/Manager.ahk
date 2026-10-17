@@ -7,6 +7,7 @@
 #Include ManagerModel.ahk
 #Include ManagerOps.ahk
 #Include ManagerImport.ahk
+#Include ManagerArchive.ahk
 #Include ManagerDriver.ahk
 #Include ManagerWindow.ahk
 
@@ -31,6 +32,7 @@ class Manager extends Role {
         this.model := ""
         this.ops := ""               ; the operations on flows and categories (WI-0074), made with the model
         this.importer := ""          ; the import from v1 (WI-0076), made with the model
+        this.archive := ""           ; the export and import of .ahf files (WI-0081), made with the model
         this.view := ""
         this.driver := ""
         this.started := false
@@ -41,6 +43,8 @@ class Manager extends Role {
         this.ops := ManagerOps(this.model)
         this.importer := ManagerImport(this.model)
         this.importer.log := (level, text) => this._Log(level, "manager", text)
+        this.archive := ManagerArchive(this.model)          ; the .ahf export and import (WI-0081)
+        this.archive.log := (level, text) => this._Log(level, "manager", text)
         this.On("evt.", (msg) => this._OnEvent(msg))
         this.On("cmd.app.prepareExit", (msg) => this._OnPrepareExit(msg))
         this.On("cmd.manager.show", (msg) => this._OnShow(msg))
@@ -48,6 +52,7 @@ class Manager extends Role {
             this.model.TraceOn()
             this.driver := ManagerDriver(this, this.model)
             this.importer.ask := this.driver
+            this.archive.ask := this.driver
         }
     }
 
@@ -59,6 +64,7 @@ class Manager extends Role {
             if (!this.headless) {
                 this.view := ManagerWindow(this.model, this)
                 this.importer.ask := this.view
+                this.archive.ask := this.view
                 this.view.Show()
             }
         }
@@ -117,6 +123,23 @@ class Manager extends Role {
     }
 
     _ImportDone(res, done) {
+        if (IsObject(this.view))
+            this.view.ShowImport(ManagerImport.Text(res))
+        ManagerImport._Done(done, res)
+    }
+
+    ; Import of an .ahf file (WI-0081, REQ-MGR-050, REQ-SEC-060): the chain of ManagerArchive; done(res) when it is over, the
+    ; report is shown when there is a window.
+    ImportFile(path, done) {
+        this.archive.Start(path, (res) => this._ArchiveDone(res, done))
+    }
+
+    ; Export of flows to an .ahf file (WI-0081): done(res) with ok, count, error.
+    ExportFlows(flowIds, path, done) {
+        this.archive.Export(flowIds, path, done)
+    }
+
+    _ArchiveDone(res, done) {
         if (IsObject(this.view))
             this.view.ShowImport(ManagerImport.Text(res))
         ManagerImport._Done(done, res)

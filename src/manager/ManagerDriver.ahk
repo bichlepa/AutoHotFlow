@@ -25,6 +25,7 @@ class ManagerDriver {
         this.flowOps := role.ops
         this.flowOps.ask := this
         this.answers := Map()
+        this.asked := []          ; the questions since the last op "asked" (WI-0081): Map(kind, args)
         this.ops := Map()
         this.ops["select"] := (args, done) => this._OpSelect(args, done)
         this.ops["run"] := (args, done) => model.RunOrStop(args.Get("flowId", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
@@ -35,6 +36,9 @@ class ManagerDriver {
         this.ops["logFilter"] := (args, done) => this._OpLogFilter(args, done)
         this.ops["notices"] := (args, done) => this._OpNotices(args, done)
         this.ops["importV1"] := (args, done) => this._OpImportV1(args, done)
+        this.ops["importFile"] := (args, done) => this.role.ImportFile(args.Get("path", ""), (res) => done(ManagerDriver.Wire(res)))
+        this.ops["exportFlows"] := (args, done) => this.role.ExportFlows(args.Get("flowIds", []), args.Get("path", ""), (res) => done(ManagerDriver.Wire(res)))
+        this.ops["asked"] := (args, done) => this._OpAsked(args, done)
         this.ops["answers"] := (args, done) => this._OpAnswers(args, done)
         this.ops["selectToggle"] := (args, done) => this._OpSelectToggle(args, done)
         this.ops["selectCategory"] := (args, done) => this._OpSelectCategory(args, done)
@@ -170,18 +174,32 @@ class ManagerDriver {
 
     ; The questions of ManagerOps (ask seam, synchronous here): the answer of the test or the cancel value.
     Confirm(kind, args, done) {
+        this._Asked(kind, args)
         done(this._Answer(kind, "no") = "yes")
     }
 
     Input(kind, default, check, done) {
+        this._Asked(kind, [default])
         value := this._Answer(kind, "")
         if (value = "" || check(value) != "")
             value := ""
         done(value)
     }
 
-    Choose(kind, items, done) {
+    Choose(kind, items, done, args*) {
+        this._Asked(kind, args)
         done(this._Answer(kind, 0))
+    }
+
+    ; WI-0081: the questions are recorded (kind and the arguments of the text) for the tests, which read them with "asked".
+    _Asked(kind, args) {
+        this.asked.Push(Map("kind", kind, "args", ManagerDriver.Wire(args)))
+    }
+
+    _OpAsked(args, done) {
+        out := this.asked
+        this.asked := []
+        done(Map("ok", true, "asked", out))
     }
 
     _Answer(kind, cancel) => this.answers.Has(kind) ? this.answers[kind] : cancel

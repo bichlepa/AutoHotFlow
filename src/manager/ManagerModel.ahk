@@ -650,7 +650,7 @@ class ManagerModel {
         return Map("NewCategory", up, "NewFlow", up, "ChangeCategory", flows && up, "Duplicate", one && up
             , "Delete", (flows || this.catSelected) && up, "Edit", false   ; arch-ok: wire-bool UI state of the buttons, not a protocol field
             , "Enable", flows && up, "Run", flows && up
-            , "Settings", false, "ImportExport", false, "About", false, "Help", false, "ShowLog", true, "Exit", true, "Notices", true
+            , "Settings", false, "ImportExport", up, "About", false, "Help", false, "ShowLog", true, "Exit", true, "Notices", true
             , "ImportV1", up)
     }
 

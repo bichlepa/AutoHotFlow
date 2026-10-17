@@ -317,7 +317,7 @@ class ManagerImport {
         }
         if (res["autostart"] = "error")
             lines.Push(Lang("Import_autostart_error", res["autostartError"]))
-        else
+        else if (res["autostart"] != "skip")      ; "skip": the report of an .ahf file has no autostart step (WI-0081)
             lines.Push(Lang("Import_autostart_" res["autostart"]))
         created := counts["created"] + counts["copy"]
         lines.Push(Lang("Import_summary", created, counts["copy"], counts["skipped"], counts["failed"], counts["taken"]
