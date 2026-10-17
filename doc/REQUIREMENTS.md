@@ -1914,11 +1914,11 @@ When a flow, variable or settings file was written by a newer version of AutoHot
 ### REQ-LNG-010 User interface in several languages
 
 - **v1:** yes (English, German, Russian, Korean)
-- **v2:** partial (the language files of v1 load; English only, until the setting exists)
+- **v2:** partial (the language files of v1 load; English only, until the setting exists; an open window follows a change of the language without a rebuild: `UiTexts.Reload()`, unit-tested only, the window itself not checked)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** `tests/ahk/core_lang.test.ahk`
+- **Evidence:** `tests/ahk/core_lang.test.ahk`, `tests/ahk/ui_common_texts.test.ahk`
 
 All texts go through `Lang()` with the v1 language files (`assets/language/`, and `src/elements/<package>/language/` for the texts of the elements, WI-0047). A missing text falls back to the key and is logged (MIGRATION M-0046).
 
