@@ -61,13 +61,13 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI-0071 | Categories and the order of the list (`Categories.json`) | done, verified (fast, foundation, slow green; slow one load flake, green alone; stress 200 flows: ready 45.4 s, largest snapshot 622 ms) | sonnet/haiku (review sonnet) | 2606b20 (rebased series) | 2026-10-17 | block A; accepted: empty categories from hand-edited files stay, case-differing names are a quirk |
 | WI-0072 | Tray icon and tray menu of the application (own role `tray`, E0075) | done, verified (fast, foundation, slow green on 3a32a30) | sonnet (review sonnet) | 3a32a30 | 2026-10-17 | block A; unlimited restart with growing pause, decided by the owner |
 | WI-0073 | Manager: window, model, resync, headless driver, replaces the stub | done, verified on 72da2f6 (fast, foundation, slow green; stress 201 flows: filled after 0.54 s, snapshot 0.2 s; gui test 4 passed) | sonnet (review sonnet) | ec2a38b–72da2f6 | 2026-10-17 | block A; the product start does not start the manager yet (the tray does) |
-| WI-0074 | Flow tree and operations | open | | | | block A |
+| WI-0074 | Flow tree and operations | integrated on 5590990a, verification running | haiku/sonnet (review sonnet) | fd0de334–5590990a | 2026-10-17 | block A; owner decisions F-0117, F-0120; drag test fixed by sonnet (cross-process RECT) |
 | WI-0075 | Notices | open | | | | block A |
 | WI-0076 | Import from v1, manual check of block A | open | | | | block A |
 | WI-0077 | Settings model | open | | | | block B |
 | WI-0078 | Settings dialog, language, about | open | | | | block B |
 | WI-0079 | Start with Windows, run as administrator | open | | | | block B, manual check |
-| WI-0080 | Log display | open | | | | block B, may start after WI-0073 |
+| WI-0080 | Log display | done, verified (foundation, slow green; fast red by 2 load flakes, green alone) on d6331fb8 | haiku (review sonnet) | dcacd43b–d6331fb8 | 2026-10-17 | block B; F-0116 and source group wait for the owner |
 | WI-0081 | `.ahf` export and import | open | | | | block B |
 | WI-0082 | Acceptance S0004 | open | | | | |
 
@@ -81,7 +81,7 @@ None.
 
 ## Running agents
 
-None (round-up 2026-10-17).
+None.
 
 ## Last verified state
 

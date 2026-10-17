@@ -5,13 +5,14 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 ## Decisions
 
 - **Log bursts (F-0116, WI-0080).** A burst of 5000 log lines reached the manager as 1991 (the topic `log` drops lines, PROTOCOL 4.6). Options: (a) keep the drop; (b) the log window reads the file again after a burst. Recommendation: (b).
-- **Instance count in the tree (WI-0074, provisional F-9000 on the branch).** REQ-MGR-010 asks for the number of running instances; the manager snapshot does not carry it. Options: (a) extend the protocol (snapshot field); (b) drop it from REQ-MGR-010. 
-- **Missing packages of non-trigger elements (WI-0074, provisional F-9003 on the branch).** They are not marked in the tree. Say if that is wanted for S0004 or later.
+- **Instance count in the tree (WI-0074, F-0117).** REQ-MGR-010 asks for the number of running instances; the manager snapshot does not carry it. Options: (a) extend the protocol (snapshot field); (b) drop it from REQ-MGR-010. 
+- **Missing packages of non-trigger elements (WI-0074, F-0120).** They are not marked in the tree. Say if that is wanted for S0004 or later.
 - **Source group of the log filter (WI-0080).** "App, flow, thread" is built as the v1 level letters a, f, t, only a stand-in. Say if you meant something else (for example the sender or the source name).
 - **Time stamps of the log tail (WI-0080).** The local stamp is converted with the current UTC offset; entries from before a DST change are up to 1 hour off (the window itself is not affected). A fix is about 10 lines (store UTC). Recommendation: leave it, as documented.
 
 ## Manual checks
 
+- **Manager tree (WI-0074):** context menus, drag and drop onto a category, Ctrl-click multi-selection (shows the focused item only, F-0119), ask dialogs (delete, unknown state, limit), trigger-not-available notice, state marks. Only the window tests ran (they now include drag and drop); the rest was never seen on screen. Review the German texts too.
 - **Log window (WI-0080):** never shown by an agent (only the class load and the window tests run). Check it with WI-0082 or earlier: open it, filters, a flood of lines, DPI. Review the German texts in `assets/language/manager/de.ini`.
 
 ## To know
