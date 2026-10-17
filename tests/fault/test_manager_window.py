@@ -16,6 +16,7 @@ import pytest
 from faultkit import event, request_ok, wait_until
 
 from faultfixtures import chains  # noqa: F401  (fixture)
+from support.flowbuilder import FlowBuilder
 
 pytestmark = [pytest.mark.fault, pytest.mark.gui]
 
@@ -306,3 +307,60 @@ def test_a_flow_dragged_onto_a_category_moves_into_it_and_the_engine_keeps_it(wi
         snap = request_ok(chain.obs, "engine", "cmd.engine.snapshot", {})
         return [f["category"] for f in snap["flows"] if f["flowId"] == "skeleton"] == ["Other"]
     assert wait_until(moved, 10.0), "the flow was not moved to the category by the drop"
+
+
+# --- WI-0075: the list of notices (a window of its own, opened by the button "Notices") ----------------------------
+
+NOTICES_TITLE = "Notices"
+NOTICES_BUTTON = "Notices"
+LVM_GETITEMCOUNT = 0x1004
+
+
+def _window_titled(pid, title):
+    """Handles of the top-level windows of a process with the given title."""
+    found = []
+    proc_type = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+
+    def visit(hwnd, _):
+        owner = ctypes.c_ulong(0)
+        user32.GetWindowThreadProcessId(hwnd, ctypes.byref(owner))
+        if owner.value == pid and _text(hwnd) == title:
+            found.append(hwnd)
+        return True
+
+    user32.EnumWindows(proc_type(visit), 0)
+    return found
+
+
+@pytest.fixture
+def notice_chain(chains, datadir):
+    """The manager with a window, and a flow whose every start ends with an unhandled exception (written before the start)."""
+    fb = FlowBuilder("gui-throws")
+    fb.chain(fb.trigger(), fb.action("Action_TestThrow"))
+    flow_id = fb.write(datadir)
+    chain = chains("storage,engine,manager", [])
+    chain.wait_ready(["storage", "engine", "manager"], timeout=READY_S)
+    chain.wait_flows(timeout=READY_S)
+    pid = chain.pid("manager")
+    hwnds = wait_until(lambda: window_of(pid), 10.0)
+    assert hwnds, "no window '%s' for pid %d" % (WINDOW_TITLE, pid)
+    return chain, pid, hwnds[0], flow_id
+
+
+def test_an_error_notice_shows_in_the_list_of_notices_opened_by_its_button(notice_chain):
+    chain, pid, hwnd, flow_id = notice_chain
+    assert wait_until(lambda: visible(hwnd), 10.0)
+    request_ok(chain.obs, "engine", "cmd.flow.start", {"flowId": flow_id})
+
+    def rows_after_open():
+        # The button opens the list (or shows it again); the rows are those of the model at that time.
+        button = [c for c in children_of(hwnd) if _text(c) == NOTICES_BUTTON]
+        assert button, "no button '%s' in the manager window" % NOTICES_BUTTON
+        user32.SendMessageW(button[0], BM_CLICK, 0, 0)
+        lists = [w for w in _window_titled(pid, NOTICES_TITLE)]
+        if not lists:
+            return -1
+        views = [c for c in children_of(lists[0]) if _classname(c) == "SysListView32"]
+        return user32.SendMessageW(views[0], LVM_GETITEMCOUNT, 0, 0) if views else -1
+
+    assert wait_until(lambda: rows_after_open() == 1, 15.0), "the list of notices has no row for the exception"
