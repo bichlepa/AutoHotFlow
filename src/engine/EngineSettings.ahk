@@ -143,8 +143,11 @@ class EngineSettings {
             throw AhfError("the settings are being loaded", ErrCode.BUSY)
         checked := SettingsModel.CheckPartial(msg.payload.Get("settings", ""))
         changed := []
+        ; A change is a change against the values with every waiting change applied, not against the values in force: a waiting
+        ; change would otherwise win over a later one that equals the old value.
+        effective := this._Effective()
         for key, value in checked {
-            if (!EngineSettings._Same(this._values[key], value))
+            if (!EngineSettings._Same(effective[key], value))
                 changed.Push(key)
         }
         if (changed.Length = 0)
@@ -152,6 +155,14 @@ class EngineSettings {
         this._queue.Push(Map("request", msg, "checked", checked, "changed", changed))
         this._Next()
         return Deferred.Marker()
+    }
+
+    ; The values in force with all waiting changes applied in order (the first one is the one that is being written).
+    _Effective() {
+        values := this._values
+        for item in this._queue
+            values := SettingsModel.Merge(values, item["checked"])
+        return values
     }
 
     ; Writes the oldest waiting change.

@@ -199,13 +199,26 @@ def test_a_failed_write_changes_nothing(flows):
 
 def test_two_changes_in_a_row_both_reach_the_file(flows):
     flows.start()
-    first = flows.begin_request("engine", "cmd.settings.set", {"settings": {"workers": 5}}) \
-        if hasattr(flows, "begin_request") else None
-    del first
     put(flows, workers=5)
     put(flows, userLevel="Programmer")
     text = on_disk(flows)
     assert text["workers"] == 5 and text["userLevel"] == "Programmer"
+
+
+def test_overlapping_changes_are_applied_in_order_and_the_later_one_wins(flows):
+    flows.start()
+    obs = flows._obs
+    # three requests without waiting for an answer; the second one sets the value that is in force while the first one waits
+    ids = [obs.send("engine", "cmd.settings.set", {"settings": values}, timeout_ms=10000)
+           for values in ({"workers": 5}, {"workers": 8}, {"userLevel": "Advanced", "logLevelApp": 1})]
+    answers = [obs._wait_answer(i, scaled(10.0))["payload"] for i in ids]
+    assert all(a["ok"] for a in answers), answers
+    assert answers[0]["changed"] == ["workers"]
+    assert answers[1]["changed"] == ["workers"], "8 differs from the 5 that waits: it is a change, not 'nothing changed'"
+    assert sorted(answers[2]["changed"]) == ["logLevelApp", "userLevel"]
+    assert get(flows)["workers"] == 8, "the later request wins"
+    text = on_disk(flows)
+    assert text["workers"] == 8 and text["userLevel"] == "Advanced" and text["logLevelApp"] == 1
 
 
 # --- live effect -------------------------------------------------------------------------------------------------
