@@ -766,3 +766,11 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 **Evidence:** `tests/e2e/test_manager_flows.py::test_enabling_a_flow_with_a_missing_package_reports_the_trigger` (trigger case only).
 
 **Closed 2026-10-17 (E0080, bug hunter):** fixed: the snapshot carries `missingPackages` per flow (the packages of all its elements that the engine process does not have, `Engine._MissingPackages`, PROTOCOL 4.2); the manager label shows "missing package: <names>" for every element type. Test: `tests/e2e/test_manager_flows.py::test_a_flow_with_a_missing_package_of_an_action_is_marked_with_the_package` (an action element; failed before with KeyError `missingPackages`).
+
+### F-0116: The log window misses lines of a burst (5000 lines, about 2000 reached storage)
+
+**What:** In `tests/e2e/test_manager_log.py::test_a_burst_of_5000_lines_does_not_stall_the_manager_and_the_model_keeps_the_limit` the observer sends 5000 `evt.log.append` lines to storage as fast as it can. The headless manager with the log open saw about 2000 lines. Three runs showed that the hub drops the lines before they reach storage (send queue to storage full, `Hub.LOG_SOFT_LIMIT` 800). The topic delivers everything storage writes.
+**Status:** fixed (E0082, owner 2026-10-17: option a, the drop in the hub stays). The re-read of `Log.txt` (E0078) was not built, because it could not fill the gap. The burst test checks that the newest entries of the model equal the newest lines that storage wrote (`cmd.test.state` `log.keys`).
+**Evidence:** `tests/e2e/test_manager_log.py::test_a_burst_of_5000_lines_does_not_stall_the_manager_and_the_model_keeps_the_limit`.
+
+**Closed 2026-10-17 (E0082, bug hunter):** decided by the owner (drop stays). The test asserts what storage wrote, not that all lines arrive; the model shows the newest lines of the file.
