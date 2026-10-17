@@ -24,6 +24,14 @@ As WI-0076, plus `v1/Source_Manager/User Interface/Import and export.ahk` (forma
 
 - The spike result is recorded; the tests of task 7 are green, serial and parallel.
 
+## Spike result (2026-10-17, verified)
+
+- `%SystemRoot%\System32\tar.exe` (libarchive) writes a ZIP with `tar --format zip -cf out.ahf -C <folder> a.json b.json`: the entries are flat at the root (no folder names), as v1 writes them. Python's `zipfile` reads that file, `tar -tvf` lists it.
+- `tar` reads a ZIP that Python wrote with deflate and entries in subfolders: `tar -tf` lists the names, `tar -xf ... -C <folder>` extracts them.
+- Entries `../evil.json` and `/abs.json` in an archive: `tar -xf` refuses the first one and strips the leading `/` of the second. The import does not rely on that: the names are checked against the allowed layout before anything is extracted (PROTOCOL 4.6, `cmd.storage.ahf.unpack`).
+- Not checked: that 7-Zip (v1 `7z_compress`, the v1 import) lists and reads an archive of tar, and that tar reads an `.ahf` written by v1 (no such file was available). v1 is not run here. The layout is the flat one v1 writes, so this is assumed.
+- Decision: tar.exe, no own ZIP writer and no PowerShell. Reason: it is part of Windows 10 and later, it runs as a plain process, and its output is a standard ZIP.
+
 ## Not part of this
 
 The deletion into the Windows recycle bin as an `.ahf` (REQ-MGR-150, `later`), which can reuse the export.

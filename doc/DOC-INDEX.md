@@ -31,28 +31,28 @@ L398-409 9. Performance budgets (targets, measured in Phase 2)
 L411-421 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (115.7 KB, 591 lines)
+## doc/PROTOCOL.md (120.6 KB, 597 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-92 3. Addresses and Topics
-L94-564 4. Message Catalog
+L94-570 4. Message Catalog
 L110-137   4.1 Lifecycle (`sys.*`)
 L139-156   4.1a Process events (topic `process`, supervisor → subscribers)
 L158-167   4.1b Test roles (only with `--test-roles`)
 L169-177   4.1c Unhandled errors (`evt.diag.error`, WI-0023)
-L179-227   4.2 Engine commands (clients → `engine`)
-L229-272   4.3 Engine events (`evt.*`, engine → topics)
-L274-304   4.4 Engine ↔ trigger host
-L306-371   4.5 Engine ↔ worker
-L373-427   4.6 Engine ↔ storage and log
-L429-448   4.7 Dialogs
-L450-483   4.8 Manager (WI-0073, `src/manager/`)
-L485-545   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
-L547-564   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L566-585 5. Connection setup, reconnection, resync
-L576-585   5a Events before subscription (design question, WI-0007)
-L587-591 6. Versioning and extension
+L179-228   4.2 Engine commands (clients → `engine`)
+L230-273   4.3 Engine events (`evt.*`, engine → topics)
+L275-305   4.4 Engine ↔ trigger host
+L307-372   4.5 Engine ↔ worker
+L374-432   4.6 Engine ↔ storage and log
+L434-453   4.7 Dialogs
+L455-489   4.8 Manager (WI-0073, `src/manager/`)
+L491-551   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
+L553-570   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
+L572-591 5. Connection setup, reconnection, resync
+L582-591   5a Events before subscription (design question, WI-0007)
+L593-597 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (53.0 KB, 324 lines)
@@ -71,22 +71,22 @@ L282-302 9a. Dialog tests (E0038, WI-0051)
 L304-324 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (51.4 KB, 465 lines)
+## doc/ELEMENT-API-V2.md (52.0 KB, 468 lines)
 ```text
 L8-18 1. Guidelines
-L20-87 2. Class contract
-L89-211 3. Context `ctx`
-L132-149   3.1 Parameter evaluation (WI-0042)
-L151-161   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
-L163-169   3.3 Dialogs (E0038, WI-0051)
-L171-186   3.4 Debug view (WI-0056, REQ-DBG-060)
-L188-211   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
-L213-295 4. Example 1: `Action_Sleep` (inline, with timer)
-L297-390 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L392-432 6. Mechanical conversion rules
-L434-455 7. What stays
-L441-455   7.1 Loop elements (WI-0054)
-L457-465 8. Still to be clarified (Phase 3)
+L20-90 2. Class contract
+L92-214 3. Context `ctx`
+L135-152   3.1 Parameter evaluation (WI-0042)
+L154-164   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
+L166-172   3.3 Dialogs (E0038, WI-0051)
+L174-189   3.4 Debug view (WI-0056, REQ-DBG-060)
+L191-214   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+L216-298 4. Example 1: `Action_Sleep` (inline, with timer)
+L300-393 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L395-435 6. Mechanical conversion rules
+L437-458 7. What stays
+L444-458   7.1 Loop elements (WI-0054)
+L460-468 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
