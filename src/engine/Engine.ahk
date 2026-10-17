@@ -14,6 +14,7 @@
 #Include TriggerArms.ahk
 #Include WorkerBridge.ahk
 #Include VarRequests.ahk
+#Include ImportV1Vars.ahk
 #Include vars\EngineVars.ahk
 #Include vars\VarLoader.ahk
 #Include vars\VarWriter.ahk
@@ -80,6 +81,7 @@ class Engine extends Role {
         pool := Engine._PoolOptions(args)
         this.workers := WorkerBridge(this, pool["size"], pool["warm"], pool["idleMs"])
         this.varRequests := VarRequests(this)   ; cmd.engine.var.* of worker elements and clients (WI-0050)
+        this.importV1 := ImportV1Vars(this)     ; cmd.import.v1.vars: the variables of a v1 folder (WI-0076)
         this._flowsLoaded := false     ; not _loaded: that name is the method _Loaded (case-insensitive)
         this._loadTries := 0           ; failed flow lists in a row for a real reason (not: storage missing)
         this._loadActive := false      ; flows.list or flow.read requests are on their way
@@ -119,6 +121,7 @@ class Engine extends Role {
         this.On("cmd.category.delete", (msg) => this.categories.CmdDelete(msg))
         this.On("cmd.category.order", (msg) => this.categories.CmdOrder(msg))
         this.On("cmd.category.sort", (msg) => this.categories.CmdSort(msg))
+        this.On("cmd.import.v1.vars", (msg) => this.importV1.Run(msg))
         this.On("evt.worker.done", (msg) => this.workers.OnDone(msg))
         this.On("evt.trigger.fired", (msg) => this._OnTriggerFired(msg))
         this.On("evt.trigger.error", (msg) => this._OnTriggerError(msg))

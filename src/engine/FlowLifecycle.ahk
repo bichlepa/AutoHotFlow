@@ -45,6 +45,8 @@ class FlowLifecycle {
         this._RequireLoaded()
         name := Engine.Optional(msg, "name")
         category := Engine.Optional(msg, "category")
+        fixedId := Engine.Optional(msg, "flowId")       ; the import from v1 gives the ID of the v1 file (WI-0076)
+        numberName := FlowLifecycle._Truth(msg.payload.Get("numberName", 0))
         defn := msg.payload.Get("definition", "")
         if (defn is Map) {
             raw := FlowDefinition.CopyValue(defn)
@@ -57,6 +59,8 @@ class FlowLifecycle {
         } else {
             throw AhfError("payload field 'definition' must be an object", ErrCode.BAD_PAYLOAD)
         }
+        if (name != "" && numberName && this._NameTaken(name, ""))
+            name := this._NewCopyName(name)             ; the import as a copy: the next free number (WI-0076)
         if (name = "")
             name := this._NewName(Lang("New_flow"))
         else
@@ -65,7 +69,9 @@ class FlowLifecycle {
         if (category != "" || !raw.Has("category"))
             raw["category"] := category
         this._CheckCategory(raw.Get("category", ""))
-        return this._Create(msg, raw, "", convert, 1)
+        if (fixedId != "")
+            this._CheckFixedId(fixedId)
+        return this._Create(msg, raw, "", convert, 1, fixedId)
     }
 
     ; cmd.flow.duplicate { flowId, name? }: a copy of the committed definition with a new ID; all triggers disabled, no
@@ -133,19 +139,19 @@ class FlowLifecycle {
     ; --- create and duplicate --------------------------------------------------------------------
 
     ; Starts the write of a new flow with a flow ID that no flow of the table has. Returns the marker of a deferred answer.
-    _Create(request, raw, pending, convert, attempt) {
-        flowId := this._FreshId()
+    _Create(request, raw, pending, convert, attempt, fixedId := "") {
+        flowId := (fixedId != "") ? this._FixedId(fixedId) : this._FreshId()
         def := this._Build(flowId, raw, pending, convert)
         this._ids[flowId] := true
         this._ReserveName(def.Name, flowId)
         this._engine.peer.Request("storage", "cmd.storage.flow.write"
             , Map("path", "Flows/" flowId ".json", "text", def.ToFileText(), "backup", Json.True, "createOnly", Json.True)
-            , (res) => this._OnCreated(request, flowId, def, raw, pending, convert, attempt, res)
+            , (res) => this._OnCreated(request, flowId, def, raw, pending, convert, attempt, res, fixedId)
             , FlowLifecycle.TIMEOUT_MS)
         return Deferred.Marker()
     }
 
-    _OnCreated(request, flowId, def, raw, pending, convert, attempt, res) {
+    _OnCreated(request, flowId, def, raw, pending, convert, attempt, res, fixedId := "") {
         try {
             this._ids.Delete(flowId)
             this._UnreserveName(def.Name, flowId)
@@ -155,11 +161,13 @@ class FlowLifecycle {
                 this._engine.Emit("topic:engine", "evt.flow.list.changed"
                     , Map("added", [flowId], "removed", [], "changed", []))
                 this._engine._Log("a1", "engine", "flow '" flowId "' created: " def.Name)
-                this._engine.peer.Reply(request, Map("flowId", flowId))
+                this._engine.peer.Reply(request, Map("flowId", flowId, "name", def.Name
+                    , "places", FlowLifecycle._Places(def), "unknown", def.Pending.Count))
                 return
             }
             err := res.payload.Get("error", "")
-            if (err is Map && err.Get("code", "") = ErrCode.CONFLICT && attempt < FlowLifecycle.CREATE_TRIES) {
+            if (err is Map && err.Get("code", "") = ErrCode.CONFLICT && attempt < FlowLifecycle.CREATE_TRIES
+                && fixedId = "") {
                 ; the file of this ID exists after all (not in the table): another ID
                 this._Create(request, raw, pending, convert, attempt + 1)
                 return
@@ -179,6 +187,34 @@ class FlowLifecycle {
         }
         throw AhfError("no free flow ID was found", ErrCode.INTERNAL)
     }
+
+    ; The ID the import gives a new flow (WI-0076): a flow of the table or a pending create has it: conflict.
+    _FixedId(flowId) {
+        if (this._engine.flows.Has(flowId) || this._ids.Has(flowId))
+            throw AhfError("flow '" flowId "' exists already", ErrCode.CONFLICT)
+        return flowId
+    }
+
+    ; A flow ID given by the caller (WI-0076): a text that is usable as the name of a file, else bad_payload.
+    _CheckFixedId(flowId) {
+        if (StrLen(flowId) > 200 || flowId = "." || flowId = ".." || RegExMatch(flowId, '[\/:*?"<>|\x00-\x1F]'))
+            throw AhfError("'" flowId "' is not a usable flow ID", ErrCode.BAD_PAYLOAD)
+    }
+
+    ; The MIGRATION places of a loaded definition (E0035): one Map(element, par, ids) per parameter that the loader marked.
+    static _Places(def) {
+        out := []
+        for elId, el in def.Raw["allElements"] {
+            if (!(el is Map) || !el.Has(FlowDefinition.MIGRATION_KEY) || !(el[FlowDefinition.MIGRATION_KEY] is Array))
+                continue
+            for entry in el[FlowDefinition.MIGRATION_KEY]
+                out.Push(Map("element", elId, "par", entry["par"], "ids", entry["ids"]))
+        }
+        return out
+    }
+
+    ; A truth value of the payload (JSON true is 1; the sentinel object Json.True is accepted too).
+    static _Truth(v) => (v == Json.True || (!IsObject(v) && (v = 1 || v = "true")))
 
     ; The record of a new flow (its definition, converted when the definition came from outside).
     _Build(flowId, raw, pending, convert) {
