@@ -467,7 +467,7 @@ class Supervisor {
         if (opts.Has("log-level"))
             text .= " --log-level=" this.logLevel
         if (opts.Has("language"))
-            text .= " --language=" Trim(String(opts["language"]))
+            text .= " --language=" SettingsModel.LanguageCode(SettingsModel.Check("language", opts["language"]))
         if (opts.Has("headless"))
             text .= " --headless"
         if (opts.Has("windows-startup"))
