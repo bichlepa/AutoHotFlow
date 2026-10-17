@@ -59,6 +59,11 @@ class Storage extends Role {
         this.logDropPending := 0           ; dropped entries not yet announced in the log
         this.logQueueMaxLines := Integer(args.Get("log-queue-max-lines", Storage.LOG_QUEUE_MAX_LINES))
         this.logQueueMaxChars := Integer(args.Get("log-queue-max-chars", Storage.LOG_QUEUE_MAX_CHARS))
+        ; .ahf archives (WI-0081): the limit of one tar run. The two environment variables are test hooks (the supervisor
+        ; passes no options to the roles): AHF_ARCHIVE_TIMEOUT_MS sets the limit, AHF_ARCHIVE_TAR replaces tar.exe (a tar that is slow).
+        timeout := EnvGet("AHF_ARCHIVE_TIMEOUT_MS")
+        this.archiveTimeoutMs := (timeout = "") ? ArchiveTar.TIMEOUT_MS : Integer(timeout)
+        ArchiveTar.TAR := EnvGet("AHF_ARCHIVE_TAR")
     }
 
     ; Creates the folders before the connection starts. A failure is logged to the console; the
@@ -273,7 +278,7 @@ class Storage extends Role {
         SplitPath(path, , &dir)
         if (!DirExist(dir))
             throw AhfError("the folder '" dir "' does not exist", ErrCode.NOT_FOUND)
-        job := ArchivePack(this.dataDir, flowIds, path)
+        job := ArchivePack(this.dataDir, flowIds, path, this.archiveTimeoutMs)
         return this._DeferBackground(msg, "ahf.pack", path, () => job.Step())
     }
 
@@ -284,7 +289,7 @@ class Storage extends Role {
             throw AhfError("the file '" path "' does not exist", ErrCode.NOT_FOUND)
         if (InStr(kind, "D"))
             throw AhfError("'" path "' is a folder, not an .ahf file", ErrCode.BAD_PAYLOAD)
-        job := ArchiveUnpack(this.dataDir, path)
+        job := ArchiveUnpack(this.dataDir, path, this.archiveTimeoutMs)
         return this._DeferBackground(msg, "ahf.unpack", path, () => job.Step())
     }
 
@@ -295,6 +300,7 @@ class Storage extends Role {
             throw AhfError(opName ": the path must be an absolute path on one line", ErrCode.BAD_PAYLOAD)
         if (!RegExMatch(text, "i)\.ahf$"))
             throw AhfError(opName ": the file must have the extension .ahf", ErrCode.BAD_PAYLOAD)
+        ArchiveTar.CheckText(text, opName ": the path")
         return text
     }
 
@@ -335,11 +341,13 @@ class Storage extends Role {
     }
 
     ; Like _Defer, but in the background queue: the operation runs when no request waits, and it asks again (retry) every
-    ; ArchiveTar.POLL_MS while tar runs (WI-0081). Its time is ArchiveTar.TIMEOUT_MS, then it is answered busy.
+    ; ArchiveTar.POLL_MS while tar runs (WI-0081). A job runs at most two tar runs (list, extract), each ends by its own
+    ; limit (ArchiveTar.Finished kills it and the job cleans up). The queue's own limit is larger than both runs together,
+    ; so the queue never answers busy before the job has answered and removed its folder.
     _DeferBackground(msg, opName, subject, run) {
         this.queue.AddLow(Map("deadline", "", "run", run
             , "finish", (payload) => this._Finish(msg, opName, subject, payload)
-            , "retryMs", ArchiveTar.TIMEOUT_MS, "retryDelayMs", ArchiveTar.POLL_MS))
+            , "retryMs", 2 * this.archiveTimeoutMs + 2000, "retryDelayMs", ArchiveTar.POLL_MS))
         return Deferred.Marker()
     }
 

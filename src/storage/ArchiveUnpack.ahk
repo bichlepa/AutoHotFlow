@@ -4,40 +4,72 @@
 #Include StoragePaths.ahk
 #Include AtomicFile.ahk
 #Include VarFiles.ahk
+#Include ..\core\Time.ahk
 #Include ArchiveTar.ahk
 #Include ArchiveEntries.ahk
 
 ; cmd.storage.ahf.unpack (WI-0081, PROTOCOL 4.6, REQ-SEC-060): reads an .ahf file (a ZIP archive, v1 or v2). Nothing is written
 ; next to the file; the archive is extracted into a job folder of the data folder (Archive/unpack-<n>-<ms>/) and the job folder
-; is removed after the read. Order: (1) the names of the archive are listed by tar and checked against the layout (ArchiveEntries),
-; (2) only then the archive is extracted, (3) the extracted tree is checked again, file by file, and a link is refused,
-; (4) the flows and the static variables are read. Any refusal leaves nothing behind (Step cleans up on failure).
+; is removed after the read. Order: (0) the file is not larger than ArchiveEntries.MAX_FILE_BYTES; (1) tar lists the entries
+; (tar -tvf) and the listing is checked against the layout and the limits (ArchiveEntries); (2) only then the archive is
+; extracted; (3) the extracted tree is checked again, file by file, and a link is refused; (4) the flows and the static
+; variables are read. Any refusal leaves nothing behind (Step cleans up on failure).
 class ArchiveUnpack {
     static seq := 0
+    static FREE_MS := 1000         ; the time a failed job waits for its folder to be free (a killed tar.exe)
 
-    __New(dataDir, path) {
+    ; timeoutMs: the limit of each tar run (0 = ArchiveTar.TIMEOUT_MS).
+    __New(dataDir, path, timeoutMs := 0) {
+        ArchiveTar.CheckText(dataDir, "the data folder")
+        ArchiveTar.CheckText(path, "the file")
         this.dataDir := dataDir
         this.path := path
+        this.timeoutMs := timeoutMs
         this.job := ""
         this.root := ""
         this.tar := ""
         this.state := "start"
+        this.failure := ""
+        this.freeUntil := 0
     }
 
     ; One step: a Map(retry, message) while tar runs, else the payload Map(flows, vars).
     Step() {
+        if (IsObject(this.failure))
+            return this._AwaitFree()
         try {
             return this._Step()
         } catch as e {
+            if (IsObject(this.tar) && this.tar.timedOut && this.job != "") {
+                ; a killed tar.exe may still hold a file of the folder: the answer waits until the folder is free
+                this.failure := e
+                this.freeUntil := Time.NowMs() + ArchiveUnpack.FREE_MS
+                return this._AwaitFree()
+            }
             this.Cleanup()
             throw e
         }
     }
 
+    ; The answer of a failed run, given when its job folder is free (or after FREE_MS, the folder then goes to leftovers).
+    _AwaitFree() {
+        if (ArchiveTar.TryDiscard(this.job) || Time.NowMs() > this.freeUntil) {
+            this.Cleanup()
+            e := this.failure
+            this.failure := ""
+            throw e
+        }
+        return Map("retry", true, "message", "waiting for a killed tar.exe to let go of the job folder")
+    }
+
     _Step() {
         if (this.state = "start") {
+            size := FileGetSize(this.path)
+            if (size > ArchiveEntries.MAX_FILE_BYTES)
+                throw AhfError("the file has " size " bytes, more than the " ArchiveEntries.MAX_FILE_BYTES " allowed for an .ahf file",
+                    ErrCode.BAD_PAYLOAD)
             this._NewJob()
-            this.tar := ArchiveTar(this.job, "list", '-tf "' this.path '"')
+            this.tar := ArchiveTar(this.job, "list", '-tvf "' this.path '"', this.timeoutMs)
             this.tar.Start()
             this.state := "listing"
             return Map("retry", true, "message", "tar is listing the archive")
@@ -47,10 +79,10 @@ class ArchiveUnpack {
                 return Map("retry", true, "message", "tar is listing the archive")
             if (!this.tar.Ok())
                 throw AhfError("the file is not a ZIP archive that can be read: " this.tar.Output(), ErrCode.BAD_PAYLOAD)
-            ArchiveEntries.Check(StrSplit(this.tar.Text(), "`n", "`r"))     ; the whole listing, never a cut one
+            ArchiveEntries.CheckListing(this.tar.Text())     ; the whole listing, never a cut one
             this.root := this.job "\files"
             DirCreate(this.root)
-            this.tar := ArchiveTar(this.job, "extract", '-xf "' this.path '" -C "' this.root '"')
+            this.tar := ArchiveTar(this.job, "extract", '-xf "' this.path '" -C "' this.root '"', this.timeoutMs)
             this.tar.Start()
             this.state := "extracting"
             return Map("retry", true, "message", "tar is extracting the archive")
@@ -107,6 +139,7 @@ class ArchiveUnpack {
     }
 
     _NewJob() {
+        ArchiveTar.Sweep()
         ArchiveUnpack.seq += 1
         this.job := StoragePaths.ArchiveDir(this.dataDir) "\unpack-" ArchiveUnpack.seq "-" A_TickCount
         DirCreate(this.job)
@@ -115,11 +148,7 @@ class ArchiveUnpack {
     Cleanup() {
         if (this.job = "")
             return
-        try {
-            DirDelete(this.job, true)
-        } catch {
-            ; a folder still in use (tar still running) is left; the start of storage removes Archive/
-        }
+        ArchiveTar.Discard(this.job)
         this.job := ""
     }
 }

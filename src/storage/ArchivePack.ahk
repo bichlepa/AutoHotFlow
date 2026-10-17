@@ -3,6 +3,7 @@
 #Include ..\core\ErrCode.ahk
 #Include StoragePaths.ahk
 #Include VarFiles.ahk
+#Include ..\core\Time.ahk
 #Include ArchiveTar.ahk
 
 ; cmd.storage.ahf.pack (WI-0081, PROTOCOL 4.6): writes an .ahf file (a ZIP archive, as v1 writes it, flat at the root) with the
@@ -12,25 +13,51 @@
 ; Nothing is written next to the target before the archive is complete.
 class ArchivePack {
     static seq := 0
+    static FREE_MS := 1000         ; the time a failed job waits for its folder to be free (a killed tar.exe)
 
-    __New(dataDir, flowIds, path) {
+    ; timeoutMs: the limit of the tar run (the queue waits longer than that, see Storage._DeferBackground).
+    __New(dataDir, flowIds, path, timeoutMs := 0) {
+        ArchiveTar.CheckText(dataDir, "the data folder")
+        ArchiveTar.CheckText(path, "the file")
         this.dataDir := dataDir
         this.flowIds := flowIds
         this.path := path
+        this.timeoutMs := timeoutMs
         this.job := ""
         this.zip := ""
         this.tar := ""
         this.started := false
+        this.failure := ""
+        this.freeUntil := 0
     }
 
     ; One step of the operation: a Map(retry, message) while tar runs, else the payload Map(count). A failure cleans up the job folder.
     Step() {
+        if (IsObject(this.failure))
+            return this._AwaitFree()
         try {
             return this._Step()
         } catch as e {
+            if (IsObject(this.tar) && this.tar.timedOut && this.job != "") {
+                ; a killed tar.exe may still hold a file of the folder: the answer waits until the folder is free
+                this.failure := e
+                this.freeUntil := Time.NowMs() + ArchivePack.FREE_MS
+                return this._AwaitFree()
+            }
             this.Cleanup()
             throw e
         }
+    }
+
+    ; The answer of a failed run, given when its job folder is free (or after FREE_MS, the folder then goes to leftovers).
+    _AwaitFree() {
+        if (ArchiveTar.TryDiscard(this.job) || Time.NowMs() > this.freeUntil) {
+            this.Cleanup()
+            e := this.failure
+            this.failure := ""
+            throw e
+        }
+        return Map("retry", true, "message", "waiting for a killed tar.exe to let go of the job folder")
     }
 
     _Step() {
@@ -56,6 +83,7 @@ class ArchivePack {
 
     ; Copies the flow files and the static variables into the job folder and prepares the tar run.
     _Stage() {
+        ArchiveTar.Sweep()
         ArchivePack.seq += 1
         this.job := StoragePaths.ArchiveDir(this.dataDir) "\pack-" ArchivePack.seq "-" A_TickCount
         staging := this.job "\files"
@@ -66,6 +94,8 @@ class ArchivePack {
             if (!(flowId is String) || flowId = "")
                 throw AhfError("cmd.storage.ahf.pack: every flow ID must be a text", ErrCode.BAD_PAYLOAD)
             StoragePaths.CheckName(flowId, "flow ID")
+            if (SubStr(flowId, 1, 1) = "-" || SubStr(flowId, 1, 1) = "@")
+                throw AhfError("flow ID '" flowId "' starts with a character that tar.exe reads as an option", ErrCode.BAD_PAYLOAD)
             if (seen.Has(flowId))
                 continue
             seen[flowId] := true
@@ -83,7 +113,7 @@ class ArchivePack {
         args := '--format zip -cf "' this.zip '" -C "' staging '"'
         for item in items
             args .= " " item
-        this.tar := ArchiveTar(this.job, "tar", args)
+        this.tar := ArchiveTar(this.job, "tar", args, this.timeoutMs)
     }
 
     ; The two files of one static variable, in the layout of the data folder (Variables/<flowId>/<name>.ahfvd|.ahfvar).
@@ -98,11 +128,7 @@ class ArchivePack {
     Cleanup() {
         if (this.job = "")
             return
-        try {
-            DirDelete(this.job, true)
-        } catch {
-            ; a folder that is still in use (tar still running) is left; the next start of storage finds it in Archive/
-        }
+        ArchiveTar.Discard(this.job)
         this.job := ""
     }
 }
