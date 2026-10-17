@@ -1368,10 +1368,11 @@ Buttons for run, stop, enable and disable, and edit (opens the editor of the flo
 ### REQ-MGR-050 Import and export flows
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (export, import, renaming and the report are tested headless; the file dialogs and the drop are checked by hand only, MANUAL-CHECKS section 1)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
+- **Evidence:** `tests/e2e/test_manager_archive.py` (headless: round trip, a v1 archive, broken and refused files, name conflicts, export without selection)
 
 Export selected flows to an `.ahf` file (a ZIP archive); import from such a file through a file selector or by dropping it on the window. On a name conflict the user can rename the imported flow. An invalid file is reported.
 
@@ -2509,11 +2510,11 @@ AutoHotFlow sends nothing anywhere by itself: no telemetry, no usage statistics,
 ### REQ-SEC-060 Imported flows are disabled and come with a warning
 
 - **v1:** no (not checked)
-- **v2:** partial
+- **v2:** partial (the warning and the disabled flows are tested headless; the warning dialog as shown is checked by hand only, MANUAL-CHECKS section 1)
 - **Prio:** could
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** `tests/e2e/test_manager_import.py::test_every_flow_of_the_folder_is_imported_with_its_id_and_disabled` (the disabled part, for the import from v1; the warning for files comes with WI-0081)
+- **Evidence:** `tests/e2e/test_manager_archive.py::test_the_warning_lists_the_elements_that_act_on_the_system_and_no_creates_nothing` and `tests/e2e/test_manager_archive.py::test_export_then_import_gives_a_new_disabled_flow_with_its_definition_and_static_variables` (warning of an .ahf file, disabled flows); `tests/e2e/test_manager_import.py::test_every_flow_of_the_folder_is_imported_with_its_id_and_disabled` (the import from v1)
 
 Importing flows from a file (REQ-MGR-050) tells the user that a flow is a program with the rights of the user (REQ-SEC-030) and lists the elements that act on the system (files, programs, keys and mouse, network, AutoHotkey scripts). The imported flows are disabled, so that nothing runs before the user has looked at them.
 

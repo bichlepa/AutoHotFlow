@@ -74,6 +74,23 @@ Start part B first (or continue in its window), so that imported v1 flows exist.
 | 32 | Select a flow, click Change category and choose another category. Rename a category (to a name that exists, ignoring case, and to a free name). | The flow moves. The taken name is refused in the dialog, the free name is applied. Both survive a restart. | |
 | 33 | Read the text of every dialog of this check (questions, folder dialog, report, notices). | No text is clipped; the full text is readable without resizing. Report each clipped dialog (the owner's finding: the dialogs of the manager leave too little space for the text). | |
 
+### Steps, part E (export and import of `.ahf` files, WI-0081, REQ-MGR-050, REQ-SEC-060)
+
+Start with the VS Code task of part A (or its terminal command), with a few flows in the fresh folder. The steps write `%TEMP%\ahf_manual_check\export-test.ahf`.
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 34 | Select two flows in the tree (Ctrl click). Click "Import and export", choose "Export the selected flows", and save to `%TEMP%\ahf_manual_check\export-test.ahf`. | A save dialog opens and asks before it overwrites a file. The file is written. The flows do not change. | |
+| 35 | Open the file in Explorer as a ZIP (or with 7-Zip). | The flow files are at the root of the archive, named by their IDs (`<flowId>.json`). Only `Variables/` entries besides them, and only if a flow has static variables. | |
+| 36 | Click "Import and export", choose "Import flows from an .ahf file", and choose the file. | A warning says that a flow is a program with your rights, and lists the elements that act on the system. The preselection is "No". | |
+| 37 | Answer "No". | Nothing is imported. The tree is unchanged. | |
+| 38 | Repeat step 36 and answer "Yes". | For each flow whose name is taken, a question asks what to do: rename with the next free number, type a name, skip, or cancel. Choose "Rename: next free number". | |
+| 39 | Look at the report and at the tree. | The imported flows are copies with a number in the name (`<name> 2`), all disabled (no state mark of a running or enabled flow). The report lists them as imported. | |
+| 40 | Drag `export-test.ahf` from Explorer onto the manager window. | The warning of step 36 appears again. "No" changes nothing. | |
+| 41 | Drag a text file (for example `%TEMP%\ahf_manual_check\note.txt`) onto the manager window. | The report window says that the file is not an .ahf file. Nothing is imported. | |
+| 42 | Click "Import and export", choose "Export the selected flows", with no flow selected. | The report window says to select at least one flow. No save dialog opens. | |
+| 43 | Watch for dialogs during the part. | Only the questions above appear as dialog windows (class `#32770`). | |
+
 **Not covered by these checks** (listed as not checked in the source): drag and drop with a real mouse at 225 %, the folder dialog with a network folder, a v1 folder with a shortcut to another v1 installation, and a v1 folder that is larger than a few hundred flows (not measured).
 
 ## 2. Debug window
