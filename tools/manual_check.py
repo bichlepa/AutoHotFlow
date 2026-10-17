@@ -11,7 +11,7 @@ It deletes only a folder that it created itself (marker file .ahf_manual_check) 
 
 "--flow <name>" copies the manual-check flow tests/data/manual/<name>.json to Flows\\<name>.json. It implies a fresh
 folder (prepared as above, then the flow is copied in). A companion `<name>.state.json` next to it is copied to
-FlowStates\<name>.json, which enables the triggers of the flow at the start. The tool does not start the flow: the
+FlowStates\\<name>.json, which enables the triggers of the flow at the start. The tool does not start the flow: the
 owner starts it in the manager (Run button), where the flow is listed under its name.
 
 "start" starts src/AutoHotFlow.ahk with --session=manual --data=<folder> and the given options, waits without a
@@ -93,7 +93,7 @@ def prepare(folder, flow=None):
 
 def copy_v1(source, target):
     """Copies the v1 data folder source (default %APPDATA%\\AutoHotFlow, only read) to target (default
-    %TEMP%\ahf_manual_check_v1), which is replaced when this tool made it before. The import of the manager takes the copy:
+    %TEMP%\\ahf_manual_check_v1), which is replaced when this tool made it before. The import of the manager takes the copy:
     the original stays as it is (REQ-MIG-060)."""
     if not os.path.isdir(source):
         raise Refused("no v1 data folder at %s" % source)
@@ -125,7 +125,7 @@ def main(argv):
         argv, options = argv[:cut], argv[cut + 1:]
     ap = argparse.ArgumentParser(description="Data folder and start of the application for the manual checks.")
     ap.add_argument("action", choices=["prepare", "start", "copy-v1"])
-    ap.add_argument("--v1-dir", default=default_v1_target(), help="copy-v1: the copy (default %%TEMP%%\ahf_manual_check_v1)")
+    ap.add_argument("--v1-dir", default=default_v1_target(), help="copy-v1: the copy (default %%TEMP%%\\ahf_manual_check_v1)")
     ap.add_argument("--v1-source", default=default_v1_source(), help="copy-v1: the v1 data folder (default %%APPDATA%%\\AutoHotFlow)")
     ap.add_argument("--dir", default=default_dir(), help="data folder (default: %%TEMP%%\\ahf_manual_check)")
     ap.add_argument("--fresh", action="store_true", help="start: prepare a fresh data folder first")
