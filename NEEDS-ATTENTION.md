@@ -4,7 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **Context menus of the manager (needed before WI-0074).** A context menu stops the threads of the process while it is open (measured for the tray, `doc/MEASUREMENTS.md`, WI-0072). The manager's tree menus (WI-0074) have the same problem. Options: (a) accept it and document the limit; (b) give the menus their own small process, as the tray (E0075). Recommendation: (b).
+None open.
 
 ## Manual checks
 
