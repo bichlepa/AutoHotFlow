@@ -45,6 +45,16 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **What:** `Engine._StorageError` sends a notice of kind `storage` (Notice_storage) when the engine is connected. No test makes storage fail that way, so the text and the path are not checked.
 **Status:** open, found in WI-0075; the notice path is built, not checked.
 
+### F-0126: The window parts of the import from v1 are not tested automatically
+
+**What:** The manager's button, its folder dialog, the report window and the two questions of the import (WI-0076) are not covered by an automated test (the window module is gui tier, which agents run only on request). The e2e tests drive the same chain through `cmd.test.op`.
+**Status:** not checked; the owner's manual check 1 (`doc/MANUAL-CHECKS.md`, part B) covers them.
+
+### F-0127: The v1 autostart shortcut is recognised by rule, not by the installed v1
+
+**What:** A v1 shortcut counts as v1 when its target is named `AutoHotFlow.exe` or `AutoHotFlow.ahk`, lies in the imported folder or in a folder with the v1 layout (`Saved Flows` or `Variables`), and is not the running v2 product. An installed v1 whose install folder is neither the imported folder nor has that layout is kept, not removed.
+**Status:** assumed: the portable layout is what the rule is made for; the installed case is not checked by hand.
+
 ### F-0115: Fast tier: hotkey input tests fail when the input desktop is locked
 
 **What:** 10 tests of `tests/integration/test_hotkey_input.py` (`@input`) failed in run 20261017-105241-27428 (commit 237441d plus uncommitted test changes): "the probe key vk88 did not arrive although the input desktop is usable and no modifier is held: hotkey path, not the desktop". A serial rerun at 11:01 skipped all of them ("no input desktop": the desktop was locked or secure).
