@@ -1372,7 +1372,7 @@ Buttons for run, stop, enable and disable, and edit (opens the editor of the flo
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** `tests/e2e/test_manager_archive.py` (headless: round trip, a v1 archive, broken and refused files, name conflicts, export without selection)
+- **Evidence:** `tests/e2e/test_manager_archive.py` (headless: round trip, a real v1 export `tests/data/ahf/v1_export_two_flows.ahf` (reading a real v1 `.ahf` verified), broken and refused files, name conflicts, the limits, export without selection)
 
 Export selected flows to an `.ahf` file (a ZIP archive); import from such a file through a file selector or by dropping it on the window. On a name conflict the user can rename the imported flow. An invalid file is reported.
 
@@ -2514,7 +2514,7 @@ AutoHotFlow sends nothing anywhere by itself: no telemetry, no usage statistics,
 - **Prio:** could
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** `tests/e2e/test_manager_archive.py::test_the_warning_lists_the_elements_that_act_on_the_system_and_no_creates_nothing` and `tests/e2e/test_manager_archive.py::test_export_then_import_gives_a_new_disabled_flow_with_its_definition_and_static_variables` (warning of an .ahf file, disabled flows); `tests/e2e/test_manager_import.py::test_every_flow_of_the_folder_is_imported_with_its_id_and_disabled` (the import from v1)
+- **Evidence:** `tests/e2e/test_manager_archive.py::test_the_warning_lists_the_elements_that_act_on_the_system_and_no_creates_nothing`, the entry layout: `tests/e2e/test_manager_archive.py::test_an_archive_with_an_entry_outside_the_layout_is_refused_as_a_whole` and `tests/e2e/test_manager_archive.py::test_export_then_import_gives_a_new_disabled_flow_with_its_definition_and_static_variables` (warning of an .ahf file, disabled flows); `tests/e2e/test_manager_import.py::test_every_flow_of_the_folder_is_imported_with_its_id_and_disabled` (the import from v1)
 
 Importing flows from a file (REQ-MGR-050) tells the user that a flow is a program with the rights of the user (REQ-SEC-030) and lists the elements that act on the system (files, programs, keys and mouse, network, AutoHotkey scripts). The imported flows are disabled, so that nothing runs before the user has looked at them.
 

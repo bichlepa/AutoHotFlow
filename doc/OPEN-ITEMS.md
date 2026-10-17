@@ -16,6 +16,12 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 | ID | Title | Status | Phase 3 |
 |---|---|---|---|
+| F-9000* | A `.ahf` written by tar.exe is not read by 7-Zip or by v1 in any test (v1 writes a flat ZIP with 7-Zip, tar writes the same layout). Reading a real v1 `.ahf` is tested (`tests/data/ahf/v1_export_two_flows.ahf`) | open, WI-0081; ask the owner for a v1 file of another kind (more flows, statics) | WI-0081 |
+| F-9001* | Drag and drop of an `.ahf` file onto the manager and the file dialogs of the import and export are not automated (the gui tier is not run by agents) | open, WI-0081; only MANUAL-CHECKS part D checks them by hand | WI-0081 |
+| F-9002* | A name outside the ANSI code page may make the listing of tar fail: the listing is read as text in the ANSI code page, and a failed listing reads as "not a ZIP archive" | open, not reproduced (WI-0081) | WI-0081 |
+| F-9003* | UNC paths (`\\server\share\x.ahf`) are refused: the path must start with a drive letter | open decision for the owner | WI-0081 |
+| F-9004* | The link branch of `ArchiveUnpack._CheckTree` and the link refusal of `ArchiveEntries.CheckListing` have no test (a junction, `mklink /J`, would test the tree check) | open, WI-0081 | WI-0081 |
+| F-9005* | The flow JSON of an `.ahf` file is parsed in the manager without a depth limit (the unpacked size is limited to 4 MB, nesting is not): very deep nesting could exhaust the parser | open, not checked, WI-0081 | WI-0081 |
 | F-0073 | The stress test with 200 big flows fails its snapshot budget (largest snapshot answer during loading 2326 ms, budget 1000 ms); every flow file is parsed twice in the engine (F-0020 merged in) | budget raised to 3 s (E0042, owner 2026-10-15); stays open as an optimization after the port (pre-filter for inactive flows, one parse instead of two); measurements in WI-0046 | yes |
 | F-0101 | Slow tier: `test_start_stop_storm_leaves_a_consistent_engine[smoke]` saw the engine's handle count grow by 19 (limit 5) | observed, red twice in a row and once alone, green since; the same 145 to 164 as F-0092; cause not known; open, watch the history | |
 | F-0110 | Foundation tier: `test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` found the storage process still alive after the session ended (the symptom of F-0095) | observed once under load, run 20261016-211715-c03b628b on `c03b628`; not reproduced; the engine's shutdown adds no request to storage in this scenario (the trigger state is not marked); open, watch |  |
@@ -29,6 +35,36 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0114 | Load warnings in the trigger host and in `Trigger_Start_up`: a local `message` (`TriggerHost._CmdArm`, `ReportCallbackError`) and a local `type` (`Trigger_Start_up.Enable`) are reported as the same name as a global variable on every start of the trigger host (seen in the engine and triggerhost logs, WI-0064); the same trap as in `doc/howto/gui-and-hotkeys.md` (case-insensitive names) | observed, not checked whether it changes behaviour; a rename of the locals removes the warnings | |
 
 ## Findings
+
+### F-9000*: A `.ahf` written by tar.exe is not read by 7-Zip or by v1
+
+**What:** The export writes the ZIP with `tar.exe --format zip` (WI-0081 spike, decision in the work item). v1 writes the same flat layout with 7-Zip. Nothing in the tests opens a tar archive with 7-Zip or with v1. The owner's real v1 export is read by the tests (`tests/data/ahf/v1_export_two_flows.ahf`), the other direction is not.
+**Status:** open, WI-0081. Ask the owner for a v1 file with statics, or a 7-Zip check by hand.
+
+### F-9001*: Drop and file dialogs are not automated
+
+**What:** The drop of an `.ahf` file onto the manager window, the save and the open dialog of "Import and export", and the warning and conflict dialogs as shown are checked by hand only (MANUAL-CHECKS part D). The headless tests answer the questions of the chain themselves.
+**Status:** open, WI-0081.
+
+### F-9002*: Names outside the ANSI code page and the listing of tar
+
+**What:** `ArchiveTar.Text()` reads the listing of tar as text in the default code page. A name with characters outside it may come out wrong, and the entry check then refuses the archive with a text that suggests the file is not a ZIP archive at all.
+**Status:** open, not reproduced (no such archive in the tests); the message is misleading in that case.
+
+### F-9003*: UNC paths are refused
+
+**What:** `Storage._AhfPath` accepts only paths that start with a drive letter. A file on a network share (`\\server\share\x.ahf`) is refused with a message.
+**Status:** open decision for the owner (the rule is simple to relax, but it would need tests on a share).
+
+### F-9004*: The link branches have no test
+
+**What:** The refusal of a link in `ArchiveEntries.CheckListing` and in `ArchiveUnpack._CheckTree` is not covered by any test: tar writes no links from our archives, and an archive with a link is not in the tests. A junction (`mklink /J`, no privilege needed) would test the tree check.
+**Status:** open, WI-0081.
+
+### F-9005*: No depth limit for the JSON of a flow in an archive
+
+**What:** The unpacked size is limited (4 MB, `ArchiveEntries.MAX_UNPACKED_BYTES`), the number of entries (2000) and the file size (50 MB). The JSON parser of the manager has no nesting limit: a flow that nests very deeply could exhaust the recursion of `Json.Parse`. Not measured.
+**Status:** open, not checked; a depth check before the parse (a scan of the brackets) or a measurement with a deep file would settle it.
 
 ### F-0123: The trigger-not-available message is a dialog, not a notice
 
