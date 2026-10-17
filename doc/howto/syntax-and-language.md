@@ -396,3 +396,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Loop with `"DFR"` (files and folders, recursive), read `A_LoopFileAttrib`: `D` for a folder, `L` for a link (reparse point). Build the relative name from `A_LoopFilePath` with the root cut off, and use `/` for the folders (ArchiveUnpack `_CheckTree`). Check the attribute in every loop that pushes names.
 - **Status:** verified (WI-0081: the round trip with static variables, `tests/e2e/test_manager_archive.py::test_export_then_import_gives_a_new_disabled_flow_with_its_definition_and_static_variables`; the link case is assumed, no test makes a link)
 - **Source:** `src/storage/ArchiveUnpack.ahk` (`_CheckTree`, `_Read`)
+### A parameter or variable named like a class hides the class (names ignore case)
+
+- **Problem:** The model class `Settings` stopped working inside methods that had a parameter `settings`: `Settings.ToWire(...)` failed with "This value of type Map has no method named ToWire". A static property `_spec` and a static method `_Spec()` of one class clash the same way ("Property is read-only").
+- **Wrong:** `class Settings { static ToText(settings) => Settings.ToWire(settings) }` (the parameter hides the class); `static _spec := ""` next to `static _Spec() {...}`.
+- **Right:** Give the class a name that no variable will have (`SettingsModel`), and never use two names that differ only in case in one class (`_table` for the cache, `_Spec()` for the method). A local that has the name of a global variable such as `map` also gives a `#Warn` at load.
+- **Status:** verified (WI-0077, found by tests/ahk/core_settings.test.ahk)
+- **Source:** WI-0077, src/core/SettingsModel.ahk.

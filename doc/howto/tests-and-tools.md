@@ -416,3 +416,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `loop files, dir "\*", "D"` and filter with `InStr(A_LoopFileAttrib, "D")`, so the loop takes both kinds and only the folders are used.
 - **Status:** verified (WI-0076, tests/e2e/test_manager_import.py, the v1 listing of the statics)
 - **Source:** WI-0076, src/storage/V1Source.ahk `List`.
+
+### A closure over the variable of a `for` loop does not work in a test case
+
+- **Problem:** `Assert.Throws(() => Check("workers", bad), AhfError)` inside `for bad in [...]` failed with "Class has no property Name" (the lambda threw an unset-variable error, which is not an `AhfError`, and `Assert.Throws` then fails while it builds its own message).
+- **Wrong:** a fat-arrow function that uses the loop variable of the enclosing `for`.
+- **Right:** Bind the value: `Assert.Throws(CheckOf.Bind("workers", bad), AhfError)` with `CheckOf(key, value) => SettingsModel.Check(key, value)`.
+- **Status:** verified (WI-0077, tests/ahk/core_settings.test.ahk)
+- **Source:** WI-0077, tests/ahk/core_settings.test.ahk.

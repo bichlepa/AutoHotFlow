@@ -8,6 +8,8 @@
 ;   - It is kept in a ring of the last RING_MAX entries (all levels, whatever the sink), for the crash report.
 ;   - It goes to the sink only if its digit is not above Log.level (default of a role: DEFAULT_LEVEL = 2, option
 ;     --log-level=<0..3>). Level 3 therefore stays in the ring only, unless the level is raised.
+;     Since WI-0077 the threshold is per source group (SetLevels: a, f, t, the settings logLevelApp, logLevelFlow,
+;     logLevelThread); SetLevel (the option --log-level) sets one threshold for all groups.
 class Log {
     static sink := ""
     static sinkErrors := 0
@@ -19,6 +21,8 @@ class Log {
     ; Highest level digit that reaches the sink. The library default lets everything pass (unit tests, tools);
     ; Role.Start and the supervisor set DEFAULT_LEVEL or the value of --log-level.
     static level := 3
+    ; Thresholds per source group (WI-0077, E0069): Map "a"/"f"/"t" -> digit, or "" when one level counts for all groups.
+    static groupLevels := ""
 
     ; sink: function(level, source, text, flowId). Pass "" to disable logging.
     static Configure(sink) {
@@ -27,6 +31,19 @@ class Log {
 
     static SetLevel(digit) {
         this.level := digit
+        this.groupLevels := ""
+    }
+
+    ; One threshold per source group: a (app), f (flow), t (thread), each 0..3 (the settings, WI-0077).
+    static SetLevels(app, flow, thread) {
+        this.groupLevels := Map("a", app, "f", flow, "t", thread)
+    }
+
+    ; The threshold of the group of a level text ("a1" -> the app threshold).
+    static LevelFor(level) {
+        if (IsObject(this.groupLevels))
+            return this.groupLevels[SubStr(level, 1, 1)]
+        return this.level
     }
 
     ; "--log-level" text or number -> Integer 0..3. Throws AhfError (bad_args) for anything else.
@@ -53,7 +70,7 @@ class Log {
         this.ring.Push(Map("ts", A_NowUTC, "level", level, "source", source, "text", text, "flowId", flowId))
         if (this.ring.Length > Log.RING_MAX)
             this.ring.RemoveAt(1)
-        if (Integer(SubStr(level, 2)) > this.level)
+        if (Integer(SubStr(level, 2)) > this.LevelFor(level))
             return
         ; Copy the sink into a local first: calling this.sink(...) passes the owner object
         ; (Log) as an extra first argument, which shifts every parameter of the sink.
