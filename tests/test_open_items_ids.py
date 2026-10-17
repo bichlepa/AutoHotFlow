@@ -38,8 +38,6 @@ HEADING = re.compile(r"^### (F-\d{4}):", re.MULTILINE)
 # Numbers up to this one were assigned before the rule of the dense series
 # (doc/ORCHESTRATOR.md section 2) and may have gaps. Above it there are none.
 DENSE_FROM = 86
-# Provisional finding numbers start here (F-9nnn, see the test above and doc/ORCHESTRATOR.md section 2).
-PROVISIONAL_FROM = 9000
 
 
 def test_finding_ids_above_the_old_series_have_no_gaps_or_duplicates():
@@ -48,9 +46,7 @@ def test_finding_ids_above_the_old_series_have_no_gaps_or_duplicates():
         ids += HEADING.findall(path.read_text(encoding="utf-8"))
     duplicates = sorted({i for i in ids if ids.count(i) > 1})
     assert not duplicates, "finding IDs used twice: %s" % ", ".join(duplicates)
-    # Provisional numbers (F-9nnn, doc/ORCHESTRATOR.md section 2) are renumbered before the commit to the main line; they
-    # are checked by the test above on the main checkout, not as part of the dense series.
-    numbers = sorted({int(i[2:]) for i in ids if DENSE_FROM <= int(i[2:]) < PROVISIONAL_FROM})
+    numbers = sorted({int(i[2:]) for i in ids if int(i[2:]) >= DENSE_FROM})
     expected = list(range(DENSE_FROM, DENSE_FROM + len(numbers)))
     assert numbers == expected, (
         "finding IDs from F-%04d on have a gap (next free number is the highest plus one, "
