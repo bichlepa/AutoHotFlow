@@ -120,7 +120,7 @@ Missing in v2: the global setting itself (settings come in S0004). Until then `d
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (manager), S0006 (editor)
-- **Evidence:** `tests/integration/test_engine.py` (`test_start_*`, `test_stop_*`, `test_toggle_starts_and_stops_a_flow`)
+- **Evidence:** `tests/integration/test_engine.py` (`test_start_*`, `test_stop_*`, `test_toggle_starts_and_stops_a_flow`), `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`
 
 The user starts a flow from the manager or the editor, through its default manual trigger or a chosen one, and stops it there. Stopping ends all running and waiting instances of the flow. Starting and stopping from inside a flow is REQ-EXE-120 and REQ-ELM-250; starting by an event is TRG.
 
@@ -131,7 +131,7 @@ The user starts a flow from the manager or the editor, through its default manua
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003 (WI-0060, WI-0062 and WI-0063 done, WI-0064 to WI-0066), S0004 (manager); the per-flow state files (E0063, WI-0068) are done
-- **Evidence:** `tests/integration/test_trigger_state.py::test_an_unreadable_state_file_refuses_a_switch_until_it_can_be_read`, `tests/integration/test_engine.py::test_enable_and_disable_set_the_flag_and_report_it`, `tests/integration/test_engine.py::test_the_switched_state_survives_a_restart_of_the_engine`, `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_trigger_arming.py::test_disabling_the_flow_disarms_the_trigger_and_no_instance_starts_after_it`
+- **Evidence:** `tests/integration/test_trigger_state.py::test_an_unreadable_state_file_refuses_a_switch_until_it_can_be_read`, `tests/integration/test_engine.py::test_enable_and_disable_set_the_flag_and_report_it`, `tests/integration/test_engine.py::test_the_switched_state_survives_a_restart_of_the_engine`, `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_trigger_arming.py::test_disabling_the_flow_disarms_the_trigger_and_no_instance_starts_after_it`, `tests/e2e/test_manager_flows.py::test_disable_of_an_inactive_flow_with_independent_triggers_yes_disables_them`, `tests/e2e/test_manager_flows.py::test_a_switch_refused_for_an_unknown_state_yes_writes_the_state_of_the_session`
 
 Enabling a flow activates its triggers that switch with the flow; disabling deactivates them (triggers that switch on their own: REQ-TRG-050). Running instances are not affected. The state survives a restart of AutoHotFlow. A flow file of v1 loads disabled (E0058). Decisions E0056, E0057.
 
@@ -208,7 +208,7 @@ Relative paths in file and folder parameters refer to the working directory. Eac
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (manager), S0005 (editor)
-- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/ahk/manager_model.test.ahk` (the model of the manager)
+- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/ahk/manager_model.test.ahk` (the model of the manager), `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`
 
 Each element has a state (idle, running, finished, exception) and counts its runs. Each flow shows whether it is enabled and whether it runs, and its running and queued instances. Manager and editor show these states live, also a window that was opened later or that reconnected after a fault.
 
@@ -1173,7 +1173,7 @@ A flow can have several triggers. Each trigger can be enabled and disabled on it
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0003 (WI-0060 done, WI-0065 done), S0004 (manager), S0007 (editor)
-- **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_engine.py::test_a_flow_without_a_following_trigger_answers_with_a_message`, `tests/integration/test_flow_status_elements.py::test_set_flow_status_every_choice_for_another_flow`, `tests/integration/test_flow_status_elements.py::test_condition_flow_enabled_every_choice`
+- **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_engine.py::test_a_flow_without_a_following_trigger_answers_with_a_message`, `tests/integration/test_flow_status_elements.py::test_set_flow_status_every_choice_for_another_flow`, `tests/integration/test_flow_status_elements.py::test_condition_flow_enabled_every_choice`, `tests/e2e/test_manager_flows.py::test_disable_of_an_inactive_flow_with_independent_triggers_yes_disables_them`
 
 Each trigger has the option "Switch with the flow", on by default, so that a flow behaves as in v1 (decision E0056).
 
@@ -1324,42 +1324,44 @@ Creates a shortcut file (default on the desktop) that starts the flow through th
 ### REQ-MGR-010 Flow list with categories and state
 
 - **v1:** yes
-- **v2:** open (the stub lists the flows without categories)
+- **v2:** partial (WI-0074: the tree is built from the model with the category order and the state marks: enabled, disabled, running, state unknown, independent triggers active, stopped by a limit, trigger not available; the number of running instances is not in the protocol yet; the look of the tree is checked by a gui test only, by the owner)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
+- **Evidence:** `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`, `tests/e2e/test_manager_flows.py::test_new_flow_is_added_to_the_list_and_another_client_sees_its_flow_too`, `tests/fault/test_manager_window.py::test_the_tree_shows_each_category_with_its_flow_and_the_flow_state (gui)`
 
 The manager shows all flows in a tree of categories, with their state (enabled, running). Flows without a category are under "Uncategorized".
 
 ### REQ-MGR-020 Create, rename, duplicate and delete flows
 
 - **v1:** yes
-- **v2:** partial (the engine commands work, with their checks and tests; the manager and its dialogs are missing)
+- **v2:** partial (WI-0074: create, duplicate, rename and delete run through the model with their checks and questions, both answers tested headless; the dialogs and the context menu are checked by the owner only)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** `tests/integration/test_flow_lifecycle_engine.py` (`test_create_*`, `test_duplicate_*`, `test_rename_*`, `test_delete_*`), `tests/integration/test_flow_lifecycle.py` (storage part)
+- **Evidence:** `tests/integration/test_flow_lifecycle_engine.py` (`test_create_*`, `test_duplicate_*`, `test_rename_*`, `test_delete_*`), `tests/integration/test_flow_lifecycle.py` (storage part), `tests/e2e/test_manager_flows.py::test_duplicate_makes_a_copy_with_the_next_name`, `tests/e2e/test_manager_flows.py::test_delete_answered_yes_removes_the_flow_for_good`, `tests/e2e/test_manager_flows.py::test_rename_with_the_dialog_refuses_a_taken_name_before_the_engine`
 
 Names are checked: no forbidden characters, no second flow with the same name. Deleting asks for confirmation. Deleting a running flow stops its instances at once (E0009). Deleting is final: the flow, its enabled state and its static variables are removed (E0066); a deletion that can be undone is REQ-MGR-150.
 
 ### REQ-MGR-030 Manage categories
 
 - **v1:** yes
-- **v2:** partial (the engine part: categories, their order and the empty categories survive a restart, with tests; the manager's tree and drag and drop are missing)
+- **v2:** partial (WI-0074: create, rename, delete with the choice of the flows target, sort, order of the categories and moves between categories run through the model and are tested headless; the drag and drop with the mouse is checked by a gui test only, by the owner)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** `tests/integration/test_categories.py` (`test_the_order_and_an_empty_category_survive_a_restart`, `test_rename_writes_every_flow_file_and_keeps_the_place`, `test_delete_moves_the_flows_first_and_then_removes_the_category`, `test_a_broken_file_is_kept_and_the_order_is_built_from_the_flows`), `tests/ahk/engine_categories.test.ahk`
+- **Evidence:** `tests/integration/test_categories.py` (`test_the_order_and_an_empty_category_survive_a_restart`, `test_rename_writes_every_flow_file_and_keeps_the_place`, `test_delete_moves_the_flows_first_and_then_removes_the_category`, `test_a_broken_file_is_kept_and_the_order_is_built_from_the_flows`), `tests/ahk/engine_categories.test.ahk`, `tests/e2e/test_manager_flows.py::test_sort_alphabetically_orders_the_categories_and_the_uncategorized_group_is_last`, `tests/e2e/test_manager_flows.py::test_delete_category_yes_moves_its_flows_to_the_chosen_category`, `tests/e2e/test_manager_flows.py::test_move_puts_a_flow_into_a_category_before_another_flow`, `tests/fault/test_manager_window.py::test_a_flow_dragged_onto_a_category_moves_into_it_and_the_engine_keeps_it (gui)`
 
 Create, rename and delete categories; move flows to another category. When a category is deleted, its flows move to a category the user chooses. An empty category stays until the user deletes it, also across a restart. The user orders the categories and the flows inside a category freely (drag and drop); a command sorts them alphabetically once; a new flow comes at the end of its category (E0067; v1 sorted automatically).
 
 ### REQ-MGR-040 Operate flows from the manager
 
 - **v1:** yes
-- **v2:** open (the stub can start a flow, manual check of 2026-10-14)
+- **v2:** partial (WI-0074: run, stop, enable and disable of the selected flows, several flows by Ctrl click; "Edit" is disabled until the editor, S0005)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
+- **Evidence:** `tests/e2e/test_manager_flows.py::test_enable_and_disable_switch_the_flow_and_the_buttons_follow`, `tests/e2e/test_manager_flows.py::test_ctrl_click_selects_several_flows_and_the_operations_act_on_them`
 
 Buttons for run, stop, enable and disable, and edit (opens the editor of the flow) for the selected flows.
 
@@ -1900,7 +1902,7 @@ The user imports the flows and variables of v1 into the v2 data folder through t
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0004 (manager and the notice), S0005 to S0007 (editor)
-- **Evidence:** `tests/integration/test_trigger_arming.py::test_an_unknown_class_and_a_missing_package_are_not_armed_with_their_message` (WI-0062: the trigger carries the message of the missing package in its state)
+- **Evidence:** `tests/integration/test_trigger_arming.py::test_an_unknown_class_and_a_missing_package_are_not_armed_with_their_message` (WI-0062: the trigger carries the message of the missing package in its state), `tests/e2e/test_manager_flows.py::test_enabling_a_flow_with_a_missing_package_reports_the_trigger`
 
 When a flow uses a package that is not installed, the flow still loads and nothing is deleted, because the package may be installed later (a flow synced from another computer). Nobody is asked whether to delete anything. The manager shows at the flow which packages are missing, without a dialog. The editor shows such an element as a placeholder with its parameters; the user can delete it like any other element. Running the element ends with `exception` and names the missing package. A trigger of a missing package does not stay off silently: enabling the flow tells the user that this trigger is not available. Saving keeps the element unchanged. (Decision of the owner 2026-10-15, MIGRATION M-0008.)
 
