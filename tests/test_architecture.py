@@ -91,6 +91,19 @@ def test_dialog_seam_details():
     assert "dialog-seam" in rules(path, worker % "Dialogs.UseProvider(P())")
 
 
+def test_dialog_seam_of_the_ui_roles():
+    body = "class A {\n    M() {\n        %s\n    }\n}\n"
+    for path in ("manager/A.ahk", "editor/A.ahk", "ui_common/A.ahk"):
+        assert "dialog-seam" in rules(path, body % "FileSelect(\"M\")"), path
+        assert "dialog-seam" in rules(path, body % "x := DirSelect()"), path
+        assert "dialog-seam" not in rules(path, body % "UiFileDialogs.File(0)"), path
+    # the seam itself is the one place with the direct calls
+    seam = "class UiFileDialogs {\n    M() {\n        return FileSelect(\"M\")\n    }\n}\n"
+    assert "dialog-seam" not in rules("ui_common/UiFileDialogs.ahk", seam)
+    # a provider is registered by the test entries, never by src/
+    assert "dialog-seam" in rules("manager/A.ahk", body % "UiFileDialogs.UseProvider(P())")
+
+
 def test_requires_hit_and_miss():
     assert "requires" in rules("core/A.ahk", "class A {\n}\n", with_requires=False)
     assert "requires" in rules("core/A.ahk", "#Requires AutoHotkey v1.1\nclass A {\n}\n", with_requires=False)

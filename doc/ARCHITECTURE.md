@@ -365,7 +365,7 @@ AutoHotFlow/
 │  │  └─ ipc/               # Pipe, Frame, Wake, Message, Dispatcher, Peer
 │  ├─ supervisor/  storage/  triggerhost/  worker/
 │  ├─ engine/               # Engine, Executor, WorkerBridge; core/ (flow model, state machines, FlowExprConvert); vars/ (variable model, WI-0040/41)
-│  ├─ ui_common/            # GUI helpers for the UI roles: UiWindow, UiDialogs, UiTexts (WI-0069); the window layout is core/GuiLayout.ahk
+│  ├─ ui_common/            # GUI helpers for the UI roles: UiWindow, UiDialogs, UiFileDialogs, UiTexts (WI-0069, E0076); the window layout is core/GuiLayout.ahk
 │  ├─ manager/  editor/     # editor/render/ = Renderer interface (D0004)
 │  ├─ expr/                 # library: expression language (tokenizer, parser, syntax tree, parse cache), doc/EXPRESSION-LANGUAGE.md
 │  ├─ debugview/            # role debug (WI-0028): DebugView.ahk, DebugGui.ahk

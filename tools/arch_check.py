@@ -144,8 +144,12 @@ DIALOG_RE = re.compile(NOT_MEMBER + r"(MsgBox|InputBox|FileSelect|DirSelect)\b(?
 # Rule dialog-seam (E0038, WI-0051): an element calls a dialog function directly, or src/ registers a dialog provider.
 # SEAM_FILE is the indirection itself: it calls the real functions and is exempt from the rules "dialog" and "dialog-seam".
 SEAM_CALL_RE = re.compile(NOT_MEMBER + r"(MsgBox|InputBox|ToolTip|TrayTip|FileSelect|DirSelect)\s*\(")
-SEAM_PROVIDER_RE = re.compile(NOT_MEMBER + r"Dialogs\s*\.\s*UseProvider", re.I)
+SEAM_PROVIDER_RE = re.compile(NOT_MEMBER + r"(?:Dialogs|UiFileDialogs)\s*\.\s*UseProvider", re.I)
 SEAM_FILE = "elements/base/Dialogs.ahk"
+# Rule dialog-seam for the UI roles (E0076): FileSelect and DirSelect only in the seam UiFileDialogs.
+UI_SEAM_CALL_RE = re.compile(NOT_MEMBER + r"(FileSelect|DirSelect)\s*\(")
+UI_SEAM_FILE = "ui_common/UiFileDialogs.ahk"
+UI_SEAM_ROLES = {"manager", "editor", "ui_common"}
 FILEIO_RE = re.compile(NOT_MEMBER + r"(FileRead|FileAppend|FileOpen|FileDelete|FileMove|FileCopy|DirCreate|"
                        r"DirDelete|DirMove|DirCopy)\b(?!\s*:=)|\bLoop[\s,]+(Files|Read)\b", re.I)
 SLEEP_RE = re.compile(NOT_MEMBER + r"Sleep\b(?!\s*:=)\s*\(?\s*([^\s,)]*)")
@@ -290,6 +294,10 @@ def check_text(relpath, text):
         if role == "elements":
             for m in SEAM_CALL_RE.finditer(code):
                 add(m.start(), "dialog-seam", m.group(1) + "( called directly, use Dialogs." + m.group(1))
+        if role in UI_SEAM_ROLES and relpath != UI_SEAM_FILE:
+            for m in UI_SEAM_CALL_RE.finditer(code):
+                add(m.start(), "dialog-seam", m.group(1) + "( called directly, use UiFileDialogs." +
+                    ("File" if m.group(1) == "FileSelect" else "Dir"))
         for m in SEAM_PROVIDER_RE.finditer(code):
             add(m.start(), "dialog-seam", "Dialogs.UseProvider is for the test entries only")
     for m in FILEIO_RE.finditer(code):

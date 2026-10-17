@@ -14,7 +14,8 @@
 ;
 ; Titles and texts are Lang keys (the arguments args* fill %1%, %2%, ...), registered in UiTexts, so they follow a
 ; language change. Item labels, the default text and the check messages are data and are shown as given.
-; The standard dialogs (MsgBox, FileSelect, DirSelect) are not used here (HOW-TO gui-and-hotkeys, WI-0069 spike).
+; MsgBox and InputBox are not used here (HOW-TO gui-and-hotkeys, WI-0069 spike); the file and folder dialogs are in
+; UiFileDialogs (E0076).
 class UiDialogs {
     static _open := Map()   ; "<owner>|<kind>" -> true while such a dialog is open
     static WIDTH := 380     ; at 100 % (96 dpi)

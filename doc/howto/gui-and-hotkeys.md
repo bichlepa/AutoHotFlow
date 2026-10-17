@@ -90,7 +90,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
   - `MsgBox` (own timeout 10 s): all pings answered (max latency 0 ms), 91 ticks, longest tick gap 140 ms.
   So the pings are answered, but the timers stall for up to 0.7 s, and the thread that opened the dialog waits for the answer. Rule 3 still forbids standard dialogs on the message path: the answered pings do not show that nothing blocks there. The window class of all three is `#32770`; for `DirSelect` the window title is "Ordner suchen" (German Windows).
 - **Status:** verified (one probe, 5 runs on this machine, Windows 11 with German UI; the dialog was closed by the probe with `WM_CLOSE`). Not checked: other Windows versions, a dialog opened from an element worker, a dialog at a DPI above 100 %, a dialog while the process is under load.
-- **Decision (WI-0069):** `ui_common/` does not use the standard dialogs but its own non-blocking dialogs (`UiDialogs.ahk`). Whether a UI role may use `FileSelect`/`DirSelect` at all is open (owner decision, see the report of WI-0069).
+- **Decision (WI-0069):** `ui_common/` does not use the standard dialogs but its own non-blocking dialogs (`UiDialogs.ahk`). A UI role may use `FileSelect`/`DirSelect` for a dialog the user opened (E0076), only through `ui_common/UiFileDialogs.ahk`; the timer stall of up to 0.7 s is accepted there. `MsgBox` and `InputBox` stay replaced by `UiDialogs`.
 - **Source:** `tests/ahk/helpers/modal_spike.ahk`, `tools/ahkrun.py` (`--no-dialog-guard`)
 
 ### A Gui created and closed without Show leaves no window and no remembered place (verified)
