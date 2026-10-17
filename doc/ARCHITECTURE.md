@@ -359,12 +359,12 @@ AutoHotFlow/
 │  ├─ AhfBoot.ahk           # boot code that every role shares: checks, AhfMain, role dispatch (WI-0029, WI-0047-PREP)
 │  ├─ entry/                # one entry script per other role: <role>.ahk (D0012)
 │  │  └─ generated/         # Elements_<role>.ahk: the element classes of a role, written by tools/gen_element_includes.py (E0041)
-│  ├─ core/                 # cross-process building blocks, no GUI
+│  ├─ core/                 # cross-process building blocks; no GUI except GuiLayout.ahk (window layout and DPI, WI-0069)
 │  │  ├─ Json.ahk  Ids.ahk  Errors.ahk  Log.ahk  Args.ahk
 │  │  └─ ipc/               # Pipe, Frame, Wake, Message, Dispatcher, Peer
 │  ├─ supervisor/  storage/  triggerhost/  worker/
 │  ├─ engine/               # Engine, Executor, WorkerBridge; core/ (flow model, state machines, FlowExprConvert); vars/ (variable model, WI-0040/41)
-│  ├─ ui_common/            # GUI helpers (Lang() is in core/, E0028)
+│  ├─ ui_common/            # GUI helpers for the UI roles: UiWindow, UiDialogs, UiTexts (WI-0069); the window layout is core/GuiLayout.ahk
 │  ├─ manager/  editor/     # editor/render/ = Renderer interface (D0004)
 │  ├─ expr/                 # library: expression language (tokenizer, parser, syntax tree, parse cache), doc/EXPRESSION-LANGUAGE.md
 │  ├─ debugview/            # role debug (WI-0028): DebugView.ahk, DebugGui.ahk
