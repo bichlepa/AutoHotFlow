@@ -42,9 +42,21 @@ class LangTable {
             text := name
             Log.Write("f3", "lang", "no text for the key '" name "' (language " LangTable.Code ")")
         }
-        for i, arg in args
-            text := StrReplace(text, "%" i "%", IsObject(arg) ? "" : String(arg))
-        return text
+        return LangTable.Fill(text, args)
+    }
+
+    ; Replaces %1%, %2%, ... by the arguments in one pass: an argument text that contains a placeholder is not replaced again.
+    ; A placeholder without an argument stays.
+    static Fill(text, args) {
+        out := ""
+        pos := 1
+        while (RegExMatch(text, "%(\d+)%", &m, pos)) {
+            out .= SubStr(text, pos, m.Pos - pos)
+            n := Integer(m[1])
+            out .= (n >= 1 && n <= args.Length) ? (IsObject(args[n]) ? "" : String(args[n])) : m[0]
+            pos := m.Pos + m.Len
+        }
+        return out . SubStr(text, pos)
     }
 
     ; Reads the files of the language and of the fallback language. Called at the first Get; call it again after a

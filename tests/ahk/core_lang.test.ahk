@@ -165,4 +165,13 @@ TestRun.Case("without language files every key gives itself", CheckMissingFolder
 TestRun.Case("the texts of the package Default are found (WI-0047)", CheckTextsOfThePackageDefault)
 TestRun.Case("the language folders of the packages are read after the program texts", CheckPackageFoldersComeAfterTheProgramTexts)
 
+CheckArgumentTextIsNotReplacedAgain() {
+    Assert.Equal(LangTable.Fill("A %1% B %2%", ["%2%", "x"]), "A %2% B x", "an argument with a placeholder stays as it is")
+    Assert.Equal(LangTable.Fill("%2% and %1%", ["a", "b"]), "b and a", "the order of the placeholders does not matter")
+    Assert.Equal(LangTable.Fill("%1% %3%", ["a"]), "a %3%", "a missing argument leaves its placeholder")
+    Assert.Equal(LangTable.Fill("%1%%1%", ["ab"]), "abab", "every occurrence is replaced")
+}
+
+TestRun.Case("an argument text with a placeholder is not replaced again; substitution is one pass", CheckArgumentTextIsNotReplacedAgain)
+
 TestRun.Finish()
