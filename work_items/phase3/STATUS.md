@@ -64,11 +64,11 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI-0074 | Flow tree and operations | done, verified on 5590990a (fast, foundation green) | haiku/sonnet (review sonnet) | fd0de334–5590990a | 2026-10-17 | block A; owner decisions F-0117, F-0120; drag test fixed by sonnet (cross-process RECT) |
 | WI-0075 | Notices | done, verified on dcafa042 (fast, foundation green; slow 2 load flakes, green alone) | | | | block A |
 | WI-0076 | Import from v1, manual check of block A | done, verified on 1248aa10 (foundation green; fast and slow 1 load flake each, green alone); owner manual check of block A is next | | | | block A |
-| WI-0077 | Settings model | open | | | | block B |
+| WI-0077 | Settings model | implemented on `wip/wi-77` (base afdc0acf, 3 commits), review running; not integrated | | | | block B |
 | WI-0078 | Settings dialog, language, about | open | | | | block B |
 | WI-0079 | Start with Windows, run as administrator | open | | | | block B, manual check |
 | WI-0080 | Log display | done, verified (foundation, slow green; fast red by 2 load flakes, green alone) on d6331fb8 | haiku (review sonnet) | dcacd43b–d6331fb8 | 2026-10-17 | block B; F-0116 and source group wait for the owner |
-| WI-0081 | `.ahf` export and import | open | | | | block B |
+| WI-0081 | `.ahf` export and import | implemented on `wip/wi-81`, review said FIX FIRST (R1 queue timeout vs tar deadline, R2 size limits, R3 ActsOnSystem for Execute_Flow and Set_Flow_Status, R4 to R6 small), fixes in progress incl. the real v1 .ahf from the owner (tests/data/ahf); not integrated | | | | block B |
 | WI-0082 | Acceptance S0004 | open | | | | |
 
 Step S0008 (remaining elements) is planned, not started.
@@ -77,10 +77,15 @@ Step-independent work item: WI-0059 (test admission, load report, run history), 
 
 ## Pending integrations
 
-None.
+- `wip/wi-81` after its fix round: the implementer rebases itself onto `v2-port` (conflicts expected in doc/MANUAL-CHECKS.md: its part D becomes part E, steps from 34), then `renumber_findings` (provisional IDs must carry the star), cherry-pick, `verify.py --auto`.
+- `wip/wi-77` after the review (rebase onto `v2-port`, M-0085 may collide with the M number of WI-0081: renumber), cherry-pick, `verify.py --auto` plus stress if the engine changed.
+- The verify of the dialog fix (`v2-port` tip 2c, run `bdx5qr5v7` in the scratchpad `verify7.txt`) was started before the pause: read it first.
 
 ## Running agents
 
+- WI-0081 implementer (haiku, workspace `wi-81`, id aa7ae7b3eb21c7dd9): fix round and rebase; resume with SendMessage if it died.
+- WI-0077 reviewer (sonnet, id a2a6a5cab854549fc): review of `wip/wi-77`; then the implementer (sonnet, workspace `wi-77`, id aa65dd2fabfc7688c) fixes.
+- Paused by the owner because of the session limit: start no new agents.
 
 ## Last verified state
 
