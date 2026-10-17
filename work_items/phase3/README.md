@@ -386,5 +386,5 @@ Block B (settings and system integration):
 
 ### Progress S0004
 
-- [ ] WI-0069  - [ ] WI-0070  - [ ] WI-0071  - [ ] WI-0072  - [ ] WI-0073  - [ ] WI-0074  - [ ] WI-0075  - [ ] WI-0076 (block A)
+- [x] WI-0069  - [x] WI-0070  - [x] WI-0071  - [x] WI-0072  - [x] WI-0073  - [ ] WI-0074  - [ ] WI-0075  - [ ] WI-0076 (block A)
 - [ ] WI-0077  - [ ] WI-0078  - [ ] WI-0079  - [ ] WI-0080  - [ ] WI-0081  - [ ] WI-0082 (block B)

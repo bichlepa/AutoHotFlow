@@ -81,9 +81,11 @@ None.
 
 ## Running agents
 
-None. The manual-check start path (section 3 of MANUAL-CHECKS) is integrated; the owner runs it.
+None (round-up 2026-10-17).
 
 ## Last verified state
+
+Commit `72da2f69` (WI-0073 integrated; status commit `b01c23f`) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261017-144912-72da2f69-3` (1368 passed, 11 skipped), foundation run `20261017-144912-72da2f69-2` (470 passed, 1 skipped), slow run `20261017-144912-72da2f69` (199 passed). Manager stress run (WI-0073, 201 flows): `20261017-143840-12032`, filled after 0.54 s. Earlier: `271f3d5` (file dialogs, E0076) green, fast `20261017-141011-271f3d5d`, foundation `20261017-141011-271f3d5d-2`, slow `20261017-141013-271f3d5d`.
 
 Commit `cb7bee9` (WI-0064 input-test skip on a locked PC, tasklist fix; on top of `21ff0da`, WI-0070 integrated) verified by `tools/verify.py` (no --auto base): VERDICT red (foundation) only. Fast run `20261017-120443-cb7bee90-2` (1298 passed, 1 skipped). Foundation run `20261017-120443-cb7bee90` (465 passed, 1 failed): `tests/integration/test_trigger_arming.py::test_the_engine_is_restarted_and_rearms_without_the_startup_context`; `tools/recheck.py` alone: green (run `20261017-122140-21548`), a load flake. Slow run `20261017-120443-cb7bee90-3` (199 passed). Owner decision (2026-10-17): slow tier not needed for now; future runs use `--tiers fast,foundation`.
 
