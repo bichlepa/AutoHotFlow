@@ -1396,7 +1396,7 @@ AutoHotFlow ships demo flows in their own category. They cannot be deleted or re
 
 The manager shows the log, filtered by level (only errors, some, many, all) and by source (app, flow). The flow settings open the log of one flow.
 
-The window shows the last 1000 entries and the new ones while it is open; a burst of lines does not stall the manager. Missing: the window is not checked by the agents (owner check, WI-0082); the flow settings (S0007) do not call it yet, the code path `OpenLog(flowId)` exists; a burst of 5000 lines reached the model with about 40 % of its lines (the rest is dropped on the way, see OPEN-ITEMS).
+The window shows the last 1000 entries and the new ones while it is open; a burst of lines does not stall the manager. Missing: the window is not checked by the agents (owner check, WI-0082); the flow settings (S0007) do not call it yet, the code path `OpenLog(flowId)` exists; the window is not complete after a burst: the hub drops log lines above its send limit before they reach storage (decided, E0082), so the window shows the lines that storage wrote, the newest 1000 of them, not every line of the burst.
 
 ### REQ-MGR-080 Closing the manager window keeps AutoHotFlow running
 

@@ -156,5 +156,13 @@ def test_a_burst_of_5000_lines_does_not_stall_the_manager_and_the_model_keeps_th
     assert worst < PING_LIMIT_S, worst
     assert max_entries <= LOG_KEEP
     assert final["entries"] == min(LOG_KEEP, before + final["seen"]), (before, final)
+    # E0082: the drop of lines in the hub stays, so not all 5000 lines arrive. The model must show what storage wrote:
+    # its newest entries are the newest lines of Log.txt (the tail reads the current file only, so it may hold fewer
+    # lines than the model keeps; the model's newest entries must then be the same).
+    tail = obs.request("storage", "cmd.storage.log.tail", {"limit": LOG_KEEP}, timeout=scaled(10))["payload"]
+    assert tail["ok"], tail
+    written = ["%s|%s|%s" % (e["ts"], e["source"], e["text"]) for e in tail["entries"]]
+    assert written, "storage has no entries"
+    assert final["keys"][-len(written):] == written, (len(written), final["keys"][-3:], written[-3:])
     log_op(obs, "close")
     assert finish(sup, obs) == 0

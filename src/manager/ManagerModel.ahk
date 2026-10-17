@@ -532,11 +532,15 @@ class ManagerModel {
         return out
     }
 
-    ; The log part of the state (test driver and PROTOCOL 4.8).
+    ; The log part of the state (test driver and PROTOCOL 4.8). keys: the kept entries, oldest first, as "ts|source|text"
+    ; (the test compares them with the newest lines that storage wrote, E0082).
     LogState() {
+        keys := []
+        for e in this.logEntries
+            keys.Push(ManagerModel._LogKey(e))
         return Map("open", Json.Bool(this.logOpen), "entries", this.logEntries.Length, "seen", this.logSeen
             , "level", this.logLevel, "group", this.logGroup, "flowId", this.logFlowId
-            , "visible", this.LogVisible().Length, "tailOk", Json.Bool(this.logTailOk))
+            , "visible", this.LogVisible().Length, "tailOk", Json.Bool(this.logTailOk), "keys", keys)
     }
 
     ; --- the state for the view ---------------------------------------------------------------
