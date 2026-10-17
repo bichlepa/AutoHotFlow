@@ -4,6 +4,7 @@
 #Include ..\core\Json.ahk
 #Include ..\core\Log.ahk
 #Include ..\core\Role.ahk
+#Include ..\core\NoticeThrottle.ahk
 #Include FlowRecord.ahk
 #Include FlowTable.ahk
 #Include FlowStateFile.ahk
@@ -89,6 +90,10 @@ class Engine extends Role {
         this._pollFn := () => this._WaitForStorage()
         this._tickFn := () => this._Tick()
         this._safetyFn := () => this._Tick()
+        this._notices := NoticeThrottle(NoticeThrottle.WINDOW_MS)   ; notices per kind and flow (WI-0075, PROTOCOL 4.7)
+        this._noticePending := Map()   ; gkey -> Map(kind, flowId, key, args): a notice that was held back
+        this._noticeFlushFn := () => this._FlushNotices()
+        this._noticeArmed := false
     }
 
     ; --- role hooks ----------------------------------------------------------------------------
@@ -471,8 +476,79 @@ class Engine extends Role {
 
     _StorageError(op, path, message) {
         this._Log("a0", "engine", "storage " op " failed for '" path "': " message)
-        if (this.peer.status = "ready")
+        if (this.peer.status = "ready") {
             this.Emit("topic:engine", "evt.storage.error", Map("op", op, "path", path, "message", message))
+            this._Notice("storage", "", "Notice_storage", [op, path, message])
+        }
+    }
+
+    ; --- notices (WI-0075, PROTOCOL 4.7) -------------------------------------------------------------
+
+    ; An unhandled exception ended a branch of a flow (Executor._Advance, REQ-EXE-090). The notice names the flow, the element
+    ; and the message, never the variables (E0072). These notices are on (REQ-USE-080): the global switch comes with WI-0077,
+    ; the per-flow switch with S0007.
+    FlowException(flowId, elementId, message) {
+        this._Notice("exception", flowId, "Notice_exception", [this._FlowName(flowId), elementId, message])
+    }
+
+    _FlowName(flowId) {
+        rec := this.flows.Get(flowId)
+        return IsObject(rec) ? rec.Def.Name : flowId
+    }
+
+    ; Sends a notice unless the throttle holds it back: the first notice of a kind and a flow goes out at once, the others
+    ; within NoticeThrottle.WINDOW_MS are counted, and their count goes out with one notice when the window ends. Nothing
+    ; here waits. An error in the notice path is logged; it does not reach the caller (the Executor calls it).
+    _Notice(kind, flowId, key, args) {
+        gkey := kind "|" flowId
+        try {
+            if (this._notices.Offer(gkey, A_TickCount)) {
+                this._EmitNotice(kind, flowId, key, args, 0)
+                return
+            }
+            this._noticePending[gkey] := Map("kind", kind, "flowId", flowId, "key", key, "args", args)
+            this._ArmNotices()
+        } catch as e {
+            this._Log("a0", "engine", "notice " kind " not sent: " Type(e) ": " e.Message)
+        }
+    }
+
+    _EmitNotice(kind, flowId, key, args, held) {
+        level := kind = "limit" ? "warning" : "error"
+        payload := Map("kind", kind, "level", level, "key", key, "args", args, "held", held)
+        if (flowId != "")
+            payload["flowId"] := flowId
+        this.Emit("topic:notice", "evt.ui.notice", payload)
+    }
+
+    ; One timer for the held back notices: it runs when the first window ends. Flush sends the counts that are due and
+    ; arms the timer again for the rest.
+    _ArmNotices() {
+        if (this._noticeArmed || this._noticePending.Count = 0)
+            return
+        due := 0
+        for gkey, p in this._noticePending {
+            ms := this._notices.DueMs(gkey, A_TickCount)
+            if (due = 0 || ms < due)
+                due := ms
+        }
+        this._noticeArmed := true
+        SetTimer(this._noticeFlushFn, -Max(due, 1))
+    }
+
+    _FlushNotices() {
+        this._noticeArmed := false
+        now := A_TickCount
+        for gkey, p in this._noticePending.Clone() {
+            if (this._notices.DueMs(gkey, now) > 0)
+                continue
+            this._noticePending.Delete(gkey)
+            held := this._notices.Take(gkey)
+            this._notices.Sent(gkey, now)
+            if (held > 0)
+                this._EmitNotice(p["kind"], p["flowId"], p["key"], p["args"], held)
+        }
+        this._ArmNotices()
     }
 
     ; --- commands ------------------------------------------------------------------------------
@@ -674,6 +750,7 @@ class Engine extends Role {
     LimitReached(flowId, kind, limit) {
         this._Log("a0", "engine", "flow '" flowId "' stopped: more than " limit " " kind " (runaway guard); all its triggers are disabled")
         this.Emit("topic:flow:" flowId, "evt.flow.limit", Map("flowId", flowId, "kind", kind, "limit", limit))
+        this._Notice("limit", flowId, "Notice_limit", [this._FlowName(flowId), limit])
         rec := this.flows.Get(flowId)
         if (IsObject(rec))
             this._SwitchTriggers(rec, rec.SetFollowingEnabled(false, true))

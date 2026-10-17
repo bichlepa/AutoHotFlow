@@ -734,6 +734,7 @@ class Executor {
                     , run["flowId"])
                 if (run["error"] = "")      ; for the caller of the instance (CallFlow)
                     run["error"] := "element '" thread.ElementId "': " thread.Message
+                this._owner.FlowException(run["flowId"], thread.ElementId, thread.Message)   ; notice (WI-0075)
             }
             this._CheckEnded(run, advOutcome["unhandled"] ? "exception" : "finished")
         } finally {

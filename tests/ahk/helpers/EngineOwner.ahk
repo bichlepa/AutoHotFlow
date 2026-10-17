@@ -106,6 +106,12 @@ class EngineOwner {
         this.limits.Push(Map("flowId", flowId, "kind", kind, "limit", limit))
     }
 
+    ; An unhandled exception ended a branch of a flow (Engine.FlowException, WI-0075): the stand-in records it.
+    FlowException(flowId, elementId, message) {
+        this.exceptions := this.HasProp("exceptions") ? this.exceptions : []
+        this.exceptions.Push(Map("flowId", flowId, "elementId", elementId, "message", message))
+    }
+
     ; Dispatches until nothing is ready (one Tick does that, up to Executor.TICK_BATCH).
     Drive() {
         this.executor.Tick()
