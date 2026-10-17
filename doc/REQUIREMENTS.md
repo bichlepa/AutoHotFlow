@@ -1334,10 +1334,11 @@ The manager shows all flows in a tree of categories, with their state (enabled, 
 ### REQ-MGR-020 Create, rename, duplicate and delete flows
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the engine commands work, with their checks and tests; the manager and its dialogs are missing)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
+- **Evidence:** `tests/integration/test_flow_lifecycle_engine.py` (`test_create_*`, `test_duplicate_*`, `test_rename_*`, `test_delete_*`), `tests/integration/test_flow_lifecycle.py` (storage part)
 
 Names are checked: no forbidden characters, no second flow with the same name. Deleting asks for confirmation. Deleting a running flow stops its instances at once (E0009). Deleting is final: the flow, its enabled state and its static variables are removed (E0066); a deletion that can be undone is REQ-MGR-150.
 
