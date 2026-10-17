@@ -408,3 +408,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Use `vk88` to `vk8F` and `vkE8`, and `$vkNN` where the test needs the block. Debug a silent hotkey first in a standalone script (`Hotkey()` plus the sender), then in the host: a log line in the callback shows whether the key arrived or the trigger path failed.
 - **Status:** verified (10 input tests green in two serial runs; listener runs for the key list)
 - **Source:** `tests/integration/test_hotkey_input.py`, `tests/support/inputlock.py`
+
+### `loop files` takes a mode string, not a number
+
+- **Problem:** `loop files, folder "\*", 2` (a number for directories only) failed at run time with "Parameter #2 invalid"; the storage role answered every request of the v1 listing with `internal`.
+- **Wrong:** `loop files, dir "\*", 2`.
+- **Right:** `loop files, dir "\*", "D"` and filter with `InStr(A_LoopFileAttrib, "D")`, so the loop takes both kinds and only the folders are used.
+- **Status:** verified (WI-0076, tests/e2e/test_manager_import.py, the v1 listing of the statics)
+- **Source:** WI-0076, src/storage/V1Source.ahk `List`.

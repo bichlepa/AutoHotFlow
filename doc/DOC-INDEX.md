@@ -244,7 +244,7 @@ L367-373 Reading the end of a log file that other processes append to (verified)
 L375-380 A ListView that follows a growing list keeps the row numbers of the model (assumed)
 ```
 
-## doc/howto/syntax-and-language.md (37.7 KB, 366 lines)
+## doc/howto/syntax-and-language.md (39.9 KB, 390 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -291,9 +291,12 @@ L339-344 A sliding window of counts costs one increment per count (verified)
 L346-352 `throw` is a statement: a lambda cannot throw in its expression body (verified) (verified)
 L354-359 A relative `#Include` is resolved from the folder of the including file (verified) (verified)
 L361-366 An optional regex group that did not match gives an empty string, and a lazy group needs a closing anchor (verified)
+L368-374 A function kept in a property is called with the object as first argument (verified)
+L376-382 `as` and `catch as` are reserved: no parameter named `as` (verified)
+L384-390 A double quote inside a double-quoted string is written `""`, not `\"` (verified)
 ```
 
-## doc/howto/tests-and-tools.md (41.6 KB, 410 lines)
+## doc/howto/tests-and-tools.md (42.2 KB, 418 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -344,6 +347,7 @@ L381-387 Kill tests: subscribe before the kill and wait for the restart before t
 L389-395 A test double of an engine class must have the members that the real class adds (verified)
 L397-402 A timer trigger in an integration test needs the trigger host role (verified)
 L404-410 Unassigned keys for hotkey input tests: not every virtual key reaches a plain hotkey (verified)
+L412-418 `loop files` takes a mode string, not a number (verified)
 ```
 
 ## doc/REQUIREMENTS.md

@@ -1864,7 +1864,7 @@ The expression texts of a v1 flow are converted into the new language when the f
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/test_migration_report.py`, `tests/test_migration_classes.py`
+- **Evidence:** `tests/test_migration_report.py`, `tests/test_migration_classes.py`, `tests/e2e/test_manager_import.py::test_the_report_has_the_places_the_engine_marked` (the places of an import in the manager's report)
 
 Every place of a loaded v1 flow that the loader cannot convert or that behaves differently carries its MIGRATION ID and keeps the v1 original text (E0035). `tools/migration_report.py` lists these places per flow. The editor shows them (REQ-EDT-150).
 
@@ -1882,10 +1882,11 @@ v2 writes `formatVersion: 2`; loading a file saved by v2 converts nothing again.
 ### REQ-MIG-060 Import from the v1 data folder
 
 - **v1:** n/a
-- **v2:** open
+- **v2:** partial
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
+- **Evidence:** `tests/e2e/test_manager_import.py` (flows with their IDs and disabled, existing IDs skipped or copied, broken file listed, demo flows not imported, variables with v2 winning, source folder unchanged, autostart kept, removed or refused; the settings part is WI-0077, not yet)
 
 The user imports the flows and variables of v1 into the v2 data folder through the manager, with a report of the marked places. An automatic backup of the v1 data at the switchover may come later (E0021). Rules (E0068):
 
@@ -2508,10 +2509,11 @@ AutoHotFlow sends nothing anywhere by itself: no telemetry, no usage statistics,
 ### REQ-SEC-060 Imported flows are disabled and come with a warning
 
 - **v1:** no (not checked)
-- **v2:** open
+- **v2:** partial
 - **Prio:** could
 - **Scope:** port
 - **Plan:** S0004
+- **Evidence:** `tests/e2e/test_manager_import.py::test_every_flow_of_the_folder_is_imported_with_its_id_and_disabled` (the disabled part, for the import from v1; the warning for files comes with WI-0081)
 
 Importing flows from a file (REQ-MGR-050) tells the user that a flow is a program with the rights of the user (REQ-SEC-030) and lists the elements that act on the system (files, programs, keys and mouse, network, AutoHotkey scripts). The imported flows are disabled, so that nothing runs before the user has looked at them.
 

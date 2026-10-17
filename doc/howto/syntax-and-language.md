@@ -364,3 +364,27 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `RegExMatch(line, pattern, &m)`: an unmatched group is `""` in `m[n]`, so `m[2] = ""` tells a line without a level. For the flow ID use `([^~]*?)` (the character class excludes the delimiter `~`) and put the literal ` ~` right after the group; a `.*?` could stop at a later ` ~` inside the text.
 - **Status:** verified (`src/storage/LogSink.ahk` `Tail`; `tests/integration/test_storage.py::test_log_tail_reads_v1_lines_without_level_and_rejects_bad_payloads` reads a v1 line and a line with a flow ID)
 - **Source:** `src/storage/LogSink.ahk` (`Tail`)
+
+### A function kept in a property is called with the object as first argument
+
+- **Problem:** A callback stored in an object property (`this.log := (level, text) => ...`) and called as `this.log("a1", text)` failed at run time with "Too many parameters passed to function", inside a callback of the peer that had no obvious source.
+- **Wrong:** `if (IsObject(this.log))` then `this.log("a1", text)`.
+- **Right:** Keep the function in a local first and call the local: `write := this.log` then `write("a1", text)`. Calling a method of an object (`this.ask.Confirm(...)`) is fine; the trap is a function value in a property.
+- **Status:** verified (tests/e2e/test_manager_import.py, the first run of the import; the fix is in src/manager/ManagerImport.ahk)
+- **Source:** WI-0076, src/manager/ManagerImport.ahk `_Finish`.
+
+### `as` and `catch as` are reserved: no parameter named `as`
+
+- **Problem:** A parameter named `as` (`_Entry(..., as := "")`) made the whole manager script unloadable: the role never became ready.
+- **Wrong:** `_Entry(i, name, state, flowId, message, places, as := "")`.
+- **Right:** Any other name, for example `newName`. Check the engine or manager log for a load error (`Missing ")"`, unexpected name) when a role does not reach `ready`: the supervisor log shows the exit code and the first lines of the output.
+- **Status:** verified (WI-0076, the manager failed to load and the test waited for `ready`)
+- **Source:** WI-0076, src/manager/ManagerImport.ahk.
+
+### A double quote inside a double-quoted string is written `""`, not `\"`
+
+- **Problem:** A regular expression with a quote character (`"[\/:*?\"<>|]"`) was a syntax error of the whole engine script: the engine exited with code 2 at each start.
+- **Wrong:** `RegExMatch(flowId, "[\/:*?\"<>|\x00-\x1F]")`.
+- **Right:** A single-quoted string, as in StoragePaths: `RegExMatch(flowId, '[\/:*?"<>|\x00-\x1F]')`. In AHK v2 a backslash does not escape a quote; the quote is doubled (`""`) or the string is single quoted.
+- **Status:** verified (WI-0076, the engine exited with "Missing ')' before ']'" at load; fixed in src/engine/FlowLifecycle.ahk)
+- **Source:** WI-0076, src/engine/FlowLifecycle.ahk `_CheckFixedId`.
