@@ -27,6 +27,7 @@ INFO = {
     "manager": {"topics": list, "epoch": int, "lastSeq": int, "flows": int, "events": int, "resyncs": int},
     "debug": {"topics": list, "processes": list, "snapshots": list, "logEntries": int, "engineEvents": int,
               "dumps": list, "paused": bool},
+    "tray": {"iconHidden": bool, "tip": str, "items": list, "requests": int, "lastResult": str},
     "echo": {},
 }
 SUPERVISOR = {"hub": dict, "children": list, "diagErrors": list, "diagLog": dict, "processEvents": list,

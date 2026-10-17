@@ -818,6 +818,26 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: tray icon and menu (gui, the real icon appears for about 15 s, the menu opens by itself, do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/fault/test_tray_role.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: tray menu probe (thread running, tray menu open 6 s, Esc)",
             "type": "shell",
             "command": "python",

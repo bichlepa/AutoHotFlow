@@ -1,4 +1,4 @@
-# WI-0072 Tray icon and tray menu of the application in the supervisor
+# WI-0072 Tray icon and tray menu of the application (role `tray`, E0075)
 
 Size: M · Depends on: – · Blocks: WI-0073, WI-0075, WI-0079
 
@@ -8,7 +8,7 @@ The tray icon of AutoHotFlow belongs to the supervisor (E0064): it is there as l
 
 ## Read first
 
-`AGENTS.md`; `doc/ARCHITECTURE.md` 3 (supervisor: no business logic, no file I/O, no dialogs), 6.1 (start, `--background`), 6.3 (exit); E0014, E0046, E0064 in `doc/DECISIONS.md`; `src/AutoHotFlow.ahk`, `src/supervisor/Supervisor.ahk` (`cmd.app.command`, `cmd.manager.show`, `_OnManagerShown`), `src/supervisor/Children.ahk`; `src/manager/StubManager.ahk` (`_SetupTray`); `tests/integration/test_manager_tray.py`, `tests/integration/test_entry.py`; `doc/howto/gui-and-hotkeys.md` (tray menu entry); AHK v2 docs `lib/Menu.htm` (`A_TrayMenu`), `lib/TraySetIcon.htm`, `lib/TrayTip.htm`, `Program.htm#tray-icon`.
+`AGENTS.md`; `doc/ARCHITECTURE.md` 3 (supervisor: no business logic, no file I/O, no dialogs), 6.1 (start, `--background`), 6.3 (exit); E0014, E0046, E0064 in `doc/DECISIONS.md`; `src/AutoHotFlow.ahk`, `src/supervisor/Supervisor.ahk` (`cmd.app.command`, `cmd.manager.show`, `_OnManagerShown`), `src/supervisor/Children.ahk`; `src/manager/StubManager.ahk` (`_SetupTray`); `tests/integration/test_tray.py`, `tests/integration/test_entry.py`; `doc/howto/gui-and-hotkeys.md` (tray menu entry); AHK v2 docs `lib/Menu.htm` (`A_TrayMenu`), `lib/TraySetIcon.htm`, `lib/TrayTip.htm`, `Program.htm#tray-icon`.
 
 ## Tasks
 
@@ -31,3 +31,15 @@ The tray icon of AutoHotFlow belongs to the supervisor (E0064): it is there as l
 ## Not part of this
 
 The notices themselves (WI-0075), the language setting (WI-0077), the editor icons (S0005).
+
+## Changed design (E0075, owner, 2026-10-17)
+
+The measurement of task 5 (`doc/MEASUREMENTS.md`, "Open menus in a running process") showed that an open menu stops the timers and usually a running thread of its process. The owner decided: the icon and the menu run in an own small process, the new role `tray` (name chosen by the implementer), not in the supervisor and not in the manager. Tasks 1 to 3 and 6 apply to that role instead of the supervisor; task 4 is partly out of scope (see below).
+
+## Result
+
+- **Role `tray`:** `src/tray/Tray.ahk`, entries `src/entry/tray.ahk` and `tests/integration/helpers/entry/tray.ahk`. Icon (tooltip "AutoHotFlow"), menu "Show manager" (default entry) and "Exit" with the texts from `Lang` (`Show_Manager`, `Exit_#verb`); the standard AutoHotkey entries are removed. The handlers send `cmd.app.command {argv: []}` and `cmd.app.exit` to the supervisor (no new message types for the product); `--headless` hides the icon and adds the test driver `cmd.test.command {item}` (PROTOCOL 4.10).
+- **Supervisor:** starts the role unless `--no-tray` (`--tray` forces it; `Supervisor.TrayDefault` is false in the test entry), restarts it (`Children.AUTO_RESTART`), ends it first (rank 0). The role ends with the supervisor by the orphan guard.
+- **Manager:** no tray menu and `#NoTrayIcon` in its entry. Every entry script now carries `#NoTrayIcon`; `Tray.Start` shows the icon.
+- **Tests:** `tests/fault/test_tray_role.py` (start, restart after a kill, exit from the menu, show manager with and without a running manager, a crashed manager opened again, bad item; gui: the real icon, the menu opened with the tray message and held 8 s, no hang, Esc closes it), `tests/integration/test_tray.py` (static), `tests/integration/test_entry.py`, `tests/test_element_includes.py`. VS Code task "Test: tray icon and menu (gui ...)".
+- **Not done / left for later:** the menu texts are read once at start (`_BuildMenu` can be called again; the trigger is the language setting, WI-0077/WI-0078). `--background` and `--windows-startup` do not start the manager yet because the product start does not start the manager at all before WI-0073 (task 4). Tray notices: WI-0075.

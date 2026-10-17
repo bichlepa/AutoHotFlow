@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; No tray icon (E0046): only the product manager (src/entry/manager.ahk) keeps its icon.
+; No tray icon (E0046, E0075): the icon of the application belongs to the role tray (src/tray/Tray.ahk).
 #NoTrayIcon
 
 ; Test entry point (WI-0029, changed by WI-0047-PREP): the supervisor with the test roles, and every product role in one
@@ -17,6 +17,7 @@
 #Include ..\..\..\src\worker\Worker.ahk
 #Include ..\..\..\src\storage\Storage.ahk
 #Include ..\..\..\src\manager\StubManager.ahk
+#Include ..\..\..\src\tray\Tray.ahk
 #Include ..\..\..\src\debugview\DebugView.ahk
 #Include ..\..\..\src\triggerhost\TriggerHost.ahk
 #Include ..\..\..\src\core\PlaceholderRole.ahk
@@ -34,10 +35,12 @@ RoleRegistry.Register("engine", Engine)
 RoleRegistry.Register("worker", Worker)
 RoleRegistry.Register("storage", Storage)
 RoleRegistry.Register("manager", StubManager)
+RoleRegistry.Register("tray", Tray)
 RoleRegistry.Register("debug", DebugView)
 RoleRegistry.Register("triggerhost", TriggerHost)
 RoleRegistry.Register("editor", PlaceholderRole)
 AhfTestRolesFn := AhfRegisterTestRoles
+Supervisor.TrayDefault := false      ; a test run starts the role tray only with --tray (no icon in a test run, E0046)
 
 AhfMain((opts) => Supervisor.Run(opts))
 

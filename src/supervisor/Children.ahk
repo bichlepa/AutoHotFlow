@@ -33,7 +33,8 @@
 ; ended workers are kept for diagnosis, but only the last GONE_WORKERS_KEEP of them.
 ; Restart policy: only roles in AUTO_RESTART restart by themselves, at most RESTART_MAX times within
 ; RESTART_WINDOW_MS. manager and editor never restart automatically; storage, engine and triggerhost do (WI-0061: the
-; engine re-arms the triggers after a restart of the trigger host). The test role "crasher" joins the
+; engine re-arms the triggers after a restart of the trigger host), and so does tray (WI-0072, E0075: the icon of the
+; application must come back). The test role "crasher" joins the
 ; list only with --test-roles (TEST_AUTO_RESTART), so the policy can be tested without a real engine.
 class Children {
     static STARTUP_MS := 10000
@@ -45,7 +46,7 @@ class Children {
     ; The normal wait is one or two ticks: the pipe of an ended process reports its end at the next read. 500 ms keep
     ; the reports evt.process.exited/crashed (and a restart) short when the connection does not end for some reason.
     static EXIT_GRACE_MS := 500
-    static AUTO_RESTART := Map("storage", 1, "engine", 1, "triggerhost", 1)
+    static AUTO_RESTART := Map("storage", 1, "engine", 1, "triggerhost", 1, "tray", 1)
     static TEST_AUTO_RESTART := Map("crasher", 1)
     ; SYNCHRONIZE (0x00100000) | PROCESS_QUERY_LIMITED_INFORMATION (0x1000) | PROCESS_TERMINATE (0x1)
     ; (no longer used by the supervisor: CreateProcessW returns a full-access handle; the unit tests open handles with it)
@@ -707,7 +708,7 @@ class Children {
     }
 
     _RankOf(role) {
-        if (role = "manager" || role = "editor" || role = "debug")
+        if (role = "manager" || role = "editor" || role = "debug" || role = "tray")
             return 0
         if (role = "engine")
             return 1

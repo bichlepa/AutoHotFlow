@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; No tray icon (E0046): only the product manager (src/entry/manager.ahk) keeps its icon.
+; No tray icon (E0046, E0075): the icon of the application belongs to the role tray (src/tray/Tray.ahk).
 #NoTrayIcon
 
 ; Test entry of the role storage (WI-0047-PREP): the product entry src\entry\storage.ahk plus the test elements of the same

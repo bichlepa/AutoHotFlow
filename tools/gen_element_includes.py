@@ -29,7 +29,7 @@ and per role one block that includes the blocks of all packages of a set:
   python tools/gen_element_includes.py --check    write nothing, exit 1 when a block is missing, stale or superfluous
 
 The selection is made by the literal `static Mode := "<inline|worker|trigger>"` of each class file, which this tool
-reads as text (it does not run AutoHotkey). Roles (ROLE_MODES): supervisor, storage, debug and manager get no block
+reads as text (it does not run AutoHotkey). Roles (ROLE_MODES): supervisor, storage, debug, manager and tray get no block
 (the manager loads all classes later if it needs them); engine and editor get all classes, triggerhost the `trigger`
 classes, worker the `worker` classes.
 

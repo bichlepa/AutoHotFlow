@@ -57,9 +57,8 @@ def test_a_probe_with_the_directive_has_the_icon_hidden(procs, datadir):
     assert "A_IconHidden=1" in out, (out, err)
 
 
-def test_the_boot_file_does_not_hide_the_icon_of_the_product_manager(procs, datadir):
-    # E0046 (correction 2026-10-15). Proves: an entry without the directive, like src/entry/manager.ahk, keeps its icon:
-    # the boot file does not hide it.
+def test_the_boot_file_does_not_hide_the_icon_of_an_entry_without_the_directive(procs, datadir):
+    # E0046 (correction 2026-10-15). Proves: an entry without the directive keeps its icon: the boot file does not hide it.
     code, out, err = run_entry(procs, datadir, [], entry=HELPERS / "IconProbeShown.ahk")
     assert code == 0, (code, out, err)
     assert "A_IconHidden=0" in out, (out, err)
@@ -69,20 +68,17 @@ def _has_directive(path):
     return any(line.strip().lower() == "#notrayicon" for line in path.read_text(encoding="utf-8").splitlines())
 
 
-def test_every_entry_script_includes_the_boot_file_and_only_the_product_manager_shows_an_icon():
-    # E0046. Proves: every entry of the product or of the tests includes the boot file; every one of them carries
-    # #NoTrayIcon except src/entry/manager.ahk (the product manager). A new entry that forgets either fails here.
-    product_manager = ROOT / "src" / "entry" / "manager.ahk"
+def test_every_entry_script_includes_the_boot_file_and_hides_the_icon_the_tray_role_shows_it_by_code():
+    # E0046, E0075. Proves: every entry of the product or of the tests includes the boot file and carries #NoTrayIcon.
+    # The one icon of the application is the role tray's: Tray.Start shows it (A_IconHidden := false) unless the role
+    # is headless, so no test run has an icon. A new entry that forgets either fails here.
     entries = [ENTRY, HELPERS / "AutoHotFlowTest.ahk", *(ROOT / "src" / "entry").glob("*.ahk"),
                *(HELPERS / "entry").rglob("*.ahk")]
     entries = [p for p in entries if "generated" not in p.parts]
     assert len(entries) >= 15
     for p in entries:
         assert "AhfBoot.ahk" in p.read_text(encoding="utf-8"), p
-        if p == product_manager:
-            assert not _has_directive(p), p
-        else:
-            assert _has_directive(p), p
+        assert _has_directive(p), p
     boot = (ROOT / "src" / "AhfBoot.ahk").read_text(encoding="utf-8")
     assert not any(line.strip().lower() == "#notrayicon" for line in boot.splitlines())
 

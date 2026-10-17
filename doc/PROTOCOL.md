@@ -481,6 +481,23 @@ Storage creates `Reports/<stamp>_<reason>/` (if it exists, `-2`, `-3` ... is app
 - **Test command `cmd.test.debug` (only with `--headless`):** `{ action }` with `state` (counters and lists of the model: `processes` names, `states` state per process (name → state according to ARCHITECTURE 5.3), `snapshots` role names, `logEntries`, `engineEvents`, `dumps` titles, `paused`, `lastExport`), `refresh` (fetches the snapshots, response after the last one; `refreshed` counts the responses; a process that is not `ready` is not asked, its entry reads `not ready (state: <state>)`), `export` (triggers `cmd.diag.report`, response with its result), `pause`/`resume`, `filter` (`{level, source}`; response `state`), `snapshot` (`{name}`: the stored snapshot text, `not_found` without), `close` (like closing the window: only this role ends, with `sys.bye {clean: true}`). Others: `bad_payload`.
 - **Echo test command `cmd.test.dump { title, value }`** (test role `echo`): calls `Debug.Dump(value, title)`.
 
+### 4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
+
+The tray icon and the tray menu of the application are a role of their own, because an open menu stops the threads and timers of the process that shows it (doc/MEASUREMENTS.md, "Open menus in a running process"). The role has no flows, no engine and no storage access, subscribes to no topic and receives no command in the product. It only sends requests to `supervisor`, each with a timeout of 5 s, from the menu handler, without waiting:
+
+| Menu entry | Request (`tray` → `supervisor`) | Effect |
+|---|---|---|
+| Show manager (default entry, double click) | `cmd.app.command { argv: [] }` (4.1) | the same as a second start of the product: the supervisor sends `cmd.manager.show` (4.8) to a running manager, or starts a manager that is not running |
+| Exit | `cmd.app.exit {}` (4.1) | the clean exit of the application (ARCHITECTURE 6.3) |
+
+An answer other than `ok`, or none, is logged (`a0`, source `tray`) and kept in the snapshot; the role goes on. Later entries (language, log; WI-0077, WI-0078) and tray notices (WI-0075) add their messages here.
+
+- **Start and restart:** the supervisor starts `tray` before the other roles unless `--no-tray` is given (`--tray` forces it; the test entry starts it only with `--tray`, so a test run shows no icon). It is in `Children.AUTO_RESTART`: after a death it is started again within the restart limit, so the icon comes back. It ends first at the exit (shutdown rank 0, with `manager` and `editor`), and ends with the supervisor like every role (orphan guard, exit 4).
+- **Options:** `--headless` keeps the icon hidden and adds `cmd.test.command`. The supervisor passes `--headless` on to all roles (4.8).
+- **Test command `cmd.test.command` (only with `--headless`):** `{ item }` with `item` `show` or `exit`; the role runs the menu handler as if the entry had been clicked and answers `{ ok: true }` at once (the request to the supervisor goes out after that). Other values: `bad_payload`.
+- **Snapshot (4.9), role part `info`:** `{ iconHidden: bool, tip: string, items: [string, string], requests: int, lastResult: string }`. `items` are the texts of the menu entries in the current language (`Show manager`, `Exit`).
+- **Open menu:** the menu stops the role's own timers (the orphan guard of `Role`) and threads. The role answers `sys.ping` while a menu is open in the idle state (measured: all pings in 6 s); the gui test `tests/fault/test_tray_role.py` holds the menu 8 s, longer than the pong timeout (6 s), and checks that the role is not judged hung.
+
 ## 5. Connection setup, reconnection, resync
 
 1. A role connects, sends `sys.hello` with the `hwnd` of its window (wake-up target, section 1). The hub answers with `sys.welcome`. Until then the role sends nothing except `sys.hello`. The peer (`src/core/ipc/Peer.ahk`) opens the pipe without waiting (one attempt, then retry via timer), wakes the hub with `sys.hello` already when the hub HWND is known (option `hubHwnd`), and reports `ready` only after `sys.welcome`.

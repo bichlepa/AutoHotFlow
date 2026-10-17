@@ -35,6 +35,8 @@
 ;               lets the tests restart a child many times (handle leaks).
 ;   --worker-limit  (only with --test-roles) most workers alive at once, default Children.WORKER_LIMIT (16).
 ;   --ui=<word>, --headless, --stub-cancel-exit  passed on to every role (WI-0013: --ui=stub for the manager stub).
+;   --tray, --no-tray  start the role tray (the tray icon and menu of the application, WI-0072, E0075) or not. Default: the
+;               product entry starts it, the test entry does not (Supervisor.TrayDefault), so that no test run shows an icon.
 ;   --windows-startup  passed on to every role; the engine arms the triggers with the start context windowsStartup
 ;               in its first pass (WI-0062, PROTOCOL 4.4). The autostart entry of S0004 sets it.
 ;   --log-level=<0..3>  highest log level that is forwarded to storage (default 2; level 3 stays in the ring of
@@ -55,6 +57,8 @@ class Supervisor {
     static TICK_MS := 200
     static ERROR_ALREADY_EXISTS := 183
     static Current := ""
+    ; Whether the supervisor starts the role tray when neither --tray nor --no-tray is given. The test entry sets it to false.
+    static TrayDefault := true
 
     static TickFn := () => Supervisor.Current._Tick()
     static ErrorFn := (e, mode) => Supervisor._OnError(e, mode)
@@ -109,6 +113,9 @@ class Supervisor {
         if (this.deadlineMs < Supervisor.MIN_DEADLINE_MS || this.deadlineMs > Supervisor.MAX_DEADLINE_MS)
             throw AhfError("supervisor: --deadline must be between " Supervisor.MIN_DEADLINE_MS " and "
                 . Supervisor.MAX_DEADLINE_MS " ms", ErrCode.BAD_ARGS)
+        if (opts.Has("tray") && opts.Has("no-tray"))
+            throw AhfError("supervisor: --tray and --no-tray exclude each other", ErrCode.BAD_ARGS)
+        this.startTray := opts.Has("tray") ? true : (opts.Has("no-tray") ? false : Supervisor.TrayDefault)
         this.startList := []
         for entry in StrSplit(String(opts.Get("start", "")), ",") {
             entry := Trim(entry)
@@ -161,6 +168,14 @@ class Supervisor {
         this.shutdown.onDone := (code) => this._Finish(code)
         this._Wire()
         this.hub.Start()
+        ; The tray icon lives as long as the application: it is started first and, like the other long-lived roles, started
+        ; again when it dies (Children.AUTO_RESTART). A start list that names "tray" does not start it twice.
+        listed := false
+        for entry in this.startList
+            if (entry = "tray")
+                listed := true
+        if (this.startTray && !listed)
+            this.children.Spawn("tray")
         for entry in this.startList
             this.children.Spawn(entry)
         this.stall.Arm(Time.NowMs())

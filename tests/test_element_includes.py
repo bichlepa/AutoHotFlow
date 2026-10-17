@@ -26,7 +26,7 @@ KINDS = {"Actions": "Action_", "Conditions": "Condition_", "Loops": "Loop_", "Tr
 
 # The table of E0041 / WI-0047-PREP, written out once more here on purpose.
 TABLE = {
-    "supervisor": None, "storage": None, "debug": None, "manager": None,
+    "supervisor": None, "storage": None, "debug": None, "manager": None, "tray": None,
     "engine": {"inline", "worker", "trigger"},
     "triggerhost": {"trigger"},
     "worker": {"worker"},
@@ -295,7 +295,8 @@ def test_a_test_class_in_the_product_is_refused(small_tree, capsys):
 
 ROLE_FILE = {"storage": r"storage\Storage.ahk", "engine": r"engine\Engine.ahk", "worker": r"worker\Worker.ahk",
              "manager": r"manager\StubManager.ahk", "debug": r"debugview\DebugView.ahk",
-             "triggerhost": r"triggerhost\TriggerHost.ahk", "editor": r"core\PlaceholderRole.ahk"}
+             "triggerhost": r"triggerhost\TriggerHost.ahk", "editor": r"core\PlaceholderRole.ahk",
+             "tray": r"tray\Tray.ahk"}
 
 
 @pytest.mark.parametrize("role", sorted(ROLE_FILE))

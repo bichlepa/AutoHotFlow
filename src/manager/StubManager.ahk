@@ -31,7 +31,7 @@ class StubManager extends Role {
     static COMMAND_MS := 5000
     static EXIT_MS := 5000
     static RENDER_MS := 50
-    ; Label of the exit button and of the tray menu entry (the stub has no Lang() yet).
+    ; Label of the exit button (the stub has no Lang() yet). The tray menu is the role tray's (E0075).
     static EXIT_LABEL := "Beenden"
     ; The only requests cmd.test.command may forward to the engine (test driver, headless only).
     static TEST_TYPES := Map("cmd.flow.start", 1, "cmd.flow.stop", 1, "cmd.flow.toggle", 1, "cmd.engine.snapshot", 1)
@@ -75,7 +75,6 @@ class StubManager extends Role {
             ExitApp(Role.EXIT_NOT_IMPLEMENTED)
         }
         super.Start()
-        this._SetupTray()
         if (!this.headless) {
             this.view := StubGui(this)
             SetTimer(this.renderFn, StubManager.RENDER_MS)
@@ -295,15 +294,6 @@ class StubManager extends Role {
 
     UserStop(flowId) {
         this._UserCommand("cmd.flow.stop", flowId)
-    }
-
-    ; Tray menu of the manager (the only process with a tray icon, E0046). The standard items are removed: AutoHotkey's
-    ; own "Exit" would end this process at once, without the shutdown of the supervisor, and "Reload" or "Suspend Hotkeys"
-    ; make no sense for a role. The one entry does what the button does (UserExit). No default item, so a double click
-    ; on the icon does nothing. The handler only sends the request: no blocking call.
-    _SetupTray() {
-        A_TrayMenu.Delete()
-        A_TrayMenu.Add(StubManager.EXIT_LABEL, (*) => this.UserExit())
     }
 
     UserExit() {

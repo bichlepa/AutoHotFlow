@@ -1406,22 +1406,22 @@ Closing the manager window only hides it. Flows and triggers keep running; the t
 ### REQ-MGR-090 Tray icon of the application
 
 - **v1:** yes
-- **v2:** partial (the stub manager shows the icon)
+- **v2:** partial (the icon with the tooltip and the double click are done in the role tray (E0075), also without a manager and after its crash; the tray notices of REQ-USE-030 are missing)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004
-- **Evidence:** `tests/integration/test_entry.py::test_the_boot_file_does_not_hide_the_icon_of_the_product_manager`
+- **Plan:** S0004 (notices: WI-0075)
+- **Evidence:** `tests/fault/test_tray_role.py::test_the_real_icon_opens_its_menu_and_a_menu_open_for_8_seconds_does_not_make_the_role_hung`, `tests/fault/test_tray_role.py::test_a_killed_tray_role_is_started_again_so_the_icon_comes_back`
 
 While AutoHotFlow runs, its icon is in the tray, with the tooltip "AutoHotFlow", also when the manager is not running or has crashed (E0064). A double click shows the manager, and starts it if it is not running. The application has one tray icon however many of its processes run; besides it, only open editors have an icon (REQ-EDT-230). Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030). The menu: REQ-MGR-140.
 
 ### REQ-MGR-140 Tray menu of the application
 
 - **v1:** yes
-- **v2:** partial (the stub manager has only an entry that ends the application)
+- **v2:** done (the role tray, E0075; the manager window itself comes with WI-0073: until then "Show manager" shows the stub)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** `tests/integration/test_manager_tray.py`, `doc/MANUAL-CHECKS.md`
+- **Evidence:** `tests/fault/test_tray_role.py::test_the_exit_entry_ends_the_application_cleanly`, `tests/fault/test_tray_role.py::test_the_show_manager_entry_starts_a_manager_that_is_not_running`, `tests/integration/test_tray.py`
 
 | Entry | Effect |
 |---|---|
