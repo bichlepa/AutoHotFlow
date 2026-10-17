@@ -2678,7 +2678,8 @@ Errors and warnings that have no window of their own (for example a flow file th
 ### REQ-USE-040 The user interface stays responsive
 
 - **v1:** no (the user interface waits for the global lock)
-- **v2:** partial (the architecture separates the processes; the real user interfaces are missing)
+- **v2:** partial (the architecture separates the processes; the real user interfaces are missing; the dialogs of the UI roles do not block: `ui_common/UiDialogs.ahk` (WI-0069), unit-tested, the windows not checked; standard dialogs stall the timers for up to 0.7 s, HOW-TO gui-and-hotkeys)
+- **Evidence:** `tests/ahk/ui_common_dialogs.test.ahk` (logic only)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 to S0007
