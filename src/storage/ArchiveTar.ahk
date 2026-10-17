@@ -35,12 +35,13 @@ class ArchiveTar {
         this.pid := pid
     }
 
-    ; True when tar has ended (the answer file exists, or the process is gone). Throws internal when the run is over its time:
+    ; True when tar has ended (the answer has its text, or the process is gone). Throws internal when the run is over its time:
     ; the process is then killed.
     Finished() {
-        if (FileExist(this.code) != "")
-            return true
         if (!ProcessExist(this.pid))
+            return true
+        ; the answer file exists before cmd has written its word into it: only a file with text is the answer
+        if (FileExist(this.code) != "" && Trim(FileRead(this.code), " `r`n`t") != "")
             return true
         if (Time.NowMs() > this.deadline) {
             try {
