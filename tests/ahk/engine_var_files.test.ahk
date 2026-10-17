@@ -39,6 +39,7 @@ class FakeEngine {
         this.peer := FakePeer()
         this.logs := []
         this.errors := []          ; Map(op, path, message)
+        this.flows := FakeFlows()  ; the writer asks whether a static variable's flow exists (WI-0070)
     }
 
     _Log(level, source, text) {
@@ -48,6 +49,13 @@ class FakeEngine {
     _StorageError(op, path, message) {
         this.errors.Push(Map("op", op, "path", path, "message", message))
     }
+
+    ; The writer asks these two of the engine (WI-0070): no flow is being deleted, and every flow of the test exists.
+    IsDeleting(flowId) => false
+}
+
+class FakeFlows {
+    Has(flowId) => true
 }
 
 Failure(code) => Map("ok", false, "error", Map("code", code, "message", "probe"))
