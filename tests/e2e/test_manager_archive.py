@@ -13,6 +13,8 @@ refused.
 """
 
 import json
+import os
+import time
 import zipfile
 from pathlib import Path
 
@@ -209,6 +211,13 @@ def test_the_warning_lists_the_elements_that_act_on_the_system_and_no_creates_no
     flow = json.loads(TRIGGERS_FLOW.read_text(encoding="utf-8"))
     flow["allElements"]["element0000000099"] = {"type": "action", "package": "Default",
                                                 "class": "Action_Unknown_Thing", "pars": {}}
+    # the actions that start or enable other flows act on the system too (ActsOnSystem true); Stop_Flow does not
+    flow["allElements"]["element0000000098"] = {"type": "action", "package": "Default",
+                                                "class": "Action_Execute_Flow", "pars": {}}
+    flow["allElements"]["element0000000097"] = {"type": "action", "package": "Default",
+                                                "class": "Action_Set_Flow_Status", "pars": {}}
+    flow["allElements"]["element0000000096"] = {"type": "action", "package": "Default",
+                                                "class": "Action_Stop_Flow", "pars": {}}
     archive = make_ahf(tmp_path / "triggers.ahf", {"triggers_check.json": json.dumps(flow)})
     before = sorted(v2_flows(obs))
     report = import_file(obs, archive, answers={"importWarning": "no"})
@@ -220,7 +229,77 @@ def test_the_warning_lists_the_elements_that_act_on_the_system_and_no_creates_no
     assert "Default.Trigger_Hotkey" in text, text                        # acts on keys and mouse
     assert "Default.Action_Unknown_Thing (unknown element)" in text, text  # unknown classes count as acting
     assert "Default.Trigger_Periodic_Timer" not in text, text            # computes nothing that acts
+    assert "Default.Action_Execute_Flow" in text and "Default.Action_Set_Flow_Status" in text, text
+    assert "Default.Action_Stop_Flow" not in text, text
     assert "rights" in text
+
+
+# --- the real v1 export (the owner's file, tests/data/ahf/) and the limits ----------------------------------------------
+
+V1_EXPORT = ROOT / "tests" / "data" / "ahf" / "v1_export_two_flows.ahf"
+
+
+def test_a_real_v1_export_imports_both_flows_disabled_and_the_warning_lists_their_elements(started, tmp_path):
+    sup, obs = started()
+    report = import_file(obs, V1_EXPORT, answers={"importWarning": "yes"})
+    assert report["ok"], report
+    states = sorted((f["name"], f["state"]) for f in report["flows"])
+    assert states == [("Speak clipboard", "created"), ("Update checker", "created")], report["flows"]
+    ids = [f["flowId"] for f in report["flows"]]
+    assert wait_until(lambda: all(i in v2_flows(obs) for i in ids), scaled(20)), sorted(v2_flows(obs))
+    assert all(not v2_flows(obs)[i]["enabled"] for i in ids)
+    text = [q for q in questions(obs) if q["kind"] == "importWarning"][0]["args"][0]
+    assert "Default.action_Run (unknown element)" in text, text
+    assert "Default.action_Send_Keystrokes (unknown element)" in text, text
+
+
+def test_a_second_import_of_the_real_v1_export_asks_the_name_conflict_for_each_flow(started, tmp_path):
+    sup, obs = started()
+    assert import_file(obs, V1_EXPORT, answers={"importWarning": "yes"})["ok"]
+    report = import_file(obs, V1_EXPORT, answers={"importWarning": "yes", "importConflict": 3})
+    assert sorted((f["name"], f["state"]) for f in report["flows"]) == \
+        [("Speak clipboard", "skipped"), ("Update checker", "skipped")], report["flows"]
+    assert [q["kind"] for q in questions(obs)].count("importConflict") == 2
+
+
+def test_an_archive_over_the_limits_is_refused(started, tmp_path):
+    sup, obs = started()
+    before = sorted(v2_flows(obs))
+    big = tmp_path / "big.ahf"                       # the file itself: more than 50 MB (random bytes do not compress)
+    big.write_bytes(os.urandom(51 * 1024 * 1024))
+    report = import_file(obs, big)
+    assert not report["ok"] and "allowed for an .ahf file" in report["error"], report
+    many = make_ahf(tmp_path / "many.ahf", {"f%d.json" % n: "{}" for n in range(2001)})
+    report = import_file(obs, many)
+    assert not report["ok"] and "more than 2000 entries" in report["error"], report["error"]
+    # a zip bomb: 5 MB of text that compresses to a few kilobytes is more than the unpacked limit
+    bomb = make_ahf(tmp_path / "bomb.ahf", {"big.json": '{"name": "big", "x": "' + "a" * (5 * 1024 * 1024) + '"}'})
+    report = import_file(obs, bomb)
+    assert not report["ok"] and "bytes unpacked" in report["error"], report["error"]
+    assert sorted(v2_flows(obs)) == before
+
+
+def test_a_percent_sign_in_the_path_is_refused_with_a_message(started, tmp_path):
+    sup, obs = started(lambda d: flow_data(d))
+    res = call(obs, "exportFlows", flowIds=[FLOW], path=str(tmp_path / "a%b.ahf"))
+    assert not res["ok"] and "cmd.exe" in res["error"], res
+    assert not (tmp_path / "a%b.ahf").exists()
+
+
+def test_a_tar_run_over_its_limit_is_answered_and_its_folder_is_removed(started, tmp_path, monkeypatch):
+    # a tar.exe that sleeps: the run is killed at its limit (1.5 s), the job answers internal (not busy) and cleans up.
+    # The two test hooks of storage are environment variables (the child processes inherit them).
+    slow = tmp_path / "slow_tar.cmd"
+    slow.write_text("@echo off\r\nping -n 60 127.0.0.1 >nul\r\n", encoding="ascii")
+    monkeypatch.setenv("AHF_ARCHIVE_TIMEOUT_MS", "1500")
+    monkeypatch.setenv("AHF_ARCHIVE_TAR", str(slow))
+    sup, obs = started()
+    t0 = time.time()
+    report = import_file(obs, V1_EXPORT, answers={"importWarning": "yes"})
+    assert not report["ok"] and "did not finish" in report["error"], report
+    assert time.time() - t0 < scaled(20), "the answer waited for the queue"
+    archive = sup.datadir / "Archive"
+    assert wait_until(lambda: not archive.exists() or not any(archive.iterdir()), scaled(10)), list(archive.iterdir())
 
 
 def test_the_warning_says_so_when_no_element_acts(started, tmp_path):
