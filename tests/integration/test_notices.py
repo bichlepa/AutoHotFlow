@@ -154,3 +154,29 @@ def test_a_stop_by_the_runaway_guard_gives_a_notice_with_the_limit(shown):
     assert p["args"] == ["runaway-notice", 2000], p
     assert wait_for(lambda: (manager_flow(shown, flow_id) or {}).get("limit") == "executionsPerMinute", WAIT_S)
     assert manager_flow(shown, flow_id)["limitValue"] == 2000, manager_flow(shown, flow_id)
+
+
+def test_the_tray_holds_back_a_second_error_within_five_seconds(shown):
+    """Two errors of two flows (two throttle keys in the engine) reach the tray within 5 s: the tray shows the first only."""
+    first = shown.add(throwing_flow("tray-first"))
+    second = shown.add(throwing_flow("tray-second"))
+    start_shown(shown)
+    shown.begin(first)
+    shown.begin(second)
+    assert wait_for(lambda: tray_info(shown)["notices"] == 2, WAIT_S), tray_info(shown)
+    info = tray_info(shown)
+    assert info["noticesHeld"] == 1, info
+    assert wait_for(lambda: len(notices_of(shown)) == 2, WAIT_S)
+
+
+def test_a_limit_stop_is_shown_even_within_five_seconds_of_an_error(shown):
+    """An error, then a stop by the runaway guard a moment later: the warning bypasses the tray throttle."""
+    error_flow = shown.add(throwing_flow("tray-error"))
+    loop_flow = shown.add(endless_loop(limit=200))
+    start_shown(shown)
+    shown.begin(error_flow)
+    shown.begin(loop_flow)
+    assert wait_for(lambda: tray_info(shown)["notices"] == 2, LIMIT_S), tray_info(shown)
+    info = tray_info(shown)
+    assert info["noticesHeld"] == 0, info
+    assert info["lastNotice"].startswith("The flow runaway-notice was stopped"), info["lastNotice"]

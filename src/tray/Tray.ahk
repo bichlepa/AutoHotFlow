@@ -94,7 +94,11 @@ class Tray extends Role {
         if (held > 0)
             text .= " " Lang("Notice_more", held)
         this.lastNotice := text
-        if (!this.noticeThrottle.Offer("tray", A_TickCount)) {
+        ; A warning (a flow stopped by the runaway guard, its triggers are off) is never hidden behind the throttle: the
+        ; user must learn it. It restarts the window, so the errors after it are still throttled.
+        if (p.Get("kind", "") = "limit" || p.Get("level", "") = "warning") {
+            this.noticeThrottle.Sent("tray", A_TickCount)
+        } else if (!this.noticeThrottle.Offer("tray", A_TickCount)) {
             this.noticesHeld += 1
             return
         }
