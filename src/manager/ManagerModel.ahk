@@ -18,6 +18,8 @@
 ;   "categories"  the categories or their order changed (the flow records are unchanged)
 ;   "settings"    the settings changed
 ;   "selection"   the selected flow changed; data is the flow ID or ""
+;   "notice"      a notice of the engine arrived (WI-0075); data is the entry of the list
+;   "notices"     the list of notices changed by the user (opened: the marks are gone); data is ""
 ;   "answer"      the answer to a command of the user; data is Map(type, flowId, ok, code, message, payload, ms)
 ;   "log"         the log window: data is "open", "close", "tail" (the answer of the tail), "entry" or "filter" (WI-0080)
 ;
@@ -35,6 +37,8 @@ class ManagerModel {
     static LOG_TAIL_MS := 5000
     ; WI-0074: after the user enabled a flow, its trigger messages are reported for this long (ms).
     static WATCH_MS := 30000
+    ; WI-0075: notices kept in the list of the manager (the oldest go).
+    static NOTICE_KEEP := 50
     ; The values of EngineState.
     static ENGINE_WAITING := "waiting"   ; no snapshot yet
     static ENGINE_LOADING := "loading"   ; the engine answers but has not loaded all flows (snapshot ready false)
@@ -96,6 +100,9 @@ class ManagerModel {
         this.logLevel := "3"           ; the highest digit shown
         this.logGroup := "all"         ; "all", or the level letter: "a" app, "f" flow (E0081: no thread group)
         this.logFlowId := ""           ; "" = all flows
+        ; Notices (WI-0075, PROTOCOL 4.8): the newest NOTICE_KEEP of topic notice, in memory only.
+        this.notices := []
+        this.noticeCount := 0          ; n of the newest notice (numbers are not reused)
     }
 
     ; --- listeners and trace -------------------------------------------------------------------
@@ -141,6 +148,7 @@ class ManagerModel {
         this.startMs := Time.NowMs()
         this.peer.Subscribe("engine")
         this.peer.Subscribe("process")
+        this.peer.Subscribe("notice")
         this.RequestSnapshot("start")
     }
 
@@ -215,10 +223,15 @@ class ManagerModel {
                 , "enabled", f.Get("enabled", 0), "executing", f.Get("executing", 0), "instances", f.Get("instances", 0)
                 , "rev", f.Get("rev", 0)
                 , "independentActive", f.Get("independentActive", 0), "stateError", f.Get("stateError", "")
-                , "triggers", f.Get("triggers", []), "limit", "", "missingPackages", f.Get("missingPackages", []))
+                , "triggers", f.Get("triggers", []), "limit", "", "limitValue", 0, "unseen", false, "missingPackages", f.Get("missingPackages", []))
             ; A flow stopped by its runaway guard keeps the mark until it is enabled again (the snapshot does not carry it).
-            if (this.flows.Has(id) && this.flows[id]["limit"] != "" && !recs[id]["enabled"])
+            if (this.flows.Has(id) && this.flows[id]["limit"] != "" && !recs[id]["enabled"]) {
                 recs[id]["limit"] := this.flows[id]["limit"]
+                recs[id]["limitValue"] := this.flows[id]["limitValue"]
+            }
+            ; An error notice keeps its mark until the user has looked at it (the snapshot does not carry it either).
+            if (this.flows.Has(id) && this.flows[id]["unseen"])
+                recs[id]["unseen"] := true
             ids.Push(id)
         }
         this.flows := recs
@@ -298,9 +311,58 @@ class ManagerModel {
                 id := p.Get("flowId", "")
                 if (this.flows.Has(id)) {
                     this.flows[id]["limit"] := "executionsPerMinute"
+                    this.flows[id]["limitValue"] := p.Get("limit", 0)
                     this._Notify("flow", this.flows[id])
                 }
+            case "evt.ui.notice":
+                this._OnNotice(p)
         }
+    }
+
+    ; A notice of the engine (WI-0075, PROTOCOL 4.7, 4.8): kept in the list, and an error of a flow marks the flow until the
+    ; user selects it or opens the list.
+    _OnNotice(p) {
+        this.noticeCount += 1
+        entry := Map("n", this.noticeCount, "kind", p.Get("kind", ""), "level", p.Get("level", "")
+            , "flowId", p.Get("flowId", ""), "key", p.Get("key", ""), "args", p.Get("args", []), "held", p.Get("held", 0)
+            , "clock", FormatTime(, "HH:mm:ss"), "ms", ManagerModel.WallMs())
+        this.notices.Push(entry)
+        if (this.notices.Length > ManagerModel.NOTICE_KEEP)
+            this.notices.RemoveAt(1)
+        id := entry["flowId"]
+        if (entry["kind"] = "exception" && this.flows.Has(id)) {
+            this.flows[id]["unseen"] := true
+            this._Notify("flow", this.flows[id])
+        }
+        this._Notify("notice", entry)
+    }
+
+    ; The user opened the list of notices: the marks of the flows go (PROTOCOL 4.8).
+    OpenNotices() {
+        for id, rec in this.flows {
+            if (rec["unseen"]) {
+                rec["unseen"] := false
+                this._Notify("flow", rec)
+            }
+        }
+        this._Notify("notices", "")
+    }
+
+    ; The list of notices for the driver (PROTOCOL 4.8): every kept entry, oldest first, without the time.
+    NoticeState() {
+        out := []
+        for e in this.notices
+            out.Push(Map("n", e["n"], "kind", e["kind"], "level", e["level"], "flowId", e["flowId"], "key", e["key"]
+                , "args", e["args"], "held", e["held"]))
+        return out
+    }
+
+    ; The user selected a flow: its error mark goes.
+    _Seen(flowId) {
+        if (flowId = "" || !this.flows.Has(flowId) || !this.flows[flowId]["unseen"])
+            return
+        this.flows[flowId]["unseen"] := false
+        this._Notify("flow", this.flows[flowId])
     }
 
     ; Process events of the supervisor. Only the engine matters to the model.
@@ -346,8 +408,10 @@ class ManagerModel {
         rec["instances"] := p.Get("instances", 0)
         rec["independentActive"] := p.Get("independentActive", 0)
         rec["stateError"] := p.Get("stateError", "")      ; absent: the state is known again
-        if (rec["enabled"])
+        if (rec["enabled"]) {
             rec["limit"] := ""                            ; enabled again: the limit mark goes
+            rec["limitValue"] := 0
+        }
         this._Notify("flow", rec)
     }
 
@@ -577,7 +641,7 @@ class ManagerModel {
         return Map("NewCategory", up, "NewFlow", up, "ChangeCategory", flows && up, "Duplicate", one && up
             , "Delete", (flows || this.catSelected) && up, "Edit", false   ; arch-ok: wire-bool UI state of the buttons, not a protocol field
             , "Enable", flows && up, "Run", flows && up
-            , "Settings", false, "ImportExport", false, "About", false, "Help", false, "ShowLog", true, "Exit", true)
+            , "Settings", false, "ImportExport", false, "About", false, "Help", false, "ShowLog", true, "Exit", true, "Notices", true)
     }
 
     ; The label of the Run button for the focused flow: "Stop" while it runs, "Run" otherwise.
@@ -599,6 +663,7 @@ class ManagerModel {
                 , "enabled", Json.Bool(rec["enabled"]), "executing", Json.Bool(rec["executing"]), "instances", rec["instances"]
                 , "rev", rec["rev"]
                 , "independentActive", rec["independentActive"], "stateError", rec["stateError"], "limit", rec["limit"]
+                , "limitValue", rec["limitValue"], "unseen", Json.Bool(rec["unseen"])
                 , "triggerMessages", ManagerModel._TriggerMessages(rec), "missingPackages", rec["missingPackages"]))
         }
         cats := []
@@ -613,7 +678,8 @@ class ManagerModel {
             , "selectedCategory", this.selectedCat, "enableIsDisable", Json.Bool(this.EnableIsDisable())
             , "buttons", buttons
             , "events", this.eventCount, "resyncs", this.resyncCount, "snapshots", this.snapshotCount
-            , "lastAnswer", this.lastAnswer = "" ? Map() : this.lastAnswer, "log", this.LogState())
+            , "lastAnswer", this.lastAnswer = "" ? Map() : this.lastAnswer, "log", this.LogState()
+            , "notices", this.NoticeState())
     }
 
     ; --- operations ----------------------------------------------------------------------------
@@ -628,6 +694,7 @@ class ManagerModel {
         this.catSelected := false
         this.selectedCat := ""
         this.selectedFlow := flowId
+        this._Seen(flowId)
         this._Notify("selection", flowId)
     }
 
@@ -644,6 +711,7 @@ class ManagerModel {
         this.selectedFlow := flowId
         this.catSelected := false
         this.selectedCat := ""
+        this._Seen(flowId)
         this._Notify("selection", flowId)
     }
 

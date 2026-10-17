@@ -5,6 +5,7 @@
 #Include ..\ui_common\UiDialogs.ahk
 #Include ManagerModel.ahk
 #Include LogWindow.ahk
+#Include NoticeWindow.ahk
 
 ; The main window of the manager (WI-0073, WI-0074; REQ-MGR-010 to REQ-MGR-040): the view of the ManagerModel. It holds no
 ; logic of its own: it draws what the model holds and calls the operations of ManagerOps.
@@ -40,7 +41,8 @@ class ManagerWindow {
         ["Settings", 328, 212, 200, "Settings"],
         ["ImportExport", 328, 252, 200, "Import_and_export"],
         ["About", 328, 292, 200, "About_AutoHotFlow"], ["Help", 538, 292, 200, "Help_#noun"],
-        ["ShowLog", 328, 332, 200, "Show_log"], ["Exit", 538, 332, 200, "Exit_#verb"]]
+        ["ShowLog", 328, 332, 200, "Show_log"], ["Exit", 538, 332, 200, "Exit_#verb"],
+        ["Notices", 328, 372, 200, "Notices"]]
     ; The questions: kind -> [title key, text key]. Texts take the arguments of the question.
     static ASK := Map("independent", ["Ask_independent_title", "Ask_independent_text"]
         , "force", ["Ask_force_title", "Ask_force_text"]
@@ -58,6 +60,7 @@ class ManagerWindow {
         this.ops := role.ops           ; the operations (ManagerOps); this window answers their questions
         this.ops.ask := this
         this.logView := ""             ; the LogWindow, made at the first "Show log"
+        this.noticeView := ""          ; the NoticeWindow (WI-0075), made at the first "Notices"
         this.dirty := true
         this.treeDirty := true
         this.labelDirty := Map()      ; flow ID -> true: its state mark changed (the item text only, no rebuild)
@@ -99,6 +102,13 @@ class ManagerWindow {
         OnMessage(ManagerWindow.WM_NOTIFY, this.notifyFn)
         this.timerOn := false
         this.win.onHide := () => this._StopTimer()
+    }
+
+    ; The list of notices (WI-0075): made at the first call, then shown. The model is changed by the role (OpenNotices).
+    ShowNotices() {
+        if (!IsObject(this.noticeView))
+            this.noticeView := NoticeWindow(this.model)
+        this.noticeView.Show()
     }
 
     ; The redraw timer runs only while the window is visible (owner decision, 2026-10-17): it starts when the window is shown
@@ -149,6 +159,8 @@ class ManagerWindow {
         OnMessage(ManagerWindow.WM_NOTIFY, this.notifyFn, 0)
         if (IsObject(this.logView))
             this.logView.Close()
+        if (IsObject(this.noticeView))
+            this.noticeView.Close()
         this.win.Close()
     }
 
@@ -172,6 +184,8 @@ class ManagerWindow {
             this._ShowSelection()
         else if (kind = "trigger")
             this._NoticeTrigger(data)
+        else if ((kind = "notice" || kind = "notices") && IsObject(this.noticeView))
+            this.noticeView.Refresh()
     }
 
     ; The tree follows a selection made by the model (the driver, an operation): the item is selected without rebuilding.
@@ -219,6 +233,8 @@ class ManagerWindow {
                 this.model.Exit()
             case "ShowLog":
                 this.role.OpenLog("")
+            case "Notices":
+                this.role.OpenNotices()
         }
     }
 
@@ -542,7 +558,9 @@ class ManagerWindow {
         if (!rec["enabled"] && rec["independentActive"] > 0)
             marks.Push(Lang("Flow_independent", rec["independentActive"]))
         if (rec["limit"] != "")
-            marks.Push(Lang("Flow_limit"))
+            marks.Push(Lang("Flow_limit", rec["limitValue"]))
+        if (rec["unseen"])
+            marks.Push(Lang("Flow_unseen"))
         if (ManagerModel._TriggerMessages(rec).Length > 0)
             marks.Push(Lang("Flow_trigger_unavailable"))
         if (rec["missingPackages"].Length > 0) {

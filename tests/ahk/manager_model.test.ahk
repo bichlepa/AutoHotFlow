@@ -90,7 +90,8 @@ TestRun.Init()
 TestRun.Case("Start subscribes to engine and process and asks for one snapshot", () => CheckStart())
 CheckStart() {
     pm := NewModel()
-    Assert.Equal(pm[1].topics.Length, 2)
+    Assert.Equal(pm[1].topics.Length, 3)
+    Assert.Equal(pm[1].topics[3], "notice", "the notices of the engine (WI-0075)")
     Assert.Equal(pm[1].requests.Length, 1)
     Assert.Equal(pm[1].requests[1]["type"], "cmd.engine.snapshot")
     Assert.Equal(pm[1].requests[1]["ms"], ManagerModel.SNAPSHOT_MS)
@@ -344,6 +345,56 @@ CheckTrace() {
     off := ManagerModel(peer)
     off.Note("x")
     Assert.Equal(off.Trace().Length, 0, "nothing is kept without TraceOn")
+}
+
+TestRun.Case("An exception notice marks its flow until the flow is selected", () => CheckNoticeMark())
+CheckNoticeMark() {
+    pm := ReadyModel()
+    m := pm[2]
+    m.OnEvent("evt.ui.notice", Evt(100, 11, Map("kind", "exception", "level", "error", "flowId", "A", "key", "Notice_exception"
+        , "args", ["Name A", "t1", "boom"], "held", 0)))
+    Assert.Equal(m.Flow("A")["unseen"], true, "the flow is marked")
+    Assert.Equal(m.Flow("B")["unseen"], false)
+    Assert.Equal(m.notices.Length, 1)
+    Assert.Equal(m.notices[1]["args"][2], "t1", "the element of the notice")
+    m.Select("A")
+    Assert.Equal(m.Flow("A")["unseen"], false, "selecting the flow removes the mark")
+}
+
+TestRun.Case("A limit notice and the limit event keep the value of the limit", () => CheckLimitValue())
+CheckLimitValue() {
+    pm := ReadyModel()
+    m := pm[2]
+    m.OnEvent("evt.flow.limit", Evt(100, 11, Map("flowId", "A", "kind", "executionsPerMinute", "limit", 2000)))
+    Assert.Equal(m.Flow("A")["limit"], "executionsPerMinute")
+    Assert.Equal(m.Flow("A")["limitValue"], 2000)
+    m.OnEvent("evt.ui.notice", Evt(100, 12, Map("kind", "limit", "level", "warning", "flowId", "A", "key", "Notice_limit"
+        , "args", ["Name A", 2000], "held", 0)))
+    Assert.Equal(m.Flow("A")["unseen"], false, "a limit notice does not mark the flow as an error")
+    ; A resync keeps the marks the snapshot does not carry.
+    m.RequestSnapshot("test")
+    pm[1].Answer(Snap(100, 13, ["A", "B"]))
+    Assert.Equal(m.Flow("A")["limit"], "executionsPerMinute", "the mark survives the snapshot while the flow is disabled")
+    Assert.Equal(m.Flow("A")["limitValue"], 2000, "and so does its value")
+}
+
+TestRun.Case("The list of notices keeps the newest 50 and opening it clears the marks", () => CheckNoticeList())
+CheckNoticeList() {
+    pm := ReadyModel()
+    m := pm[2]
+    seq := 10
+    loop ManagerModel.NOTICE_KEEP + 5 {
+        seq += 1
+        m.OnEvent("evt.ui.notice", Evt(100, seq, Map("kind", "storage", "level", "error", "key", "Notice_storage"
+            , "args", ["flows.list", "", "x"], "held", 0)))
+    }
+    Assert.Equal(m.notices.Length, ManagerModel.NOTICE_KEEP)
+    Assert.Equal(m.notices[1]["n"], 6, "the oldest five are gone")
+    m.OnEvent("evt.ui.notice", Evt(100, seq + 1, Map("kind", "exception", "level", "error", "flowId", "B", "key", "Notice_exception"
+        , "args", ["Name B", "t", "boom"], "held", 0)))
+    Assert.Equal(m.Flow("B")["unseen"], true)
+    m.OpenNotices()
+    Assert.Equal(m.Flow("B")["unseen"], false, "opening the list removes the marks")
 }
 
 TestRun.Finish()

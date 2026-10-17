@@ -5,6 +5,7 @@
 #Include ..\core\Time.ahk
 #Include ..\core\Lang.ahk
 #Include ..\core\Role.ahk
+#Include ..\core\NoticeThrottle.ahk
 
 ; Role "tray": the tray icon and the tray menu of the application (WI-0072, E0075, REQ-MGR-090, REQ-MGR-140).
 ;
@@ -21,7 +22,11 @@
 ;                                                supervisor shows the manager, or starts it when it is not running
 ;   Exit           cmd.app.exit {}               the clean exit of the application (ARCHITECTURE 6.3)
 ; It has no flows, no engine and no storage access, subscribes to nothing and holds no state besides the menu.
-; Later entries (language, log; WI-0077, WI-0078) and notices (WI-0075) are added here.
+; Later entries (language, log; WI-0077, WI-0078) are added here.
+;
+; Notices (WI-0075, PROTOCOL 4.7, 4.10): the role subscribes to the topic notice and shows each evt.ui.notice as a tray
+; notice (TrayTip). The tray shows it, not the supervisor: a tray notice belongs to the process that owns the icon. At most
+; one tray notice per 5 s; the others are counted. A headless role only counts.
 ;
 ;   AutoHotkey64.exe src\entry\tray.ahk --role=tray --session=<id> --hub=<pipe> --data=<dir> [--headless]
 ;   --headless   the icon stays hidden (every test run; E0046). Adds cmd.test.command, a driver for the tests that
@@ -37,6 +42,10 @@ class Tray extends Role {
     static KEY_EXIT := "Exit_#verb"
     ; The entries of cmd.test.command, by their name.
     static TEST_ITEMS := Map("show", 1, "exit", 1)
+    ; Notices (WI-0075): at most one tray notice per NOTICE_MS; the title of the balloon.
+    static NOTICE_MS := 5000
+    static NOTICE_TITLE := "AutoHotFlow"
+    static NOTICE_CHARS := 250         ; the balloon of Windows holds about 250 characters
 
     __New(args) {
         super.__New(args)
@@ -45,10 +54,15 @@ class Tray extends Role {
         this.menuExit := ""
         this.lastResult := ""       ; outcome of the last request, for the snapshot
         this.requests := 0
+        this.notices := 0           ; notices received (WI-0075)
+        this.noticesHeld := 0       ; of them, not shown as a tray notice (the throttle)
+        this.lastNotice := ""
+        this.noticeThrottle := NoticeThrottle(Tray.NOTICE_MS)
     }
 
     Start() {
         super.Start()
+        this.peer.Subscribe("notice")
         this._BuildMenu()
         A_IconTip := Tray.TIP
         ; The entry script carries #NoTrayIcon, so the icon appears only here, with the menu already complete.
@@ -56,13 +70,38 @@ class Tray extends Role {
     }
 
     RegisterHandlers() {
+        this.On("evt.ui.notice", (msg) => this._OnNotice(msg))
         if (this.headless)
             this.On("cmd.test.command", (msg) => this._OnTestCommand(msg))
     }
 
     DiagInfo() {
         return Map("iconHidden", Json.Bool(A_IconHidden), "tip", A_IconTip, "items", [this.menuShow, this.menuExit]
-            , "requests", this.requests, "lastResult", this.lastResult)
+            , "requests", this.requests, "lastResult", this.lastResult, "notices", this.notices
+            , "noticesHeld", this.noticesHeld, "lastNotice", this.lastNotice)
+    }
+
+    ; --- notices (WI-0075) -----------------------------------------------------------------------------
+
+    ; evt.ui.notice of the topic notice: the text is translated here (Lang(key, args...)); "held" adds the count of the
+    ; notices the engine held back. The tray notice is shown at most once per NOTICE_MS, the others are only counted.
+    _OnNotice(msg) {
+        p := msg.payload
+        this.notices += 1
+        args := p.Get("args", [])
+        text := Lang(p.Get("key", ""), args*)
+        held := p.Get("held", 0)
+        if (held > 0)
+            text .= " " Lang("Notice_more", held)
+        this.lastNotice := text
+        if (!this.noticeThrottle.Offer("tray", A_TickCount)) {
+            this.noticesHeld += 1
+            return
+        }
+        if (!this.headless) {
+            icon := p.Get("level", "") = "warning" ? "Icon!" : "Iconx"
+            TrayTip(Tray.NOTICE_TITLE, SubStr(text, 1, Tray.NOTICE_CHARS), icon)
+        }
     }
 
     ; (Re)builds the menu from the language texts. A later change of the language calls this again.

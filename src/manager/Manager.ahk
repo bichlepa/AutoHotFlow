@@ -97,6 +97,13 @@ class Manager extends Role {
             this.view.ShowLog()
     }
 
+    ; The list of notices (WI-0075, PROTOCOL 4.8): the marks of the flows go, the window of the list is shown when there is one.
+    OpenNotices() {
+        this.model.OpenNotices()
+        if (IsObject(this.view))
+            this.view.ShowNotices()
+    }
+
     CloseLog() {
         this.model.CloseLog()
         if (IsObject(this.view) && IsObject(this.view.logView))

@@ -33,6 +33,7 @@ class ManagerDriver {
         this.ops["hide"] := (args, done) => this._OpHide(args, done)
         this.ops["log"] := (args, done) => this._OpLog(args, done)
         this.ops["logFilter"] := (args, done) => this._OpLogFilter(args, done)
+        this.ops["notices"] := (args, done) => this._OpNotices(args, done)
         this.ops["answers"] := (args, done) => this._OpAnswers(args, done)
         this.ops["selectToggle"] := (args, done) => this._OpSelectToggle(args, done)
         this.ops["selectCategory"] := (args, done) => this._OpSelectCategory(args, done)
@@ -107,6 +108,13 @@ class ManagerDriver {
         else
             throw AhfError("cmd.test.op log: action must be open or close", ErrCode.BAD_PAYLOAD)
         done(Map("ok", true, "log", this.model.LogState()))
+    }
+
+    ; WI-0075: opens the list of notices (the marks of the flows go, the window is shown when there is one); the answer
+    ; has the list of notices of the model (PROTOCOL 4.8).
+    _OpNotices(args, done) {
+        this.role.OpenNotices()
+        done(Map("ok", true, "notices", this.model.NoticeState()))
     }
 
     ; WI-0080: the filter of the log (level, group, flowId; the keys that are given are changed).
