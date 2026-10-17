@@ -388,3 +388,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** A single-quoted string, as in StoragePaths: `RegExMatch(flowId, '[\/:*?"<>|\x00-\x1F]')`. In AHK v2 a backslash does not escape a quote; the quote is doubled (`""`) or the string is single quoted.
 - **Status:** verified (WI-0076, the engine exited with "Missing ')' before ']'" at load; fixed in src/engine/FlowLifecycle.ahk)
 - **Source:** WI-0076, src/engine/FlowLifecycle.ahk `_CheckFixedId`.
+
+### `Loop files` with the folder flag: check `A_LoopFileAttrib` for "D" and "L"
+
+- **Problem:** A walk of an extracted tree must see the folders (for their names) and must refuse links. Which entries a loop with a folder flag returns is easy to get wrong (the flags D and F), so the code does not rely on the flag alone; the attribute decides (not checked in the docs by the agent).
+- **Wrong:** Trusting that `"D"` alone returns folders only, or checking the file name for the link.
+- **Right:** Loop with `"DFR"` (files and folders, recursive), read `A_LoopFileAttrib`: `D` for a folder, `L` for a link (reparse point). Build the relative name from `A_LoopFilePath` with the root cut off, and use `/` for the folders (ArchiveUnpack `_CheckTree`). Check the attribute in every loop that pushes names.
+- **Status:** verified (WI-0081: the round trip with static variables, `tests/e2e/test_manager_archive.py::test_export_then_import_gives_a_new_disabled_flow_with_its_definition_and_static_variables`; the link case is assumed, no test makes a link)
+- **Source:** `src/storage/ArchiveUnpack.ahk` (`_CheckTree`, `_Read`)

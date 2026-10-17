@@ -198,7 +198,7 @@ L121-127 `Array` has no `Sort` method in AHK v2 (verified)
 L129-135 `Map` keys are case-sensitive by default; compare names with `==` when the case matters (verified)
 ```
 
-## doc/howto/processes-pipes-messages.md (43.4 KB, 381 lines)
+## doc/howto/processes-pipes-messages.md (44.8 KB, 389 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L13-17 `PostMessageW` with a NULL handle reports success (verified)
@@ -243,9 +243,10 @@ L351-357 An event of a trigger can arrive before the answer that arms it (verifi
 L359-365 An error in a request callback ends that request, the step after it never runs (verified)
 L367-373 Reading the end of a log file that other processes append to (verified)
 L375-380 A ListView that follows a growing list keeps the row numbers of the model (assumed)
+L382-388 A child process from a queue operation (tar.exe), without waiting (partly verified)
 ```
 
-## doc/howto/syntax-and-language.md (39.9 KB, 390 lines)
+## doc/howto/syntax-and-language.md (41.0 KB, 398 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -295,6 +296,7 @@ L361-366 An optional regex group that did not match gives an empty string, and a
 L368-374 A function kept in a property is called with the object as first argument (verified)
 L376-382 `as` and `catch as` are reserved: no parameter named `as` (verified)
 L384-390 A double quote inside a double-quoted string is written `""`, not `\"` (verified)
+L392-398 `Loop files` with the folder flag: check `A_LoopFileAttrib` for "D" and "L" (partly verified)
 ```
 
 ## doc/howto/tests-and-tools.md (42.2 KB, 418 lines)

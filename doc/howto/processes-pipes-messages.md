@@ -379,3 +379,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** assumed (the logic is in `src/manager/LogWindow.ahk`; the window was not run by the agents, `gui` tier is for the owner)
 - **Source:** `src/manager/LogWindow.ahk` (`_Update`, `_Rebuild`)
 
+### A child process from a queue operation (tar.exe), without waiting
+
+- **Problem:** The archive operations of storage run `tar.exe`, which takes a moment. A `RunWait` would block the message pump of storage; a loop with `Sleep` is forbidden; a request that asks again (`retry`) in the normal queue would spin at full CPU, because the request queue has no delay for its retries.
+- **Wrong:** `RunWait(tarCmd)` in the operation, or `Add` (normal queue) with `retry` and `retryDelayMs` (the delay is not honoured for requests, so the loop runs at 1 ms).
+- **Right:** `Run(cmdLine, , "Hide", &pid)` starts `cmd.exe`, which runs tar and writes `ok` or `fail` into a file when it is done. The operation goes into the low-priority queue (`queue.AddLow`) with `retryMs` and `retryDelayMs`; the low queue honours the delay of a retry (`notBefore`). The operation checks `FileExist(code)` and `ProcessExist(pid)` each time. Write the answer file with the words `echo ok>` and `echo fail>`: a digit before `>` (`echo 0>`) would be read by cmd as a handle redirection (assumed, not tested).
+- **Status:** verified (WI-0081, `tests/e2e/test_manager_archive.py`, 18 tests green serially; the queue and the process check by the e2e tests); the remark on `echo 0>` is assumed
+- **Source:** `src/storage/ArchiveTar.ahk`, `src/storage/Storage.ahk` (`_DeferBackground`), `src/storage/WriteQueue.ahk`
+
