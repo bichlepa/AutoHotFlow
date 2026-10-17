@@ -309,7 +309,7 @@ class FlowRunner:
                 if time.monotonic() > deadline:
                     raise AssertionError("no connection to the hub of the session:\n" + self.stderr_text())
                 time.sleep(0.005)
-        for topic in ["log"] + ["flow:" + f for f in self.flows]:
+        for topic in ["log", "notice"] + ["flow:" + f for f in self.flows]:
             self.request_ok("supervisor", "cmd.topic.subscribe", {"topic": topic})
         self._rec = Recorder(self._obs)
 
