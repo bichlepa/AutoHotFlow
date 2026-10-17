@@ -1055,7 +1055,7 @@
                 "start",
                 "--fresh",
                 "--",
-                "--start=storage,engine,manager,debug"
+                "--start=storage,engine,triggerhost,manager,debug"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -1138,22 +1138,6 @@
                 "--",
                 "--start=storage,engine,triggerhost,manager",
                 "--windows-startup"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Start: manual check 6, manager for the import from v1 in a fresh data folder (manual_check.py)",
-            "type": "process",
-            "command": "python",
-            "args": [
-                "tools/manual_check.py",
-                "start",
-                "--fresh",
-                "--",
-                "--start=storage,engine,manager"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

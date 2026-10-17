@@ -13,11 +13,11 @@ Where a step starts the application, the VS Code task is named by its label in `
 Test on the manager window (REQ-MGR-010 to REQ-MGR-050, REQ-MIG-060, REQ-USE-030, REQ-LNG-010). Not automated: the tests use the headless manager (`--headless`), and the window and its drag and drop are only checked by the gui tier, which agents do not run. Written after block A of S0004 (WI-0076).
 
 **Start, part A (the tree and the operations).** VS Code task "Start: manual check 1, manager in a fresh data folder (manual_check.py)", or in a terminal:
-`python tools/manual_check.py start --fresh -- --start=storage,engine,manager,debug`
+`python tools/manual_check.py start --fresh -- --start=storage,engine,triggerhost,manager,debug`
 
 The start prepares a fresh data folder first (see above), so no preparation by hand is needed. It also starts the debug window.
 
-**Start, part B (the import from v1).** VS Code task "Setup: copy of the v1 data folder for the import check (manual_check.py copy-v1)" first: it copies `%APPDATA%\AutoHotFlow` (the v1 data folder, only read) to `%TEMP%\ahf_manual_check_v1`. Then the VS Code task "Start: manual check 6, manager for the import from v1 in a fresh data folder (manual_check.py)", or in a terminal `python tools/manual_check.py start --fresh -- --start=storage,engine,manager`. The import in part B takes the copy, not the original; the folder dialog of the button opens at `%APPDATA%\AutoHotFlow`, so the copy has to be chosen by hand.
+**Start, part B (the import from v1).** VS Code task "Setup: copy of the v1 data folder for the import check (manual_check.py copy-v1)" first: it copies `%APPDATA%\AutoHotFlow` (the v1 data folder, only read) to `%TEMP%\ahf_manual_check_v1`. Then the same start as in part A (the task "Start: manual check 1 ..."). The import in part B takes the copy, not the original; the folder dialog of the button opens at `%APPDATA%\AutoHotFlow`, so the copy has to be chosen by hand.
 
 ### Steps, part A
 
@@ -59,6 +59,20 @@ The start prepares a fresh data folder first (see above), so no preparation by h
 | 24 | At 225 % scaling (Windows settings): open the manager and the report window, look at both. | Both windows are sharp. The text of the buttons fits. The report text is readable and can be scrolled. | |
 | 25 | Kill the manager process by hand (Task Manager, or the debug window's Processes tab). The tray icon stays. Then double-click the tray icon. | The manager does not come back by itself: the supervisor does not restart it (source: `src/supervisor/Children.ahk`, `AUTO_RESTART` has no manager). The double click starts a new manager, which shows its window; the log says `manager is not running (not_running), started it`. Source checked, not yet by hand. | |
 | 26 | Watch for dialogs during the whole check. | No dialog (window class `#32770`) appears except the questions of the steps above. | |
+
+### Steps, part D (enabling imported flows, notices, categories)
+
+Start part B first (or continue in its window), so that imported v1 flows exist. Some of them may use a trigger or an element of a package that v2 does not have yet.
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 27 | Select an imported flow that has a trigger and click Enable. Watch for up to 30 s. | If all its triggers are available: the state mark changes to enabled, nothing else. If a trigger is not available (missing package, not ported yet): a dialog "Trigger not available" names the flow and the reason; the flow stays enabled, the tree line carries the mark `a trigger is not available`. Known: the message is a blocking dialog, not a notice (F-0123), and the dialog leaves too little room for the text (owner's finding; check that you can still read the full reason, otherwise note it). | |
+| 28 | Look at the tree line of a flow with an element of a missing package (any element type, not only the trigger). | The line names the missing packages (`missing package: <package>`), also when the flow is disabled. | |
+| 29 | Click Notices after step 27. | The list opens. Note whether the unavailable trigger is listed there (not expected while F-0123 is open). | |
+| 30 | Disable the flow of step 27 again. | The mark of the unavailable trigger and the enabled mark go away; no question appears (a question only comes for independent triggers, step 6). | |
+| 31 | Create a category `Tests` with two flows in it. Select the category and click Delete; answer No, then Delete again and answer Yes. | With No nothing changes. With Yes a second question asks where the flows of the category go; after the choice they are in that category and the category is gone. Cancelling the second question keeps the category. | |
+| 32 | Select a flow, click Change category and choose another category. Rename a category (to a name that exists, ignoring case, and to a free name). | The flow moves. The taken name is refused in the dialog, the free name is applied. Both survive a restart. | |
+| 33 | Read the text of every dialog of this check (questions, folder dialog, report, notices). | No text is clipped; the full text is readable without resizing. Report each clipped dialog (the owner's finding: the dialogs of the manager leave too little space for the text). | |
 
 **Not covered by these checks** (listed as not checked in the source): drag and drop with a real mouse at 225 %, the folder dialog with a network folder, a v1 folder with a shortcut to another v1 installation, and a v1 folder that is larger than a few hundred flows (not measured).
 
@@ -169,10 +183,6 @@ The same flow, started as after a start of Windows. The supervisor option `--win
 | 4 | Press `Ctrl+Alt+Shift+F12` once. | The tooltip "Hotkey fired" appears (as in section 4, step 3). | pass |
 | 5 | Quit the application, then start it again with the task of section 4 (no option). | The second start shows no tooltip "Started with Windows". | pass |
 | 6 | Watch for dialogs during the whole check. | No dialog appears. | pass |
-
-## 6. Checks that wait for a decision of the project owner
-
-None open. The `gui` tests of the hotkey trigger (key combinations, wildcard, F13) are `tests/integration/test_hotkey_input.py` (VS Code task "Test: hotkey input with key combinations (gui...)"), and the hotkey part of the trigger measurement is `tests/stress/test_trigger_host_busy.py` (MS-0040). Both run on this PC while nobody uses the keyboard.
 
 ## Result
 
