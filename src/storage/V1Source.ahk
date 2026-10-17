@@ -72,7 +72,11 @@ class V1Source {
 
     ; Map(exists, v1, target) of the shortcut AutoHotFlow.lnk in the startup folder. v1 is true when the target is the
     ; executable of v1 (AutoHotFlow.exe); the v2 shortcut targets AutoHotkey64.exe.
-    static Autostart(startupDir) {
+    ; v1Dir: the v1 data folder the user imports from ("" when unknown). v1 is true only when the target has the name of v1,
+    ; is not the running v2 product (src\AutoHotFlow.ahk), and lies in v1Dir or in a folder with the v1 layout (Saved Flows or
+    ; Variables; the portable v1 keeps its data beside the executable). An installed v1 whose data is in %APPDATA% is
+    ; recognised by its name only when its install folder is not v1Dir (F-9001).
+    static Autostart(startupDir, v1Dir := "") {
         filePath := V1Source._Shortcut(startupDir)
         if (FileExist(filePath) = "")
             return Map("exists", Json.Bool(false), "v1", Json.Bool(false), "target", "")
@@ -83,13 +87,13 @@ class V1Source {
             throw AhfError("the shortcut '" filePath "' cannot be read: " e.Message, ErrCode.INTERNAL)
         }
         SplitPath(target, &targetName)
-        return Map("exists", Json.Bool(true), "v1", Json.Bool(V1Source._IsV1Name(targetName)), "target", target)
+        return Map("exists", Json.Bool(true), "v1", Json.Bool(V1Source._IsV1Target(target, targetName, v1Dir)), "target", target)
     }
 
     ; Deletes the shortcut when it points to v1. Map(removed): false when there is no shortcut. denied for a shortcut of another
     ; program (it is kept).
-    static RemoveAutostart(startupDir) {
-        state := V1Source.Autostart(startupDir)
+    static RemoveAutostart(startupDir, v1Dir := "") {
+        state := V1Source.Autostart(startupDir, v1Dir)
         if (!V1Source._Truth(state["exists"]))
             return Map("removed", Json.Bool(false))
         if (!V1Source._Truth(state["v1"]))
@@ -104,6 +108,18 @@ class V1Source {
 
     ; A truth value of a state Map (Json.Bool gives the sentinel objects, which are true or false too).
     static _Truth(v) => (v == Json.True || (!IsObject(v) && (v = 1 || v = "true")))
+
+    static _IsV1Target(target, fileName, v1Dir) {
+        if (!V1Source._IsV1Name(fileName))
+            return false
+        product := "\src\autohotflow.ahk"
+        if (StrLen(target) >= StrLen(product) && StrLower(SubStr(target, -StrLen(product))) = product)
+            return false                                  ; the running v2 product
+        SplitPath(target, , &dirPath)
+        if (v1Dir != "" && StrLower(RTrim(dirPath, "\")) = StrLower(RTrim(v1Dir, "\")))
+            return true
+        return DirExist(dirPath "\" V1Source.FLOWS_DIR) || DirExist(dirPath "\" V1Source.VARS_DIR)
+    }
 
     static _IsV1Name(fileName) {
         for name in V1Source.V1_NAMES {

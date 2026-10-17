@@ -248,12 +248,14 @@ class Storage extends Role {
     ; cmd.storage.autostart.* (WI-0076, E0068): the shortcut of v1 in the startup folder the manager names.
     _CmdAutostartCheck(msg) {
         startupDir := msg.payload.Get("startupDir", "")
-        return this._Defer(msg, "autostart.check", startupDir, () => V1Source.Autostart(startupDir))
+        v1Dir := msg.payload.Get("v1Dir", "")
+        return this._Defer(msg, "autostart.check", startupDir, () => V1Source.Autostart(startupDir, v1Dir))
     }
 
     _CmdAutostartRemove(msg) {
         startupDir := msg.payload.Get("startupDir", "")
-        return this._Defer(msg, "autostart.remove", startupDir, () => V1Source.RemoveAutostart(startupDir))
+        v1Dir := msg.payload.Get("v1Dir", "")
+        return this._Defer(msg, "autostart.remove", startupDir, () => V1Source.RemoveAutostart(startupDir, v1Dir))
     }
 
     ; cmd.storage.log.tail (WI-0080, PROTOCOL 4.6): the last entries of Log.txt or of one source file. Queued like every
