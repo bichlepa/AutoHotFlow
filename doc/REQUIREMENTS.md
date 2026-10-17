@@ -237,11 +237,11 @@ Every element that can wait (REQ-EXE-100) has a setting "maximum run time". The 
 ### REQ-EXE-170 Runaway flows are stopped
 
 - **v1:** no
-- **v2:** partial (the three limits work per flow with the defaults from MS-0036, set in the flow file; the notice in the manager and the global defaults are missing)
+- **v2:** partial (the three limits work per flow with the defaults from MS-0036, set in the flow file; the notice (tray and manager list, WI-0075) is there; the global defaults and the switch of the notice are missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0003 (WI-0066, done), S0004 (global defaults, notice), S0007 (per flow, editing)
-- **Evidence:** `tests/ahk/engine_runaway.test.ahk`, `tests/integration/test_runaway.py::test_an_endless_loop_is_stopped_and_its_triggers_stay_disabled_after_a_restart`, `tests/integration/test_runaway.py::test_a_flood_of_refused_starts_is_answered_and_logged_a_few_times`
+- **Plan:** S0003 (WI-0066, done), S0004 (global defaults; the notice, WI-0075, done), S0007 (per flow, editing)
+- **Evidence:** `tests/ahk/engine_runaway.test.ahk`, `tests/integration/test_notices.py::test_a_stop_by_the_runaway_guard_gives_a_notice_with_the_limit`, `tests/integration/test_runaway.py::test_an_endless_loop_is_stopped_and_its_triggers_stay_disabled_after_a_restart`, `tests/integration/test_runaway.py::test_a_flood_of_refused_starts_is_answered_and_logged_a_few_times`
 
 A flow that runs away does not disturb the others (decision E0062, after the model of the Android app AutoMagic). A flow that executes more elements per minute than its limit (the trigger of each new instance counts) is stopped and all its triggers are disabled, also those that do not switch with the flow; the user is told. A start that would exceed the limit of waiting instances (policy `wait`) or of running instances of a flow is refused like the policy `skip`; a flow that calls it learns this (`exception`). The limits have global defaults and can be changed per flow; 0 means no limit. The defaults are chosen so that a loop over a long list passes.
 
@@ -2675,10 +2675,11 @@ An experimental element is marked in the list and in its settings ("This element
 ### REQ-USE-030 Messages reach the user without blocking dialogs
 
 - **v1:** partial (dialogs from the execution under the global lock, MIGRATION M-0008)
-- **v2:** open
+- **v2:** partial (WI-0075: the notices of unhandled exceptions, runaway stops and storage errors reach the tray and the manager's list, without a dialog; not checked: the tray notice itself on a real tray (headless tests only count it), and a notice of a flow file that cannot be saved, which no test provokes)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004
+- **Plan:** S0004 (WI-0075 done; the flow file notice and the real tray check open)
+- **Evidence:** - **Evidence:** `tests/integration/test_notices.py::test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray`, `tests/integration/test_notices.py::test_a_burst_of_errors_gives_one_notice_at_once_and_the_count_when_the_window_ends`, `tests/integration/test_notices.py::test_a_stop_by_the_runaway_guard_gives_a_notice_with_the_limit`, `tests/ahk/core_notice_throttle.test.ahk`, `tests/ahk/manager_model.test.ahk`
 
 Errors and warnings that have no window of their own (for example a flow file that cannot be saved) reach the user as notices in the tray or the manager, never as a dialog that blocks the running flows.
 
@@ -2751,10 +2752,11 @@ Every hint that is not critical (for example "take care with global variables", 
 ### REQ-USE-080 Unhandled errors of a flow are noticed
 
 - **v1:** yes (read: a window with the message that does not block; a new error replaces the window shown)
-- **v2:** open
+- **v2:** partial (part 1 done in WI-0075: the notice (tray and list) and the mark of the flow until it is selected or the list is opened; the window with the variables of the branch is missing; the switch per flow is missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0004 (notice and mark in the manager), S0007 (the window with the variables), E0072
+- **Plan:** S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables), E0072
+- **Evidence:** `tests/integration/test_notices.py::test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray`, `tests/integration/test_notices.py::test_opening_the_list_of_notices_removes_the_marks_and_keeps_the_entries`, `tests/fault/test_manager_window.py::test_an_error_notice_shows_in_the_list_of_notices_opened_by_its_button`, `tests/ahk/manager_model.test.ahk`
 
 When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the user learns it without reading the log: a window like the debug dialog (REQ-DBG-060) shows the error message, the element and the variables of the branch at the moment of the error. Unlike the debug dialog it does not halt anything, because the branch has already ended; the variables can be looked at, not changed. The flow also gets a mark in the manager until the user has looked at the error. Many errors in a short time give one notice. The notice can be switched off per flow and globally (REQ-USE-070).
 

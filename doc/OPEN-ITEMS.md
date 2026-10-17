@@ -21,9 +21,15 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0110 | Foundation tier: `test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` found the storage process still alive after the session ended (the symptom of F-0095) | observed once under load, run 20261016-211715-c03b628b on `c03b628`; not reproduced; the engine's shutdown adds no request to storage in this scenario (the trigger state is not marked); open, watch |  |
 | F-0111 | Fast tier: `tests/integration/test_worker.py::test_worker_reports_busy_when_a_job_begins_and_ends` saw `[False, True, False]` as the `sys.busy` values instead of `[True, False]` | observed once (run 20261016-225151-4328, commit a3c0dad plus WI-0063 changes that do not touch workers); not reproduced; open, watch the history | |
 | F-0115 | Fast tier: 10 tests of `tests/integration/test_hotkey_input.py` (`@input`) failed in run 20261017-105241-27428 (commit 237441d plus uncommitted test changes, WI-0070 branch): "the probe key vk88 did not arrive although the input desktop is usable and no modifier is held: hotkey path, not the desktop" | cause found: the input desktop was locked (LogonUI.exe) and the `tasklist` output of the LogonUI check could not be decoded (OEM code page); both fixed (91b08a7, cb7bee9, WI-0064); the skip on a real lock screen is not yet seen, see NEEDS-ATTENTION | |
+| F-9000 | A trigger that is not available after the user enabled its flow is shown as a dialog (`ManagerWindow._NoticeTrigger`, `UiDialogs.Confirm`), not as a notice; REQ-USE-030 asks for notices (tray or list) for messages without a window of their own | open; the flow is not blocked, but the window waits for a click; the change needs the trigger message routed through the notice path (WI-0075 built it) | WI-0075 |
 | F-0114 | Load warnings in the trigger host and in `Trigger_Start_up`: a local `message` (`TriggerHost._CmdArm`, `ReportCallbackError`) and a local `type` (`Trigger_Start_up.Enable`) are reported as the same name as a global variable on every start of the trigger host (seen in the engine and triggerhost logs, WI-0064); the same trap as in `doc/howto/gui-and-hotkeys.md` (case-insensitive names) | observed, not checked whether it changes behaviour; a rename of the locals removes the warnings | |
 
 ## Findings
+
+### F-9000: The trigger-not-available message is a dialog, not a notice
+
+**What:** After the user enabled a flow, a trigger that cannot be armed (REQ-MIG-070) is shown with `UiDialogs.Confirm` (`src/manager/ManagerWindow.ahk`, `_NoticeTrigger`). REQ-USE-030 asks that messages without a window of their own reach the user as notices, and WI-0075 built that path (`evt.ui.notice`, the list of notices). The dialog does not block the flows, but it waits for a click and does not appear in the list.
+**Status:** open, found in WI-0075; the change is small (send the message as a notice of the manager, or mark the flow), but it changes what the user sees for REQ-MIG-070, so it needs the owner's decision.
 
 ### F-0115: Fast tier: hotkey input tests fail when the input desktop is locked
 

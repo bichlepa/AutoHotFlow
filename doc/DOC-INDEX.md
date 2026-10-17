@@ -152,7 +152,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (21.9 KB, 161 lines)
+## doc/howto/gui-and-hotkeys.md (22.8 KB, 169 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -174,6 +174,7 @@ L133-138 A tree drag is started by TVN_BEGINDRAG; the drop is found by a timer t
 L140-146 TVM_GETITEMW returned 0 for a tree item in a test helper; the cause is not found (not checked) (partly verified)
 L148-153 A Ctrl click in a TreeView is read in the ItemSelect handler with GetKeyState (assumed) (assumed)
 L155-161 TVM_GETITEMRECT (and other messages with a pointer) returns 0 for a tree of another process (verified) (verified)
+L163-169 A tray notice (TrayTip) is shown by the process that owns the tray icon (assumed) (assumed)
 ```
 
 ## doc/howto/objects-maps-arrays.md (11.0 KB, 135 lines)

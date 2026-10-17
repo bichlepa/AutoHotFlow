@@ -159,3 +159,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Allocate the RECT in the process that owns the tree (`VirtualAllocEx`, `WriteProcessMemory` with the item handle in the first pointer-size bytes, send, `ReadProcessMemory`, `VirtualFreeEx`). Set `argtypes` for the kernel32 calls (64-bit pointers).
 - **Status:** verified (`tests/fault/test_manager_window.py`: 7 gui tests pass; the drag test fails when the drop target is the start position).
 - **Source:** `tests/fault/test_manager_window.py` (`_remote_item_rect`)
+
+### A tray notice (TrayTip) is shown by the process that owns the tray icon (assumed)
+
+- **Problem:** The notices of the engine should appear as tray notices. The supervisor has no icon; the icon belongs to the tray role.
+- **Wrong:** Calling `TrayTip` in the supervisor, or in any role without an icon of its own. The balloon is attached to the icon of the calling script, and a script without an icon has none to attach it to.
+- **Right:** The tray role subscribes to the notice topic and calls `TrayTip` itself (`src/tray/Tray.ahk`, `_OnNotice`), at most one per 5 s; headless it only counts.
+- **Status:** assumed (the rule of the icon owner is from the Windows shell documentation as remembered; no test shows a real balloon, the headless tests count only). Not checked: the balloon on a real desktop.
+- **Source:** `src/tray/Tray.ahk` (`_OnNotice`), `tests/integration/test_notices.py::test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray`

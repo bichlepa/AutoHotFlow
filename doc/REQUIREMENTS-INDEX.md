@@ -27,8 +27,8 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Security (SEC)](#security-sec) | 7 | 2 | 1 | 0 | 3 | 1 | 1 |
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
-| [Usability (USE)](#usability-use) | 10 | 0 | 0 | 2 | 8 | 0 | 0 |
-| **All** | **221** | **60** | **1** | **49** | **110** | **1** | **6** |
+| [Usability (USE)](#usability-use) | 10 | 0 | 0 | 4 | 6 | 0 | 0 |
+| **All** | **221** | **60** | **1** | **51** | **108** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -50,7 +50,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-EXE-140](REQUIREMENTS.md#req-exe-140-every-element-and-flow-shows-its-state) | L204-213 | Every element and flow shows its state | yes | partial | must | port | S0004 (manager), S0005 (editor) |
 | [REQ-EXE-150](REQUIREMENTS.md#req-exe-150-elements-with-any-number-of-named-outputs) | L215-225 | Elements with any number of named outputs | no | open | could | later | - |
 | [REQ-EXE-160](REQUIREMENTS.md#req-exe-160-time-limit-per-element) | L227-235 | Time limit per element | no | open | could | later | - |
-| [REQ-EXE-170](REQUIREMENTS.md#req-exe-170-runaway-flows-are-stopped) | L237-246 | Runaway flows are stopped | no | partial | should | port | S0003 (WI-0066, done), S0004 (global defaults, notice), S0007 (per flow, editing) |
+| [REQ-EXE-170](REQUIREMENTS.md#req-exe-170-runaway-flows-are-stopped) | L237-246 | Runaway flows are stopped | no | partial | should | port | S0003 (WI-0066, done), S0004 (global defaults; the notice, WI-0075, done), S0007 (per flow, editing) |
 
 ## Expressions and variables (VAR)
 
@@ -347,11 +347,11 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 |---|---|---|---|---|---|---|---|
 | [REQ-USE-010](REQUIREMENTS.md#req-use-010-user-level-hides-advanced-elements) | L2655-2663 | User level hides advanced elements | yes | open | should | port | S0004 (setting), S0007 (element list) |
 | [REQ-USE-020](REQUIREMENTS.md#req-use-020-experimental-elements-are-marked) | L2665-2673 | Experimental elements are marked | yes | open | could | port | S0007 |
-| [REQ-USE-030](REQUIREMENTS.md#req-use-030-messages-reach-the-user-without-blocking-dialogs) | L2675-2683 | Messages reach the user without blocking dialogs | partial | open | must | port | S0004 |
-| [REQ-USE-040](REQUIREMENTS.md#req-use-040-the-user-interface-stays-responsive) | L2685-2694 | The user interface stays responsive | no | partial | must | port | S0004 to S0007 |
-| [REQ-USE-100](REQUIREMENTS.md#req-use-100-setup-assistant-at-the-first-start) | L2696-2711 | Setup assistant at the first start | no | open | should | later | - |
-| [REQ-USE-050](REQUIREMENTS.md#req-use-050-the-setup-assistant-asks-for-the-users-experience) | L2713-2729 | The setup assistant asks for the user's experience | no | open | should | later | - |
-| [REQ-USE-060](REQUIREMENTS.md#req-use-060-amount-of-hints) | L2731-2739 | Amount of hints | no | open | should | later | - |
-| [REQ-USE-070](REQUIREMENTS.md#req-use-070-hints-can-be-switched-off-one-by-one) | L2741-2749 | Hints can be switched off one by one | no | open | should | later | - |
-| [REQ-USE-080](REQUIREMENTS.md#req-use-080-unhandled-errors-of-a-flow-are-noticed) | L2751-2759 | Unhandled errors of a flow are noticed | yes | open | should | port | S0004 (notice and mark in the manager), S0007 (the window with the variables), E0072 |
-| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2761-2770 | Sharp and correctly sized on high-resolution displays | no | partial | should | port | dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0006 |
+| [REQ-USE-030](REQUIREMENTS.md#req-use-030-messages-reach-the-user-without-blocking-dialogs) | L2675-2684 | Messages reach the user without blocking dialogs | partial | partial | must | port | S0004 (WI-0075 done; the flow file notice and the real tray check open) |
+| [REQ-USE-040](REQUIREMENTS.md#req-use-040-the-user-interface-stays-responsive) | L2686-2695 | The user interface stays responsive | no | partial | must | port | S0004 to S0007 |
+| [REQ-USE-100](REQUIREMENTS.md#req-use-100-setup-assistant-at-the-first-start) | L2697-2712 | Setup assistant at the first start | no | open | should | later | - |
+| [REQ-USE-050](REQUIREMENTS.md#req-use-050-the-setup-assistant-asks-for-the-users-experience) | L2714-2730 | The setup assistant asks for the user's experience | no | open | should | later | - |
+| [REQ-USE-060](REQUIREMENTS.md#req-use-060-amount-of-hints) | L2732-2740 | Amount of hints | no | open | should | later | - |
+| [REQ-USE-070](REQUIREMENTS.md#req-use-070-hints-can-be-switched-off-one-by-one) | L2742-2750 | Hints can be switched off one by one | no | open | should | later | - |
+| [REQ-USE-080](REQUIREMENTS.md#req-use-080-unhandled-errors-of-a-flow-are-noticed) | L2752-2761 | Unhandled errors of a flow are noticed | yes | partial | should | port | S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables), E0072 |
+| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2763-2772 | Sharp and correctly sized on high-resolution displays | no | partial | should | port | dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0006 |
