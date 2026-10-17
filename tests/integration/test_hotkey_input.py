@@ -64,6 +64,15 @@ class InputRunner(FlowRunner):
             inputlock.baseline_missed("the probe key vk%X" % PROBE_VK)    # skip only for a desktop reason, else fail
 
 
+@pytest.fixture(scope="session", autouse=True)
+def input_desktop_check():
+    """Runs once per session (WI-0064): without a usable input desktop every test of this module skips at the start,
+    with the reason of inputlock.session_skip_reason, before any flow runs."""
+    reason = inputlock.session_skip_reason(inputlock.input_desktop_open())
+    if reason:
+        pytest.skip(reason)
+
+
 @pytest.fixture
 def input_session(procs, datadir, session_id):
     """A session with the trigger host (see InputRunner). Skips when there is no input desktop."""

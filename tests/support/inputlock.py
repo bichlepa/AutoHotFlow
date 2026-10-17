@@ -131,6 +131,15 @@ def input_desktop_open():
     return True
 
 
+DESKTOP_UNUSABLE_REASON = "the input desktop is not usable (locked workstation or secure desktop)"
+
+
+def session_skip_reason(desktop_open):
+    """The skip reason for all input tests of a session, decided once at its start from input_desktop_open(); None when
+    the input desktop is usable. Pure, so the decision can be tested without a desktop."""
+    return None if desktop_open else DESKTOP_UNUSABLE_REASON
+
+
 def _key(vk, up):
     return _INPUT(INPUT_KEYBOARD, _INPUTUNION(ki=_KEYBDINPUT(vk, 0, KEYEVENTF_KEYUP if up else 0, 0, 0)))
 

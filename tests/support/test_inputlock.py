@@ -60,6 +60,12 @@ def test_a_fresh_lock_that_is_renamed_by_mistake_is_given_back(lockfile):
     assert not list(lockfile.parent.glob(inputlock.LOCK_NAME + ".stale.*"))
 
 
+def test_the_session_check_skips_with_the_desktop_reason_only_without_a_usable_desktop():
+    assert inputlock.session_skip_reason(True) is None
+    assert inputlock.session_skip_reason(False) == inputlock.DESKTOP_UNUSABLE_REASON
+    assert "input desktop" in inputlock.DESKTOP_UNUSABLE_REASON and "secure desktop" in inputlock.DESKTOP_UNUSABLE_REASON
+
+
 def test_release_leaves_a_lock_of_someone_else(lockfile):
     with inputlock.input_lock(stale_s=STALE_S):
         lockfile.write_text("pid 1 since 0\n", encoding="ascii")      # replaced behind our back
