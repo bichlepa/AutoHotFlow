@@ -204,6 +204,7 @@ def test_engine_loads_flow_announces_ready_and_answers_snapshot(procs, datadir, 
         flow = snap["flows"][0]
         assert flow["name"] == "Skeleton" and flow["rev"] == 1
         assert flow["enabled"] is False and flow["executing"] is False   # real JSON booleans (PROTOCOL 2)
+        assert flow["independentActive"] == 0 and "stateError" not in flow   # as evt.flow.state (WI-0073)
         assert snap["settings"] == {}
         assert snap["ready"] is True                                    # a late client reads it here (F-0090)
 
@@ -1051,6 +1052,10 @@ def test_an_unreadable_flow_state_affects_that_flow_only(procs, runs, pipe, sess
         snap = ask(obs, "cmd.engine.snapshot")
         assert flow_enabled(snap, "ok") is True, "a readable flow keeps its state"
         assert flow_enabled(snap, "sw") is False
+        # The snapshot carries what evt.flow.state carries, so a resync of the manager loses nothing (WI-0073).
+        by_id = {f["flowId"]: f for f in snap["flows"]}
+        assert "stateError" in by_id["sw"] and "stateError" not in by_id["ok"], by_id
+        assert by_id["ok"]["independentActive"] == 0
         # A switch of the unknown flow is refused, and nothing changes.
         answer = obs.request("engine", "cmd.flow.enable", {"flowId": "sw"}, timeout=scaled(10))["payload"]
         assert answer["ok"] is False and "cannot be read" in answer["message"], answer

@@ -480,9 +480,13 @@ class Engine extends Role {
     _CmdSnapshot(msg) {
         list := []
         for rec in this.flows.All() {
-            list.Push(Map("flowId", rec.FlowId, "name", rec.Def.Name, "category", rec.Def.Category
+            entry := Map("flowId", rec.FlowId, "name", rec.Def.Name, "category", rec.Def.Category
                 , "enabled", Json.Bool(rec.IsFlowEnabled()), "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))
-                , "rev", rec.Rev, "triggers", this.arms.Snapshot(rec)))
+                , "rev", rec.Rev, "independentActive", rec.IndependentActiveCount(), "triggers", this.arms.Snapshot(rec))
+            stateError := this.flowState.ErrorOf(rec.FlowId)
+            if (stateError != "")
+                entry["stateError"] := stateError       ; as in evt.flow.state: the state is unknown (E0063)
+            list.Push(entry)
         }
         ; "ready": the start is complete (evt.engine.ready was sent). A client that subscribed late cannot know it from the
         ; event (F-0090).
