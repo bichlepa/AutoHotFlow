@@ -99,7 +99,7 @@ An incorrectly classified inline action does not fail silently: the engine watch
 |---|---:|---|---|---|
 | `supervisor` | 1 | start, monitoring, restart, shutdown, hub/router (no icon of its own: the tray icon is the role `tray`'s, E0075) | process list, session ID | business logic, file I/O, dialogs |
 | `storage` | 1 | file access, log sink, settings file | all files under the data directory | business decisions, dialogs |
-| `engine` | 1 | flow definitions (committed), instances, threads, variables, execution of inline elements, trigger target state | runtime state | block, touch files, show dialogs |
+| `engine` | 1 | flow definitions (committed), instances, threads, variables, execution of inline elements, trigger target state, categories and the order of the flow list (E0067) | runtime state | block, touch files, show dialogs |
 | `triggerhost` | 1 (later n) | arm triggers, report events | OS handles of the triggers (hotkeys, hooks, timers) | execute flows |
 | `tray` | 1 | the tray icon and the tray menu of the application ("Show manager", "Exit"; later language and log); sends its commands to the supervisor (E0075, WI-0072). A menu stops the threads of the process that shows it, so it has a process of its own; the supervisor starts it and starts it again when it dies (the icon must come back) | the menu | flows, engine, storage access, windows |
 | `manager` | 0..1 | flow list, categories, settings, import/export, log display | window state | execute flows |
