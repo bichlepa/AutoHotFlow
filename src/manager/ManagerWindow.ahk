@@ -3,6 +3,7 @@
 #Include ..\core\Time.ahk
 #Include ..\ui_common\UiWindow.ahk
 #Include ManagerModel.ahk
+#Include LogWindow.ahk
 
 ; The main window of the manager (WI-0073; REQ-MGR-080, REQ-USE-040, REQ-USE-090): the view of the ManagerModel. It holds no
 ; logic of its own: it draws what the model holds and calls the operations of the model for the buttons.
@@ -32,8 +33,10 @@ class ManagerWindow {
         ["About", 328, 292, 200, "About_AutoHotFlow"], ["Help", 538, 292, 200, "Help_#noun"],
         ["ShowLog", 328, 332, 200, "Show_log"], ["Exit", 538, 332, 200, "Exit_#verb"]]
 
-    __New(model) {
+    __New(model, role := "") {
         this.model := model
+        this.role := role              ; the Manager role: the log window opens through its OpenLog (WI-0080)
+        this.logView := ""             ; the LogWindow, made at the first "Show log"
         this.dirty := true
         this.treeDirty := true
         this.filling := false
@@ -110,7 +113,16 @@ class ManagerWindow {
 
     Close() {
         this._StopTimer()
+        if (IsObject(this.logView))
+            this.logView.Close()
         this.win.Close()
+    }
+
+    ; The log window (WI-0080): made at the first call, then shown. The model is opened by the role (OpenLog).
+    ShowLog() {
+        if (!IsObject(this.logView))
+            this.logView := LogWindow(this.model)
+        this.logView.Show()
     }
 
     ; Only a change of the flows or the categories needs the tree to be built again. A flow state (running), the engine state
@@ -136,6 +148,8 @@ class ManagerWindow {
                 this.model.RunOrStop()
             case "Exit":
                 this.model.Exit()
+            case "ShowLog":
+                this.role.OpenLog("")
         }
     }
 

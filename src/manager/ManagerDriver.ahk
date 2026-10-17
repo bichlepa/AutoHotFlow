@@ -25,6 +25,8 @@ class ManagerDriver {
         this.ops["exit"] := (args, done) => model.Exit((ans) => done(ManagerDriver.AnswerResult(ans)))
         this.ops["show"] := (args, done) => this._OpShow(args, done)
         this.ops["hide"] := (args, done) => this._OpHide(args, done)
+        this.ops["log"] := (args, done) => this._OpLog(args, done)
+        this.ops["logFilter"] := (args, done) => this._OpLogFilter(args, done)
         role.On("cmd.test.command", (msg) => this._OnCommand(msg))
         role.On("cmd.test.state", (msg) => Map("ok", true, "state", ManagerDriver.Wire(model.State())))
         role.On("cmd.test.trace", (msg) => this._OnTrace(msg))
@@ -72,6 +74,29 @@ class ManagerDriver {
         if (IsObject(this.role.view))
             this.role.view.Hide()
         done(Map("ok", true))
+    }
+
+    ; WI-0080: opens (with a flow ID: only that flow) or closes the log; the answer has the log part of the state.
+    _OpLog(args, done) {
+        action := args.Get("action", "open")
+        if (action = "open")
+            this.role.OpenLog(args.Get("flowId", ""))
+        else if (action = "close")
+            this.role.CloseLog()
+        else
+            throw AhfError("cmd.test.op log: action must be open or close", ErrCode.BAD_PAYLOAD)
+        done(Map("ok", true, "log", this.model.LogState()))
+    }
+
+    ; WI-0080: the filter of the log (level, group, flowId; the keys that are given are changed).
+    _OpLogFilter(args, done) {
+        changes := Map()
+        for key in ["level", "group", "flowId"] {
+            if (args.Has(key))
+                changes[key] := args[key]
+        }
+        this.model.LogFilter(changes)
+        done(Map("ok", true, "log", this.model.LogState()))
     }
 
     ; The result of an operation that sent a command: whether the answer was ok, its code and message.

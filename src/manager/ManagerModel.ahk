@@ -19,6 +19,7 @@
 ;   "settings"    the settings changed
 ;   "selection"   the selected flow changed; data is the flow ID or ""
 ;   "answer"      the answer to a command of the user; data is Map(type, flowId, ok, code, message, payload, ms)
+;   "log"         the log window: data is "open", "close", "tail" (the answer of the tail), "entry" or "filter" (WI-0080)
 ;
 ; Resync (PROTOCOL 4.8 and 5): cmd.engine.snapshot after evt.engine.ready, evt.engine.restarted, evt.flow.list.changed, a new
 ; epoch, a gap in seq, evt.process.restarted/ready of the engine, and after an answer that is older than the newest
@@ -29,6 +30,9 @@ class ManagerModel {
     static COMMAND_MS := 5000
     static EXIT_MS := 5000
     static TRACE_MAX := 20000
+    ; The log (WI-0080): entries kept in the model (the oldest go), and the time to wait for the answer of the tail.
+    static LOG_KEEP := 1000
+    static LOG_TAIL_MS := 5000
     ; The values of EngineState.
     static ENGINE_WAITING := "waiting"   ; no snapshot yet
     static ENGINE_LOADING := "loading"   ; the engine answers but has not loaded all flows (snapshot ready false)
@@ -74,6 +78,18 @@ class ManagerModel {
         this.recording := false
         this.traceLog := []                ; the record of everything the model saw (tests, TraceOn)
         this.traceCount := 0
+        ; The log (WI-0080): kept only while the log window is open (topic log is subscribed only then).
+        this.logOpen := false
+        this.logGen := 0                ; counts the openings: an answer of an older opening is ignored
+        this.logEntries := []          ; Array of Map(n, ts, level, source, flowId, text), oldest first
+        this.logCount := 0             ; n of the newest entry (numbers are never reused while the log is open)
+        this.logSeen := 0              ; evt.log.entry received while the log is open
+        this.logTailPending := false   ; the answer of cmd.storage.log.tail is still out
+        this.logTailOk := false
+        this.logLive := []             ; entries that came before the tail answer
+        this.logLevel := "3"           ; the highest digit shown
+        this.logGroup := "all"         ; "all", or the level letter: "a" app, "f" flow, "t" thread
+        this.logFlowId := ""           ; "" = all flows
     }
 
     ; --- listeners and trace -------------------------------------------------------------------
@@ -325,6 +341,154 @@ class ManagerModel {
         this._Notify("flow", rec)
     }
 
+    ; --- the log (WI-0080, PROTOCOL 4.8) -----------------------------------------------------------
+
+    ; Opens the log: subscribes to topic log, asks storage for the tail and sets the flow filter (flowId "" = all flows).
+    ; An open log only changes its filter. The entries that arrive before the tail answer are kept (see _OnLogTail).
+    OpenLog(flowId := "") {
+        this.logFlowId := flowId
+        if (this.logOpen) {
+            this._Notify("log", "filter")
+            return
+        }
+        this.logOpen := true
+        this.logGen += 1
+        this.logEntries := []
+        this.logLive := []
+        this.logSeen := 0
+        this.logTailOk := false
+        this.logTailPending := true
+        this.Note("manager.log", Map("action", "open", "flowId", flowId))
+        this.peer.Subscribe("log")
+        gen := this.logGen
+        try {
+            this.peer.Request("storage", "cmd.storage.log.tail", Map("limit", ManagerModel.LOG_KEEP)
+                , (ans) => this._OnLogTail(gen, ans), ManagerModel.LOG_TAIL_MS)
+        } catch as e {
+            this.logTailPending := false
+            this.Note("manager.error", Map("text", "log tail request failed: " Type(e) ": " e.Message))
+        }
+        this._Notify("log", "open")
+    }
+
+    ; Closes the log: the topic is unsubscribed and the entries are dropped (the next opening loads them again).
+    CloseLog() {
+        if (!this.logOpen)
+            return
+        this.logOpen := false
+        this.logGen += 1
+        this.logTailPending := false
+        this.logEntries := []
+        this.logLive := []
+        this.peer.Unsubscribe("log")
+        this.Note("manager.log", Map("action", "close"))
+        this._Notify("log", "close")
+    }
+
+    ; Answer of cmd.storage.log.tail. An answer of an older opening is ignored. The tail is the older part: a live entry that
+    ; equals one of its newest entries (ts, source, text) is not added a second time (a line written while the window opened).
+    _OnLogTail(gen, ans) {
+        if (gen != this.logGen || !this.logOpen)
+            return
+        this.logTailPending := false
+        p := ans.payload
+        tail := []
+        this.logTailOk := p.Get("ok", 0) ? true : false
+        if (this.logTailOk)
+            tail := p.Get("entries", [])
+        else
+            this.Note("manager.log", Map("action", "tail", "ok", Json.False, "code", ManagerModel.Outcome(p)))
+        known := Map()
+        start := Max(1, tail.Length - 99)
+        loop tail.Length - start + 1 {
+            e := tail[start + A_Index - 1]
+            known[ManagerModel._LogKey(e)] := true
+        }
+        for e in tail
+            this._AddLogEntry(e)
+        for e in this.logLive {
+            if (!known.Has(ManagerModel._LogKey(e)))
+                this._AddLogEntry(e)
+        }
+        this.logLive := []
+        this.Note("manager.log", Map("action", "tail", "ok", Json.Bool(this.logTailOk), "entries", tail.Length))
+        this._Notify("log", "tail")
+    }
+
+    ; An entry of topic log (evt.log.entry). Kept while the log is open; the view draws the changes in batches.
+    OnLogEntry(p) {
+        if (!this.logOpen)
+            return
+        this.logSeen += 1
+        if (this.logTailPending) {
+            if (this.logLive.Length < ManagerModel.LOG_KEEP)   ; more than that before the answer: the rest is dropped
+                this.logLive.Push(p)
+            return
+        }
+        this._AddLogEntry(p)
+        this._Notify("log", "entry")
+    }
+
+    _AddLogEntry(e) {
+        this.logCount += 1
+        this.logEntries.Push(Map("n", this.logCount, "ts", e.Get("ts", ""), "level", e.Get("level", "")
+            , "source", e.Get("source", ""), "flowId", e.Get("flowId", ""), "text", e.Get("text", "")))
+        if (this.logEntries.Length > ManagerModel.LOG_KEEP)
+            this.logEntries.RemoveAt(1, this.logEntries.Length - ManagerModel.LOG_KEEP)
+    }
+
+    static _LogKey(e) => e.Get("ts", "") "|" e.Get("source", "") "|" e.Get("text", "")
+
+    ; Sets the filter: changes is a Map with the keys level (0 to 3), group (all, a, f, t) and flowId (any text, "" = all).
+    ; A value outside its range is bad_payload.
+    LogFilter(changes) {
+        if (changes.Has("level")) {
+            level := String(changes["level"])
+            if (!RegExMatch(level, "^[0-3]$"))
+                throw AhfError("log level must be 0 to 3 (got '" level "')", ErrCode.BAD_PAYLOAD)
+            this.logLevel := level
+        }
+        if (changes.Has("group")) {
+            group := String(changes["group"])
+            if (!RegExMatch(group, "^(all|a|f|t)$"))
+                throw AhfError("log group must be all, a, f or t (got '" group "')", ErrCode.BAD_PAYLOAD)
+            this.logGroup := group
+        }
+        if (changes.Has("flowId"))
+            this.logFlowId := String(changes["flowId"])
+        this.Note("manager.log", Map("action", "filter", "level", this.logLevel, "group", this.logGroup, "flowId", this.logFlowId))
+        this._Notify("log", "filter")
+    }
+
+    ; The entries that pass the filter, oldest first. An entry without a stored level (a line of v1) passes only at level 3.
+    LogVisible() {
+        out := []
+        top := Integer(this.logLevel)
+        for e in this.logEntries {
+            level := e["level"]
+            if (level = "") {
+                if (top < 3 || this.logGroup != "all")
+                    continue
+            } else {
+                if (Integer(SubStr(level, 2)) > top)
+                    continue
+                if (this.logGroup != "all" && SubStr(level, 1, 1) != this.logGroup)
+                    continue
+            }
+            if (this.logFlowId != "" && e["flowId"] != this.logFlowId)
+                continue
+            out.Push(e)
+        }
+        return out
+    }
+
+    ; The log part of the state (test driver and PROTOCOL 4.8).
+    LogState() {
+        return Map("open", Json.Bool(this.logOpen), "entries", this.logEntries.Length, "seen", this.logSeen
+            , "level", this.logLevel, "group", this.logGroup, "flowId", this.logFlowId
+            , "visible", this.LogVisible().Length, "tailOk", Json.Bool(this.logTailOk))
+    }
+
     ; --- the state for the view ---------------------------------------------------------------
 
     ; The flow record, or "" for an unknown ID.
@@ -356,7 +520,7 @@ class ManagerModel {
         has := this.selectedFlow != "" && this.flows.Has(this.selectedFlow)
         return Map("NewCategory", false, "NewFlow", false, "ChangeCategory", false, "Duplicate", false, "Delete", false   ; arch-ok: wire-bool UI state of the buttons, not a protocol field
             , "Edit", false, "Enable", false, "Run", has && this.engineState != ManagerModel.ENGINE_DOWN
-            , "Settings", false, "ImportExport", false, "About", false, "Help", false, "ShowLog", false, "Exit", true)
+            , "Settings", false, "ImportExport", false, "About", false, "Help", false, "ShowLog", true, "Exit", true)
     }
 
     ; The label of the Run button for the selected flow: "Stop" while it runs, "Run" otherwise.
@@ -382,7 +546,7 @@ class ManagerModel {
         return Map("engine", this.engineState, "epoch", this.epoch, "seq", this.lastSeq, "flows", flows
             , "categories", cats, "settings", this.settings, "selectedFlow", this.selectedFlow, "buttons", buttons
             , "events", this.eventCount, "resyncs", this.resyncCount, "snapshots", this.snapshotCount
-            , "lastAnswer", this.lastAnswer = "" ? Map() : this.lastAnswer)
+            , "lastAnswer", this.lastAnswer = "" ? Map() : this.lastAnswer, "log", this.LogState())
     }
 
     ; --- operations ----------------------------------------------------------------------------

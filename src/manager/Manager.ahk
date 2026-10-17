@@ -49,7 +49,7 @@ class Manager extends Role {
             this.started := true
             this.model.Note("manager.ready", Map("headless", this.headless ? 1 : 0))
             if (!this.headless) {
-                this.view := ManagerWindow(this.model)
+                this.view := ManagerWindow(this.model, this)
                 this.view.Show()
             }
         }
@@ -74,11 +74,30 @@ class Manager extends Role {
         }
     }
 
-    ; Every event of a topic that the model subscribed to. The log lines of the application are not for the model.
+    ; Every event of a topic that the model subscribed to. The entries of topic log go to the log part of the model
+    ; (WI-0080, only while the log is open); the other log events are not for the model.
     _OnEvent(msg) {
+        if (msg.type = "evt.log.entry") {
+            this.model.OnLogEntry(msg.payload)
+            return
+        }
         if (SubStr(msg.type, 1, 8) = "evt.log.")
             return
         this.model.OnEvent(msg.type, msg.payload)
+    }
+
+    ; The log window (WI-0080, PROTOCOL 4.8): opens the log of the model (flowId "" = all flows) and shows the window
+    ; when there is one. Without a window (--headless) only the model changes.
+    OpenLog(flowId := "") {
+        this.model.OpenLog(flowId)
+        if (IsObject(this.view))
+            this.view.ShowLog()
+    }
+
+    CloseLog() {
+        this.model.CloseLog()
+        if (IsObject(this.view) && IsObject(this.view.logView))
+            this.view.logView.Hide()
     }
 
     _OnPrepareExit(msg) {
