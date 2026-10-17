@@ -54,20 +54,20 @@ L486-495   5a Events before subscription (design question, WI-0007)
 L497-501 6. Versioning and extension
 ```
 
-## doc/TEST-STRATEGY.md (51.7 KB, 323 lines)
+## doc/TEST-STRATEGY.md (52.5 KB, 324 lines)
 ```text
 L5-11 1. Principles
 L13-22 2. Levels
 L24-58 3. Important scenarios
 L60-65 4. Round trip and compatibility
 L67-85 5. Structure of the directory `tests/`
-L87-217 6. Execution
-L219-246 7. Golden data from v1 (L0006, WI-0036)
-L248-269 8. Oracle of the expression language: native AHK v2 (E0035, WI-0044)
-L271-273 8a. Smoke test of every element (WI-0048)
-L275-279 8b. Test triggers (WI-0061)
-L281-301 9a. Dialog tests (E0038, WI-0051)
-L303-323 9. Flow builder and headless runner (WI-0049)
+L87-218 6. Execution
+L220-247 7. Golden data from v1 (L0006, WI-0036)
+L249-270 8. Oracle of the expression language: native AHK v2 (E0035, WI-0044)
+L272-274 8a. Smoke test of every element (WI-0048)
+L276-280 8b. Test triggers (WI-0061)
+L282-302 9a. Dialog tests (E0038, WI-0051)
+L304-324 9. Flow builder and headless runner (WI-0049)
 ```
 
 ## doc/ELEMENT-API-V2.md (51.4 KB, 465 lines)
@@ -122,7 +122,7 @@ L503-520   19.1 The subset that is compared
 L522-539   19.2 Deliberate deviations from native AutoHotkey v2
 ```
 
-## doc/MEASUREMENTS.md (34.5 KB, 120 lines)
+## doc/MEASUREMENTS.md (35.2 KB, 120 lines)
 ```text
 L11-21 Important: one machine, not an idle machine
 L23-72 Overview
@@ -272,7 +272,7 @@ L332-337 A timer period is limited to 2^31 - 1 milliseconds (partly verified)
 L339-344 A sliding window of counts costs one increment per count (verified)
 ```
 
-## doc/howto/tests-and-tools.md (40.3 KB, 402 lines)
+## doc/howto/tests-and-tools.md (41.6 KB, 410 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -322,6 +322,7 @@ L372-378 A stub that records a request before it does the work makes the test ra
 L381-387 Kill tests: subscribe before the kill and wait for the restart before the next pid (verified)
 L389-395 A test double of an engine class must have the members that the real class adds (verified)
 L397-402 A timer trigger in an integration test needs the trigger host role (verified)
+L404-410 Unassigned keys for hotkey input tests: not every virtual key reaches a plain hotkey (verified)
 ```
 
 ## doc/REQUIREMENTS.md

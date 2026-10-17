@@ -1242,11 +1242,11 @@ Fires when AutoHotFlow starts; it can tell a start with Windows (REQ-SET-030) fr
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003, S0008
-- **Evidence:** `tests/ahk/element_hotkey.test.ahk` (WI-0064: the hotkey text of every option, the window condition of each UseWindow value, two triggers on one hotkey share it), `tests/ahk/element_window_ident.test.ahk` (the window identification). The end-to-end tests with real key presses are pending (an open owner decision on how keys are delivered in the tests)
+- **Evidence:** `tests/ahk/element_hotkey.test.ahk` (WI-0064: the hotkey text of every option, the window condition of each UseWindow value, two triggers on one hotkey share it), `tests/ahk/element_window_ident.test.ahk` (the window identification)., `tests/integration/test_hotkey_input.py` (WI-0064: real keys with `SendInput` on unassigned keys: plain, `~`, release, the window conditions, two flows on one key, disabling one of them, an error of one trigger; the combinations with modifiers are `gui` tests for the project owner)
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
-| `Trigger_Hotkey` | yes | partial | S0003 |
+| `Trigger_Hotkey` | yes | done | S0003 |
 | `Trigger_Hotstring` | yes | open | S0008 |
 
 A hotkey can be limited to a given window; it is disabled in the same context (MIGRATION M-0003).

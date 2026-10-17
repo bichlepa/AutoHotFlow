@@ -163,6 +163,25 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: hotkey input with key combinations (gui, keys are sent, do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/integration/test_hotkey_input.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0",
+                "-v"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Test: foundation (IPC, supervisor, diagnosis; incl. slow, no windows)",
             "type": "shell",
             "command": "python",

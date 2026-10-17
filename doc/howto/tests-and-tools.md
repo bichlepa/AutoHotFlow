@@ -400,3 +400,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Start the session with the trigger host as well (`roles="storage,engine,triggerhost"`, as `tests/integration/test_time_triggers.py` does with its `host_flows` fixture). Manual triggers need no host.
 - **Status:** verified (the failing run of `test_a_flood_of_refused_starts_is_answered_and_logged_a_few_times`, then green with the host role)
 - **Source:** `tests/integration/test_runaway.py`
+
+### Unassigned keys for hotkey input tests: not every virtual key reaches a plain hotkey
+
+- **Problem:** The input tests of `Trigger_Hotkey` (`tests/integration/test_hotkey_input.py`) all skipped: the probe key `vk9A`, sent with `SendInput`, never fired the plain hotkey `vk9A`. The same key fired with `$vk9A` or `~vk9A`, and a standalone listener showed it: plain `vk9A`, `vk9B`, `vk9C` stay silent, while `vk88` to `vk8F`, `vkD8` to `vkDA`, `vkE8`, `vk97` and F13 fire in every form. An earlier spike that mixed the forms looked like "sometimes it works". A plain hotkey also does not stop the key from reaching other keyboard hooks: only a hook hotkey (`$`) blocks it.
+- **Wrong:** Pick the unassigned keys from one range without trying each form (plain, `~`, ` up`), and test "the key is blocked" with a plain hotkey.
+- **Right:** Use `vk88` to `vk8F` and `vkE8`, and `$vkNN` where the test needs the block. Debug a silent hotkey first in a standalone script (`Hotkey()` plus the sender), then in the host: a log line in the callback shows whether the key arrived or the trigger path failed.
+- **Status:** verified (10 input tests green in two serial runs; listener runs for the key list)
+- **Source:** `tests/integration/test_hotkey_input.py`, `tests/support/inputlock.py`
