@@ -7,6 +7,8 @@ import json
 import time
 from pathlib import Path
 
+from support import pipenames
+from support.ahfclient import AhfClient
 from support.flowrun import flows  # noqa: F401  (fixture flows)
 from support.timing import scaled
 
@@ -222,20 +224,31 @@ def test_the_order_is_sent_as_an_event_when_it_changes(flows):
 
 # --- concurrency: a category command while another one waits for the flow files (WI-0071 review) ----------------
 
-def _in_thread(fn):
-    """Runs fn in a thread; returns (thread, result dict). The result holds "value" or "error"."""
+def _run_in_thread(flows, to, type_, payload):
+    """Sends one request from a thread on its own client connection (a client is not shared between threads).
+    Returns (thread, box); box holds "value" (the payload of the answer) or "error". The thread closes its client."""
     import threading
     box = {}
+    pipe = pipenames.hub_pipe(flows.sessions[-1])
 
     def run():
+        client = AhfClient(pipe, "race", connect_timeout=2.0)
         try:
-            box["value"] = fn()
+            box["value"] = client.request(to, type_, payload, timeout=scaled(20.0))["payload"]
         except Exception as e:  # reported by the test, not swallowed
             box["error"] = e
+        finally:
+            client.close()
 
     thread = threading.Thread(target=run, daemon=True)
     thread.start()
     return thread, box
+
+
+def _join(thread):
+    """Waits for the thread, bounded; a thread that does not end fails the test (it may still use the session)."""
+    thread.join(scaled(20.0))
+    assert not thread.is_alive(), "the request thread did not end within 20 s"
 
 
 def test_a_rename_meanwhile_another_flow_changes_leaves_one_category(flows):
@@ -249,9 +262,9 @@ def test_a_rename_meanwhile_another_flow_changes_leaves_one_category(flows):
             other_call = ("engine", "cmd.flow.delete", {"flowId": other})
         else:
             other_call = ("engine", "cmd.flow.meta.update", {"flowId": other, "name": "renamed %d" % round_no})
-        thread, box = _in_thread(lambda: flows.request("engine", "cmd.category.rename", {"name": old, "newName": new}))
+        thread, box = _run_in_thread(flows, "engine", "cmd.category.rename", {"name": old, "newName": new})
         flows.request(*other_call)
-        thread.join(scaled(20.0))
+        _join(thread)
         assert "error" not in box, box.get("error")
         assert box["value"]["ok"] is True, box["value"]
         names = names_of(flows)
@@ -265,17 +278,22 @@ def test_a_second_category_command_while_a_rename_waits_is_busy_or_after_it(flow
     flows.request_ok("engine", "cmd.category.create", {"name": "Busy"})
     for i in range(20):
         create_flow(flows, "b%d" % i, "Busy")
-    thread, box = _in_thread(lambda: flows.request("engine", "cmd.category.rename", {"name": "Busy", "newName": "Done"}))
+    thread, box = _run_in_thread(flows, "engine", "cmd.category.rename", {"name": "Busy", "newName": "Done"})
     answers = []
-    while thread.is_alive():
-        answers.append(flows.request("engine", "cmd.category.create", {"name": "Tmp"}))
+    created = []
+    deadline = time.monotonic() + scaled(20.0)
+    while thread.is_alive() and len(answers) < 200 and time.monotonic() < deadline:
+        name = "Tmp %d" % len(answers)
+        answers.append(flows.request("engine", "cmd.category.create", {"name": name}))
         if answers[-1]["ok"]:
-            flows.request("engine", "cmd.category.delete", {"name": "Tmp"})
-    thread.join(scaled(20.0))
+            created.append(name)
+    _join(thread)
     assert "error" not in box, box.get("error")
     assert box["value"]["ok"] is True, box["value"]
     for answer in answers:
         assert answer["ok"] or answer["error"]["code"] == "busy", answer
+    for name in created:       # the rename is over: the test categories go, the list is as before
+        flows.request_ok("engine", "cmd.category.delete", {"name": name})
     assert names_of(flows) == ["Done", ""]
 
 
