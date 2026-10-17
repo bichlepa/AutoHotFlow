@@ -57,7 +57,7 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
 | WI-0069 | `ui_common/`, dialogs, DPI, spike on modal dialogs | done, verified (fast red by one load flake, green alone; gui 3 passed) | haiku (review sonnet) | e653f44–255266b | 2026-10-17 | block A; spike: pings answered, timers stall up to 0.7 s; `FileSelect`/`DirSelect` open for the owner |
-| WI-0070 | Flow lifecycle in engine and storage | open | | | | block A |
+| WI-0070 | Flow lifecycle in engine and storage | done, verified (fast green, foundation green after recheck of one load flake, slow green on 21ff0da and cb7bee9) | haiku (review sonnet) | 6f848fd–21ff0da (13 commits) | 2026-10-17 | block A; a save and trigger switches are busy during a pending delete; deviations M-0078, M-0079 accepted by the owner |
 | WI-0071 | Categories and order (`Categories.json`) | open | | | | block A |
 | WI-0072 | Tray icon in the supervisor (E0064) | open | | | | block A, foundation tier |
 | WI-0073 | Manager shell, replaces the stub | open | | | | block A |
@@ -84,6 +84,10 @@ None.
 None. The manual-check start path (section 3 of MANUAL-CHECKS) is integrated; the owner runs it.
 
 ## Last verified state
+
+Commit `cb7bee9` (WI-0064 input-test skip on a locked PC, tasklist fix; on top of `21ff0da`, WI-0070 integrated) verified by `tools/verify.py` (no --auto base): VERDICT red (foundation) only. Fast run `20261017-120443-cb7bee90-2` (1298 passed, 1 skipped). Foundation run `20261017-120443-cb7bee90` (465 passed, 1 failed): `tests/integration/test_trigger_arming.py::test_the_engine_is_restarted_and_rearms_without_the_startup_context`; `tools/recheck.py` alone: green (run `20261017-122140-21548`), a load flake. Slow run `20261017-120443-cb7bee90-3` (199 passed). Owner decision (2026-10-17): slow tier not needed for now; future runs use `--tiers fast,foundation`.
+
+Commit `21ff0da` (WI-0070 integrated, 13 commits) verified: foundation run `20261017-111638-21ff0da0` (466 passed, 1 skipped), slow run `20261017-111638-21ff0da0-3` (199 passed); fast run stalled and was stopped by the owner's order (no result).
 
 Commit `255266b` (WI-0069 integrated, 7 commits from `e653f44`) verified by `tools/verify.py --auto`: VERDICT red (fast) only. Fast run `20261017-102543-255266bd` (1261 passed, 1 skipped, 1 failed): `tests/integration/test_trigger_state.py::test_an_unreadable_state_file_refuses_a_switch_until_it_can_be_read`; `tools/recheck.py` alone at the same commit: green (run `20261017-103235-2496`), a load flake; recorded in the run history, no OPEN-ITEMS entry (owner rule). Foundation run `20261017-102543-255266bd-2` (466 passed, 1 skipped). Gui tier, owner away: `tests/integration/test_dialog_windows_gui.py` 3 passed (run `20261017-103249-24164`).
 
