@@ -44,13 +44,17 @@ class StateFiles {
         return Map()
     }
 
-    ; Removes the file of one flow (WI-0070, the flow is deleted). Nothing to do when the file is missing.
+    ; Removes the file of one flow (WI-0070, the flow is deleted). Nothing to do when the file is missing. A folder with
+    ; that name is removed as well: it cannot be a state, and it is what makes the state of the flow unreadable.
     static Delete(dataDir, flowId) {
         path := StateFiles.Path(dataDir, flowId)
         if (FileExist(path) = "")
             return Map()
         try {
-            FileDelete(path)
+            if (InStr(FileExist(path), "D"))
+                DirDelete(path, true)
+            else
+                FileDelete(path)
         } catch as e {
             throw AhfError("cannot delete '" path "': " e.Message, ErrCode.INTERNAL)
         }
