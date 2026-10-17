@@ -78,6 +78,20 @@ class VarFiles {
         return Map("existed", Json.Bool(existed))
     }
 
+    ; Removes the static variables of one flow: the folder Variables/<flowId>/ with its files (WI-0070, E0066).
+    ; Nothing to do when the folder is missing.
+    static DeleteFlow(dataDir, flowId) {
+        dirPath := StoragePaths.VarsDir(dataDir) "\" StoragePaths.CheckName(flowId, "flow id")
+        if (!DirExist(dirPath))
+            return Map()
+        try {
+            DirDelete(dirPath, true)
+        } catch as e {
+            throw AhfError("cannot delete the static variables of '" flowId "': " e.Message, ErrCode.INTERNAL)
+        }
+        return Map()
+    }
+
     ; Names of the variables of one scope, sorted. Map("names", Array).
     static List(dataDir, scope, flowId) {
         dirPath := ""

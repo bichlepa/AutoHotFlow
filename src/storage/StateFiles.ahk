@@ -43,4 +43,17 @@ class StateFiles {
         }
         return Map()
     }
+
+    ; Removes the file of one flow (WI-0070, the flow is deleted). Nothing to do when the file is missing.
+    static Delete(dataDir, flowId) {
+        path := StateFiles.Path(dataDir, flowId)
+        if (FileExist(path) = "")
+            return Map()
+        try {
+            FileDelete(path)
+        } catch as e {
+            throw AhfError("cannot delete '" path "': " e.Message, ErrCode.INTERNAL)
+        }
+        return Map()
+    }
 }

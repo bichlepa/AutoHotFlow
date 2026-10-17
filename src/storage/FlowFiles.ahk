@@ -52,7 +52,8 @@ class FlowFiles {
     }
 
     ; Writes a flow file atomically with CRLF line ends. text must be a JSON object (bad_payload otherwise).
-    static Write(dataDir, flowPath, text, backup) {
+    ; createOnly (WI-0070): an existing file is not replaced; conflict then, and nothing is written.
+    static Write(dataDir, flowPath, text, backup, createOnly := false) {
         filePath := StoragePaths.Flow(dataDir, flowPath)
         root := ""
         try {
@@ -62,9 +63,26 @@ class FlowFiles {
         }
         if (!(root is Map))
             throw AhfError("flow text is not a JSON object", ErrCode.BAD_PAYLOAD)
-        if (backup && FileExist(filePath) != "")
+        exists := FileExist(filePath) != ""
+        if (createOnly && exists)
+            throw AhfError("flow file '" flowPath "' exists already", ErrCode.CONFLICT)
+        if (backup && exists)
             FlowFiles._Backup(filePath)
         AtomicFile.Write(filePath, AtomicFile.Crlf(String(text)))
+    }
+
+    ; Removes the flow file (WI-0070, E0066). The backups in backup/ stay. Map(existed) with existed a JSON boolean.
+    static Delete(dataDir, flowId) {
+        filePath := StoragePaths.FlowsDir(dataDir) "\" StoragePaths.CheckName(flowId, "flow ID") ".json"
+        existed := FileExist(filePath) != ""
+        if (existed) {
+            try {
+                FileDelete(filePath)
+            } catch as e {
+                throw AhfError("cannot delete flow file '" filePath "': " e.Message, ErrCode.INTERNAL)
+            }
+        }
+        return Map("existed", Json.Bool(existed))
     }
 
     ; Copies the current file into backup/ and removes the oldest backups above MAX_BACKUPS.

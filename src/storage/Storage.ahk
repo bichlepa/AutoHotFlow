@@ -68,6 +68,7 @@ class Storage extends Role {
         this.On("cmd.storage.flows.list", (msg) => this._CmdFlowsList(msg))
         this.On("cmd.storage.flow.read", (msg) => this._CmdFlowRead(msg))
         this.On("cmd.storage.flow.write", (msg) => this._CmdFlowWrite(msg))
+        this.On("cmd.storage.flow.delete", (msg) => this._CmdFlowDelete(msg))
         this.On("cmd.storage.var.get", (msg) => this._CmdVarGet(msg))
         this.On("cmd.storage.var.set", (msg) => this._CmdVarSet(msg))
         this.On("cmd.storage.var.delete", (msg) => this._CmdVarDelete(msg))
@@ -120,8 +121,16 @@ class Storage extends Role {
         flowPath := msg.payload.Get("path", "")
         text := msg.payload.Get("text", "")
         backup := msg.payload.Get("backup", true)
+        createOnly := Storage._Flag(msg.payload.Get("createOnly", 0))
         return this._Defer(msg, "flow.write", flowPath
-            , () => this._RunFlowWrite(flowPath, text, backup))
+            , () => this._RunFlowWrite(flowPath, text, backup, createOnly))
+    }
+
+    ; cmd.storage.flow.delete (WI-0070, E0066): the flow file, its state file and its static variables. The order is
+    ; the flow file first: when that fails, nothing else is touched.
+    _CmdFlowDelete(msg) {
+        flowId := msg.payload.Get("flowId", "")
+        return this._Defer(msg, "flow.delete", flowId, () => this._RunFlowDelete(flowId))
     }
 
     _CmdVarGet(msg) {
@@ -222,10 +231,20 @@ class Storage extends Role {
 
     ; --- operations (run inside the queue, one at a time) ------------------------------------
 
-    _RunFlowWrite(flowPath, text, backup) {
-        FlowFiles.Write(this.dataDir, flowPath, text, backup)
+    _RunFlowWrite(flowPath, text, backup, createOnly) {
+        FlowFiles.Write(this.dataDir, flowPath, text, backup, createOnly)
         return Map()
     }
+
+    _RunFlowDelete(flowId) {
+        answer := FlowFiles.Delete(this.dataDir, flowId)
+        StateFiles.Delete(this.dataDir, flowId)
+        VarFiles.DeleteFlow(this.dataDir, flowId)
+        return answer
+    }
+
+    ; A JSON boolean of a message (the parser gives 1 and 0 for true and false; Json.True is the sentinel object).
+    static _Flag(v) => (v == Json.True || (!IsObject(v) && (v = 1 || v = "1" || v = "true")))
 
     _RunVarSet(scope, flowId, name, varType, content) {
         VarFiles.Set(this.dataDir, scope, flowId, name, varType, content)
