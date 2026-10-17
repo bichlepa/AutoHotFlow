@@ -60,7 +60,7 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI-0070 | Flow lifecycle in engine and storage | done, verified (fast green, foundation green after recheck of one load flake, slow green on 21ff0da and cb7bee9) | haiku (review sonnet) | 6f848fd–21ff0da (13 commits) | 2026-10-17 | block A; a save and trigger switches are busy during a pending delete; deviations M-0078, M-0079 accepted by the owner |
 | WI-0071 | Categories and the order of the list (`Categories.json`) | done, verified (fast, foundation, slow green; slow one load flake, green alone; stress 200 flows: ready 45.4 s, largest snapshot 622 ms) | sonnet/haiku (review sonnet) | 2606b20 (rebased series) | 2026-10-17 | block A; accepted: empty categories from hand-edited files stay, case-differing names are a quirk |
 | WI-0072 | Tray icon and tray menu of the application (own role `tray`, E0075) | done, verified (fast, foundation, slow green on 3a32a30) | sonnet (review sonnet) | 3a32a30 | 2026-10-17 | block A; unlimited restart with growing pause, decided by the owner |
-| WI-0073 | Manager shell, replaces the stub | open | | | | block A |
+| WI-0073 | Manager: window, model, resync, headless driver, replaces the stub | done, verified on 72da2f6 (fast, foundation, slow green; stress 201 flows: filled after 0.54 s, snapshot 0.2 s; gui test 4 passed) | sonnet (review sonnet) | ec2a38b–72da2f6 | 2026-10-17 | block A; the product start does not start the manager yet (the tray does) |
 | WI-0074 | Flow tree and operations | open | | | | block A |
 | WI-0075 | Notices | open | | | | block A |
 | WI-0076 | Import from v1, manual check of block A | open | | | | block A |
