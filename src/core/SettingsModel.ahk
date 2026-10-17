@@ -190,7 +190,7 @@ class SettingsModel {
     ; Windows and run as administrator are not (otherwise v1 and v2 would both start with Windows), "Log to file" does not
     ; exist in v2 (E0069) and "hide demo flows" comes with the demonstration flows (REQ-MGR-060). A value that v2 refuses is not taken over (the v2 value stays).
     ; Returns Map(settings: Map of v2 keys, taken: [Map(v1, key)], skipped: [Map(v1, reason)]). reason is a Lang key
-    ; suffix: "not_taken" (deliberately), "dropped" (no such setting in v2), "later" (the setting comes later), "invalid" (the value is
+    ; suffix: "not_taken" (deliberately), "dropped" (no such setting in v2), "later" (the setting comes later), "default_language" (v1 default en), "invalid" (the value is
     ; refused).
     static FromV1(v1) {
         out := Map("settings", Map(), "taken", [], "skipped", [])
@@ -204,6 +204,12 @@ class SettingsModel {
             key := pair[2]
             if (!v1.Has(v1Key))
                 continue
+            ; v1 writes UILanguage "en" into every settings file, also when the user never chose a language; the file does not
+            ; tell the two cases apart, so "en" is not taken over and the user keeps "language of Windows" (REQ-LNG-020).
+            if (key = "language" && StrLower(Trim(String(v1[v1Key]))) = "en") {
+                out["skipped"].Push(Map("v1", v1Key, "reason", "default_language", "text", ""))
+                continue
+            }
             try {
                 out["settings"][key] := SettingsModel.Check(key, v1[v1Key])
                 out["taken"].Push(Map("v1", v1Key, "key", key))

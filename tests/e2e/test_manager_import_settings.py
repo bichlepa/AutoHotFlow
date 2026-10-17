@@ -65,6 +65,7 @@ def test_a_value_that_v2_refuses_is_listed_and_the_v2_value_stays(started, tmp_p
     assert lines["FlowExecutionPolicy"]["state"] == "skipped" and "policy" in lines["FlowExecutionPolicy"]["message"].lower()
     assert lines["FlowWorkingDir"]["state"] == "skipped"
     assert lines["UILanguage"]["state"] == "taken"
+    assert engine_settings(obs)["language"] == "ru"
     s = engine_settings(obs)
     assert s["executionPolicy"] == "parallel" and s["workingDir"].endswith("\\AutoHotFlow") and s["language"] == "ru", s
 
@@ -80,3 +81,12 @@ def test_a_missing_or_broken_settings_file_does_not_stop_the_import(started, tmp
     again = run_import(obs, v1)
     assert settings_lines(again)["settings.json"]["state"] == "failed", again["settings"]
     assert any(f["state"] in ("skipped", "copy") for f in again["flows"]), "the flows are handled anyway"
+
+
+def test_the_default_language_of_v1_is_not_taken_over(started, tmp_path):
+    v1 = make_v1(tmp_path / "v1", examples=[ONE_EXAMPLE])
+    write_v1_settings(v1)                                   # v1 writes UILanguage "en" by default
+    sup, obs = started()
+    result = run_import(obs, v1)
+    assert settings_lines(result)["UILanguage"]["state"] == "skipped"
+    assert engine_settings(obs)["language"] == "", "the language of Windows stays"

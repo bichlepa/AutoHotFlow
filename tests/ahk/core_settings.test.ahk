@@ -236,6 +236,14 @@ CheckFromV1() {
     Assert.Equal(reasons["HideDemoFlows"], "later")
 }
 
+CheckFromV1DoesNotTakeTheDefaultLanguage() {
+    r := SettingsModel.FromV1(Map("UILanguage", "en", "LogLevelApp", 1))
+    Assert.True(!r["settings"].Has("language"), "en is what v1 writes by default: the language of Windows stays")
+    Assert.Equal(r["skipped"][1]["reason"], "default_language")
+    Assert.Equal(r["settings"]["logLevelApp"], 1)
+    Assert.Equal(SettingsModel.FromV1(Map("UILanguage", "EN"))["settings"].Count, 0)
+}
+
 CheckFromV1DropsInvalidValues() {
     r := SettingsModel.FromV1(Map("FlowExecutionPolicy", "sometimes", "FlowWorkingDir", "relative", "LogLevelApp", 2))
     Assert.Equal(r["settings"].Count, 1)
@@ -293,6 +301,7 @@ TestRun.Case("the file text round trip", CheckTextRoundTrip)
 TestRun.Case("a broken file or an unknown format version is refused", CheckFromTextRefusesBrokenFiles)
 TestRun.Case("the wire form has real JSON booleans", CheckWireHasRealBooleans)
 TestRun.Case("the settings of v1 are taken over as E0068 says", CheckFromV1)
+TestRun.Case("the v1 default language en is not taken over", CheckFromV1DoesNotTakeTheDefaultLanguage)
 TestRun.Case("invalid settings of v1 are not taken over", CheckFromV1DropsInvalidValues)
 TestRun.Case("the log thresholds are per source group", CheckLogThresholdsPerGroup)
 
