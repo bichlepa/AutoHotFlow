@@ -191,6 +191,25 @@ def test_headless_manager_records_every_skeleton_event_in_order(procs, datadir, 
     try:
         for topic in ("engine", "flow:" + FLOW, "log"):
             assert obs.request("supervisor", "cmd.topic.subscribe", {"topic": topic}, timeout=5)["payload"]["ok"]
+        # The manager subscribes to the topic of a flow when its snapshot lists the flow (ManagerModel.ApplySnapshot).
+        # Until then it cannot receive the events of that flow: the test waits for the model to know the flow first.
+        def manager_knows_flow():
+            st = obs.request("manager", "cmd.test.state", {}, timeout=5)["payload"]["state"]
+            return any(f["flowId"] == FLOW for f in st["flows"])
+        assert wait_until(manager_knows_flow, 10), "the manager does not know the flow %s" % FLOW
+
+        # The engine emits its start events (flow list, engine ready) after the flows are loaded. s0 is taken when the
+        # engine has been quiet for 0.5 s, so that no start event counts as an event of the flow.
+        quiet = {"seq": None, "since": time.monotonic()}
+
+        def engine_quiet():
+            sq = engine_snapshot(obs)["seq"]
+            if sq != quiet["seq"]:
+                quiet["seq"], quiet["since"] = sq, time.monotonic()
+                return False
+            return time.monotonic() - quiet["since"] >= 0.5
+
+        assert wait_until(engine_quiet, 10), "the engine keeps emitting events"
         s0 = engine_snapshot(obs)["seq"]          # events up to here are not compared
         start_flow(obs)
 
