@@ -77,6 +77,18 @@ def test_logonui_check_treats_a_failed_tasklist_as_not_locked(monkeypatch):
     assert inputlock.logonui_running() is False
 
 
+@pytest.mark.parametrize("stdout, expected", [
+    (b"LogonUI.exe  21524 Console  1  50.000 K\r\n", True),
+    (b"\x81\x9a non-ASCII OEM text, no lock screen\r\n", False),    # the OEM code page is not cp1252: no decode error
+    (b"INFO: No tasks are running which match the specified criteria.\r\n", False),
+    (None, False),                                                  # no output at all: not locked
+])
+def test_logonui_check_reads_the_output_as_bytes(monkeypatch, stdout, expected):
+    fake = subprocess.CompletedProcess(args=["tasklist"], returncode=0, stdout=stdout, stderr=b"")
+    monkeypatch.setattr(inputlock.subprocess, "run", lambda *a, **k: fake)
+    assert inputlock.logonui_running() is expected
+
+
 def test_release_leaves_a_lock_of_someone_else(lockfile):
     with inputlock.input_lock(stale_s=STALE_S):
         lockfile.write_text("pid 1 since 0\n", encoding="ascii")      # replaced behind our back

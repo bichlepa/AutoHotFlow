@@ -140,11 +140,13 @@ CREATE_NO_WINDOW = 0x08000000
 def logonui_running(timeout_s=5.0):
     """True when LogonUI.exe runs (the lock screen). Read-only: tasklist with a timeout. Any failure counts as not locked."""
     try:
+        # Bytes, not text: tasklist writes the OEM code page, and a text decode fails on it (stdout would be None).
         result = subprocess.run(["tasklist", "/FI", "IMAGENAME eq " + LOGONUI_IMAGE, "/NH"], capture_output=True,
-                                text=True, timeout=timeout_s, creationflags=CREATE_NO_WINDOW)
+                                timeout=timeout_s, creationflags=CREATE_NO_WINDOW)
     except (OSError, subprocess.SubprocessError):
         return False
-    return LOGONUI_IMAGE.lower() in result.stdout.lower()
+    out = result.stdout or b""
+    return LOGONUI_IMAGE.lower().encode("ascii") in out.lower()
 
 
 def session_skip_reason(desktop_open, logonui_is_running):
