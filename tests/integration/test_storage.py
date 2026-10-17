@@ -5,6 +5,7 @@ tools/ahkrun.py). Its hub is the Python stand-in RoleHub (WakingHub). The files 
 from Python. v1 example data is copied to a temporary directory, never used in place.
 """
 
+import calendar
 import json
 import os
 import shutil
@@ -27,7 +28,8 @@ SKELETON_SRC = ROOT / "tests" / "data" / "skeleton_flow.json"
 BIG_BYTES = 5 * 1024 * 1024
 ASK_TIMEOUT_S = 15.0
 PING_LIMIT_S = scaled(1.0)          # acceptance: sys.ping is answered within 1 s during a 5 MB write
-V1_LOG_LINE = re.compile(r"^--- \d{4} \d{2} \d{2} \d{2}:\d{2}:\d{2} ~[^~]*~[^~]*~ ")
+# A log line (PROTOCOL 4.6): the v1 line, with the level and the flow ID stored between the stamp and the sender (WI-0080).
+V1_LOG_LINE = re.compile(r"^--- \d{4} \d{2} \d{2} \d{2}:\d{2}:\d{2}(?: [aft][0-3](?: [^~]*?)?)? ~[^~]*~[^~]*~ ")
 
 
 # --- helpers ----------------------------------------------------------------------------------------
@@ -421,6 +423,7 @@ def test_log_line_has_the_v1_format_and_goes_to_the_log_topic(storage, flowdir, 
         line = raw[raw.rindex("\r\n---"):]
         assert V1_LOG_LINE.match(line[2:]), line
         assert line.endswith("~Editor3~Flow 369404488~ left mouse button click")
+        assert " f1 Flow 369404488 ~Editor3~Flow 369404488~ left mouse button click" in line
         # Time is local, as in v1: the stamp is close to the local now (the sender sends UTC).
         stamp = re.search(r"--- (\d{4} \d{2} \d{2} \d{2}:\d{2}:\d{2})", line).group(1)
         local_struct = time.strptime(stamp, "%Y %m %d %H:%M:%S")
@@ -443,6 +446,74 @@ def test_log_file_over_100_kb_is_renamed_to_old_before_the_next_entry(storage, f
         time.sleep(0.05)
     assert (logdir / "Log_old.txt").stat().st_size > 100 * 1024
     assert "after rotation" in (logdir / "Log.txt").read_text("utf-8")
+
+
+def _send_log_entries(pipe, entries):
+    """Sends evt.log.append for each (ts, level, source, flowId, text) and waits until the last text is in Log.txt."""
+    sender = AhfClient(pipe, "Editor4")
+    for ts, level, source, flow_id, text in entries:
+        payload = {"ts": ts, "level": level, "source": source, "text": text}
+        if flow_id:
+            payload["flowId"] = flow_id
+        sender.send("storage", "evt.log.append", payload)
+    sender.close()
+
+
+# --- cmd.storage.log.tail (WI-0080, PROTOCOL 4.6) -----------------------------------------------------
+
+def test_log_tail_returns_the_last_entries_with_level_flow_and_source(storage, flowdir, pipe):
+    _, _, client = storage
+    ts = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+    _send_log_entries(pipe, [(ts, "a0", "storage", "", "first"),
+                             (ts, "f1", "Flow 369404488", "Flow 369404488", "second"),
+                             (ts, "t2", "Flow 369404488", "Flow 369404488", "multi\nline"),
+                             (ts, "a3", "app", "", "fourth")])
+    assert _wait_for_text(flowdir / "Log" / "Log.txt", "fourth", 5) is not None
+
+    p = ask_ok(client, "cmd.storage.log.tail", {"limit": 3})
+    entries = p["entries"]
+    assert [e["text"] for e in entries] == ["second", "multi\nline", "fourth"], entries
+    assert [e["level"] for e in entries] == ["f1", "t2", "a3"]
+    assert entries[0]["source"] == "Flow 369404488" and entries[0]["flowId"] == "Flow 369404488"
+    assert "flowId" not in entries[2]
+    assert p["truncated"] is True
+    # ts is UTC and within a minute of now (converted from the local stamp of the file)
+    assert re.match(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", entries[0]["ts"]), entries[0]
+    assert abs(calendar.timegm(time.strptime(entries[0]["ts"], "%Y-%m-%d %H:%M:%S")) - time.time()) < 60
+
+
+def test_log_tail_of_one_source_file_and_a_missing_one(storage, flowdir, pipe):
+    _, _, client = storage
+    ts = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+    _send_log_entries(pipe, [(ts, "f1", "Flow 369404488", "Flow 369404488", "in the flow"),
+                             (ts, "a0", "storage", "", "not in the flow"),
+                             (ts, "f2", "Flow 369404488", "Flow 369404488", "last of the flow")])
+    assert _wait_for_text(flowdir / "Log" / "Log_Flow 369404488.txt", "last of the flow", 5) is not None
+
+    p = ask_ok(client, "cmd.storage.log.tail", {"source": "Flow 369404488", "limit": 10})
+    assert [e["text"] for e in p["entries"]] == ["in the flow", "last of the flow"], p
+    assert p["truncated"] is False
+    missing = ask_ok(client, "cmd.storage.log.tail", {"source": "nothing here"})
+    assert missing["entries"] == [] and missing["truncated"] is False
+
+
+def test_log_tail_reads_v1_lines_without_level_and_rejects_bad_payloads(storage, flowdir, pipe):
+    _, _, client = storage
+    logdir = flowdir / "Log"
+    logdir.mkdir(exist_ok=True)
+    (logdir / "Log.txt").write_bytes(b"\r\n--- 2025 01 02 03:04:05 ~old~old~ a v1 line\r\n")
+    ts = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+    _send_log_entries(pipe, [(ts, "a1", "storage", "", "new line")])
+    assert _wait_for_text(logdir / "Log.txt", "new line", 5) is not None
+
+    entries = ask_ok(client, "cmd.storage.log.tail", {})["entries"]
+    assert [e["text"] for e in entries] == ["a v1 line", "new line"], entries
+    assert entries[0]["level"] == "" and "flowId" not in entries[0]
+    assert entries[1]["level"] == "a1"
+
+    for payload in ({"limit": 0}, {"limit": 2001}, {"source": "a/b"}):
+        answer = ask(client, "cmd.storage.log.tail", payload)
+        assert answer["ok"] is False and answer["error"]["code"] == "bad_payload", (payload, answer)
 
 
 def _hold_exclusive(path, stop, share_mode, permanent=False):

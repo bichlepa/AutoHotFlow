@@ -40,6 +40,8 @@ class Storage extends Role {
     static LOG_BUNDLE_MAX_CHARS := 64 * 1024
     ; At most this many lost lines of one bundle are listed one by one in the own log.
     static LOG_LOST_REPORT_MAX := 5
+    ; cmd.storage.log.tail: the largest number of entries of one answer (WI-0080).
+    static LOG_TAIL_MAX := 2000
     static SelfLogFn := (level, source, text, flowId := "") => Role.Current._SelfLog(level, source, text, flowId)
 
     __New(args) {
@@ -81,6 +83,7 @@ class Storage extends Role {
         this.On("cmd.storage.categories.write", (msg) => this._CmdCategoriesWrite(msg))
         this.On("cmd.storage.categories.keepBroken", (msg) => this._CmdCategoriesKeepBroken(msg))
         this.On("cmd.storage.report.write", (msg) => this._CmdReportWrite(msg))
+        this.On("cmd.storage.log.tail", (msg) => this._CmdLogTail(msg))
         this.On("evt.log.append", (msg) => this._EvtLogAppend(msg))
     }
 
@@ -214,6 +217,21 @@ class Storage extends Role {
             , () => ReportFiles.Write(this.dataDir, stamp, reason, files))
     }
 
+    ; cmd.storage.log.tail (WI-0080, PROTOCOL 4.6): the last entries of Log.txt or of one source file. Queued like every
+    ; request, so the read runs between the log writes; the read is bounded (LogSink.Tail).
+    _CmdLogTail(msg) {
+        p := msg.payload
+        source := p.Get("source", "")
+        limit := p.Get("limit", 200)
+        if (!IsInteger(limit) || limit < 1 || limit > Storage.LOG_TAIL_MAX)
+            throw AhfError("cmd.storage.log.tail: limit must be 1 to " Storage.LOG_TAIL_MAX, ErrCode.BAD_PAYLOAD)
+        if (source != "" && (Type(source) != "String" || source != LogSink.SafeName(source)))
+            throw AhfError("cmd.storage.log.tail: source has characters that are not allowed in a file name", ErrCode.BAD_PAYLOAD)
+        fileName := (source = "") ? "Log.txt" : LogSink.FileNames(source)[2]
+        return this._Defer(msg, "log.tail", fileName
+            , () => LogSink.Tail(StoragePaths.LogDir(this.dataDir), fileName, limit))
+    }
+
     ; evt.log.append (noReply): no answer. Invalid entries are reported to the console only.
     _EvtLogAppend(msg) {
         p := msg.payload
@@ -305,7 +323,7 @@ class Storage extends Role {
         entry := Map("ts", ts, "level", level, "source", source, "text", text)
         if (flowId != "")
             entry["flowId"] := flowId
-        line := LogSink.Line(LogSink.LocalStamp(ts), thread, source, text)
+        line := LogSink.Line(LogSink.LocalStamp(ts), thread, source, text, level, flowId)
         names := LogSink.FileNames(source)
         ; The record lives until all files of the entry are written ("left" counts them).
         rec := Map("entry", entry, "line", line, "left", names.Length, "chars", StrLen(line))
