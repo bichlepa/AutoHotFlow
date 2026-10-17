@@ -1324,13 +1324,13 @@ Creates a shortcut file (default on the desktop) that starts the flow through th
 ### REQ-MGR-010 Flow list with categories and state
 
 - **v1:** yes
-- **v2:** partial (WI-0074: the tree is built from the model with the category order and the state marks: enabled, disabled, running, state unknown, independent triggers active, stopped by a limit, trigger not available; the number of running instances is not in the protocol yet; the look of the tree is checked by a gui test only, by the owner)
+- **v2:** partial (WI-0074: the tree is built from the model with the category order and the state marks: enabled, disabled, running, state unknown, independent triggers active, stopped by a limit, trigger not available; E0079: a running flow shows the number of its running instances, the count is in the snapshot and in `evt.flow.state` (tested); the text of the tree item is not checked by a test (F-0121), the look of the tree is checked by a gui test only, by the owner)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`, `tests/e2e/test_manager_flows.py::test_new_flow_is_added_to_the_list_and_another_client_sees_its_flow_too`, `tests/fault/test_manager_window.py::test_the_tree_shows_each_category_and_the_flow_below_its_category (gui)`
+- **Evidence:** `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`, `tests/e2e/test_manager_flows.py::test_the_running_instances_are_counted_in_the_snapshot_and_the_state`, `tests/e2e/test_manager_flows.py::test_new_flow_is_added_to_the_list_and_another_client_sees_its_flow_too`, `tests/fault/test_manager_window.py::test_the_tree_shows_each_category_and_the_flow_below_its_category (gui)`
 
-The manager shows all flows in a tree of categories, with their state (enabled, running). Flows without a category are under "Uncategorized".
+The manager shows all flows in a tree of categories, with their state (enabled, running). A running flow shows how many of its instances run. Flows without a category are under "Uncategorized".
 
 ### REQ-MGR-020 Create, rename, duplicate and delete flows
 

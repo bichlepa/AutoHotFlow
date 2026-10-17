@@ -530,12 +530,13 @@ class ManagerWindow {
 
     ; The text of a flow item: its name and the marks of its state (translated): enabled, disabled, running, state unknown,
     ; independent triggers active while the flow is inactive, stopped by a limit, a trigger that is not available.
+    ; A running flow shows the number of its running instances (E0079).
     _FlowLabel(rec) {
         marks := []
         if (rec["stateError"] != "")
             marks.Push(Lang("Flow_state_unknown"))
         else if (rec["executing"])
-            marks.Push(Lang("Flow_state_running"))
+            marks.Push(rec["instances"] > 0 ? Lang("Flow_state_running_n", rec["instances"]) : Lang("Flow_state_running"))
         else
             marks.Push(Lang(rec["enabled"] ? "Flow_state_enabled" : "Flow_state_disabled"))
         if (!rec["enabled"] && rec["independentActive"] > 0)

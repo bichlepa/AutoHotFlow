@@ -212,7 +212,8 @@ class ManagerModel {
         for f in p.Get("flows", []) {
             id := f["flowId"]
             recs[id] := Map("flowId", id, "name", f.Get("name", ""), "category", f.Get("category", "")
-                , "enabled", f.Get("enabled", 0), "executing", f.Get("executing", 0), "rev", f.Get("rev", 0)
+                , "enabled", f.Get("enabled", 0), "executing", f.Get("executing", 0), "instances", f.Get("instances", 0)
+                , "rev", f.Get("rev", 0)
                 , "independentActive", f.Get("independentActive", 0), "stateError", f.Get("stateError", "")
                 , "triggers", f.Get("triggers", []), "limit", "")
             ; A flow stopped by its runaway guard keeps the mark until it is enabled again (the snapshot does not carry it).
@@ -342,6 +343,7 @@ class ManagerModel {
         rec := this.flows[id]
         rec["enabled"] := p.Get("enabled", 0)
         rec["executing"] := p.Get("executing", 0)
+        rec["instances"] := p.Get("instances", 0)
         rec["independentActive"] := p.Get("independentActive", 0)
         rec["stateError"] := p.Get("stateError", "")      ; absent: the state is known again
         if (rec["enabled"])
@@ -590,7 +592,8 @@ class ManagerModel {
         for id in this.flowIds {
             rec := this.flows[id]
             flows.Push(Map("flowId", id, "name", rec["name"], "category", rec["category"]
-                , "enabled", Json.Bool(rec["enabled"]), "executing", Json.Bool(rec["executing"]), "rev", rec["rev"]
+                , "enabled", Json.Bool(rec["enabled"]), "executing", Json.Bool(rec["executing"]), "instances", rec["instances"]
+                , "rev", rec["rev"]
                 , "independentActive", rec["independentActive"], "stateError", rec["stateError"], "limit", rec["limit"]
                 , "triggerMessages", ManagerModel._TriggerMessages(rec)))
         }

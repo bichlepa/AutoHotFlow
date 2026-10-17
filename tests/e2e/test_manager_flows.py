@@ -397,3 +397,25 @@ def test_a_running_flow_is_shown_as_running_while_it_runs(started):
     assert wait_until(lambda: any(e["type"] == "evt.flow.state" and e["payload"].get("executing")
                                   for e in trace(obs)), scaled(10)), "no running state in the manager's record"
     assert wait_state(obs, lambda s: flow(obs)["executing"] is False, timeout=15)
+
+
+def slow_parallel(d):
+    """The skeleton with a sleep of 3 s and the policy parallel: two instances can run at the same time."""
+    def change(data):
+        data["flowSettings"]["ExecutionPolicy"] = "parallel"
+        data["allElements"]["element0000000002"]["pars"]["Duration"] = "3000"
+    write_flow(d, change)
+
+
+def test_the_running_instances_are_counted_in_the_snapshot_and_the_state(started):
+    sup, obs = started(slow_parallel)
+    for _ in range(2):
+        ans = obs.request("engine", "cmd.flow.start", {"flowId": FLOW}, timeout=scaled(5))
+        assert ans["payload"]["ok"], ans
+    assert wait_state(obs, lambda s: flow(obs)["instances"] == 2, timeout=10), flow(obs)
+    snap = obs.request("engine", "cmd.engine.snapshot", {}, timeout=scaled(5))["payload"]
+    assert [f["instances"] for f in snap["flows"] if f["flowId"] == FLOW] == [2]
+    assert any(e["type"] == "evt.flow.state" and e["payload"].get("instances") == 2 for e in trace(obs))
+    obs.request("engine", "cmd.flow.stop", {"flowId": FLOW}, timeout=scaled(5))
+    assert wait_state(obs, lambda s: flow(obs)["instances"] == 0 and flow(obs)["executing"] is False, timeout=10)
+

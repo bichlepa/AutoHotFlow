@@ -203,7 +203,7 @@ class Engine extends Role {
         enabled := IsObject(rec) ? rec.IsFlowEnabled() : false
         independent := IsObject(rec) ? rec.IndependentActiveCount() : 0
         payload := Map("flowId", flowId, "enabled", Json.Bool(enabled), "independentActive", independent
-            , "executing", Json.Bool(this.executor.IsExecuting(flowId)))
+            , "executing", Json.Bool(this.executor.IsExecuting(flowId)), "instances", this.executor.RunningCount(flowId))
         stateError := this.flowState.ErrorOf(flowId)
         if (stateError != "")
             payload["stateError"] := stateError          ; the state is unknown (E0063): its file cannot be read
@@ -482,6 +482,7 @@ class Engine extends Role {
         for rec in this.flows.All() {
             entry := Map("flowId", rec.FlowId, "name", rec.Def.Name, "category", rec.Def.Category
                 , "enabled", Json.Bool(rec.IsFlowEnabled()), "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))
+                , "instances", this.executor.RunningCount(rec.FlowId)
                 , "rev", rec.Rev, "independentActive", rec.IndependentActiveCount(), "triggers", this.arms.Snapshot(rec))
             stateError := this.flowState.ErrorOf(rec.FlowId)
             if (stateError != "")

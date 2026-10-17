@@ -97,6 +97,10 @@ class Executor {
         return false
     }
 
+    ; The number of instances of the flow that run or stop (not the waiting ones): the count of the snapshot and of
+    ; evt.flow.state (PROTOCOL 4.2, E0079).
+    RunningCount(flowId) => this._CountRunning(flowId)
+
     ; Instances with their threads for the snapshot (doc/PROTOCOL.md 4.9): ids, states, the element of each thread.
     ; No variables and no parameters. At most DIAG_INSTANCES instances (the rest is only counted by the caller).
     DiagInstances() {
@@ -274,7 +278,7 @@ class Executor {
                 , Map("flowId", flowId, "instanceId", instId, "position", this._waiting[flowId].Length))
             return instId
         }
-        this._Launch(runRec, true)
+        this._Launch(runRec)
         this._owner.Kick()
         return instId
     }
@@ -345,8 +349,9 @@ class Executor {
     ; Starts a new or waiting instance: creates the trigger thread, reports the start and moves the trigger
     ; thread on. The trigger fires when the engine is asked to start the flow: running, then finished (v1
     ; newInstance). A waiting instance reads the newest revision now; if the flow or its trigger is gone by
-    ; then, the instance ends without having started. emitState: false when the flow was executing all along.
-    _Launch(run, emitState) {
+    ; then, the instance ends without having started. Every start sends evt.flow.state: it carries the count of running
+    ; instances (E0079), which changes with every start, also with a promoted waiting instance.
+    _Launch(run) {
         flowId := run["flowId"]
         instId := run["instanceId"]
         inst := run["inst"]
@@ -369,8 +374,7 @@ class Executor {
         trigger.Vars["A_TriggerID"] := triggerId
         this._SetTriggerVars(run, def, trigger)
         this._owner.Emit("topic:flow:" flowId, "evt.instance.started", Map("flowId", flowId, "instanceId", instId))
-        if (emitState)
-            this._owner.EmitFlowState(flowId)
+        this._owner.EmitFlowState(flowId)
         this._ElementStarted(run, triggerId)
         this._ElementStopped(run, triggerId, "normal", "")
         this._Advance(run, trigger)
@@ -780,7 +784,7 @@ class Executor {
         runRec := this._runs.Get(instId, "")
         if (!IsObject(runRec))
             return true
-        this._Launch(runRec, false)
+        this._Launch(runRec)
         return true
     }
 
