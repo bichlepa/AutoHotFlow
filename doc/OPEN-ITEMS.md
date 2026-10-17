@@ -25,6 +25,11 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 ## Findings
 
+### F-9000*: Fast tier: hotkey input tests fail when the input desktop is locked
+
+**What:** 10 tests of `tests/integration/test_hotkey_input.py` (`@input`) failed in run 20261017-105241-27428 (commit 237441d plus uncommitted test changes): "the probe key vk88 did not arrive although the input desktop is usable and no modifier is held: hotkey path, not the desktop". A serial rerun at 11:01 skipped all of them ("no input desktop": the desktop was locked or secure).
+**Status:** observed once; not reproduced; not checked against a base commit; cause not known. The change of WI-0070 touches the engine trigger path only in a guard (`IsDeleting`). Watch the next fast runs. A locked PC explains the skips (LogonUI was running during the session, verified).
+
 ### F-0114: Load warnings in the trigger host and in `Trigger_Start_up`
 
 **What:** A local `message` (`TriggerHost._CmdArm`, `ReportCallbackError`) and a local `type` (`Trigger_Start_up.Enable`) are reported as the same name as a global variable on every start of the trigger host (seen in the engine and triggerhost logs, WI-0064). It is the same trap as in `doc/howto/gui-and-hotkeys.md` (case-insensitive names).
