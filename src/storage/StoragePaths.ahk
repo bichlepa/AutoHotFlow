@@ -13,6 +13,8 @@ class StoragePaths {
     static VarsDir(dataDir) => dataDir "\Variables"
     static LogDir(dataDir) => dataDir "\Log"
     static StatesDir(dataDir) => dataDir "\FlowStates"
+    ; Job folders of the .ahf archives (WI-0081): made here, removed after each operation and at the start of storage.
+    static ArchiveDir(dataDir) => dataDir "\Archive"
 
     ; Absolute path of a flow file given as "Flows/<name>.json".
     static Flow(dataDir, flowPath) {

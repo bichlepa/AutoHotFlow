@@ -15,6 +15,8 @@
 #Include StateFiles.ahk
 #Include CategoryFile.ahk
 #Include V1Source.ahk
+#Include ArchivePack.ahk
+#Include ArchiveUnpack.ahk
 
 ; Storage role (WI-0012, ARCHITECTURE D0007 and 4, PROTOCOL 4.6). The only process that touches files
 ; under the data directory: flows, variables and logs. Requests are queued (WriteQueue) and answered
@@ -88,6 +90,8 @@ class Storage extends Role {
         this.On("cmd.storage.v1.read", (msg) => this._CmdV1Read(msg))
         this.On("cmd.storage.autostart.check", (msg) => this._CmdAutostartCheck(msg))
         this.On("cmd.storage.autostart.remove", (msg) => this._CmdAutostartRemove(msg))
+        this.On("cmd.storage.ahf.pack", (msg) => this._CmdAhfPack(msg))
+        this.On("cmd.storage.ahf.unpack", (msg) => this._CmdAhfUnpack(msg))
         this.On("cmd.storage.log.tail", (msg) => this._CmdLogTail(msg))
         this.On("evt.log.append", (msg) => this._EvtLogAppend(msg))
     }
@@ -258,6 +262,42 @@ class Storage extends Role {
         return this._Defer(msg, "autostart.remove", startupDir, () => V1Source.RemoveAutostart(startupDir, v1Dir))
     }
 
+    ; cmd.storage.ahf.pack / unpack (WI-0081, PROTOCOL 4.6): the .ahf archives. The job runs in the background queue (AddLow),
+    ; it asks again while tar runs; the paths are checked here (absolute, extension .ahf).
+    _CmdAhfPack(msg) {
+        p := msg.payload
+        flowIds := p.Get("flowIds", "")
+        if (!(flowIds is Array) || flowIds.Length = 0)
+            throw AhfError("cmd.storage.ahf.pack: flowIds must be a list with at least one flow", ErrCode.BAD_PAYLOAD)
+        path := Storage._AhfPath(p.Get("path", ""), "cmd.storage.ahf.pack")
+        SplitPath(path, , &dir)
+        if (!DirExist(dir))
+            throw AhfError("the folder '" dir "' does not exist", ErrCode.NOT_FOUND)
+        job := ArchivePack(this.dataDir, flowIds, path)
+        return this._DeferBackground(msg, "ahf.pack", path, () => job.Step())
+    }
+
+    _CmdAhfUnpack(msg) {
+        path := Storage._AhfPath(msg.payload.Get("path", ""), "cmd.storage.ahf.unpack")
+        kind := FileExist(path)
+        if (kind = "")
+            throw AhfError("the file '" path "' does not exist", ErrCode.NOT_FOUND)
+        if (InStr(kind, "D"))
+            throw AhfError("'" path "' is a folder, not an .ahf file", ErrCode.BAD_PAYLOAD)
+        job := ArchiveUnpack(this.dataDir, path)
+        return this._DeferBackground(msg, "ahf.unpack", path, () => job.Step())
+    }
+
+    ; An absolute path (a drive) with the extension .ahf, on one line; the text as given.
+    static _AhfPath(rawPath, opName) {
+        text := String(rawPath)
+        if (!RegExMatch(text, "^[A-Za-z]:\\") || InStr(text, "`n") || InStr(text, "`r"))
+            throw AhfError(opName ": the path must be an absolute path on one line", ErrCode.BAD_PAYLOAD)
+        if (!RegExMatch(text, "i)\.ahf$"))
+            throw AhfError(opName ": the file must have the extension .ahf", ErrCode.BAD_PAYLOAD)
+        return text
+    }
+
     ; cmd.storage.log.tail (WI-0080, PROTOCOL 4.6): the last entries of Log.txt or of one source file. Queued like every
     ; request, so the read runs between the log writes; the read is bounded (LogSink.Tail).
     _CmdLogTail(msg) {
@@ -291,6 +331,15 @@ class Storage extends Role {
         timeoutMs := (msg.timeoutMs > 0) ? msg.timeoutMs : Storage.DEFAULT_TIMEOUT_MS
         this.queue.Add(Map("deadline", Time.NowMs() + timeoutMs, "run", run
             , "finish", (payload) => this._Finish(msg, opName, subject, payload)))
+        return Deferred.Marker()
+    }
+
+    ; Like _Defer, but in the background queue: the operation runs when no request waits, and it asks again (retry) every
+    ; ArchiveTar.POLL_MS while tar runs (WI-0081). Its time is ArchiveTar.TIMEOUT_MS, then it is answered busy.
+    _DeferBackground(msg, opName, subject, run) {
+        this.queue.AddLow(Map("deadline", "", "run", run
+            , "finish", (payload) => this._Finish(msg, opName, subject, payload)
+            , "retryMs", ArchiveTar.TIMEOUT_MS, "retryDelayMs", ArchiveTar.POLL_MS))
         return Deferred.Marker()
     }
 
@@ -504,6 +553,12 @@ class Storage extends Role {
         removed += AtomicFile.RemoveStaleTemps(StoragePaths.VarsDir(this.dataDir))
         removed += AtomicFile.RemoveStaleTemps(StoragePaths.StatesDir(this.dataDir))
         removed += AtomicFile.RemoveStaleTemps(this.dataDir)
+        ; job folders of an archive operation that a crash or a running tar left behind (WI-0081)
+        try {
+            DirDelete(StoragePaths.ArchiveDir(this.dataDir), true)
+        } catch {
+            ; no folder (the normal case) or one that is still in use: nothing to remove now
+        }
         return Map("removed", removed)
     }
 
