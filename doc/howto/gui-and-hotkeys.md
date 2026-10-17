@@ -77,3 +77,17 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** The owner left the tray menu of the idle stub manager open for more than 10 s: the manager was not judged hung, so it kept answering `sys.ping`. Which part of the docs does not apply (perhaps "navigating" means only the active use of the menu) is not known. Not checked: a menu opened while a thread runs (does that thread pause until the menu closes, and the timers with it?), a menu under load, a menu the user navigates. Do not rely on "a menu blocks nothing" before WI-0072 has checked these cases.
 - **Status:** verified by hand for an idle process only (owner, 2026-10-17, once); the other cases and the mechanism are not checked
 - **Source:** `src/manager/StubManager.ahk` (`_SetupTray`), `src/supervisor/Heartbeat.ahk`
+
+### Standard dialogs (`FileSelect`, `DirSelect`, `MsgBox`) keep the message handling going, but stall the timers (verified)
+
+- **Problem:** A UI role must answer `sys.ping` while a file or folder dialog is open. Those dialogs block the calling thread until the user answers. The question was whether the message handling and the timers of the same process keep running meanwhile.
+- **Wrong:** Assuming that a blocked thread blocks the whole process, or that the timers work during a standard dialog as they do otherwise.
+- **Right:** Measured with `tests/ahk/helpers/modal_spike.ahk` (`python tools/ahkrun.py --no-dialog-guard --timeout 40 tests/ahk/helpers/modal_spike.ahk <mode> 10000`): a ping posted every 500 ms to the script window (WM_AHF_WAKE) and a tick timer every 100 ms ran while the dialog was open for 10 s; the script closed the dialog itself. Results (one run each, `FileSelect` twice):
+  - `none` (baseline): 20 pings answered, 91 ticks, longest tick gap 0 ms.
+  - `FileSelect`: all pings answered (max answer latency 47 ms and 32 ms), 85 and 86 ticks, longest tick gap 718 ms and 640 ms.
+  - `DirSelect`: all pings answered (max latency 16 ms), 89 ticks, longest tick gap 250 ms.
+  - `MsgBox` (own timeout 10 s): all pings answered (max latency 0 ms), 91 ticks, longest tick gap 140 ms.
+  So the pings are answered, but the timers stall for up to 0.7 s, and the thread that opened the dialog waits for the answer. Rule 3 still forbids standard dialogs on the message path: the answered pings do not show that nothing blocks there. The window class of all three is `#32770`; for `DirSelect` the window title is "Ordner suchen" (German Windows).
+- **Status:** verified (one probe, 5 runs on this machine, Windows 11 with German UI; the dialog was closed by the probe with `WM_CLOSE`). Not checked: other Windows versions, a dialog opened from an element worker, a dialog at a DPI above 100 %, a dialog while the process is under load.
+- **Decision (WI-0069):** `ui_common/` does not use the standard dialogs but its own non-blocking dialogs (`UiDialogs.ahk`). Whether a UI role may use `FileSelect`/`DirSelect` at all is open (owner decision, see the report of WI-0069).
+- **Source:** `tests/ahk/helpers/modal_spike.ahk`, `tools/ahkrun.py` (`--no-dialog-guard`)

@@ -150,7 +150,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (9.8 KB, 79 lines)
+## doc/howto/gui-and-hotkeys.md (12.0 KB, 93 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -162,6 +162,7 @@ L51-57 A local variable named like a built-in function silently calls the variab
 L59-64 `contains` is a reserved word in AutoHotkey v2 (verified) (verified)
 L66-71 An object literal with a lambda property is called with the object as an extra argument (verified) (partly verified)
 L73-79 An open tray menu does not stop the pipe handling, although the docs suggest it (verified by hand) (partly verified)
+L81-93 Standard dialogs (`FileSelect`, `DirSelect`, `MsgBox`) keep the message handling going, but stall the timers (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (9.6 KB, 119 lines)
