@@ -45,7 +45,7 @@ class ManagerWindow {
         ["ImportExport", 328, 252, 200, "Import_and_export"],
         ["About", 328, 292, 200, "About_AutoHotFlow"], ["Help", 538, 292, 200, "Help_#noun"],
         ["ShowLog", 328, 332, 200, "Show_log"], ["Exit", 538, 332, 200, "Exit_#verb"],
-        ["Notices", 328, 372, 200, "Notices"], ["ImportV1", 328, 412, 200, "Import_from_v1"]]
+        ["Notices", 328, 372, 200, "Notices"]]
     ; The questions: kind -> [title key, text key]. Texts take the arguments of the question.
     static ASK := Map("independent", ["Ask_independent_title", "Ask_independent_text"]
         , "force", ["Ask_force_title", "Ask_force_text"]
@@ -258,17 +258,16 @@ class ManagerWindow {
                 this.role.OpenLog("")
             case "Notices":
                 this.role.OpenNotices()
-            case "ImportV1":
-                this._ImportV1()
             case "ImportExport":
                 this._ImportExport()
         }
     }
 
-    ; Import and export of .ahf files (WI-0081): the user chooses the direction, then the file dialog of the choice. The
-    ; dialogs are only opened by these clicks (E0076).
+    ; Import and export (WI-0081, WI-0076): the user chooses the direction, then the dialog of the choice: export or import
+    ; of .ahf files (the file dialog), or the import from v1 (the folder dialog). The dialogs are only opened by these
+    ; clicks (E0076).
     _ImportExport() {
-        items := [[1, Lang("Archive_export_action")], [2, Lang("Archive_import_action")]]
+        items := [[1, Lang("Archive_export_action")], [2, Lang("Archive_import_action")], [3, Lang("Import_from_v1")]]
         this.Choose("importExport", items, (idx) => this._ExportOrImport(idx))
     }
 
@@ -290,6 +289,8 @@ class ManagerWindow {
             if (path = "")
                 return
             this.role.ImportFile(path, (res) => 0)
+        } else if (idx = 3) {
+            this._ImportV1()
         }
     }
 
@@ -328,7 +329,7 @@ class ManagerWindow {
     }
 
     ; Import from v1 (WI-0076): the folder dialog of the user (default: the data folder of v1), then the import. The dialog is
-    ; only opened by this click (E0076). The startup folder is the real one: the autostart step of the import asks first.
+    ; only opened by the choice "Import from v1" of the button "Import and export" (E0076). The startup folder is the real one: the autostart step of the import asks first.
     _ImportV1() {
         ; "*" makes the start folder a starting point the user may leave; without it the dialog is locked to that folder.
         start := DirExist(A_AppData "\AutoHotFlow") ? "*" A_AppData "\AutoHotFlow" : "*" A_AppData

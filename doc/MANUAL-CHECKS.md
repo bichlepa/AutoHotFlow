@@ -17,7 +17,7 @@ Test on the manager window (REQ-MGR-010 to REQ-MGR-050, REQ-MIG-060, REQ-USE-030
 
 The start prepares a fresh data folder first (see above), so no preparation by hand is needed. It also starts the debug window.
 
-**Start, part B (the import from v1).** VS Code task "Setup: copy of the v1 data folder for the import check (manual_check.py copy-v1)" first: it copies `%APPDATA%\AutoHotFlow` (the v1 data folder, only read) to `%TEMP%\ahf_manual_check_v1`. Then the same start as in part A (the task "Start: manual check 1 ..."). The import in part B takes the copy, not the original; the folder dialog of the button opens at `%APPDATA%\AutoHotFlow`, so the copy has to be chosen by hand.
+**Start, part B (the import from v1).** VS Code task "Setup: copy of the v1 data folder for the import check (manual_check.py copy-v1)" first: it copies `%APPDATA%\AutoHotFlow` (the v1 data folder, only read) to `%TEMP%\ahf_manual_check_v1`. Then the same start as in part A (the task "Start: manual check 1 ..."). The import in part B takes the copy, not the original; the folder dialog (choice "Import from v1" of the button "Import and export") opens at `%APPDATA%\AutoHotFlow`, so the copy has to be chosen by hand.
 
 ### Steps, part A
 
@@ -41,11 +41,11 @@ The start prepares a fresh data folder first (see above), so no preparation by h
 
 | # | Step | Expected result | Result |
 |---|---|---|---|
-| 14 | Start part B. Click "Import from v1". | A folder dialog opens. Choose `%TEMP%\ahf_manual_check_v1` (the copy). The window stays usable while the dialog is open. | |
+| 14 | Start part B. Click "Import and export", then choose "Import from v1" (the third item). | A folder dialog opens. Choose `%TEMP%\ahf_manual_check_v1` (the copy). The window stays usable while the dialog is open. | |
 | 15 | Wait for the import to end. | A report window "Import from v1 - report" opens. It lists the flows: created, skipped or failed with the reason, and the MIGRATION places (`MIGRATION M-...`). The text can be selected and copied (Ctrl+A, Ctrl+C). | |
 | 16 | In the report, look at the flows of the folder. | Every flow of the copy's `Saved Flows` is listed, none from `demo flows`. The broken file (a file that is not valid JSON, if the copy has one) is listed as failed; the others are imported. | |
 | 17 | Look at the imported flows in the tree. | They are listed under their names, all disabled (no state mark of a running or enabled flow). | |
-| 18 | Start the import a second time into the same window (Import from v1, same folder). | A question asks whether to import the flows that exist already as copies. No: they are skipped (reason: a flow with this ID exists already). Yes: they come as copies with a number in the name (`<name> 2`). | |
+| 18 | Start the import a second time into the same window (Import and export, then Import from v1, same folder). | A question asks whether to import the flows that exist already as copies. No: they are skipped (reason: a flow with this ID exists already). Yes: they come as copies with a number in the name (`<name> 2`). | |
 | 19 | Look at the variables of the report. | Global variables that v2 has keep their value and are listed as kept. Static variables of an imported flow are listed as taken over. | |
 | 20 | When the copy has an autostart shortcut of v1 (a shortcut `AutoHotFlow.lnk` in the Startup folder that starts AutoHotFlow.exe; check it with `shell:startup` first), the import asks whether to remove it. | The question appears with the preselection "No". No: the shortcut stays. Yes: it is removed. A shortcut of another program is not asked. | |
 | 21 | Check the original folder `%APPDATA%\AutoHotFlow`. | Nothing in it has changed (compare with the folder before the import, for example by the file dates). | |
