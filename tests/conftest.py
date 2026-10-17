@@ -5,7 +5,7 @@ Environment variables:
   AHF_TEST_KEEP  set to 1 to keep the temporary data directories after a test (failed tests keep theirs anyway,
                  see "Run log" below)
   AHF_TEST_LOGS  folder for the run logs (default: %TEMP%/ahf_testruns); the newest 15 runs are kept
-  AHF_WINDOWS_LANGUAGE  hexadecimal LCID that replaces the language of Windows for the setting "language" = "" (WI-0077); this
+  AHF_WINDOWS_LANGUAGE  hexadecimal LCID that replaces the language of Windows for the setting "language" = "" (WI-0077; the product honours it too); this
                  file sets it to 0409 (English) so that the tests do not depend on the language of the machine
   AHF_MAX_WORKERS, AHF_ADMISSION_TIMEOUT, AHF_NO_ADMISSION, AHF_ADMITTED, AHF_HISTORY_DIR, AHF_LOAD_SAMPLER
                  machine-wide admission, load figures and run history (WI-0059, tests/support/runrecord.py)
