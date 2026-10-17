@@ -22,7 +22,7 @@
 ; waits, the called instance runs on, as in v1.
 class Action_Execute_Flow extends AhfElement {
     static Mode := "inline"
-    static ActsOnSystem := false
+    static ActsOnSystem := true    ; starts or enables other flows, which can act on the system (WI-0081, REQ-SEC-060)
     static Level := "Beginner"
     static Stability := "Stable"
 

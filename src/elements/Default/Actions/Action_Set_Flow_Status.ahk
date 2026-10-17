@@ -23,7 +23,7 @@
 ; the element with "exception" and changes nothing.
 class Action_Set_Flow_Status extends AhfElement {
     static Mode := "inline"
-    static ActsOnSystem := false
+    static ActsOnSystem := true    ; starts or enables other flows, which can act on the system (WI-0081, REQ-SEC-060)
     static Level := "Beginner"
     static Stability := "Stable"
 
