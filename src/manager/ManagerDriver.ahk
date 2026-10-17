@@ -19,6 +19,12 @@ class ManagerDriver {
         this.role := role
         this.model := model
         this.allowed := Map("cmd.flow.start", 1, "cmd.flow.stop", 1, "cmd.flow.toggle", 1, "cmd.engine.snapshot", 1)
+        ; WI-0074: the operations on flows and categories (ManagerOps). The driver answers their questions itself: the
+        ; answers of the test are set with the op "answers" (kind -> value, see _Answer); a question without an answer is
+        ; answered no, "" (Cancel) or 0 (Cancel of a choice).
+        this.flowOps := role.ops
+        this.flowOps.ask := this
+        this.answers := Map()
         this.ops := Map()
         this.ops["select"] := (args, done) => this._OpSelect(args, done)
         this.ops["run"] := (args, done) => model.RunOrStop(args.Get("flowId", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
@@ -27,6 +33,21 @@ class ManagerDriver {
         this.ops["hide"] := (args, done) => this._OpHide(args, done)
         this.ops["log"] := (args, done) => this._OpLog(args, done)
         this.ops["logFilter"] := (args, done) => this._OpLogFilter(args, done)
+        this.ops["answers"] := (args, done) => this._OpAnswers(args, done)
+        this.ops["selectToggle"] := (args, done) => this._OpSelectToggle(args, done)
+        this.ops["selectCategory"] := (args, done) => this._OpSelectCategory(args, done)
+        this.ops["enable"] := (args, done) => this._OpSwitch(args, done, true)
+        this.ops["disable"] := (args, done) => this._OpSwitch(args, done, false)
+        this.ops["create"] := (args, done) => this.flowOps.NewFlow(args.Get("category", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
+        this.ops["duplicate"] := (args, done) => this.flowOps.Duplicate(args.Get("flowId", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
+        this.ops["delete"] := (args, done) => this.flowOps.Delete(ManagerDriver.Ids(args), (ans) => done(ManagerDriver.AnswerResult(ans)))
+        this.ops["rename"] := (args, done) => this._OpRename(args, done)
+        this.ops["move"] := (args, done) => this.flowOps.Move(ManagerDriver.Ids(args), args.Get("category", ""), args.Get("before", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
+        this.ops["catNew"] := (args, done) => this.flowOps.CategoryNew((ans) => done(ManagerDriver.AnswerResult(ans)))
+        this.ops["catRename"] := (args, done) => this.flowOps.CategoryRename(args.Get("name", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
+        this.ops["catDelete"] := (args, done) => this.flowOps.CategoryDelete(args.Get("name", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
+        this.ops["catSort"] := (args, done) => this.flowOps.CategorySort((ans) => done(ManagerDriver.AnswerResult(ans)))
+        this.ops["catMove"] := (args, done) => this.flowOps.CategoryMove(args.Get("name", ""), args.Get("before", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
         role.On("cmd.test.command", (msg) => this._OnCommand(msg))
         role.On("cmd.test.state", (msg) => Map("ok", true, "state", ManagerDriver.Wire(model.State())))
         role.On("cmd.test.trace", (msg) => this._OnTrace(msg))
@@ -99,10 +120,72 @@ class ManagerDriver {
         done(Map("ok", true, "log", this.model.LogState()))
     }
 
-    ; The result of an operation that sent a command: whether the answer was ok, its code and message.
+    ; WI-0074: the answers of the questions of an operation (kind -> "yes"/"no", a text, or a choice number).
+    _OpAnswers(args, done) {
+        given := args.Get("answers", Map())
+        if (!(given is Map))
+            throw AhfError("cmd.test.op answers: answers must be an object", ErrCode.BAD_PAYLOAD)
+        this.answers := given
+        done(Map("ok", true))
+    }
+
+    _OpSelectToggle(args, done) {
+        this.model.SelectToggle(args.Get("flowId", ""))
+        done(Map("ok", true, "selectedFlows", ManagerDriver.Wire(this.model.SelectedFlows())))
+    }
+
+    _OpSelectCategory(args, done) {
+        this.model.SelectCategory(args.Get("name", ""))
+        done(Map("ok", true))
+    }
+
+    ; enable/disable of flows (flowIds); the answer is the one of the last command, or sent false when none was sent.
+    _OpSwitch(args, done, enable) {
+        this.flowOps.SetEnabled(ManagerDriver.Ids(args), enable, (ans) => done(ManagerDriver.AnswerResult(ans)))
+    }
+
+    ; rename: with name the engine gets the name as given (its check is tested); without name the dialog's check and answer.
+    _OpRename(args, done) {
+        flowId := args.Get("flowId", "")
+        if (args.Has("name"))
+            this.flowOps.RenameTo(flowId, args["name"], (ans) => done(ManagerDriver.AnswerResult(ans)))
+        else
+            this.flowOps.Rename(flowId, (ans) => done(ManagerDriver.AnswerResult(ans)))
+    }
+
+    ; The questions of ManagerOps (ask seam, synchronous here): the answer of the test or the cancel value.
+    Confirm(kind, args, done) {
+        done(this._Answer(kind, "no") = "yes")
+    }
+
+    Input(kind, default, check, done) {
+        value := this._Answer(kind, "")
+        if (value = "" || check(value) != "")
+            value := ""
+        done(value)
+    }
+
+    Choose(kind, items, done) {
+        done(this._Answer(kind, 0))
+    }
+
+    _Answer(kind, cancel) => this.answers.Has(kind) ? this.answers[kind] : cancel
+
+    ; The flow IDs of an operation: payload flowIds (a list); a single flowId is taken as a list of one.
+    static Ids(args) {
+        if (args.Has("flowIds"))
+            return args["flowIds"]
+        return args.Has("flowId") ? [args["flowId"]] : []
+    }
+
+    ; The result of an operation that sent a command: whether the answer was ok, its code and message. sent false when
+    ; the operation sent nothing (a question was answered no, or no flow matched).
     static AnswerResult(ans) {
-        return Map("ok", true, "answer", ManagerDriver.Wire(Map("type", ans["type"], "flowId", ans["flowId"]
-            , "ok", ans["ok"], "code", ans["code"], "message", ans["message"], "ms", ans["ms"])))
+        if (!IsObject(ans))
+            return Map("ok", true, "sent", Json.False)
+        return Map("ok", true, "sent", Json.True, "answer", ManagerDriver.Wire(Map("type", ans["type"], "flowId", ans["flowId"]
+            , "ok", ans["ok"], "code", ans["code"], "message", ans["message"], "ms", ans["ms"]
+            , "payload", ans["payload"])))
     }
 
     ; A copy of a node as it goes onto the wire: Json.Parse read true/false as 1/0, so the truth fields of the protocol are

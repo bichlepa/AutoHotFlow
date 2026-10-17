@@ -33,6 +33,8 @@ class ManagerModel {
     ; The log (WI-0080): entries kept in the model (the oldest go), and the time to wait for the answer of the tail.
     static LOG_KEEP := 1000
     static LOG_TAIL_MS := 5000
+    ; WI-0074: after the user enabled a flow, its trigger messages are reported for this long (ms).
+    static WATCH_MS := 30000
     ; The values of EngineState.
     static ENGINE_WAITING := "waiting"   ; no snapshot yet
     static ENGINE_LOADING := "loading"   ; the engine answers but has not loaded all flows (snapshot ready false)
@@ -65,7 +67,11 @@ class ManagerModel {
         this.flowIds := []              ; the flow IDs in the order of the last snapshot
         this.categories := []           ; Array of Map(name, flows: [flowId, ..]) in the order of the engine
         this.settings := Map()
-        this.selectedFlow := ""
+        this.selectedFlow := ""         ; the focused flow ("" = none)
+        this.selectedSet := Map()       ; flowId -> true: the flows of a multi-selection (Ctrl click); empty = only selectedFlow
+        this.catSelected := false       ; a category header is selected ...
+        this.selectedCat := ""          ; ... with this name ("" = Uncategorized)
+        this.watchPkg := Map()          ; flowId -> wall clock ms until which a trigger message is reported (WI-0074)
         this.subscribed := Map()        ; flowId -> true, the topics flow:<id> that are subscribed
         this.snapshotOut := false       ; a cmd.engine.snapshot is in flight
         this.snapshotAgain := ""        ; the reason of a resync that came while one was in flight
@@ -208,7 +214,10 @@ class ManagerModel {
             recs[id] := Map("flowId", id, "name", f.Get("name", ""), "category", f.Get("category", "")
                 , "enabled", f.Get("enabled", 0), "executing", f.Get("executing", 0), "rev", f.Get("rev", 0)
                 , "independentActive", f.Get("independentActive", 0), "stateError", f.Get("stateError", "")
-                , "triggers", f.Get("triggers", []))
+                , "triggers", f.Get("triggers", []), "limit", "")
+            ; A flow stopped by its runaway guard keeps the mark until it is enabled again (the snapshot does not carry it).
+            if (this.flows.Has(id) && this.flows[id]["limit"] != "" && !recs[id]["enabled"])
+                recs[id]["limit"] := this.flows[id]["limit"]
             ids.Push(id)
         }
         this.flows := recs
@@ -216,6 +225,7 @@ class ManagerModel {
         this.categories := ManagerModel._CopyCategories(p.Get("categories", []))
         settings := p.Get("settings", Map())
         this.settings := IsObject(settings) ? settings : Map()
+        this._PruneSelection()
         if (this.selectedFlow != "" && !recs.Has(this.selectedFlow))
             this.Select("")
         for id in ids {
@@ -224,6 +234,16 @@ class ManagerModel {
                 this.peer.Subscribe("flow:" id)
             }
         }
+    }
+
+    ; The messages of the triggers of a flow that are not empty (an arming error, for example a missing package).
+    static _TriggerMessages(rec) {
+        out := []
+        for t in rec["triggers"] {
+            if (t.Get("message", "") != "")
+                out.Push(t["message"])
+        }
+        return out
     }
 
     static _CopyCategories(list) {
@@ -273,6 +293,12 @@ class ManagerModel {
                 settings := p.Get("settings", Map())
                 this.settings := IsObject(settings) ? settings : Map()
                 this._Notify("settings")
+            case "evt.flow.limit":
+                id := p.Get("flowId", "")
+                if (this.flows.Has(id)) {
+                    this.flows[id]["limit"] := "executionsPerMinute"
+                    this._Notify("flow", this.flows[id])
+                }
         }
     }
 
@@ -318,6 +344,8 @@ class ManagerModel {
         rec["executing"] := p.Get("executing", 0)
         rec["independentActive"] := p.Get("independentActive", 0)
         rec["stateError"] := p.Get("stateError", "")      ; absent: the state is known again
+        if (rec["enabled"])
+            rec["limit"] := ""                            ; enabled again: the limit mark goes
         this._Notify("flow", rec)
     }
 
@@ -327,18 +355,38 @@ class ManagerModel {
             return
         rec := this.flows[id]
         elementId := p.Get("elementId", "")
+        found := false
         for t in rec["triggers"] {
             if (t["elementId"] = elementId) {
                 t["enabled"] := p.Get("enabled", 0)
                 t["armed"] := p.Get("armed", 0)
                 t["message"] := p.Get("message", "")
-                this._Notify("flow", rec)
-                return
+                found := true
+                break
             }
         }
-        rec["triggers"].Push(Map("elementId", elementId, "enabled", p.Get("enabled", 0), "armed", p.Get("armed", 0)
-            , "message", p.Get("message", "")))
+        if (!found)
+            rec["triggers"].Push(Map("elementId", elementId, "enabled", p.Get("enabled", 0), "armed", p.Get("armed", 0)
+                , "message", p.Get("message", "")))
         this._Notify("flow", rec)
+        ; After the user enabled the flow: a trigger that cannot be armed (a missing package, WI-0074, REQ-MIG-070) is told.
+        msg := p.Get("message", "")
+        if (msg != "" && this.watchPkg.Has(id) && Time.NowMs() <= this.watchPkg[id]) {
+            this.watchPkg.Delete(id)
+            this.Note("manager.notice", Map("flowId", id, "elementId", elementId, "message", msg))
+            this._Notify("trigger", Map("flowId", id, "elementId", elementId, "message", msg))
+        }
+    }
+
+    ; The user enabled the flow: for ManagerModel.WATCH_MS a trigger message of the flow is reported as the event "trigger".
+    ; The trigger host arms the triggers after the answer, so the message comes after it.
+    WatchPackages(flowId) {
+        this.watchPkg[flowId] := Time.NowMs() + ManagerModel.WATCH_MS
+    }
+
+    UnwatchPackages(flowId) {
+        if (this.watchPkg.Has(flowId))
+            this.watchPkg.Delete(flowId)
     }
 
     ; --- the log (WI-0080, PROTOCOL 4.8) -----------------------------------------------------------
@@ -517,15 +565,23 @@ class ManagerModel {
     ; The state of the buttons from the selection: Map(name -> true/false). Operations of later packages are false until
     ; their package exists (Edit: the editor, S0005).
     ButtonStates() {
-        has := this.selectedFlow != "" && this.flows.Has(this.selectedFlow)
-        return Map("NewCategory", false, "NewFlow", false, "ChangeCategory", false, "Duplicate", false, "Delete", false   ; arch-ok: wire-bool UI state of the buttons, not a protocol field
-            , "Edit", false, "Enable", false, "Run", has && this.engineState != ManagerModel.ENGINE_DOWN
+        up := this.engineState != ManagerModel.ENGINE_DOWN
+        flows := this.SelectedFlows().Length > 0
+        one := this.selectedFlow != "" && this.flows.Has(this.selectedFlow)
+        return Map("NewCategory", up, "NewFlow", up, "ChangeCategory", flows && up, "Duplicate", one && up
+            , "Delete", (flows || this.catSelected) && up, "Edit", false   ; arch-ok: wire-bool UI state of the buttons, not a protocol field
+            , "Enable", flows && up, "Run", flows && up
             , "Settings", false, "ImportExport", false, "About", false, "Help", false, "ShowLog", true, "Exit", true)
     }
 
-    ; The label of the Run button for the selected flow: "Stop" while it runs, "Run" otherwise.
+    ; The label of the Run button for the focused flow: "Stop" while it runs, "Run" otherwise.
     RunIsStop() {
         return this.selectedFlow != "" && this.flows.Has(this.selectedFlow) && this.flows[this.selectedFlow]["executing"]
+    }
+
+    ; The label of the Enable button: "Disable" when the focused flow is enabled.
+    EnableIsDisable() {
+        return this.selectedFlow != "" && this.flows.Has(this.selectedFlow) && this.flows[this.selectedFlow]["enabled"]
     }
 
     ; Plain values of the whole state (the driver and the snapshot of the role).
@@ -535,7 +591,8 @@ class ManagerModel {
             rec := this.flows[id]
             flows.Push(Map("flowId", id, "name", rec["name"], "category", rec["category"]
                 , "enabled", Json.Bool(rec["enabled"]), "executing", Json.Bool(rec["executing"]), "rev", rec["rev"]
-                , "independentActive", rec["independentActive"], "stateError", rec["stateError"]))
+                , "independentActive", rec["independentActive"], "stateError", rec["stateError"], "limit", rec["limit"]
+                , "triggerMessages", ManagerModel._TriggerMessages(rec)))
         }
         cats := []
         for c in this.categories
@@ -544,20 +601,105 @@ class ManagerModel {
         for name, on in this.ButtonStates()
             buttons[name] := Json.Bool(on)
         return Map("engine", this.engineState, "epoch", this.epoch, "seq", this.lastSeq, "flows", flows
-            , "categories", cats, "settings", this.settings, "selectedFlow", this.selectedFlow, "buttons", buttons
+            , "categories", cats, "settings", this.settings, "selectedFlow", this.selectedFlow
+            , "selectedFlows", this.SelectedFlows(), "categorySelected", Json.Bool(this.catSelected)
+            , "selectedCategory", this.selectedCat, "enableIsDisable", Json.Bool(this.EnableIsDisable())
+            , "buttons", buttons
             , "events", this.eventCount, "resyncs", this.resyncCount, "snapshots", this.snapshotCount
             , "lastAnswer", this.lastAnswer = "" ? Map() : this.lastAnswer, "log", this.LogState())
     }
 
     ; --- operations ----------------------------------------------------------------------------
 
+    ; Selects one flow (or none with ""), and drops a category selection and a multi-selection.
     Select(flowId) {
         if (flowId != "" && !this.flows.Has(flowId))
             flowId := ""
-        if (flowId = this.selectedFlow)
+        if (flowId = this.selectedFlow && !this.catSelected && this.selectedSet.Count = 0)
             return
+        this.selectedSet := Map()
+        this.catSelected := false
+        this.selectedCat := ""
         this.selectedFlow := flowId
         this._Notify("selection", flowId)
+    }
+
+    ; Ctrl click: adds the flow to the multi-selection or removes it. The first Ctrl click keeps the selected flow.
+    SelectToggle(flowId) {
+        if (!this.flows.Has(flowId))
+            return
+        if (this.selectedSet.Count = 0 && this.selectedFlow != "" && !this.catSelected)
+            this.selectedSet[this.selectedFlow] := true
+        if (this.selectedSet.Has(flowId))
+            this.selectedSet.Delete(flowId)
+        else
+            this.selectedSet[flowId] := true
+        this.selectedFlow := flowId
+        this.catSelected := false
+        this.selectedCat := ""
+        this._Notify("selection", flowId)
+    }
+
+    ; Selects a category header (name "" = Uncategorized); the flows are not selected.
+    SelectCategory(name) {
+        this.selectedSet := Map()
+        this.selectedFlow := ""
+        this.catSelected := true
+        this.selectedCat := name
+        this._Notify("selection", "")
+    }
+
+    ; The flows the operations act on: the multi-selection, or the focused flow. In the order of the list.
+    SelectedFlows() {
+        out := []
+        if (this.selectedSet.Count > 0) {
+            for id in this.OrderedFlowIds()
+                if (this.selectedSet.Has(id))
+                    out.Push(id)
+        } else if (this.selectedFlow != "" && this.flows.Has(this.selectedFlow)) {
+            out.Push(this.selectedFlow)
+        }
+        return out
+    }
+
+    ; Drops the selected flows that a snapshot no longer has.
+    _PruneSelection() {
+        for id in this.selectedSet.Clone() {
+            if (!this.flows.Has(id))
+                this.selectedSet.Delete(id)
+        }
+    }
+
+    ; The names of the categories in their order (without the uncategorized group).
+    CategoryNames() {
+        out := []
+        for c in this.categories {
+            if (c["name"] != "")
+                out.Push(c["name"])
+        }
+        return out
+    }
+
+    ; Map name -> Array of flow IDs in their order, for every category and the uncategorized group ("").
+    CategoryOrderMap() {
+        out := Map()
+        for id in this.OrderedFlowIds() {
+            cat := this.flows[id]["category"]
+            if (!out.Has(cat))
+                out[cat] := []
+            out[cat].Push(id)
+        }
+        return out
+    }
+
+    ; The names of the flows, without the flow flowId (for the name checks).
+    FlowNames(exceptId := "") {
+        out := []
+        for id in this.flowIds {
+            if (id != exceptId)
+                out.Push(this.flows[id]["name"])
+        }
+        return out
     }
 
     ; Sends a command to the engine with a timeout. Every answer, a refusal or a timeout included, reaches the listeners as

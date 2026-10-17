@@ -5,6 +5,7 @@
 #Include ..\core\Time.ahk
 #Include ..\core\Role.ahk
 #Include ManagerModel.ahk
+#Include ManagerOps.ahk
 #Include ManagerDriver.ahk
 #Include ManagerWindow.ahk
 
@@ -27,6 +28,7 @@ class Manager extends Role {
         this.headless := args.Has("headless")
         this.cancelExit := args.Has("cancel-exit")
         this.model := ""
+        this.ops := ""               ; the operations on flows and categories (WI-0074), made with the model
         this.view := ""
         this.driver := ""
         this.started := false
@@ -34,6 +36,7 @@ class Manager extends Role {
 
     RegisterHandlers() {
         this.model := ManagerModel(this.peer)
+        this.ops := ManagerOps(this.model)
         this.On("evt.", (msg) => this._OnEvent(msg))
         this.On("cmd.app.prepareExit", (msg) => this._OnPrepareExit(msg))
         this.On("cmd.manager.show", (msg) => this._OnShow(msg))
