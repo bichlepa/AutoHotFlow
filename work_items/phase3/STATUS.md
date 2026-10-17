@@ -68,7 +68,7 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI-0078 | Settings dialog, language, about | open | | | | block B |
 | WI-0079 | Start with Windows, run as administrator | open | | | | block B, manual check |
 | WI-0080 | Log display | done, verified (foundation, slow green; fast red by 2 load flakes, green alone) on d6331fb8 | haiku (review sonnet) | dcacd43b–d6331fb8 | 2026-10-17 | block B; F-0116 and source group wait for the owner |
-| WI-0081 | `.ahf` export and import | implemented on `wip/wi-81`, review said FIX FIRST (R1 queue timeout vs tar deadline, R2 size limits, R3 ActsOnSystem for Execute_Flow and Set_Flow_Status, R4 to R6 small), fixes in progress incl. the real v1 .ahf from the owner (tests/data/ahf); not integrated | | | | block B |
+| WI-0081 | `.ahf` export and import | done, verified on 4e510dc1 (fast, foundation, slow green); owner decisions: 4 MB unpacked cap, UNC refused, ActsOnSystem list | | | | block B |
 | WI-0082 | Acceptance S0004 | open | | | | |
 
 Step S0008 (remaining elements) is planned, not started.
@@ -77,17 +77,16 @@ Step-independent work item: WI-0059 (test admission, load report, run history), 
 
 ## Pending integrations
 
-- `wip/wi-81` after its fix round: the implementer rebases itself onto `v2-port` (conflicts expected in doc/MANUAL-CHECKS.md: its part D becomes part E, steps from 34), then `renumber_findings` (provisional IDs must carry the star), cherry-pick, `verify.py --auto`.
 - `wip/wi-77` after the review (rebase onto `v2-port`, M-0085 may collide with the M number of WI-0081: renumber), cherry-pick, `verify.py --auto` plus stress if the engine changed.
-- The verify of the dialog fix (`v2-port` tip 2c, run `bdx5qr5v7` in the scratchpad `verify7.txt`) was started before the pause: read it first.
+- `wip/wi-77` fix round (D1 to D3, S4 to S6, S2/S10) and its own rebase are with the implementer; WI-0081 took the M number M-0085 and F-0129 to F-0134 first: the implementer of WI-0077 must renumber on rebase.
 
 ## Running agents
 
-- WI-0081 implementer (haiku, workspace `wi-81`, id aa7ae7b3eb21c7dd9): fix round and rebase; resume with SendMessage if it died.
-- WI-0077 reviewer (sonnet, id a2a6a5cab854549fc): review of `wip/wi-77`; then the implementer (sonnet, workspace `wi-77`, id aa65dd2fabfc7688c) fixes.
-- Paused by the owner because of the session limit: start no new agents.
+- WI-0077 implementer (sonnet, workspace `wi-77`, id aa65dd2fabfc7688c): review fixes, rebase, fast, foundation, slow and stress.
 
 ## Last verified state
+
+Commit `4e510dc1` (WI-0081 `.ahf`) verified by `--auto`: fast 1461, foundation 470, slow 203, VERDICT green. `19fb1ba8` (dialog text fix F-0128) green too (1444 / 470 / 203).
 
 Commit `1248aa10` (WI-0076 import from v1) verified by `--auto` (fast, foundation, slow): foundation 470 green; fast red by `test_new_category_rename_and_the_delete_answered_no`, slow red by `test_a_burst_of_5000_lines_does_not_stall_the_manager_and_the_model_keeps_the_limit`, both green alone (rechecks `20261017-194249`, `-194300`). Manager e2e tests flake under load three times today (also the closing-log test): watch.
 
