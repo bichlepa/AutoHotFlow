@@ -98,19 +98,20 @@ def test_the_tray_role_ends_when_the_supervisor_is_killed(chains):
     assert wait_until(lambda: not psutil.pid_exists(pids["tray"]), 3.0 + scaled(10.0)), "the tray role is still alive"
 
 
-def test_the_tray_role_is_not_restarted_after_the_restart_limit_and_the_application_keeps_running(chains):
-    # Current policy (Children.RESTART_MAX = 3 within 60 s). The owner decides whether the icon needs more (finding of the review).
+def test_the_tray_role_always_comes_back_after_a_growing_pause(chains):
+    # Owner decision (E0075): no restart limit for the tray; the pause before the restart doubles (1 s, 2 s, 4 s, 8 s ...).
+    # Four kills within 60 s would stop an ordinary role (Children.RESTART_MAX = 3). The order of the delays is asserted, not their size.
     chain = chains("storage", TRAY_OPTS)
     pid = chain.wait_ready(["storage", "tray"], timeout=READY_S)["tray"]
-    for n in range(3):
+    delays = []
+    for _ in range(4):
+        t_kill = time.perf_counter()
         psutil.Process(pid).kill()
-        pid, _ = chain.wait_restarted_ready("tray", pid)
-    psutil.Process(pid).kill()                # the 4th death: over the limit
-    assert wait_until(lambda: chain.rec.find(event("evt.process.crashed", name="tray", restart=False)), scaled(10.0)),         chain.sup.text()
-    time.sleep(1.0)                            # no restart follows
-    states = chain.states()
-    assert states["tray"]["state"] == "crashed", states["tray"]
-    assert states["storage"]["state"] == "ready" and chain.sup.proc.poll() is None   # the application goes on
+        pid, t_ready = chain.wait_restarted_ready("tray", pid, timeout=30.0)
+        delays.append(t_ready - t_kill)
+    assert delays == sorted(delays) and delays[3] > delays[1] + 1.0, delays
+    assert not chain.rec.find(event("evt.process.crashed", name="tray", restart=False))
+    assert chain.states()["tray"]["state"] == "ready" and chain.sup.proc.poll() is None
 
 
 def test_the_show_manager_entry_makes_the_running_manager_show_its_window(chains):

@@ -1410,7 +1410,7 @@ Closing the manager window only hides it. Flows and triggers keep running; the t
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (notices: WI-0075)
-- **Evidence:** `tests/fault/test_tray_role.py::test_the_real_icon_opens_its_menu_and_a_menu_open_for_8_seconds_does_not_make_the_role_hung`, `tests/fault/test_tray_role.py::test_a_killed_tray_role_is_started_again_so_the_icon_comes_back`
+- **Evidence:** `tests/fault/test_tray_role.py::test_the_real_icon_opens_its_menu_and_a_menu_open_for_8_seconds_does_not_make_the_role_hung`, `tests/fault/test_tray_role.py::test_the_tray_role_always_comes_back_after_a_growing_pause`
 
 While AutoHotFlow runs, its icon is in the tray, with the tooltip "AutoHotFlow", also when the manager is not running or has crashed (E0064). A double click shows the manager, and starts it if it is not running. The application has one tray icon however many of its processes run; besides it, only open editors have an icon (REQ-EDT-230). Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030). The menu: REQ-MGR-140.
 
@@ -1421,7 +1421,7 @@ While AutoHotFlow runs, its icon is in the tray, with the tooltip "AutoHotFlow",
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** `tests/fault/test_tray_role.py::test_the_exit_entry_ends_the_application_cleanly`, `tests/fault/test_tray_role.py::test_the_show_manager_entry_starts_a_manager_that_is_not_running`, `tests/integration/test_tray.py`
+- **Evidence:** `tests/fault/test_tray_role.py::test_the_exit_entry_ends_the_supervisor_with_exit_0_and_leaves_no_process`, `tests/fault/test_tray_role.py::test_the_show_manager_entry_starts_a_manager_that_is_not_running`, `tests/integration/test_tray.py`
 
 | Entry | Effect |
 |---|---|
