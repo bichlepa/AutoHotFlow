@@ -294,7 +294,8 @@ class ManagerWindow {
                 m.SelectToggle(id)
                 return
             }
-            if (!m.catSelected && m.selectedFlow = id && m.selectedSet.Count = 0)
+            ; A late event of a rebuilt tree names the focused flow: the model already has it, the set stays (whatever it holds).
+            if (!m.catSelected && m.selectedFlow = id)
                 return
             m.Select(id)
         } else if (this.catItems.Has(cur)) {
@@ -508,6 +509,9 @@ class ManagerWindow {
         this.itemOfCat[name] := parent
         for id in ids
             this._AddFlow(parent, id)
+        ; "Expand" at the creation of an item without children has no effect: the flows below are shown by expanding now.
+        if (ids.Length > 0)
+            this.tree.Modify(parent, "Expand")
     }
 
     _AddFlow(parent, flowId) {

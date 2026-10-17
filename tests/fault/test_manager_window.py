@@ -179,6 +179,7 @@ def test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted(
 # --- WI-0074: the tree of flows and categories, and drag and drop with the mouse (gui tier, owner's check) -------------
 
 TVM_GETITEMRECT = 0x1104
+TVM_EXPAND = 0x1102
 TVGN_NEXT, TVGN_PARENT = 1, 3
 MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP = 0x0002, 0x0004
 DRAG_STEPS = 12
@@ -212,7 +213,11 @@ def _has_children(tree, item):
 
 
 def _item_center(tree, item):
-    """Screen position of the middle of the text of a tree item."""
+    """Screen position of the middle of the text of a tree item. A flow below a collapsed category has no rectangle: the
+    category is expanded first (TVM_EXPAND, TVE_EXPAND)."""
+    parent = user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_PARENT, item)
+    if parent:
+        user32.SendMessageW(tree, TVM_EXPAND, 2, parent)
     rect = ctypes.create_string_buffer(16)
     ctypes.c_void_p.from_buffer(rect, 0).value = item     # TVM_GETITEMRECT: the item goes into rect (text only: wParam 1)
     assert user32.SendMessageW(tree, TVM_GETITEMRECT, 1, ctypes.addressof(rect)), "no rect for the item"
