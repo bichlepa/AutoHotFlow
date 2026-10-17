@@ -62,13 +62,6 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Action:** watch the history of the test; if it recurs, decide whether the test must skip the idle report or the worker must not send it at start.
 **Evidence:** run 20261016-225151-4328 (fast tier, `python -m pytest tests -q`).
 
-### F-0112: The per-minute limit counts every element execution, so a legitimate flow with many big runs can reach it
-
-**What:** `maxExecutionsPerMinute` (default 50,000, WI-0066, REQ-EXE-170) counts all element executions of a flow in 60 s. A loop over 10,000 members with four body elements is 50,000 executions; a flow that runs such a loop several times a minute (for example from a periodic timer) reaches the limit and is stopped with all its triggers disabled, although nothing runs away.
-**Status:** open, a decision of the project owner. The default follows the measured throughput (MS-0036): a runaway loop of one body element is caught after about 8 to 11 s; a higher limit would catch it later, a lower one stops legitimate loops. The per-flow setting is in the flow file (the editor comes with S0007).
-**Options:** a higher default per flow; counting the trigger starts only (a runaway loop would then not be caught); a rate per instance instead of per minute. The project owner decides, the limit is a constant until S0004.
-**Evidence:** `doc/MEASUREMENTS.md` MS-0036; `src/engine/core/RunawayGuard.ahk` (`DEFAULT_PER_MINUTE`).
-
 ### F-0113: Warning of AutoHotkey on stdout from Trigger_Start_up (local `type`) at every load
 
 **What:** AutoHotkey prints `Warning: This local variable has the same name as a global variable. Specifically: type (in function Default.Trigger_Start_up.Enable)` (`src/elements/Default/Triggers/Trigger_Start_up.ahk` line 46) on the output of every test that loads the element classes. It is outside WI-0066 and not a failure.

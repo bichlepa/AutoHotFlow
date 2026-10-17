@@ -1339,7 +1339,7 @@ The manager shows all flows in a tree of categories, with their state (enabled, 
 - **Scope:** port
 - **Plan:** S0004
 
-Names are checked: no forbidden characters, no second flow with the same name. Deleting asks for confirmation. Deleting a running flow stops its instances at once (E0009).
+Names are checked: no forbidden characters, no second flow with the same name. Deleting asks for confirmation. Deleting a running flow stops its instances at once (E0009). Deleting is final: the flow, its enabled state and its static variables are removed (E0066); a deletion that can be undone is REQ-MGR-150.
 
 ### REQ-MGR-030 Manage categories
 
@@ -1349,7 +1349,7 @@ Names are checked: no forbidden characters, no second flow with the same name. D
 - **Scope:** port
 - **Plan:** S0004
 
-Create, rename and delete categories; move flows to another category. When a category is deleted, its flows move to a category the user chooses.
+Create, rename and delete categories; move flows to another category. When a category is deleted, its flows move to a category the user chooses. An empty category stays until the user deletes it, also across a restart. The user orders the categories and the flows inside a category freely (drag and drop); a command sorts them alphabetically once; a new flow comes at the end of its category (E0067; v1 sorted automatically).
 
 ### REQ-MGR-040 Operate flows from the manager
 
@@ -1411,7 +1411,7 @@ Closing the manager window only hides it. Flows and triggers keep running; the t
 - **Plan:** S0004
 - **Evidence:** `tests/integration/test_entry.py::test_the_boot_file_does_not_hide_the_icon_of_the_product_manager`
 
-While AutoHotFlow runs, its icon is in the tray, with the tooltip "AutoHotFlow". A double click shows the manager. The application has one tray icon however many of its processes run; besides it, only open editors have an icon (REQ-EDT-230). Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030). The menu: REQ-MGR-140.
+While AutoHotFlow runs, its icon is in the tray, with the tooltip "AutoHotFlow", also when the manager is not running or has crashed (E0064). A double click shows the manager, and starts it if it is not running. The application has one tray icon however many of its processes run; besides it, only open editors have an icon (REQ-EDT-230). Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030). The menu: REQ-MGR-140.
 
 ### REQ-MGR-140 Tray menu of the application
 
@@ -1424,7 +1424,7 @@ While AutoHotFlow runs, its icon is in the tray, with the tooltip "AutoHotFlow".
 
 | Entry | Effect |
 |---|---|
-| Show manager | shows the manager window; default entry (double click on the icon) |
+| Show manager | shows the manager window, and starts the manager if it is not running; default entry (double click on the icon) |
 | Exit | ends the application, the same as the "Exit" button of the manager (REQ-MGR-080, REQ-ROB-070) |
 
 The standard entries of AutoHotkey (pause, reload, exit without the shutdown of AutoHotFlow) are not in the menu. The entries are translated (REQ-LNG-010) and follow a change of the language without a restart (v1 needed a restart).
@@ -1467,6 +1467,19 @@ The manager shows the global variables and the static variables of each flow wit
 - **Plan:** -
 
 A search field filters the flow list by name and category, and a filter shows only the flows in a given state (enabled, running, with errors).
+
+### REQ-MGR-150 A deleted flow can be restored
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+A deleted flow is not lost at once (E0066). Ideas of the owner (2026-10-17), to be chosen when it is built:
+
+- AutoHotFlow writes an `.ahf` file of the flow with its static variables and moves it to the Windows recycle bin. The user restores it with the means of Windows, or drags it out, and imports it again (REQ-MGR-050). One file, so the flow and its variables stay together.
+- Or an own folder of deleted flows, cleaned up automatically by age.
 
 ## Editor (EDT)
 
@@ -1569,7 +1582,7 @@ Ctrl+Z and Ctrl+Y and menu entries. A cancelled action (a move cancelled with Es
 - **Plan:** S0006
 - **Evidence:** `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`
 
-Every completed edit takes effect at once, also for running instances (REQ-EXE-080). Saving (Ctrl+S, menu) writes the flow to disk. When the editor or the application is closed with unsaved changes, the user is asked and can cancel (two-phase exit, `ARCHITECTURE.md` 6.3). A rename by the manager while the editor is open is merged.
+Every completed edit takes effect at once, also for running instances (REQ-EXE-080), and is saved automatically a few seconds later (E0065): about 3 s after the last change, at the latest every 10 s while the user keeps editing. A flow has no unsaved state, so closing the editor or the application asks nothing. Saving by hand (Ctrl+S, menu) only writes at once. Mistakes are undone with undo (REQ-EDT-090) or by a backup: a backup is made at the first write of an editing session and then at most every 10 minutes (REQ-ROB-060, REQ-MGR-110). A rename by the manager while the editor is open is merged.
 
 ### REQ-EDT-110 Run, stop and enable from the editor
 
@@ -1748,7 +1761,7 @@ The global execution policy (REQ-EXE-050) and the global working directory (REQ-
 - **Scope:** port
 - **Plan:** S0004
 
-If the user wants it, AutoHotFlow starts in the background when the user logs on to Windows. It is an option in the settings; the setup assistant (REQ-USE-100) proposes it switched on, and the user can switch it off there. The start-up trigger knows that it was a start with Windows (REQ-TRG-220).
+If the user wants it, AutoHotFlow starts in the background when the user logs on to Windows: only the tray icon appears, no manager window. It is an option in the settings; the setup assistant (REQ-USE-100) proposes it switched on, and the user can switch it off there. The start-up trigger knows that it was a start with Windows (REQ-TRG-220). The entry is a shortcut in the startup folder of the user, as in v1 (E0070). Together with "Run as administrator" (REQ-SET-040) Windows asks at every logon; a start without the question is REQ-SET-080.
 
 ### REQ-SET-040 Run as administrator
 
@@ -1758,7 +1771,7 @@ If the user wants it, AutoHotFlow starts in the background when the user logs on
 - **Scope:** port
 - **Plan:** S0004
 
-AutoHotFlow restarts itself with administrator rights, so that flows can control windows of elevated programs. To check: all processes of a session must run with the same rights, or the pipes and wake-up messages fail (UIPI).
+AutoHotFlow restarts itself with administrator rights, so that flows can control windows of elevated programs. To check: all processes of a session must run with the same rights, or the pipes and wake-up messages fail (UIPI). Checked by hand only, because the UAC prompt cannot be automated (E0073).
 
 ### REQ-SET-050 Logging settings
 
@@ -1768,6 +1781,8 @@ AutoHotFlow restarts itself with administrator rights, so that flows can control
 - **Scope:** port
 - **Plan:** S0004
 - **Evidence:** `tests/fault/test_diagnose.py::test_the_log_level_decides_what_is_forwarded_to_storage`
+
+Three thresholds as in v1, one for each source group: app (`a`), flow (`f`) and thread (`t`), each from 0 to 3. They take effect at once in every process. v2 always writes the log files (rotated at 100 KB); the v1 option "Log to file" is dropped (E0069).
 
 ### REQ-SET-060 Own data folder
 
@@ -1789,6 +1804,16 @@ v2 keeps its data in `%APPDATA%\AutoHotFlow v2`, or in the folder given by `--da
 - **Plan:** S0004 (E0044)
 
 A global setting limits how many waiting elements (REQ-EXE-100) run at the same time. **Default: 8, from 1 to 16.** The memory is used only while elements wait, not for the limit itself. A lower number limits the memory when many elements wait at the same time (REQ-PRF-030); a higher number lets more of them run at the same time.
+
+### REQ-SET-080 Start with Windows as administrator without a question
+
+- **v1:** no
+- **v2:** open
+- **Prio:** could
+- **Scope:** later
+- **Plan:** -
+
+With "Start with Windows" and "Run as administrator" together, Windows asks at every logon (E0070). A later improvement starts AutoHotFlow through a task of the Windows Task Scheduler with the highest rights, so that no question appears.
 
 ## Import and migration (MIG)
 
@@ -1855,7 +1880,13 @@ v2 writes `formatVersion: 2`; loading a file saved by v2 converts nothing again.
 - **Scope:** port
 - **Plan:** S0004
 
-The user imports the flows and variables of v1 into the v2 data folder through the manager, with a report of the marked places. An automatic backup of the v1 data at the switchover may come later (E0021).
+The user imports the flows and variables of v1 into the v2 data folder through the manager, with a report of the marked places. An automatic backup of the v1 data at the switchover may come later (E0021). Rules (E0068):
+
+- The source is the v1 data folder (`%APPDATA%\AutoHotFlow` by default, selectable); it is only read.
+- A flow that v2 has already (same ID) is skipped and listed; the user can import it as a copy. The demonstration flows of v1 are skipped. Imported flows are disabled (E0058).
+- A global variable that v2 has already keeps its v2 value; the conflict is listed.
+- The settings working directory, language, execution policy, user level and log levels are taken over; start with Windows and run as administrator are not.
+- Afterwards the manager offers to remove the autostart entry of v1 (preselection "no", v1 stays in use until v2 is finished).
 
 ### REQ-MIG-070 Flows with missing element packages
 
@@ -2293,9 +2324,9 @@ The broken file is reported; all other flows load.
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (manager), S0006 (editor)
-- **Doubt:** The exact behaviour is open: whether AutoHotFlow opens the editor again by itself, and how the user sees that the flow has unsaved changes (in the manager, in the reopened editor, as a notice).
+- **Doubt:** Still open: whether AutoHotFlow opens a crashed editor again by itself. (The question of unsaved changes is gone with E0065.)
 
-When an editor crashes, no completed edit is lost: every edit is in effect at once (REQ-EDT-100), also before it is saved. The user learns that the editor has ended and that the flow has unsaved changes; the editor opened again shows the flow with all edits. Only an edit in progress at that moment (an open dialog, a move with the mouse) may be lost. A crashed manager can be opened again from the tray icon (REQ-MGR-090). Flows and triggers keep running in both cases (REQ-ROB-010).
+When an editor crashes, no completed edit is lost: every edit is in effect at once and is saved automatically (REQ-EDT-100, E0065). The user learns that the editor has ended; the editor opened again shows the flow with all edits. Only an edit in progress at that moment (an open dialog, a move with the mouse) may be lost. A crashed manager is opened again from the tray icon, which belongs to the application and stays (REQ-MGR-090, E0064). Flows and triggers keep running in both cases (REQ-ROB-010).
 
 ## Performance and resources (PRF)
 
@@ -2715,7 +2746,7 @@ Every hint that is not critical (for example "take care with global variables", 
 - **v2:** open
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0004
+- **Plan:** S0004 (notice and mark in the manager), S0007 (the window with the variables), E0072
 
 When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the user learns it without reading the log: a window like the debug dialog (REQ-DBG-060) shows the error message, the element and the variables of the branch at the moment of the error. Unlike the debug dialog it does not halt anything, because the branch has already ended; the variables can be looked at, not changed. The flow also gets a mark in the manager until the user has looked at the error. Many errors in a short time give one notice. The notice can be switched off per flow and globally (REQ-USE-070).
 

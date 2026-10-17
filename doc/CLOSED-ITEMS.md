@@ -72,6 +72,7 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0103 | `test_worker_reports_busy_when_a_job_begins_and_ends` failed once in a fast run; three serial reruns passed | closed 2026-10-16: one failure, 58 green |  |
 | F-0104 | Ping test: the three `sys.ping` requests of `test_pings_are_answered_while_a_blocking_element_runs` use a fixed timeout of 1.0 s while the block time is scaled | closed 2026-10-16: fixed, the pings use `scaled(1.0)` |  |
 | F-0105 | A role's summary line is written lazily: after a burst of log lines it can come late or not at all | closed 2026-10-16: suspicion without an observation |  |
+| F-0112 | The per-minute limit counts every element execution, so a legitimate flow with many big runs can reach it | accepted (owner, 2026-10-17, E0071): the defaults stay and become global settings in S0004; revisit after the port | |
 | F-0106 | The header of a slow-run output in `run_suite` named another commit than the run folder | closed 2026-10-16: not reproduced; the run record carries the commit |  |
 
 ## Findings
@@ -238,6 +239,14 @@ This document lists findings that are closed or accepted. Entries are moved here
 
 **What:** An interrupted write of a state file leaves a temp file (`<name>.ahf-<pid>.tmp`) in the data folder, and nothing removed it at the next start.
 **Closed (WI-0068, 2026-10-16):** the start cleanup covers `FlowStates/` as well; a temp file of a live process is kept. Evidence: test `test_temp_files_of_dead_processes_are_removed_at_start_and_those_of_live_ones_stay`.
+
+### F-0112: The per-minute limit counts every element execution, so a legitimate flow with many big runs can reach it
+
+**What:** `maxExecutionsPerMinute` (default 50,000, WI-0066, REQ-EXE-170) counts all element executions of a flow in 60 s. A loop over 10,000 members with four body elements is 50,000 executions; a flow that runs such a loop several times a minute (for example from a periodic timer) reaches the limit and is stopped with all its triggers disabled, although nothing runs away.
+**Status:** open, a decision of the project owner. The default follows the measured throughput (MS-0036): a runaway loop of one body element is caught after about 8 to 11 s; a higher limit would catch it later, a lower one stops legitimate loops. The per-flow setting is in the flow file (the editor comes with S0007).
+**Options:** a higher default per flow; counting the trigger starts only (a runaway loop would then not be caught); a rate per instance instead of per minute. The project owner decides, the limit is a constant until S0004.
+**Evidence:** `doc/MEASUREMENTS.md` MS-0036; `src/engine/core/RunawayGuard.ahk` (`DEFAULT_PER_MINUTE`).
+**Accepted (owner, 2026-10-17, E0071):** the values stay (50,000 per minute, 100 waiting, 100 running) and become global settings in S0004 (WI-0077, WI-0078). The owner questions the numbers after the port, when he can use v2.
 
 ## Sources
 
