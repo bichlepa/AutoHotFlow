@@ -78,8 +78,11 @@ def test_log_opens_with_the_tail_takes_new_entries_and_filters_them(procs, datad
     # Filters (level digit, group letter, flow). Each call sets all three.
     assert log_filter(obs, "3", "all", FLOW)["visible"] == 3      # tail two, tail three, live four
     assert log_filter(obs, "1", "all", FLOW)["visible"] == 1      # f1 only: digit 2 and 3 are above 1
-    assert log_filter(obs, "3", "t", FLOW)["visible"] == 1        # the t entry
     assert log_filter(obs, "3", "a", FLOW)["visible"] == 0        # no app entry of this flow
+    # E0081: there is no "thread" group; the t entry is shown with "all" only
+    no_thread = obs.request("manager", "cmd.test.op", {"op": "logFilter", "group": "t"}, timeout=5)["payload"]
+    assert no_thread["ok"] is False, no_thread
+    assert log_filter(obs, "3", "all", FLOW)["visible"] == 3
     assert log_filter(obs, "0", "all", "")["visible"] >= 1        # tail one (a0) is among the errors
 
     bad = obs.request("manager", "cmd.test.op", {"op": "logFilter", "level": "9"}, timeout=5)["payload"]

@@ -8,7 +8,7 @@
 ; its own: the filters call ManagerModel.LogFilter, the rows are the entries of ManagerModel.LogVisible.
 ;
 ;   - Filters: level (only errors, some, many, all = the highest digit shown), source group (all, app = a, flow = f,
-;     thread = t, the level letter of an entry) and the flow.
+;     the level letter of an entry; E0081 removed the thread group) and the flow.
 ;   - The rows are added and removed at the front and the end only: a redraw adds the new rows and removes the rows that
 ;     fell out of the model's limit. A change of the filter or a reopening rebuilds the list.
 ;   - The redraw is a timer of 50 ms, and runs only while the window is visible: a burst of lines is one redraw.
@@ -22,8 +22,8 @@ class LogWindow {
     ; Filter choices: the Lang key and the value of each entry, in the order of the drop-down lists.
     static LEVEL_KEYS := ["Log_only_errors", "Log_some", "Log_many", "Log_all"]
     static LEVEL_VALUES := ["0", "1", "2", "3"]
-    static GROUP_KEYS := ["Log_source_all", "Log_source_app", "Log_source_flow", "Log_source_thread"]
-    static GROUP_VALUES := ["all", "a", "f", "t"]
+    static GROUP_KEYS := ["Log_source_all", "Log_source_app", "Log_source_flow"]
+    static GROUP_VALUES := ["all", "a", "f"]
 
     __New(model) {
         this.model := model

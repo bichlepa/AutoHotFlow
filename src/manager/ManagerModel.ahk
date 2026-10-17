@@ -94,7 +94,7 @@ class ManagerModel {
         this.logTailOk := false
         this.logLive := []             ; entries that came before the tail answer
         this.logLevel := "3"           ; the highest digit shown
-        this.logGroup := "all"         ; "all", or the level letter: "a" app, "f" flow, "t" thread
+        this.logGroup := "all"         ; "all", or the level letter: "a" app, "f" flow (E0081: no thread group)
         this.logFlowId := ""           ; "" = all flows
     }
 
@@ -487,7 +487,7 @@ class ManagerModel {
 
     static _LogKey(e) => e.Get("ts", "") "|" e.Get("source", "") "|" e.Get("text", "")
 
-    ; Sets the filter: changes is a Map with the keys level (0 to 3), group (all, a, f, t) and flowId (any text, "" = all).
+    ; Sets the filter: changes is a Map with the keys level (0 to 3), group (all, a, f) and flowId (any text, "" = all).
     ; A value outside its range is bad_payload.
     LogFilter(changes) {
         if (changes.Has("level")) {
@@ -498,8 +498,8 @@ class ManagerModel {
         }
         if (changes.Has("group")) {
             group := String(changes["group"])
-            if (!RegExMatch(group, "^(all|a|f|t)$"))
-                throw AhfError("log group must be all, a, f or t (got '" group "')", ErrCode.BAD_PAYLOAD)
+            if (!RegExMatch(group, "^(all|a|f)$"))
+                throw AhfError("log group must be all, a or f (got '" group "')", ErrCode.BAD_PAYLOAD)
             this.logGroup := group
         }
         if (changes.Has("flowId"))
