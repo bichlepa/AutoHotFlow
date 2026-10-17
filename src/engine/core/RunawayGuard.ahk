@@ -79,9 +79,11 @@ class RunawayGuard {
         return n " start" (n = 1 ? "" : "s") " refused since the last line: " text
     }
 
-    ; Forgets a flow (deleted from the table): its window and its refusals.
+    ; Forgets a flow (deleted from the table): its window and its refusals. A flow that has no window is no error:
+    ; the deletion may ask twice (Executor.FlowDeleted, then Engine.RemoveFlow), and Map.Delete throws for a missing key.
     Forget(flowId) {
-        this._flows.Delete(flowId)
+        if (this._flows.Has(flowId))
+            this._flows.Delete(flowId)
     }
 
     _Window(flowId) {
