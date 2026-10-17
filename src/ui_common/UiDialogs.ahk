@@ -23,7 +23,6 @@ class UiDialogs {
     static BUTTON_W := 110
     static BUTTON_H := 30
     static EDIT_H := 24
-    static LINE_H := 20
     static LIST_H := 200
 
     ; Confirm: buttons is an Array of [id, labelKey]. callback(true, id) for a button, callback(false, "close") otherwise.
@@ -34,7 +33,7 @@ class UiDialogs {
         if (!IsObject(st))
             return false
         m := this.MARGIN
-        textH := this._TextHeight(Lang(textKey, args*))
+        textH := GuiLayout.TextHeight(st["gui"], Lang(textKey, args*), this.WIDTH - 2 * this.MARGIN)
         width := this.WIDTH
         y := m + textH + m
         height := y + this.BUTTON_H + m
@@ -65,11 +64,12 @@ class UiDialogs {
         if (!IsObject(st))
             return false
         m := this.MARGIN
-        textH := this._TextHeight(Lang(textKey, args*))
+        textH := GuiLayout.TextHeight(st["gui"], Lang(textKey, args*), this.WIDTH - 2 * this.MARGIN)
         width := this.WIDTH
         editY := m + textH + 4
         statusY := editY + this.EDIT_H + 4
-        buttonY := statusY + 18 + m
+        statusH := GuiLayout.TextHeight(st["gui"], "A`nA", width - 2 * m)   ; two lines: a refusal text may wrap
+        buttonY := statusY + statusH + m
         height := buttonY + this.BUTTON_H + m
         g := st["gui"]
         lay := st["lay"] := GuiLayout.Create(g, width, height)
@@ -79,7 +79,7 @@ class UiDialogs {
         edit := g.AddEdit(, default)
         GuiLayout.Place(lay, edit, m, editY, width - 2 * m, this.EDIT_H)
         status := st["status"] := g.AddText()
-        GuiLayout.Place(lay, status, m, statusY, width - 2 * m, 18)
+        GuiLayout.Place(lay, status, m, statusY, width - 2 * m, statusH)
         x := width - m - (2 * this.BUTTON_W + m)
         ok := g.AddButton("Default")
         GuiLayout.Place(lay, ok, x, buttonY, this.BUTTON_W, this.BUTTON_H)
@@ -102,7 +102,7 @@ class UiDialogs {
         if (!IsObject(st))
             return false
         m := this.MARGIN
-        textH := this._TextHeight(Lang(textKey, args*))
+        textH := GuiLayout.TextHeight(st["gui"], Lang(textKey, args*), this.WIDTH - 2 * this.MARGIN)
         width := this.WIDTH
         listY := m + textH + 4
         buttonY := listY + this.LIST_H + m
@@ -219,12 +219,4 @@ class UiDialogs {
     }
 
     static _Pick(st, ok, value) => (*) => UiDialogs.Answer(st, ok, value)
-
-    ; Lines of text at 100 %: a text of n lines needs n rows.
-    static _TextHeight(text) {
-        lines := 1
-        loop parse text, "`n"
-            lines := A_Index
-        return lines * this.LINE_H
-    }
 }

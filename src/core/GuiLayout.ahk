@@ -38,15 +38,40 @@ class GuiLayout {
 
     static Scale(lay, n) => Round(n * lay["dpi"] / 96)
 
+    ; The font of the controls (Segoe UI 9 pt at the DPI dpi). The caller deletes it.
+    static MakeFont(dpi) => DllCall("gdi32\CreateFontW", "int", -Round(9 * dpi / 72), "int", 0, "int", 0, "int", 0
+        , "int", 400, "uint", 0, "uint", 0, "uint", 0, "uint", 1, "uint", 0, "uint", 0, "uint", 5, "uint", 0
+        , "str", "Segoe UI", "ptr")
+
+    ; The height at 100 % of a text shown in a Text control of the width (at 100 %) of the Gui g. The text is wrapped at
+    ; the width the way a Text control wraps it (DrawText with the font of the layout at the DPI of the window), and
+    ; every line counts. A height from the number of newlines alone clips a wrapped text to its first line (F-9000*).
+    ; Measured once when the dialog is built: a later DPI change keeps the height of the first DPI.
+    static TextHeight(g, text, width) {
+        dpi := DllCall("user32\GetDpiForWindow", "ptr", g.Hwnd, "uint")
+        dpi := dpi > 0 ? dpi : 96
+        font := this.MakeFont(dpi)
+        hdc := DllCall("user32\GetDC", "ptr", g.Hwnd, "ptr")
+        old := DllCall("gdi32\SelectObject", "ptr", hdc, "ptr", font, "ptr")
+        rc := Buffer(16, 0)
+        NumPut("int", Round(width * dpi / 96), rc, 8)   ; right edge of the text area; left and top are 0
+        ; DT_CALCRECT (0x400) | DT_WORDBREAK (0x10) | DT_NOPREFIX (0x800); DrawText takes CR LF as the line end
+        lines := StrReplace(StrReplace(text, "`r`n", "`n"), "`n", "`r`n")
+        ; with DT_CALCRECT the result is the height of the text (the rectangle is not changed)
+        px := DllCall("user32\DrawTextW", "ptr", hdc, "str", lines, "int", -1, "ptr", rc, "uint", 0xC10, "int")
+        DllCall("gdi32\SelectObject", "ptr", hdc, "ptr", old, "ptr")
+        DllCall("gdi32\DeleteObject", "ptr", font)
+        DllCall("user32\ReleaseDC", "ptr", g.Hwnd, "ptr", hdc)
+        return Ceil(px * 96 / dpi)
+    }
+
     ; Moves the controls and sets the font for the DPI dpi (0: the DPI of the window).
     static Apply(lay, dpi := 0) {
         if (dpi <= 0)
             dpi := DllCall("user32\GetDpiForWindow", "ptr", lay["g"].Hwnd, "uint")
         lay["dpi"] := dpi > 0 ? dpi : 96
         oldFont := lay["font"]
-        lay["font"] := DllCall("gdi32\CreateFontW", "int", -Round(9 * lay["dpi"] / 72), "int", 0, "int", 0, "int", 0
-            , "int", 400, "uint", 0, "uint", 0, "uint", 0, "uint", 1, "uint", 0, "uint", 0, "uint", 5, "uint", 0
-            , "str", "Segoe UI", "ptr")
+        lay["font"] := this.MakeFont(lay["dpi"])
         for it in lay["items"] {
             ctl := it[1]
             if (it[5] = "")
