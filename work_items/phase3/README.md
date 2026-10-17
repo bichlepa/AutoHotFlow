@@ -105,6 +105,7 @@ Decisions of the project owner while S0004 was detailed (2026-10-17; details in 
 | E0072 | **REQ-USE-080 in two parts:** notice and mark in S0004, the window with the variables of the branch in S0007. | WI-0075, S0007 |
 | E0073 | **"Run as administrator" in S0004,** checked by hand only. | WI-0079 |
 | E0074 | **S0004 in two blocks** with a manual check in between; hints (REQ-USE-060, REQ-USE-070) stay `later`. | S0004 |
+| E0075 | **Tray icon and tray menu in their own process (option b of the WI-0072 measurement, 2026-10-17).** The menus of a running process stop its threads and timers while open (measured, MEASUREMENTS), so the icon and menu move out of the supervisor into a small role. This changes E0064 (the supervisor starts and restarts that role; the icon still lives as long as the application). The manager menus (WI-0074) need the same decision: its context menus stop its threads too. | WI-0072, WI-0073, WI-0074 |
 
 ## Open questions for the project owner
 
