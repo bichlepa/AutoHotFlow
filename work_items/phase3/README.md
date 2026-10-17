@@ -290,4 +290,4 @@ No owner decision needed; a package may refine it and says so in its result.
 
 ### Progress S0003
 
-- [ ] WI-0060  - [ ] WI-0061  - [ ] WI-0062  - [ ] WI-0063  - [ ] WI-0064  - [ ] WI-0065  - [ ] WI-0066  - [ ] WI-0067
+- [x] WI-0060  - [x] WI-0061  - [x] WI-0062  - [x] WI-0063  - [x] WI-0064  - [x] WI-0065  - [x] WI-0066  - [x] WI-0067 (step S0003 complete, 2026-10-17)
