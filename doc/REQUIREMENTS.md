@@ -204,11 +204,11 @@ Relative paths in file and folder parameters refer to the working directory. Eac
 ### REQ-EXE-140 Every element and flow shows its state
 
 - **v1:** yes
-- **v2:** partial (the states are reported; manager and editor do not show them yet)
+- **v2:** partial (the states are reported; the manager holds the state of every flow, the tree shows the flows without their state until WI-0074; the editor does not show them yet)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (manager), S0005 (editor)
-- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`
+- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/ahk/manager_model.test.ahk` (the model of the manager)
 
 Each element has a state (idle, running, finished, exception) and counts its runs. Each flow shows whether it is enabled and whether it runs, and its running and queued instances. Manager and editor show these states live, also a window that was opened later or that reconnected after a fault.
 
@@ -1396,11 +1396,11 @@ The manager shows the log, filtered by level (only errors, some, many, all) and 
 ### REQ-MGR-080 Closing the manager window keeps AutoHotFlow running
 
 - **v1:** yes (read: the v1 manager has no `GuiClose` handler)
-- **v2:** open (the stub ends the whole application when its window is closed)
+- **v2:** done (the manager hides its window on the close box; checked with the real window, gui test of 2026-10-17)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** -
+- **Evidence:** `tests/fault/test_manager_window.py::test_closing_the_window_only_hides_it_and_the_application_runs_on`, `tests/fault/test_manager_window.py::test_the_exit_button_ends_the_application_cleanly`
 
 Closing the manager window only hides it. Flows and triggers keep running; the tray icon brings the window back. Only the "Exit" button of the manager and the "Exit" entry of the tray menu of the application (REQ-MGR-140) end the application. Decision E0014.
 
@@ -2680,8 +2680,8 @@ Errors and warnings that have no window of their own (for example a flow file th
 ### REQ-USE-040 The user interface stays responsive
 
 - **v1:** no (the user interface waits for the global lock)
-- **v2:** partial (the architecture separates the processes; the real user interfaces are missing; the dialogs of the UI roles do not block: `ui_common/UiDialogs.ahk` (WI-0069), unit-tested, the windows not checked; standard dialogs stall the timers for up to 0.7 s, HOW-TO gui-and-hotkeys)
-- **Evidence:** `tests/ahk/ui_common_dialogs.test.ahk` (logic only)
+- **v2:** partial (the architecture separates the processes; the manager (WI-0073) handles its events in a timer and its commands with timeouts, the editor is missing; the dialogs of the UI roles do not block: `ui_common/UiDialogs.ahk` (WI-0069), unit-tested, the windows not checked; standard dialogs stall the timers for up to 0.7 s, HOW-TO gui-and-hotkeys)
+- **Evidence:** `tests/ahk/ui_common_dialogs.test.ahk` (logic only), `tests/ahk/manager_model.test.ahk`, `tests/e2e/test_manager.py::test_manager_answers_at_once_while_the_engine_is_missing`
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 to S0007
@@ -2756,7 +2756,7 @@ When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the us
 ### REQ-USE-090 Sharp and correctly sized on high-resolution displays
 
 - **v1:** no (not checked)
-- **v2:** partial (dialogs done; the window base for the UI roles is written, `ui_common/UiWindow.ahk` with the layout in `core/GuiLayout.ahk` (WI-0069), not checked in a window; manager, editor, tray icon and zoom missing)
+- **v2:** partial (dialogs done; the window base for the UI roles is written, `ui_common/UiWindow.ahk` with the layout in `core/GuiLayout.ahk` (WI-0069), the manager window (WI-0073) uses it, opened in the gui test but not checked at another scaling; editor and zoom missing)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0006

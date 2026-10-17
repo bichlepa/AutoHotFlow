@@ -838,6 +838,26 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: manager window (gui, a real window opens, closes and hides, do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/fault/test_manager_window.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: tray menu probe (thread running, tray menu open 6 s, Esc)",
             "type": "shell",
             "command": "python",

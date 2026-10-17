@@ -167,7 +167,7 @@ L73-80 An open menu stops timers and usually a running thread, but not the pings
 L82-94 Standard dialogs (`FileSelect`, `DirSelect`, `MsgBox`) keep the message handling going, but stall the timers (verified) (verified)
 L96-101 A Gui created and closed without Show leaves no window and no remembered place (verified) (verified)
 L103-109 A field and a method whose names differ only in case make the constructor fail with "Property is read-only" (verified) (verified)
-L111-116 The close box hides a window only when its Close handler hides it and returns 1 (assumed, gui test follows) (assumed)
+L111-116 The close box hides a window only when its Close handler hides it and returns 1 (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (11.0 KB, 135 lines)

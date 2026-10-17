@@ -108,9 +108,9 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (two failed runs of `tests/e2e/test_manager.py`, green after the rename, run 20261017-141607-14108).
 - **Source:** `src/manager/ManagerModel.ahk`
 
-### The close box hides a window only when its Close handler hides it and returns 1 (assumed, gui test follows)
+### The close box hides a window only when its Close handler hides it and returns 1 (verified)
 
 - **Problem:** The manager must stay alive when the user closes its window (E0014), and the window must come back at the same place and size.
 - **Right:** `UiWindow` has `hideOnClose`: the Close event calls `Hide()` (remembers the place, `Gui.Hide()`) and returns 1, so Windows does not destroy the window; `Show()` later puts it back with `GuiLayout.Show`. A minimized or maximized window is not remembered (its position is not the one of the normal window).
-- **Status:** assumed until `tests/gui/test_manager_window.py` ran.
+- **Status:** verified (`tests/fault/test_manager_window.py`, run 20261017-142607-22544: WM_CLOSE hides the window, the process and the application run on, `cmd.manager.show` shows it again). Not checked: a window that was minimized when it was hidden.
 - **Source:** `src/ui_common/UiWindow.ahk`

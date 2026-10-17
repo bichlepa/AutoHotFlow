@@ -13,7 +13,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
 | [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 6 | 16 | 0 | 0 |
 | [Triggers (TRG)](#triggers-trg) | 14 | 1 | 0 | 7 | 6 | 0 | 0 |
-| [Manager (MGR)](#manager-mgr) | 15 | 1 | 0 | 3 | 11 | 0 | 0 |
+| [Manager (MGR)](#manager-mgr) | 15 | 2 | 0 | 3 | 10 | 0 | 0 |
 | [Editor (EDT)](#editor-edt) | 23 | 0 | 0 | 1 | 22 | 0 | 0 |
 | [Settings (SET)](#settings-set) | 8 | 1 | 0 | 2 | 5 | 0 | 0 |
 | [Import and migration (MIG)](#import-and-migration-mig) | 8 | 5 | 0 | 1 | 2 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 0 | 0 | 2 | 8 | 0 | 0 |
-| **All** | **221** | **59** | **1** | **46** | **114** | **1** | **6** |
+| **All** | **221** | **60** | **1** | **46** | **113** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -162,7 +162,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-MGR-050](REQUIREMENTS.md#req-mgr-050-import-and-export-flows) | L1366-1374 | Import and export flows | yes | open | must | port | S0004 |
 | [REQ-MGR-060](REQUIREMENTS.md#req-mgr-060-demonstration-flows) | L1376-1384 | Demonstration flows | yes | open | should | port | S0008 |
 | [REQ-MGR-070](REQUIREMENTS.md#req-mgr-070-show-the-log) | L1386-1394 | Show the log | yes | open | must | port | S0004 |
-| [REQ-MGR-080](REQUIREMENTS.md#req-mgr-080-closing-the-manager-window-keeps-autohotflow-running) | L1396-1405 | Closing the manager window keeps AutoHotFlow running | yes | open | must | port | S0004 |
+| [REQ-MGR-080](REQUIREMENTS.md#req-mgr-080-closing-the-manager-window-keeps-autohotflow-running) | L1396-1405 | Closing the manager window keeps AutoHotFlow running | yes | done | must | port | S0004 |
 | [REQ-MGR-090](REQUIREMENTS.md#req-mgr-090-tray-icon-of-the-application) | L1407-1416 | Tray icon of the application | yes | partial | must | port | S0004 (notices: WI-0075) |
 | [REQ-MGR-140](REQUIREMENTS.md#req-mgr-140-tray-menu-of-the-application) | L1418-1432 | Tray menu of the application | yes | done | must | port | S0004 |
 | [REQ-MGR-100](REQUIREMENTS.md#req-mgr-100-about-window) | L1433-1441 | About window | yes | open | could | port | S0004 |
