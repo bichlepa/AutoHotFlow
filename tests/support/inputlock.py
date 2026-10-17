@@ -12,6 +12,7 @@ foreground window, and the modifiers that the user holds (a test waits for them 
 import contextlib
 import ctypes
 import os
+import subprocess
 import threading
 import time
 from ctypes import wintypes
@@ -132,12 +133,25 @@ def input_desktop_open():
 
 
 DESKTOP_UNUSABLE_REASON = "the input desktop is not usable (locked workstation or secure desktop)"
+LOGONUI_IMAGE = "LogonUI.exe"           # the Windows lock screen; OpenInputDesktop still succeeds while it runs
+CREATE_NO_WINDOW = 0x08000000
 
 
-def session_skip_reason(desktop_open):
-    """The skip reason for all input tests of a session, decided once at its start from input_desktop_open(); None when
-    the input desktop is usable. Pure, so the decision can be tested without a desktop."""
-    return None if desktop_open else DESKTOP_UNUSABLE_REASON
+def logonui_running(timeout_s=5.0):
+    """True when LogonUI.exe runs (the lock screen). Read-only: tasklist with a timeout. Any failure counts as not locked."""
+    try:
+        result = subprocess.run(["tasklist", "/FI", "IMAGENAME eq " + LOGONUI_IMAGE, "/NH"], capture_output=True,
+                                text=True, timeout=timeout_s, creationflags=CREATE_NO_WINDOW)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return LOGONUI_IMAGE.lower() in result.stdout.lower()
+
+
+def session_skip_reason(desktop_open, logonui_is_running):
+    """The skip reason for all input tests of a session, decided once at its start from the two signals (input_desktop_open()
+    and logonui_running()); None when the input desktop is usable and the screen is not locked. Pure, so the decision can be
+    tested without a desktop."""
+    return DESKTOP_UNUSABLE_REASON if (not desktop_open or logonui_is_running) else None
 
 
 def _key(vk, up):

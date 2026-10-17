@@ -1,6 +1,7 @@
 """The input lock: a live holder keeps it past the stale limit, a dead holder's lock is taken over (pure Python)."""
 
 import os
+import subprocess
 import threading
 import time
 
@@ -60,10 +61,20 @@ def test_a_fresh_lock_that_is_renamed_by_mistake_is_given_back(lockfile):
     assert not list(lockfile.parent.glob(inputlock.LOCK_NAME + ".stale.*"))
 
 
-def test_the_session_check_skips_with_the_desktop_reason_only_without_a_usable_desktop():
-    assert inputlock.session_skip_reason(True) is None
-    assert inputlock.session_skip_reason(False) == inputlock.DESKTOP_UNUSABLE_REASON
-    assert "input desktop" in inputlock.DESKTOP_UNUSABLE_REASON and "secure desktop" in inputlock.DESKTOP_UNUSABLE_REASON
+@pytest.mark.parametrize("desktop_open, logonui, expected", [
+    (False, False, inputlock.DESKTOP_UNUSABLE_REASON),     # desktop closed
+    (True, True, inputlock.DESKTOP_UNUSABLE_REASON),       # LogonUI running (locked; the desktop still opens)
+    (True, False, None),                                   # both fine
+])
+def test_the_session_check_skips_when_the_desktop_is_closed_or_locked(desktop_open, logonui, expected):
+    assert inputlock.session_skip_reason(desktop_open, logonui) == expected
+
+
+def test_logonui_check_treats_a_failed_tasklist_as_not_locked(monkeypatch):
+    def broken(*args, **kwargs):
+        raise subprocess.TimeoutExpired(cmd="tasklist", timeout=5)
+    monkeypatch.setattr(inputlock.subprocess, "run", broken)
+    assert inputlock.logonui_running() is False
 
 
 def test_release_leaves_a_lock_of_someone_else(lockfile):

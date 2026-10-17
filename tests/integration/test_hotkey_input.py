@@ -66,9 +66,9 @@ class InputRunner(FlowRunner):
 
 @pytest.fixture(scope="session", autouse=True)
 def input_desktop_check():
-    """Runs once per session (WI-0064): without a usable input desktop every test of this module skips at the start,
+    """Runs once per session (WI-0064): without a usable input desktop or with the lock screen up (LogonUI), every test of this module skips at the start,
     with the reason of inputlock.session_skip_reason, before any flow runs."""
-    reason = inputlock.session_skip_reason(inputlock.input_desktop_open())
+    reason = inputlock.session_skip_reason(inputlock.input_desktop_open(), inputlock.logonui_running())
     if reason:
         pytest.skip(reason)
 
