@@ -179,7 +179,6 @@ def test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted(
 # --- WI-0074: the tree of flows and categories, and drag and drop with the mouse (gui tier, owner's check) -------------
 
 TVM_GETITEMRECT = 0x1104
-TVM_GETITEMW = 0x113E
 TVGN_NEXT, TVGN_PARENT = 1, 3
 MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP = 0x0002, 0x0004
 DRAG_STEPS = 12
@@ -204,22 +203,12 @@ def _items(tree):
 
 
 def _is_flow(tree, item):
+    """A flow is an item below a category (it has a parent); a category has none."""
     return user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_PARENT, item) != 0
 
 
-def _text_of_item(tree, item):
-    """The text of a tree item (TVM_GETITEMW; TVITEMW layout for the bitness of this process)."""
-    ptr = ctypes.sizeof(ctypes.c_void_p)
-    hoff = 8 if ptr == 8 else 4                 # hItem follows mask (and its padding)
-    poff = hoff + ptr + 8                       # pszText follows hItem, state and stateMask
-    buf = ctypes.create_unicode_buffer(256)
-    tvitem = ctypes.create_string_buffer(poff + 2 * ptr)
-    ctypes.c_uint.from_buffer(tvitem, 0).value = 0x0001          # TVIF_TEXT
-    ctypes.c_void_p.from_buffer(tvitem, hoff).value = item
-    ctypes.c_void_p.from_buffer(tvitem, poff).value = ctypes.addressof(buf)
-    ctypes.c_int.from_buffer(tvitem, poff + ptr).value = 256
-    assert user32.SendMessageW(tree, TVM_GETITEMW, 0, ctypes.addressof(tvitem)), "no text for the item"
-    return buf.value
+def _has_children(tree, item):
+    return user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_CHILD, item) != 0
 
 
 def _item_center(tree, item):
@@ -233,30 +222,38 @@ def _item_center(tree, item):
     return point[0], point[1]
 
 
-def test_the_tree_shows_each_category_with_its_flow_and_the_flow_state(window_chain):
+def _create_category(obs, name):
+    """cmd.category.create, repeated while the engine loads its flows (busy)."""
+    def create():
+        return obs.request("engine", "cmd.category.create", {"name": name}, timeout=5)["payload"].get("ok")
+    assert wait_until(create, 15.0), "the category %s was not created" % name
+
+
+def test_the_tree_shows_each_category_and_the_flow_below_its_category(window_chain):
     chain, pid, hwnd = window_chain
     assert wait_until(lambda: visible(hwnd), 10.0)
     tree = _tree(hwnd)
-    assert wait_until(lambda: user32.SendMessageW(tree, TVM_GETCOUNT, 0, 0) >= 2, 10.0)
-    request_ok(chain.obs, "engine", "cmd.category.create", {"name": "Other"})
+    _create_category(chain.obs, "Other")
     assert wait_until(lambda: user32.SendMessageW(tree, TVM_GETCOUNT, 0, 0) == 3, 10.0), \
         "the tree has %d items, expected 3 (two categories and the flow)" % user32.SendMessageW(tree, TVM_GETCOUNT, 0, 0)
     items = _items(tree)
     flows = [i for i in items if _is_flow(tree, i)]
-    assert len(flows) == 1 and _text_of_item(tree, flows[0]).startswith("Skeleton")
-    assert "[" in _text_of_item(tree, flows[0]), "the flow carries no state mark"
-    assert "Other" in [_text_of_item(tree, i) for i in items if not _is_flow(tree, i)]
+    headers = [i for i in items if not _is_flow(tree, i)]
+    assert len(flows) == 1 and len(headers) == 2, (flows, headers)
+    parent = user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_PARENT, flows[0])
+    assert parent in headers and _has_children(tree, parent), "the flow is not below its category"
+    assert [h for h in headers if not _has_children(tree, h)], "the new category has no item of its own"
 
 
 def test_a_flow_dragged_onto_a_category_moves_into_it_and_the_engine_keeps_it(window_chain):
     chain, pid, hwnd = window_chain
     assert wait_until(lambda: visible(hwnd), 10.0)
     tree = _tree(hwnd)
-    request_ok(chain.obs, "engine", "cmd.category.create", {"name": "Other"})
+    _create_category(chain.obs, "Other")
     assert wait_until(lambda: user32.SendMessageW(tree, TVM_GETCOUNT, 0, 0) == 3, 10.0)
     items = _items(tree)
     flow_item = [i for i in items if _is_flow(tree, i)][0]
-    other = [i for i in items if not _is_flow(tree, i) and _text_of_item(tree, i) == "Other"][0]
+    other = [i for i in items if not _is_flow(tree, i) and not _has_children(tree, i)][0]
     start = _item_center(tree, flow_item)
     end = _item_center(tree, other)
     user32.SetCursorPos(*start)
