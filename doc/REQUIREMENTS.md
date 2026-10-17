@@ -2679,7 +2679,7 @@ An experimental element is marked in the list and in its settings ("This element
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (WI-0075 done; the flow file notice and the real tray check open)
-- **Evidence:** - **Evidence:** `tests/integration/test_notices.py::test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray`, `tests/integration/test_notices.py::test_a_burst_of_errors_gives_one_notice_at_once_and_the_count_when_the_window_ends`, `tests/integration/test_notices.py::test_a_stop_by_the_runaway_guard_gives_a_notice_with_the_limit`, `tests/ahk/core_notice_throttle.test.ahk`, `tests/ahk/manager_model.test.ahk`
+- **Evidence:** `tests/integration/test_notices.py::test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray`, `tests/integration/test_notices.py::test_a_burst_of_errors_gives_one_notice_at_once_and_the_count_when_the_window_ends`, `tests/integration/test_notices.py::test_a_stop_by_the_runaway_guard_gives_a_notice_with_the_limit`, `tests/ahk/core_notice_throttle.test.ahk`, `tests/ahk/manager_model.test.ahk`
 
 Errors and warnings that have no window of their own (for example a flow file that cannot be saved) reach the user as notices in the tray or the manager, never as a dialog that blocks the running flows.
 
