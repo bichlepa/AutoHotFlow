@@ -8,7 +8,11 @@ button "Exit" (BM_CLICK). What is checked: closing only hides the window and the
 """
 
 import ctypes
+import re
+import subprocess
+import sys
 import time
+from pathlib import Path
 
 import psutil
 import pytest
@@ -364,3 +368,21 @@ def test_an_error_notice_shows_in_the_list_of_notices_opened_by_its_button(notic
         return user32.SendMessageW(views[0], LVM_GETITEMCOUNT, 0, 0) if views else -1
 
     assert wait_until(lambda: rows_after_open() == 1, 15.0), "the list of notices has no row for the exception"
+
+
+# --- F-9000*: the text of a question dialog is shown in full (gui tier, one run of a probe) -----------------------------
+
+REPO = Path(__file__).resolve().parents[2]
+UI_TEXT_PROBE = REPO / "tests" / "ahk" / "helpers" / "ui_dialog_text.ahk"
+
+
+def test_a_wrapped_question_text_of_a_dialog_is_shown_in_full():
+    """The text control of a Confirm dialog holds every wrapped line of its text. Before F-9000* its height was one line
+    (the newlines were counted, the wrapping was not), so the text showed only its first line."""
+    proc = subprocess.run([sys.executable, str(REPO / "tools" / "ahkrun.py"), "--timeout", "30", str(UI_TEXT_PROBE)],
+                          capture_output=True, text=True, timeout=90)
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    found = re.search(r"static=(\d+) line=(\d+)", proc.stdout)
+    assert found, proc.stdout
+    static, line = int(found.group(1)), int(found.group(2))
+    assert static >= 2 * line, f"the text control is {static} px, one line is {line} px: the text is clipped"
