@@ -6,6 +6,12 @@
     "version": "2.0.0",
     "inputs": [
         {
+            "id": "testGroups",
+            "type": "promptString",
+            "description": "Test groups, comma separated (doc/TEST-GROUPS.md), e.g. ui,docs",
+            "default": "ui,docs"
+        },
+        {
             "id": "testFilter",
             "type": "promptString",
             "description": "pytest -k Ausdruck, z. B. engine or wait",
@@ -111,6 +117,36 @@
                 "kind": "test",
                 "isDefault": true
             },
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: tests selected by my changes (--changed-from v2-port, parallel)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "-q",
+                "--changed-from",
+                "v2-port"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: tests of named groups (--groups, e.g. ui,docs)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "-q",
+                "--groups",
+                "${input:testGroups}"
+            ],
+            "group": "test",
             "problemMatcher": []
         },
         {
@@ -888,6 +924,34 @@
                 "cwd": "${workspaceFolder}"
             },
             "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: what my changes select (select_tests.py --from v2-port --time)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/select_tests.py",
+                "--from",
+                "v2-port",
+                "--time"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: test selection simulation (select_tests.py --simulate)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/select_tests.py",
+                "--simulate"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "problemMatcher": []
         },
         {

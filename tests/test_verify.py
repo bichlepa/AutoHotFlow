@@ -1,4 +1,4 @@
-"""tools/verify.py: the choice of tiers, the reading of run_suite results and the verdict flow, on a temporary git
+"""tools/verify.py: the choice of tiers (the groups of doc/TEST-GROUPS.md decide in --auto), the reading of run_suite results and the verdict flow, on a temporary git
 repository with a fake runner (no pytest run, no AHK process)."""
 
 import json
@@ -18,27 +18,29 @@ SHA = "abcdef12" + "3" * 32          # a fake full sha for the run folder names 
 
 # --- choice of tiers ----------------------------------------------------------------------------------
 
+ALL = ["fast", "foundation", "slow"]
+
+
 @pytest.mark.parametrize("changed, expected", [
-    (["src/supervisor/x.py"], ["fast", "foundation", "slow"]),
-    (["src/expr/x.ahk"], ["fast"]),
-    (["src/core/x.ahk"], ["fast", "foundation"]),
-    (["src/AhfBoot.ahk"], ["fast", "foundation"]),
-    (["src/AutoHotFlow.ahk"], ["fast"]),                  # not in the AGENTS.md list (src/Ahf*.ahk only)
-    (["tools/ahkrun.py"], ["fast", "foundation"]),
-    (["doc/PROTOCOL.md"], ["fast", "foundation"]),
-    (["tests/support/timing.py"], ["fast", "foundation", "slow"]),
-    (["tests/support/elements.py"], ["fast", "foundation"]),
-    (["tests/integration/helpers/x.py"], ["fast", "foundation"]),
-    (["tests/conftest.py"], ["fast", "foundation"]),
-    (["src/storage/x.ahk"], ["fast", "slow"]),
-    (["src/worker/x.ahk"], ["fast", "slow"]),
-    (["tests/test_x.py", "src/expr/y.ahk"], ["fast"]),
-    (["doc/OPEN-ITEMS.md"], ["fast"]),                    # documents are read by tests: fast tier
-    (["src/README.md"], ["fast"]),
-    ([".vscode/tasks.json"], ["fast"]),
-    (["pytest.ini"], ["fast"]),
-    (["README.md"], ["fast"]),
-    (["assets/x.png"], ["fast"]),
+    # a change that the groups can narrow down: the one tier "select"
+    (["src/core/GuiLayout.ahk"], ["select"]),
+    (["src/engine/Executor.ahk"], ["select"]),
+    (["src/supervisor/x.ahk"], ["select"]),
+    (["src/elements/Default/Actions/Action_Sleep.ahk"], ["select"]),
+    (["tests/test_x.py", "src/expr/y.ahk"], ["select"]),
+    (["doc/OPEN-ITEMS.md"], ["select"]),                  # documents: the cheap docs and architecture checks
+    ([".vscode/tasks.json"], ["select"]),
+    (["README.md"], ["select"]),
+    # a change that selects everything: all tiers
+    (["src/AhfBoot.ahk"], ALL),
+    (["src/core/Errors.ahk"], ALL),
+    (["tools/ahkrun.py"], ALL),
+    (["tests/conftest.py"], ALL),
+    (["tests/support/procs.py"], ALL),
+    (["tests/integration/helpers/x.py"], ALL),
+    (["pytest.ini"], ALL),
+    (["assets/x.png"], ALL),                              # no rule for the path: any test may read it
+    (["src/new_folder/x.ahk"], ALL),                      # no area for the file: the guard test of the table fails too
 ])
 def test_tiers_follow_the_changed_paths(changed, expected):
     assert verify.select_tiers(changed) == (expected, None)
@@ -54,16 +56,27 @@ def test_paths_no_test_reads_run_nothing(changed, reason):
 
 
 def test_unread_paths_do_not_hide_a_source_change():
-    assert verify.decide(["work_items/x.md", "src/supervisor/s.ahk"]) == (["fast", "foundation", "slow"], None)
+    assert verify.decide(["work_items/x.md", "src/supervisor/s.ahk"]) == (["select"], None)
+    assert verify.decide(["work_items/x.md", "src/core/Errors.ahk"]) == (ALL, None)
 
 
 def test_decide_without_a_base_runs_all_tiers():
-    assert verify.decide(None) == (["fast", "foundation", "slow"], None)
+    assert verify.decide(None) == (ALL, None)
 
 
 def test_decide_skips_only_when_nothing_a_test_reads_changed():
     assert verify.decide(["work_items/x.md"]) == ([], "not read by any test")
-    assert verify.decide(["tests/x.py"]) == (["fast"], None)
+    assert verify.decide(["tests/test_x.py"]) == (["select"], None)
+
+
+def test_the_select_tier_compares_with_the_base_commit():
+    assert verify.pytest_args("select", "abc123") == ["tests", "-q", "--changed-from", "abc123"]
+    assert verify.pytest_args("fast") == ["tests", "-q"]
+
+
+def test_the_note_names_the_groups_the_change_chose():
+    note = verify.selection_note(["src/core/GuiLayout.ahk"], "0123456789abcdef")
+    assert "groups ui" in note and "smoke tests for ui" in note and "0123456789"[:8] in note
 
 
 # --- reading run_suite results ------------------------------------------------------------------------
@@ -207,7 +220,7 @@ def test_auto_with_base_writes_nothing(repo, tmp_path):
     runner = FakeRunner(tmp_path / "runs")
     verify.main([], runner=runner, repo=repo)
     base_sha = state_of(repo)["sha"]
-    commit(repo, {"tests/t2.py": "t2"}, "test change")
+    commit(repo, {"tests/test_t2.py": "t2"}, "test change")
     assert verify.main(["--auto", "--base", base_sha], runner=runner, repo=repo) == 0
     assert state_of(repo)["sha"] == base_sha
 
@@ -227,12 +240,12 @@ def test_auto_without_base_writes_and_picks_tiers_from_the_change(repo, tmp_path
     assert verify.main(["--auto"], runner=runner, repo=repo) == 0        # no record yet: all tiers
     assert [tier for tier, _ in runner.calls] == list(verify.TIERS)
     assert state_of(repo)["tiers"] == list(verify.TIERS)
-    commit(repo, {"tests/t2.py": "t2"}, "test change")
+    commit(repo, {"tests/test_t2.py": "t2"}, "test change")
     runner.calls.clear()
     assert verify.main(["--auto"], runner=runner, repo=repo) == 0
-    assert [tier for tier, _ in runner.calls] == ["fast"]
-    assert state_of(repo)["tiers"] == ["fast"]
-    commit(repo, {"src/supervisor/s.ahk": "s"}, "supervisor change")
+    assert [tier for tier, _ in runner.calls] == ["select"]
+    assert state_of(repo)["tiers"] == ["select"]
+    commit(repo, {"src/core/Errors.ahk": "e"}, "a hub file changes")
     runner.calls.clear()
     assert verify.main(["--auto"], runner=runner, repo=repo) == 0
     assert [tier for tier, _ in runner.calls] == ["fast", "foundation", "slow"]

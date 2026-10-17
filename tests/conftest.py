@@ -31,7 +31,7 @@ from pathlib import Path
 
 import pytest
 
-from support import admission, runrecord
+from support import admission, groups, runrecord
 from support import ahk as ahk_locator
 from support import wirebool
 from support.procs import ProcessTracker
@@ -170,6 +170,14 @@ def pytest_addoption(parser):
                      help="also run the slow, foundation and gui tests (stress and soak still need -m stress / -m soak)")
     parser.addoption("--foundation", action="store_true", default=False,
                      help="run only the foundation tests, including the slow ones (no gui, stress, soak)")
+    parser.addoption("--changed-from", default=None, metavar="REF",
+                     help="run the tests that the files changed since REF need (committed, staged, unstaged and new "
+                          "files; doc/TEST-GROUPS.md). Slow and foundation tests of the selected groups run too; "
+                          "gui, stress, soak and idle tests do not")
+    parser.addoption("--changed-paths", default=None, metavar="P1,P2",
+                     help="like --changed-from, for a given list of repo-relative paths (simulation, tools/select_tests.py)")
+    parser.addoption("--groups", default=None, metavar="A,B",
+                     help="run the tests of the named test groups (doc/TEST-GROUPS.md); same tiers as --changed-from")
 
 
 DEFAULT_DIR_GUARD_ENV = "AHF_DATA_DIR"    # read by the supervisor when --data is missing (Supervisor.DataDir)
@@ -210,14 +218,56 @@ def pytest_configure(config):
                                        "run with -m gui or --all")
 
 
+def _selection(config):
+    """The group selection of --changed-from, --changed-paths or --groups (support/groups.py), or None for a normal run."""
+    ref = config.getoption("--changed-from")
+    names = config.getoption("--groups")
+    listed = config.getoption("--changed-paths")
+    if listed:
+        return groups.select([p.strip() for p in listed.split(",") if p.strip()])
+    if ref:
+        try:
+            return groups.select(groups.changed_paths(ref, TESTS_DIR.parent))
+        except RuntimeError as e:
+            raise pytest.UsageError("--changed-from: %s" % e)
+    if names:
+        return groups.select_groups([n.strip() for n in names.split(",") if n.strip()])
+    return None
+
+
+def _select_items(config, items, selection, asked):
+    """Keeps the items that the selection accepts. The slow variants of tests/stress stay out unless asked for."""
+    kept = []
+    for item in items:
+        try:
+            rel = item.path.relative_to(TESTS_DIR).as_posix()
+        except ValueError:
+            kept.append(item)
+            continue
+        params = getattr(getattr(item, "callspec", None), "params", {})
+        key = groups.test_key(rel, params.get("ahk_file") if rel == "test_ahk_runner.py" else None)
+        if "stress" in item.path.parts and "stress" not in asked and "soak" not in asked:
+            continue
+        if selection.accepts(key, getattr(item, "originalname", None)):
+            kept.append(item)
+    if len(kept) != len(items):
+        config.hook.pytest_deselected(items=[i for i in items if i not in kept])
+        items[:] = kept
+
+
 def pytest_collection_modifyitems(config, items):
     # Tiers (doc/TEST-STRATEGY.md section 6). The default run keeps only the fast tests without windows. A group is
     # switched on by naming its marker in -m (stress and soak: full-size tests only, their smoke variants are slow;
     # idle: tests that need a quiet machine);
     # --all switches on slow, foundation and gui. A test in several tiers runs only when all of them are on.
+    # --changed-from / --groups (doc/TEST-GROUPS.md) first keep the tests of the selected groups; slow and foundation
+    # tests among them run, gui, stress, soak and idle tests do not (unless -m asks for them).
     asked = config.getoption("markexpr") or ""
     run_all = config.getoption("--all")
     only_foundation = config.getoption("--foundation")
+    selection = _selection(config)
+    if selection is not None:
+        _select_items(config, items, selection, asked)
     for item in items:
         if _is_foundation(item, TESTS_DIR):
             item.add_marker(pytest.mark.foundation)
@@ -232,10 +282,11 @@ def pytest_collection_modifyitems(config, items):
         # smoke variants in tests/stress are not marked themselves: they count as slow
         if "stress" in item.path.parts and not any(item.get_closest_marker(m) for m in ("stress", "soak")):
             item.add_marker(pytest.mark.slow)
+    lifted = ("slow", "foundation", "gui") if run_all else ("slow", "foundation") if selection is not None else ()
     for marker in ("stress", "soak", "idle", "slow", "foundation", "gui"):
         if marker == "gui" and only_foundation:
             continue          # already removed above
-        if marker not in asked and not (run_all and marker in ("slow", "foundation", "gui")):
+        if marker not in asked and marker not in lifted:
             # a stress, soak or idle test that was asked for is not dropped because it is also foundation or slow
             exempt = marker in ("slow", "foundation", "gui")
             kept = [i for i in items if i.get_closest_marker(marker) is None

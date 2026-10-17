@@ -4,23 +4,26 @@ Usage:
     python tools/verify.py [--ref <commit>] [--tiers fast,foundation,slow] [--auto] [--base <commit>] [--json]
 
     python tools/verify.py                      # HEAD, all three tiers
-    python tools/verify.py --auto               # only the tiers that the change since the last green state needs
+    python tools/verify.py --auto               # only the tests that the change since the last green state needs
     python tools/verify.py --tiers fast         # one tier
 
 Tiers (the pytest arguments that run_suite.py gets after --):
     fast        tests -q
     foundation  tests -q --foundation
     slow        tests -q --all -m "slow and not gui"
+    select      tests -q --changed-from <base>      (only with --auto; the groups of doc/TEST-GROUPS.md)
 
 What it does:
   * resolves --ref to a full sha. Every run tests that sha in its own worktree (tools/run_suite.py --ref <sha>), never
     the working tree. The selected tiers start at the same time; run_suite and the admission limit the load.
   * --auto: the change is git diff --name-only --no-renames <base>..<ref>, where base is --base or the sha of the last
-    green state. Paths that no test reads (NOT_READ_BY_TESTS: work_items/, .claude/, NEEDS-ATTENTION.md) need no run.
-    If only such paths changed, or nothing did, nothing runs: "skipped (not read by any test)" or "skipped (no
-    change)". Any other changed path runs fast; foundation when a path is in FOUNDATION_DIRS / FOUNDATION_FILES /
-    FOUNDATION_GLOBS, slow when a path is in SLOW_DIRS / SLOW_FILES. Without a last green state and without --base,
-    all three tiers run.
+    green state. tests/support/groups.py maps the paths to the tests that need to run (doc/TEST-GROUPS.md). Paths that
+    no test reads (work_items/, .claude/, NEEDS-ATTENTION.md) need no run: if only such paths changed, or nothing did,
+    nothing runs: "skipped (not read by any test)" or "skipped (no change)". A change that selects everything (a hub
+    file such as Errors.ahk, test infrastructure, an unknown path) and a run without a last green state and without
+    --base run all three tiers. Any other change runs the one tier "select": the tests of the selected groups, slow and
+    foundation ones included, plus the smoke tests of the users of a shared module, plus the cheap docs and
+    architecture checks.
   * per run it reads the result folder of run_suite (output.txt, status.json): run id, exit code, the summary line,
     INTERNALERROR in the output, and the names of the failed tests (at most 10 per run). A run is green only with exit
     0, no INTERNALERROR, a summary that contains "passed", and a result folder that names the sha (its first 8 hex
@@ -34,14 +37,15 @@ Exit code: 0 green or skipped, 1 red (a tier is not green, could not run, or sho
 error. A last green state that cannot be written is a note in the output, not a failure.
 
 Not covered: the checks outside pytest. The architecture check, the requirements index check and the element include
-check are tests of the fast tier (tests/test_architecture.py, tests/test_requirements.py, tests/test_element_includes.py).
+check are tests of the groups architecture, docs and element-units (tests/test_architecture.py,
+tests/test_requirements.py, tests/test_element_includes.py); they run in every selection.
 tests/test_open_items_ids.py skips itself in a worktree, so verify.py only prints a note about provisional finding IDs
 in doc/OPEN-ITEMS.md; it does not fail on them (agents' branches have them on purpose). The gui tier is never run here.
 """
 
 import argparse
 import concurrent.futures
-import fnmatch
+import functools
 import json
 import os
 import re
@@ -54,25 +58,19 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "tests"))
 sys.path.insert(0, str(REPO / "tools"))
 
-from support import history  # noqa: E402
+from support import groups, history  # noqa: E402
 
 import run_suite  # noqa: E402  (tools/ is the folder of this script)
 
 TIERS = ("fast", "foundation", "slow")
+SELECT = "select"             # the run of --auto that the groups chose; its pytest arguments need the base commit
+ORDER = TIERS + (SELECT,)
 TIER_ARGS = {
     "fast": ["tests", "-q"],
     "foundation": ["tests", "-q", "--foundation"],
     "slow": ["tests", "-q", "--all", "-m", "slow and not gui"],
 }
 
-# --auto: paths that no test reads (checked with git grep over tests/ and tools/). A change of them alone runs nothing.
-NOT_READ_BY_TESTS = ("work_items/", ".claude/", "NEEDS-ATTENTION.md")
-# --auto: which changed paths need which tier beyond fast. Keep these lists in step with AGENTS.md (the paragraph on tests).
-FOUNDATION_DIRS = ("src/core/", "src/supervisor/", "src/debugview/", "tests/support/", "tests/integration/helpers/")
-FOUNDATION_FILES = ("tests/conftest.py", "tools/ahkrun.py", "doc/PROTOCOL.md")
-FOUNDATION_GLOBS = ("src/Ahf*.ahk",)
-SLOW_DIRS = ("src/supervisor/", "src/worker/", "src/storage/")
-SLOW_FILES = ("tests/support/timing.py",)
 # The trees that the record keeps to show what was verified (documentation is not one of them).
 TREE_DIRS = ("src", "tests", "tools")
 
@@ -152,32 +150,16 @@ def write_state(path, data):
 
 # --- deciding what to run ---------------------------------------------------------------------------
 
-def is_unread(path):
-    return path.startswith(NOT_READ_BY_TESTS)
-
-
-def needs_foundation(path):
-    return (path.startswith(FOUNDATION_DIRS) or path in FOUNDATION_FILES
-            or any(fnmatch.fnmatchcase(path, glob) for glob in FOUNDATION_GLOBS))
-
-
-def needs_slow(path):
-    return path.startswith(SLOW_DIRS) or path in SLOW_FILES
-
-
 def select_tiers(changed):
     """The tiers for a list of changed paths, or ([], reason) when nothing has to run."""
     if not changed:
         return [], "no change"
-    relevant = [p for p in changed if not is_unread(p)]
-    if not relevant:
+    sel = groups.select(changed)
+    if sel.is_empty():
         return [], "not read by any test"
-    tiers = ["fast"]
-    if any(needs_foundation(p) for p in relevant):
-        tiers.append("foundation")
-    if any(needs_slow(p) for p in relevant):
-        tiers.append("slow")
-    return tiers, None
+    if sel.everything:
+        return list(TIERS), None
+    return [SELECT], None
 
 
 def decide(changed):
@@ -185,6 +167,18 @@ def decide(changed):
     if changed is None:
         return list(TIERS), None
     return select_tiers(changed)
+
+
+def selection_note(changed, base):
+    """One line for the output that says what the groups chose."""
+    sel = groups.select(changed)
+    names = sorted(sel.groups - set(groups.ALWAYS_GROUPS))
+    text = "selection: groups %s" % (", ".join(names) or "-")
+    if sel.files:
+        text += "; %d test files by name" % len(sel.files)
+    if sel.smoke_areas:
+        text += "; smoke tests for %s" % ", ".join(sorted(sel.smoke_areas))
+    return text + " (python tools/select_tests.py --from %s explains it)" % base[:8]
 
 
 # --- reading the results of run_suite -------------------------------------------------------------
@@ -240,9 +234,16 @@ def provisional_ids(repo, sha):
 
 # --- running ----------------------------------------------------------------------------------------
 
-def run_suite_runner(tier, sha):
-    """Runs tools/run_suite.py for one tier and returns (exit code, stdout and stderr)."""
-    cmd = [sys.executable, str(REPO / "tools" / "run_suite.py"), "--ref", sha, "--", *TIER_ARGS[tier]]
+def pytest_args(tier, base=None):
+    if tier == SELECT:
+        return ["tests", "-q", "--changed-from", base]
+    return TIER_ARGS[tier]
+
+
+def run_suite_runner(tier, sha, base=None):
+    """Runs tools/run_suite.py for one tier and returns (exit code, stdout and stderr). base: the commit that the
+    select tier compares with (the frozen worktree is at sha, so the diff is base..sha)."""
+    cmd = [sys.executable, str(REPO / "tools" / "run_suite.py"), "--ref", sha, "--", *pytest_args(tier, base)]
     proc = subprocess.run(cmd, capture_output=True, stdin=subprocess.DEVNULL)
     return proc.returncode, (proc.stdout + proc.stderr).decode("utf-8", "replace")
 
@@ -252,7 +253,7 @@ def run_tiers(tiers, sha, runner):
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(tiers)) as pool:
         futures = {tier: pool.submit(runner, tier, sha) for tier in tiers}
         outcomes = []
-        for tier in TIERS:
+        for tier in ORDER:
             if tier in futures:
                 code, text = futures[tier].result()
                 outcomes.append(run_outcome(tier, code, text, sha))
@@ -299,8 +300,9 @@ def main(argv=None, runner=None, repo=REPO):
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--ref", default="HEAD", help="commit, branch or tag to verify (default HEAD)")
     parser.add_argument("--tiers", default=None, help="comma-separated tiers: fast,foundation,slow (default all)")
-    parser.add_argument("--auto", action="store_true", help="run only the tiers the change since the last green state "
-                                                            "needs; nothing for changes that no test reads")
+    parser.add_argument("--auto", action="store_true", help="run only the tests the change since the last green state "
+                                                            "needs (doc/TEST-GROUPS.md); nothing for changes that no "
+                                                            "test reads")
     parser.add_argument("--base", default=None, help="base commit for --auto (default: the last green state)")
     parser.add_argument("--json", action="store_true", help="print one JSON object instead of the text")
     args = parser.parse_args(argv)
@@ -322,11 +324,14 @@ def main(argv=None, runner=None, repo=REPO):
         state_file = state_path(repo)
         state = read_state(state_file)
         skip_reason = None
+        base = None
         if args.auto:
             base = args.base or (state or {}).get("sha")
             changed = changed_paths(repo, base, sha) if base else None
             tiers, skip_reason = decide(changed)
         notes = []
+        if tiers == [SELECT]:
+            notes.append(selection_note(changed, base))
         provisional = provisional_ids(repo, sha)
         if provisional:
             notes.append("provisional finding IDs in doc/OPEN-ITEMS.md: %s (renumber before integration)"
@@ -346,7 +351,7 @@ def main(argv=None, runner=None, repo=REPO):
                 say(line)
         return EXIT_GREEN
 
-    outcomes = run_tiers(tiers, sha, runner or run_suite_runner)
+    outcomes = run_tiers(tiers, sha, runner or functools.partial(run_suite_runner, base=base))
     verdict, detail = verdict_of(outcomes)
     code = EXIT_GREEN if verdict == "green" else EXIT_RED
     if verdict == "green":
