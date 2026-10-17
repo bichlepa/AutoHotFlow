@@ -152,7 +152,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (15.7 KB, 116 lines)
+## doc/howto/gui-and-hotkeys.md (15.8 KB, 116 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
