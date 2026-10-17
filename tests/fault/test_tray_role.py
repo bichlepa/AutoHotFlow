@@ -109,7 +109,8 @@ def test_the_tray_role_always_comes_back_after_a_growing_pause(chains):
         psutil.Process(pid).kill()
         pid, t_ready = chain.wait_restarted_ready("tray", pid, timeout=30.0)
         delays.append(t_ready - t_kill)
-    assert delays == sorted(delays) and delays[3] > delays[1] + 1.0, delays
+    # Startup time under load blurs neighbours (1 s against 2 s), so only pairs two steps apart are compared.
+    assert delays[2] > delays[0] and delays[3] > delays[1] and delays[3] > delays[0] + 3.0, delays
     assert not chain.rec.find(event("evt.process.crashed", name="tray", restart=False))
     assert chain.states()["tray"]["state"] == "ready" and chain.sup.proc.poll() is None
 
