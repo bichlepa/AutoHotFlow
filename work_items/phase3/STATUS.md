@@ -86,6 +86,8 @@ Step-independent work item: WI-0059 (test admission, load report, run history), 
 
 ## Last verified state
 
+Commit `d0165a5f` (test groups of the owner, group entry for `test_manager_archive.py`, race fix in the skeleton event test) verified by `--auto`: fast 1505, foundation 470, slow 203, VERDICT green. Load flakes seen on the way: `test_the_engine_is_restarted_and_rearms_without_the_startup_context` (red under load 4 times today, green alone), `test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor` (once).
+
 Commit `c31d126a` (import entry in the choice dialog, Yes/No order of the questions) verified: fast 1466 green; foundation red by 2 cases of `supervisor_tick.test.ahk` (load flake: 46 cases green alone, run `20261018-004804-c31d126a`).
 
 Commit `4e510dc1` (WI-0081 `.ahf`) verified by `--auto`: fast 1461, foundation 470, slow 203, VERDICT green. `19fb1ba8` (dialog text fix F-0128) green too (1444 / 470 / 203).
