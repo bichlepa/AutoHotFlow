@@ -218,3 +218,76 @@ def test_the_order_is_sent_as_an_event_when_it_changes(flows):
     found = flows.wait_message(lambda m: m.get("type") == "evt.category.changed"
                                and any(c["name"] == "Evented" for c in m["payload"]["categories"]))
     assert found is not None, "evt.category.changed with the new category"
+
+
+# --- concurrency: a category command while another one waits for the flow files (WI-0071 review) ----------------
+
+def _in_thread(fn):
+    """Runs fn in a thread; returns (thread, result dict). The result holds "value" or "error"."""
+    import threading
+    box = {}
+
+    def run():
+        try:
+            box["value"] = fn()
+        except Exception as e:  # reported by the test, not swallowed
+            box["error"] = e
+
+    thread = threading.Thread(target=run, daemon=True)
+    thread.start()
+    return thread, box
+
+
+def test_a_rename_meanwhile_another_flow_changes_leaves_one_category(flows):
+    flows.start()
+    for round_no in range(3):
+        old, new = "Old %d" % round_no, "New %d" % round_no
+        other = create_flow(flows, "other %d" % round_no, "")
+        flows.request_ok("engine", "cmd.category.create", {"name": old})
+        members = [create_flow(flows, "m%d-%d" % (round_no, i), old) for i in range(20)]
+        if round_no % 2:
+            other_call = ("engine", "cmd.flow.delete", {"flowId": other})
+        else:
+            other_call = ("engine", "cmd.flow.meta.update", {"flowId": other, "name": "renamed %d" % round_no})
+        thread, box = _in_thread(lambda: flows.request("engine", "cmd.category.rename", {"name": old, "newName": new}))
+        flows.request(*other_call)
+        thread.join(scaled(20.0))
+        assert "error" not in box, box.get("error")
+        assert box["value"]["ok"] is True, box["value"]
+        names = names_of(flows)
+        assert old not in names, "no stale old category: %s" % names
+        assert names.count(new) == 1, names
+        assert all(on_disk(flows.datadir, f)["category"] == new for f in members)
+
+
+def test_a_second_category_command_while_a_rename_waits_is_busy_or_after_it(flows):
+    flows.start()
+    flows.request_ok("engine", "cmd.category.create", {"name": "Busy"})
+    for i in range(20):
+        create_flow(flows, "b%d" % i, "Busy")
+    thread, box = _in_thread(lambda: flows.request("engine", "cmd.category.rename", {"name": "Busy", "newName": "Done"}))
+    answers = []
+    while thread.is_alive():
+        answers.append(flows.request("engine", "cmd.category.create", {"name": "Tmp"}))
+        if answers[-1]["ok"]:
+            flows.request("engine", "cmd.category.delete", {"name": "Tmp"})
+    thread.join(scaled(20.0))
+    assert "error" not in box, box.get("error")
+    assert box["value"]["ok"] is True, box["value"]
+    for answer in answers:
+        assert answer["ok"] or answer["error"]["code"] == "busy", answer
+    assert names_of(flows) == ["Done", ""]
+
+
+def test_an_order_of_the_flows_of_one_category_is_kept_across_a_restart(flows):
+    flows.start()
+    flows.request_ok("engine", "cmd.category.create", {"name": "A"})
+    f1 = create_flow(flows, "one", "A")
+    f2 = create_flow(flows, "two", "A")
+    f3 = create_flow(flows, "three", "A")
+    flows.request_ok("engine", "cmd.category.order", {"flows": {"A": [f3, f1, f2]}})
+    assert order_of(flows)[0] == ("A", [f3, f1, f2])
+    assert wait_for(lambda: categories_on_disk(flows.datadir)["categories"][0]["flows"] == [f3, f1, f2])
+    flows.stop()
+    flows.start()
+    assert order_of(flows)[0] == ("A", [f3, f1, f2]), "the order of the flows is kept"

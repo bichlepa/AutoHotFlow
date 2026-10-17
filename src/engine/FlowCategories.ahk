@@ -199,14 +199,41 @@ class FlowCategories {
         return Deferred.Marker()
     }
 
+    ; Every answer goes out, also when a step throws (the request must not wait for its deadline). While the writes were
+    ; pending, another command may have changed the flows: a Sync then created newName from the written flows, so the
+    ; old group is merged into it instead of renamed.
     _RenameDone(request, name, newName, failed) {
-        if (!(failed is Map))
-            this._order.Rename(name, newName)
-        this._Sync(true)
-        if (failed is Map)
-            this._ReplyFailed(request, "renaming category '" name "' failed", failed)
-        else
-            this._engine.peer.Reply(request, Map())
+        try {
+            if (!(failed is Map)) {
+                if (this._order.Has(newName)) {
+                    this._Sync(false)
+                    if (this._order.Has(name)) {
+                        this._order.MoveAll(name, newName)
+                        this._order.Remove(name)
+                    }
+                } else {
+                    this._order.Rename(name, newName)
+                }
+            }
+            this._Sync(true)
+            if (failed is Map)
+                this._ReplyFailed(request, "renaming category '" name "' failed", failed)
+            else
+                this._engine.peer.Reply(request, Map())
+        } catch as e {
+            this._AnswerInternal(request, "renaming category '" name "'", e)
+        }
+    }
+
+    ; Answers a request whose last step threw: an internal error, logged with the reason.
+    _AnswerInternal(request, what, e) {
+        this._engine._Log("a0", "engine", "answering " what " failed: " Type(e) ": " e.Message)
+        try {
+            this._engine.peer.Reply(request, Map("ok", false, "error"
+                , Map("code", ErrCode.INTERNAL, "message", "the engine could not finish " what)))
+        } catch as e2 {
+            this._engine._Log("a0", "engine", "answering failed too: " Type(e2) ": " e2.Message)
+        }
     }
 
     ; cmd.category.delete { name, moveTo }: the flows move to moveTo first; then the category is removed.
@@ -234,15 +261,19 @@ class FlowCategories {
     }
 
     _DeleteDone(request, name, moveTo, failed) {
-        if (!(failed is Map)) {
-            this._order.MoveAll(name, moveTo)
-            this._order.Remove(name)
+        try {
+            if (!(failed is Map) && this._order.Has(name)) {
+                this._order.MoveAll(name, moveTo)
+                this._order.Remove(name)
+            }
+            this._Sync(true)
+            if (failed is Map)
+                this._ReplyFailed(request, "deleting category '" name "' failed", failed)
+            else
+                this._engine.peer.Reply(request, Map())
+        } catch as e {
+            this._AnswerInternal(request, "deleting category '" name "'", e)
         }
-        this._Sync(true)
-        if (failed is Map)
-            this._ReplyFailed(request, "deleting category '" name "' failed", failed)
-        else
-            this._engine.peer.Reply(request, Map())
     }
 
     ; cmd.category.order { categories?, flows? }: a new order, checked as a whole (every list is a permutation); a refused
@@ -310,7 +341,11 @@ class FlowCategories {
         if (st["left"] > 0)
             return
         this._busy := false
-        done(st["failed"])
+        try {
+            done(st["failed"])
+        } catch as e {
+            this._engine._Log("a0", "engine", "finishing a category change failed: " Type(e) ": " e.Message)
+        }
     }
 
     ; --- checks ----------------------------------------------------------------------------------------
