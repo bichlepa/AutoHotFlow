@@ -167,3 +167,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** The tray role subscribes to the notice topic and calls `TrayTip` itself (`src/tray/Tray.ahk`, `_OnNotice`), at most one per 5 s; headless it only counts.
 - **Status:** assumed (the rule of the icon owner is from the Windows shell documentation as remembered; no test shows a real balloon, the headless tests count only). Not checked: the balloon on a real desktop.
 - **Source:** `src/tray/Tray.ahk` (`_OnNotice`), `tests/integration/test_notices.py::test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray`
+
+### A Text control is clipped to its newlines when its height is counted from them (verified)
+
+- **Problem:** The question dialogs of the manager showed only the first line of a text. The text is one line in the language file but wraps at the dialog width; the height was counted from the newlines (one line), so the control was 20 px for two lines of text.
+- **Wrong:** Computing the height of a wrapped text from the number of lines (`` `n `` count) or from a fixed height per line. Such a height is right only for texts that the author has already broken into lines.
+- **Right:** Measure the text as the control wraps it: `DrawTextW` with `DT_CALCRECT | DT_WORDBREAK | DT_NOPREFIX` (0xC10), the font of the control and the width of the control; the return value is the height of the text (the rectangle is not changed). Convert it to the 100 % sizes of the layout. In a probe, read the control with `ControlGetPos` (`Static1`) to compare the two heights.
+- **Status:** verified (`src/core/GuiLayout.ahk` `TextHeight`; probe with `tools/ahkrun.py`: the delete question gave a 20 px control before the fix, 30 px (two lines of 15 px) after it; unit cases in `tests/ahk/core_gui_layout.test.ahk`). Not checked: the same control at 225 % on a real display.
+- **Source:** `src/core/GuiLayout.ahk`, `src/ui_common/UiDialogs.ahk`
