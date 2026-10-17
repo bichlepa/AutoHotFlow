@@ -4,7 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **How the hotkey input tests send keys (WI-0064, escalated by the agent).** The spike did not settle it: unassigned keys fired in three of four runs (one run missed both hook keys, cause unknown). A real `Trigger_Hotkey` registration of an unassigned key did not fire on `SendInput` in one run, while calling its callback directly does fire. The input desktop then closed (the PC locked) and `SendInput` returned 0. Two questions for you: (1) which key-delivery method the input tests use (a hook-only probe, another unassigned key set, or the `gui` tier only); (2) whether these tests may run on this PC at all, given that they cannot run while it is locked. Until you decide, the tests skip with a reason. The uncommitted test files are in the workspace `wi-0064`.
+None open.
 
 ## To know
 
@@ -13,7 +13,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 ## Manual checks
 
 - **Manual checks 4 and 5 (WI-0067, `doc/MANUAL-CHECKS.md`):** done by the owner on 2026-10-17, all steps pass (run record in the document). The first attempt failed because the Start tasks did not start the triggerhost; fixed.
-- **Real-key tests (WI-0064, WI-0067):** the hotkey tests with real key presses and the `gui` tests of WI-0064 are waiting for the decision on how keys are delivered (see Decisions).
+- **Hotkey input tests (WI-0064, WI-0067):** solved on 2026-10-17. The normal-tier tests run (10 green, serial and parallel); the cause of the old skips was the choice of keys (plain hotkeys on `vk9A` to `vk9C` do not fire for `SendInput`), the PC lock was not the reason. Still for the owner: the `gui` tests with key combinations (VS Code task `Test: hotkey input with key combinations (gui...)`) and the hotkey part of REQ-TRG-010.
 
 ## To know
 
