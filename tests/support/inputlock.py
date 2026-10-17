@@ -2,7 +2,8 @@
 
 The input tests send real keys to the desktop. Two test runs must never send keys at the same time, so each input test
 holds one lock file next to the admission files (admission.runs_dir()). A lock older than INPUT_LOCK_STALE_S was left
-behind by a crashed process and is taken over. Nothing here blocks forever: the wait for the lock has a limit.
+behind by a dead process and is taken over; the holder refreshes the file while it holds the lock.
+Nothing here blocks forever: the wait for the lock has a limit.
 
 Helpers: the input desktop (a locked workstation or a UAC prompt has none), SendInput of a key with modifiers, the
 foreground window, and the modifiers that the user holds (a test waits for them to be released).
@@ -11,13 +12,14 @@ foreground window, and the modifiers that the user holds (a test waits for them 
 import contextlib
 import ctypes
 import os
+import threading
 import time
 from ctypes import wintypes
 
 from support import admission
 
 LOCK_NAME = "input.lock"
-INPUT_LOCK_STALE_S = 120.0      # a lock file older than this belongs to a crashed run
+INPUT_LOCK_STALE_S = 120.0      # a lock file not refreshed for this long belongs to a dead run
 INPUT_LOCK_WAIT_S = 240.0       # longest wait for the lock before the test fails
 
 INPUT_KEYBOARD = 1
@@ -47,35 +49,76 @@ def lock_path():
     return admission.runs_dir() / LOCK_NAME
 
 
+def _take_over(path, stale_s):
+    """Removes the lock file when it is stale. The file is first renamed to a name of our own (atomic), so an unlink
+    can never hit a lock that another process created in the meantime; if the renamed file turns out to be fresh
+    (it was replaced between our stat and our rename), it is put back with os.link, which fails if the name is taken."""
+    mine = path.with_name("%s.stale.%d.%d" % (LOCK_NAME, os.getpid(), time.time_ns()))
+    try:
+        os.rename(str(path), str(mine))
+    except FileNotFoundError:
+        return                                     # released meanwhile
+    try:
+        if time.time() - mine.stat().st_mtime <= stale_s:
+            try:
+                os.link(str(mine), str(path))      # not stale after all: give it back
+            except FileExistsError:
+                pass                               # a third process has created a new lock already
+    finally:
+        try:
+            mine.unlink()
+        except FileNotFoundError:
+            pass
+
+
+def _heartbeat(path, stale_s, stop):
+    """Refreshes the mtime of our lock file while it is held, so the stale limit only applies to a dead holder."""
+    while not stop.wait(stale_s / 4.0):
+        try:
+            os.utime(str(path), None)
+        except OSError:
+            pass
+
+
 @contextlib.contextmanager
-def input_lock(wait_s=INPUT_LOCK_WAIT_S):
-    """Holds the machine-wide input lock for the block. Fails with TimeoutError when another run holds it too long."""
+def input_lock(wait_s=INPUT_LOCK_WAIT_S, stale_s=None):
+    """Holds the machine-wide input lock for the block. Fails with TimeoutError when another run holds it too long.
+    The holder refreshes the mtime of the lock file (every stale_s / 4); a lock that was not refreshed for stale_s
+    seconds belongs to a dead holder and is taken over. stale_s defaults to INPUT_LOCK_STALE_S."""
+    stale_s = INPUT_LOCK_STALE_S if stale_s is None else stale_s
     path = lock_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     deadline = time.monotonic() + wait_s
+    token = "pid %d since %.6f\n" % (os.getpid(), time.time())
     while True:
         try:
             fd = os.open(str(path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except FileExistsError:
             try:
-                if time.time() - path.stat().st_mtime > INPUT_LOCK_STALE_S:
-                    path.unlink()                  # left behind by a crashed run
+                if time.time() - path.stat().st_mtime > stale_s:
+                    _take_over(path, stale_s)      # left behind by a dead run
                     continue
             except FileNotFoundError:
                 continue                           # released meanwhile
             if time.monotonic() > deadline:
                 raise TimeoutError("input lock %s is held by another run (waited %.0f s)" % (path, wait_s))
-            time.sleep(0.2)
+            time.sleep(min(0.2, stale_s / 4.0))
             continue
-        os.write(fd, ("pid %d since %.0f\n" % (os.getpid(), time.time())).encode("ascii"))
+        os.write(fd, token.encode("ascii"))
         os.close(fd)
         break
+    stop = threading.Event()
+    beat = threading.Thread(target=_heartbeat, args=(path, stale_s, stop), daemon=True)
+    beat.start()
     try:
         yield path
     finally:
+        stop.set()
+        beat.join()
         try:
-            path.unlink()
-        except FileNotFoundError:
+            if path.read_text(encoding="ascii") == token:      # never remove a lock that is not ours
+                path.unlink()
+        except (FileNotFoundError, OSError):
             pass
 
 
