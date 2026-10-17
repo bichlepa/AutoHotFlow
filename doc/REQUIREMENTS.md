@@ -1242,7 +1242,7 @@ Fires when AutoHotFlow starts; it can tell a start with Windows (REQ-SET-030) fr
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003, S0008
-- **Evidence:** `tests/ahk/element_hotkey.test.ahk` (WI-0064: the hotkey text of every option, the window condition of each UseWindow value, two triggers on one hotkey share it), `tests/ahk/element_window_ident.test.ahk` (the window identification)., `tests/integration/test_hotkey_input.py` (WI-0064: real keys with `SendInput` on unassigned keys: plain, `~`, release, the window conditions, two flows on one key, disabling one of them, an error of one trigger; the combinations with modifiers are `gui` tests for the project owner)
+- **Evidence:** `tests/ahk/element_hotkey.test.ahk` (WI-0064: the hotkey text of every option, the window condition of each UseWindow value, two triggers on one hotkey share it), `tests/ahk/element_window_ident.test.ahk` (the window identification), `tests/integration/test_hotkey_input.py` (WI-0064: real keys with `SendInput` on unassigned keys: plain, `~`, release, the window conditions, two flows on one key, disabling one of them, an error of one trigger; the combinations with modifiers are `gui` tests for the project owner)
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
