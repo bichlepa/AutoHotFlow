@@ -41,4 +41,10 @@ class EngineVars {
             out.Push(flowId)
         return out
     }
+
+    ; Forgets the static variables of a deleted flow (WI-0070, E0066). Nothing is done for a flow without a table.
+    DropStatic(flowId) {
+        if (this._statics.Has(flowId))
+            this._statics.Delete(flowId)
+    }
 }

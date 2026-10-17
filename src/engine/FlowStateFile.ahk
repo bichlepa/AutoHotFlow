@@ -121,10 +121,7 @@ class FlowStateFile {
         this._scheduled := false
         if (!this._loaded)
             return false
-        flowIds := []
-        for flowId, _ in this._dirty
-            flowIds.Push(flowId)
-        this._dirty := Map()
+        flowIds := this._Writable()
         sent := false
         for flowId in flowIds
             sent := this._Send(flowId, Max(500, Integer(deadlineMs)), true) || sent
@@ -308,12 +305,31 @@ class FlowStateFile {
         this._scheduled := false
         if (this._closing || !this._loaded)
             return
-        flowIds := []
-        for flowId, _ in this._dirty
-            flowIds.Push(flowId)
-        this._dirty := Map()
-        for flowId in flowIds
+        for flowId in this._Writable()
             this._Send(flowId, FlowStateFile.TIMEOUT_MS, false)
+    }
+
+    ; The changed flows that may be written now, and removed from the changed set. A flow that is being deleted keeps its
+    ; mark until the deletion is answered (WI-0070); a flow that is gone is dropped.
+    _Writable() {
+        flowIds := []
+        held := Map()
+        for flowId, _ in this._dirty {
+            if (this._engine.IsDeleting(flowId)) {
+                held[flowId] := true
+                continue
+            }
+            if (this._flows.Has(flowId))
+                flowIds.Push(flowId)
+        }
+        this._dirty := held
+        return flowIds
+    }
+
+    ; The state of a deleted flow is dropped: nothing of it is kept or written (WI-0070, E0066).
+    Forget(flowId) {
+        for map in [this._known, this._errors, this._merged, this._waiters, this._dirty, this._reported]
+            this._Forget(map, flowId)
     }
 
     ; Sends the state of one flow as it is now. Returns true if a request left.

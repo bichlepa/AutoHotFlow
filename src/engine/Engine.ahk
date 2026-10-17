@@ -7,6 +7,7 @@
 #Include FlowRecord.ahk
 #Include FlowTable.ahk
 #Include FlowStateFile.ahk
+#Include FlowLifecycle.ahk
 #Include Executor.ahk
 #Include TriggerArms.ahk
 #Include WorkerBridge.ahk
@@ -65,6 +66,7 @@ class Engine extends Role {
         this.seq := 0
         this.flows := FlowTable()
         this.flowState := FlowStateFile(this, this.flows)   ; enabled state of the triggers (WI-0060)
+        this.lifecycle := FlowLifecycle(this)               ; create, duplicate, rename and delete a flow (WI-0070)
         this.arms := TriggerArms(this)                       ; arming of the enabled triggers in the trigger host (WI-0062)
         this.vars := EngineVars()      ; global and static variables (WI-0040)
         this.varLoader := VarLoader(this, this.vars)
@@ -101,6 +103,10 @@ class Engine extends Role {
         this.On("cmd.trigger.disable", (msg) => this._CmdTriggerSwitch(msg, false))
         this.On("cmd.flow.patch", (msg) => this._CmdFlowPatch(msg))
         this.On("cmd.flow.save", (msg) => this._CmdFlowSave(msg))
+        this.On("cmd.flow.create", (msg) => this.lifecycle.CmdCreate(msg))
+        this.On("cmd.flow.duplicate", (msg) => this.lifecycle.CmdDuplicate(msg))
+        this.On("cmd.flow.meta.update", (msg) => this.lifecycle.CmdMetaUpdate(msg))
+        this.On("cmd.flow.delete", (msg) => this.lifecycle.CmdDelete(msg))
         this.On("evt.worker.done", (msg) => this.workers.OnDone(msg))
         this.On("evt.trigger.fired", (msg) => this._OnTriggerFired(msg))
         this.On("evt.trigger.error", (msg) => this._OnTriggerError(msg))
@@ -208,6 +214,13 @@ class Engine extends Role {
         this.arms.FlowRemoved(flowId)
         return this.flows.Remove(flowId)
     }
+
+    ; True while cmd.flow.delete waits for storage for this flow (WI-0070): no start, no fired trigger, and the writers of
+    ; its files hold back.
+    IsDeleting(flowId) => this.lifecycle.IsDeleting(flowId)
+
+    ; True once the start is complete (evt.engine.ready was sent).
+    IsLoaded => this._flowsLoaded
 
     ; Asks for a dispatch tick soon (once, after the current message).
     Kick() {
@@ -465,6 +478,8 @@ class Engine extends Role {
 
     _CmdFlowStart(msg) {
         rec := this.flows.Require(Engine.Text(msg, "flowId"))
+        if (this.IsDeleting(rec.FlowId))
+            throw AhfError("flow '" rec.FlowId "' is being deleted", ErrCode.BUSY)
         instId := this.executor.StartFlow(rec, Engine.Optional(msg, "triggerId"))
         ; Policy wait while the flow runs: the instance is queued (PROTOCOL 4.2), "waiting" is only sent then.
         if (this.executor.IsWaiting(instId))
@@ -485,6 +500,8 @@ class Engine extends Role {
             this.executor.StopFlow(flowId, "toggle")
             return Map("action", "stopped")
         }
+        if (this.IsDeleting(flowId))
+            throw AhfError("flow '" flowId "' is being deleted", ErrCode.BUSY)
         instId := this.executor.StartFlow(rec)
         return Map("action", "started", "instanceId", instId)
     }
@@ -697,7 +714,7 @@ class Engine extends Role {
         flowId := String(p.Get("flowId", ""))
         elementId := String(p.Get("elementId", ""))
         rec := this.flows.Get(flowId)
-        if (!IsObject(rec) || !this.arms.Accepts(key, gen) || !rec.TriggerEnabled(elementId)) {
+        if (!IsObject(rec) || !this.arms.Accepts(key, gen) || !rec.TriggerEnabled(elementId) || this.IsDeleting(flowId)) {
             this._Log("a2", "engine", "dropped the event of trigger '" key "' (generation " gen ")")
             return
         }

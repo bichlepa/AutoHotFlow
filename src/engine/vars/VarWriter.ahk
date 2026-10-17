@@ -54,20 +54,44 @@ class VarWriter {
         this._Schedule()
     }
 
-    ; sys.shutdown: sends every variable that is still marked. Returns how many were sent.
+    ; The static variables of a deleted flow are dropped (WI-0070): the marked writes of the flow go with it.
+    Forget(flowId) {
+        drop := []
+        for key, entry in this._dirty {
+            if (entry["scope"] = "static" && entry["flowId"] = flowId)
+                drop.Push(key)
+        }
+        for key in drop
+            this._dirty.Delete(key)
+    }
+
+    ; The writes that were held for a flow whose deletion failed are sent again (WI-0070).
+    Resume() {
+        this._Schedule()
+    }
+
+    ; sys.shutdown: sends every variable that is still marked. Returns how many were sent. The writes of a flow that is
+    ; being deleted, and of a flow that is gone, are not sent.
     FlushAll(deadlineMs) {
         this._closing := true
         SetTimer(this._runFn, 0)
         timeoutMs := Max(500, Integer(deadlineMs))
         sent := 0
         lost := 0
+        keep := Map()
         for key, entry in this._dirty {
+            if (this._Held(entry)) {
+                keep[key] := entry
+                continue
+            }
+            if (this._Vanished(entry))
+                continue
             if (this._Send(key, entry, timeoutMs, true))
                 sent += 1
             else
                 lost += 1
         }
-        this._dirty := Map()
+        this._dirty := keep
         ; The peer refuses requests beyond its limit of waiting ones and the process ends at once, so the rest is lost
         ; (F-0070). One summary line instead of one error per variable.
         if (lost > 0)
@@ -85,13 +109,24 @@ class VarWriter {
             return
         due := ""
         for _, entry in this._dirty {
+            if (this._Held(entry))
+                continue     ; waits for Resume or Forget; a due time in the past would make the timer spin
             if (due = "" || entry["due"] < due)
                 due := entry["due"]
         }
+        if (due = "")
+            return
         wait := Max(1, Integer(due - Time.NowMs()) + 1)
         this._scheduled := true
         SetTimer(this._runFn, -wait)
     }
+
+    ; A write of a static variable of a flow that is being deleted waits (WI-0070): storage must not get it after the
+    ; deletion of the folder.
+    _Held(entry) => entry["scope"] = "static" && this._engine.IsDeleting(entry["flowId"])
+
+    ; A write of a static variable of a flow that is gone is dropped (WI-0070).
+    _Vanished(entry) => entry["scope"] = "static" && !this._engine.flows.Has(entry["flowId"])
 
     _Run() {
         this._scheduled := false
@@ -101,10 +136,15 @@ class VarWriter {
             now := Time.NowMs()
             sent := 0
             due := []
+            gone := []
             for key, entry in this._dirty {
-                if (entry["due"] <= now)
+                if (this._Vanished(entry))
+                    gone.Push(key)
+                else if (!this._Held(entry) && entry["due"] <= now)
                     due.Push(key)
             }
+            for key in gone            ; not while the Map is enumerated
+                this._dirty.Delete(key)
             for key in due {
                 if (sent >= VarWriter.BATCH || this._inflight >= VarWriter.MAX_INFLIGHT)
                     break

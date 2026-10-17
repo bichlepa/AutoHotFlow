@@ -36,6 +36,14 @@ class FlowTable {
         return out
     }
 
+    ; Adds a record that was created by a command (WI-0070, FlowLifecycle). Throws AhfError (conflict) for a flow ID
+    ; that is in the table already.
+    Insert(rec) {
+        if (this._records.Has(rec.FlowId))
+            throw AhfError("flow '" rec.FlowId "' is loaded already", ErrCode.CONFLICT)
+        this._records[rec.FlowId] := rec
+    }
+
     ; Removes a flow. Returns true if it was loaded. The caller stops its instances first
     ; (Executor.FlowDeleted).
     Remove(flowId) {
