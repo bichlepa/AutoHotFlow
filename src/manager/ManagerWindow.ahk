@@ -257,7 +257,9 @@ class ManagerWindow {
     ; Import from v1 (WI-0076): the folder dialog of the user (default: the data folder of v1), then the import. The dialog is
     ; only opened by this click (E0076). The startup folder is the real one: the autostart step of the import asks first.
     _ImportV1() {
-        dir := UiFileDialogs.Dir(this.win.Hwnd, A_AppData "\AutoHotFlow", 1, Lang("Import_choose_folder"))
+        ; "*" makes the start folder a starting point the user may leave; without it the dialog is locked to that folder.
+        start := DirExist(A_AppData "\AutoHotFlow") ? "*" A_AppData "\AutoHotFlow" : "*" A_AppData
+        dir := UiFileDialogs.Dir(this.win.Hwnd, start, 1, Lang("Import_choose_folder"))
         if (dir = "")
             return
         this.role.ImportV1(dir, A_Startup, (res) => 0)
