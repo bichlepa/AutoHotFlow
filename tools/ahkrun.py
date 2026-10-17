@@ -1,7 +1,11 @@
 """Runs an AutoHotkey v2 script headless and never hangs on error dialogs.
 
 Usage:
-    python tools/ahkrun.py [--timeout SECONDS] [--interpreter EXE] script.ahk [script args...]
+    python tools/ahkrun.py [--timeout SECONDS] [--interpreter EXE] [--no-dialog-guard] script.ahk [script args...]
+
+--no-dialog-guard: a dialog that appears is not closed and not reported; only the timeout applies (the probe of
+WI-0069 opens a standard dialog on purpose and closes it itself). Never use it for a script that may show an
+unexpected dialog.
 
 --interpreter runs the script with another interpreter (the v1 interpreter of the v1 folder, for the
 golden data, see tools/golden_v1.py). Dialog guard and timeout work the same; only /ErrorStdOut without the
@@ -34,12 +38,14 @@ CREATE_NO_WINDOW = 0x08000000
 ERROR_OPTION_CUSTOM = "/ErrorStdOut"   # for --interpreter; see HOW-TO (AutoHotkey_H 1.1.32)
 
 
-def run(script, args=(), timeout=60.0, cwd=None, interpreter=None, error_option=None):
+def run(script, args=(), timeout=60.0, cwd=None, interpreter=None, error_option=None, dialog_guard=True):
     """Returns (returncode, stdout, stderr, dialogs). returncode 97/98 as documented above.
 
     interpreter: path of another interpreter (the v1 interpreter for the golden data), instead of
     the AutoHotkey v2 one. error_option: the /ErrorStdOut switch to pass; the default is
     /ErrorStdOut=UTF-8 for the v2 interpreter and ERROR_OPTION_CUSTOM for any other one.
+    dialog_guard=False (--no-dialog-guard): dialogs are neither closed nor reported, only the timeout applies.
+    For probes that open a dialog on purpose (WI-0069 spike); such a script must close its dialogs itself.
     """
     if interpreter:
         exe, reason = (os.path.abspath(interpreter), None) if os.path.isfile(interpreter) \
@@ -51,12 +57,13 @@ def run(script, args=(), timeout=60.0, cwd=None, interpreter=None, error_option=
     if not exe:
         return 99, "", reason, []
     script = os.path.abspath(script)
-    watcher = shared_watcher()
+    watcher = shared_watcher() if dialog_guard else None
     proc = subprocess.Popen([exe, error_option, script, *map(str, args)],
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.DEVNULL,
                             cwd=cwd or os.path.dirname(os.path.abspath(script)),
                             creationflags=CREATE_NO_WINDOW)
-    watcher.watch(proc.pid)
+    if watcher is not None:
+        watcher.watch(proc.pid)
     try:
         out, err = proc.communicate(timeout=timeout)
         code = proc.returncode
@@ -70,7 +77,7 @@ def run(script, args=(), timeout=60.0, cwd=None, interpreter=None, error_option=
             pass
         out, err = proc.communicate()
         code = 98
-    dialogs = watcher.events(proc.pid)
+    dialogs = watcher.events(proc.pid) if watcher is not None else []
     if dialogs and code != 98:
         code = 97
     return code, out.decode("utf-8", "replace"), err.decode("utf-8", "replace"), dialogs
@@ -79,7 +86,12 @@ def run(script, args=(), timeout=60.0, cwd=None, interpreter=None, error_option=
 def main(argv):
     timeout = 60.0
     interpreter = None
-    while argv and argv[0] in ("--timeout", "--interpreter"):
+    dialog_guard = True
+    while argv and argv[0] in ("--timeout", "--interpreter", "--no-dialog-guard"):
+        if argv[0] == "--no-dialog-guard":
+            dialog_guard = False
+            argv = argv[1:]
+            continue
         if len(argv) < 2:
             print(__doc__)
             return 2
@@ -91,7 +103,7 @@ def main(argv):
     if not argv:
         print(__doc__)
         return 2
-    code, out, err, dialogs = run(argv[0], argv[1:], timeout, interpreter=interpreter)
+    code, out, err, dialogs = run(argv[0], argv[1:], timeout, interpreter=interpreter, dialog_guard=dialog_guard)
     if out:
         sys.stdout.write(out)
     if err:
