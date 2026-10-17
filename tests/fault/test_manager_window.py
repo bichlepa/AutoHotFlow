@@ -174,3 +174,101 @@ def test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted(
     assert states["manager"]["state"] != "ready"
     assert chain.sup.proc.poll() is None
     assert request_ok(chain.obs, "engine", "cmd.flow.start", {"flowId": "skeleton"})
+
+
+# --- WI-0074: the tree of flows and categories, and drag and drop with the mouse (gui tier, owner's check) -------------
+
+TVM_GETITEMRECT = 0x1104
+TVM_GETITEMW = 0x113E
+TVGN_NEXT, TVGN_PARENT = 1, 3
+MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP = 0x0002, 0x0004
+DRAG_STEPS = 12
+
+
+def _tree(hwnd):
+    return [c for c in children_of(hwnd) if _classname(c) == "SysTreeView32"][0]
+
+
+def _items(tree):
+    """All tree items in order: each category, then its flows."""
+    out = []
+    group = user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_ROOT, 0)
+    while group:
+        out.append(group)
+        child = user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_CHILD, group)
+        while child:
+            out.append(child)
+            child = user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_NEXT, child)
+        group = user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_NEXT, group)
+    return out
+
+
+def _is_flow(tree, item):
+    return user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_PARENT, item) != 0
+
+
+def _text_of_item(tree, item):
+    """The text of a tree item (TVM_GETITEMW; TVITEMW layout for the bitness of this process)."""
+    ptr = ctypes.sizeof(ctypes.c_void_p)
+    hoff = 8 if ptr == 8 else 4                 # hItem follows mask (and its padding)
+    poff = hoff + ptr + 8                       # pszText follows hItem, state and stateMask
+    buf = ctypes.create_unicode_buffer(256)
+    tvitem = ctypes.create_string_buffer(poff + 2 * ptr)
+    ctypes.c_uint.from_buffer(tvitem, 0).value = 0x0001          # TVIF_TEXT
+    ctypes.c_void_p.from_buffer(tvitem, hoff).value = item
+    ctypes.c_void_p.from_buffer(tvitem, poff).value = ctypes.addressof(buf)
+    ctypes.c_int.from_buffer(tvitem, poff + ptr).value = 256
+    assert user32.SendMessageW(tree, TVM_GETITEMW, 0, ctypes.addressof(tvitem)), "no text for the item"
+    return buf.value
+
+
+def _item_center(tree, item):
+    """Screen position of the middle of the text of a tree item."""
+    rect = ctypes.create_string_buffer(16)
+    ctypes.c_void_p.from_buffer(rect, 0).value = item     # TVM_GETITEMRECT: the item goes into rect (text only: wParam 1)
+    assert user32.SendMessageW(tree, TVM_GETITEMRECT, 1, ctypes.addressof(rect)), "no rect for the item"
+    left, top, right, bottom = (ctypes.c_int32 * 4).from_buffer(rect)
+    point = (ctypes.c_long * 2)((left + right) // 2, (top + bottom) // 2)
+    user32.ClientToScreen(tree, point)
+    return point[0], point[1]
+
+
+def test_the_tree_shows_each_category_with_its_flow_and_the_flow_state(window_chain):
+    chain, pid, hwnd = window_chain
+    assert wait_until(lambda: visible(hwnd), 10.0)
+    tree = _tree(hwnd)
+    assert wait_until(lambda: user32.SendMessageW(tree, TVM_GETCOUNT, 0, 0) >= 2, 10.0)
+    request_ok(chain.obs, "engine", "cmd.category.create", {"name": "Other"})
+    assert wait_until(lambda: user32.SendMessageW(tree, TVM_GETCOUNT, 0, 0) == 3, 10.0), \
+        "the tree has %d items, expected 3 (two categories and the flow)" % user32.SendMessageW(tree, TVM_GETCOUNT, 0, 0)
+    items = _items(tree)
+    flows = [i for i in items if _is_flow(tree, i)]
+    assert len(flows) == 1 and _text_of_item(tree, flows[0]).startswith("Skeleton")
+    assert "[" in _text_of_item(tree, flows[0]), "the flow carries no state mark"
+    assert "Other" in [_text_of_item(tree, i) for i in items if not _is_flow(tree, i)]
+
+
+def test_a_flow_dragged_onto_a_category_moves_into_it_and_the_engine_keeps_it(window_chain):
+    chain, pid, hwnd = window_chain
+    assert wait_until(lambda: visible(hwnd), 10.0)
+    tree = _tree(hwnd)
+    request_ok(chain.obs, "engine", "cmd.category.create", {"name": "Other"})
+    assert wait_until(lambda: user32.SendMessageW(tree, TVM_GETCOUNT, 0, 0) == 3, 10.0)
+    items = _items(tree)
+    flow_item = [i for i in items if _is_flow(tree, i)][0]
+    other = [i for i in items if not _is_flow(tree, i) and _text_of_item(tree, i) == "Other"][0]
+    start = _item_center(tree, flow_item)
+    end = _item_center(tree, other)
+    user32.SetCursorPos(*start)
+    user32.mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
+    for step in range(1, DRAG_STEPS + 1):        # the tree starts the drag with the first movement
+        user32.SetCursorPos(start[0] + (end[0] - start[0]) * step // DRAG_STEPS,
+                            start[1] + (end[1] - start[1]) * step // DRAG_STEPS)
+        time.sleep(0.03)
+    time.sleep(0.1)
+    user32.mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
+
+    def moved():
+        snap = request_ok(chain.obs, "engine", "cmd.engine.snapshot", {})
+        return [f["category"] for f in snap["flows"] if f["flowId"] == "skeleton"] == ["Other"]
+    assert wait_until(moved, 10.0), "the flow was not moved to the category by the drop"

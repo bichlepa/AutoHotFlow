@@ -838,7 +838,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: manager window (gui, a real window opens, closes and hides, do not use the PC)",
+            "label": "Test: manager window (gui, a real window opens; the tree and the drag and drop of a flow move the mouse; do not use the PC)",
             "type": "shell",
             "command": "python",
             "args": [
