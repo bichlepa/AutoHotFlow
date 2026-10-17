@@ -12,7 +12,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 ### Closing a Gui window does not end a role (`Persistent`)
 
 - **Problem:** A window without its own reason to keep the main loop alive ends with the last window. The role keeps running through timers and the peer, but its display could disappear by accident.
-- **Right:** `Role.Start` calls `Persistent()`. In the stub, closing the window does the same as quitting (`cmd.app.exit`), so no state is lost.
+- **Right:** `Role.Start` calls `Persistent()`. The real manager only hides its window on close (`UiWindow.hideOnClose`, E0014).
 - **Status:** verified (smoke run: window open, supervisor answers, `cmd.app.exit` leads to exit 0)
 - **Source:** `src/manager/StubGui.ahk`
 
@@ -98,4 +98,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Problem:** The window base of the UI roles (`ui_common/UiWindow.ahk`) creates its `Gui` in the constructor, but it must not remember a position for a window that was never shown (the position of a hidden window is not a place the user chose).
 - **Right:** A flag set by `Show` decides whether `Close` remembers the position (`UiWindow._shown`). A `Gui` created and destroyed without `Show` leaves no window behind, and the texts registered for it are removed again with `UiTexts.Forget`.
 - **Status:** verified (probe with `tools/ahkrun.py`: create, place, register a text, close, close again; the registry is empty after the close and nothing is remembered; no window was shown). Not checked: the position and size of a shown window after a restart or a DPI change (owner's check, WI-0073/WI-0076).
+- **Source:** `src/ui_common/UiWindow.ahk`
+
+### A field and a method whose names differ only in case make the constructor fail with "Property is read-only" (verified)
+
+- **Problem:** `ManagerModel` had a method `Trace(since)` and a field `this.trace := []`, and a method `TraceOn()` and a field `this.traceOn := false`. AHK v2 names are case-insensitive, so the assignment in `__New` hits the method property of the class and throws `Error: Property is read-only.` The role then ends with "manager failed to start", and the message does not name the property.
+- **Wrong:** Naming a field like a method and relying on the different case (it is fine in languages with case-sensitive names).
+- **Right:** Give fields and methods names that differ by more than case (`traceLog`, `recording`). When a constructor fails with "Property is read-only", look for a field that has the name of a method of the class or of its base class (for a `Role`, also the methods of `Role`).
+- **Status:** verified (two failed runs of `tests/e2e/test_manager.py`, green after the rename, run 20261017-141607-14108).
+- **Source:** `src/manager/ManagerModel.ahk`
+
+### The close box hides a window only when its Close handler hides it and returns 1 (assumed, gui test follows)
+
+- **Problem:** The manager must stay alive when the user closes its window (E0014), and the window must come back at the same place and size.
+- **Right:** `UiWindow` has `hideOnClose`: the Close event calls `Hide()` (remembers the place, `Gui.Hide()`) and returns 1, so Windows does not destroy the window; `Show()` later puts it back with `GuiLayout.Show`. A minimized or maximized window is not remembered (its position is not the one of the normal window).
+- **Status:** assumed until `tests/gui/test_manager_window.py` ran.
 - **Source:** `src/ui_common/UiWindow.ahk`

@@ -208,7 +208,7 @@ Relative paths in file and folder parameters refer to the working directory. Eac
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (manager), S0005 (editor)
-- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/e2e/test_ui_stub.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_stub`
+- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`
 
 Each element has a state (idle, running, finished, exception) and counts its runs. Each flow shows whether it is enabled and whether it runs, and its running and queued instances. Manager and editor show these states live, also a window that was opened later or that reconnected after a fault.
 
@@ -2240,7 +2240,7 @@ No blocking call on the message path. Every request has a timeout; a late answer
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (editor)
-- **Evidence:** `tests/e2e/test_ui_stub.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_stub`, `tests/fault/test_worker_lifecycle.py::test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs`, `tests/integration/test_trigger_arming.py::test_the_engine_is_restarted_and_rearms_without_the_startup_context`, `tests/integration/test_trigger_arming.py::test_the_trigger_host_is_restarted_and_its_triggers_fire_again`
+- **Evidence:** `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/fault/test_worker_lifecycle.py::test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs`, `tests/integration/test_trigger_arming.py::test_the_engine_is_restarted_and_rearms_without_the_startup_context`, `tests/integration/test_trigger_arming.py::test_the_trigger_host_is_restarted_and_its_triggers_fire_again`
 
 When the part that runs the flows (the engine) crashes, it starts again by itself. Open windows stay open and show the current state again; the triggers of enabled flows are active again. Instances that were running are lost (MIGRATION M-0001).
 
@@ -2273,7 +2273,7 @@ Flows and variables are written to a temporary file and renamed; a crash leaves 
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/fault/test_shutdown.py`, `tests/e2e/test_ui_stub.py::test_cancelled_exit_is_answered_and_nothing_stops`
+- **Evidence:** `tests/fault/test_shutdown.py`, `tests/e2e/test_manager.py::test_cancelled_exit_is_answered_and_nothing_stops`
 
 Exit has two phases: the user interfaces may ask the user and cancel; then all processes end in a fixed order within 5 s, after writing what is still queued. A process that does not end is ended hard.
 
