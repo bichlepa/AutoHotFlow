@@ -432,7 +432,7 @@ The engine never shows dialogs. If the user must react, the engine uses a worker
 
 - `kind`: `exception` (an unhandled exception ended a branch of a flow, REQ-EXE-090; `flowId` set; `args`: flow name, element ID, message of the exception; never the variables, E0072), `limit` (the runaway guard stopped a flow, REQ-EXE-170; `flowId` set; `args`: flow name, the limit), `storage` (a storage operation failed; no `flowId`; `args`: operation, path, message).
 - `level`: `error` (`exception`, `storage`) or `warning` (`limit`).
-- `key`: the Lang key of the text (`Notice_exception`, `Notice_limit`, `Notice_storage`, basic language file), `args`: the arguments as strings. The receiver translates them with `Lang(key, args...)`; the engine sends no translated text.
+- `key`: the Lang key of the text (`Notice_exception`, `Notice_limit`, `Notice_storage`, in `assets/language/manager/{en,de}.ini`), `args`: the arguments as strings. The receiver translates them with `Lang(key, args...)`; the engine sends no translated text.
 - `held` (integer, only with the throttle below): the number of notices of the same kind and flow that were held back and are not sent one by one. Absent or `0` when none.
 - **Throttle (engine):** per `kind` and `flowId` the first notice goes out at once. Further ones within 10 s are held back and counted. When the window of 10 s ends, one notice with `held` = the number held back goes out, so the count is never lost. A flow that fails over and over gives one notice per 10 s with its count, not one per error.
 - **Tray:** at most one tray notice (TrayTip) per 5 s. A notice within the 5 s is not shown as a tray notice; the tray counts it (role part `info`, 4.10). The manager's list still has it.
