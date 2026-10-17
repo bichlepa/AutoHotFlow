@@ -55,7 +55,8 @@ class GuiLayout {
         old := DllCall("gdi32\SelectObject", "ptr", hdc, "ptr", font, "ptr")
         rc := Buffer(16, 0)
         NumPut("int", Round(width * dpi / 96), rc, 8)   ; right edge of the text area; left and top are 0
-        ; DT_CALCRECT (0x400) | DT_WORDBREAK (0x10) | DT_NOPREFIX (0x800); DrawText takes CR LF as the line end
+        ; DT_CALCRECT (0x400) | DT_WORDBREAK (0x10) | DT_NOPREFIX (0x800); DrawText takes CR LF as the line end. The control
+        ; must not interpret "&" either: the Text control of a dialog has SS_NOPREFIX ("+0x80", UiDialogs).
         lines := StrReplace(StrReplace(text, "`r`n", "`n"), "`n", "`r`n")
         ; with DT_CALCRECT the result is the height of the text (the rectangle is not changed)
         px := DllCall("user32\DrawTextW", "ptr", hdc, "str", lines, "int", -1, "ptr", rc, "uint", 0xC10, "int")

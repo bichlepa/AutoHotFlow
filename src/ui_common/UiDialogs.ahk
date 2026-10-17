@@ -33,13 +33,13 @@ class UiDialogs {
         if (!IsObject(st))
             return false
         m := this.MARGIN
-        textH := GuiLayout.TextHeight(st["gui"], Lang(textKey, args*), this.WIDTH - 2 * this.MARGIN)
+        textH := this._TextH(st["gui"], Lang(textKey, args*), 3 * m + this.BUTTON_H)
         width := this.WIDTH
         y := m + textH + m
         height := y + this.BUTTON_H + m
         g := st["gui"]
         lay := st["lay"] := GuiLayout.Create(g, width, height)
-        text := g.AddText()
+        text := g.AddText("+0x80")
         GuiLayout.Place(lay, text, m, m, width - 2 * m, textH)
         UiTexts.Register(st["hwnd"], text, textKey, "Text", args*)
         x := width - m - (buttons.Length * this.BUTTON_W + (buttons.Length - 1) * m)
@@ -64,21 +64,21 @@ class UiDialogs {
         if (!IsObject(st))
             return false
         m := this.MARGIN
-        textH := GuiLayout.TextHeight(st["gui"], Lang(textKey, args*), this.WIDTH - 2 * this.MARGIN)
         width := this.WIDTH
+        statusH := GuiLayout.TextHeight(st["gui"], "A`nA", width - 2 * m)   ; two lines: a refusal text may wrap
+        textH := this._TextH(st["gui"], Lang(textKey, args*), 3 * m + 8 + this.EDIT_H + statusH + this.BUTTON_H)
         editY := m + textH + 4
         statusY := editY + this.EDIT_H + 4
-        statusH := GuiLayout.TextHeight(st["gui"], "A`nA", width - 2 * m)   ; two lines: a refusal text may wrap
         buttonY := statusY + statusH + m
         height := buttonY + this.BUTTON_H + m
         g := st["gui"]
         lay := st["lay"] := GuiLayout.Create(g, width, height)
-        text := g.AddText()
+        text := g.AddText("+0x80")
         GuiLayout.Place(lay, text, m, m, width - 2 * m, textH)
         UiTexts.Register(st["hwnd"], text, textKey, "Text", args*)
         edit := g.AddEdit(, default)
         GuiLayout.Place(lay, edit, m, editY, width - 2 * m, this.EDIT_H)
-        status := st["status"] := g.AddText()
+        status := st["status"] := g.AddText("+0x80")
         GuiLayout.Place(lay, status, m, statusY, width - 2 * m, statusH)
         x := width - m - (2 * this.BUTTON_W + m)
         ok := g.AddButton("Default")
@@ -102,7 +102,7 @@ class UiDialogs {
         if (!IsObject(st))
             return false
         m := this.MARGIN
-        textH := GuiLayout.TextHeight(st["gui"], Lang(textKey, args*), this.WIDTH - 2 * this.MARGIN)
+        textH := this._TextH(st["gui"], Lang(textKey, args*), 3 * m + 4 + this.LIST_H + this.BUTTON_H)
         width := this.WIDTH
         listY := m + textH + 4
         buttonY := listY + this.LIST_H + m
@@ -115,7 +115,7 @@ class UiDialogs {
         }
         g := st["gui"]
         lay := st["lay"] := GuiLayout.Create(g, width, height)
-        text := g.AddText()
+        text := g.AddText("+0x80")
         GuiLayout.Place(lay, text, m, m, width - 2 * m, textH)
         UiTexts.Register(st["hwnd"], text, textKey, "Text", args*)
         list := g.AddListBox(, labels)
@@ -219,4 +219,24 @@ class UiDialogs {
     }
 
     static _Pick(st, ok, value) => (*) => UiDialogs.Answer(st, ok, value)
+
+    ; The height at 100 % of a dialog text: its wrapped height (GuiLayout.TextHeight), capped so that the dialog stays on the
+    ; work area of the primary monitor. restH is the height of the rest of the dialog at 100 %. A capped text is clipped at
+    ; its end; the buttons stay on the screen. Measured when the dialog is built: a language change while the dialog is open
+    ; can wrap the text differently (accepted; the height is not measured again).
+    static _TextH(g, text, restH) {
+        textH := GuiLayout.TextHeight(g, text, this.WIDTH - 2 * this.MARGIN)
+        return UiDialogs.FitTextHeight(textH, restH, this._MaxHeight(g))
+    }
+
+    ; The text height that fits: textH, or what is left of maxH after restH (never below 0). Pure.
+    static FitTextHeight(textH, restH, maxH) => Min(textH, Max(maxH - restH, 0))
+
+    ; The height of the work area of the primary monitor at 100 % (the dialog is at the DPI of its window).
+    static _MaxHeight(g) {
+        dpi := DllCall("user32\GetDpiForWindow", "ptr", g.Hwnd, "uint")
+        dpi := dpi > 0 ? dpi : 96
+        MonitorGetWorkArea(MonitorGetPrimary(), , &top, , &bottom)
+        return Round((bottom - top) * 96 / dpi)
+    }
 }

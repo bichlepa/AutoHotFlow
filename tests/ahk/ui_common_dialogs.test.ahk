@@ -43,6 +43,13 @@ TestRun.Case("Claim: kinds and owners are independent", () => (
     Assert.True(UiDialogs._Claim(8, "confirm"), "the same kind of another owner is free"),
     Assert.True(UiDialogs._Claim(0, "confirm"), "owner 0 (no owner) is its own owner")))
 
+TestRun.Case("FitTextHeight: a text that fits keeps its height", () => (
+    Assert.Equal(UiDialogs.FitTextHeight(30, 100, 1000), 30)))
+
+TestRun.Case("FitTextHeight: a text is capped by what is left of the screen after the rest", () => (
+    Assert.Equal(UiDialogs.FitTextHeight(300, 100, 250), 150, "250 - 100 is left"),
+    Assert.Equal(UiDialogs.FitTextHeight(300, 100, 80), 0, "nothing is left: no negative height")))
+
 TestRun.Case("CheckInput: no check accepts everything", () => (
     Assert.Equal(UiDialogs.CheckInput("", "anything"), ""),
     Assert.Equal(UiDialogs.CheckInput(0, "anything"), "")))
