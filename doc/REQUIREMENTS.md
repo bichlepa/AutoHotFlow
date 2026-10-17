@@ -1386,12 +1386,15 @@ AutoHotFlow ships demo flows in their own category. They cannot be deleted or re
 ### REQ-MGR-070 Show the log
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the log window and its filters work headless; the window itself is not checked, and the flow settings do not open it yet)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
+- **Evidence:** `tests/integration/test_storage.py::test_log_tail_returns_the_last_entries_with_level_flow_and_source`, `tests/e2e/test_manager_log.py::test_log_opens_with_the_tail_takes_new_entries_and_filters_them`, `tests/e2e/test_manager_log.py::test_closing_the_log_ends_the_subscription_and_its_entries`, `tests/e2e/test_manager_log.py::test_a_burst_of_5000_lines_does_not_stall_the_manager_and_the_model_keeps_the_limit`
 
 The manager shows the log, filtered by level (only errors, some, many, all) and by source (app, flow, thread). The flow settings open the log of one flow.
+
+The window shows the last 1000 entries and the new ones while it is open; a burst of lines does not stall the manager. Missing: the window is not checked by the agents (owner check, WI-0082); the flow settings (S0007) do not call it yet, the code path `OpenLog(flowId)` exists; a burst of 5000 lines reached the model with about 40 % of its lines (the rest is dropped on the way, see OPEN-ITEMS).
 
 ### REQ-MGR-080 Closing the manager window keeps AutoHotFlow running
 

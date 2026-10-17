@@ -192,7 +192,7 @@ L121-127 `Array` has no `Sort` method in AHK v2 (verified)
 L129-135 `Map` keys are case-sensitive by default; compare names with `==` when the case matters (verified)
 ```
 
-## doc/howto/processes-pipes-messages.md (41.6 KB, 366 lines)
+## doc/howto/processes-pipes-messages.md (43.4 KB, 381 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L13-17 `PostMessageW` with a NULL handle reports success (verified)
@@ -235,9 +235,11 @@ L333-339 Take a shared entry with one `Delete`, not with `Get` and then `Delete`
 L342-348 A race test must hook the access the fixed code makes, not the old one (verified)
 L351-357 An event of a trigger can arrive before the answer that arms it (verified)
 L359-365 An error in a request callback ends that request, the step after it never runs (verified)
+L367-373 Reading the end of a log file that other processes append to (verified)
+L375-380 A ListView that follows a growing list keeps the row numbers of the model (assumed)
 ```
 
-## doc/howto/syntax-and-language.md (36.8 KB, 359 lines)
+## doc/howto/syntax-and-language.md (37.7 KB, 366 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -283,6 +285,7 @@ L332-337 A timer period is limited to 2^31 - 1 milliseconds (partly verified)
 L339-344 A sliding window of counts costs one increment per count (verified)
 L346-352 `throw` is a statement: a lambda cannot throw in its expression body (verified) (verified)
 L354-359 A relative `#Include` is resolved from the folder of the including file (verified) (verified)
+L361-366 An optional regex group that did not match gives an empty string, and a lazy group needs a closing anchor (verified)
 ```
 
 ## doc/howto/tests-and-tools.md (41.6 KB, 410 lines)

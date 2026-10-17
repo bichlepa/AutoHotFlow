@@ -364,3 +364,18 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (`src/core/ipc/Peer.ahk` read). Not verified: the `a0` line itself; the WI-0068 hang was found by reading the code, the test output showed only the timeout.
 - **Source:** `src/core/ipc/Peer.ahk` (`_Finish`), `src/engine/FlowStateFile.ahk`
 
+### Reading the end of a log file that other processes append to
+
+- **Problem:** The tail of `Log.txt` (WI-0080) must be read while storage appends to it, and the file can be bigger than the part that is wanted. `File.Read(n)` counts characters, not bytes, so the byte count of the end is wrong with UTF-8.
+- **Wrong:** `FileOpen(path, "r")`, `file.Pos := start` and `file.Read(count)` for a byte count: the read is off in every file with umlauts.
+- **Right:** Read bytes into a `Buffer` with `file.RawRead(buf, count)` (`count` = bytes), decode with `StrGet(buf.Ptr, count, "UTF-8")`, and drop the first line when the read did not start at the beginning. Open with `"r"` only: the writers hold their own handles, and a plain `FileOpen` does not deny them (LogSink comment).
+- **Status:** verified for ASCII text (`tests/integration/test_storage.py::test_log_tail_*`). Assumed for the byte count with umlauts (not run, no test with non-ASCII text yet).
+- **Source:** `src/storage/LogSink.ahk` (`Tail`)
+
+### A ListView that follows a growing list keeps the row numbers of the model
+
+- **Problem:** A log of 1000 entries redrawn on every change rebuilds 1000 rows per burst line. Only the rows that are new or that fell out of the front are wanted.
+- **Right:** Each entry carries its number `n` from the model. The view keeps the list of the `n` it shows: rows below the first visible `n` are removed with `lv.Delete(1)` at the front, rows above the last shown `n` are added with `lv.Add` at the end. Any change of the filter rebuilds the list. The row removal and the addition run between `Opt("-Redraw")` and `Opt("+Redraw")`.
+- **Status:** assumed (the logic is in `src/manager/LogWindow.ahk`; the window was not run by the agents, `gui` tier is for the owner)
+- **Source:** `src/manager/LogWindow.ahk` (`_Update`, `_Rebuild`)
+

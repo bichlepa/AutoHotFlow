@@ -357,3 +357,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Write `#Include UiTexts.ahk` inside `ui_common/` and `#Include ..\core\GuiLayout.ahk` for the folder above it. The test run of the unit files (`tests/test_ahk_runner.py`) loads both without error from a script in another folder.
 - **Status:** verified (the unit test files of WI-0069 run; the same pattern is used by the existing includes such as `#Include ..\..\core\Lang.ahk` in `src/elements/base/DialogWindow.ahk`)
 - **Source:** `src/ui_common/UiWindow.ahk`, `tests/ahk/ui_common_texts.test.ahk`
+
+### An optional regex group that did not match gives an empty string, and a lazy group needs a closing anchor
+
+- **Problem:** The log line parser reads an optional part (level, flow ID) between the time stamp and the sender. Lines without that part must give an empty value, not an error, and a lazy `(.*?)` for the flow ID must stop at the separator of the sender and not run into the text.
+- **Right:** `RegExMatch(line, pattern, &m)`: an unmatched group is `""` in `m[n]`, so `m[2] = ""` tells a line without a level. For the flow ID use `([^~]*?)` (the character class excludes the delimiter `~`) and put the literal ` ~` right after the group; a `.*?` could stop at a later ` ~` inside the text.
+- **Status:** verified (`src/storage/LogSink.ahk` `Tail`; `tests/integration/test_storage.py::test_log_tail_reads_v1_lines_without_level_and_rejects_bad_payloads` reads a v1 line and a line with a flow ID)
+- **Source:** `src/storage/LogSink.ahk` (`Tail`)

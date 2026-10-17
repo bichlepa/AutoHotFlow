@@ -21,6 +21,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0110 | Foundation tier: `test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` found the storage process still alive after the session ended (the symptom of F-0095) | observed once under load, run 20261016-211715-c03b628b on `c03b628`; not reproduced; the engine's shutdown adds no request to storage in this scenario (the trigger state is not marked); open, watch |  |
 | F-0111 | Fast tier: `tests/integration/test_worker.py::test_worker_reports_busy_when_a_job_begins_and_ends` saw `[False, True, False]` as the `sys.busy` values instead of `[True, False]` | observed once (run 20261016-225151-4328, commit a3c0dad plus WI-0063 changes that do not touch workers); not reproduced; open, watch the history | |
 | F-0115 | Fast tier: 10 tests of `tests/integration/test_hotkey_input.py` (`@input`) failed in run 20261017-105241-27428 (commit 237441d plus uncommitted test changes, WI-0070 branch): "the probe key vk88 did not arrive although the input desktop is usable and no modifier is held: hotkey path, not the desktop" | cause found: the input desktop was locked (LogonUI.exe) and the `tasklist` output of the LogonUI check could not be decoded (OEM code page); both fixed (91b08a7, cb7bee9, WI-0064); the skip on a real lock screen is not yet seen, see NEEDS-ATTENTION | |
+| F-9000 | The log window misses lines of a burst: 1991 of 5000 lines reached the manager (WI-0080; the drop is on the way to topic `log`, PROTOCOL 4.6) | open, assumed; decision needed (keep the drop or read the file again) | WI-0080 |
 | F-0114 | Load warnings in the trigger host and in `Trigger_Start_up`: a local `message` (`TriggerHost._CmdArm`, `ReportCallbackError`) and a local `type` (`Trigger_Start_up.Enable`) are reported as the same name as a global variable on every start of the trigger host (seen in the engine and triggerhost logs, WI-0064); the same trap as in `doc/howto/gui-and-hotkeys.md` (case-insensitive names) | observed, not checked whether it changes behaviour; a rename of the locals removes the warnings | |
 
 ## Findings
@@ -73,6 +74,12 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **What:** AutoHotkey prints `Warning: This local variable has the same name as a global variable. Specifically: type (in function Default.Trigger_Start_up.Enable)` (`src/elements/Default/Triggers/Trigger_Start_up.ahk` line 46) on the output of every test that loads the element classes. It is outside WI-0066 and not a failure.
 **Status:** open, not checked whether the engine output shows it in the product (it goes to stdout, not a dialog). The fix is to rename the local (the rule `#Warn` with `StdOut` is in CONVENTIONS section 3).
 **Evidence:** the output of `tests/ahk/helpers/element_rate_bench.ahk` and `tests/ahk/engine_runaway.test.ahk` runs.
+
+### F-9000: The log window misses lines of a burst (5000 lines, 1991 reached the manager)
+
+**What:** In `tests/e2e/test_manager_log.py::test_a_burst_of_5000_lines_does_not_stall_the_manager_and_the_model_keeps_the_limit` the observer sends 5000 `evt.log.append` lines to storage as fast as it can. The headless manager with the log open received 1991 `evt.log.entry` events (the slowest manager request during the burst took 199 ms). The lines are written to `Log.txt` by storage; the drop happens on the way to topic `log`, where `evt.log.entry` is droppable (PROTOCOL 4.6: above 500 frames in the sender's queue, above 800 in the hub's queue to the target).
+**Status:** open, assumed (which of the two limits drops the lines is not checked; the file was not compared with the 5000 lines). Effect: the log window shows fewer lines than the file during a burst. Decision needed from the owner: keep the drop (the window then says so), or let the window read the file again after a burst.
+**Evidence:** `tests/e2e/test_manager_log.py` (WI-0080, run of 2026-10-17, serial, printed by the test).
 
 ## Observed only (not for the bug hunter)
 
