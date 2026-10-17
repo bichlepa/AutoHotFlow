@@ -18,7 +18,7 @@
 ; soon as storage says sys.hello (OnStorageHello), under its original stamp.
 ;
 ; Automatic reports (Auto) come from the supervisor's own observations: a child that ended unexpectedly, the
-; restart limit, a hung child, a burst of unhandled errors (NoteError). At most one per AUTO_MIN_INTERVAL_MS, none
+; restart limit, a hung child, a burst of unhandled errors (NoteError). At most one per AUTO_MIN_INTERVAL_MS (and one per kind and role per AUTO_SAME_INTERVAL_MS), none
 ; while the session ends. Manual reports (Request) are not limited.
 ;
 ;   report := DiagReport(hub, children, () => supervisor.Snapshot(), "main")
@@ -33,6 +33,9 @@ class DiagReport {
     static WRITE_TIMEOUT_MS := 15000
     static STORAGE_WAIT_MS := 10000
     static AUTO_MIN_INTERVAL_MS := 60000
+    ; The same incident of the same role (kind and name) starts at most one automatic report per this interval, so a role
+    ; that dies in a loop (the tray role restarts without limit, WI-0072) does not write a report a minute.
+    static AUTO_SAME_INTERVAL_MS := 600000
     static KEEP_UNWRITTEN := 5
     static ERROR_BURST := 10
     static ERROR_WINDOW_MS := 60000
@@ -51,6 +54,7 @@ class DiagReport {
         this.written := 0
         this.autoSuppressed := 0
         this._lastAutoMs := 0
+        this._lastAutoByKey := Map()   ; "kind-name" -> time (ms) of its last automatic report
         this._unwritten := []          ; finished jobs that wait for storage
         this._errorTimes := Map()      ; role name -> times (ms) of its unhandled errors
         this._seq := 0
@@ -106,8 +110,16 @@ class DiagReport {
                 . this.autoSuppressed " so far)")
             return false
         }
+        key := kind "-" name
+        if (this._lastAutoByKey.Has(key) && now - this._lastAutoByKey[key] < DiagReport.AUTO_SAME_INTERVAL_MS) {
+            this.autoSuppressed += 1
+            Log.Write("a1", "report", "automatic report '" key "' suppressed (same incident within "
+                . DiagReport.AUTO_SAME_INTERVAL_MS " ms, " this.autoSuppressed " so far)")
+            return false
+        }
         this._lastAutoMs := now
-        this.Request(kind "-" name, true)
+        this._lastAutoByKey[key] := now
+        this.Request(key, true)
         return true
     }
 

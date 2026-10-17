@@ -130,6 +130,41 @@ NewSupervisor(hub) {
     return s
 }
 
+BackoffPausesDoubleUpToTheCap() {
+    expected := [1000, 2000, 4000, 8000, 16000, 32000, 60000, 60000]
+    for n, ms in expected
+        Assert.Equal(Children.BackoffMs(n - 1), ms, "pause after death number " n)
+    Assert.Equal(Children.BackoffMs(1000), 60000, "a huge count does not overflow")
+}
+
+BackoffStartsAgainOnlyAfterAStableReadyTime() {
+    t := 1000000
+    Assert.True(Children.BackoffResets(t, t - 10, t + Children.BACKOFF_STABLE_MS), "ready for 30 s: reset")
+    Assert.True(!Children.BackoffResets(t, t - 10, t + Children.BACKOFF_STABLE_MS - 1), "ready for less than 30 s: no reset")
+    Assert.True(!Children.BackoffResets(t, t + 5000, t + 100000), "readyAt of an earlier incarnation: no reset")
+    Assert.True(!Children.BackoffResets(0, 0, t + 100000), "never ready: no reset")
+}
+
+TrayRestartIsPlannedWithGrowingPausesAndNeverGivesUp() {
+    kids := Children(Map("session", "t", "pipe", "p", "data", "d", "hubHwnd", 0, "testRoles", false
+        , "script", "x", "roleOpts", ""), FakeHub())
+    rec := AddChildRecord(kids, "tray", "crashed", 0)
+    rec["role"] := "tray"
+    rec["restartable"] := true
+    rec["readyAt"] := 0
+    rec["backoffN"] := 0       ; a record made by Children.Spawn has it
+    t := 5000
+    pauses := []
+    loop 8 {
+        Assert.True(kids._ScheduleRestart(rec, t), "restart " A_Index " is planned")
+        pauses.Push(rec["restartAt"] - t)
+        t += 1000
+    }
+    Assert.Equal(pauses[1], 1000)
+    Assert.Equal(pauses[4], 8000)
+    Assert.Equal(pauses[8], 60000)
+}
+
 TestRun.Init()
 
 TestRun.Case("Tick: a sys.bye that is unread when the process end is seen is read first (F-0005, F-0010)", ByeIsReadBeforeTheExitIsReported)
@@ -965,5 +1000,9 @@ DataDirFollowsOptionThenEnvironmentThenAppData() {
         EnvSet(Supervisor.DATA_DIR_ENV, saved)
     }
 }
+
+TestRun.Case("Children: the pauses before a restart double from 1 s up to 60 s", BackoffPausesDoubleUpToTheCap)
+TestRun.Case("Children: the pauses start again only after 30 s ready", BackoffStartsAgainOnlyAfterAStableReadyTime)
+TestRun.Case("Children: the tray role is restarted without limit with growing pauses", TrayRestartIsPlannedWithGrowingPausesAndNeverGivesUp)
 
 TestRun.Finish()

@@ -31,7 +31,7 @@ L398-409 9. Performance budgets (targets, measured in Phase 2)
 L411-421 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (92.0 KB, 526 lines)
+## doc/PROTOCOL.md (92.2 KB, 526 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope

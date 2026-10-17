@@ -696,9 +696,9 @@ class Children {
         if (!rec["restartable"] || this.shuttingDown)
             return false
         if (Children.UNLIMITED_RESTART.Has(rec["role"])) {
-            if (rec["readyAt"] >= rec["startedAt"] && rec["readyAt"] > 0 && now - rec["readyAt"] >= Children.BACKOFF_STABLE_MS)
+            if (Children.BackoffResets(rec["readyAt"], rec["startedAt"], now))
                 rec["backoffN"] := 0
-            pause := Min(Children.BACKOFF_MAX_MS, Children.BACKOFF_BASE_MS * (2 ** rec["backoffN"]))
+            pause := Children.BackoffMs(rec["backoffN"])
             rec["backoffN"] += 1
             rec["restartAt"] := now + pause
             Log.Write("a1", "children", rec["name"] " restarts in " pause " ms (death " rec["backoffN"] " in a row)")
@@ -717,6 +717,13 @@ class Children {
         rec["restartAt"] := now + Children.RESTART_DELAY_MS
         return true
     }
+
+    ; The pause before restart number n + 1 in a row (n = deaths in a row before this one): 1 s, 2 s, 4 s ... up to 60 s.
+    static BackoffMs(n) => Min(Children.BACKOFF_MAX_MS, Children.BACKOFF_BASE_MS * (2 ** Min(n, 20)))
+
+    ; True when the death of a process starts the pauses again at the base: the process was ready (readyAt belongs to this
+    ; incarnation, not to an earlier one) and stayed so for BACKOFF_STABLE_MS.
+    static BackoffResets(readyAt, startedAt, now) => (readyAt > 0 && readyAt >= startedAt && now - readyAt >= Children.BACKOFF_STABLE_MS)
 
     _Restart(rec, now) {
         rec["restartTimes"].Push(now)

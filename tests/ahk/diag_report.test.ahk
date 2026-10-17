@@ -277,6 +277,20 @@ CheckAutomaticReportsAreRateLimited() {
     Sleep(50)
 }
 
+CheckTheSameIncidentOfTheSameRoleIsReportedOncePerTenMinutes() {
+    r := NewReport(&hub, &children)
+    Assert.True(r.Auto("crashed", "tray"))
+    r._lastAutoMs := Time.NowMs() - DiagReport.AUTO_MIN_INTERVAL_MS - 1
+    Assert.True(!r.Auto("crashed", "tray"), "the same role dying again a minute later is not reported again")
+    Assert.Equal(r.Stats()["autoSuppressed"], 1)
+    r._lastAutoMs := Time.NowMs() - DiagReport.AUTO_MIN_INTERVAL_MS - 1
+    Assert.True(r.Auto("crashed", "engine"), "another role is")
+    r._lastAutoMs := Time.NowMs() - DiagReport.AUTO_MIN_INTERVAL_MS - 1
+    r._lastAutoByKey["crashed-tray"] := Time.NowMs() - DiagReport.AUTO_SAME_INTERVAL_MS - 1
+    Assert.True(r.Auto("crashed", "tray"), "after ten minutes it is")
+    Sleep(50)
+}
+
 CheckNoAutomaticReportWhileTheSessionEnds() {
     r := NewReport(&hub, &children)
     children.shuttingDown := true
@@ -331,6 +345,7 @@ TestRun.Case("the list of unwritten reports is bounded", CheckTheWaitingListIsBo
 TestRun.Case("a write that finds storage gone is kept", CheckAWriteThatFindsStorageGoneIsKept)
 TestRun.Case("an error answer of storage is passed on", CheckAWriteErrorIsPassedOn)
 TestRun.Case("automatic reports: one per interval, the rest is counted", CheckAutomaticReportsAreRateLimited)
+TestRun.Case("automatic reports: the same incident of the same role once per ten minutes", CheckTheSameIncidentOfTheSameRoleIsReportedOncePerTenMinutes)
 TestRun.Case("no automatic report while the session ends", CheckNoAutomaticReportWhileTheSessionEnds)
 TestRun.Case("ten unhandled errors of one role start a report", CheckABurstOfErrorsStartsAReportButFewDoNot)
 TestRun.Case("reasons become safe folder names", CheckReasonsAreMadeSafeForFolderNames)
