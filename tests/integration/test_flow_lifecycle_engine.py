@@ -304,3 +304,36 @@ def test_a_deleted_flow_stays_deleted_after_a_restart(flows):
     del flows.flows[FLOW]        # the runner loads the flows it has been given: this one is gone
     flows.start()
     assert snapshot_flow(flows, FLOW) is None
+
+
+def send_delete_then(flows, follow_type, follow_payload):
+    """Sends cmd.flow.delete without waiting, then the follow-up command at once, so that the follow-up arrives while
+    storage works on the delete. Returns the answer of the follow-up."""
+    flows._obs.send("engine", "cmd.flow.delete", {"flowId": FLOW})
+    return flows.request("engine", follow_type, follow_payload)
+
+
+def test_a_save_right_after_a_delete_is_busy_and_does_not_re_create_the_file(flows):
+    add_skeleton(flows)
+    flows.start()
+    answer = send_delete_then(flows, "cmd.flow.save", {"flowId": FLOW})
+    assert error_code(answer) == "busy", answer
+    flows.wait_message(lambda m: m.get("type") == "evt.flow.list.changed"
+                       and FLOW in m["payload"].get("removed", []), timeout=WAIT_S)
+    assert snapshot_flow(flows, FLOW) is None
+    assert not (flows.datadir / "Flows" / (FLOW + ".json")).exists()
+    flows.stop()
+    del flows.flows[FLOW]        # the runner loads the flows it was given: this one is gone
+    flows.start()
+    assert snapshot_flow(flows, FLOW) is None
+    assert not (flows.datadir / "Flows" / (FLOW + ".json")).exists()
+
+
+def test_a_trigger_switch_right_after_a_delete_is_busy(flows):
+    add_skeleton(flows)
+    flows.start()
+    answer = send_delete_then(flows, "cmd.trigger.enable", {"flowId": FLOW, "elementId": TRIGGER})
+    assert error_code(answer) == "busy", answer
+    flows.wait_message(lambda m: m.get("type") == "evt.flow.list.changed"
+                       and FLOW in m["payload"].get("removed", []), timeout=WAIT_S)
+    assert not (flows.datadir / "Flows" / (FLOW + ".json")).exists()

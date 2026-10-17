@@ -537,6 +537,8 @@ class Engine extends Role {
     ; cmd.trigger.enable / cmd.trigger.disable (E0056): one trigger. bad_payload if the element is not a trigger of the flow.
     _CmdTriggerSwitch(msg, enabled) {
         rec := this.flows.Require(Engine.Text(msg, "flowId"))
+        if (this.IsDeleting(rec.FlowId))
+            throw AhfError("flow '" rec.FlowId "' is being deleted", ErrCode.BUSY)
         triggerId := Engine.Text(msg, "elementId")
         if (rec.Def.ElementKind(triggerId) != "trigger")
             throw AhfError("element '" triggerId "' is not a trigger of flow '" rec.FlowId "'", ErrCode.BAD_PAYLOAD)
@@ -681,6 +683,9 @@ class Engine extends Role {
     _CmdFlowSave(msg) {
         flowId := Engine.Text(msg, "flowId")
         rec := this.flows.Require(flowId)
+        ; A write queued behind a pending delete in storage would re-create the deleted file (WI-0070, E0066).
+        if (this.IsDeleting(flowId))
+            throw AhfError("flow '" flowId "' is being deleted", ErrCode.BUSY)
         savedRev := rec.Rev
         text := rec.Def.ToFileText()
         this.peer.Request(Engine.STORAGE, "cmd.storage.flow.write"
