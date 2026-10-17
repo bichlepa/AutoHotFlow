@@ -20,6 +20,9 @@
 tests/data/flows/**/*.json -text
 tests/data/variables/** -text
 
+# The .ahf files are ZIP archives (binary): byte for byte, no line-ending conversion (WI-0081, the v1 export of the owner)
+tests/data/ahf/** binary
+
 # Language files are the v1 files, byte for byte (UTF-16 and CRLF as written by v1): no line-ending conversion
 assets/language/** -text
 
