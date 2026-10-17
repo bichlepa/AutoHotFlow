@@ -72,7 +72,8 @@ def test_log_opens_with_the_tail_takes_new_entries_and_filters_them(procs, datad
     # New entries arrive while the log is open.
     send_entry(writer, "f2", "Flow 369404488", FLOW, "live four")
     writer.close()
-    assert wait_until(lambda: manager_state(obs)["log"]["seen"] >= 1, 10)
+    # Wait for this very entry: "seen" also counts entries of other sources (storage, the manager) and is no proof.
+    assert wait_until(lambda: log_filter(obs, "3", "all", FLOW)["visible"] == 3, 10)
 
     # Filters (level digit, group letter, flow). Each call sets all three.
     assert log_filter(obs, "3", "all", FLOW)["visible"] == 3      # tail two, tail three, live four
