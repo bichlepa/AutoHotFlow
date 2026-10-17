@@ -70,13 +70,13 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified that the class double works (`tests/ahk/element_hotkey.test.ahk`, `FakeCtx`); the cause is assumed
 - **Source:** `tests/ahk/element_hotkey.test.ahk`
 
-### An open tray menu does not stop the pipe handling, although the docs suggest it (verified by hand)
+### An open menu stops timers and usually a running thread, but not the pings (verified)
 
-- **Problem:** The AHK v2 docs say that a thread is uninterruptible while a menu of the script is shown (`misc/Threads.htm`, "Thread Interruptibility"), that timers do not run "when the user is navigating through one of the script's menus" (`lib/SetTimer.htm`), and that a posted message above 0x0311 is buffered while the script is uninterruptible (`lib/OnMessage.htm`); the wake-up message `WM_AHF_WAKE` is 0x8001. Read together, an open tray menu would stop the pipe handling of the process, and the supervisor would judge it hung after 6 s.
-- **Wrong:** Concluding from the docs alone that an open menu blocks a role (an agent proposed a separate tray role for this reason, 2026-10-17).
-- **Right:** The owner left the tray menu of the idle stub manager open for more than 10 s: the manager was not judged hung, so it kept answering `sys.ping`. Which part of the docs does not apply (perhaps "navigating" means only the active use of the menu) is not known. Not checked: a menu opened while a thread runs (does that thread pause until the menu closes, and the timers with it?), a menu under load, a menu the user navigates. Do not rely on "a menu blocks nothing" before WI-0072 has checked these cases.
-- **Status:** verified by hand for an idle process only (owner, 2026-10-17, once); the other cases and the mechanism are not checked
-- **Source:** `src/manager/StubManager.ahk` (`_SetupTray`), `src/supervisor/Heartbeat.ahk`
+- **Problem:** The AHK v2 docs say that a thread is uninterruptible while a menu of the script is shown (`misc/Threads.htm`, "Thread Interruptibility"), that timers do not run "when the user is navigating through one of the script's menus" (`lib/SetTimer.htm`), and that a posted message above 0x0311 may not be buffered while a menu's modal loop runs (`lib/OnMessage.htm`). The supervisor's tray menu (E0064) rests on the assumption that an open menu blocks nothing; the owner's check (2026-10-17) covered only an idle stub manager with the menu open for 10 s.
+- **Right:** Measured with `tools/tray_menu_probe.py` (results in `doc/MEASUREMENTS.md`, "Open menus in a running process"): with light load (20 wake messages per second) a pinged process answers all of them while its tray or Gui menu is open. Its timers stop for the whole time of the menu (one tick in 6 s), and they stop for good while the user navigates. A running thread went on in one of five runs with a passive tray menu, and stalled in the other four and in every navigated run. Under a flood of wake messages (300 per second) the handling of the messages stopped until the menu closed. Plan for it: the hub does not run timers or threads of the process while a menu is open, so a tray or Gui menu in a process that must keep working (the supervisor) is only safe while the menu is short and the load is light. Do not rely on "a menu blocks nothing".
+- **Not checked:** a menu open for minutes, several menus at once, a menu under a real user's navigation with the mouse (the probe uses Esc and three Down keys), other Windows versions. The mechanism is not known (assumed: a Gui menu runs as a new thread that interrupts the running one).
+- **Status:** verified (probe runs of WI-0072, one run per case, five for the passive tray case; the flood cases are one run each)
+- **Source:** `tests/ahk/helpers/tray_menu_probe.ahk`, `tools/tray_menu_probe.py`, `doc/MEASUREMENTS.md`
 
 ### Standard dialogs (`FileSelect`, `DirSelect`, `MsgBox`) keep the message handling going, but stall the timers (verified)
 

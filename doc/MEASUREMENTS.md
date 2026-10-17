@@ -98,6 +98,27 @@ Notes on the table:
 
 **Unassigned keys for input tests (WI-0064 spike, E0059).** A script registers `vk97` (plain), `$vk98` (keyboard hook), `~vk99` (hook, key passes on) and `vk9F` (plain). A second process sends each key with `SendInput` (key down and up, `wVk` only, scan code 0), 0.4 s apart, while the listener runs (`tools/ahkrun.py`, AutoHotkey 2.0.30, interactive session, no window of the test). Result of 4 runs: in runs 2 to 4 every key fired once; a second listener variant (`$vk98`, `$*vk9A`, `$vk9B`, `vk9C`, with an `InputHook` for the keys) fired every key too. The plain keys fired in every run. In run 1 the two hook keys (`$vk98`, `~vk99`) did not fire, the plain ones did. The cause is not known (not reproduced in the three later runs). Verified: these 4 runs of the spike (not the test suite). Consequence: the input tests must not treat one miss as proof either way. **Correction (WI-0064, 2026-10-17, verified, 4 runs of a listener with `Hotkey()` and `SendInput` from Python, AutoHotkey 2.0.30):** the keys are not equal. A plain hotkey (no `$`, so `RegisterHotKey`) did **not** fire for `vk9A`, `vk9B` and `vk9C` in any run, while the same keys fired with `$` or `~` (keyboard hook). `vk97`, `vk88` to `vk8F`, `vkD8` to `vkDA`, `vkE8` and `vk7C` (F13) fired in every form (plain, `~`, ` up`). Checked again in 3 runs: plain `vk97`, `vk98`, `vk99`, `vk9D`, `vk9E` and `vk9F` fire, only `vk9A`, `vk9B` and `vk9C` do not. The first spike had picked keys that work; the cause of the miss in run 1 (two hook keys) is still not known. The input tests use `vk88` to `vk8F` and `vkE8`. A plain hotkey on `vk9A` is not reliable for `SendInput`.
 
+## Open menus in a running process (WI-0072, E0064)
+
+**What and how.** `tools/tray_menu_probe.py` (VS Code task "Tool: tray menu probe ...") opens the menu of `tests/ahk/helpers/tray_menu_probe.ahk` at 3 s (tray menu: right-click message to the script window; Gui: `WM_CONTEXTMENU` to a ListView, its `ContextMenu` event shows the menu), holds it 6 s and closes it with Esc. Meanwhile the driver posts `WM_AHF_WAKE` (0x8001) at 20 per second (300 per second for the flood cases) and the script counts the answers and its 100 ms timer ticks. "Navigate" presses Down three times while the menu is open. One machine, Windows 11 with the German UI, the probe runs alone; the numbers are one run each unless the count says otherwise. Code state: the commit that adds the probe (WI-0072).
+
+| Case | Runs | Pings answered in the menu window | Timer ticks in the window | Thread progress in the window (normal: about 50 per s) |
+|---|---:|---|---:|---|
+| Tray menu, idle script | 1 | 80 of 80 (max 12 ms) | 1 (gap 4.0 s) | no thread |
+| Tray menu, thread running, menu only open | 5 | 120 of 120 in every run (max 1 to 3 ms) | 40 in one run, 1 to 2 in the others | 275 in one run (no stall); 1, 2, 2 and 8 in the other four (stall) |
+| Tray menu, thread running, navigated | 1 | 120 of 120 (max 1 ms) | 1 | 1 (stall) |
+| Gui context menu, idle script | 1 | 120 of 120 (max 1 ms) | 1 | no thread |
+| Gui context menu, thread running, menu only open | 1 | 120 of 120 (max 1 ms) | 1 | 3 (stall) |
+| Gui context menu, thread running, navigated | 1 | 120 of 120 (max 2 ms) | 1 | 3 (stall) |
+| Tray menu, idle script, navigated | 1 | 120 of 120 (max 1 ms) | 1 | no thread |
+| Flood 300 per s, no menu (baseline) | 1 | 959 of 2800 answered in 15 s | - | - |
+| Flood 300 per s, tray menu open | 1 | 0 of about 1800 sent in the window; 573 answered in all, all after the menu closed | 1 | - |
+| Flood 300 per s, tray menu open, navigated | 1 | 0 in the window; 573 answered in all, all after the close | 1 | - |
+
+**Reading.** (1) Pings are answered while a menu is open, as long as the load is light: the message handler runs inside the menu's message loop. (2) Timers stop while a menu is open on an idle script (one tick in 6 s), and while the user navigates them stop in every case. (3) A running thread is not stopped by an open tray menu in one run of five; in the other four it made 1 to 8 progress records in 6 s. A Gui context menu stopped it in its one run. Navigating stops it. (4) Under a flood of wake messages the message handling stops for the whole time the menu is open (no answer in 6 s), and it resumes after the close. Without a menu, most of the flood is not answered either (959 of 2800; the handler is not re-entered while it runs, see `Wake.MaxThreads`). So the menu adds a pause, it does not add a loss that we can see. The mechanism of (3) and (4) is not known (assumed: a Gui menu runs as a new thread that interrupts the running one, which resumes only after the menu closes; not checked).
+
+**Consequence (open).** No case stopped the message handling for good, and every pause ended with the close. But a running thread of the process and its timers stop while a menu is open, and under load the wake handling stops too. E0064 says the risk of the supervisor is low; for the supervisor's tray menu this is so as long as the menu is short and the hub is not under load. Not checked: a menu open for minutes, several menus, a supervisor whose children judge it hung while its menu is open (the supervisor's own timers stop as well, so it judges nothing in that time). The result goes to the owner (WI-0072, task 5).
+
 ## Not measured
 
 These points are missing from the measurements. The first group is listed in the source as "not measured" or "not checked".

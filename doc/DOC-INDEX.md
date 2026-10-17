@@ -122,12 +122,13 @@ L503-520   19.1 The subset that is compared
 L522-539   19.2 Deliberate deviations from native AutoHotkey v2
 ```
 
-## doc/MEASUREMENTS.md (36.7 KB, 121 lines)
+## doc/MEASUREMENTS.md (40.3 KB, 142 lines)
 ```text
 L11-21 Important: one machine, not an idle machine
 L23-73 Overview
 L75-99 Method
-L101-121 Not measured
+L101-120 Open menus in a running process (WI-0072, E0064)
+L122-142 Not measured
 ```
 
 ## doc/CONVENTIONS.md (8.3 KB, 63 lines)
@@ -150,7 +151,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (13.0 KB, 100 lines)
+## doc/howto/gui-and-hotkeys.md (13.5 KB, 100 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -161,7 +162,7 @@ L42-49 Per-monitor DPI awareness scales only the title bar, not the controls (ve
 L51-57 A local variable named like a built-in function silently calls the variable (verified) (verified)
 L59-64 `contains` is a reserved word in AutoHotkey v2 (verified) (verified)
 L66-71 An object literal with a lambda property is called with the object as an extra argument (verified) (partly verified)
-L73-79 An open tray menu does not stop the pipe handling, although the docs suggest it (verified by hand) (partly verified)
+L73-79 An open menu stops timers and usually a running thread, but not the pings (verified) (verified)
 L81-93 Standard dialogs (`FileSelect`, `DirSelect`, `MsgBox`) keep the message handling going, but stall the timers (verified) (verified)
 L95-100 A Gui created and closed without Show leaves no window and no remembered place (verified) (verified)
 ```
