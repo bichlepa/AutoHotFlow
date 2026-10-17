@@ -2,18 +2,18 @@
 
 The automated tests do not cover the checks in this document. The project owner runs them by hand. Each step states the expected result. A step passes only if the expected result is seen. A dialog box (window class `#32770`) at any point is a failure.
 
-The checks cover two interfaces: the manager stub (section 1) and the debug window (section 2). Use the "Result" template at the end to record a run.
+The checks cover two interfaces: the manager (section 1) and the debug window (section 2). Use the "Result" template at the end to record a run.
 
 Where a step starts the application, the VS Code task is named by its label in `.vscode/tasks.json`, followed by the same call for a terminal.
 
 **Data folder and session.** The checks run with `tools/manual_check.py` in their own data folder `%TEMP%\ahf_manual_check` and their own session `manual`. The default folder `%APPDATA%\AutoHotFlow v2` stays untouched, and an instance that runs for something else (session `main`) is not met. The tool starts `AutoHotkey64.exe` without a timeout and without a dialog guard, waits until the application ends, and then prints `AutoHotFlow ended with exit code <n>` in the task terminal. The logs and reports of a check are in `%TEMP%\ahf_manual_check\Log` and `...\Reports`. A fresh folder (VS Code task "Setup: fresh data folder for the manual checks (manual_check.py prepare)", or `python tools/manual_check.py prepare`) holds only `Flows\skeleton.json`, a copy of `tests/data/skeleton_flow.json`.
 
-## 1. Manager stub (GUI)
+## 1. Manager (GUI)
 
-Test on the stub GUI. Not automated; the stub has a headless variant that the tests use.
+Test on the manager window. Not automated; the manager has a headless variant that the tests use. (Written for the stub of phase 2; the tree and the buttons of the real manager are checked after block A of S0004, WI-0076.)
 
-**Start.** VS Code task "Start: manual check 1, manager stub in a fresh data folder (manual_check.py)", or in a terminal:
-`python tools/manual_check.py start --fresh -- --ui=stub --start=storage,engine,manager,debug`
+**Start.** VS Code task "Start: manual check 1, manager in a fresh data folder (manual_check.py)", or in a terminal:
+`python tools/manual_check.py start --fresh -- --start=storage,engine,manager,debug`
 
 The start prepares a fresh data folder first (see above), so no preparation by hand is needed. It also starts the debug window.
 
@@ -21,7 +21,7 @@ The start prepares a fresh data folder first (see above), so no preparation by h
 
 | # | Step | Expected result | Result |
 |---|---|---|---|
-| 1 | Start the application (see above). | The stub window opens. No dialog. The debug window "AutoHotFlow - debug" also opens next to it. | pass |
+| 1 | Start the application (see above). | The manager window opens. No dialog. The debug window "AutoHotFlow - debug" also opens next to it. | pass |
 | 2 | Check the window. | The list shows `skeleton`. The status line shows connection `ready`, `epoch` and `seq`. | pass |
 | 3 | Click `skeleton`, then click Start. | The element list shows the states `running` and `finished` for three elements. The status line shows a command latency. | pass |
 | 4 | During a run, move the window and click Start several times. | The window stays usable. Moving and clicking do not freeze it. | pass |
@@ -69,7 +69,7 @@ Test on the real dialog windows of the elements Message_Box, Confirmation_Dialog
 **Set the scaling.** Windows Settings > System > Display > Scale: choose 100 %, 125 % or 150 %. Log off and on only if the text stays blurred after a change.
 
 **Start.** VS Code task "Start: manual check 3, dialog windows at other DPI scaling (manual_check.py)", or in a terminal:
-`python tools/manual_check.py start --flow dpi_dialogs -- --ui=stub --start=storage,engine,manager`
+`python tools/manual_check.py start --flow dpi_dialogs -- --start=storage,engine,manager`
 
 The start prepares a fresh data folder with the flow `dpi_dialogs` (`tests/data/manual/dpi_dialogs.json`, which runs the message box, the confirmation dialog, the debug dialog with a few variables and the tooltip, in this order). The flow does not start by itself: in the manager stub select `dpi_dialogs` and click Start. The window of an element that ends the flow early (for example the debug window closed with X) stops the flow at that element; then start the flow again in the stub.
 
@@ -106,13 +106,13 @@ Test with a real start of the application and with real keys: the triggers of an
 
 This check runs in the manual-check data folder, not in the default folder `%APPDATA%\AutoHotFlow v2` (the rule of this document). To run it in the default folder instead, copy the two files into `Flows\` and `FlowStates\` of that folder; the owner decides.
 
-**Start.** VS Code task "Start: manual check 4, enabled flow with a hotkey and a periodic timer (manual_check.py)", or in a terminal `python tools/manual_check.py start --flow triggers_check -- --ui=stub --start=storage,engine,triggerhost,manager`. Without `--start` no role runs: no window and no log folder appear.
+**Start.** VS Code task "Start: manual check 4, enabled flow with a hotkey and a periodic timer (manual_check.py)", or in a terminal `python tools/manual_check.py start --flow triggers_check -- --start=storage,engine,triggerhost,manager`. Without `--start` no role runs: no window and no log folder appear.
 
 ### Steps
 
 | # | Step | Expected result | Result |
 |---|---|---|---|
-| 1 | Start the application (see above). | The stub window opens and lists `triggers_check`. No dialog. | pass |
+| 1 | Start the application (see above). | The manager window opens and lists `triggers_check`. No dialog. | pass |
 | 2 | Wait 12 s without touching the keyboard. | A tooltip "Periodic timer fired" appears two or three times. No tooltip "Started with Windows". | pass |
 | 3 | Press `Ctrl+Alt+Shift+F12` once. | The tooltip "Hotkey fired" appears within about one second. | pass |
 | 4 | Press `Ctrl+Alt+Shift+F12` three times in quick succession. | Each press shows the tooltip "Hotkey fired" (the tooltips may follow each other). | pass |
@@ -126,13 +126,13 @@ This check runs in the manual-check data folder, not in the default folder `%APP
 
 The same flow, started as after a start of Windows. The supervisor option `--windows-startup` tells the engine that AutoHotFlow starts with Windows (WI-0063).
 
-**Start.** VS Code task "Start: manual check 5, the same enabled flow started with --windows-startup (manual_check.py)", or `python tools/manual_check.py start --flow triggers_check -- --ui=stub --start=storage,engine,triggerhost,manager --windows-startup`.
+**Start.** VS Code task "Start: manual check 5, the same enabled flow started with --windows-startup (manual_check.py)", or `python tools/manual_check.py start --flow triggers_check -- --start=storage,engine,triggerhost,manager --windows-startup`.
 
 ### Steps
 
 | # | Step | Expected result | Result |
 |---|---|---|---|
-| 1 | Start the application (see above). | The stub window opens. No dialog. | pass |
+| 1 | Start the application (see above). | The manager window opens. No dialog. | pass |
 | 2 | Look at the screen within 5 s after the start. | Exactly one tooltip "Started with Windows" appears. | pass |
 | 3 | Wait 12 s. | The periodic timer tooltips appear as in section 4, step 2. The start-up tooltip does not come again. | pass |
 | 4 | Press `Ctrl+Alt+Shift+F12` once. | The tooltip "Hotkey fired" appears (as in section 4, step 3). | pass |

@@ -14,7 +14,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Problem:** A window without its own reason to keep the main loop alive ends with the last window. The role keeps running through timers and the peer, but its display could disappear by accident.
 - **Right:** `Role.Start` calls `Persistent()`. The real manager only hides its window on close (`UiWindow.hideOnClose`, E0014).
 - **Status:** verified (smoke run: window open, supervisor answers, `cmd.app.exit` leads to exit 0)
-- **Source:** `src/manager/StubGui.ahk`
+- **Source:** `src/manager/ManagerWindow.ahk`
 
 ### Capture and operate a window of an AHK role without screen access
 
