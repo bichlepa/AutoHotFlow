@@ -152,7 +152,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (20.7 KB, 153 lines)
+## doc/howto/gui-and-hotkeys.md (21.9 KB, 161 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -171,8 +171,9 @@ L111-116 The close box hides a window only when its Close handler hides it and r
 L118-123 `this.callback()` on a function stored in a property passes `this` as the first argument (verified) (verified)
 L125-131 Events of a tree that is built again arrive late; do not clear the selection in them (verified) (verified)
 L133-138 A tree drag is started by TVN_BEGINDRAG; the drop is found by a timer that reads the mouse button (assumed) (assumed)
-L140-146 TVM_GETITEMW returned 0 for a tree item in a test helper; the cause is not found (not checked) (not checked)
+L140-146 TVM_GETITEMW returned 0 for a tree item in a test helper; the cause is not found (not checked) (partly verified)
 L148-153 A Ctrl click in a TreeView is read in the ItemSelect handler with GetKeyState (assumed) (assumed)
+L155-161 TVM_GETITEMRECT (and other messages with a pointer) returns 0 for a tree of another process (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (11.0 KB, 135 lines)

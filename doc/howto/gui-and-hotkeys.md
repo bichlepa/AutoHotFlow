@@ -141,8 +141,8 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 
 - **Problem:** A helper of the gui test read the text of a tree item with `TVM_GETITEMW` (0x113E) and a `TVITEMW` buffer (mask, hItem at 8, pszText at 24 on 64 bit). The message returned 0 for items that `TVM_GETNEXTITEM` had just returned.
 - **Wrong:** Trusting the offsets alone; the test had no other way to read the text.
-- **Right:** Not known yet. The helper was removed; the state text of the tree has no gui test.
-- **Status:** not checked (observed once, one gui run, the test helper was removed after it, no second run was allowed).
+- **Right:** Probably the same cause as the entry below: `TVITEMW` and its text buffer are pointers into the test process, which Windows does not translate for a tree of another process. Not retried with remote memory. The helper was removed.
+- **Status:** assumed (cause by analogy with the TVM_GETITEMRECT entry, which was verified; the text read itself was not retried).
 - **Source:** `tests/fault/test_manager_window.py` (the helper is gone)
 
 ### A Ctrl click in a TreeView is read in the ItemSelect handler with GetKeyState (assumed)
@@ -151,3 +151,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** In the `ItemSelect` handler read `GetKeyState("Ctrl", "P")`; the model keeps the set of the selected flows, the native selection shows the focused item. A late event of a rebuilt tree is ignored by comparing the item with the model (see the entry above).
 - **Status:** assumed (the model side is tested headless, `tests/e2e/test_manager_flows.py::test_ctrl_click_selects_several_flows_and_the_operations_act_on_them`; the Ctrl click itself is not automated). Not checked on screen: the item marks of the set (open finding F-9002).
 - **Source:** `src/manager/ManagerWindow.ahk` (`_OnTreeSelect`), `src/manager/ManagerModel.ahk` (`SelectToggle`)
+
+### TVM_GETITEMRECT (and other messages with a pointer) returns 0 for a tree of another process (verified)
+
+- **Problem:** A gui test asked the tree of the manager process for the rectangle of a flow item (to drag it with the mouse). `TVM_GETITEMRECT` returned 0 ("no rect"), even for a visible, expanded item, while `TVM_GETNEXTITEM`/`TVM_GETCOUNT` worked.
+- **Wrong:** Passing `ctypes.addressof(buffer)` of the test process as lParam. Windows marshals the pointer only for a few standard messages, not for common-control messages; the address means nothing in the other process.
+- **Right:** Allocate the RECT in the process that owns the tree (`VirtualAllocEx`, `WriteProcessMemory` with the item handle in the first pointer-size bytes, send, `ReadProcessMemory`, `VirtualFreeEx`). Set `argtypes` for the kernel32 calls (64-bit pointers).
+- **Status:** verified (`tests/fault/test_manager_window.py`: 7 gui tests pass; the drag test fails when the drop target is the start position).
+- **Source:** `tests/fault/test_manager_window.py` (`_remote_item_rect`)

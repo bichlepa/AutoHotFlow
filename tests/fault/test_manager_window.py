@@ -212,16 +212,48 @@ def _has_children(tree, item):
     return user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_CHILD, item) != 0
 
 
+kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+kernel32.OpenProcess.argtypes = [ctypes.c_ulong, ctypes.c_int, ctypes.c_ulong]
+kernel32.OpenProcess.restype = ctypes.c_void_p
+kernel32.VirtualAllocEx.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong, ctypes.c_ulong]
+kernel32.VirtualAllocEx.restype = ctypes.c_void_p
+kernel32.VirtualFreeEx.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong]
+kernel32.WriteProcessMemory.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p]
+kernel32.ReadProcessMemory.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p]
+kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
+
+
+def _remote_item_rect(tree, item):
+    """TVM_GETITEMRECT (text only, wParam 1) for a tree of another process. The message carries a pointer to a RECT, and
+    Windows does not translate it between processes: the RECT must live in the memory of the process that owns the tree
+    (VirtualAllocEx, WriteProcessMemory, ReadProcessMemory). A local buffer makes the message fail (returns 0)."""
+    owner = ctypes.c_ulong(0)
+    user32.GetWindowThreadProcessId(tree, ctypes.byref(owner))
+    # PROCESS_VM_OPERATION | VM_READ | VM_WRITE
+    proc = kernel32.OpenProcess(0x0008 | 0x0010 | 0x0020, 0, owner.value)
+    assert proc, "OpenProcess failed: %d" % ctypes.get_last_error()
+    remote = kernel32.VirtualAllocEx(proc, None, 16, 0x3000, 0x04)    # MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE
+    try:
+        assert remote, "VirtualAllocEx failed: %d" % ctypes.get_last_error()
+        local = ctypes.create_string_buffer(16)
+        ctypes.c_void_p.from_buffer(local, 0).value = item            # the item handle goes into the first bytes of the RECT
+        assert kernel32.WriteProcessMemory(proc, remote, local, 16, None)
+        assert user32.SendMessageW(tree, TVM_GETITEMRECT, 1, remote), "no rect for the item"
+        assert kernel32.ReadProcessMemory(proc, remote, local, 16, None)
+        return tuple((ctypes.c_int32 * 4).from_buffer(local))
+    finally:
+        if remote:
+            kernel32.VirtualFreeEx(proc, remote, 0, 0x8000)           # MEM_RELEASE
+        kernel32.CloseHandle(proc)
+
+
 def _item_center(tree, item):
     """Screen position of the middle of the text of a tree item. A flow below a collapsed category has no rectangle: the
     category is expanded first (TVM_EXPAND, TVE_EXPAND)."""
     parent = user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_PARENT, item)
     if parent:
         user32.SendMessageW(tree, TVM_EXPAND, 2, parent)
-    rect = ctypes.create_string_buffer(16)
-    ctypes.c_void_p.from_buffer(rect, 0).value = item     # TVM_GETITEMRECT: the item goes into rect (text only: wParam 1)
-    assert user32.SendMessageW(tree, TVM_GETITEMRECT, 1, ctypes.addressof(rect)), "no rect for the item"
-    left, top, right, bottom = (ctypes.c_int32 * 4).from_buffer(rect)
+    left, top, right, bottom = _remote_item_rect(tree, item)
     point = (ctypes.c_long * 2)((left + right) // 2, (top + bottom) // 2)
     user32.ClientToScreen(tree, point)
     return point[0], point[1]
