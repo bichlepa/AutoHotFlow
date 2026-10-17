@@ -18,6 +18,8 @@
 ; import at once.
 class ManagerImport {
     static STORAGE_MS := 30000
+    ; A create writes a flow file (and a category list) in storage: longer than a click (ManagerModel.COMMAND_MS, 5 s).
+    static WRITE_MS := 30000
 
     __New(model) {
         this.m := model
@@ -75,7 +77,7 @@ class ManagerImport {
 
     _Flows(i) {
         if (i > this.names.Length)
-            return this._Variables(1)
+            return this._StartVariables()
         name := this.names[i]
         this._Request("cmd.storage.v1.read", Map("dir", this.dir, "kind", "flow", "name", name)
             , (p) => this._Read(i, name, p))
@@ -103,7 +105,7 @@ class ManagerImport {
         }
         if (cat != "" && !this.cats.Has(cat)) {
             ; v1 keeps the category in the flow file; v2 keeps the list of categories, so the import adds the category first
-            this.m.Command("cmd.category.create", Map("name", cat), (ans) => this._CategoryAdded(i, name, exists, defn, cat, ans))
+            this.m.Command("cmd.category.create", Map("name", cat), (ans) => this._CategoryAdded(i, name, exists, defn, cat, ans), ManagerImport.WRITE_MS)
             return
         }
         this._Send(i, name, exists, defn)
@@ -121,7 +123,7 @@ class ManagerImport {
             payload["numberName"] := Json.True    ; a copy: a new ID (the engine picks it), the name gets a number
         else
             payload["flowId"] := name             ; the flow keeps the ID of the v1 file
-        this.m.Command("cmd.flow.create", payload, (ans) => this._Created(i, name, exists, ans))
+        this.m.Command("cmd.flow.create", payload, (ans) => this._Created(i, name, exists, ans), ManagerImport.WRITE_MS)
     }
 
     _Created(i, name, copy, ans) {
@@ -135,19 +137,28 @@ class ManagerImport {
         this._Entry(i, name, copy ? "copy" : "created", flowId, "", p.Get("places", []), p.Get("name", ""))
     }
 
+    ; The variables to read: the static variables of a flow that was not imported are listed as skipped here, so the
+    ; chain below only asks storage for variables that are taken over (no synchronous recursion over skipped entries).
+    _StartVariables() {
+        this.reads := []
+        for ref in this.varList {
+            if (ref["scope"] = "static" && !this.idOf.Has(ref["flowId"])) {
+                this._VarEntry("static", ref["flowId"], ref["name"], "skipped", "")
+                continue
+            }
+            this.reads.Push(ref)
+        }
+        this._Variables(1)
+    }
+
     _Variables(j) {
-        if (j > this.varList.Length)
+        if (j > this.reads.Length)
             return this._SendVariables()
-        ref := this.varList[j]
+        ref := this.reads[j]
         scope := ref["scope"]
         flowId := ref["flowId"]
         name := ref["name"]
-        newId := ""
-        if (scope = "static") {
-            if (!this.idOf.Has(flowId))          ; the flow was not imported: its variables stay with it
-                return this._Variables(j + 1)
-            newId := this.idOf[flowId]
-        }
+        newId := (scope = "static") ? this.idOf[flowId] : ""
         this._Request("cmd.storage.v1.read", Map("dir", this.dir, "kind", "var", "scope", scope, "flowId", flowId
             , "name", name), (p) => this._VarRead(j, scope, newId, name, p))
     }
@@ -198,7 +209,8 @@ class ManagerImport {
     _Autostart() {
         if (this.startupDir = "")
             return this._Finish()
-        this._Request("cmd.storage.autostart.check", Map("startupDir", this.startupDir), (p) => this._AutostartChecked(p))
+        this._Request("cmd.storage.autostart.check", Map("startupDir", this.startupDir, "v1Dir", this.dir)
+            , (p) => this._AutostartChecked(p))
     }
 
     _AutostartChecked(p) {
@@ -223,7 +235,7 @@ class ManagerImport {
             this.res["autostart"] := "kept"
             return this._Finish()
         }
-        this._Request("cmd.storage.autostart.remove", Map("startupDir", this.startupDir)
+        this._Request("cmd.storage.autostart.remove", Map("startupDir", this.startupDir, "v1Dir", this.dir)
             , (p) => this._AutostartRemoved(p))
     }
 
@@ -289,6 +301,7 @@ class ManagerImport {
         }
         for v in res["vars"] {
             if (v["state"] != "failed")
+                if (v["state"] = "taken" || v["state"] = "kept")
                 counts[v["state"]] += 1
             where := (v["scope"] = "static") ? Lang("Import_scope_static", v["flowId"]) : Lang("Import_scope_global")
             switch v["state"] {
@@ -296,6 +309,8 @@ class ManagerImport {
                     lines.Push(Lang("Import_var_taken", v["name"], where))
                 case "kept":
                     lines.Push(Lang("Import_var_kept", v["name"], where))
+                case "skipped":
+                    lines.Push(Lang("Import_var_skipped", v["name"], where))
                 default:
                     lines.Push(Lang("Import_var_failed", v["name"], where, v["message"]))
             }

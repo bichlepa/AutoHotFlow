@@ -790,13 +790,14 @@ class ManagerModel {
     ; Sends a command to the engine with a timeout. Every answer, a refusal or a timeout included, reaches the listeners as
     ; the event "answer" and goes to done(answer) when it is given. answer is Map(type, flowId, ok, code, message, payload,
     ; ms). Never blocks.
-    Command(type, payload, done := "") {
+    ; timeoutMs: the time of the answer (0 = COMMAND_MS); the import of a flow may take longer than a click (30 s).
+    Command(type, payload, done := "", timeoutMs := 0) {
         t0 := Time.NowMs()
         flowId := (payload is Map) ? payload.Get("flowId", "") : ""
         this.Note("manager.command", Map("type", type, "flowId", flowId))
         try {
             this.peer.Request("engine", type, payload, (ans) => this._OnCommandAnswer(type, flowId, t0, ans, done)
-                , ManagerModel.COMMAND_MS)
+                , timeoutMs > 0 ? timeoutMs : ManagerModel.COMMAND_MS)
         } catch as e {
             this._Answered(Map("type", type, "flowId", flowId, "ok", false, "code", "not_sent", "message", e.Message
                 , "payload", Map(), "ms", 0), done)
