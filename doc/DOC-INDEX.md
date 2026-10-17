@@ -123,13 +123,13 @@ L503-520   19.1 The subset that is compared
 L522-539   19.2 Deliberate deviations from native AutoHotkey v2
 ```
 
-## doc/MEASUREMENTS.md (40.3 KB, 142 lines)
+## doc/MEASUREMENTS.md (41.4 KB, 143 lines)
 ```text
 L11-21 Important: one machine, not an idle machine
-L23-73 Overview
-L75-99 Method
-L101-120 Open menus in a running process (WI-0072, E0064)
-L122-142 Not measured
+L23-74 Overview
+L76-100 Method
+L102-121 Open menus in a running process (WI-0072, E0064)
+L123-143 Not measured
 ```
 
 ## doc/CONVENTIONS.md (8.5 KB, 63 lines)
