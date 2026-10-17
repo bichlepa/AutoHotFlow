@@ -81,37 +81,37 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Status:** open, assumed (which of the two limits drops the lines is not checked; the file was not compared with the 5000 lines). Effect: the log window shows fewer lines than the file during a burst. Decision needed from the owner: keep the drop (the window then says so), or let the window read the file again after a burst.
 **Evidence:** `tests/e2e/test_manager_log.py` (WI-0080, run of 2026-10-17, serial, printed by the test).
 
-### F-9000: The tree shows that a flow runs, not how many instances run
+### F-0117: The tree shows that a flow runs, not how many instances run
 
 **What:** WI-0074 asks the tree to show a running flow with the number of its instances (REQ-MGR-010). The engine reports only `executing` (0 or 1) in `evt.flow.state` and in the snapshot (PROTOCOL 4.2, 4.3); the count of running and waiting instances is not sent. The tree shows "running" without a number.
 **Status:** open, verified (read of PROTOCOL 4.2 and 4.3, `ManagerWindow._FlowLabel`). Decision needed from the owner: add the count to the snapshot and `evt.flow.state` (an engine and protocol change), or take the count out of REQ-MGR-010.
 **Evidence:** `doc/PROTOCOL.md` 4.2 and 4.3; `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`.
 
-### F-9001: The question for an unknown state recognises the refusal by its text
+### F-0118: The question for an unknown state recognises the refusal by its text
 
 **What:** The question "write the state of this session to the file?" (E0063, `ManagerOps._AfterSwitch`) is asked when the answer of the engine is `ok: false` with the text "cannot be read (". The engine gives this refusal no error code, so the text is the only mark. A change of the text in `Engine.ahk` would silently remove the question.
 **Status:** open, assumed (the test `test_a_switch_refused_for_an_unknown_state_*` in `tests/e2e/test_manager_flows.py` would fail on such a change, but it was not checked against a changed text). Robust option (review, decision needed): `code: state_unknown` in the two refusal replies of `src/engine/Engine.ahk` (`_SwitchOrRead`, `_ReplyRefused`) and documented in PROTOCOL 4.2; the manager then checks the code instead of the text.
 **Evidence:** `src/engine/Engine.ahk` (`_ReplyRefused`, `_SwitchOrRead`), `tests/e2e/test_manager_flows.py`.
 
-### F-9002: A multi-selection of flows is not visible in the tree
+### F-0119: A multi-selection of flows is not visible in the tree
 
 **What:** The Ctrl click adds flows to the selection that the operations act on (`ManagerModel.selectedSet`). The Windows tree highlights only the focused item, and nothing else marks the other flows of the selection.
 **Status:** open, verified in code (no mark is drawn), not checked on screen. Action: the owner decides on a mark (for example a prefix in the text of the item), or a note in the status line with the count.
 **Evidence:** `src/manager/ManagerWindow.ahk` (`_OnTreeSelect`), `src/manager/ManagerModel.ahk` (`SelectToggle`).
 
-### F-9003: A flow that has no trigger message but a missing package is not marked
+### F-0120: A flow that has no trigger message but a missing package is not marked
 
 **What:** REQ-MIG-070 asks the manager to show at the flow which packages are missing. The manager marks a flow only when one of its triggers has an arming error (`message` of `evt.trigger.state`, which a missing package causes). An element of a missing package that is not a trigger is not marked, because the snapshot does not list missing packages.
 **Status:** open, verified in code, not checked for a flow with a missing non-trigger element. Action: a snapshot field for the missing packages (protocol change, owner decision).
 **Evidence:** `tests/e2e/test_manager_flows.py::test_enabling_a_flow_with_a_missing_package_reports_the_trigger` (trigger case only).
 
-### F-9004: The tree label of a running flow has no automated test
+### F-0121: The tree label of a running flow has no automated test
 
 **What:** The state text of a tree item ("running", "enabled", ...) is built in `ManagerWindow._FlowLabel`. No test reads the text of a tree item: the headless tests read the model, and the gui tests check the structure of the tree only (the item text read with `TVM_GETITEMW` returned 0 in one gui run and the helper was removed).
 **Status:** open, verified in code, not checked on screen. Action: a headless check of `_FlowLabel` with a record, or a gui test that reads the item text once `TVM_GETITEMW` is understood.
 **Evidence:** `src/manager/ManagerWindow.ahk` (`_FlowLabel`), `tests/fault/test_manager_window.py`.
 
-### F-9005: A multi-selection was lost on a later rebuild of the tree (fixed, no automated test)
+### F-0122: A multi-selection was lost on a later rebuild of the tree (fixed, no automated test)
 
 **What:** A late `ItemSelect` event of a rebuilt tree called `ManagerModel.Select` and cleared the multi-selection. The fix in `ManagerWindow._OnTreeSelect` skips the event when the focused flow is already the model's selection. The rebuild path is only reachable through a real tree, so no headless test covers the fix.
 **Status:** open, verified in code, not checked on screen. Action: a gui test that selects two flows and then creates a category.

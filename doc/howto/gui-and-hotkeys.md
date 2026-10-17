@@ -149,7 +149,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 
 - **Problem:** A multi-selection (several flows) needs the Ctrl key at the moment of the click. The TreeView itself selects one item only.
 - **Right:** In the `ItemSelect` handler read `GetKeyState("Ctrl", "P")`; the model keeps the set of the selected flows, the native selection shows the focused item. A late event of a rebuilt tree is ignored by comparing the item with the model (see the entry above).
-- **Status:** assumed (the model side is tested headless, `tests/e2e/test_manager_flows.py::test_ctrl_click_selects_several_flows_and_the_operations_act_on_them`; the Ctrl click itself is not automated). Not checked on screen: the item marks of the set (open finding F-9002).
+- **Status:** assumed (the model side is tested headless, `tests/e2e/test_manager_flows.py::test_ctrl_click_selects_several_flows_and_the_operations_act_on_them`; the Ctrl click itself is not automated). Not checked on screen: the item marks of the set (open finding F-0119).
 - **Source:** `src/manager/ManagerWindow.ahk` (`_OnTreeSelect`), `src/manager/ManagerModel.ahk` (`SelectToggle`)
 
 ### TVM_GETITEMRECT (and other messages with a pointer) returns 0 for a tree of another process (verified)
