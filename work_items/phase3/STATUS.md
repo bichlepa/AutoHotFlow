@@ -61,7 +61,7 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI-0071 | Categories and the order of the list (`Categories.json`) | done, verified (fast, foundation, slow green; slow one load flake, green alone; stress 200 flows: ready 45.4 s, largest snapshot 622 ms) | sonnet/haiku (review sonnet) | 2606b20 (rebased series) | 2026-10-17 | block A; accepted: empty categories from hand-edited files stay, case-differing names are a quirk |
 | WI-0072 | Tray icon and tray menu of the application (own role `tray`, E0075) | done, verified (fast, foundation, slow green on 3a32a30) | sonnet (review sonnet) | 3a32a30 | 2026-10-17 | block A; unlimited restart with growing pause, decided by the owner |
 | WI-0073 | Manager: window, model, resync, headless driver, replaces the stub | done, verified on 72da2f6 (fast, foundation, slow green; stress 201 flows: filled after 0.54 s, snapshot 0.2 s; gui test 4 passed) | sonnet (review sonnet) | ec2a38b–72da2f6 | 2026-10-17 | block A; the product start does not start the manager yet (the tray does) |
-| WI-0074 | Flow tree and operations | integrated on 5590990a, verification running | haiku/sonnet (review sonnet) | fd0de334–5590990a | 2026-10-17 | block A; owner decisions F-0117, F-0120; drag test fixed by sonnet (cross-process RECT) |
+| WI-0074 | Flow tree and operations | done, verified on 5590990a (fast, foundation green) | haiku/sonnet (review sonnet) | fd0de334–5590990a | 2026-10-17 | block A; owner decisions F-0117, F-0120; drag test fixed by sonnet (cross-process RECT) |
 | WI-0075 | Notices | open | | | | block A |
 | WI-0076 | Import from v1, manual check of block A | open | | | | block A |
 | WI-0077 | Settings model | open | | | | block B |
@@ -81,9 +81,12 @@ None.
 
 ## Running agents
 
-None.
+- WI-0075 (notices): haiku, workspace `wi-75`.
+- Bug hunter for F-0116, F-0117, F-0120 and E0081: haiku, workspace `hunt-1`.
 
 ## Last verified state
+
+Commit `5590990a` (WI-0074 integrated) verified by `tools/verify.py --tiers fast,foundation`: VERDICT green. Fast run `20261017-162956-5590990a-2` (1403 passed, 1 skipped), foundation run `20261017-162956-5590990a` (470 passed, 1 skipped). Before that `d6331fb8` (WI-0080): foundation and slow green (`20261017-154520-d6331fb8`, `-3`), fast red by 2 `pipe_write_gone` tests under heavy load (`-2`), green alone (run `20261017-162931-26520`).
 
 Commit `72da2f69` (WI-0073 integrated; status commit `b01c23f`) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261017-144912-72da2f69-3` (1368 passed, 11 skipped), foundation run `20261017-144912-72da2f69-2` (470 passed, 1 skipped), slow run `20261017-144912-72da2f69` (199 passed). Manager stress run (WI-0073, 201 flows): `20261017-143840-12032`, filled after 0.54 s. Earlier: `271f3d5` (file dialogs, E0076) green, fast `20261017-141011-271f3d5d`, foundation `20261017-141011-271f3d5d-2`, slow `20261017-141013-271f3d5d`.
 
