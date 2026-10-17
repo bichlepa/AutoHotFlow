@@ -26,11 +26,11 @@ Each step is worked through individually: **detail** (package files WI-xx with t
 |---|---|---|---|---|
 | **S0001** | Expressions and variables | new expression language (AHK v2 semantics), conversion of old expressions, golden data from v1, variable model, `global`/`static` permanent, parameter evaluation | see below, packages WI-0036 to WI-0043 | done (acceptance closed 2026-10-15, E0050; F-0073 stays open) |
 | **S0002** | Element foundation and core set | oracle of the expression language (native AHK v2, E0035), migration markers, R0003 measurement, element layout per package (E0037), L0001 smoke test, flow builder for tests, R0004 (`ctx.Request`), dialog test seam (E0038), core set of 29 elements, test corpus from the "Automatic tests" flows | see below, packages WI-0044 to WI-0058 | **done** (acceptance WI-0058, 2026-10-16; F-0107 and F-0108 closed by the owner) |
-| **S0003** | Trigger host and a few triggers | enabled state per trigger, kept across starts (E0056, E0057), role `triggerhost` (WI-0014), `cmd.trigger.arm/disarm`, `evt.trigger.fired/error`, re-arming after a restart of engine or trigger host, activate/deactivate flow. Triggers: Manual, Hotkey (with window conditions, E0060), Periodic_Timer, Start_up; elements `Set_Flow_Status`, `Condition_Flow_Enabled`; guard against runaway flows (REQ-EXE-170, E0062) | see below, packages WI-0060 to WI-0067 | **detailed** |
-| S0004 | UI foundation and manager | `ui_common/`, manager (category tree, start/stop/activate, new/rename/delete/duplicate, settings, log display, hints), **import from v1** (flows, variables), `.ahf` export/import, engine commands `cmd.flow.create/delete/meta.update`, `cmd.category.*`, `cmd.settings.*`, global setting for the number of workers (E0044, F-0082). Closing the window only hides it (E0014). Tray icon and tray menu (REQ-MGR-140), start with Windows, run as administrator, user level setting, about window (REQ-MGR-090, REQ-SET-030, REQ-SET-040, REQ-USE-010, REQ-MGR-100). Notice on unhandled flow errors (REQ-USE-080), imported flows disabled with a warning (REQ-SEC-060), the manager can be reopened after a crash (REQ-ROB-120), sharp on high-resolution displays (REQ-USE-090, also S0005 to S0007). From S0003: the display of active independent triggers and the dialog that disables a flow completely (E0056), the notice when a flow was stopped by a limit and the global defaults of the limits (REQ-EXE-170, E0062), the autostart entry passes `--windows-startup` (WI-0063) | operation by hand, e2e of the commands | rough |
+| **S0003** | Trigger host and a few triggers | enabled state per trigger, kept across starts (E0056, E0057), role `triggerhost` (WI-0014), `cmd.trigger.arm/disarm`, `evt.trigger.fired/error`, re-arming after a restart of engine or trigger host, activate/deactivate flow. Triggers: Manual, Hotkey (with window conditions, E0060), Periodic_Timer, Start_up; elements `Set_Flow_Status`, `Condition_Flow_Enabled`; guard against runaway flows (REQ-EXE-170, E0062) | see below, packages WI-0060 to WI-0067 | **done** (2026-10-17) |
+| **S0004** | UI foundation and manager | `ui_common/`, manager (category tree with free order, start/stop/enable, new/rename/delete/duplicate, settings, log display), **import from v1** (flows, variables, settings), `.ahf` export/import, engine commands `cmd.flow.create/delete/meta.update`, `cmd.category.*`, `cmd.settings.*`, global setting for the number of workers (E0048). Closing the window only hides it (E0014). Tray icon and tray menu in the supervisor (E0064, REQ-MGR-090, REQ-MGR-140), start with Windows, run as administrator, user level setting, about window. Notice and mark on unhandled flow errors (REQ-USE-080 part 1, E0072), imported flows disabled with a warning (REQ-SEC-060), the manager can be reopened after a crash (REQ-ROB-120), sharp on high-resolution displays (REQ-USE-090). From S0003: the display of active independent triggers and the dialog that disables a flow completely (E0056), the question before `force` (E0063), the notice when a flow was stopped by a limit and the global defaults of the limits (E0062, E0071), the autostart entry passes `--windows-startup` | see below, packages WI-0069 to WI-0082 | **detailed** |
 | S0005 | Editor I: display | `Renderer`/`Scene`, GDI+ in v2, zoom, panning the view, live states, resync, tray icon of the editor with the state of the flow (REQ-EDT-230) | R0002 measurement (300 elements, under 16 ms per frame), memory with 5 editors | rough |
-| S0006 | Editor II: editing | selection, moving, connecting, copy/paste, undo/redo, patch operations, `baseRev` conflict, saving, prompt when quitting, a crashed editor loses nothing (REQ-ROB-120), tray menu of the editor (REQ-EDT-230). From S0003: a changed, added or removed trigger of an enabled flow is re-armed or disarmed; the enabled state of a new trigger | e2e: editing during execution (E0001) | rough |
-| S0007 | Editor III: settings dialogs | parameter schema to GUI, `form` API for `CheckSettings`, flow settings, wizards (window info, color, mouse), help, element list filtered by user level (REQ-USE-010). From S0003: the checkbox "Switch with the flow" (`followsFlow`, E0056) in every trigger dialog, the limits of a flow in the flow settings (REQ-EXE-170) | every element of the core set editable | rough |
+| S0006 | Editor II: editing | selection, moving, connecting, copy/paste, undo/redo, patch operations, `baseRev` conflict, automatic saving and the backup rhythm (E0065: no unsaved state, no prompt when quitting), a crashed editor loses nothing (REQ-ROB-120), tray menu of the editor (REQ-EDT-230). From S0003: a changed, added or removed trigger of an enabled flow is re-armed or disarmed; the enabled state of a new trigger | e2e: editing during execution (E0001) | rough |
+| S0007 | Editor III: settings dialogs | parameter schema to GUI, `form` API for `CheckSettings`, flow settings, wizards (window info, color, mouse), help, element list filtered by user level (REQ-USE-010). From S0003: the checkbox "Switch with the flow" (`followsFlow`, E0056) in every trigger dialog, the limits of a flow in the flow settings (REQ-EXE-170). From S0004: the window of an unhandled error with the variables of the branch (REQ-USE-080 part 2, E0072) | every element of the core set editable | rough |
 | S0008 | Remaining elements | first the converter `tools/convert_element.py` (E0036, tested with the core set of S0002 as before/after cases), then the elements in groups: dialogs/worker, file/drive/process/internet/power/sound, window/user simulation/image, unsafe elements (AHK script with v2 code only, E0039; DllCall, TTS, Eject, Monitor, screen, input block), remaining triggers, demonstration flows (REQ-MGR-060) | the "Automatic tests" flows of the test corpus (WI-0057, adapted to v2 where needed) run green | rough |
 | S0009 | Distribution and release | compiled program (one program or one per role, R0007), installer with start menu entry and uninstaller, release checklist, translations brought up to date, translation tools for contributors, newer file formats are not destroyed (REQ-DST-010, REQ-DST-020, REQ-DST-050, REQ-LNG-050, REQ-MIG-080) | install, start, use and uninstall on a Windows without AutoHotkey | rough |
 | S0010 | Phase 3 completion | overall acceptance, equality list with v1, performance budgets, documents, check that nothing is sent from the computer (REQ-SEC-050), scope of Phase 4 | serial, parallel, stress green | rough |
@@ -90,9 +90,25 @@ Decisions of the project owner while S0003 was detailed (2026-10-16; details in 
 | E0061 | **Acceptance evidence of S0003:** an adapted copy of the v1 flow "Trigger test" without its `Action_Speech_output` (S0008), recorded in the fix list with a MIGRATION ID. | WI-0067 |
 | E0062 | **Guard against runaway flows (new REQ-EXE-170).** Per flow: element executions per minute (the trigger counts too); over the limit all instances stop and all triggers of the flow are disabled, independent ones included, and the user is told. Waiting instances and parallel instances: a start over the limit is refused like `skip`. No separate "new instances per minute". Global defaults (S0004), per flow changeable (S0007), 0 = no limit. WI-0066 sets the defaults from its throughput measurement (start: 100 waiting, 100 parallel); the owner may change them later. | WI-0066, S0004, S0007 |
 
+Decisions of the project owner while S0004 was detailed (2026-10-17; details in `doc/DECISIONS.md`):
+
+| # | Decision | Affects |
+|---|---|---|
+| E0064 | **The tray icon of the application belongs to the supervisor** (replaces the manager part of E0046). It lives as long as the application; a double click shows the manager or starts it (also after a crash); the manager starts only when it is needed. Tray notices come from the supervisor. An open tray menu blocked nothing in the owner's test (2026-10-17, idle only); WI-0072 checks the other cases first (a menu opened while a thread runs, under load, while navigating). | WI-0072, WI-0073, WI-0079 |
+| E0065 | **Flows are saved automatically** shortly after every change (about 3 s, at the latest every 10 s); no unsaved state, no question at exit; backups at the first write of an editing session and then at most every 10 minutes. Built in S0006; in S0004 every change of the manager is written at once. | S0006, WI-0070 |
+| E0066 | **Deleting a flow is final in phase 3** (flow file, state file, static variables), after a confirmation. A deletion that can be undone: REQ-MGR-150, later. | WI-0070 |
+| E0067 | **Empty categories are kept; categories and flows are ordered freely** (drag and drop, a command sorts alphabetically once), kept in `Categories.json`; the category of a flow stays in its flow file. | WI-0071, WI-0074 |
+| E0068 | **Rules of the import from v1:** existing IDs skipped (import as a copy on request), v2 variables win, demonstration flows skipped, imported flows disabled, settings taken over except autostart and administrator; afterwards the offer to remove the autostart of v1 (preselection "no"). | WI-0076, WI-0077 |
+| E0069 | **Logging:** three thresholds (`a`, `f`, `t`); the option "Log to file" is dropped. | WI-0077, WI-0078 |
+| E0070 | **Start with Windows** through a shortcut in the startup folder; only the icon appears; with administrator rights the UAC question at logon is accepted (without it: REQ-SET-080, later). | WI-0079 |
+| E0071 | **The limits of the runaway guard keep their values** and become global settings; F-0112 accepted until after the port. | WI-0077, WI-0078 |
+| E0072 | **REQ-USE-080 in two parts:** notice and mark in S0004, the window with the variables of the branch in S0007. | WI-0075, S0007 |
+| E0073 | **"Run as administrator" in S0004,** checked by hand only. | WI-0079 |
+| E0074 | **S0004 in two blocks** with a manual check in between; hints (REQ-USE-060, REQ-USE-070) stay `later`. | S0004 |
+
 ## Open questions for the project owner
 
-None at the moment (E0056 to E0062 answered on 2026-10-16).
+None at the moment (E0064 to E0074 answered on 2026-10-17).
 
 ## Required reading for every package
 
@@ -291,3 +307,83 @@ No owner decision needed; a package may refine it and says so in its result.
 ### Progress S0003
 
 - [x] WI-0060  - [x] WI-0061  - [x] WI-0062  - [x] WI-0063  - [x] WI-0064  - [x] WI-0065  - [x] WI-0066  - [x] WI-0067 (step S0003 complete, 2026-10-17)
+
+## S0004: UI foundation and manager
+
+**Goal:** The owner uses v2 by hand for daily work without the editor: he imports his v1 flows and variables, sees all flows in a tree of categories with their live state, runs, stops, enables and disables them, creates, renames, duplicates, moves and deletes flows, sees notices and the log, changes the settings, and AutoHotFlow starts with Windows. The tray icon belongs to the application (E0064). Two blocks (E0074): block A is the manager for daily use, block B the settings and the system integration; a manual check of the owner lies between them.
+
+**Not part of S0004:** the editor (S0005 to S0007; the button "Edit" is shown disabled until S0005), automatic saving of edits (E0065 is built in S0006; S0004 writes every change of the manager at once), the window of an unhandled error with the variables (S0007, E0072), the element list filtered by the user level (S0007; S0004 has only the setting), the demonstration flows and the setting "Hide demonstration flows" (S0008, REQ-MGR-060), hints (REQ-USE-060, REQ-USE-070, `later`), a deletion that can be undone (REQ-MGR-150, `later`), restoring backups (REQ-MGR-110), the setup assistant (REQ-USE-100), search and filter (REQ-MGR-130), showing and changing permanent variables (REQ-MGR-120).
+
+### Findings for S0004 (2026-10-17)
+
+- **Verified (read):** `cmd.flow.create`, `cmd.flow.delete`, `cmd.flow.meta.update`, `cmd.category.*` and `cmd.settings.*` are listed in `doc/PROTOCOL.md` 4.2, but not implemented (no hit in `src/`); `cmd.storage.settings.get/set` likewise (4.6). `cmd.engine.snapshot` answers `settings: {}`. There is no command to delete a flow file.
+- **Verified (read):** the manager is the stub (`src/manager/StubManager.ahk`, `StubGui.ahk`, about 500 lines); it has the tray icon with one entry and ends the application when its window is closed. `src/AutoHotFlow.ahk` carries `#NoTrayIcon` (E0046). The supervisor never restarts the manager (`Children.AUTO_RESTART`); a second start of AutoHotFlow shows or starts it (`cmd.manager.show`, F-0074). The option `--background` is named in `doc/ARCHITECTURE.md` 6.1 but not implemented; `--windows-startup` is passed to every role (WI-0063).
+- **Verified (read):** the pool size is the option `--workers` (default 4, 0 to 8) and `Children.WORKER_LIMIT` is 16; E0048 wants 8 (1 to 16) and 24. `doc/ARCHITECTURE.md` 9 still describes the old values.
+- **Verified (read):** `LangTable.Code` is fixed to `en` until the setting exists; `LangTable.Load` reads the language files with `FileRead`. The v1 language files are `de`, `en`, `ko`, `ru` (`assets/language/basic/`).
+- **Verified (read, v1):** the v1 data folder holds `Saved Flows/` (the flows v1 uses, with the subfolder `demo flows`), `Variables/` (global variables in the folder, static ones in `Variables/<flowId>/`, the same layout as v2) and `settings.json` (`UILanguage`, `runAsAdmin`, `FlowExecutionPolicy`, `FlowWorkingDir`, `HideDemoFlows`, `ShowElementsLevel`, `LogLevelApp`, `LogLevelFlow`, `LogLevelThread`, `LogToFile`; `v1/Source_Common/Settings/Settings.ahk`). v1 flow IDs are `lang("Flow") " " <random>`, so their prefix depends on the language. A category is a name in the flow file; v1 builds its categories from the loaded flows (`v1/Source_Common/Flows/Load.ahk:51`).
+- **Verified (read, v1):** the `.ahf` file is a ZIP archive of the flow files, written and read with 7-Zip (`v1/Source_Manager/User Interface/Import and export.ahk`, `7z_compress(..., "-tzip", ...)`).
+- **Verified (read, AHK v2 docs), contradicted for the idle case (owner, 2026-10-17):** the docs say a thread is uninterruptible while a menu is shown; an open tray menu of the idle stub manager for more than 10 s blocked nothing (`doc/howto/gui-and-hotkeys.md`). **Not checked:** a menu opened while a thread runs, under load, or while the user navigates it; WI-0072 checks these cases first.
+- **Not checked:** whether a modal `FileSelect`, `DirSelect` or `MsgBox` in the manager keeps the pipe handling going (WI-0069 checks it); whether `tar.exe` of Windows writes and reads the ZIP format of `.ahf` (WI-0081 checks it first).
+
+### Design fixed while detailing
+
+No owner decision needed; a package may refine it and says so in its result.
+
+- **The manager holds UI state only.** The truth is the engine (flows, categories, order, settings) and storage (files); the manager shows what they report and resyncs as the stub does (PROTOCOL 4.8). It is split into a model (state from the events, commands, the rules of the dialogs) and a view (the windows). The model is driven headless through test commands (`cmd.test.*`, only with `--headless`), so the operations are tested in the normal tiers; the view is checked in the `gui` tier and by manual checks.
+- **The manager includes no element classes.** Whatever needs element metadata (missing packages, the elements that act on the system for REQ-SEC-060, the MIGRATION places of an import) is computed by the engine and sent with the answer (E0041 would allow the classes, but the manager stays small for the memory budget, E0040).
+- **All file access goes through storage** (D0007), also outside the data folder: reading the chosen v1 folder, writing and reading an `.ahf` file, the startup shortcut. The paths come from a dialog of the user; storage checks them. No file I/O in the manager.
+- **Variables are imported through the engine,** which owns them in memory (a file written behind its back would be overwritten by its write-behind).
+- **Settings:** storage owns the file `Settings.json` in the data folder, the engine owns the runtime copy and sends `evt.settings.changed`; every role that needs a setting takes it from there (the supervisor for the language of the tray menu and the log thresholds, the engine for the policy, the working directory, the pool size and the limits). A setting that cannot take effect at once says so in the dialog and offers a restart.
+- **New flow IDs** are `Flow <random number>`, independent of the language (v1 used `lang("Flow")`), MIGRATION entry. A new flow is strict (`FlowDefinition.NEW_FLOW_STRICT_TYPES`).
+- **Every change of the manager is written at once** (create, rename, move, delete, order); with E0065 in S0006 nothing changes for the manager.
+- **Dialogs of the manager never block the message path** (rule 3): own `Gui` windows from `ui_common/`, or a modal standard dialog only where WI-0069 shows that the pipe handling goes on.
+
+### Packages
+
+Block A (the manager for daily use):
+
+| ID | Title | Size | Depends on |
+|---|---|---|---|
+| [WI-0069](WI-0069-ui-common.md) | `ui_common/`: window base, DPI, dialogs that do not block, language reload | M | – |
+| [WI-0070](WI-0070-flow-lifecycle.md) | Engine and storage: create, rename, duplicate, delete a flow | L | – |
+| [WI-0071](WI-0071-categories-order.md) | Categories and the order of the list (`Categories.json`) | M | WI-0070 |
+| [WI-0072](WI-0072-tray-icon-supervisor.md) | Tray icon and tray menu of the application in the supervisor | M | – |
+| [WI-0073](WI-0073-manager-shell.md) | Manager: window, model, resync, headless driver, replaces the stub | L | WI-0069, WI-0072 |
+| [WI-0074](WI-0074-manager-flow-list.md) | Manager: flow tree with state and the operations | L | WI-0070, WI-0071, WI-0073 |
+| [WI-0075](WI-0075-notices.md) | Notices: tray and manager, limit stop, unhandled errors (part 1) | M | WI-0072, WI-0074 |
+| [WI-0076](WI-0076-import-v1.md) | Import from v1: flows and variables, report | L | WI-0070, WI-0074 |
+
+**Manual check after block A** (owner): the manager with a copy of his v1 data folder imported, at 100 % and 225 % scaling (the rest of manual check 3 for the manager), the tray icon after a crash of the manager. WI-0076 writes it into `doc/MANUAL-CHECKS.md`, with VS Code tasks.
+
+Block B (settings and system integration):
+
+| ID | Title | Size | Depends on |
+|---|---|---|---|
+| [WI-0077](WI-0077-settings-model.md) | Settings: file, engine commands, live effect, settings of v1 in the import | L | WI-0073, WI-0076 |
+| [WI-0078](WI-0078-settings-dialog.md) | Settings dialog, change of language without a restart, about window | M | WI-0077 |
+| [WI-0079](WI-0079-windows-startup-admin.md) | Start with Windows, run as administrator | M | WI-0072, WI-0077 |
+| [WI-0080](WI-0080-log-display.md) | Log display in the manager | M | WI-0073 |
+| [WI-0081](WI-0081-ahf-export-import.md) | `.ahf` export and import with the warning of REQ-SEC-060 | M | WI-0074, WI-0076 |
+| [WI-0082](WI-0082-acceptance-s4.md) | Acceptance S0004 | M | all |
+
+**Order.** WI-0069, WI-0070 and WI-0072 first (separate files: `ui_common/`, engine and storage, supervisor), then WI-0071 and WI-0073, then WI-0074, then WI-0075 and WI-0076. Block B after the manual check; WI-0080 may start as soon as WI-0073 is done. As before, the column "Depends on" is binding, the order is not. The manager packages (WI-0073 to WI-0081) change the same files and run one after the other.
+
+**Load path (F-0073).** WI-0071 adds `Categories.json` to the start of the engine, WI-0077 the settings. Both run `tests/stress/test_big_flows.py` at their end and record the time to ready and the largest snapshot answer (budget 3 s, E0042). The manager asks for the snapshot of 200 big flows: WI-0073 measures how long its first display takes.
+
+**Files with conflict risk in S0004:** `doc/PROTOCOL.md` (WI-0070, WI-0071, WI-0072, WI-0075, WI-0076, WI-0077, WI-0080, WI-0081), `src/engine/Engine.ahk` (WI-0070, WI-0071, WI-0075, WI-0076, WI-0077), `src/storage/Storage.ahk` (WI-0070, WI-0071, WI-0076, WI-0077, WI-0079, WI-0080, WI-0081), `src/supervisor/Supervisor.ahk` (WI-0072, WI-0077, WI-0079), `src/manager/` (WI-0073 to WI-0081), `doc/MIGRATION.md`, `.vscode/tasks.json`.
+
+### Acceptance S0004
+
+- Every engine and storage command of S0004 has e2e tests; the manager operations are tested headless through the model (normal tiers), the windows by `gui` tests of the owner and the manual checks.
+- The owner's v1 flows and variables (a copy of the v1 data folder) are imported; the report lists the MIGRATION places; the flows are disabled; the v1 folder is unchanged.
+- Closing the manager window keeps AutoHotFlow running; the tray icon stays after a crash of the manager and brings it back; "Exit" in the menu and in the manager ends the application cleanly (REQ-MGR-080, REQ-MGR-090, REQ-MGR-140, REQ-ROB-120 for the manager).
+- The settings take effect without a restart where the requirement says so (language including the tray menu, log thresholds, policy, working directory, number of workers, limits).
+- Start with Windows and run as administrator pass their manual checks.
+- The memory of the background processes is measured again, with the manager open and with the manager not running (REQ-PRF-030, E0040).
+- `tests/stress/test_big_flows.py` with the manager connected stays within the budget.
+- Serial, parallel, `-m stress`, foundation and slow runs are green.
+
+### Progress S0004
+
+- [ ] WI-0069  - [ ] WI-0070  - [ ] WI-0071  - [ ] WI-0072  - [ ] WI-0073  - [ ] WI-0074  - [ ] WI-0075  - [ ] WI-0076 (block A)
+- [ ] WI-0077  - [ ] WI-0078  - [ ] WI-0079  - [ ] WI-0080  - [ ] WI-0081  - [ ] WI-0082 (block B)

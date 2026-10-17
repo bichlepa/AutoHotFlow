@@ -52,6 +52,25 @@ Step S0003 (trigger host and triggers), detailed on 2026-10-16 (E0056 to E0062).
 | WI-0067 | Acceptance S0003 | done, verified; P1 (key delivery) solved 2026-10-17 and the hotkey measurement done (MS-0040), P2 manual checks 4 and 5 done by the owner | haiku (review sonnet) | 752097a–251e86bc | 2026-10-17 | point-by-point result in the work item; measurements MS-0038, MS-0039, MS-0040 |
 | WI-0068 | Enabled state per flow file (E0063, answer to the FlowState read error) | done, verified (stress test 200 flows green) | haiku (review sonnet) | a313d3b–8d2eb98 | 2026-10-16 | reviewer approved after a fix (late read arms the merged triggers); F-0109 closed |
 
+Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074), not started. Block A: WI-0069 to WI-0076, then the owner's manual check; block B: WI-0077 to WI-0082.
+
+| WI | Title | State | Model | Commits | Date | Note |
+|---|---|---|---|---|---|---|
+| WI-0069 | `ui_common/`, dialogs, DPI, spike on modal dialogs | open | | | | block A |
+| WI-0070 | Flow lifecycle in engine and storage | open | | | | block A |
+| WI-0071 | Categories and order (`Categories.json`) | open | | | | block A |
+| WI-0072 | Tray icon in the supervisor (E0064) | open | | | | block A, foundation tier |
+| WI-0073 | Manager shell, replaces the stub | open | | | | block A |
+| WI-0074 | Flow tree and operations | open | | | | block A |
+| WI-0075 | Notices | open | | | | block A |
+| WI-0076 | Import from v1, manual check of block A | open | | | | block A |
+| WI-0077 | Settings model | open | | | | block B |
+| WI-0078 | Settings dialog, language, about | open | | | | block B |
+| WI-0079 | Start with Windows, run as administrator | open | | | | block B, manual check |
+| WI-0080 | Log display | open | | | | block B, may start after WI-0073 |
+| WI-0081 | `.ahf` export and import | open | | | | block B |
+| WI-0082 | Acceptance S0004 | open | | | | |
+
 Step S0008 (remaining elements) is planned, not started.
 
 Step-independent work item: WI-0059 (test admission, load report, run history), done, closed by the owner's criterion, commits 9cefa8c–ce1024f (plus AGENTS.md commits 2524a5d, 1120c28).
