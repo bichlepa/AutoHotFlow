@@ -1145,6 +1145,35 @@
             "problemMatcher": []
         },
         {
+            "label": "Start: manual check 6, manager for the import from v1 in a fresh data folder (manual_check.py)",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/manual_check.py",
+                "start",
+                "--fresh",
+                "--",
+                "--start=storage,engine,manager"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Setup: copy of the v1 data folder for the import check (manual_check.py copy-v1)",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/manual_check.py",
+                "copy-v1"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Setup: fresh data folder for the manual checks (manual_check.py prepare)",
             "type": "process",
             "command": "python",

@@ -10,26 +10,57 @@ Where a step starts the application, the VS Code task is named by its label in `
 
 ## 1. Manager (GUI)
 
-Test on the manager window. Not automated; the manager has a headless variant that the tests use. (Written for the stub of phase 2; the tree and the buttons of the real manager are checked after block A of S0004, WI-0076.)
+Test on the manager window (REQ-MGR-010 to REQ-MGR-050, REQ-MIG-060, REQ-USE-030, REQ-LNG-010). Not automated: the tests use the headless manager (`--headless`), and the window and its drag and drop are only checked by the gui tier, which agents do not run. Written after block A of S0004 (WI-0076).
 
-**Start.** VS Code task "Start: manual check 1, manager in a fresh data folder (manual_check.py)", or in a terminal:
+**Start, part A (the tree and the operations).** VS Code task "Start: manual check 1, manager in a fresh data folder (manual_check.py)", or in a terminal:
 `python tools/manual_check.py start --fresh -- --start=storage,engine,manager,debug`
 
 The start prepares a fresh data folder first (see above), so no preparation by hand is needed. It also starts the debug window.
 
-### Steps
+**Start, part B (the import from v1).** VS Code task "Setup: copy of the v1 data folder for the import check (manual_check.py copy-v1)" first: it copies `%APPDATA%\AutoHotFlow` (the v1 data folder, only read) to `%TEMP%\ahf_manual_check_v1`. Then the VS Code task "Start: manual check 6, manager for the import from v1 in a fresh data folder (manual_check.py)", or in a terminal `python tools/manual_check.py start --fresh -- --start=storage,engine,manager`. The import in part B takes the copy, not the original; the folder dialog of the button opens at `%APPDATA%\AutoHotFlow`, so the copy has to be chosen by hand.
+
+### Steps, part A
 
 | # | Step | Expected result | Result |
 |---|---|---|---|
-| 1 | Start the application (see above). | The manager window opens. No dialog. The debug window "AutoHotFlow - debug" also opens next to it. | pass |
-| 2 | Check the window. | The list shows `skeleton`. The status line shows connection `ready`, `epoch` and `seq`. | pass |
-| 3 | Click `skeleton`, then click Start. | The element list shows the states `running` and `finished` for three elements. The status line shows a command latency. | pass |
-| 4 | During a run, move the window and click Start several times. | The window stays usable. Moving and clicking do not freeze it. | pass |
-| 5 | Quit the application (button Beenden, or close the window). | The application ends: the task terminal prints `AutoHotFlow ended with exit code 0`. | pass (exit code 0 from an `ahkrun.py` start, before `manual_check.py` existed) |
-| 6 | Watch for dialogs during the whole check. | No dialog (window class `#32770`) appears. The dialog guard would store one under `%TEMP%\ahf_dialogs\`. | pass |
-| 7 | Right-click the tray icon of the manager (the only icon), choose `Beenden`. Start again, double-click the icon. | The menu has exactly one entry, `Beenden` (no AutoHotkey standard items such as Exit or Reload). It ends the application like the button (exit code 0, supervisor shutdown). The double click does nothing. | pass (owner, 2026-10-15: the tray entry ends the application like the button) |
+| 1 | Start the application (part A). | The manager window opens with the tree and the buttons. No dialog. The debug window "AutoHotFlow - debug" also opens. | |
+| 2 | Look at the tree and the status line. | The flow `skeleton` is listed in the uncategorized group. The status line shows the connection `ready`, `epoch` and `seq`. | |
+| 3 | Click New flow, then New category. Type a name for the category (for example `Tests`). | A new flow `New flow 1` appears in the category of the selection. The category appears. A second name equal to an existing one (ignoring case) is refused in the dialog, before anything is sent. | |
+| 4 | Drag `skeleton` onto the category `Tests`, then drag the category header onto the top of the list. | The flow moves into the category, the category moves. The new order stays after a restart of the application. | |
+| 5 | Select `skeleton`, Ctrl-click `New flow 1`, then click Enable. | Both flows are enabled (the state mark changes). Disable works the same way. | |
+| 6 | Enable a flow whose independent trigger is enabled, then disable it again. | The question about the independent triggers appears (Yes disables them too, No changes nothing). The dialog says that only the editor can undo this. | |
+| 7 | Click Duplicate on `skeleton`. Then Rename the copy to a name that the other flow has (ignoring case). | The copy is named `skeleton 2`. The rename with a taken name is refused in the dialog with the reason. | |
+| 8 | Click Delete on the copy and answer No, then Delete again and answer Yes. | With No the flow stays. With Yes it is removed for good. | |
+| 9 | Click Run on `skeleton`, then Stop while it runs. | The state mark shows running and then stopped. The button label changes between Run and Stop. | |
+| 10 | Click Notices. | The list of notices opens; with no errors it says that there are none. | |
+| 11 | Click Show log, then close it with the X. | The log window opens and shows the entries of the session. Closing it hides it. | |
+| 12 | Right-click the tray icon of the manager, choose `Beenden`. Start again and double-click the icon. | The menu has exactly one entry, `Beenden`. The application ends with exit code 0 and the second start shows the window again. | |
+| 13 | Watch for dialogs during the whole check. | No dialog (window class `#32770`) appears, except the questions of the steps above. | |
 
-**Not covered by these checks** (listed as not checked in the source): the GUI clicks of steps 3 and 4 are not covered by automated tests, so these steps are the only check of them. The labels are ASCII on purpose, so the display of umlauts is not checked. An engine restart while an instance runs is not checked.
+### Steps, part B (the import from v1)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 14 | Start part B. Click "Import from v1". | A folder dialog opens. Choose `%TEMP%\ahf_manual_check_v1` (the copy). The window stays usable while the dialog is open. | |
+| 15 | Wait for the import to end. | A report window "Import from v1 - report" opens. It lists the flows: created, skipped or failed with the reason, and the MIGRATION places (`MIGRATION M-...`). The text can be selected and copied (Ctrl+A, Ctrl+C). | |
+| 16 | In the report, look at the flows of the folder. | Every flow of the copy's `Saved Flows` is listed, none from `demo flows`. The broken file (a file that is not valid JSON, if the copy has one) is listed as failed; the others are imported. | |
+| 17 | Look at the imported flows in the tree. | They are listed under their names, all disabled (no state mark of a running or enabled flow). | |
+| 18 | Start the import a second time into the same window (Import from v1, same folder). | A question asks whether to import the flows that exist already as copies. No: they are skipped (reason: a flow with this ID exists already). Yes: they come as copies with a number in the name (`<name> 2`). | |
+| 19 | Look at the variables of the report. | Global variables that v2 has keep their value and are listed as kept. Static variables of an imported flow are listed as taken over. | |
+| 20 | When the copy has an autostart shortcut of v1 (a shortcut `AutoHotFlow.lnk` in the Startup folder that starts AutoHotFlow.exe; check it with `shell:startup` first), the import asks whether to remove it. | The question appears with the preselection "No". No: the shortcut stays. Yes: it is removed. A shortcut of another program is not asked. | |
+| 21 | Check the original folder `%APPDATA%\AutoHotFlow`. | Nothing in it has changed (compare with the folder before the import, for example by the file dates). | |
+| 22 | Quit the application. Look at the log (`%TEMP%\ahf_manual_check\Log\Log.txt`). | The report of the import is in the log (manager, level a1), one line per item. | |
+
+### Steps, part C (scaling and a killed manager)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 23 | At 100 % scaling: resize the window to the smallest size and back to the largest. | The buttons and the tree stay readable, no text is cut off, the window is not blank. | |
+| 24 | At 225 % scaling (Windows settings): open the manager and the report window, look at both. | Both windows are sharp. The text of the buttons fits. The report text is readable and can be scrolled. | |
+| 25 | Kill the manager process by hand (Task Manager, process `AutoHotFlow` role manager, or the debug window's Processes tab). | The supervisor restarts nothing for the manager; the tray icon stays. Right-click the tray icon and choose "Show manager": a new manager window opens and shows the flows. | |
+| 26 | Watch for dialogs during the whole check. | No dialog (window class `#32770`) appears except the questions of the steps above. | |
+
+**Not covered by these checks** (listed as not checked in the source): drag and drop with a real mouse at 225 %, the folder dialog with a network folder, a v1 folder with a shortcut to another v1 installation, and a v1 folder that is larger than a few hundred flows (not measured).
 
 ## 2. Debug window
 
