@@ -61,6 +61,11 @@ def tree_hash(root):
     return out
 
 
+def v1_exe(tmp_path):
+    """The executable of v1 that the shortcut points to: in the folder that the test imports from (the portable layout)."""
+    return tmp_path / "legacy" / "AutoHotFlow.exe"
+
+
 def make_shortcut(folder, target):
     """A shortcut AutoHotFlow.lnk in the test startup folder that points to target (WScript.Shell, as v1 wrote it)."""
     folder.mkdir(parents=True, exist_ok=True)
@@ -216,9 +221,9 @@ def test_a_global_variable_that_v2_has_keeps_its_value_and_statics_come_with_the
 # --- the autostart shortcut of v1 ------------------------------------------------------------------------------------
 
 def test_the_autostart_shortcut_of_v1_is_kept_when_the_user_says_no(started, tmp_path):
-    v1 = make_v1(tmp_path / "v1", examples=[ONE_EXAMPLE])
+    v1 = make_v1(tmp_path / "legacy", examples=[ONE_EXAMPLE])
     startup = tmp_path / "startup"
-    lnk = make_shortcut(startup, str(tmp_path / "v1" / "AutoHotFlow.exe"))
+    lnk = make_shortcut(startup, str(v1_exe(tmp_path)))
     sup, obs = started()
     result = run_import(obs, v1, startup=startup, answers={"autostartV1": "no"})
     assert result["autostart"] == "kept", result
@@ -226,9 +231,9 @@ def test_the_autostart_shortcut_of_v1_is_kept_when_the_user_says_no(started, tmp
 
 
 def test_the_autostart_shortcut_of_v1_is_removed_when_the_user_says_yes(started, tmp_path):
-    v1 = make_v1(tmp_path / "v1", examples=[ONE_EXAMPLE])
+    v1 = make_v1(tmp_path / "legacy", examples=[ONE_EXAMPLE])
     startup = tmp_path / "startup"
-    lnk = make_shortcut(startup, str(tmp_path / "v1" / "AutoHotFlow.exe"))
+    lnk = make_shortcut(startup, str(v1_exe(tmp_path)))
     sup, obs = started()
     result = run_import(obs, v1, startup=startup, answers={"autostartV1": "yes"})
     assert result["autostart"] == "removed", result
@@ -270,3 +275,65 @@ def test_a_missing_v1_folder_is_an_error_and_nothing_is_created(started, tmp_pat
     assert not result["ok"] and result["error"] != "", result
     assert result["flows"] == [], result
     assert not (sup.datadir / "Flows" / (ONE_EXAMPLE + ".json")).exists()
+
+
+def test_a_global_variable_that_v2_lacks_is_taken_over_and_written(started, tmp_path):
+    v1 = make_v1(tmp_path / "v1", examples=[ONE_EXAMPLE])
+    sup, obs = started()
+    result = run_import(obs, v1)
+    states = {(v["scope"], v["name"]): v["state"] for v in result["vars"]}
+    assert states[("global", "gx")] == "taken", result["vars"]
+    gx = sup.datadir / "Variables" / "gx.ahfvar"
+    assert wait_until(gx.is_file, scaled(10)), "the global variable was not written"
+    assert gx.read_text(encoding="utf-8") == "42"
+
+
+def test_the_report_names_the_migration_places_of_an_imported_flow(started, tmp_path):
+    v1 = make_v1(tmp_path / "v1", examples=[])
+    # a v1 flow with expressions that the converter marks (MIGRATION IDs, the same flow as tests/test_migration_report.py)
+    marked = {
+        "name": "Marked flow", "category": "Tests", "ElementIDCounter": "4",
+        "allElements": {
+            "e1": {"ID": "e1", "type": "action", "package": "Default", "class": "Action_Sleep",
+                   "pars": {"Duration": 'x < "abc"', "Unit": "Seconds"}},
+            "e3": {"ID": "e3", "type": "action", "package": "default", "class": "Action_Sleep",
+                   "pars": {"Duration": "7 % 3"}},
+        },
+        "allConnections": {},
+    }
+    (v1 / "Saved Flows" / "Marked flow.json").write_text(json.dumps(marked), encoding="utf-8")
+    sup, obs = started()
+    result = run_import(obs, v1)
+    created = flows_by_name(result)["Marked flow"]
+    assert created["state"] == "created", created
+    places = created["places"]
+    assert places, "the flow carries MIGRATION places, the report must list them"
+    assert all(p["ids"] for p in places), places
+    assert all(p["element"] and p["par"] for p in places), places
+
+
+def test_a_flow_id_with_a_path_is_refused_by_the_engine(started):
+    sup, obs = started()
+    for bad in ["../x", "a/b", "a\\b", "."]:
+        ans = obs.request("engine", "cmd.flow.create", {"flowId": bad, "definition": {"name": "Bad id"}}, timeout=scaled(10))
+        payload = ans["payload"]
+        assert not payload.get("ok", 0), (bad, payload)
+        assert payload["error"]["code"] == "bad_payload", (bad, payload)
+    assert not (sup.datadir / "Flows" / "x.json").exists()
+
+
+def test_storage_refuses_to_remove_a_shortcut_of_another_program(started, tmp_path):
+    sup, obs = started()
+    startup = tmp_path / "startup"
+    lnk = make_shortcut(startup, r"C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe")
+    ans = obs.request("storage", "cmd.storage.autostart.remove", {"startupDir": str(startup)}, timeout=scaled(10))
+    assert ans["payload"]["error"]["code"] == "denied", ans
+    assert lnk.is_file()
+
+
+def test_storage_does_not_take_the_running_v2_product_for_v1(started, tmp_path):
+    sup, obs = started()
+    startup = tmp_path / "startup"
+    make_shortcut(startup, str(tmp_path / "src" / "AutoHotFlow.ahk"))
+    ans = obs.request("storage", "cmd.storage.autostart.check", {"startupDir": str(startup)}, timeout=scaled(10))
+    assert ans["payload"]["ok"] and not ans["payload"]["v1"], ans
