@@ -1898,11 +1898,11 @@ The user imports the flows and variables of v1 into the v2 data folder through t
 ### REQ-MIG-070 Flows with missing element packages
 
 - **v1:** yes (the flow is not loaded; a dialog under the global lock asks, on "Yes" the file is deleted)
-- **v2:** partial (the flow loads, the element is kept and fails with `exception` when run, WI-0047; manager and editor are missing)
+- **v2:** partial (the flow loads, the element is kept and fails with `exception` when run, WI-0047; the manager marks the flow with its missing packages for every element type, E0080; the editor is missing)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0004 (manager and the notice), S0005 to S0007 (editor)
-- **Evidence:** `tests/integration/test_trigger_arming.py::test_an_unknown_class_and_a_missing_package_are_not_armed_with_their_message` (WI-0062: the trigger carries the message of the missing package in its state), `tests/e2e/test_manager_flows.py::test_enabling_a_flow_with_a_missing_package_reports_the_trigger`
+- **Evidence:** `tests/integration/test_trigger_arming.py::test_an_unknown_class_and_a_missing_package_are_not_armed_with_their_message` (WI-0062: the trigger carries the message of the missing package in its state), `tests/e2e/test_manager_flows.py::test_enabling_a_flow_with_a_missing_package_reports_the_trigger`, `tests/e2e/test_manager_flows.py::test_a_flow_with_a_missing_package_of_an_action_is_marked_with_the_package`
 
 When a flow uses a package that is not installed, the flow still loads and nothing is deleted, because the package may be installed later (a flow synced from another computer). Nobody is asked whether to delete anything. The manager shows at the flow which packages are missing, without a dialog. The editor shows such an element as a placeholder with its parameters; the user can delete it like any other element. Running the element ends with `exception` and names the missing package. A trigger of a missing package does not stay off silently: enabling the flow tells the user that this trigger is not available. Saving keeps the element unchanged. (Decision of the owner 2026-10-15, MIGRATION M-0008.)
 

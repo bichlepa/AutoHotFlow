@@ -215,7 +215,7 @@ class ManagerModel {
                 , "enabled", f.Get("enabled", 0), "executing", f.Get("executing", 0), "instances", f.Get("instances", 0)
                 , "rev", f.Get("rev", 0)
                 , "independentActive", f.Get("independentActive", 0), "stateError", f.Get("stateError", "")
-                , "triggers", f.Get("triggers", []), "limit", "")
+                , "triggers", f.Get("triggers", []), "limit", "", "missingPackages", f.Get("missingPackages", []))
             ; A flow stopped by its runaway guard keeps the mark until it is enabled again (the snapshot does not carry it).
             if (this.flows.Has(id) && this.flows[id]["limit"] != "" && !recs[id]["enabled"])
                 recs[id]["limit"] := this.flows[id]["limit"]
@@ -595,7 +595,7 @@ class ManagerModel {
                 , "enabled", Json.Bool(rec["enabled"]), "executing", Json.Bool(rec["executing"]), "instances", rec["instances"]
                 , "rev", rec["rev"]
                 , "independentActive", rec["independentActive"], "stateError", rec["stateError"], "limit", rec["limit"]
-                , "triggerMessages", ManagerModel._TriggerMessages(rec)))
+                , "triggerMessages", ManagerModel._TriggerMessages(rec), "missingPackages", rec["missingPackages"]))
         }
         cats := []
         for c in this.categories

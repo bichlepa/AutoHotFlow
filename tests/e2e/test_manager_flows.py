@@ -419,3 +419,15 @@ def test_the_running_instances_are_counted_in_the_snapshot_and_the_state(started
     obs.request("engine", "cmd.flow.stop", {"flowId": FLOW}, timeout=scaled(5))
     assert wait_state(obs, lambda s: flow(obs)["instances"] == 0 and flow(obs)["executing"] is False, timeout=10)
 
+
+def test_a_flow_with_a_missing_package_of_an_action_is_marked_with_the_package(started):
+    """E0080: the package of an element that is no trigger is reported too (the trigger case is above)."""
+    def action_missing(d):
+        def change(data):
+            data["allElements"]["element0000000002"]["package"] = "NoSuchPackage"
+        write_flow(d, change)
+    sup, obs = started(action_missing)
+    assert wait_state(obs, lambda s: flow(obs)["missingPackages"] == ["NoSuchPackage"], timeout=10), flow(obs)
+    snap = obs.request("engine", "cmd.engine.snapshot", {}, timeout=scaled(5))["payload"]
+    assert [f["missingPackages"] for f in snap["flows"] if f["flowId"] == FLOW] == [["NoSuchPackage"]]
+    assert flow(obs)["triggerMessages"] == []        # the trigger itself is available

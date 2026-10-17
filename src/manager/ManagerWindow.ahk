@@ -545,6 +545,12 @@ class ManagerWindow {
             marks.Push(Lang("Flow_limit"))
         if (ManagerModel._TriggerMessages(rec).Length > 0)
             marks.Push(Lang("Flow_trigger_unavailable"))
+        if (rec["missingPackages"].Length > 0) {
+            names := ""
+            for name in rec["missingPackages"]
+                names .= (names = "" ? "" : ", ") name
+            marks.Push(Lang("Flow_missing_packages", names))      ; any element type (E0080, REQ-MIG-070)
+        }
         text := rec["name"] "  ["
         for i, mark in marks
             text .= (i > 1 ? ", " : "") mark

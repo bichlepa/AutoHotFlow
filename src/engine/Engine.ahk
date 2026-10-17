@@ -477,12 +477,31 @@ class Engine extends Role {
 
     ; --- commands ------------------------------------------------------------------------------
 
+    ; The packages that the elements of a loaded flow use and that are not installed in this process (E0080, REQ-MIG-070):
+    ; the names in the order of the elements, each once. A missing package is not an error of the flow: it loads, and the
+    ; element fails when it runs. The registry of the engine holds the classes of every trigger and action it can run.
+    _MissingPackages(def) {
+        names := []
+        for id, elem in def.Raw["allElements"] {
+            if (!(elem is Map))
+                continue
+            package := FlowDefinition.TextOf(def.FlowId, elem, "package", "")
+            if (package = "" || ElementRegistry.HasPackage(package))
+                continue
+            for name in names
+                if (name = package)
+                    continue 2
+            names.Push(package)
+        }
+        return names
+    }
+
     _CmdSnapshot(msg) {
         list := []
         for rec in this.flows.All() {
             entry := Map("flowId", rec.FlowId, "name", rec.Def.Name, "category", rec.Def.Category
                 , "enabled", Json.Bool(rec.IsFlowEnabled()), "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))
-                , "instances", this.executor.RunningCount(rec.FlowId)
+                , "instances", this.executor.RunningCount(rec.FlowId), "missingPackages", this._MissingPackages(rec.Def)
                 , "rev", rec.Rev, "independentActive", rec.IndependentActiveCount(), "triggers", this.arms.Snapshot(rec))
             stateError := this.flowState.ErrorOf(rec.FlowId)
             if (stateError != "")
