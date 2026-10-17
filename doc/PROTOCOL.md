@@ -407,7 +407,7 @@ Engine side (WI-0062, `src/engine/TriggerArms.ahk`):
 
 **Test hooks (WI-0081, tests only):** `AHF_ARCHIVE_TIMEOUT_MS` replaces the 20 s limit of a tar run, `AHF_ARCHIVE_TAR` replaces tar.exe (a slow stand-in). The supervisor passes no options to the roles, so the hooks are environment variables.
 
-The archive is checked from its listing: the names, the sizes and the types of the entries, which are the only input of the check. Nothing is trusted from the archive itself. A real v1 export (`tests/data/ahf/v1_export_two_flows.ahf`, two v1 flows written by v1) is read by the tests; a file written by tar has not been read by 7-Zip or by v1 (open item F-9000*).
+The archive is checked from its listing: the names, the sizes and the types of the entries, which are the only input of the check. Nothing is trusted from the archive itself. A real v1 export (`tests/data/ahf/v1_export_two_flows.ahf`, two v1 flows written by v1) is read by the tests; a file written by tar has not been read by 7-Zip or by v1 (open item F-0129).
 
 
 **`Categories.json` (WI-0071, E0067):** in the data folder, owned by the engine, written only through storage (at most once per second, flushed at shutdown). Format: `{ "formatVersion": 1, "categories": [ { "name": "<category>", "flows": [ "<flowId>", ... ] }, ... ] }`. The entry with `"name": ""` (uncategorized) is last. A missing file is no error: the order is then built from the flows, alphabetically (categories and flows, ignoring case), as the v1 list looked. A file that cannot be parsed is kept as `Categories.json.broken` and the order is built again. A read that fails for another reason makes the engine wait and read again: the start does not finish without the order, and nothing is written before it was read.
