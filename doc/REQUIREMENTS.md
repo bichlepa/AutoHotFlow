@@ -95,7 +95,7 @@ Each start of a flow creates an **instance**: one run of the flow, with its own 
 ### REQ-EXE-050 Execution policy per flow
 
 - **v1:** partial (`wait` behaves like `parallel`, MIGRATION M-0011)
-- **v2:** done (the four policies work; `default` follows the global setting, which takes effect at once; the dialog for the setting is REQ-SET-020)
+- **v2:** partial (the four policies work; `default` follows the global setting, which takes effect at once; the user cannot change the setting until the dialog of WI-0078 exists)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (global setting, WI-0077, done)

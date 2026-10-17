@@ -7,7 +7,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 
 | Area | Total | done | implemented | partial | open | dropped | in doubt |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| [Flows and execution (EXE)](#flows-and-execution-exe) | 17 | 10 | 0 | 5 | 2 | 0 | 1 |
+| [Flows and execution (EXE)](#flows-and-execution-exe) | 17 | 9 | 0 | 6 | 2 | 0 | 1 |
 | [Expressions and variables (VAR)](#expressions-and-variables-var) | 15 | 8 | 0 | 3 | 4 | 0 | 2 |
 | [Script language (SCR)](#script-language-scr) | 15 | 0 | 0 | 3 | 12 | 0 | 1 |
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 0 | 0 | 5 | 5 | 0 | 0 |
-| **All** | **221** | **61** | **1** | **57** | **101** | **1** | **6** |
+| **All** | **221** | **60** | **1** | **58** | **101** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -38,7 +38,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-EXE-020](REQUIREMENTS.md#req-exe-020-connection-types-and-parallel-branches) | L62-71 | Connection types and parallel branches | yes | done | must | port | - |
 | [REQ-EXE-030](REQUIREMENTS.md#req-exe-030-loops-with-head-tail-and-break) | L73-82 | Loops with head, tail and break | yes | done | must | port | S0002 (WI-0054) |
 | [REQ-EXE-040](REQUIREMENTS.md#req-exe-040-instances-and-parallel-branches) | L84-93 | Instances and parallel branches | yes | done | must | port | - |
-| [REQ-EXE-050](REQUIREMENTS.md#req-exe-050-execution-policy-per-flow) | L95-114 | Execution policy per flow | partial | done | must | port | S0004 (global setting, WI-0077, done) |
+| [REQ-EXE-050](REQUIREMENTS.md#req-exe-050-execution-policy-per-flow) | L95-114 | Execution policy per flow | partial | partial | must | port | S0004 (global setting, WI-0077, done) |
 | [REQ-EXE-060](REQUIREMENTS.md#req-exe-060-start-and-stop-a-flow-by-hand) | L116-125 | Start and stop a flow by hand | yes | partial | must | port | S0004 (manager), S0006 (editor) |
 | [REQ-EXE-070](REQUIREMENTS.md#req-exe-070-enable-and-disable-a-flow) | L127-136 | Enable and disable a flow | yes | partial | must | port | S0003 (WI-0060, WI-0062 and WI-0063 done, WI-0064 to WI-0066), S0004 (manager); the per-flow state files (E0063, WI-0068) are done |
 | [REQ-EXE-080](REQUIREMENTS.md#req-exe-080-change-a-flow-while-it-runs) | L138-147 | Change a flow while it runs | yes | done | must | port | - |
