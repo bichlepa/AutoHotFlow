@@ -18,7 +18,8 @@
 ; The result is a report (Map as ManagerImport: flows, vars, error), shown by the view as ManagerImport.Text does.
 ; Nothing is overwritten: a name that is taken gets a number or a name of the user, never the flow of v2.
 class ManagerArchive {
-    static STORAGE_MS := 30000
+    ; The storage answer of an archive job: two tar runs of 20 s at most (PROTOCOL 4.6), then storage answers.
+    static STORAGE_MS := 50000
     static SCAN_MS := 30000
     ; A create writes a flow file (and a category list) in storage (as in ManagerImport).
     static WRITE_MS := 30000

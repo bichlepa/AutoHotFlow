@@ -131,6 +131,12 @@ class Manager extends Role {
     ; Import of an .ahf file (WI-0081, REQ-MGR-050, REQ-SEC-060): the chain of ManagerArchive; done(res) when it is over, the
     ; report is shown when there is a window.
     ImportFile(path, done) {
+        if (this.archive.running) {                  ; a drop or a second choice while an import runs: told, nothing started
+            if (IsObject(this.view))
+                this.view.ShowImport(Lang("Import_busy"))
+            ManagerImport._Done(done, Map("ok", 0, "error", Lang("Import_busy"), "flows", [], "vars", [], "autostart", "skip"))
+            return
+        }
         this.archive.Start(path, (res) => this._ArchiveDone(res, done))
     }
 
