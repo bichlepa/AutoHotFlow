@@ -15,6 +15,7 @@
 ; One tooltip per worker process, as in v1 (number 13, a new tooltip replaces the one shown and its timer).
 class Action_Tooltip extends AhfElement {
     static Mode := "worker"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
     static Icon := "Tooltip.png"

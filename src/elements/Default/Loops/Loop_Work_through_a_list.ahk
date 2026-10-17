@@ -17,6 +17,7 @@
 ; sees it); one pass reads one member of it.
 class Loop_Work_through_a_list extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

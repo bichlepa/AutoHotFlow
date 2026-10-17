@@ -13,6 +13,7 @@
 ;              positive key (0 if there is none); count: the number of members of every kind
 class Action_Get_List_Info extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

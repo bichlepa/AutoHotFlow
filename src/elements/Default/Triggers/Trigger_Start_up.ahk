@@ -9,6 +9,7 @@
 ; and not when a flow is enabled later (the engine sends no start context then).
 class Trigger_Start_up extends AhfElement {
     static Mode := "trigger"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

@@ -12,6 +12,7 @@
 ; first one; see MIGRATION M-0003).
 class Trigger_Hotkey extends AhfElement {
     static Mode := "trigger"
+    static ActsOnSystem := true
     static Level := "Beginner"
     static Stability := "Stable"
 

@@ -15,6 +15,7 @@
 ; The default of SearchWhat is the index 2 (Content) as in v1; a flow file has the enum text.
 class Condition_List_Contains_Element extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

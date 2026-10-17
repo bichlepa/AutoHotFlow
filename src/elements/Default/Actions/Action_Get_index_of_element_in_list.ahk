@@ -14,6 +14,7 @@
 ; A list without such a value ends the element with "exception".
 class Action_Get_index_of_element_in_list extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
     static Icon := "New variable.png"

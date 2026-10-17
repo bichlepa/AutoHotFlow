@@ -19,6 +19,7 @@
 ; gives "no" and an f1 log entry. A flow or trigger that does not exist ends the element with "exception", as in v1.
 class Condition_Flow_Enabled extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

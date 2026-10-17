@@ -7,6 +7,7 @@
 ; (ctx.After), which the context removes when the instance is stopped, so it needs no Stop.
 class Action_Sleep extends AhfElement {
     static Mode      := "inline"
+    static ActsOnSystem := false
     static Level     := "Beginner"
     static Stability := "Stable"
     static Icon      := "Sleep.ico"

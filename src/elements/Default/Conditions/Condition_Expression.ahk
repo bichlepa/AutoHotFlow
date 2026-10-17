@@ -14,6 +14,7 @@
 ; compatibility mode the failed part is the empty text (E0025), as everywhere.
 class Condition_Expression extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

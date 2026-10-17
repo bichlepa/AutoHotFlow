@@ -20,6 +20,7 @@
 ; text. The choices of the lists are the trace points of the flow, asked through the context of the editor.
 class Action_Trace_Point_Check extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Programmer"
     static Stability := "Stable"
     ; v1: the form is updated after every edit of a parameter (the editor decides how, S0007)

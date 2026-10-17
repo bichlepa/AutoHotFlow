@@ -22,6 +22,7 @@
 ; waits, the called instance runs on, as in v1.
 class Action_Execute_Flow extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

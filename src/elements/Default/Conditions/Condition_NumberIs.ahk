@@ -17,6 +17,7 @@
 ; "yes" if expected - d <= input <= expected + d, with d = absoluteDeviation + |expected| * relativeDeviation.
 class Condition_NumberIs extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

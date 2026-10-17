@@ -14,6 +14,7 @@
 ; The window is not stopped by a stop of the instance: the worker ends with it (ARCHITECTURE 6.4).
 class Action_Message_Box extends AhfElement {
     static Mode := "worker"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
     static Icon := ""

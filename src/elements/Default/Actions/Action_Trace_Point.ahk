@@ -15,6 +15,7 @@
 ; the instance, so it is shared by all threads of the instance and gone when the instance ends.
 class Action_Trace_Point extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Programmer"
     static Stability := "Stable"
     ; v1: the form is updated after every edit of a parameter (the editor decides how, S0007)

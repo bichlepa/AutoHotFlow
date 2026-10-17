@@ -9,6 +9,7 @@
 ; about a new AutoHotkey thread and loss of data that do not apply to this condition; they are not carried over.)
 class Condition_Variable_Is_Empty extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

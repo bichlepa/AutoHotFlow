@@ -14,6 +14,7 @@
 ; The element has no seed (v1 had none either).
 class Action_Shuffle_list extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

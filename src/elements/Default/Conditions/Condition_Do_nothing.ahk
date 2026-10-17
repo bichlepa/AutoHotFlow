@@ -7,6 +7,7 @@
 ; it existed) means "Yes", the default of the parameter. A value that is none of the three ends with "exception".
 class Condition_Do_nothing extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
     static Icon := "yellow.png"

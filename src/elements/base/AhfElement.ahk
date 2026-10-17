@@ -16,6 +16,9 @@ class AhfElement {
     static Icon := ""                ; file name in Icons/ of the package of the class, "" = none (WI-0047)
     ; Worker elements only: the engine ends the job with the exception "worker timeout" after this many ms and has
     ; the worker killed if it does not react to the cancel (ARCHITECTURE 6.4). 0 = no deadline (v1 had none).
+    ; Acts on the system (files, programs, keys and mouse, network, AHK scripts): listed before an import (WI-0081,
+    ; REQ-SEC-060). The base says true, so a class without the line counts as acting; the core classes set false.
+    static ActsOnSystem := true
     static JobTimeoutMs := 0
     ; Parameters that the element evaluates itself as an expression or a script (v1: x_EvaluateExpression or
     ; x_EvaluateScript on a RawString), as Map("ParameterId", "expression" | "script"). The loader of flows converts

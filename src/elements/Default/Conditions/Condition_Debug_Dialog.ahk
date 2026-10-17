@@ -11,6 +11,7 @@
 ; Worker element (ARCHITECTURE 2.3): the variables are read and changed through the requests to the engine (ctx, WI-0050).
 class Condition_Debug_Dialog extends AhfElement {
     static Mode := "worker"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
     static Icon := "Bug.png"

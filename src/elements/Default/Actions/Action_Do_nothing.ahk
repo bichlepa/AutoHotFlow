@@ -5,6 +5,7 @@
 ; Metadata, parameters and language keys are those of v1 (Source_Elements/Default/Actions/Do_nothing.ahk).
 class Action_Do_nothing extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
     static Icon := "yellow.png"

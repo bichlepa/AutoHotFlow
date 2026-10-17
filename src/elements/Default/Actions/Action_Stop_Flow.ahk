@@ -13,6 +13,7 @@
 ; the element with "exception".
 class Action_Stop_Flow extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

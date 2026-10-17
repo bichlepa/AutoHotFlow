@@ -13,6 +13,7 @@
 ;   cancel button, close   IfDismiss: yes, no or exception ("User cancelled the dialog" / "User closed the dialog")
 class Condition_Confirmation_Dialog extends AhfElement {
     static Mode := "worker"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
     static Icon := ""

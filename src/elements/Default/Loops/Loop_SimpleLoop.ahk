@@ -14,6 +14,7 @@
 ; while the loop runs (as in v1).
 class Loop_SimpleLoop extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

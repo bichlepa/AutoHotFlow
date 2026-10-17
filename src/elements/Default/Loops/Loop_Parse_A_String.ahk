@@ -18,6 +18,7 @@
 ; one pass reads one field.
 class Loop_Parse_A_String extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

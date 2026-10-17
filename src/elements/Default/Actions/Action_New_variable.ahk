@@ -14,6 +14,7 @@
 ; (MIGRATION M-0051); v1 only logged it.
 class Action_New_variable extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
     static Icon := "new Variable.png"

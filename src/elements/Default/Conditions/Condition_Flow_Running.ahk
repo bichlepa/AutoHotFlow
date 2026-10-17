@@ -12,6 +12,7 @@
 ; ends the element with "exception".
 class Condition_Flow_Running extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

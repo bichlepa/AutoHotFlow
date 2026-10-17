@@ -14,6 +14,7 @@
 ;                     as in v1): the values get the keys 1, 2, ...
 class Action_New_List extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
     static Icon := "New variable.png"

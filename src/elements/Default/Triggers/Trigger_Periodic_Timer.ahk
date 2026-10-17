@@ -9,6 +9,7 @@
 ; instances is the job of the execution guard (WI-0066).
 class Trigger_Periodic_Timer extends AhfElement {
     static Mode := "trigger"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

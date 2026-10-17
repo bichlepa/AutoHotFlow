@@ -15,6 +15,7 @@
 ; A list without an Integer key (First, Last) or without the key (Specified) ends the element with "exception".
 class Action_Delete_from_list extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

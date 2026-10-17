@@ -20,6 +20,7 @@
 ; content type).
 class Loop_Condition extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

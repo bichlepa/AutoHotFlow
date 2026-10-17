@@ -18,6 +18,7 @@
 ; every other value is never an "object". The details where AutoHotkey v2 differs from v1 are in MIGRATION M-0053.
 class Condition_Variable_content_is extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

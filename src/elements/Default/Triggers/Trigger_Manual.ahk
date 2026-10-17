@@ -8,6 +8,7 @@
 ; editor (S0007), so the default here is empty: a flow of v1 always has the parameter.
 class Trigger_Manual extends AhfElement {
     static Mode := "trigger"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
 

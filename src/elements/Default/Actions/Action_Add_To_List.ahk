@@ -16,6 +16,7 @@
 ; Adding several values (the v1 code never ran that branch, MIGRATION M-0057) keeps their order also at First.
 class Action_Add_To_List extends AhfElement {
     static Mode := "inline"
+    static ActsOnSystem := false
     static Level := "Beginner"
     static Stability := "Stable"
     static Icon := "New variable.png"
