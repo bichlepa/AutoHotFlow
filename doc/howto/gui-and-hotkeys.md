@@ -129,3 +129,25 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** In the handler read the current selection with `tree.GetSelection()` and ignore the parameter. Rebuild only when the content changes (snapshot, categories). Same applies to other controls that raise events from a script-made change (`ListView`, `DropDownList`).
 - **Status:** verified by the owner's manual check (2026-10-17); the regression test `tests/fault/test_manager_window.py::test_the_selection_survives_a_flow_run_and_the_run_button_stays_enabled` is a gui test and not run by an agent.
 - **Source:** `src/manager/ManagerWindow.ahk`
+
+### A tree drag is started by TVN_BEGINDRAG; the drop is found by a timer that reads the mouse button (assumed)
+
+- **Problem:** The manager needs drag and drop of flows and categories in its TreeView. AutoHotkey has no drag event for a TreeView.
+- **Right:** `OnMessage(0x4E, ...)` catches the WM_NOTIFY of the tree with code -456 (`TVN_BEGINDRAGW`, `lParam` is the NMHDR: the control handle at offset 0, the code at `2 * A_PtrSize`). The item under the cursor is found with `TVM_HITTEST` (0x1111) on the cursor position in client coordinates (`GetCursorPos`, `ScreenToClient`); the hit item is at offset 16 (64 bit) or 12 (32 bit) of the `TVHITTESTINFO`. A `SetTimer` of 30 ms ends the drag when `GetKeyState("LButton", "P")` is false, so no mouse capture is needed.
+- **Status:** assumed (written in `src/manager/ManagerWindow.ahk`; the gui test `test_a_flow_dragged_onto_a_category_moves_into_it_and_the_engine_keeps_it` was run once and failed before the drag, at a setup step; the drag itself was not run). Not checked: the drop on a screen with a high DPI, a drag that leaves the tree.
+- **Source:** `src/manager/ManagerWindow.ahk`, `tests/fault/test_manager_window.py`
+
+### TVM_GETITEMW returned 0 for a tree item in a test helper; the cause is not found (not checked)
+
+- **Problem:** A helper of the gui test read the text of a tree item with `TVM_GETITEMW` (0x113E) and a `TVITEMW` buffer (mask, hItem at 8, pszText at 24 on 64 bit). The message returned 0 for items that `TVM_GETNEXTITEM` had just returned.
+- **Wrong:** Trusting the offsets alone; the test had no other way to read the text.
+- **Right:** Not known yet. The helper was removed; the state text of the tree has no gui test.
+- **Status:** not checked (observed once, one gui run, the test helper was removed after it, no second run was allowed).
+- **Source:** `tests/fault/test_manager_window.py` (the helper is gone)
+
+### A Ctrl click in a TreeView is read in the ItemSelect handler with GetKeyState (assumed)
+
+- **Problem:** A multi-selection (several flows) needs the Ctrl key at the moment of the click. The TreeView itself selects one item only.
+- **Right:** In the `ItemSelect` handler read `GetKeyState("Ctrl", "P")`; the model keeps the set of the selected flows, the native selection shows the focused item. A late event of a rebuilt tree is ignored by comparing the item with the model (see the entry above).
+- **Status:** assumed (the model side is tested headless, `tests/e2e/test_manager_flows.py::test_ctrl_click_selects_several_flows_and_the_operations_act_on_them`; the Ctrl click itself is not automated). Not checked on screen: the item marks of the set (open finding F-9002).
+- **Source:** `src/manager/ManagerWindow.ahk` (`_OnTreeSelect`), `src/manager/ManagerModel.ahk` (`SelectToggle`)
