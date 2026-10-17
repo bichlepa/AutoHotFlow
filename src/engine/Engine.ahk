@@ -503,7 +503,13 @@ class Engine extends Role {
         gkey := kind "|" flowId
         try {
             if (this._notices.Offer(gkey, A_TickCount)) {
-                this._EmitNotice(kind, flowId, key, args, 0)
+                ; The window has ended: the count of the notices held back goes out with this one, not later.
+                held := 0
+                if (this._noticePending.Has(gkey)) {
+                    this._noticePending.Delete(gkey)
+                    held := this._notices.Take(gkey)
+                }
+                this._EmitNotice(kind, flowId, key, args, held)
                 return
             }
             this._noticePending[gkey] := Map("kind", kind, "flowId", flowId, "key", key, "args", args)
