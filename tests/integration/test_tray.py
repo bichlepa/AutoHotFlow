@@ -1,7 +1,7 @@
 """Static checks of the role tray (WI-0072, E0075, E0014, E0046, REQ-MGR-090, REQ-MGR-140).
 
 The tray icon and the tray menu of the application are the role tray's (src/tray/Tray.ahk), not the supervisor's and not
-the manager's. These checks read the source: the e2e tests (tests/fault/test_tray.py) start the role and click the menu
+the manager's. These checks read the source: the e2e tests (tests/fault/test_tray_role.py) start the role and click the menu
 entries through the test driver, the real icon and an open menu are checked by the gui test there.
 What they prove: the standard items of AutoHotkey (above all its own "Exit", which ends the process without the shutdown
 of the application) are removed before the own entries are added; the menu has the two entries, "Show manager" as the

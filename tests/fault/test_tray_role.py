@@ -81,19 +81,36 @@ def test_a_killed_tray_role_is_started_again_so_the_icon_comes_back(chains):
     assert snap["pid"] == new_pid and snap["info"]["items"] == ["Show manager", "Exit"]
 
 
-def test_the_exit_entry_ends_the_application_cleanly(chains):
+def test_the_exit_entry_ends_the_supervisor_with_exit_0_and_leaves_no_process(chains):
     chain = chains("storage,engine,manager,tray", [*TRAY_OPTS, "--ui=stub"])
     chain.wait_ready(["storage", "engine", "manager", "tray"], timeout=READY_S)
     click(chain, "exit")
     assert chain.sup.wait_exit(timeout=scaled(15.0)) == EXIT_OK, chain.sup.text()
-    # the fixture checks at teardown that no process of the session is left, the tray role included
+    # the fixture checks at teardown that no process of the session is left, the tray role included.
+    # Not checked here: that storage saved its data before the end (the shutdown tests cover the order).
 
 
-def test_the_tray_role_alone_does_not_keep_the_application_alive_when_the_supervisor_exits(chains):
+def test_the_tray_role_ends_when_the_supervisor_is_killed(chains):
     chain = chains("storage", TRAY_OPTS)
-    chain.wait_ready(["storage", "tray"], timeout=READY_S)
-    chain.request_exit()
-    assert chain.sup.wait_exit(timeout=scaled(15.0)) == EXIT_OK, chain.sup.text()
+    pids = chain.wait_ready(["storage", "tray"], timeout=READY_S)
+    psutil.Process(chain.sup.ahk_pid()).kill()
+    # orphan guard of Role: the hub is gone, the role ends after Role.ORPHAN_MS
+    assert wait_until(lambda: not psutil.pid_exists(pids["tray"]), 3.0 + scaled(10.0)), "the tray role is still alive"
+
+
+def test_the_tray_role_is_not_restarted_after_the_restart_limit_and_the_application_keeps_running(chains):
+    # Current policy (Children.RESTART_MAX = 3 within 60 s). The owner decides whether the icon needs more (finding of the review).
+    chain = chains("storage", TRAY_OPTS)
+    pid = chain.wait_ready(["storage", "tray"], timeout=READY_S)["tray"]
+    for n in range(3):
+        psutil.Process(pid).kill()
+        pid, _ = chain.wait_restarted_ready("tray", pid)
+    psutil.Process(pid).kill()                # the 4th death: over the limit
+    assert wait_until(lambda: chain.rec.find(event("evt.process.crashed", name="tray", restart=False)), scaled(10.0)),         chain.sup.text()
+    time.sleep(1.0)                            # no restart follows
+    states = chain.states()
+    assert states["tray"]["state"] == "crashed", states["tray"]
+    assert states["storage"]["state"] == "ready" and chain.sup.proc.poll() is None   # the application goes on
 
 
 def test_the_show_manager_entry_makes_the_running_manager_show_its_window(chains):
