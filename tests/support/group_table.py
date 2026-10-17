@@ -7,6 +7,7 @@ TEST_GROUPS = {
     "ahk/child_launcher.test.ahk": ["supervisor"],
     "ahk/children_output.test.ahk": ["supervisor"],
     "ahk/core_args.test.ahk": ["util"],
+    "ahk/core_settings.test.ahk": ["settings"],
     "ahk/core_debug.test.ahk": ["diagnosis"],
     "ahk/core_errors.test.ahk": ["base"],
     "ahk/core_gui_layout.test.ahk": ["ui"],
@@ -78,6 +79,8 @@ TEST_GROUPS = {
     "e2e/test_manager_flows.py": ["manager"],
     "e2e/test_manager_archive.py": ["manager", "storage"],
     "e2e/test_manager_import.py": ["manager"],
+    "e2e/test_manager_import_settings.py": ["settings", "manager"],
+    "e2e/test_manager_archive.py": ["manager"],
     "e2e/test_manager_log.py": ["manager"],
     "fault/test_debug_dump.py": ["diagnosis"],
     "fault/test_debug_role.py": ["diagnosis"],
@@ -133,6 +136,7 @@ TEST_GROUPS = {
     "integration/test_pipe.py": ["transport"],
     "integration/test_role.py": ["transport", "supervisor"],
     "integration/test_runaway.py": ["engine", "triggers"],
+    "integration/test_settings.py": ["settings"],
     "integration/test_storage.py": ["storage"],
     "integration/test_supervisor.py": ["supervisor"],
     "integration/test_time_triggers.py": ["triggers"],
@@ -402,6 +406,7 @@ SOURCE_AREAS = [
     ("base-hub", ["src/AhfBoot.ahk", "src/AutoHotFlow.ahk", "src/core/AhfError.ahk", "src/core/AhfTimeoutError.ahk",
                   "src/core/ElementError.ahk", "src/core/ErrCode.ahk", "src/core/Errors.ahk", "src/core/Json.ahk",
                   "src/core/JsonError.ahk", "src/core/Log.ahk", "src/core/ProtocolError.ahk"]),
+    ("settings", ["src/core/SettingsModel.ahk", "src/engine/EngineSettings.ahk", "src/storage/SettingsFile.ahk"]),
     ("util", ["src/core/Args.ahk", "src/core/Ids.ahk", "src/core/Time.ahk", "src/core/AhfVersion.ahk"]),
     ("lang", ["src/core/Lang.ahk", "src/core/LangTable.ahk"]),
     ("transport", ["src/core/ipc/*", "src/core/PipeNames.ahk", "src/core/Role.ahk", "src/core/RoleRegistry.ahk",
@@ -441,6 +446,9 @@ OWN_TEST_GROUPS = {
 # Smoke tests: one or a few fast tests per user of a shared module. A key is a test file or `file::test function`; the
 # value names the source areas for which the test stands in ("a change there must not break what this consumer needs").
 SMOKE_FOR = {
+    # the settings: the engine start reads them before the flows, the manager import writes them
+    "integration/test_engine.py::test_start_emits_the_documented_event_order": ["settings"],
+    "e2e/test_manager_import.py::test_every_flow_of_the_folder_is_imported_with_its_id_and_disabled": ["settings"],
     # the element base: a flow run, a worker, a dialog element
     "ahk/element_runner.test.ahk": ["elements-base"],
     "ahk/element_evalparams.test.ahk": ["elements-base", "expr"],

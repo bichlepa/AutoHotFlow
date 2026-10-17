@@ -41,6 +41,7 @@ The first matching pattern wins; `*` also matches `/`. Test groups that run in f
 | Area | Files | Own test groups (besides `docs`, `architecture`) |
 |---|---|---|
 | `base-hub` | `AhfBoot`, `AutoHotFlow`, `Errors`, `ErrCode`, error classes, `Json`, `Log` | **everything** |
+| `settings` | `SettingsModel`, `EngineSettings`, `SettingsFile` (WI-0077) | `settings` (the model units, the settings in a session, the import of the settings of v1) |
 | `util` | `Args`, `Ids`, `Time`, `AhfVersion` | `util` |
 | `lang` | `Lang`, `LangTable` | `lang` |
 | `transport` | `core/ipc/`, `PipeNames`, `Role`, `RoleRegistry` | `transport` |
@@ -69,6 +70,7 @@ A test file may verify several things; its groups are listed in `tests/support/g
 
 | Group | Verifies |
 |---|---|
+| `settings` | the global settings: checks, file, live effect, import of the settings of v1 |
 | `base`, `util`, `lang` | the units of the core helpers, the log, JSON and the texts |
 | `transport` | pipes, frames, peers, the role base, pipe breaks and timeouts |
 | `supervisor` | start, readiness, routing, role entries, second start |
