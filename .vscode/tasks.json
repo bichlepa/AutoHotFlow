@@ -1013,13 +1013,12 @@
             "problemMatcher": []
         },
         {
-            "label": "Start: manager stub with debug window (--ui=stub --start=storage,engine,manager,debug)",
+            "label": "Start: manager with debug window (--start=storage,engine,manager,debug)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
             "args": [
                 "/ErrorStdOut=UTF-8",
                 "src\\AutoHotFlow.ahk",
-                "--ui=stub",
                 "--start=storage,engine,manager,debug"
             ],
             "options": {
@@ -1028,7 +1027,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Start: manual check 1, manager stub in a fresh data folder (manual_check.py)",
+            "label": "Start: manual check 1, manager in a fresh data folder (manual_check.py)",
             "type": "process",
             "command": "python",
             "args": [
@@ -1036,7 +1035,6 @@
                 "start",
                 "--fresh",
                 "--",
-                "--ui=stub",
                 "--start=storage,engine,manager,debug"
             ],
             "options": {
@@ -1084,7 +1082,6 @@
                 "--flow",
                 "dpi_dialogs",
                 "--",
-                "--ui=stub",
                 "--start=storage,engine,manager"
             ],
             "options": {
@@ -1102,7 +1099,6 @@
                 "--flow",
                 "triggers_check",
                 "--",
-                "--ui=stub",
                 "--start=storage,engine,triggerhost,manager"
             ],
             "options": {
@@ -1120,7 +1116,6 @@
                 "--flow",
                 "triggers_check",
                 "--",
-                "--ui=stub",
                 "--start=storage,engine,triggerhost,manager",
                 "--windows-startup"
             ],

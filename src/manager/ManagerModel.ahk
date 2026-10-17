@@ -71,8 +71,8 @@ class ManagerModel {
         this.firstSnapshotMs := 0       ; Time.NowMs() of the first good snapshot
         this.startMs := 0
         this.lastAnswer := ""
-        this.traceOn := false
-        this.trace := []                ; the record of everything the model saw (tests, TraceOn)
+        this.recording := false
+        this.traceLog := []                ; the record of everything the model saw (tests, TraceOn)
         this.traceCount := 0
     }
 
@@ -90,22 +90,22 @@ class ManagerModel {
     ; Switches the record of events on (the headless driver does; the product keeps nothing). The newest TRACE_MAX
     ; entries are kept; Trace(since) returns the entries with a number above since.
     TraceOn() {
-        this.traceOn := true
+        this.recording := true
     }
 
     Note(type, payload := "") {
-        if (!this.traceOn)
+        if (!this.recording)
             return
         this.traceCount += 1
-        this.trace.Push(Map("n", this.traceCount, "type", type, "recvMs", ManagerModel.WallMs()
+        this.traceLog.Push(Map("n", this.traceCount, "type", type, "recvMs", ManagerModel.WallMs()
             , "payload", IsObject(payload) ? payload : Map()))
-        if (this.trace.Length > ManagerModel.TRACE_MAX)
-            this.trace.RemoveAt(1, this.trace.Length - ManagerModel.TRACE_MAX)
+        if (this.traceLog.Length > ManagerModel.TRACE_MAX)
+            this.traceLog.RemoveAt(1, this.traceLog.Length - ManagerModel.TRACE_MAX)
     }
 
     Trace(since := 0) {
         out := []
-        for entry in this.trace {
+        for entry in this.traceLog {
             if (entry["n"] > since)
                 out.Push(entry)
         }
@@ -353,7 +353,7 @@ class ManagerModel {
     ; their package exists (Edit: the editor, S0005).
     ButtonStates() {
         has := this.selectedFlow != "" && this.flows.Has(this.selectedFlow)
-        return Map("NewCategory", false, "NewFlow", false, "ChangeCategory", false, "Duplicate", false, "Delete", false
+        return Map("NewCategory", false, "NewFlow", false, "ChangeCategory", false, "Duplicate", false, "Delete", false   ; arch-ok: wire-bool UI state of the buttons, not a protocol field
             , "Edit", false, "Enable", false, "Run", has && this.engineState != ManagerModel.ENGINE_DOWN
             , "Settings", false, "ImportExport", false, "About", false, "Help", false, "ShowLog", false, "Exit", true)
     }

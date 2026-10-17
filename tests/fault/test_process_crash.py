@@ -16,7 +16,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import (CRASH_BUDGET_S, FULL_CHAIN, REQUEST_BUDGET_S, STUB_OPTS, RoleProc, alive, death_watch,
+from faultkit import (CRASH_BUDGET_S, FULL_CHAIN, REQUEST_BUDGET_S, HEADLESS_OPTS, RoleProc, alive, death_watch,
                       event, repeat_ids, request_ok, wait_until, write_flow)
 
 from support import pipenames
@@ -57,7 +57,7 @@ def kill_role(chain, name):
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_killed_engine_is_reported_restarted_and_the_others_are_untouched(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     before = chain.wait_ready(["storage", "engine", "manager"])
     pid, t_death, msg = kill_role(chain, "engine")
     assert msg["payload"]["restart"] is True, "engine must restart by policy: %s" % msg
@@ -78,7 +78,7 @@ def test_killed_engine_is_reported_restarted_and_the_others_are_untouched(chains
 
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_killed_storage_is_restarted_and_the_engine_keeps_running(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     before = chain.wait_ready(["storage", "engine", "manager"])
     pid, t_death, msg = kill_role(chain, "storage")
     assert msg["payload"]["restart"], msg
@@ -97,7 +97,7 @@ def test_killed_storage_is_restarted_and_the_engine_keeps_running(chains, round_
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_killed_manager_stub_is_not_restarted_and_requests_to_it_end_at_once(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     before = chain.wait_ready(["storage", "engine", "manager"])
     _, _, msg = kill_role(chain, "manager")
     assert msg["payload"]["restart"] is False, "the UI is never restarted automatically: %s" % msg
@@ -125,7 +125,7 @@ def test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted
     """Regression of WI-0011 under the real supervisor. Since WI-0027 the engine is a child and asks the supervisor for its
     warm worker (worker:1); the supervisor still never restarts a worker, the engine asks for a new one."""
     write_flow(datadir, "w8", element_class="Action_TestHangWorker")
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     before = chain.wait_ready(["storage", "engine", "manager", "worker:1"])
     request_ok(chain.obs, "supervisor", "cmd.topic.subscribe", {"topic": "flow:w8"})
     assert chain.rec.wait(event("evt.engine.ready"), timeout=20) is not None, chain.sup.text()

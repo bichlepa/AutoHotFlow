@@ -16,7 +16,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import (EXIT_HUB_LOST, FULL_CHAIN, ORPHAN_BUDGET_S, STUB_OPTS, RoleProc, connect, repeat_ids,
+from faultkit import (EXIT_HUB_LOST, FULL_CHAIN, ORPHAN_BUDGET_S, HEADLESS_OPTS, RoleProc, connect, repeat_ids,
                       wait_until)
 from support import winpipe
 from support.ahfclient import AhfClient, FrameDecoder, dumps, encode_frame, make_envelope
@@ -72,7 +72,7 @@ def handles_of(pid):
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_clients_that_close_abruptly_are_cleaned_up_without_handle_leak(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     before = chain.wait_ready(["storage", "engine", "manager"])
     ahk = chain.sup.ahk_pid()
     # warm up once, so lazily created handles are not counted as a leak
@@ -107,7 +107,7 @@ def test_clients_that_close_abruptly_are_cleaned_up_without_handle_leak(chains, 
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_client_that_never_reads_is_removed_on_queue_overflow_and_the_chain_stays_responsive(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     before = chain.wait_ready(["storage", "engine", "manager"])
     ahk = chain.sup.ahk_pid()
     base = handles_of(ahk)

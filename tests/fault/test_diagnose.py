@@ -68,11 +68,11 @@ def test_a_line_on_stderr_of_a_child_becomes_a_log_line(chains, datadir):
 
 
 def test_a_child_that_fails_to_start_leaves_its_message_in_the_log(chains, datadir):
-    # manager without --ui=stub ends at once with exit 3 and a message on stderr
-    chain = chains("storage,manager")
-    assert wait_for_log(datadir, "no UI selected"), chain.sup.text()
+    # the editor is a placeholder until S0005: it ends at once with exit 3 and a message on stderr
+    chain = chains("storage,editor")
+    assert wait_for_log(datadir, "role 'editor' is not implemented yet"), chain.sup.text()
     # the event may come before the observer has subscribed, the log is the evidence
-    assert wait_for_log(datadir, "manager ended unexpectedly (exited, exit 3"), chain.sup.text()
+    assert wait_for_log(datadir, "editor ended unexpectedly (exited, exit 3"), chain.sup.text()
     assert end_session(chain) == 0, chain.sup.text()
 
 

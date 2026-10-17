@@ -50,7 +50,7 @@ REQUEST_BUDGET_S = scaled(1.0)  # an unanswered request ends at its own limit (t
 
 # Roles of a full chain: the UI stub is the manager in stub mode, the engine needs storage for its flows.
 FULL_CHAIN = "storage,engine,manager"
-STUB_OPTS = ["--ui=stub", "--headless"]
+HEADLESS_OPTS = ["--headless"]
 
 
 def repeat_ids():

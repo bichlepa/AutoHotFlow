@@ -9,7 +9,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import FULL_CHAIN, STUB_OPTS, alive, freeze, session_processes, thaw, wait_until
+from faultkit import FULL_CHAIN, HEADLESS_OPTS, alive, freeze, session_processes, thaw, wait_until
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 
@@ -17,7 +17,7 @@ pytestmark = pytest.mark.fault
 
 
 def test_full_chain_starts_answers_and_ends_without_leftovers(chains):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     pids = chain.wait_ready(["storage", "engine", "manager"])
     assert len(set(pids.values())) == 3
     assert all(alive(pid) for pid in pids.values())

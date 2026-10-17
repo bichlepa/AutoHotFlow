@@ -22,7 +22,7 @@ import psutil
 import pytest
 
 from stresskit import _connect, hwnd_of, stress_chain  # noqa: F401  (fixture)
-from faultkit import (FULL_CHAIN, SKELETON_FLOW, SKELETON_SRC, STUB_OPTS, Sup, kill_ours, session_processes,
+from faultkit import (FULL_CHAIN, SKELETON_FLOW, SKELETON_SRC, HEADLESS_OPTS, Sup, kill_ours, session_processes,
                       wait_until)
 from support import metrics
 
@@ -145,7 +145,7 @@ def start_chain_and_time_it(procs, datadir_root, run_no):
     datadir = Path(datadir_root) / ("run%d" % run_no)
     (datadir / "Flows").mkdir(parents=True)
     (datadir / "Flows" / (SKELETON_FLOW + ".json")).write_bytes(SKELETON_SRC.read_bytes())
-    sup = Sup(procs, datadir, session, ["--start=" + FULL_CHAIN, *STUB_OPTS], label="sup%d" % run_no)
+    sup = Sup(procs, datadir, session, ["--start=" + FULL_CHAIN, *HEADLESS_OPTS], label="sup%d" % run_no)
     client = None
     try:
         hwnd = hwnd_of(sup.ahk_pid())

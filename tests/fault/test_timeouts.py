@@ -4,7 +4,7 @@ Two levels are covered:
   1. Hub.Request (the supervisor asks a UI for cmd.app.prepareExit, PROTOCOL 4.1). The UI is frozen, so
      no answer comes. The limit (--prepare-limit=500, test option) must end the request once with a
      timeout, the exit must go on, and the answer that comes after the thaw must be dropped. The stub
-     answers cancel=1 (--stub-cancel-exit): if the late answer were counted, the exit would be cancelled.
+     answers cancel=1 (--cancel-exit): if the late answer were counted, the exit would be cancelled.
   2. A client request to a frozen engine: the caller's own limit ends it (AhfTimeout), and the frozen
      engine is then ended and restarted by the supervisor, so no request waits forever.
 """
@@ -13,7 +13,7 @@ import time
 
 import pytest
 
-from faultkit import (EXIT_OK, FULL_CHAIN, REQUEST_BUDGET_S, STUB_OPTS, alive, event, repeat_ids, wait_until)
+from faultkit import (EXIT_OK, FULL_CHAIN, REQUEST_BUDGET_S, HEADLESS_OPTS, alive, event, repeat_ids, wait_until)
 from support.ahfclient import AhfTimeout
 from support.timing import scaled
 
@@ -29,8 +29,8 @@ CALLER_LIMIT_S = 1.0
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_hub_request_to_a_frozen_ui_times_out_once_and_the_late_answer_is_dropped(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS + ["--test-roles", "--prepare-limit=%d" % PREPARE_LIMIT_MS,
-                                             "--stub-cancel-exit"])
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS + ["--test-roles", "--prepare-limit=%d" % PREPARE_LIMIT_MS,
+                                             "--cancel-exit"])
     chain.wait_ready(["storage", "engine", "manager"])
     manager = chain.pid("manager")
     chain.freeze(manager)
@@ -54,7 +54,7 @@ def test_hub_request_to_a_frozen_ui_times_out_once_and_the_late_answer_is_droppe
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_request_to_a_frozen_engine_ends_at_the_callers_limit_and_the_engine_is_then_restarted(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     chain.wait_ready(["storage", "engine", "manager"])
     engine = chain.pid("engine")
     chain.freeze(engine)

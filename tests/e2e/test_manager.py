@@ -1,22 +1,19 @@
-"""WI-0013: manager stub (src/manager/StubManager.ahk, StubGui.ahk) under the real supervisor, headless.
+"""WI-0073: the real manager (src/manager/) under the real supervisor, headless. Replaces the tests of the manager (WI-0013).
 
-The supervisor starts storage, engine and manager (--ui=stub --headless) as real processes through
-tools/ahkrun.py. The skeleton flow (tests/data/skeleton_flow.json, copied to Flows/skeleton.json) runs
-in the engine. A Python observer subscribes to the same topics as the stub, so the two sequences of
-events can be compared.
+The supervisor starts storage, engine and manager (--headless) as real processes through tools/ahkrun.py. The skeleton flow
+(tests/data/skeleton_flow.json, copied to Flows/skeleton.json) runs in the engine. A Python observer subscribes to the same
+topics as the manager, so the two sequences of events can be compared.
 
-The stub's copy of the events is written by storage into Log/Log_manager.txt ("... ui-event {json}").
-The test never reads that file while the run is going on: storage fails to append a line when another
-process holds the file (OSError 6, "invalid handle"), and the line is lost (WI-0013 findings, F-0003). The
-observer subscribes to topic log instead. storage forwards every line after it has been written, so the
-test knows when a line is in the file. The file is read once, after the supervisor has ended.
+The manager keeps a record of everything it sees when it runs headless (ManagerModel.Trace); the test reads it with
+cmd.test.trace (PROTOCOL 4.8). Entries: the engine events as received (type evt.*, payload with epoch and seq) and the
+entries of the manager itself (manager.ready, manager.snapshot, manager.command, manager.commandAnswer,
+manager.prepareExit, manager.show, manager.engine).
 
-Timing: recvMs in the stub's lines is the wall clock (ms, UTC) at arrival. The stub also logs
-stub.command with the send time of a forwarded command, so the arrival latency is measured on the same
-clock. Python requests reach the hub on its 250 ms fallback timer, so times that start with a Python
-send are not used; only stub.command -> event arrival is measured.
+Timing: recvMs in the entries is the wall clock (ms, UTC) at arrival. manager.command carries the send time of a forwarded
+command, so the arrival latency is measured on the same clock. Python requests reach the hub on its 250 ms fallback timer,
+so times that start with a Python send are not used.
 
-The GUI (StubGui) is not tested here: see doc/MANUAL-CHECKS.md, section "1. Manager stub (GUI)".
+The window (ManagerWindow) is tested in tests/gui/test_manager_window.py (gui tier).
 """
 
 import json
@@ -39,7 +36,6 @@ ENTRY = ROOT / "src" / "AutoHotFlow.ahk"
 AHKRUN = ROOT / "tools" / "ahkrun.py"
 SKELETON_SRC = ROOT / "tests" / "data" / "skeleton_flow.json"
 FLOW = "skeleton"
-UI_PREFIX = "ui-event "
 READY_TIMEOUT_S = 15.0
 
 
@@ -91,27 +87,18 @@ class Recorder:
         self._thread.join(timeout=3.0)
 
 
-def ui_lines_from_log(msgs):
-    """Parsed ui-event payloads of the manager, from evt.log.entry messages (topic log), in order."""
-    out = []
-    for m in msgs:
-        if m.get("type") != "evt.log.entry":
-            continue
-        p = m.get("payload", {})
-        text = str(p.get("text", ""))
-        if p.get("source") == "manager" and text.startswith(UI_PREFIX):
-            out.append(json.loads(text[len(UI_PREFIX):]))
-    return out
+def trace(obs, since=0):
+    """The record of the headless manager: entries with a number above since."""
+    ans = obs.request("manager", "cmd.test.trace", {"since": since}, timeout=5)
+    assert ans["payload"]["ok"], ans
+    return ans["payload"]["entries"]
 
 
-def stub_events_from_file(datadir):
-    """Every ui-event line of the stub from the log file. Read once, after the supervisor has ended."""
-    path = Path(datadir) / "Log" / "Log_manager.txt"
-    out = []
-    for line in path.read_bytes().decode("utf-8", "replace").splitlines():
-        if UI_PREFIX in line:
-            out.append(json.loads(line[line.index(UI_PREFIX) + len(UI_PREFIX):]))
-    return out
+def trace_events(obs, s0):
+    """(type, seq) of the engine events with seq above s0 that the manager has seen, in arrival order."""
+    return [(e["type"], e["payload"]["seq"]) for e in trace(obs)
+            if e["type"].startswith("evt.") and "seq" in e["payload"] and e["payload"]["seq"] > s0
+            and e["type"] != "evt.log.entry"]
 
 
 def connect_obs(pipe, timeout=20.0):
@@ -169,7 +156,7 @@ def flow_data(datadir):
 def start_flow(obs):
     ans = obs.request("manager", "cmd.test.command", {"type": "cmd.flow.start", "payload": {"flowId": FLOW}},
                       timeout=8)
-    assert ans["payload"]["ok"], ans                       # the stub answered
+    assert ans["payload"]["ok"], ans                       # the manager answered
     assert ans["payload"]["answer"]["ok"], ans             # and the engine accepted the start
     return ans["payload"]["answer"]
 
@@ -183,10 +170,10 @@ def finish(sup, obs):
 
 
 @pytest.fixture
-def stubbed(procs, datadir, session_id):
-    """Supervisor with storage, engine and the headless stub; the skeleton flow is in Flows/."""
+def managed(procs, datadir, session_id):
+    """Supervisor with storage, engine and the headless manager; the skeleton flow is in Flows/."""
     flow_data(datadir)
-    sup = Sup(procs, datadir, session_id, ["--start=storage,engine,manager", "--ui=stub", "--headless"])
+    sup = Sup(procs, datadir, session_id, ["--start=storage,engine,manager", "--headless"])
     obs = connect_obs(sup.pipe)
     wait_ready(obs, ["storage", "engine", "manager"])
     wait_flow_loaded(obs)
@@ -195,11 +182,11 @@ def stubbed(procs, datadir, session_id):
     sup.close_files()
 
 
-# --- acceptance 2 of the phase: every state change reaches the stub ---------------------------------
+# --- acceptance 2 of the phase: every state change reaches the manager ---------------------------------
 
 @pytest.mark.slow
-def test_headless_stub_logs_every_skeleton_event_in_order(procs, datadir, session_id, stubbed):
-    sup, obs = stubbed
+def test_headless_manager_records_every_skeleton_event_in_order(procs, datadir, session_id, managed):
+    sup, obs = managed
     rec = Recorder(obs)
     try:
         for topic in ("engine", "flow:" + FLOW, "log"):
@@ -216,46 +203,40 @@ def test_headless_stub_logs_every_skeleton_event_in_order(procs, datadir, sessio
                     out.append((m["type"], p["seq"]))
             return out
 
-        def relevant_stub(lines):
-            return [(e["type"], e["payload"]["seq"]) for e in lines
-                    if e["type"].startswith("evt.") and "seq" in e["payload"] and e["payload"]["seq"] > s0]
-
         # The skeleton run has 10 events from the engine (instance started, flow state, 3 x running and
         # finished, instance ended, flow state). Wait for all of them at the observer ...
         assert wait_until(lambda: len(relevant_observed()) >= 10, 10), relevant_observed()
         observed = relevant_observed()
-        # ... and until storage has reported as many stub lines (written to the file, forwarded on log).
-        assert wait_until(lambda: len(relevant_stub(ui_lines_from_log(rec.snapshot()))) >= len(observed), 10), \
-            "storage reported fewer stub lines than the observer saw"
-        ui = ui_lines_from_log(rec.snapshot())
+        # ... and until the manager has recorded as many.
+        assert wait_until(lambda: len(trace_events(obs, s0)) >= len(observed), 10),             "the manager recorded fewer events than the observer saw"
         types = [t for t, _ in observed]
         assert types[0] == "evt.instance.started", types
         assert types[-1] == "evt.flow.state", types
         assert types.count("evt.element.state") == 6, types      # 3 elements, running and finished each
 
-        # The stub's lines (as storage wrote them, in the order storage received them) are the proof.
-        # Compare them with the observer's sequence of this run.
-        stub_run = relevant_stub(ui)
-        assert stub_run == observed, "stub and observer differ:\nstub=%s\nobs=%s" % (stub_run, observed)
+        # The manager's record (in the order it received the events) is the proof.
+        seen = trace_events(obs, s0)
+        assert seen == observed, "manager and observer differ: manager=%s obs=%s" % (seen, observed)
+
+        # Latency from the command of the manager to the arrival of each event, on the clock of the manager.
+        entries = trace(obs)
+        sent = [e["recvMs"] for e in entries if e["type"] == "manager.command"][-1]
+        arrivals = [(e["type"], e["payload"]["seq"], e["recvMs"] - sent) for e in entries
+                    if e["type"].startswith("evt.") and "seq" in e["payload"] and e["payload"]["seq"] > s0]
+        print("\nlatency ms (command -> manager arrival):", arrivals)
+        assert max(ms for _, _, ms in arrivals) < scaled(1000)
     finally:
         rec.close()
     assert finish(sup, obs) == 0
 
-    # The file, read once after the end: every line is there, in the same order as the topic log.
-    events = stub_events_from_file(sup.datadir)
-    sent = [e["recvMs"] for e in events if e["type"] == "stub.command"][-1]
-    arrivals = [(e["type"], e["payload"]["seq"], e["recvMs"] - sent) for e in events
-                if e["type"].startswith("evt.") and "seq" in e["payload"] and e["payload"]["seq"] > s0]
-    print("\nlatency ms (command -> stub arrival):", arrivals)
-    assert max(ms for _, _, ms in arrivals) < scaled(1000)
-    assert relevant_stub(events) == observed
+    # (The record is gone with the manager; the latency was taken before the exit, see below.)
 
 
-# --- acceptance 2: engine restart is seen, the stub is resynced, the stub keeps running ----------
+# --- acceptance 2: engine restart is seen, the manager is resynced, the manager keeps running ----------
 
 @pytest.mark.slow
-def test_engine_restart_is_seen_and_resynced_without_restarting_the_stub(procs, datadir, session_id, stubbed):
-    sup, obs = stubbed
+def test_engine_restart_is_seen_and_resynced_without_restarting_the_manager(procs, datadir, session_id, managed):
+    sup, obs = managed
     rec = Recorder(obs)
     try:
         for topic in ("process", "engine", "log"):
@@ -294,43 +275,43 @@ def test_engine_restart_is_seen_and_resynced_without_restarting_the_stub(procs, 
                        for m in rec.snapshot()), "the first start must not announce a restart"
 
         def resynced_in_log():
-            return any(e["type"] == "stub.snapshot" and e["payload"].get("ok") == 1
-                       and e["payload"].get("epoch") == epoch_after for e in ui_lines_from_log(rec.snapshot()))
-        assert wait_until(resynced_in_log, 15), "storage never reported a snapshot of the new epoch"
+            return any(e["type"] == "manager.snapshot" and e["payload"].get("ok") is True
+                       and e["payload"].get("epoch") == epoch_after for e in trace(obs))
+        assert wait_until(resynced_in_log, 15), "the manager never took a snapshot of the new epoch"
 
         after = process_states(obs)
-        assert after["manager"]["pid"] == manager_pid, "the stub was restarted"
+        assert after["manager"]["pid"] == manager_pid, "the manager was restarted"
         assert after["manager"]["restarts"] == 0
         assert after["engine"]["pid"] != engine_pid
 
-        # The subscriptions of the stub survived the engine restart: a new run reaches the stub.
+        # The subscriptions of the manager survived the engine restart: a new run reaches the manager.
         start_flow(obs)
 
         def run_in_log():
             return any(e["type"] == "evt.instance.ended" and e["payload"].get("epoch") == epoch_after
-                       for e in ui_lines_from_log(rec.snapshot()))
-        assert wait_until(run_in_log, 10), "the stub did not report the run after the restart"
+                       for e in trace(obs))
+        assert wait_until(run_in_log, 10), "the manager did not see the run after the restart"
+        events = trace(obs)
+        assert any(e["type"] == "evt.process.restarted" and e["payload"].get("name") == "engine" for e in events)
+        assert any(e["type"] == "manager.engine" and e["payload"].get("state") == "ready" for e in events)
     finally:
         rec.close()
     assert finish(sup, obs) == 0
 
-    events = stub_events_from_file(sup.datadir)
-    assert any(e["type"] == "evt.process.restarted" and e["payload"].get("name") == "engine" for e in events)
-    assert any(e["type"] == "stub.snapshot" and e["payload"].get("epoch") == epoch_after for e in events)
 
 
-# --- the stub never blocks on a request ---------------------------------------------------------------
+# --- the manager never blocks on a request ---------------------------------------------------------------
 
-def test_stub_answers_at_once_while_the_engine_is_missing(procs, datadir, session_id):
+def test_manager_answers_at_once_while_the_engine_is_missing(procs, datadir, session_id):
     flow_data(datadir)
-    sup = Sup(procs, datadir, session_id, ["--start=storage,manager", "--ui=stub", "--headless"])
+    sup = Sup(procs, datadir, session_id, ["--start=storage,manager", "--headless"])
     obs = connect_obs(sup.pipe)
     try:
         wait_ready(obs, ["storage", "manager"])
         t0 = time.perf_counter()
         ans = obs.request("manager", "cmd.test.command", {"type": "cmd.engine.snapshot", "payload": {}}, timeout=8)
         elapsed = time.perf_counter() - t0
-        assert ans["payload"]["ok"], ans                       # the stub answered, not the timeout
+        assert ans["payload"]["ok"], ans                       # the manager answered, not the timeout
         assert ans["payload"]["answer"]["ok"] == 0             # the engine is not there
         assert ans["payload"]["answer"]["error"]["code"] == "not_found", ans
         assert elapsed < scaled(2.0), "answer took %.2f s" % elapsed
@@ -345,12 +326,12 @@ def test_stub_answers_at_once_while_the_engine_is_missing(procs, datadir, sessio
         sup.close_files()
 
 
-# --- exit: the stub answers prepareExit; cancelled and normal exits ------------------------------
+# --- exit: the manager answers prepareExit; cancelled and normal exits ------------------------------
 
 def test_cancelled_exit_is_answered_and_nothing_stops(procs, datadir, session_id):
     flow_data(datadir)
     sup = Sup(procs, datadir, session_id,
-              ["--start=storage,engine,manager", "--ui=stub", "--headless", "--stub-cancel-exit"])
+              ["--start=storage,engine,manager", "--headless", "--cancel-exit"])
     obs = connect_obs(sup.pipe)
     rec = Recorder(obs)
     try:
@@ -368,26 +349,24 @@ def test_cancelled_exit_is_answered_and_nothing_stops(procs, datadir, session_id
         assert states["engine"]["state"] == "ready" and states["storage"]["state"] == "ready"
 
         def answered_in_log():
-            return any(e["type"] == "stub.prepareExit" and e["payload"]["cancel"] is True
-                       for e in ui_lines_from_log(rec.snapshot()))
-        assert wait_until(answered_in_log, 10), "storage never reported the stub's prepareExit answer"
+            return any(e["type"] == "manager.prepareExit" and e["payload"]["cancel"] is True for e in trace(obs))
+        assert wait_until(answered_in_log, 10), "the manager did not record its prepareExit answer"
     finally:
-        # The stub always cancels in this mode; the procs fixture ends the tree at teardown.
+        # The manager always cancels in this mode; the procs fixture ends the tree at teardown.
         rec.close()
         obs.close()
         sup.close_files()
 
 
-def test_exit_without_cancel_ends_the_stub_cleanly(procs, datadir, session_id):
+def test_exit_without_cancel_ends_the_manager_cleanly(procs, datadir, session_id):
     flow_data(datadir)
-    sup = Sup(procs, datadir, session_id, ["--start=storage,engine,manager", "--ui=stub", "--headless"])
+    sup = Sup(procs, datadir, session_id, ["--start=storage,engine,manager", "--headless"])
     obs = connect_obs(sup.pipe)
     try:
         wait_ready(obs, ["storage", "engine", "manager"])
         assert obs.request("supervisor", "cmd.topic.subscribe", {"topic": "process"}, timeout=5)["payload"]["ok"]
         code = finish(sup, obs)
         assert code == 0
-        assert any(e["type"] == "stub.shutdown" for e in stub_events_from_file(sup.datadir))
     finally:
         obs.close()
         sup.close_files()

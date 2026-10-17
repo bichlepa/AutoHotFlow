@@ -10,7 +10,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import (CLEAN_EXIT_BUDGET_S, EXIT_FORCED, EXIT_OK, FULL_CHAIN, STUB_OPTS, alive, death_watch, describe_pid,
+from faultkit import (CLEAN_EXIT_BUDGET_S, EXIT_FORCED, EXIT_OK, FULL_CHAIN, HEADLESS_OPTS, alive, death_watch, describe_pid,
                       event, repeat_ids, session_processes, wait_until)
 
 from faultfixtures import chains  # noqa: F401  (fixture)
@@ -25,7 +25,7 @@ EVENT_LAG_S = scaled(1.0)             # the recorder thread of the observer may 
 
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_healthy_session_exits_within_2_seconds_and_every_role_says_it_is_clean(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     pids = chain.wait_ready(["storage", "engine", "manager"])
     t0 = time.perf_counter()
     answer = chain.request_exit()
@@ -45,7 +45,7 @@ def test_healthy_session_exits_within_2_seconds_and_every_role_says_it_is_clean(
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_frozen_storage_is_terminated_at_the_deadline_and_the_others_exit_clean(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     pids = chain.wait_ready(["storage", "engine", "manager"])
     storage = pids["storage"]
     chain.freeze(storage)
@@ -67,9 +67,9 @@ def test_frozen_storage_is_terminated_at_the_deadline_and_the_others_exit_clean(
 
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_ui_cancels_the_exit_in_phase_one_and_the_session_keeps_working(chains, procs, round_no):
-    # --stub-cancel-exit: the stub answers cmd.app.prepareExit with cancel. The stub cancels every exit, so
+    # --cancel-exit: the stub answers cmd.app.prepareExit with cancel. The stub cancels every exit, so
     # this test ends the session hard at its end (tree kill, as a last resort); the leftover check still applies.
-    chain = chains(FULL_CHAIN, STUB_OPTS + ["--stub-cancel-exit"])
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS + ["--cancel-exit"])
     pids = chain.wait_ready(["storage", "engine", "manager"])
     answer = chain.request_exit()
     assert answer["payload"]["started"] is True, answer
@@ -150,7 +150,7 @@ def test_a_child_that_has_not_connected_does_not_hold_storage_and_the_session_en
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_two_sessions_in_a_row_both_exit_within_2_seconds(chains, round_no):
     for n in (1, 2):
-        chain = chains(FULL_CHAIN, STUB_OPTS, label="sup%d" % n)
+        chain = chains(FULL_CHAIN, HEADLESS_OPTS, label="sup%d" % n)
         chain.wait_ready(["storage", "engine", "manager"])
         t0 = time.perf_counter()
         chain.request_exit()

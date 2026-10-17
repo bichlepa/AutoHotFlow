@@ -11,7 +11,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import FULL_CHAIN, STUB_OPTS, alive, connect, event, repeat_ids, wait_until
+from faultkit import FULL_CHAIN, HEADLESS_OPTS, alive, connect, event, repeat_ids, wait_until
 from support import winpipe
 
 from faultfixtures import chains  # noqa: F401  (fixture)
@@ -25,7 +25,7 @@ SETTLE_S = 4.0          # after the thaw: ping schedule restarts, a wrong verdic
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_supervisor_stand_still_does_not_make_healthy_children_hung(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     # worker:1 is the warm worker the engine asks for when it is ready (WI-0027). A worker that is still in its handshake
     # when the hub freezes gives up after 3 s (no welcome), which is right but not what this test is about.
     before = chain.wait_ready(["storage", "engine", "manager", "worker:1"])

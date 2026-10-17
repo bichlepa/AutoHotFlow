@@ -20,7 +20,7 @@ from pathlib import Path
 import psutil
 import pytest
 
-from faultkit import FULL_CHAIN, STUB_OPTS, request_ok
+from faultkit import FULL_CHAIN, HEADLESS_OPTS, request_ok
 from faultfixtures import chains  # noqa: F401  (fixture)
 from test_var_persistence import (new_session, read_pair, run_flow, steps, wait_pair, wait_ready_count)
 
@@ -94,7 +94,7 @@ def test_a_v1_flow_with_every_kind_of_variable_survives_the_restarts_and_leaves_
     shutil.copytree(v1dir / "Flows", datadir / "Flows")
     shutil.copytree(v1dir / "Variables", datadir / "Variables")
 
-    first = chains(FULL_CHAIN, STUB_OPTS)
+    first = chains(FULL_CHAIN, HEADLESS_OPTS)
     wait_ready_count(first, 1)
 
     # the texts of the v1 flow are converted when the engine loads it
@@ -134,7 +134,7 @@ def test_a_v1_flow_with_every_kind_of_variable_survives_the_restarts_and_leaves_
     assert first.request_exit()["payload"]["started"] is True
     assert first.sup.wait_exit(30) == 0, first.sup.text()
     clear_probes(datadir)
-    second = chains(FULL_CHAIN, STUB_OPTS, session=new_session())
+    second = chains(FULL_CHAIN, HEADLESS_OPTS, session=new_session())
     wait_ready_count(second, 1)
     run_flow(second, FLOW_ID)
     assert_loaded_values(datadir)

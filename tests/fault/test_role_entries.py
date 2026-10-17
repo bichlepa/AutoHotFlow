@@ -14,7 +14,7 @@ import psutil
 import pytest
 
 import faultkit
-from faultkit import STUB_OPTS, request_ok
+from faultkit import HEADLESS_OPTS, request_ok
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 from support import snapshotschema
@@ -32,7 +32,7 @@ EXIT_NOT_IMPLEMENTED = 3
 
 def test_every_role_of_the_product_starts_from_its_own_entry_and_reports_ready(chains, datadir, monkeypatch):
     monkeypatch.setattr(faultkit, "ENTRY", PRODUCT_ENTRY)
-    chain = chains("storage,engine,manager,debug", STUB_OPTS)
+    chain = chains("storage,engine,manager,debug", HEADLESS_OPTS)
     chain.wait_ready(["storage", "engine", "manager", "debug", "worker:1"], timeout=READY_S)
     chain.wait_flows(timeout=READY_S)
     for name, role in (("storage", "storage"), ("engine", "engine"), ("manager", "manager"), ("debug", "debug"),

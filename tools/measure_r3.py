@@ -582,7 +582,7 @@ def roles_chain(entry, procs, datadir):
     """Supervisor with storage, engine (one warm worker), manager (stub, headless) and debug (headless). Returns
     the memory of each process."""
     faultkit.ENTRY = Path(entry)
-    chain = Chain(procs, datadir, new_session(), "storage,engine,manager,debug", ["--ui=stub", "--headless"],
+    chain = Chain(procs, datadir, new_session(), "storage,engine,manager,debug", ["--headless"],
                   run_timeout=90)
     try:
         chain.wait_ready(["storage", "engine", "manager", "debug", "worker:1"], timeout=40)

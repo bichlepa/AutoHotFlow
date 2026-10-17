@@ -42,11 +42,11 @@ def test_prepare_takes_an_empty_folder(tmp_path):
 
 
 def test_start_uses_the_manual_session_and_the_data_folder():
-    cmd = mc.command_line("ahk.exe", r"C:\data", ["--ui=stub", "--start=storage,engine,manager,debug"])
+    cmd = mc.command_line("ahk.exe", r"C:\data", ["--start=storage,engine,manager,debug"])
     assert cmd[0] == "ahk.exe"
     assert cmd[1] == "/ErrorStdOut=UTF-8"
     assert cmd[2].endswith(os.path.join("src", "AutoHotFlow.ahk"))
-    assert cmd[3:] == ["--session=manual", r"--data=C:\data", "--ui=stub", "--start=storage,engine,manager,debug"]
+    assert cmd[3:] == ["--session=manual", r"--data=C:\data", "--start=storage,engine,manager,debug"]
 
 
 DPI_FLOW = "dpi_dialogs"
@@ -85,10 +85,10 @@ def test_start_with_a_flow_copies_it_and_builds_the_start_command(tmp_path, monk
     monkeypatch.setattr(mc, "find_ahk_exe", lambda: ("ahk.exe", None))
     monkeypatch.setattr(mc.subprocess, "run", fake_run)
     code = mc.main(["start", "--flow", DPI_FLOW, "--dir", str(folder), "--",
-                    "--ui=stub", "--start=storage,engine,manager"])
+                    "--start=storage,engine,manager"])
     assert code == 0
     (cmd, cwd), = calls
     assert cmd[0] == "ahk.exe" and cmd[1] == "/ErrorStdOut=UTF-8"
     assert cmd[2].endswith(os.path.join("src", "AutoHotFlow.ahk"))
-    assert cmd[3:] == ["--session=manual", "--data=" + str(folder), "--ui=stub", "--start=storage,engine,manager"]
+    assert cmd[3:] == ["--session=manual", "--data=" + str(folder), "--start=storage,engine,manager"]
     assert cwd == mc.ROOT

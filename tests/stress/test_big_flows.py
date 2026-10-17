@@ -20,7 +20,7 @@ import pytest
 from support import metrics
 from support.timing import scaled
 from stresskit import StressChain, _connect, hwnd_of, stress_chain  # noqa: F401  (fixture)
-from faultkit import FULL_CHAIN, STUB_OPTS, Chain, event, wait_until
+from faultkit import FULL_CHAIN, HEADLESS_OPTS, Chain, event, wait_until
 
 TESTS_DIR = Path(__file__).resolve().parents[1]
 V1_EXAMPLES = TESTS_DIR / "data" / "flows" / "v1_examples"
@@ -99,7 +99,7 @@ def load_chain_and_probe(procs, datadir, session_id, count):
     """Starts the chain over `count` big flows and asks for snapshots until evt.engine.ready.
     Returns a dict with the measurements; leaves cleaning up to the caller (chain)."""
     names, total_bytes = fill_flows(datadir, count)
-    chain = Chain(procs, datadir, session_id, FULL_CHAIN + ",triggerhost", STUB_OPTS, run_timeout=400)
+    chain = Chain(procs, datadir, session_id, FULL_CHAIN + ",triggerhost", HEADLESS_OPTS, run_timeout=400)
     result = {"chain": chain, "names": names, "bytes": total_bytes}
     sc = StressChain(chain)
     probe = _connect(chain.sup.pipe, "probe", sc.hub_hwnd)

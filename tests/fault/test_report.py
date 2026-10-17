@@ -12,7 +12,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import STUB_OPTS, event, request_ok, wait_until
+from faultkit import HEADLESS_OPTS, event, request_ok, wait_until
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 
@@ -43,7 +43,7 @@ def read_report(folder):
 
 
 def full_chain(chains, datadir, extra=()):
-    chain = chains("storage,engine,manager", [*STUB_OPTS, *extra])
+    chain = chains("storage,engine,manager", [*HEADLESS_OPTS, *extra])
     chain.wait_ready(["storage", "engine", "manager", "worker:1"], timeout=READY_S)
     chain.wait_flows(timeout=READY_S)
     return chain

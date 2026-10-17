@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TRAY = (ROOT / "src" / "tray" / "Tray.ahk").read_text(encoding="utf-8")
-MANAGER = (ROOT / "src" / "manager" / "StubManager.ahk").read_text(encoding="utf-8")
+MANAGER = (ROOT / "src" / "manager" / "Manager.ahk").read_text(encoding="utf-8")
 
 
 def _method_body(source, name):

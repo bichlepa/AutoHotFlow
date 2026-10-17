@@ -13,7 +13,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import FULL_CHAIN, STUB_OPTS, repeat_ids, request_ok
+from faultkit import FULL_CHAIN, HEADLESS_OPTS, repeat_ids, request_ok
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 
@@ -34,7 +34,7 @@ def flow_text(label, pad=""):
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_killed_storage_mid_write_leaves_the_old_or_the_new_file_never_a_half_one(chains, datadir, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     chain.wait_ready(["storage", "engine", "manager"])
     target = datadir / "Flows" / "atomic.json"
     old = flow_text("old")

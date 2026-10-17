@@ -1,6 +1,6 @@
 """The flow of the manual check 3 (tests/data/manual/dpi_dialogs.json, doc/MANUAL-CHECKS.md section 3) loads in the
 engine, and every element class it uses is an element of its package. No element runs and no window opens: the flow
-is only loaded (cmd.flow.get). The owner starts it in the manager stub.
+is only loaded (cmd.flow.get). The owner starts it in the manager.
 """
 
 import json

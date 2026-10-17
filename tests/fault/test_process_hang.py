@@ -14,7 +14,7 @@ import pytest
 
 from support.timing import scaled
 
-from faultkit import HANG_BUDGET_S, FULL_CHAIN, STUB_OPTS, alive, death_watch, event, repeat_ids, wait_until
+from faultkit import HANG_BUDGET_S, FULL_CHAIN, HEADLESS_OPTS, alive, death_watch, event, repeat_ids, wait_until
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 
@@ -56,7 +56,7 @@ def expect_terminated(chain, name, pid, t_hung, restart):
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_frozen_engine_is_hung_ended_and_restarted_while_the_others_work(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     before = chain.wait_ready(["storage", "engine", "manager"])
     pid, t_frozen, t_hung = freeze_and_expect_hung(chain, "engine")
     expect_terminated(chain, "engine", pid, t_hung, restart=True)
@@ -74,7 +74,7 @@ def test_frozen_engine_is_hung_ended_and_restarted_while_the_others_work(chains,
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_frozen_storage_is_hung_ended_and_restarted_and_answers_again(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     before = chain.wait_ready(["storage", "engine", "manager"])
     pid, t_frozen, t_hung = freeze_and_expect_hung(chain, "storage")
     expect_terminated(chain, "storage", pid, t_hung, restart=True)
@@ -90,7 +90,7 @@ def test_frozen_storage_is_hung_ended_and_restarted_and_answers_again(chains, ro
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_frozen_ui_stub_is_hung_ended_and_not_restarted(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     before = chain.wait_ready(["storage", "engine", "manager"])
     pid, t_frozen, t_hung = freeze_and_expect_hung(chain, "manager")
     expect_terminated(chain, "manager", pid, t_hung, restart=False)

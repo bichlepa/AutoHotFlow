@@ -47,7 +47,7 @@ class ManagerDriver {
         since := msg.payload.Get("since", 0)
         if (!IsInteger(since))
             throw AhfError("cmd.test.trace: since must be an integer", ErrCode.BAD_PAYLOAD)
-        return Map("ok", true, "entries", this.model.Trace(since), "count", this.model.traceCount)
+        return Map("ok", true, "entries", ManagerDriver.Wire(this.model.Trace(since)), "count", this.model.traceCount)
     }
 
     _OnOp(msg) {

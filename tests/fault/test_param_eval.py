@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from faultkit import FULL_CHAIN, STUB_OPTS, event, request_ok, wait_until, write_flow
+from faultkit import FULL_CHAIN, HEADLESS_OPTS, event, request_ok, wait_until, write_flow
 from faultfixtures import chains  # noqa: F401  (fixture)
 from support.timing import scaled
 
@@ -95,7 +95,7 @@ def test_the_same_parameters_give_the_same_result_inline_and_in_a_worker(chains,
     for name in ("compat_in", "compat_wk", "strict_in", "strict_wk"):
         cls = INLINE if name.endswith("_in") else WORKER
         flow(datadir, name, cls, {"Expr": "global_t + 1", "Tag": name}, strict=name.startswith("strict"))
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     # evt.engine.ready comes after the variables are loaded (WI-0041); the flows alone are loaded earlier
     assert chain.rec.wait(event("evt.engine.ready"), READY_S) is not None, chain.sup.text()
 

@@ -15,7 +15,7 @@ from pathlib import Path
 import psutil
 import pytest
 
-from faultkit import FULL_CHAIN, STUB_OPTS, request_ok, wait_until, write_flow
+from faultkit import FULL_CHAIN, HEADLESS_OPTS, request_ok, wait_until, write_flow
 from faultfixtures import chains  # noqa: F401  (fixture)
 from faultkit import event
 from support.timing import scaled
@@ -27,7 +27,7 @@ DATA_VARS = ROOT / "tests" / "data" / "variables"
 STATIC_FLOW = "Flow 1000000001"       # the folder name of the static variables in tests/data/variables
 READY_S = 20.0
 FILE_S = scaled(8.0)                   # a write after the delay of 200 ms
-OPTS = [*STUB_OPTS]
+OPTS = [*HEADLESS_OPTS]
 
 
 # --- helpers ----------------------------------------------------------------------------------------------

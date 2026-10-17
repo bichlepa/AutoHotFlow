@@ -9,7 +9,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import (EXIT_HUB_LOST, FULL_CHAIN, ORPHAN_BUDGET_S, STUB_OPTS, death_watch, repeat_ids,
+from faultkit import (EXIT_HUB_LOST, FULL_CHAIN, ORPHAN_BUDGET_S, HEADLESS_OPTS, death_watch, repeat_ids,
                       session_processes, wait_until)
 
 from faultfixtures import chains  # noqa: F401  (fixture)
@@ -20,7 +20,7 @@ pytestmark = pytest.mark.fault
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_children_end_within_the_orphan_budget_when_the_supervisor_is_killed(chains, round_no):
-    chain = chains(FULL_CHAIN, STUB_OPTS)
+    chain = chains(FULL_CHAIN, HEADLESS_OPTS)
     # worker:1 is the warm worker of the engine (WI-0027). A child that is still connecting when the supervisor dies
     # lives on until the retry budget of its peer (10 s) is used up: the orphan guard counts a lost connection only.
     pids = chain.wait_ready(["storage", "engine", "manager", "worker:1"])

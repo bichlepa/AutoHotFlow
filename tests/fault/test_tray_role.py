@@ -13,7 +13,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import EXIT_OK, STUB_OPTS, event, request_ok, wait_until
+from faultkit import EXIT_OK, HEADLESS_OPTS, event, request_ok, wait_until
 from support import inputlock, snapshotschema
 from support.timing import scaled
 
@@ -22,7 +22,6 @@ from faultfixtures import chains  # noqa: F401  (fixture)
 pytestmark = pytest.mark.fault
 
 READY_S = 20.0
-UI_PREFIX = "ui-event "
 TRAY_OPTS = ["--tray", "--headless"]
 
 
@@ -30,14 +29,10 @@ def log_entries(chain):
     return [m["payload"] for t, m in chain.rec.find(lambda m: m.get("type") == "evt.log.entry")]
 
 
-def stub_shows(chain):
-    out = []
-    for p in log_entries(chain):
-        text = str(p.get("text", ""))
-        if p.get("source") == "manager" and text.startswith(UI_PREFIX):
-            if json.loads(text[len(UI_PREFIX):]).get("type") == "stub.show":
-                out.append(p)
-    return out
+def manager_shows(chain):
+    """The cmd.manager.show requests that the headless manager has seen (its trace, PROTOCOL 4.8)."""
+    ans = request_ok(chain.obs, "manager", "cmd.test.trace", {})
+    return [e for e in ans["entries"] if e["type"] == "manager.show"]
 
 
 def click(chain, item):
@@ -46,7 +41,7 @@ def click(chain, item):
 
 
 def test_the_test_entry_starts_no_tray_role_unless_asked(chains):
-    chain = chains("storage", STUB_OPTS)
+    chain = chains("storage", HEADLESS_OPTS)
     chain.wait_ready(["storage"], timeout=READY_S)
     assert "tray" not in chain.states()
 
@@ -82,7 +77,7 @@ def test_a_killed_tray_role_is_started_again_so_the_icon_comes_back(chains):
 
 
 def test_the_exit_entry_ends_the_supervisor_with_exit_0_and_leaves_no_process(chains):
-    chain = chains("storage,engine,manager,tray", [*TRAY_OPTS, "--ui=stub"])
+    chain = chains("storage,engine,manager,tray", [*TRAY_OPTS])
     chain.wait_ready(["storage", "engine", "manager", "tray"], timeout=READY_S)
     click(chain, "exit")
     assert chain.sup.wait_exit(timeout=scaled(15.0)) == EXIT_OK, chain.sup.text()
@@ -116,18 +111,18 @@ def test_the_tray_role_always_comes_back_after_a_growing_pause(chains):
 
 
 def test_the_show_manager_entry_makes_the_running_manager_show_its_window(chains):
-    chain = chains("storage,manager,tray", [*TRAY_OPTS, "--ui=stub"])
+    chain = chains("storage,manager,tray", [*TRAY_OPTS])
     chain.wait_ready(["storage", "manager", "tray"], timeout=READY_S)
     request_ok(chain.obs, "supervisor", "cmd.topic.subscribe", {"topic": "log"})
-    assert stub_shows(chain) == []
+    assert manager_shows(chain) == []
     click(chain, "show")
-    assert wait_until(lambda: stub_shows(chain), scaled(10.0)), log_entries(chain)[-10:]
+    assert wait_until(lambda: manager_shows(chain), scaled(10.0)), log_entries(chain)[-10:]
     click(chain, "show")                    # a second click is a second request
-    assert wait_until(lambda: len(stub_shows(chain)) == 2, scaled(10.0)), stub_shows(chain)
+    assert wait_until(lambda: len(manager_shows(chain)) == 2, scaled(10.0)), manager_shows(chain)
 
 
 def test_the_show_manager_entry_starts_a_manager_that_is_not_running(chains):
-    chain = chains("storage,tray", [*TRAY_OPTS, "--ui=stub"])
+    chain = chains("storage,tray", [*TRAY_OPTS])
     chain.wait_ready(["storage", "tray"], timeout=READY_S)
     assert "manager" not in chain.states()
     click(chain, "show")
@@ -135,7 +130,7 @@ def test_the_show_manager_entry_starts_a_manager_that_is_not_running(chains):
 
 
 def test_a_crashed_manager_is_opened_again_by_the_show_manager_entry(chains):
-    chain = chains("storage,manager,tray", [*TRAY_OPTS, "--ui=stub"])
+    chain = chains("storage,manager,tray", [*TRAY_OPTS])
     pids = chain.wait_ready(["storage", "manager", "tray"], timeout=READY_S)
     psutil.Process(pids["manager"]).kill()
     assert wait_until(lambda: chain.states().get("manager", {}).get("state") in ("crashed", "exited"), scaled(10.0)), \

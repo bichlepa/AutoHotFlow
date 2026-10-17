@@ -8,7 +8,7 @@ their pid. Re-arming the triggers after the restart is the engine's job (WI-0062
 import psutil
 import pytest
 
-from faultkit import CRASH_BUDGET_S, STUB_OPTS, event, repeat_ids, request_ok
+from faultkit import CRASH_BUDGET_S, HEADLESS_OPTS, event, repeat_ids, request_ok
 from faultfixtures import chains  # noqa: F401  (fixture)
 from support.timing import scaled
 
@@ -19,7 +19,7 @@ CHAIN = "storage,engine,manager,triggerhost"
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_killed_triggerhost_is_reported_restarted_and_answers_again(chains, round_no):
-    chain = chains(CHAIN, STUB_OPTS)
+    chain = chains(CHAIN, HEADLESS_OPTS)
     before = chain.wait_ready(["storage", "engine", "manager", "triggerhost"])
     pid = before["triggerhost"]
     psutil.Process(pid).kill()

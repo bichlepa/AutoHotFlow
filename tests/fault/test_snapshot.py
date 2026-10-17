@@ -11,7 +11,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import STUB_OPTS, event, request_ok, wait_until, write_flow
+from faultkit import HEADLESS_OPTS, event, request_ok, wait_until, write_flow
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 from support import snapshotschema
@@ -30,7 +30,7 @@ def snapshot_of(chain, name, timeout=5.0):
 def full_chain(chains, datadir, flows=(), extra=()):
     for name, cls, pars in flows:
         write_flow(datadir, name, cls, pars)
-    chain = chains("storage,engine,manager", [*STUB_OPTS, *extra])
+    chain = chains("storage,engine,manager", [*HEADLESS_OPTS, *extra])
     chain.wait_ready(["storage", "engine", "manager", "worker:1"], timeout=READY_S)
     chain.wait_flows(timeout=READY_S)
     return chain

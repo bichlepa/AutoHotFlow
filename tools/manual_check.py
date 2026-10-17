@@ -11,7 +11,7 @@ It deletes only a folder that it created itself (marker file .ahf_manual_check) 
 "--flow <name>" copies the manual-check flow tests/data/manual/<name>.json to Flows\\<name>.json. It implies a fresh
 folder (prepared as above, then the flow is copied in). A companion `<name>.state.json` next to it is copied to
 FlowStates\<name>.json, which enables the triggers of the flow at the start. The tool does not start the flow: the
-owner starts it in the manager stub (--ui=stub), where the flow is listed under its name.
+owner starts it in the manager (Run button), where the flow is listed under its name.
 
 "start" starts src/AutoHotFlow.ahk with --session=manual --data=<folder> and the given options, waits without a
 timeout until the application ends, and prints its exit code (the VS Code task terminal does not show an exit code

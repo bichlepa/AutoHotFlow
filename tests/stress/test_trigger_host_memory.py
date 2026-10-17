@@ -21,7 +21,7 @@ from support.flowrun import FlowRunner, session_processes
 from support.timing import scaled
 
 ROLES = "storage,engine,triggerhost,manager"
-STUB = ["--ui=stub", "--headless"]
+STUB = ["--headless"]
 PERIODIC_FLOWS = 5
 PERIOD_MS = 1000
 SAMPLE_S = 30.0

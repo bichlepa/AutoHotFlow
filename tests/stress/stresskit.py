@@ -22,7 +22,7 @@ import pytest
 TESTS_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TESTS_DIR / "fault"))
 
-from faultkit import (FULL_CHAIN, SKELETON_SRC, STUB_OPTS, Chain, session_processes, wait_until)  # noqa: E402
+from faultkit import (FULL_CHAIN, SKELETON_SRC, HEADLESS_OPTS, Chain, session_processes, wait_until)  # noqa: E402
 from support.ahfclient import AhfClient, wake  # noqa: E402
 
 SLEEP_ELEMENT = "element0000000002"
@@ -162,7 +162,7 @@ def stress_chain(procs, datadir, session_id):
     """Factory: stress_chain(flows={"name": (sleep_ms, policy)}, wake_hub=True) -> StressChain, started and ready."""
     made = []
 
-    def make(flows=None, wake_hub=True, extra=STUB_OPTS, start=FULL_CHAIN, wait=True,
+    def make(flows=None, wake_hub=True, extra=HEADLESS_OPTS, start=FULL_CHAIN, wait=True,
              run_timeout=RUN_TIMEOUT_S):
         for name, (sleep_ms, policy) in (flows or {}).items():
             (Path(datadir) / "Flows").mkdir(exist_ok=True)

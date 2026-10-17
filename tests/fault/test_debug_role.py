@@ -14,7 +14,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import AHKRUN, ENTRY, ROOT, STUB_OPTS, event, request_ok, wait_until
+from faultkit import AHKRUN, ENTRY, ROOT, HEADLESS_OPTS, event, request_ok, wait_until
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 from support import snapshotschema
@@ -26,7 +26,7 @@ WINDOW_TITLE = "AutoHotFlow - debug"
 
 
 def full_chain(chains, datadir, start="storage,engine,manager,debug", extra=()):
-    chain = chains(start, [*STUB_OPTS, *extra])
+    chain = chains(start, [*HEADLESS_OPTS, *extra])
     names = [n for n in start.split(",")]
     chain.wait_ready(names + ["worker:1"], timeout=READY_S)
     chain.wait_flows(timeout=READY_S)
@@ -84,7 +84,7 @@ def test_refresh_shows_a_process_that_is_not_ready_as_not_ready_instead_of_leavi
     # F-0034 (WI-0034): RefreshSnapshots asked only the ready processes and left the others out without a trace. The
     # window is meant to show such states. echo:slowhello says hello 4 s after its start, so it is "starting" here.
     late = "echo:slowhello4000"
-    chain = chains("storage,debug," + late, ["--test-roles", *STUB_OPTS])
+    chain = chains("storage,debug," + late, ["--test-roles", *HEADLESS_OPTS])
     chain.wait_ready(["storage", "debug"], timeout=READY_S)
     assert wait_until(lambda: late in dbg(chain, "state")["processes"], 10.0), dbg(chain, "state")
     # chain.wait_ready looks at the supervisor's events; the window's own table may still lag behind (a loaded run
@@ -103,7 +103,7 @@ def test_refresh_shows_a_process_that_is_not_ready_as_not_ready_instead_of_leavi
 
 
 def test_the_live_log_has_a_level_and_a_source_filter(chains, datadir):
-    chain = chains("storage,echo:a,debug", ["--test-roles", *STUB_OPTS])
+    chain = chains("storage,echo:a,debug", ["--test-roles", *HEADLESS_OPTS])
     chain.wait_ready(["storage", "echo:a", "debug"], timeout=READY_S)
     request_ok(chain.obs, "echo:a", "cmd.test.setlogtarget", {"to": "storage"})
     before = dbg(chain, "state")["logEntries"]
@@ -145,7 +145,7 @@ def test_the_event_stream_can_be_paused_and_resumed(chains, datadir):
 
 
 def test_dump_values_arrive_in_the_window(chains, datadir):
-    chain = chains("storage,echo:a,debug", ["--test-roles", *STUB_OPTS])
+    chain = chains("storage,echo:a,debug", ["--test-roles", *HEADLESS_OPTS])
     chain.wait_ready(["storage", "echo:a", "debug"], timeout=READY_S)
     request_ok(chain.obs, "echo:a", "cmd.test.dump", {"title": "loop state", "value": {"i": 3}})
     state = wait_until(lambda: (lambda s: s if "loop state" in s["dumps"] else None)(dbg(chain, "state")), 10.0)
