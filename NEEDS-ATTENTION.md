@@ -4,7 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-None open. (Decided 2026-10-17, E0078 to E0081: log burst re-read, instance count, marks for missing packages, no thread group. The follow-up task is queued after WI-0075.)
+- **Log burst (F-0116): your decision E0078 rests on a wrong premise.** The bug hunter measured: the lines are not lost on the topic `log`. The hub drops them before storage ("log lines dropped, send queue to storage was full", soft limit 800 per queue), storage writes about 1900 of 5000 lines to the files, and the manager shows exactly those. Re-reading `Log.txt` would show the same lines. Options: (a) keep the drop (it protects the hub from a flood) and change the test to "the model equals what storage wrote"; (b) raise the intake of storage (changes the drop policy of PROTOCOL 4.6, F-0016, F-0066). Recommendation: (a). The other three decisions (E0079 to E0081) are done on the hunter's branch, in review.
 
 ## Manual checks
 
