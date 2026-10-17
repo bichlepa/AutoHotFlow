@@ -75,7 +75,7 @@ class V1Source {
     ; v1Dir: the v1 data folder the user imports from ("" when unknown). v1 is true only when the target has the name of v1,
     ; is not the running v2 product (src\AutoHotFlow.ahk), and lies in v1Dir or in a folder with the v1 layout (Saved Flows or
     ; Variables; the portable v1 keeps its data beside the executable). An installed v1 whose data is in %APPDATA% is
-    ; recognised by its name only when its install folder is not v1Dir (F-9001).
+    ; recognised by its name only when its install folder is not v1Dir (F-0127).
     static Autostart(startupDir, v1Dir := "") {
         filePath := V1Source._Shortcut(startupDir)
         if (FileExist(filePath) = "")
