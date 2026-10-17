@@ -4,7 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-Nothing waits for a decision now. (F-0116 decided: keep the drop, E0082; the test is being adjusted.)
+Nothing waits for a decision now. (F-0116 decided: keep the drop, E0082; test adjusted and closed.)
 
 ## Manual checks
 
