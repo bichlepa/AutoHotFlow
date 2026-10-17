@@ -14,6 +14,7 @@
 #Include ReportFiles.ahk
 #Include StateFiles.ahk
 #Include CategoryFile.ahk
+#Include V1Source.ahk
 
 ; Storage role (WI-0012, ARCHITECTURE D0007 and 4, PROTOCOL 4.6). The only process that touches files
 ; under the data directory: flows, variables and logs. Requests are queued (WriteQueue) and answered
@@ -83,6 +84,10 @@ class Storage extends Role {
         this.On("cmd.storage.categories.write", (msg) => this._CmdCategoriesWrite(msg))
         this.On("cmd.storage.categories.keepBroken", (msg) => this._CmdCategoriesKeepBroken(msg))
         this.On("cmd.storage.report.write", (msg) => this._CmdReportWrite(msg))
+        this.On("cmd.storage.v1.list", (msg) => this._CmdV1List(msg))
+        this.On("cmd.storage.v1.read", (msg) => this._CmdV1Read(msg))
+        this.On("cmd.storage.autostart.check", (msg) => this._CmdAutostartCheck(msg))
+        this.On("cmd.storage.autostart.remove", (msg) => this._CmdAutostartRemove(msg))
         this.On("cmd.storage.log.tail", (msg) => this._CmdLogTail(msg))
         this.On("evt.log.append", (msg) => this._EvtLogAppend(msg))
     }
@@ -215,6 +220,40 @@ class Storage extends Role {
         files := p.Get("files", "")
         return this._Defer(msg, "report.write", reason
             , () => ReportFiles.Write(this.dataDir, stamp, reason, files))
+    }
+
+    ; cmd.storage.v1.* (WI-0076, PROTOCOL 4.6): reading the v1 data folder chosen by the user. Read only, queued like every request.
+    _CmdV1List(msg) {
+        dir := msg.payload.Get("dir", "")
+        return this._Defer(msg, "v1.list", dir, () => V1Source.List(dir))
+    }
+
+    _CmdV1Read(msg) {
+        p := msg.payload
+        dir := p.Get("dir", "")
+        kind := p.Get("kind", "")
+        if (kind = "flow") {
+            name := p.Get("name", "")
+            return this._Defer(msg, "v1.read", name, () => V1Source.ReadFlow(dir, name))
+        }
+        if (kind = "var") {
+            scope := p.Get("scope", "global")
+            flowId := p.Get("flowId", "")
+            name := p.Get("name", "")
+            return this._Defer(msg, "v1.read", name, () => V1Source.ReadVar(dir, scope, flowId, name))
+        }
+        throw AhfError("cmd.storage.v1.read: kind must be flow or var", ErrCode.BAD_PAYLOAD)
+    }
+
+    ; cmd.storage.autostart.* (WI-0076, E0068): the shortcut of v1 in the startup folder the manager names.
+    _CmdAutostartCheck(msg) {
+        startupDir := msg.payload.Get("startupDir", "")
+        return this._Defer(msg, "autostart.check", startupDir, () => V1Source.Autostart(startupDir))
+    }
+
+    _CmdAutostartRemove(msg) {
+        startupDir := msg.payload.Get("startupDir", "")
+        return this._Defer(msg, "autostart.remove", startupDir, () => V1Source.RemoveAutostart(startupDir))
     }
 
     ; cmd.storage.log.tail (WI-0080, PROTOCOL 4.6): the last entries of Log.txt or of one source file. Queued like every
