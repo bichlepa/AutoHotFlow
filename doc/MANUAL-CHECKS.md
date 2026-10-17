@@ -34,7 +34,7 @@ The start prepares a fresh data folder first (see above), so no preparation by h
 | 9 | Click Run on `skeleton`, then Stop while it runs. | The state mark shows running and then stopped. The button label changes between Run and Stop. | |
 | 10 | Click Notices. | The list of notices opens; with no errors it says that there are none. | |
 | 11 | Click Show log, then close it with the X. | The log window opens and shows the entries of the session. Closing it hides it. | |
-| 12 | Right-click the tray icon of the manager, choose `Beenden`. Start again and double-click the icon. | The menu has exactly one entry, `Beenden`. The application ends with exit code 0 and the second start shows the window again. | |
+| 12 | Right-click the tray icon (the only icon of the application). | The menu has two entries: `Show manager` (the default, a double click does the same) and `Exit` (German: `Beenden`). `Show manager` brings the window to the front; `Exit` ends the application with exit code 0 (the task terminal prints it). Source: `src/tray/Tray.ahk`, not yet checked by hand. | |
 | 13 | Watch for dialogs during the whole check. | No dialog (window class `#32770`) appears, except the questions of the steps above. | |
 
 ### Steps, part B (the import from v1)
@@ -57,7 +57,7 @@ The start prepares a fresh data folder first (see above), so no preparation by h
 |---|---|---|---|
 | 23 | At 100 % scaling: resize the window to the smallest size and back to the largest. | The buttons and the tree stay readable, no text is cut off, the window is not blank. | |
 | 24 | At 225 % scaling (Windows settings): open the manager and the report window, look at both. | Both windows are sharp. The text of the buttons fits. The report text is readable and can be scrolled. | |
-| 25 | Kill the manager process by hand (Task Manager, process `AutoHotFlow` role manager, or the debug window's Processes tab). | The supervisor restarts nothing for the manager; the tray icon stays. Right-click the tray icon and choose "Show manager": a new manager window opens and shows the flows. | |
+| 25 | Kill the manager process by hand (Task Manager, or the debug window's Processes tab). The tray icon stays. Then double-click the tray icon. | The manager does not come back by itself: the supervisor does not restart it (source: `src/supervisor/Children.ahk`, `AUTO_RESTART` has no manager). The double click starts a new manager, which shows its window; the log says `manager is not running (not_running), started it`. Source checked, not yet by hand. | |
 | 26 | Watch for dialogs during the whole check. | No dialog (window class `#32770`) appears except the questions of the steps above. | |
 
 **Not covered by these checks** (listed as not checked in the source): drag and drop with a real mouse at 225 %, the folder dialog with a network folder, a v1 folder with a shortcut to another v1 installation, and a v1 folder that is larger than a few hundred flows (not measured).
