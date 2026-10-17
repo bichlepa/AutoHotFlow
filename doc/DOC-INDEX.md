@@ -150,7 +150,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (12.0 KB, 93 lines)
+## doc/howto/gui-and-hotkeys.md (13.0 KB, 100 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -163,6 +163,7 @@ L59-64 `contains` is a reserved word in AutoHotkey v2 (verified) (verified)
 L66-71 An object literal with a lambda property is called with the object as an extra argument (verified) (partly verified)
 L73-79 An open tray menu does not stop the pipe handling, although the docs suggest it (verified by hand) (partly verified)
 L81-93 Standard dialogs (`FileSelect`, `DirSelect`, `MsgBox`) keep the message handling going, but stall the timers (verified) (verified)
+L95-100 A Gui created and closed without Show leaves no window and no remembered place (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (9.6 KB, 119 lines)
@@ -228,7 +229,7 @@ L351-357 An event of a trigger can arrive before the answer that arms it (verifi
 L359-365 An error in a request callback ends that request, the step after it never runs (verified)
 ```
 
-## doc/howto/syntax-and-language.md (35.2 KB, 344 lines)
+## doc/howto/syntax-and-language.md (36.8 KB, 359 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -272,6 +273,8 @@ L317-323 A class used by an element without its #Include: a warning dialog and a
 L325-330 A lambda in a static method of a class: `this` is the class (verified)
 L332-337 A timer period is limited to 2^31 - 1 milliseconds (partly verified)
 L339-344 A sliding window of counts costs one increment per count (verified)
+L346-352 `throw` is a statement: a lambda cannot throw in its expression body (verified) (verified)
+L354-359 A relative `#Include` is resolved from the folder of the including file (verified) (verified)
 ```
 
 ## doc/howto/tests-and-tools.md (41.6 KB, 410 lines)

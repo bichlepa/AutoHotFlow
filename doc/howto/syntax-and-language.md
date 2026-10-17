@@ -342,3 +342,18 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Keep 60 buckets (one per second, with the second they belong to) and the total of the valid buckets. A count adds to the bucket of the current second and to the total. The buckets are cleared only when the second changes (at most 60 checks per second), and a bucket of the same index that holds an older second is taken out of the total before it is reused. `RunawayGuard.Count` in `src/engine/core/RunawayGuard.ahk`.
 - **Status:** verified (`tests/ahk/engine_runaway.test.ahk`: the window forgets after 60 s, a reused bucket does not keep its old count, a long gap clears everything)
 - **Source:** `src/engine/core/RunawayGuard.ahk`
+
+### `throw` is a statement: a lambda cannot throw in its expression body (verified)
+
+- **Problem:** A test helper needed a function that throws, written as an expression lambda, `check := (v) => (throw ValueError("x"))`.
+- **Wrong:** Writing `throw` inside a lambda expression, or as the body of a property setter (`set => throw ...`).
+- **Right:** Use a named function with a `throw` statement (`BrokenCheck(v) { throw ValueError("x") }`) and pass its name. A setter with a block: `set { throw Error("...") }`. The mistake is a load error (`The following reserved word must not be used as a variable name`, exit 2), so it shows at once.
+- **Status:** verified (probe with `tools/ahkrun.py`: exit 2 on load; the fixed form in `tests/ahk/ui_common_texts.test.ahk` and `tests/ahk/ui_common_dialogs.test.ahk` runs)
+- **Source:** `tests/ahk/ui_common_dialogs.test.ahk`, `tests/ahk/ui_common_texts.test.ahk`
+
+### A relative `#Include` is resolved from the folder of the including file (verified)
+
+- **Problem:** `src/ui_common/UiWindow.ahk` includes `UiTexts.ahk` from its own folder, while the test script that includes it lies in `tests/ahk/`.
+- **Right:** Write `#Include UiTexts.ahk` inside `ui_common/` and `#Include ..\core\GuiLayout.ahk` for the folder above it. The test run of the unit files (`tests/test_ahk_runner.py`) loads both without error from a script in another folder.
+- **Status:** verified (the unit test files of WI-0069 run; the same pattern is used by the existing includes such as `#Include ..\..\core\Lang.ahk` in `src/elements/base/DialogWindow.ahk`)
+- **Source:** `src/ui_common/UiWindow.ahk`, `tests/ahk/ui_common_texts.test.ahk`

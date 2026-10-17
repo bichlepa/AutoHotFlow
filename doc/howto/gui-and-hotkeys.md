@@ -91,3 +91,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (one probe, 5 runs on this machine, Windows 11 with German UI; the dialog was closed by the probe with `WM_CLOSE`). Not checked: other Windows versions, a dialog opened from an element worker, a dialog at a DPI above 100 %, a dialog while the process is under load.
 - **Decision (WI-0069):** `ui_common/` does not use the standard dialogs but its own non-blocking dialogs (`UiDialogs.ahk`). Whether a UI role may use `FileSelect`/`DirSelect` at all is open (owner decision, see the report of WI-0069).
 - **Source:** `tests/ahk/helpers/modal_spike.ahk`, `tools/ahkrun.py` (`--no-dialog-guard`)
+
+### A Gui created and closed without Show leaves no window and no remembered place (verified)
+
+- **Problem:** The window base of the UI roles (`ui_common/UiWindow.ahk`) creates its `Gui` in the constructor, but it must not remember a position for a window that was never shown (the position of a hidden window is not a place the user chose).
+- **Right:** A flag set by `Show` decides whether `Close` remembers the position (`UiWindow._shown`). A `Gui` created and destroyed without `Show` leaves no window behind, and the texts registered for it are removed again with `UiTexts.Forget`.
+- **Status:** verified (probe with `tools/ahkrun.py`: create, place, register a text, close, close again; the registry is empty after the close and nothing is remembered; no window was shown). Not checked: the position and size of a shown window after a restart or a DPI change (owner's check, WI-0073/WI-0076).
+- **Source:** `src/ui_common/UiWindow.ahk`
