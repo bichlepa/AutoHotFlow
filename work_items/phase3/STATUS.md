@@ -56,7 +56,7 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
-| WI-0069 | `ui_common/`, dialogs, DPI, spike on modal dialogs | open | | | | block A |
+| WI-0069 | `ui_common/`, dialogs, DPI, spike on modal dialogs | done, verified (fast red by one load flake, green alone; gui 3 passed) | haiku (review sonnet) | e653f44–255266b | 2026-10-17 | block A; spike: pings answered, timers stall up to 0.7 s; `FileSelect`/`DirSelect` open for the owner |
 | WI-0070 | Flow lifecycle in engine and storage | open | | | | block A |
 | WI-0071 | Categories and order (`Categories.json`) | open | | | | block A |
 | WI-0072 | Tray icon in the supervisor (E0064) | open | | | | block A, foundation tier |
@@ -84,6 +84,8 @@ None.
 None. The manual-check start path (section 3 of MANUAL-CHECKS) is integrated; the owner runs it.
 
 ## Last verified state
+
+Commit `255266b` (WI-0069 integrated, 7 commits from `e653f44`) verified by `tools/verify.py --auto`: VERDICT red (fast) only. Fast run `20261017-102543-255266bd` (1261 passed, 1 skipped, 1 failed): `tests/integration/test_trigger_state.py::test_an_unreadable_state_file_refuses_a_switch_until_it_can_be_read`; `tools/recheck.py` alone at the same commit: green (run `20261017-103235-2496`), a load flake; recorded in the run history, no OPEN-ITEMS entry (owner rule). Foundation run `20261017-102543-255266bd-2` (466 passed, 1 skipped). Gui tier, owner away: `tests/integration/test_dialog_windows_gui.py` 3 passed (run `20261017-103249-24164`).
 
 Commit `e495a8cc` (review fixes of the input tests and the input lock, after WI-0067) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261017-090407-e495a8cc` (1240 passed, 1 skipped), foundation run `20261017-090407-e495a8cc-2` (466 passed, 1 skipped). Before that, `aca17d96` (hotkeys with real keys while the engine is blocked): fast `20261017-085945-aca17d96` (1234 passed, 3 skipped), foundation `20261017-085945-aca17d96-2` (466 passed, 1 skipped). Open: owner decision on whether the non-gui input tests run in the fast tier (NEEDS-ATTENTION.md).
 
