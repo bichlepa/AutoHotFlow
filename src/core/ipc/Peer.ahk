@@ -152,6 +152,17 @@ class Peer {
             this._SendSubscribe(topic)
     }
 
+    ; Ends a topic subscription (cmd.topic.unsubscribe, WI-0080). The list of topics is changed at once, so a reconnect
+    ; does not subscribe it again; the hub is told when the peer is ready. Events that are already on their way may still come.
+    Unsubscribe(topic) {
+        if (topic = "")
+            throw AhfError("Peer.Unsubscribe: topic is empty", ErrCode.BAD_ARGS)
+        if (this._topics.Has(topic))
+            this._topics.Delete(topic)
+        if (this.status = "ready")
+            this._SendUnsubscribe(topic)
+    }
+
     ; Frames waiting in the send queue of the connection (0 without a connection). See Role.LOG_SEND_SOFT (F-0016).
     QueuedFrames => IsObject(this._conn) ? this._conn.QueuedFrames : 0
 
@@ -515,6 +526,20 @@ class Peer {
     _CheckSubscribe(topic, res) {
         if (!res.payload.Get("ok", false))
             Log.Write("a0", "ipc", "peer " this.name ": subscribe to " topic " refused: " res.type)
+    }
+
+    _SendUnsubscribe(topic) {
+        try {
+            this.Request("supervisor", "cmd.topic.unsubscribe", Map("topic", topic)
+                , (res) => this._CheckUnsubscribe(topic, res), Peer.DEFAULT_TIMEOUT_MS)
+        } catch as e {
+            Log.Write("a0", "ipc", "peer " this.name ": unsubscribe from " topic " not sent: " e.Message)
+        }
+    }
+
+    _CheckUnsubscribe(topic, res) {
+        if (!res.payload.Get("ok", false))
+            Log.Write("a0", "ipc", "peer " this.name ": unsubscribe from " topic " refused: " res.type)
     }
 
     ; --- sending helpers ---------------------------------------------------------------------
