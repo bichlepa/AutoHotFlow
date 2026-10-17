@@ -228,3 +228,13 @@ When the project owner writes something like "wrap up", "round off" or "finish s
 - The integrator role keeps going: integrate finished branches, rebase them, and remove their workspaces (sections 5 and 5a).
 - At the end, all changes are on `v2-port`, `verify.py` has run on the final state (verdict and run IDs in `STATUS.md`), any findings are in `doc/OPEN-ITEMS.md` with their final IDs, and the other documents are updated (`STATUS.md`, `NEEDS-ATTENTION.md`, requirements, history).
 - Then report to the project owner (section 8) and stop.
+
+## 13. Shutdown request ("shut down when done")
+
+When the project owner writes something like "shut down when done" or "shut the PC down when you are finished", the orchestrator does the following. This is separate from the wrap-up of section 12.
+
+- **Keep working.** Do not read the request as "wrap up", unless the owner asks for both in one request. Continue all tasks until one of two conditions holds:
+  1. Nothing more can be done without input from the owner, and all remaining tasks are blocked by it.
+  2. All tasks are done, and there is nothing left to do.
+- **Assume that the owner has nothing important running.** The orchestrator may shut the PC down even when it finds processes of the owner. If something important blocks the shutdown, try hibernate first, and standby if hibernate is not possible.
+- **Revocation.** If the owner gives a reason for the request, such as "I am away" or "I am going to sleep", and later says that he is back, the shutdown request is revoked. From then on the orchestrator does not shut down unless the owner asks again.
