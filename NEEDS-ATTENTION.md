@@ -4,7 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-None open.
+- **Do the non-`gui` hotkey input tests send real keys in every fast-tier run?** The 10 input tests in `tests/integration/test_hotkey_input.py` are not marked `gui`. They send unassigned keys (vk88 to vk8F, vkE8) to the active window in every fast-tier run, including the runs of agents. The harm is small (the keys are unassigned), but it is a decision: keep them in the fast tier, or mark them `gui` or put them behind an opt-in. Source: review of `e658784` to `aca17d9`.
 
 ## To know
 
