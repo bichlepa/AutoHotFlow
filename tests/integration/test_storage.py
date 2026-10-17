@@ -826,6 +826,6 @@ def test_engine_starts_with_the_real_storage_and_its_log_arrives(procs, datadir,
         obs.close()
     deadline = time.time() + 5
     engine_log = datadir / "Log" / "Log_engine.txt"
-    while time.time() < deadline and not engine_log.exists():
+    while time.time() < deadline and not (engine_log.exists() and "ready with" in engine_log.read_text("utf-8")):
         time.sleep(0.05)
     assert "ready with 1 flow(s)" in engine_log.read_text("utf-8")

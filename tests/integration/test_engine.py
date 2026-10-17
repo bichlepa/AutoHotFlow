@@ -101,6 +101,18 @@ class StorageStub:
             if target.is_file():
                 target.replace(target.with_name(target.name + ".broken"))
             self.client.reply(msg, {"ok": True})
+        elif type_ == "cmd.storage.settings.read":
+            # WI-0077: Settings.json of the data folder, as storage keeps it (the engine reads it before the flows).
+            target = self.datadir / "Settings.json"
+            if target.is_file():
+                self.client.reply(msg, {"ok": True, "exists": True, "text": target.read_text(encoding="utf-8")})
+            else:
+                self.client.reply(msg, {"ok": True, "exists": False})
+        elif type_ == "cmd.storage.settings.write":
+            (self.datadir / "Settings.json").write_text(payload.get("text", ""), encoding="utf-8")
+            self.client.reply(msg, {"ok": True})
+        elif type_ == "cmd.storage.settings.keepBroken":
+            self.client.reply(msg, {"ok": True})
         elif type_ == "cmd.storage.categories.read":
             # WI-0071: Categories.json of the data folder, as storage keeps it (the engine reads it before the start).
             target = self.datadir / "Categories.json"
@@ -205,7 +217,7 @@ def test_engine_loads_flow_announces_ready_and_answers_snapshot(procs, datadir, 
         assert flow["name"] == "Skeleton" and flow["rev"] == 1
         assert flow["enabled"] is False and flow["executing"] is False   # real JSON booleans (PROTOCOL 2)
         assert flow["independentActive"] == 0 and "stateError" not in flow   # as evt.flow.state (WI-0073)
-        assert snap["settings"] == {}
+        assert snap["settings"]["workers"] == 8 and snap["settings"]["executionPolicy"] == "parallel"   # the defaults (WI-0077)
         assert snap["ready"] is True                                    # a late client reads it here (F-0090)
 
         hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})

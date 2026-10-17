@@ -148,6 +148,7 @@ class ManagerModel {
     Start() {
         this.startMs := Time.NowMs()
         this.peer.Subscribe("engine")
+        this.peer.Subscribe("settings")      ; evt.settings.changed has its own topic (WI-0077); it carries the sequence of the engine
         this.peer.Subscribe("process")
         this.peer.Subscribe("notice")
         this.RequestSnapshot("start")

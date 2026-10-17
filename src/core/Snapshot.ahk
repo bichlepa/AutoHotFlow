@@ -32,7 +32,8 @@ class Snapshot {
                 , "text", Snapshot.Cut(entry["text"])))
         }
         return Map("queued", queued, "dropped", dropped, "sinkErrors", Log.sinkErrors
-            , "lastSinkError", Snapshot.Cut(Log.lastSinkError), "level", Log.level, "recent", recent)
+            , "lastSinkError", Snapshot.Cut(Log.lastSinkError), "level", Log.level, "recent", recent
+            , "levels", [Log.LevelFor("a0"), Log.LevelFor("f0"), Log.LevelFor("t0")])
     }
 
     ; count: all unhandled errors so far; list: the newest ones (Maps). Only the newest ERROR_ENTRIES are kept.

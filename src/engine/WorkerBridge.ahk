@@ -38,8 +38,8 @@
 class WorkerBridge {
     static ACK_TIMEOUT_MS := 5000
     static ORPHAN_MS := 2000
-    static MAX_SIZE := 8
-    static DEFAULT_SIZE := 4
+    static MAX_SIZE := 16          ; E0048: the user setting goes from 1 to 16, the option --workers also allows 0 (no pool)
+    static DEFAULT_SIZE := 8
     static DEFAULT_WARM := 1
     static DEFAULT_IDLE_MS := 60000
     static MIN_IDLE_MS := 100
@@ -53,6 +53,7 @@ class WorkerBridge {
     __New(owner, size, warm := 0, idleMs := 60000) {
         this._owner := owner
         this._size := size
+        this._warmWish := warm                 ; W as asked for; the effective W is never above N
         this._warm := Min(warm, size)
         this._idleMs := idleMs
         this._slots := []                      ; Maps: name, state, execId, idleSince (monotonic ms)
@@ -71,6 +72,22 @@ class WorkerBridge {
 
     ; N, the most workers at once. 0: no pool.
     Size => this._size
+
+    ; The user changed N (WI-0077, REQ-SET-070). A bigger N lets the pool grow when jobs wait for workers. A smaller N ends
+    ; the workers beyond it at once when they are idle or still starting; a worker with a job ends after its job (SetIdle).
+    ; A pool that was started without workers (--workers=0) stays without; so does a stopped one.
+    Resize(n) {
+        if (n = this._size || this._size = 0 || n < 1 || this._stopped)
+            return
+        old := this._size
+        this._size := n
+        this._warm := Min(this._warmWish, n)
+        Log.Write("a1", "engine", "worker pool: size " old " -> " n)
+        this._TrimExcess()
+        if (n > old && this._ready)
+            this._Maintain()
+        this._owner.Kick()
+    }
 
     ; The pool for the snapshot (doc/PROTOCOL.md 4.9): size, warm workers, the slots with their state, starts on
     ; their way and the abnormal ends in the storm window.
@@ -359,6 +376,8 @@ class WorkerBridge {
         if (this._earlyReady.Has(name)) {
             this._earlyReady.Delete(name)
             this._SetIdle(slot)
+        } else {
+            this._TrimExcess()          ; the pool may have shrunk while the spawn was on its way
         }
         this._owner.Kick()
     }
@@ -414,7 +433,33 @@ class WorkerBridge {
     _SetIdle(slot) {
         slot["state"] := "idle"
         slot["idleSince"] := Time.NowMs()
+        this._TrimExcess()
         this._ScheduleMaint()
+    }
+
+    ; The slot to end first: a starting one, else the idle one that has been idle longest. "" when every slot has a job.
+    _PickExcess() {
+        victim := ""
+        for slot in this._slots {
+            if (slot["state"] = "starting")
+                return slot
+            if (slot["state"] = "idle" && (!IsObject(victim) || slot["idleSince"] < victim["idleSince"]))
+                victim := slot
+        }
+        return victim
+    }
+
+    ; Ends workers while there are more than N: first the starting ones, then the idle ones that were idle longest. A busy worker
+    ; stays; it is looked at again when its job is over (_SetIdle).
+    _TrimExcess() {
+        while (this._slots.Length > this._size) {
+            victim := this._PickExcess()
+            if (!IsObject(victim))
+                return
+            this._RemoveSlot(victim)
+            Log.Write("a1", "engine", "worker pool: " victim["name"] " ends, the pool shrank to " this._size)
+            this._Kill(victim["name"], "pool size")
+        }
     }
 
     ; --- answers and timers --------------------------------------------------------------------

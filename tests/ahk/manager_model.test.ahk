@@ -87,11 +87,12 @@ ReadyModel() {
 
 TestRun.Init()
 
-TestRun.Case("Start subscribes to engine and process and asks for one snapshot", () => CheckStart())
+TestRun.Case("Start subscribes to engine, settings, process and notice and asks for one snapshot", () => CheckStart())
 CheckStart() {
     pm := NewModel()
-    Assert.Equal(pm[1].topics.Length, 3)
-    Assert.Equal(pm[1].topics[3], "notice", "the notices of the engine (WI-0075)")
+    Assert.Equal(pm[1].topics.Length, 4)
+    Assert.Equal(pm[1].topics[2], "settings", "evt.settings.changed has its own topic (WI-0077)")
+    Assert.Equal(pm[1].topics[4], "notice", "the notices of the engine (WI-0075)")
     Assert.Equal(pm[1].requests.Length, 1)
     Assert.Equal(pm[1].requests[1]["type"], "cmd.engine.snapshot")
     Assert.Equal(pm[1].requests[1]["ms"], ManagerModel.SNAPSHOT_MS)

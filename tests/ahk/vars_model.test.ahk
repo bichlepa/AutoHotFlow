@@ -332,6 +332,10 @@ CheckWorkingDir() {
     Assert.Equal(BuiltInVars.WorkingDirOf(NewMap("DefaultWorkingDir", "0", "WorkingDir", "D:\x")), "D:\x")
     Assert.Equal(BuiltInVars.WorkingDirOf(NewMap("DefaultWorkingDir", 0, "WorkingDir", "")), dflt)
     Assert.Equal(BuiltInVars.WorkingDirOf(NewMap("WorkingDir", "D:\y")), "D:\y")
+    ; the global setting (WI-0077) replaces the built-in default, the own folder of a flow still wins
+    Assert.Equal(BuiltInVars.WorkingDirOf("", "E:\global"), "E:\global")
+    Assert.Equal(BuiltInVars.WorkingDirOf(NewMap("DefaultWorkingDir", 1, "WorkingDir", "D:\x"), "E:\global"), "E:\global")
+    Assert.Equal(BuiltInVars.WorkingDirOf(NewMap("DefaultWorkingDir", 0, "WorkingDir", "D:\x"), "E:\global"), "D:\x")
 }
 
 ; ---- substitution -------------------------------------------------------------------------------------------------

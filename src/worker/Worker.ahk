@@ -38,6 +38,7 @@ class Worker extends Role {
     RegisterHandlers() {
         this.On("cmd.worker.run", (msg) => this._CmdRun(msg))
         this.On("cmd.worker.cancel", (msg) => this._CmdCancel(msg))
+        this.FollowSettings()      ; log thresholds and language of the dialogs (WI-0077)
     }
 
     ; Role part of the snapshot (doc/PROTOCOL.md 4.9): the current job (class and execId, no parameters), or "".

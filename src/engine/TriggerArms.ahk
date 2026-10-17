@@ -392,7 +392,7 @@ class TriggerArms {
         name := (elem is Map) ? elem.Get("name", "") : ""
         env := Map("flowId", rec.FlowId, "elementId", triggerId, "flowName", def.Name
             , "elementName", IsObject(name) ? "" : String(name)
-            , "workingDir", BuiltInVars.WorkingDirOf(def.Raw.Get("flowSettings", "")))
+            , "workingDir", BuiltInVars.WorkingDirOf(def.Raw.Get("flowSettings", ""), this._owner.settings.Value("workingDir")))
         try {
             ctx := ExecContext(rec.FlowId, triggerId, "", "", "", VarAccess(this._owner.vars, "", "", env))
             ctx.cls := cls

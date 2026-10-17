@@ -14,6 +14,7 @@
 #Include ReportFiles.ahk
 #Include StateFiles.ahk
 #Include CategoryFile.ahk
+#Include SettingsFile.ahk
 #Include V1Source.ahk
 #Include ArchivePack.ahk
 #Include ArchiveUnpack.ahk
@@ -90,6 +91,9 @@ class Storage extends Role {
         this.On("cmd.storage.categories.read", (msg) => this._CmdCategoriesRead(msg))
         this.On("cmd.storage.categories.write", (msg) => this._CmdCategoriesWrite(msg))
         this.On("cmd.storage.categories.keepBroken", (msg) => this._CmdCategoriesKeepBroken(msg))
+        this.On("cmd.storage.settings.read", (msg) => this._CmdSettingsRead(msg))
+        this.On("cmd.storage.settings.write", (msg) => this._CmdSettingsWrite(msg))
+        this.On("cmd.storage.settings.keepBroken", (msg) => this._CmdSettingsKeepBroken(msg))
         this.On("cmd.storage.report.write", (msg) => this._CmdReportWrite(msg))
         this.On("cmd.storage.v1.list", (msg) => this._CmdV1List(msg))
         this.On("cmd.storage.v1.read", (msg) => this._CmdV1Read(msg))
@@ -99,6 +103,7 @@ class Storage extends Role {
         this.On("cmd.storage.ahf.unpack", (msg) => this._CmdAhfUnpack(msg))
         this.On("cmd.storage.log.tail", (msg) => this._CmdLogTail(msg))
         this.On("evt.log.append", (msg) => this._EvtLogAppend(msg))
+        this.FollowSettings()      ; the log thresholds (WI-0077)
     }
 
     ; Role part of the snapshot (doc/PROTOCOL.md 4.9): queue lengths and the log counters. No file names, no content.
@@ -218,6 +223,20 @@ class Storage extends Role {
         return this._Defer(msg, "categories.keepBroken", "Categories.json", () => CategoryFile.KeepBroken(this.dataDir))
     }
 
+    ; cmd.storage.settings.* (WI-0077, PROTOCOL 4.6): Settings.json as text, like Categories.json. The engine checks the content.
+    _CmdSettingsRead(msg) {
+        return this._Defer(msg, "settings.read", "Settings.json", () => SettingsFile.Read(this.dataDir))
+    }
+
+    _CmdSettingsWrite(msg) {
+        text := msg.payload.Get("text", "")
+        return this._Defer(msg, "settings.write", "Settings.json", () => SettingsFile.Write(this.dataDir, text))
+    }
+
+    _CmdSettingsKeepBroken(msg) {
+        return this._Defer(msg, "settings.keepBroken", "Settings.json", () => SettingsFile.KeepBroken(this.dataDir))
+    }
+
     ; cmd.storage.report.write (WI-0028, PROTOCOL 4.9): only the supervisor builds reports. The contents are checked
     ; again by ReportFiles (names), the write runs in the request queue like every other file operation.
     _CmdReportWrite(msg) {
@@ -251,7 +270,9 @@ class Storage extends Role {
             name := p.Get("name", "")
             return this._Defer(msg, "v1.read", name, () => V1Source.ReadVar(dir, scope, flowId, name))
         }
-        throw AhfError("cmd.storage.v1.read: kind must be flow or var", ErrCode.BAD_PAYLOAD)
+        if (kind = "settings")
+            return this._Defer(msg, "v1.read", "settings.json", () => V1Source.ReadSettings(dir))
+        throw AhfError("cmd.storage.v1.read: kind must be flow, var or settings", ErrCode.BAD_PAYLOAD)
     }
 
     ; cmd.storage.autostart.* (WI-0076, E0068): the shortcut of v1 in the startup folder the manager names.

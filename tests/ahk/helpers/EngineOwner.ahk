@@ -3,6 +3,7 @@
 ; Provides what Executor reads from its owner: flows (FlowTable), vars (EngineVars), workers, Emit, EmitFlowState, Kick.
 #Include ..\..\..\src\engine\Executor.ahk
 #Include ..\..\..\src\engine\FlowTable.ahk
+#Include ..\..\..\src\engine\EngineSettings.ahk
 #Include ..\..\..\src\elements\base\AhfElement.ahk
 #Include ..\..\..\src\elements\base\ElementRegistry.ahk
 
@@ -79,6 +80,7 @@ class NoArms {
 class EngineOwner {
     __New() {
         this.arms := NoArms()
+        this.settings := EngineSettings(this)    ; the defaults (WI-0077); a test may change settings._values
         this.flows := FlowTable()
         this.vars := EngineVars()
         this.workers := FakeWorkers()

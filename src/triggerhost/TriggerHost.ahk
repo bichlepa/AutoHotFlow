@@ -24,6 +24,7 @@ class TriggerHost extends Role {
         this.On("cmd.trigger.arm", (msg) => this._CmdArm(msg))
         this.On("cmd.trigger.disarm", (msg) => this._CmdDisarm(msg))
         this.On("cmd.trigger.reset", (msg) => this._CmdReset(msg))
+        this.FollowSettings()      ; log thresholds and language (WI-0077)
     }
 
     ; Role part of the snapshot (doc/PROTOCOL.md 4.9): the armed triggers, without parameter values.

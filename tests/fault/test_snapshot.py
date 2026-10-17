@@ -46,7 +46,7 @@ def test_every_role_answers_with_the_general_part_and_its_own_part(chains, datad
         assert snap["name"] == name
     engine = snapshot_of(chain, "engine")
     assert any(f["flowId"] == "skeleton" for f in engine["info"]["flows"]), engine["info"]["flows"]
-    assert engine["info"]["workers"]["size"] == 4 and engine["info"]["workers"]["warm"] == 1
+    assert engine["info"]["workers"]["size"] == 8 and engine["info"]["workers"]["warm"] == 1
     assert [s["name"] for s in engine["info"]["workers"]["slots"]] == ["worker:1"]
     assert engine["peer"]["status"] == "ready"
 

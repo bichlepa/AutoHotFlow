@@ -5,11 +5,15 @@
 #Include Args.ahk
 #Include Snapshot.ahk
 #Include Debug.ahk
+#Include SettingsModel.ahk
+#Include LangTable.ahk
 #Include ipc\Peer.ahk
 
 ; Base class of every role process (doc/ARCHITECTURE.md 3 and 6, doc/PROTOCOL.md 4.1 and 5).
 ; A role is started by src/AutoHotFlow.ahk with the command line of v2-phase2-final:work_items/phase2/README.md:
 ;   --role=<name> --session=<id> --hub=<pipe> --data=<dir> [--flow=<flowId>] [--hubHwnd=<n>] [--log-level=<0..3>]
+;   [--language=<code>] [--log-levels=<a>,<f>,<t>] [--start-language=<code>]   (settings, WI-0077: the first fixes the language
+;   like --log-level fixes the thresholds; the other two are the values of the settings that the supervisor passes to new processes)
 ;
 ; Subclasses override the hooks and register their own message handlers:
 ;
@@ -100,6 +104,17 @@ class Role {
         this.dataDir := args.Get("data", "")
         this.hubHwnd := Integer(args.Get("hubHwnd", 0))
         this.logLevel := Log.ParseLevel(args.Get("log-level", Log.DEFAULT_LEVEL))   ; throws: the entry exits with 2
+        ; Order of the log thresholds (WI-0077): --log-level (tests) wins over everything, then the settings (evt.settings.changed),
+        ; whose values the supervisor passes on as --log-levels=<app>,<flow>,<thread> to a new process, then the default.
+        this.logFixed := args.Has("log-level")
+        this.logLevels := this.logFixed ? "" : Role._ParseLevels(args.Get("log-levels", ""))
+        this._followSettings := false
+        ; The language likewise: --language (tests) fixes it, --start-language is the value of the settings that the supervisor
+        ; knew when it started this process (it is replaced by the first evt.settings.changed).
+        this.langFixed := args.Has("language")
+        language := args.Get("language", args.Get("start-language", ""))
+        if (language != "")
+            LangTable.Code := SettingsModel.LanguageCode(language)
         this.peer := ""
         this.closing := false
         this.exitCode := Role.EXIT_OK
@@ -123,6 +138,8 @@ class Role {
         Persistent()
         Log.Configure(Role.LogSinkFn)
         Log.SetLevel(this.logLevel)
+        if (IsObject(this.logLevels))
+            Log.SetLevels(this.logLevels[1], this.logLevels[2], this.logLevels[3])
         OnError(Role.ErrorFn)
         this.peer := Peer(this.name, this.hubPipe, Map("hubHwnd", this.hubHwnd))
         this.peer.On("sys.shutdown", Role.ShutdownFn)
@@ -148,6 +165,15 @@ class Role {
     OnPeerLost() {
     }
 
+    ; The settings changed (WI-0077): the log thresholds and the language are already applied; settings is the whole set (a
+    ; Map, truth values 1 and 0). A role that has more to do (a window that shows texts, the tray menu) overrides this.
+    OnSettings(settings) {
+    }
+
+    ; The message evt.settings.changed itself, for a role that needs more than the settings (the manager checks the sequence).
+    OnSettingsMessage(msg) {
+    }
+
     ; The role part of the snapshot (doc/PROTOCOL.md 4.9): a Map of names, ids, counters and states. Never
     ; the content of variables or flows. Must not block and should not throw (a throw becomes info.error).
     DiagInfo() {
@@ -170,6 +196,81 @@ class Role {
         this.peer.On(typePrefix, handler)
     }
 
+    ; --- settings ------------------------------------------------------------------------------
+
+    ; Call it from RegisterHandlers: the role takes the log thresholds and the language from the settings of the engine
+    ; (PROTOCOL 4.3 evt.settings.changed, topic settings) and asks for the current settings after every handshake. The
+    ; engine itself does not call it (it is the source).
+    FollowSettings() {
+        this._followSettings := true
+        this.On("evt.settings.changed", (msg) => this._OnSettingsEvent(msg))
+        this.peer.Subscribe("settings")
+    }
+
+    _OnSettingsEvent(msg) {
+        settings := msg.payload.Get("settings", "")
+        if (settings is Map)
+            this.ApplySettings(settings)
+        try {
+            this.OnSettingsMessage(msg)
+        } catch as e {
+            this._Log("a0", "role", this.name " OnSettingsMessage failed: " Type(e) ": " e.Message)
+        }
+    }
+
+    _AskSettings() {
+        try {
+            this.peer.Request("engine", "cmd.settings.get", Map(), (res) => this._OnSettingsAnswer(res), 5000)
+        } catch as e {
+            this._Log("a2", "role", this.name " settings not requested: " Type(e) ": " e.Message)
+        }
+    }
+
+    ; The engine may not be there or not loaded yet (busy): the event follows when it has loaded the settings.
+    _OnSettingsAnswer(res) {
+        if (!res.payload.Get("ok", false))
+            return
+        settings := res.payload.Get("settings", "")
+        if (settings is Map)
+            this.ApplySettings(settings)
+    }
+
+    ; Takes what every role takes from the settings: the thresholds of the log (unless --log-level fixes them) and the
+    ; language of the texts; then the hook OnSettings. A bad value is logged and the rest is still applied.
+    ApplySettings(settings) {
+        try {
+            if (!this.logFixed && settings.Has("logLevelApp") && settings.Has("logLevelFlow") && settings.Has("logLevelThread"))
+                Log.SetLevels(Integer(settings["logLevelApp"]), Integer(settings["logLevelFlow"]), Integer(settings["logLevelThread"]))
+            if (!this.langFixed && settings.Has("language")) {
+                code := SettingsModel.LanguageCode(settings["language"])
+                if (code != LangTable.Code) {
+                    LangTable.Code := code
+                    LangTable.Load()
+                }
+            }
+        } catch as e {
+            this._Log("a0", "role", this.name " settings not applied: " Type(e) ": " e.Message)
+        }
+        try {
+            this.OnSettings(settings)
+        } catch as e {
+            this._Log("a0", "role", this.name " OnSettings failed: " Type(e) ": " e.Message)
+        }
+    }
+
+    ; "--log-levels=a,f,t" -> Array of three Integers, or "" for no option. Throws AhfError (bad_args).
+    static _ParseLevels(raw) {
+        if (raw = "")
+            return ""
+        parts := StrSplit(raw, ",")
+        if (parts.Length != 3)
+            throw AhfError("--log-levels must be <app>,<flow>,<thread> (got '" raw "')", ErrCode.BAD_ARGS)
+        out := []
+        for part in parts
+            out.Push(Log.ParseLevel(part))
+        return out
+    }
+
     ; --- snapshot ------------------------------------------------------------------------------
 
     ; cmd.diag.snapshot: the general part is the same for every role, the role part comes from DiagInfo.
@@ -182,6 +283,7 @@ class Role {
         snap := Snapshot.General(this.name, this.roleName)
         snap["peer"] := IsObject(this.peer) ? this.peer.Stats() : Map()
         snap["log"] := Snapshot.LogPart(this.logQueue.Length, this.logDropped)
+        snap["language"] := LangTable.Code
         snap["errors"] := Snapshot.ErrorsPart(this.errorCount, this.errorRing)
         try {
             snap["info"] := this.DiagInfo()
@@ -262,6 +364,8 @@ class Role {
 
     _OnPeerReady() {
         this.lostSince := 0
+        if (this._followSettings)
+            this._AskSettings()
         try {
             this.OnReady()
         } catch as e {

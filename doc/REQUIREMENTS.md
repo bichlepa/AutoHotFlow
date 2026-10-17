@@ -95,11 +95,11 @@ Each start of a flow creates an **instance**: one run of the flow, with its own 
 ### REQ-EXE-050 Execution policy per flow
 
 - **v1:** partial (`wait` behaves like `parallel`, MIGRATION M-0011)
-- **v2:** partial (the four policies work; the global default setting is missing)
+- **v2:** done (the four policies work; `default` follows the global setting, which takes effect at once; the dialog for the setting is REQ-SET-020)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (global setting)
-- **Evidence:** `tests/integration/test_engine.py` (the `*_policy_*` tests), `tests/ahk/engine_wait.test.ahk`
+- **Plan:** S0004 (global setting, WI-0077, done)
+- **Evidence:** `tests/integration/test_engine.py` (the `*_policy_*` tests), `tests/ahk/engine_wait.test.ahk`, `tests/integration/test_settings.py::test_the_global_execution_policy_decides_for_flows_set_to_default`
 
 A flow decides what happens when it is triggered while an instance of it is still running:
 
@@ -111,7 +111,7 @@ A flow decides what happens when it is triggered while an instance of it is stil
 | `stop` | stop the running instances, then start a new one |
 | `default` | use the global setting (v1 default: `parallel`) |
 
-Missing in v2: the global setting itself (settings come in S0004). Until then `default` means `parallel`.
+The global setting is `executionPolicy` (default `parallel`, never `default`); it is read when a flow is started, so a change takes effect at once (WI-0077).
 
 ### REQ-EXE-060 Start and stop a flow by hand
 
@@ -194,10 +194,11 @@ The action `Execute_Flow` starts a flow (this one or another) through its defaul
 ### REQ-EXE-130 Working directory of a flow
 
 - **v1:** yes
-- **v2:** partial (`A_WorkingDir` and the file parameters use a fixed default; the settings are missing)
+- **v2:** partial (`A_WorkingDir` and the file parameters use the global setting `workingDir` at once; the own folder of a flow is kept from the flow file, its editing comes with S0007)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (global), S0007 (flow settings)
+- **Plan:** S0004 (global, WI-0077, done), S0007 (flow settings)
+- **Evidence:** `tests/ahk/vars_model.test.ahk`, `tests/integration/test_settings.py::test_the_global_working_directory_is_a_working_directory_of_flows_at_once`
 
 Relative paths in file and folder parameters refer to the working directory. Each flow uses the global working directory (default `A_MyDocuments "\AutoHotFlow"`, the same as in v1, so imported flows find their files) or its own (flow setting). Decision E0028.
 
@@ -237,11 +238,11 @@ Every element that can wait (REQ-EXE-100) has a setting "maximum run time". The 
 ### REQ-EXE-170 Runaway flows are stopped
 
 - **v1:** no
-- **v2:** partial (the three limits work per flow with the defaults from MS-0036, set in the flow file; the notice (tray and manager list, WI-0075) is there; the global defaults and the switch of the notice are missing)
+- **v2:** partial (the three limits work per flow with the defaults from MS-0036, set in the flow file; the notice (tray and manager list, WI-0075) is there; the global defaults and the global switch of the notice are settings and take effect at once (WI-0077); their dialog (WI-0078) and the editing per flow (S0007) are missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0003 (WI-0066, done), S0004 (global defaults; the notice, WI-0075, done), S0007 (per flow, editing)
-- **Evidence:** `tests/ahk/engine_runaway.test.ahk`, `tests/integration/test_notices.py::test_a_stop_by_the_runaway_guard_gives_a_notice_with_the_limit`, `tests/integration/test_runaway.py::test_an_endless_loop_is_stopped_and_its_triggers_stay_disabled_after_a_restart`, `tests/integration/test_runaway.py::test_a_flood_of_refused_starts_is_answered_and_logged_a_few_times`
+- **Plan:** S0003 (WI-0066, done), S0004 (global defaults, WI-0077, done; the notice, WI-0075, done), S0007 (per flow, editing)
+- **Evidence:** `tests/ahk/engine_runaway.test.ahk`, `tests/integration/test_settings.py::test_the_global_runaway_limit_stops_a_flow_without_its_own_limit`, `tests/integration/test_settings.py::test_a_limit_of_the_flow_wins_over_the_global_one`, `tests/integration/test_settings.py::test_the_global_limit_of_running_instances_refuses_a_start`, `tests/integration/test_settings.py::test_the_switch_for_notices_of_unhandled_errors`, `tests/integration/test_notices.py::test_a_stop_by_the_runaway_guard_gives_a_notice_with_the_limit`, `tests/integration/test_runaway.py::test_an_endless_loop_is_stopped_and_its_triggers_stay_disabled_after_a_restart`, `tests/integration/test_runaway.py::test_a_flood_of_refused_starts_is_answered_and_logged_a_few_times`
 
 A flow that runs away does not disturb the others (decision E0062, after the model of the Android app AutoMagic). A flow that executes more elements per minute than its limit (the trigger of each new instance counts) is stopped and all its triggers are disabled, also those that do not switch with the flow; the user is told. A start that would exceed the limit of waiting instances (policy `wait`) or of running instances of a flow is refused like the policy `skip`; a flow that calls it learns this (`exception`). The limits have global defaults and can be changed per flow; 0 means no limit. The defaults are chosen so that a loop over a long list passes.
 
@@ -1744,20 +1745,22 @@ The standard entries of AutoHotkey are not in the menu. v1 calls the last entry 
 ### REQ-SET-010 Global settings dialog
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the model works: the file, the commands, the effect at once and the import of the settings of v1; the dialog comes with WI-0078)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004
+- **Plan:** S0004 (WI-0077 model, done; WI-0078 dialog)
+- **Evidence:** `tests/ahk/core_settings.test.ahk`, `tests/integration/test_settings.py::test_a_change_is_written_announced_and_survives_a_restart`, `tests/integration/test_settings.py::test_a_broken_file_is_kept_and_the_defaults_are_used`
 
 Settings are stored in the data folder and take effect at once where possible; a setting that needs a restart says so and offers it.
 
 ### REQ-SET-020 Defaults for execution policy and working directory
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (both settings work and take effect at once; the dialog to change them comes with WI-0078)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004
+- **Plan:** S0004 (WI-0077 settings, done; WI-0078 dialog)
+- **Evidence:** `tests/integration/test_settings.py::test_the_global_execution_policy_decides_for_flows_set_to_default`, `tests/integration/test_settings.py::test_the_global_working_directory_is_a_working_directory_of_flows_at_once`
 
 The global execution policy (REQ-EXE-050) and the global working directory (REQ-EXE-130). The import of v1 takes over a working directory that the user changed in v1.
 
@@ -1784,11 +1787,11 @@ AutoHotFlow restarts itself with administrator rights, so that flows can control
 ### REQ-SET-050 Logging settings
 
 - **v1:** yes (levels for app, flow and thread; log to file)
-- **v2:** partial (the level can only be set on the command line)
+- **v2:** partial (the three thresholds are settings and take effect at once in every process; the dialog comes with WI-0078)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004
-- **Evidence:** `tests/fault/test_diagnose.py::test_the_log_level_decides_what_is_forwarded_to_storage`
+- **Plan:** S0004 (WI-0077 settings, done; WI-0078 dialog)
+- **Evidence:** `tests/fault/test_diagnose.py::test_the_log_level_decides_what_is_forwarded_to_storage`, `tests/ahk/core_settings.test.ahk`, `tests/integration/test_settings.py::test_the_log_thresholds_change_in_every_role_at_once`, `tests/integration/test_settings.py::test_a_command_line_log_level_wins_over_the_settings`
 
 Three thresholds as in v1, one for each source group: app (`a`), flow (`f`) and thread (`t`), each from 0 to 3. They take effect at once in every process. v2 always writes the log files (rotated at 100 KB); the v1 option "Log to file" is dropped (E0069).
 
@@ -1806,10 +1809,11 @@ v2 keeps its data in `%APPDATA%\AutoHotFlow v2`, or in the folder given by `--da
 ### REQ-SET-070 Number of workers
 
 - **v1:** n/a
-- **v2:** partial (the number can only be set on the command line; the default is 4 there)
+- **v2:** partial (the number is a setting (default 8, 1 to 16) and the pool grows and shrinks at once; the dialog comes with WI-0078)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (E0044)
+- **Plan:** S0004 (E0044; WI-0077 setting, done; WI-0078 dialog)
+- **Evidence:** `tests/ahk/engine_worker_bridge.test.ahk`, `tests/integration/test_settings.py::test_the_number_of_workers_grows_and_shrinks_at_once`, `tests/integration/test_settings.py::test_the_command_line_number_of_workers_wins_over_the_setting`
 
 A global setting limits how many waiting elements (REQ-EXE-100) run at the same time. **Default: 8, from 1 to 16.** The memory is used only while elements wait, not for the limit itself. A lower number limits the memory when many elements wait at the same time (REQ-PRF-030); a higher number lets more of them run at the same time.
 
@@ -1923,21 +1927,22 @@ When a flow, variable or settings file was written by a newer version of AutoHot
 ### REQ-LNG-010 User interface in several languages
 
 - **v1:** yes (English, German, Russian, Korean)
-- **v2:** partial (the language files of v1 load; English only, until the setting exists; an open window follows a change of the language without a rebuild: `UiTexts.Reload()`, unit-tested only, the window itself not checked)
+- **v2:** partial (the language files of v1 load; the language is a setting and every process takes a change at once; an open window follows a change of the language without a rebuild: `UiTexts.Reload()`, unit-tested only, the window itself not checked)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004
-- **Evidence:** `tests/ahk/core_lang.test.ahk`, `tests/ahk/ui_common_texts.test.ahk`
+- **Plan:** S0004 (WI-0077 setting, done)
+- **Evidence:** `tests/ahk/core_lang.test.ahk`, `tests/ahk/ui_common_texts.test.ahk`, `tests/integration/test_settings.py::test_the_language_changes_the_texts_of_two_roles_at_once`
 
 All texts go through `Lang()` with the v1 language files (`assets/language/`, and `src/elements/<package>/language/` for the texts of the elements, WI-0047). A missing text falls back to the key and is logged (MIGRATION M-0046).
 
 ### REQ-LNG-020 Choice of the language
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the setting and the language of Windows as its default work; the dialog to choose comes with WI-0078)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004
+- **Plan:** S0004 (WI-0077 setting, done; WI-0078 dialog)
+- **Evidence:** `tests/ahk/core_settings.test.ahk`, `tests/integration/test_settings.py::test_the_language_changes_the_texts_of_two_roles_at_once`
 
 The language is the setting, or the language of Windows when nothing is set.
 
@@ -2658,10 +2663,11 @@ Every deliberate behaviour change compared to v1 has a MIGRATION ID; no silent c
 ### REQ-USE-010 User level hides advanced elements
 
 - **v1:** yes (Beginner, Advanced, Programmer)
-- **v2:** open
+- **v2:** partial (the setting `userLevel` exists and is taken over from v1; the element list that uses it comes with S0007)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0004 (setting), S0007 (element list)
+- **Plan:** S0004 (setting, WI-0077, done), S0007 (element list)
+- **Evidence:** `tests/ahk/core_settings.test.ahk`
 
 Each element has a level; the setting "Shown elements" hides the elements above the user's level, so beginners are not overwhelmed. The first start proposes a level (REQ-USE-050).
 

@@ -546,6 +546,92 @@ AnswerAndDeadlineOfOneJobEndTheJobOnce() {
     Assert.Equal(got["calls"], 1, "the job ends once, the deadline and the answer do not both call onDone")
 }
 
+; --- Resize (WI-0077) --------------------------------------------------------------------------------------
+
+ResizeUpLetsThePoolGrowBeyondTheOldLimit() {
+    r := NewPool(2, 0)
+    owner := r[1]
+    bridge := r[2]
+    bridge.Want(5)
+    Assert.Equal(owner.peer.Count("cmd.process.spawn"), 2, "the old limit")
+    bridge.Resize(4)
+    Assert.Equal(bridge.Size, 4)
+    bridge.Want(5)
+    Assert.Equal(owner.peer.Count("cmd.process.spawn"), 4, "the new limit")
+}
+
+ResizeDownEndsIdleWorkersAtOnce() {
+    r := NewPool(4, 0)
+    owner := r[1]
+    bridge := r[2]
+    bridge.Want(4)
+    SpawnReady(owner, bridge)
+    Assert.Equal(bridge.Count, 4)
+    bridge.Resize(1)
+    Assert.Equal(bridge.Count, 1, "three idle workers are gone")
+    Assert.Equal(owner.peer.Count("cmd.process.kill"), 3)
+    bridge.Want(3)
+    Assert.Equal(owner.peer.Count("cmd.process.spawn"), 4, "no new worker beyond the new limit")
+}
+
+ResizeDownKeepsABusyWorkerUntilItsJobIsDone() {
+    r := NewPool(2, 0)
+    owner := r[1]
+    bridge := r[2]
+    bridge.Want(2)
+    SpawnReady(owner, bridge)
+    execId := bridge.Run("Action_X", Map(), Map(), Map(), Noop)
+    bridge.Resize(1)
+    Assert.Equal(bridge.Count, 1, "the idle worker went, the busy one stays")
+    Assert.Equal(bridge.CountState("busy"), 1)
+    Assert.Equal(owner.peer.Count("cmd.process.kill"), 1)
+    bridge.OnDone(FakeMsg("evt.worker.done", Map("execId", execId, "result", "normal")))
+    Assert.Equal(bridge.Count, 1, "within the limit now, the worker stays")
+    Assert.Equal(owner.peer.Count("cmd.process.kill"), 1)
+}
+
+ResizeBelowTheNumberOfBusyWorkersEndsThemAfterTheirJobs() {
+    r := NewPool(3, 0)
+    owner := r[1]
+    bridge := r[2]
+    bridge.Want(3)
+    SpawnReady(owner, bridge)
+    first := bridge.Run("Action_X", Map(), Map(), Map(), Noop)
+    second := bridge.Run("Action_X", Map(), Map(), Map(), Noop)
+    Assert.Equal(bridge.CountState("busy"), 2)
+    bridge.Resize(1)
+    Assert.Equal(bridge.Count, 2, "two busy workers stay while their jobs run")
+    bridge.OnDone(FakeMsg("evt.worker.done", Map("execId", first, "result", "normal")))
+    Assert.Equal(bridge.Count, 1, "the worker of the first job ends after its job")
+    bridge.OnDone(FakeMsg("evt.worker.done", Map("execId", second, "result", "normal")))
+    Assert.Equal(bridge.Count, 1, "the last one stays")
+    Assert.Equal(owner.peer.Count("cmd.process.kill"), 2)
+}
+
+ResizeEndsAWorkerThatWasStillStarting() {
+    r := NewPool(3, 0)
+    owner := r[1]
+    bridge := r[2]
+    bridge.Want(3)
+    for call in owner.peer.Open("cmd.process.spawn")
+        owner.peer.Answer(call, Map("ok", true, "name", "worker:" (A_Index)))
+    Assert.Equal(bridge.CountState("starting"), 3)
+    bridge.Resize(1)
+    Assert.Equal(bridge.Count, 1)
+    Assert.Equal(owner.peer.Count("cmd.process.kill"), 2)
+}
+
+ResizeToTheSameSizeOrToNoPoolDoesNothing() {
+    r := NewPool(2, 0)
+    owner := r[1]
+    bridge := r[2]
+    bridge.Resize(2)
+    Assert.Equal(bridge.Size, 2)
+    none := WorkerBridge(FakeOwner(), 0, 0)
+    none.Resize(5)
+    Assert.Equal(none.Size, 0, "a pool started with --workers=0 stays without")
+}
+
 TestRun.Init()
 
 TestRun.Case("Pool: the start asks for the process list first and does not grow before the answer", StartAsksForTheProcessListFirstAndDoesNotGrowBeforeTheAnswer)
@@ -574,5 +660,11 @@ TestRun.Case("Pool: the job deadline ends the job, cancels and kills", JobDeadli
 TestRun.Case("Pool: a job that ends in time is not timed out", JobThatEndsBeforeItsDeadlineIsNotTimedOut)
 TestRun.Case("Pool: a stopped pool asks for nothing", StoppedPoolAsksForNothing)
 TestRun.Case("Pool: the answer and the deadline of one job end it once (F-0012)", AnswerAndDeadlineOfOneJobEndTheJobOnce)
+TestRun.Case("Pool: a bigger size lets the pool grow (WI-0077)", ResizeUpLetsThePoolGrowBeyondTheOldLimit)
+TestRun.Case("Pool: a smaller size ends the idle workers at once (WI-0077)", ResizeDownEndsIdleWorkersAtOnce)
+TestRun.Case("Pool: a smaller size keeps a busy worker until its job is done (WI-0077)", ResizeDownKeepsABusyWorkerUntilItsJobIsDone)
+TestRun.Case("Pool: busy workers above the new size end after their jobs (WI-0077)", ResizeBelowTheNumberOfBusyWorkersEndsThemAfterTheirJobs)
+TestRun.Case("Pool: a smaller size ends a worker that is still starting (WI-0077)", ResizeEndsAWorkerThatWasStillStarting)
+TestRun.Case("Pool: the same size or no pool changes nothing (WI-0077)", ResizeToTheSameSizeOrToNoPoolDoesNothing)
 
 TestRun.Finish()

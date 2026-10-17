@@ -71,6 +71,7 @@ class Tray extends Role {
 
     RegisterHandlers() {
         this.On("evt.ui.notice", (msg) => this._OnNotice(msg))
+        this.FollowSettings()      ; log thresholds; the menu follows the language (WI-0077)
         if (this.headless)
             this.On("cmd.test.command", (msg) => this._OnTestCommand(msg))
     }
@@ -106,6 +107,12 @@ class Tray extends Role {
             icon := p.Get("level", "") = "warning" ? "Icon!" : "Iconx"
             TrayTip(Tray.NOTICE_TITLE, SubStr(text, 1, Tray.NOTICE_CHARS), icon)
         }
+    }
+
+    ; The language may have changed (Role.ApplySettings loaded the texts already): the menu gets the new texts.
+    OnSettings(settings) {
+        if (this.menuShow != "" && (this.menuShow != Lang(Tray.KEY_SHOW) || this.menuExit != Lang(Tray.KEY_EXIT)))
+            this._BuildMenu()
     }
 
     ; (Re)builds the menu from the language texts. A later change of the language calls this again.

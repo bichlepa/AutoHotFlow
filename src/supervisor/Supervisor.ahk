@@ -5,6 +5,7 @@
 #Include ..\core\Args.ahk
 #Include ..\core\Time.ahk
 #Include ..\core\Snapshot.ahk
+#Include ..\core\SettingsModel.ahk
 #Include ..\core\PipeNames.ahk
 #Include ..\core\ipc\Wake.ahk
 #Include Hub.ahk
@@ -33,14 +34,18 @@
 ;   --prepare-limit  (only with --test-roles) answer limit of cmd.app.prepareExit in ms, default 600000.
 ;   --restart-max  (only with --test-roles) restarts per RESTART_WINDOW_MS, default Children.RESTART_MAX (3);
 ;               lets the tests restart a child many times (handle leaks).
-;   --worker-limit  (only with --test-roles) most workers alive at once, default Children.WORKER_LIMIT (16).
+;   --worker-limit  (only with --test-roles) most workers alive at once, default Children.WORKER_LIMIT (24, E0048).
 ;   --headless, --cancel-exit  passed on to every role (the manager and the tray have no window or icon and answer test commands, WI-0073).
 ;   --tray, --no-tray  start the role tray (the tray icon and menu of the application, WI-0072, E0075) or not. Default: the
 ;               product entry starts it, the test entry does not (Supervisor.TrayDefault), so that no test run shows an icon.
 ;   --windows-startup  passed on to every role; the engine arms the triggers with the start context windowsStartup
 ;               in its first pass (WI-0062, PROTOCOL 4.4). The autostart entry of S0004 sets it.
 ;   --log-level=<0..3>  highest log level that is forwarded to storage (default 2; level 3 stays in the ring of
-;               Log only). Valid for the supervisor and passed on to every role (WI-0023).
+;               Log only). Valid for the supervisor and passed on to every role (WI-0023). It wins over the three log
+;               thresholds of the settings (WI-0077); without it the supervisor and the processes it starts use the
+;               thresholds of the settings (it learns them from evt.settings.changed of the engine).
+;   --language=<code>  fixes the language of every role (tests); without it the setting "language" decides (WI-0077).
+;   --workers=<n>  passed on to the engine; wins over the setting "workers" (WI-0027, WI-0077).
 ;
 ; Single instance: a named mutex per session. A second supervisor with the same session sends
 ; cmd.app.command {argv} to the running one and exits (exit 0 = delivered, 1 = no answer).
@@ -100,6 +105,8 @@ class Supervisor {
                     . Shutdown.PREPARE_LIMIT_MS " ms", ErrCode.BAD_ARGS)
         }
         this.logLevel := Log.ParseLevel(opts.Get("log-level", Log.DEFAULT_LEVEL))
+        this.opts := opts
+        this.settings := ""            ; the newest evt.settings.changed of the engine (WI-0077), "" before the first
         this.restartMax := Children.RESTART_MAX
         if (this.testRoles && opts.Has("restart-max"))
             this.restartMax := this._Integer(opts, "restart-max", Children.RESTART_MAX)
@@ -195,6 +202,7 @@ class Supervisor {
         h.On("cmd.process.", (msg) => this._OnProcess(msg))
         h.On("cmd.diag.report", (msg) => this._OnReport(msg))
         h.On("evt.diag.error", (msg) => this._OnDiagError(msg))
+        h.On("evt.settings.changed", (msg) => this._OnSettings(msg))
         h.onHello := (link) => this._OnHello(link)
         h.onLinkLost := (link, reason) => this.children.OnLinkLost(link["name"], reason)
     }
@@ -458,6 +466,8 @@ class Supervisor {
         text := ""
         if (opts.Has("log-level"))
             text .= " --log-level=" this.logLevel
+        if (opts.Has("language"))
+            text .= " --language=" Trim(String(opts["language"]))
         if (opts.Has("headless"))
             text .= " --headless"
         if (opts.Has("windows-startup"))
@@ -475,6 +485,33 @@ class Supervisor {
         if (opts.Has("cancel-exit"))
             text .= " --cancel-exit"
         return text
+    }
+
+    ; The settings changed (WI-0077, sent by the engine): the supervisor takes its log thresholds from them (unless --log-level fixes
+    ; them) and keeps the options for the processes it starts from now on: the thresholds and the language. A running process
+    ; takes the same values from the topic settings by itself.
+    _OnSettings(msg) {
+        settings := msg.payload.Get("settings", "")
+        if (!(settings is Map))
+            return
+        try {
+            app := Integer(settings["logLevelApp"])
+            flow := Integer(settings["logLevelFlow"])
+            thread := Integer(settings["logLevelThread"])
+            text := ""
+            if (!this.opts.Has("log-level")) {
+                Log.SetLevels(app, flow, thread)
+                text .= " --log-levels=" app "," flow "," thread
+            }
+            if (!this.opts.Has("language"))
+                text .= " --start-language=" SettingsModel.LanguageCode(settings["language"])
+        } catch as e {
+            Log.Write("a0", "supervisor", "settings not applied: " Type(e) ": " e.Message)
+            return
+        }
+        this.settings := settings
+        if (IsObject(this.children))
+            this.children.config["settingsOpts"] := text
     }
 
     _Integer(opts, key, fallback) {

@@ -10,6 +10,7 @@
 #Include FlowStateFile.ahk
 #Include FlowLifecycle.ahk
 #Include FlowCategories.ahk
+#Include EngineSettings.ahk
 #Include Executor.ahk
 #Include TriggerArms.ahk
 #Include WorkerBridge.ahk
@@ -72,6 +73,7 @@ class Engine extends Role {
         this.flowState := FlowStateFile(this, this.flows)   ; enabled state of the triggers (WI-0060)
         this.lifecycle := FlowLifecycle(this)               ; create, duplicate, rename and delete a flow (WI-0070)
         this.categories := FlowCategories(this)             ; categories and the order of the list (WI-0071)
+        this.settings := EngineSettings(this)               ; the global settings, read before the flows (WI-0077)
         this.arms := TriggerArms(this)                       ; arming of the enabled triggers in the trigger host (WI-0062)
         this.vars := EngineVars()      ; global and static variables (WI-0040)
         this.varLoader := VarLoader(this, this.vars)
@@ -81,6 +83,7 @@ class Engine extends Role {
         this.executor := Executor(this)
         pool := Engine._PoolOptions(args)
         this.workers := WorkerBridge(this, pool["size"], pool["warm"], pool["idleMs"])
+        this._poolFixed := args.Has("workers")   ; --workers wins over the setting (WI-0077, tests)
         this.varRequests := VarRequests(this)   ; cmd.engine.var.* of worker elements and clients (WI-0050)
         this.importV1 := ImportV1Vars(this)     ; cmd.import.v1.vars: the variables of a v1 folder (WI-0076)
         this.importScan := ImportScan(this)     ; cmd.import.scan: the elements of an .ahf file that act on the system (WI-0081)
@@ -125,6 +128,8 @@ class Engine extends Role {
         this.On("cmd.category.sort", (msg) => this.categories.CmdSort(msg))
         this.On("cmd.import.v1.vars", (msg) => this.importV1.Run(msg))
         this.On("cmd.import.scan", (msg) => this.importScan.Run(msg))
+        this.On("cmd.settings.get", (msg) => this.settings.CmdGet(msg))
+        this.On("cmd.settings.set", (msg) => this.settings.CmdSet(msg))
         this.On("evt.worker.done", (msg) => this.workers.OnDone(msg))
         this.On("evt.trigger.fired", (msg) => this._OnTriggerFired(msg))
         this.On("evt.trigger.error", (msg) => this._OnTriggerError(msg))
@@ -141,6 +146,13 @@ class Engine extends Role {
         this.workers.Start()        ; ends the workers of an earlier engine, then the pool may grow (WI-0027)
         if (!this._flowsLoaded)
             this._WaitForStorage()
+    }
+
+    ; The settings changed (WI-0077): the log thresholds and the language are applied by Role.ApplySettings; the number of
+    ; workers is applied here unless --workers fixes it. The other settings are read when they are needed (settings.Value).
+    OnSettings(settings) {
+        if (!this._poolFixed)
+            this.workers.Resize(Integer(settings["workers"]))
     }
 
     ; Role part of the snapshot (doc/PROTOCOL.md 4.9): loaded flows, instances with threads, the worker pool.
@@ -327,7 +339,8 @@ class Engine extends Role {
             return
         this._loadActive := true
         SetTimer(this._pollFn, 0)
-        this._LoadFlows()
+        ; The settings come first (WI-0077): the flows start with the working directory, the policy and the limits of the user.
+        this.settings.Load(() => this._LoadFlows(), (why) => this._LoadInterrupted(why))
     }
 
     _LoadFlows() {
@@ -491,9 +504,11 @@ class Engine extends Role {
     ; --- notices (WI-0075, PROTOCOL 4.7) -------------------------------------------------------------
 
     ; An unhandled exception ended a branch of a flow (Executor._Advance, REQ-EXE-090). The notice names the flow, the element
-    ; and the message, never the variables (E0072). These notices are on (REQ-USE-080): the global switch comes with WI-0077,
-    ; the per-flow switch with S0007.
+    ; and the message, never the variables (E0072). The global switch is the setting notifyUnhandledErrors (WI-0077,
+    ; REQ-USE-070); the per-flow switch comes with S0007.
     FlowException(flowId, elementId, message) {
+        if (!this.settings.Value("notifyUnhandledErrors"))
+            return
         this._Notice("exception", flowId, "Notice_exception", [this._FlowName(flowId), elementId, message])
     }
 
@@ -599,7 +614,7 @@ class Engine extends Role {
         ; "ready": the start is complete (evt.engine.ready was sent). A client that subscribed late cannot know it from the
         ; event (F-0090).
         return Map("epoch", this.epoch, "seq", this.seq, "flows", list, "categories", this.categories.Entries()
-            , "settings", Map(), "ready", Json.Bool(this._flowsLoaded))
+            , "settings", this.settings.Wire(), "ready", Json.Bool(this._flowsLoaded))
     }
 
     _CmdFlowGet(msg) {
@@ -895,8 +910,8 @@ class Engine extends Role {
         return (v = "") ? "" : String(v)
     }
 
-    ; Pool options (WI-0027, ARCHITECTURE 6.4): --workers=<N> (default 4, 0 = no pool; worker elements then end with
-    ; "exception"), --warm-workers=<W> (default 1, at most N), --worker-idle-ms=<ms> (default 60000).
+    ; Pool options (WI-0027, ARCHITECTURE 6.4): --workers=<N> (default 8, 0 to 16; 0 = no pool, worker elements then end with
+    ; "exception"; the option wins over the setting "workers", WI-0077), --warm-workers=<W> (default 1, at most N), --worker-idle-ms=<ms> (default 60000).
     static _PoolOptions(args) {
         size := Engine._IntOption(args, "workers", WorkerBridge.DEFAULT_SIZE, 0, WorkerBridge.MAX_SIZE)
         warm := Engine._IntOption(args, "warm-workers", Min(WorkerBridge.DEFAULT_WARM, size), 0, size)

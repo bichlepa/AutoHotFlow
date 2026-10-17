@@ -67,6 +67,15 @@ class V1Source {
         return Map("text", AtomicFile.ReadText(filePath))
     }
 
+    ; Map(exists, text) of "settings.json" in the v1 data folder (WI-0077); exists is false when the file is missing.
+    static ReadSettings(dir) {
+        root := V1Source.Root(dir)
+        filePath := root "\settings.json"
+        if (FileExist(filePath) = "")
+            return Map("exists", Json.False)
+        return Map("exists", Json.True, "text", AtomicFile.ReadText(filePath))
+    }
+
     ; Map(exists, type, content) of one variable (VarFiles.Get, read only).
     static ReadVar(dir, scope, flowId, name) => VarFiles.Get(V1Source.Root(dir), scope, flowId, name)
 

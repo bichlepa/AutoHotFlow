@@ -3,6 +3,7 @@
 #Include ..\core\ErrCode.ahk
 #Include ..\core\Json.ahk
 #Include ..\core\Lang.ahk
+#Include ..\core\SettingsModel.ahk
 #Include ManagerModel.ahk
 
 ; The import of the flows and variables of AutoHotFlow v1 (WI-0076, REQ-MIG-060, E0068, PROTOCOL 4.8 "Import from v1").
@@ -11,6 +12,10 @@
 ; handed to the engine (cmd.import.v1.vars). The questions go through the seam `ask` (ManagerWindow or the test driver):
 ;   ask.Confirm("importCopies", [count], done)   yes: the flows whose ID exists in v2 are imported as copies
 ;   ask.Confirm("autostartV1", [], done)        yes: the shortcut of v1 in the startup folder is removed (preselection no)
+;
+; The settings of v1 (settings.json of the folder) are taken over first (WI-0077, E0068): the working directory, the language, the
+; execution policy, the user level and the three log levels, by cmd.settings.set; start with Windows and run as administrator are
+; not taken over. A settings file that is missing or cannot be read does not stop the import; it is listed.
 ;
 ; The result (Map, see Text) is a report: per flow created, copy, skipped (with the reason) or failed (with the message), the
 ; MIGRATION places the engine marked, the variables taken over, kept or failed, and the autostart step. A file that cannot be
@@ -48,7 +53,7 @@ class ManagerImport {
         for c in this.m.CategoryNames()
             this.cats[c] := true
         this.pending := []                  ; variables read, not yet handed to the engine
-        this.res := Map("ok", 1, "dir", dir, "error", "", "flows", [], "vars", [], "autostart", "none"
+        this.res := Map("ok", 1, "dir", dir, "error", "", "settings", [], "flows", [], "vars", [], "autostart", "none"
             , "autostartError", "", "copies", 0)
         this._Request("cmd.storage.v1.list", Map("dir", dir), (p) => this._Listed(p))
     }
@@ -60,6 +65,53 @@ class ManagerImport {
             return this._Fail(Lang("Import_source_error", ManagerImport._Message(p)))
         this.names := p["flows"]
         this.varList := p["vars"]
+        this._Request("cmd.storage.v1.read", Map("dir", this.dir, "kind", "settings"), (s) => this._SettingsRead(s))
+    }
+
+    ; --- the settings of v1 ------------------------------------------------------------------------------------------
+
+    _SettingsRead(p) {
+        if (!p.Get("ok", 0)) {
+            this._SettingEntry("settings.json", "failed", ManagerImport._Message(p))
+            return this._AfterSettings()
+        }
+        if (!p.Get("exists", 0))
+            return this._AfterSettings()
+        v1 := ""
+        try {
+            v1 := Json.Parse(p["text"])
+        } catch as e {
+            this._SettingEntry("settings.json", "failed", Lang("Import_reason_json", e.Message))
+            return this._AfterSettings()
+        }
+        if (!(v1 is Map)) {
+            this._SettingEntry("settings.json", "failed", Lang("Import_reason_not_flow"))
+            return this._AfterSettings()
+        }
+        mapped := SettingsModel.FromV1(v1)
+        for skip in mapped["skipped"]
+            this._SettingEntry(skip["v1"], "skipped", Lang("Import_setting_reason_" skip["reason"], skip["text"]))
+        if (mapped["settings"].Count = 0)
+            return this._AfterSettings()
+        this.m.Command("cmd.settings.set", Map("settings", SettingsModel.ToWire(mapped["settings"]))
+            , (ans) => this._SettingsSet(mapped, ans), ManagerImport.WRITE_MS)
+    }
+
+    _SettingsSet(mapped, ans) {
+        for item in mapped["taken"] {
+            if (ans["ok"])
+                this._SettingEntry(item["v1"], "taken", item["key"])
+            else
+                this._SettingEntry(item["v1"], "failed", ans["message"])
+        }
+        this._AfterSettings()
+    }
+
+    _SettingEntry(name, state, message) {
+        this.res["settings"].Push(Map("name", name, "state", state, "message", message))
+    }
+
+    _AfterSettings() {
         existing := 0
         for name in this.names {
             if (this.m.flows.Has(name))
@@ -283,6 +335,16 @@ class ManagerImport {
         if (res["error"] != "")
             lines.Push(res["error"])
         counts := Map("created", 0, "copy", 0, "skipped", 0, "failed", 0, "taken", 0, "kept", 0)
+        for s in res["settings"] {
+            switch s["state"] {
+                case "taken":
+                    lines.Push(Lang("Import_setting_taken", s["name"], s["message"]))
+                case "skipped":
+                    lines.Push(Lang("Import_setting_skipped", s["name"], s["message"]))
+                default:
+                    lines.Push(Lang("Import_setting_failed", s["name"], s["message"]))
+            }
+        }
         for f in res["flows"] {
             counts[f["state"]] += 1
             name := f["name"]

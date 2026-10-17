@@ -10,18 +10,21 @@
 class BuiltInVars {
     static _getters := ""
 
-    ; The default working directory of flows until the settings exist (E0028, v1 Settings.ahk:15).
+    ; The built-in default working directory of flows (E0028, v1 Settings.ahk:15). The global setting workingDir (WI-0077)
+    ; has this value until the user changes it; the callers pass the setting as globalDir.
     static DefaultWorkingDir() => A_MyDocuments "\AutoHotFlow"
 
     ; The working directory of a flow (v1 xx_GetWorkingDir and the check in v1 Load.ahk:214): the flow's own
     ; folder if flowSettings.DefaultWorkingDir is off and flowSettings.WorkingDir is set, else the default.
-    static WorkingDirOf(flowSettings) {
+    static WorkingDirOf(flowSettings, globalDir := "") {
+        if (globalDir = "")
+            globalDir := BuiltInVars.DefaultWorkingDir()
         if (!(flowSettings is Map))
-            return BuiltInVars.DefaultWorkingDir()
+            return globalDir
         useDefault := flowSettings.Get("DefaultWorkingDir", "")
         own := String(IsObject(flowSettings.Get("WorkingDir", "")) ? "" : flowSettings.Get("WorkingDir", ""))
         if (BuiltInVars._Truthy(useDefault) || Trim(own) = "")
-            return BuiltInVars.DefaultWorkingDir()
+            return globalDir
         return own
     }
 

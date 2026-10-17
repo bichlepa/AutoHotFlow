@@ -244,7 +244,8 @@ class Executor {
             throw AhfError("'" triggerId "' is not a trigger of flow '" flowId "'", ErrCode.BAD_PAYLOAD)
         }
         try {
-            decision := ExecutionPolicy.Decide(Executor._PolicyOf(def), this.IsExecuting(flowId), "parallel")
+            decision := ExecutionPolicy.Decide(Executor._PolicyOf(def), this.IsExecuting(flowId)
+                , this._owner.settings.Value("executionPolicy"))
         } catch as e {
             throw AhfError(e.Message, ErrCode.BAD_PAYLOAD)
         }
@@ -288,12 +289,12 @@ class Executor {
     ; stops the running ones first, so it is not checked.
     _CheckStartLimits(flowId, def, decision) {
         if (decision = "wait") {
-            cap := RunawayGuard.LimitOf(def, "maxWaitingInstances", RunawayGuard.DEFAULT_WAITING)
+            cap := RunawayGuard.LimitOf(def, "maxWaitingInstances", this._owner.settings.Value("maxWaitingInstances"))
             queued := this._waiting.Has(flowId) ? this._waiting[flowId].Length : 0
             if (cap > 0 && queued >= cap)
                 this._RefuseStart(flowId, "waiting", "maxWaitingInstances", cap)
         } else if (decision = "start") {
-            cap := RunawayGuard.LimitOf(def, "maxParallelInstances", RunawayGuard.DEFAULT_PARALLEL)
+            cap := RunawayGuard.LimitOf(def, "maxParallelInstances", this._owner.settings.Value("maxParallelInstances"))
             if (cap > 0 && this._CountRunning(flowId) >= cap)
                 this._RefuseStart(flowId, "running", "maxParallelInstances", cap)
         }
@@ -326,7 +327,7 @@ class Executor {
         def := this._DefOf(run)
         if (!IsObject(def))
             return
-        limit := RunawayGuard.LimitOf(def, "maxExecutionsPerMinute", RunawayGuard.DEFAULT_PER_MINUTE)
+        limit := RunawayGuard.LimitOf(def, "maxExecutionsPerMinute", this._owner.settings.Value("maxExecutionsPerMinute"))
         if (limit = 0)
             return
         if (this._guard.Count(flowId) > limit && !this._overLimit.Has(flowId))
@@ -1061,7 +1062,7 @@ class Executor {
         name := (elem is Map) ? elem.Get("name", "") : ""
         env := Map("flowId", run["flowId"], "elementId", elementId, "flowName", def.Name
             , "elementName", IsObject(name) ? "" : String(name)
-            , "workingDir", BuiltInVars.WorkingDirOf(def.Raw.Get("flowSettings", "")))
+            , "workingDir", BuiltInVars.WorkingDirOf(def.Raw.Get("flowSettings", ""), this._owner.settings.Value("workingDir")))
         return VarAccess(this._owner.vars, run["inst"], thread, env)
     }
 

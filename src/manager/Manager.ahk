@@ -48,6 +48,7 @@ class Manager extends Role {
         this.On("evt.", (msg) => this._OnEvent(msg))
         this.On("cmd.app.prepareExit", (msg) => this._OnPrepareExit(msg))
         this.On("cmd.manager.show", (msg) => this._OnShow(msg))
+        this.FollowSettings()      ; log thresholds and language (WI-0077)
         if (this.headless) {
             this.model.TraceOn()
             this.driver := ManagerDriver(this, this.model)
@@ -87,6 +88,16 @@ class Manager extends Role {
             this.view.Close()
             this.view := ""
         }
+    }
+
+    ; The settings changed (WI-0077): Role.ApplySettings has loaded the new language; the open windows get its texts.
+    OnSettings(settings) {
+        UiTexts.Reload()
+    }
+
+    ; The event goes to the model too (it checks the sequence and keeps the settings for the dialog).
+    OnSettingsMessage(msg) {
+        this.model.OnEvent(msg.type, msg.payload)
     }
 
     ; Every event of a topic that the model subscribed to. The entries of topic log go to the log part of the model

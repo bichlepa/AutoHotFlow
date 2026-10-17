@@ -61,7 +61,7 @@ class Children {
     static WAIT_OBJECT_0 := 0
     static OUTPUT_RING_MAX := 100
     ; Most workers alive at the same time (a safeguard against a faulty engine; the pool size N is the engine's).
-    static WORKER_LIMIT := 16
+    static WORKER_LIMIT := 24
     static GONE_WORKERS_KEEP := 8
     ; Per child and tick: at most 64 KB are read and at most 200 lines are logged. The rest of the lines goes
     ; into the ring only, with one log line that says how many; so a chatty child cannot flood storage.
@@ -566,6 +566,7 @@ class Children {
             cmd .= ' --test-roles'
         if (isRestart)
             cmd .= ' --restarted=' rec["restartTimes"].Length   ; the role knows it is a restart (engine: evt.engine.restarted)
+        cmd .= cfg.Get("settingsOpts", "")   ; --log-levels and --start-language of the settings (WI-0077), "" before the first
         cmd .= cfg["roleOpts"]   ; --headless, --cancel-exit (WI-0013), --windows-startup (WI-0062), "" when not given
         ; The state is reset BEFORE the process starts. AHK may interrupt this thread between CreateProcessW and the
         ; assignment of the pid (the hub handles messages meanwhile, and other requests such as cmd.process.spawn can
