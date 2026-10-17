@@ -79,24 +79,24 @@ Close each dialog after its step (button or X). Steps 2 to 5 are repeated at eac
 
 | # | Step | Expected result | Result |
 |---|---|---|---|
-| 1 | Set the Windows scale to 100 %. | Settings shows 100 %. | |
-| 2 | Start the message box (see Start). | The text is sharp. The buttons and the text are fully visible. The window fits on the screen and its size looks reasonable. | |
-| 3 | Start the confirmation dialog. | The text is sharp. Both buttons are fully visible. The window fits on the screen. | |
-| 4 | Start the debug dialog with a few variables. | The text and the variable values are sharp and not cut off. The window fits on the screen. | |
-| 5 | Start the tooltip. | The text is sharp and not cut off. The tooltip is shown near the mouse pointer and fits on the screen. | |
-| 6 | Set the Windows scale to 125 %. | Settings shows 125 %. | |
-| 7 | Start the message box. | As step 2. | |
-| 8 | Start the confirmation dialog. | As step 3. | |
-| 9 | Start the debug dialog with a few variables. | As step 4. | |
-| 10 | Start the tooltip. | As step 5. | |
-| 11 | Set the Windows scale to 150 %. | Settings shows 150 %. | |
-| 12 | Start the message box. | As step 2. | |
-| 13 | Start the confirmation dialog. | As step 3. | |
-| 14 | Start the debug dialog with a few variables. | As step 4. | |
-| 15 | Start the tooltip. | As step 5. | |
-| 16 | Optional: with a second monitor at another scale, start the message box and the debug dialog on that monitor. | The text is sharp on that monitor too, and each window fits on the screen of its monitor. If no second monitor with another scale is available, write "not run" in the Result column. | |
-| 18 | Test the start order. (a) Start the application at 225 % (restart it after the change) and open the message box. (b) Start it at 100 %, set 225 %, then open the message box. | Both windows look the same as at step 2 at 225 %: the text and the OK button are fully visible, the button has a margin to the edge. | |
-| 17 | At 100 %, start the message box and leave it open. Set the scale to 150 %, look at the window, then set it back to 100 %. Repeat with the debug dialog. | The window grows and shrinks with the scale. Text, buttons and size follow it, nothing is cut off, and no empty area remains. (Before the fix of 2026-10-16 only the title bar scaled.) | |
+| 1 | Set the Windows scale to 100 %. | Settings shows 100 %. | pass |
+| 2 | Start the message box (see Start). | The text is sharp. The buttons and the text are fully visible. The window fits on the screen and its size looks reasonable. | pass |
+| 3 | Start the confirmation dialog. | The text is sharp. Both buttons are fully visible. The window fits on the screen. | pass (scale not recorded separately) |
+| 4 | Start the debug dialog with a few variables. | The text and the variable values are sharp and not cut off. The window fits on the screen. | pass |
+| 5 | Start the tooltip. | The text is sharp and not cut off. The tooltip is shown near the mouse pointer and fits on the screen. | pass |
+| 6 | Set the Windows scale to 125 %. | Settings shows 125 %. | pass |
+| 7 | Start the message box. | As step 2. | pass (sporadic) |
+| 8 | Start the confirmation dialog. | As step 3. | pass (scale not recorded separately) |
+| 9 | Start the debug dialog with a few variables. | As step 4. | pass (checked with focus) |
+| 10 | Start the tooltip. | As step 5. | pass (sporadic) |
+| 11 | Set the Windows scale to 150 %. | Settings shows 150 %. | pass |
+| 12 | Start the message box. | As step 2. | pass |
+| 13 | Start the confirmation dialog. | As step 3. | pass (scale not recorded separately) |
+| 14 | Start the debug dialog with a few variables. | As step 4. | pass (checked with focus) |
+| 15 | Start the tooltip. | As step 5. | pass (sporadic) |
+| 16 | Optional: with a second monitor at another scale, start the message box and the debug dialog on that monitor. | The text is sharp on that monitor too, and each window fits on the screen of its monitor. If no second monitor with another scale is available, write "not run" in the Result column. | pass |
+| 18 | Test the start order. (a) Start the application at 225 % (restart it after the change) and open the message box. (b) Start it at 100 %, set 225 %, then open the message box. | Both windows look the same as at step 2 at 225 %: the text and the OK button are fully visible, the button has a margin to the edge. | pass (after the last fix) |
+| 17 | At 100 %, start the message box and leave it open. Set the scale to 150 %, look at the window, then set it back to 100 %. Repeat with the debug dialog. | The window grows and shrinks with the scale. Text, buttons and size follow it, nothing is cut off, and no empty area remains. (Before the fix of 2026-10-16 only the title bar scaled.) | pass |
 
 **Not covered by these checks:** a screenshot comparison, the exact pixel sizes, and how a dialog reacts when it is moved between monitors while it is shown (not checked).
 
@@ -106,19 +106,19 @@ Test with a real start of the application and with real keys: the triggers of an
 
 This check runs in the manual-check data folder, not in the default folder `%APPDATA%\AutoHotFlow v2` (the rule of this document). To run it in the default folder instead, copy the two files into `Flows\` and `FlowStates\` of that folder; the owner decides.
 
-**Start.** VS Code task "Start: manual check 4, enabled flow with a hotkey and a periodic timer (manual_check.py)", or in a terminal `python tools/manual_check.py start --flow triggers_check -- --ui=stub`.
+**Start.** VS Code task "Start: manual check 4, enabled flow with a hotkey and a periodic timer (manual_check.py)", or in a terminal `python tools/manual_check.py start --flow triggers_check -- --ui=stub --start=storage,engine,triggerhost,manager`. Without `--start` no role runs: no window and no log folder appear.
 
 ### Steps
 
 | # | Step | Expected result | Result |
 |---|---|---|---|
-| 1 | Start the application (see above). | The stub window opens and lists `triggers_check`. No dialog. | |
-| 2 | Wait 12 s without touching the keyboard. | A tooltip "Periodic timer fired" appears two or three times. No tooltip "Started with Windows". | |
-| 3 | Press `Ctrl+Alt+Shift+F12` once. | The tooltip "Hotkey fired" appears within about one second. | |
-| 4 | Press `Ctrl+Alt+Shift+F12` three times in quick succession. | Each press shows the tooltip "Hotkey fired" (the tooltips may follow each other). | |
-| 5 | Press `Ctrl+Alt+Shift+F12` in a text editor. | The text editor receives the key as well (the key is not blocked). | |
-| 6 | Watch for dialogs during the whole check. | No dialog (window class `#32770`) appears. | |
-| 7 | Quit the application (button Beenden, or close the window). | The task terminal prints `AutoHotFlow ended with exit code 0`. | |
+| 1 | Start the application (see above). | The stub window opens and lists `triggers_check`. No dialog. | pass |
+| 2 | Wait 12 s without touching the keyboard. | A tooltip "Periodic timer fired" appears two or three times. No tooltip "Started with Windows". | pass |
+| 3 | Press `Ctrl+Alt+Shift+F12` once. | The tooltip "Hotkey fired" appears within about one second. | pass |
+| 4 | Press `Ctrl+Alt+Shift+F12` three times in quick succession. | Each press shows the tooltip "Hotkey fired" (the tooltips may follow each other). | pass |
+| 5 | In VS Code open the keyboard shortcuts (`Ctrl+K Ctrl+S`), click into the search field, click the "Record Keys" button on its right and press `Ctrl+Alt+Shift+F12`. (A plain text editor does nothing with this key, so it shows nothing.) | The search field shows `Ctrl+Alt+Shift+F12`: the application received the key as well (the key is not blocked). The tooltip "Hotkey fired" appears too. | pass |
+| 6 | Watch for dialogs during the whole check. | No dialog (window class `#32770`) appears. | pass |
+| 7 | Quit the application (button Beenden, or close the window). | The task terminal prints `AutoHotFlow ended with exit code 0`. | pass |
 
 **Not covered by these checks:** the hotkey with window conditions (the flow uses "Everywhere"), a second flow with the same hotkey, and the start with Windows at log on (the autostart entry comes with S0004). Not checked: the hotkey while another application holds the key.
 
@@ -126,18 +126,18 @@ This check runs in the manual-check data folder, not in the default folder `%APP
 
 The same flow, started as after a start of Windows. The supervisor option `--windows-startup` tells the engine that AutoHotFlow starts with Windows (WI-0063).
 
-**Start.** VS Code task "Start: manual check 5, the same enabled flow started with --windows-startup (manual_check.py)", or `python tools/manual_check.py start --flow triggers_check -- --ui=stub --windows-startup`.
+**Start.** VS Code task "Start: manual check 5, the same enabled flow started with --windows-startup (manual_check.py)", or `python tools/manual_check.py start --flow triggers_check -- --ui=stub --start=storage,engine,triggerhost,manager --windows-startup`.
 
 ### Steps
 
 | # | Step | Expected result | Result |
 |---|---|---|---|
-| 1 | Start the application (see above). | The stub window opens. No dialog. | |
-| 2 | Look at the screen within 5 s after the start. | Exactly one tooltip "Started with Windows" appears. | |
-| 3 | Wait 12 s. | The periodic timer tooltips appear as in section 4, step 2. The start-up tooltip does not come again. | |
-| 4 | Press `Ctrl+Alt+Shift+F12` once. | The tooltip "Hotkey fired" appears (as in section 4, step 3). | |
-| 5 | Quit the application, then start it again with the task of section 4 (no option). | The second start shows no tooltip "Started with Windows". | |
-| 6 | Watch for dialogs during the whole check. | No dialog appears. | |
+| 1 | Start the application (see above). | The stub window opens. No dialog. | pass |
+| 2 | Look at the screen within 5 s after the start. | Exactly one tooltip "Started with Windows" appears. | pass |
+| 3 | Wait 12 s. | The periodic timer tooltips appear as in section 4, step 2. The start-up tooltip does not come again. | pass |
+| 4 | Press `Ctrl+Alt+Shift+F12` once. | The tooltip "Hotkey fired" appears (as in section 4, step 3). | pass |
+| 5 | Quit the application, then start it again with the task of section 4 (no option). | The second start shows no tooltip "Started with Windows". | pass |
+| 6 | Watch for dialogs during the whole check. | No dialog appears. | pass |
 
 ## 6. Checks that wait for a decision of the project owner
 
@@ -199,4 +199,41 @@ Notes: Step 3 first failed: the Snapshots text jumped to the top on every 2-seco
   with peer_closed, no "ended unexpectedly" entry. Open point: the hub log shows only
   one "debug gone" entry (17:04:13), so it is not fully clear which debug window it
   belonged to; the window of session main may have been closed earlier than step 8.
+```
+
+Run record (2026-10-17, dialog windows, section 3):
+
+```
+Date: 2026-10-17
+Tester: Paul
+Dialog windows (section 3): steps 2 to 5 and 7 to 10 pass at 100 % and 225 %.
+  Steps 12 to 15 (150 %) pass for the message box; the tooltip and the other
+  dialogs at 150 % and the message box and tooltip at 125 % were checked
+  sporadically, not systematically. Step 16 (second monitor at another scale):
+  pass, a window moved between the two monitors stayed sharp and correctly
+  sized. Step 17 (DPI change while the window is open): pass for the debug
+  dialog at 100, 125 and 150 %; for the message box at 100, 150 and 225 %.
+Notes: The debug dialog was checked with focus: started at 100 % and at 125 %;
+  while open, the scale was changed to 100, 125 and 150 % and the window was
+  moved between the screens; always sharp and correctly sized. The flow was run
+  again from the start at each of the three scales, so the first appearance of
+  the debug dialog was checked at each scale too. The confirmation dialog was
+  checked, without a separate record of the scales. No flicker when the windows
+  open was seen. Tooltip: good at all scales checked.
+  Earlier problems that led to the fixes (not repeated here): the window size
+  was wrong at a start with another scale than the current one (fixed by
+  -DPIScale and by showing the window only after the size is set).
+```
+
+Run record (2026-10-17, triggers, sections 4 and 5):
+
+```
+Date: 2026-10-17
+Tester: Paul
+Triggers (sections 4 and 5): steps 1 to 7 and 1 to 6 pass
+Notes: The first attempt showed no tooltip at all: the Start tasks passed
+  --start=storage,engine,manager, so the triggerhost never started and nothing
+  was armed. Fixed by adding triggerhost to --start (tasks.json and this
+  document). Section 4 step 5 was reworded (a plain text editor shows nothing
+  for this key; VS Code "Record Keys" does). All expectations met after that.
 ```

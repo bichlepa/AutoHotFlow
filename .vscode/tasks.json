@@ -1043,7 +1043,8 @@
                 "--flow",
                 "triggers_check",
                 "--",
-                "--ui=stub"
+                "--ui=stub",
+                "--start=storage,engine,triggerhost,manager"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -1061,6 +1062,7 @@
                 "triggers_check",
                 "--",
                 "--ui=stub",
+                "--start=storage,engine,triggerhost,manager",
                 "--windows-startup"
             ],
             "options": {
