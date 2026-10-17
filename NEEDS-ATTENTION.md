@@ -13,7 +13,7 @@ None open.
 ## Manual checks
 
 - **Manual checks 4 and 5 (WI-0067, `doc/MANUAL-CHECKS.md`):** done by the owner on 2026-10-17, all steps pass (run record in the document). The first attempt failed because the Start tasks did not start the triggerhost; fixed.
-- **Hotkey input tests (WI-0064, WI-0067):** solved on 2026-10-17. The normal-tier tests run (10 green, serial and parallel); the cause of the old skips was the choice of keys (plain hotkeys on `vk9A` to `vk9C` do not fire for `SendInput`), the PC lock was not the reason. Still for the owner: the `gui` tests with key combinations (VS Code task `Test: hotkey input with key combinations (gui...)`) and the hotkey part of REQ-TRG-010.
+- **Hotkey input tests (WI-0064, WI-0067):** solved on 2026-10-17. The normal-tier tests run (10 green, serial and parallel); the cause of the old skips was the choice of keys (plain hotkeys on `vk9A` to `vk9C` do not fire for `SendInput`), the PC lock was not the reason. The 3 `gui` tests (key combinations, wildcard with a held modifier, F13) are green too (run on request of the owner, 2026-10-17). Still open: the measurement of the hotkey reaction while the engine is busy (hotkey part of REQ-TRG-010, WI-0067).
 
 ## To know
 
