@@ -54,7 +54,7 @@ L486-495   5a Events before subscription (design question, WI-0007)
 L497-501 6. Versioning and extension
 ```
 
-## doc/TEST-STRATEGY.md (52.5 KB, 324 lines)
+## doc/TEST-STRATEGY.md (52.6 KB, 324 lines)
 ```text
 L5-11 1. Principles
 L13-22 2. Levels
@@ -122,12 +122,12 @@ L503-520   19.1 The subset that is compared
 L522-539   19.2 Deliberate deviations from native AutoHotkey v2
 ```
 
-## doc/MEASUREMENTS.md (35.2 KB, 120 lines)
+## doc/MEASUREMENTS.md (36.4 KB, 121 lines)
 ```text
 L11-21 Important: one machine, not an idle machine
-L23-72 Overview
-L74-98 Method
-L100-120 Not measured
+L23-73 Overview
+L75-99 Method
+L101-121 Not measured
 ```
 
 ## doc/CONVENTIONS.md (8.3 KB, 63 lines)

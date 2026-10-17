@@ -49,7 +49,7 @@ Step S0003 (trigger host and triggers), detailed on 2026-10-16 (E0056 to E0062).
 | WI-0064 | Hotkey trigger with window conditions | done (input tests green, 2026-10-17; the gui tests are for the owner) | haiku (review sonnet) | 2f5faea–8e37e0b, input tests 58b465d | 2026-10-17 | cause found: plain hotkeys on vk9A to vk9C do not fire for SendInput, tests use vk88 to vk8F and vkE8; F-0114 (provisional F-9000*) |
 | WI-0065 | Set_Flow_Status, Condition_Flow_Enabled | done, verified | haiku (review sonnet) | 5adfc6b–1bcbb127 | 2026-10-16 | reviewer approved; M-0072 to M-0074 (M-0072 confirmed by the owner) |
 | WI-0066 | Guard against runaway flows | integrated and verified (fast and foundation green; slow and stress by the author) | haiku (review sonnet) | ed35b78–0941cda | 2026-10-17 | default limit is the owner's decision (NEEDS-ATTENTION) |
-| WI-0067 | Acceptance S0003 | done, verified; owner items pending (P1 key delivery, P2 manual checks 4 and 5) | haiku (review sonnet) | 752097a–251e86bc | 2026-10-17 | point-by-point result in the work item; measurements MS-0038, MS-0039 |
+| WI-0067 | Acceptance S0003 | done, verified; P1 (key delivery) solved 2026-10-17 and the hotkey measurement done (MS-0040), P2 manual checks 4 and 5 done by the owner | haiku (review sonnet) | 752097a–251e86bc | 2026-10-17 | point-by-point result in the work item; measurements MS-0038, MS-0039, MS-0040 |
 | WI-0068 | Enabled state per flow file (E0063, answer to the FlowState read error) | done, verified (stress test 200 flows green) | haiku (review sonnet) | a313d3b–8d2eb98 | 2026-10-16 | reviewer approved after a fix (late read arms the merged triggers); F-0109 closed |
 
 Step S0008 (remaining elements) is planned, not started.

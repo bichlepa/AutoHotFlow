@@ -141,8 +141,7 @@ The same flow, started as after a start of Windows. The supervisor option `--win
 
 ## 6. Checks that wait for a decision of the project owner
 
-- **The gui tests of the hotkey trigger (WI-0064, real key combinations).** They do not exist in the repository yet: the test of the hotkey with real input is an open owner decision (how keys are delivered in the tests, `doc/OPEN-ITEMS.md`, `NEEDS-ATTENTION.md`). When the decision is made, a VS Code task "Test: hotkey input (gui)" is added with the test. Until then the gui tests that exist (the dialog windows of section 3 and the other `gui` tests) run with the task `Test: gui`.
-- **The hotkey part of the trigger measurement (REQ-TRG-010).** A hotkey on an unassigned key while the engine is busy (MS-0038): the hook must not be removed by Windows and must fire afterwards. Waits for the same decision.
+None open. The `gui` tests of the hotkey trigger (key combinations, wildcard, F13) are `tests/integration/test_hotkey_input.py` (VS Code task "Test: hotkey input with key combinations (gui...)"), and the hotkey part of the trigger measurement is `tests/stress/test_trigger_host_busy.py` (MS-0040). Both run on this PC while nobody uses the keyboard.
 
 ## Result
 

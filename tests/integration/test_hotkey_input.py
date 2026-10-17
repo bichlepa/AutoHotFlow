@@ -19,6 +19,7 @@ from support import inputlock
 from support.flowbuilder import FlowBuilder
 from support.flowrun import FlowRunner
 from support.timing import scaled
+from support.triggerwait import trigger_state, wait_armed
 
 pytestmark = pytest.mark.xdist_group("input")
 
@@ -82,29 +83,6 @@ def hotkey_flow(name, hotkey, **pars):
     done = fb.action("Action_Do_nothing")
     fb.chain(trigger, done)
     return fb, trigger
-
-
-def trigger_state(runner, flow_id, element_id):
-    try:
-        answer = runner.request_ok("engine", "cmd.engine.snapshot", {})
-    except Exception:
-        return None
-    for flow in answer["flows"]:
-        if flow["flowId"] == flow_id:
-            for t in flow.get("triggers", []):
-                if t["elementId"] == element_id:
-                    return t
-    return None
-
-
-def wait_armed(runner, flow_id, element_id, armed=True, timeout=WAIT_S):
-    deadline = time.monotonic() + scaled(timeout)
-    while time.monotonic() < deadline:
-        state = trigger_state(runner, flow_id, element_id)
-        if state is not None and state["armed"] is armed:
-            return state
-        time.sleep(0.05)
-    return None
 
 
 def press(vk, with_modifiers=()):

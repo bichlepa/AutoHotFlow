@@ -12,7 +12,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Script language (SCR)](#script-language-scr) | 15 | 0 | 0 | 3 | 12 | 0 | 1 |
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
 | [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 6 | 16 | 0 | 0 |
-| [Triggers (TRG)](#triggers-trg) | 14 | 0 | 0 | 8 | 6 | 0 | 0 |
+| [Triggers (TRG)](#triggers-trg) | 14 | 1 | 0 | 7 | 6 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 14 | 0 | 0 | 2 | 12 | 0 | 0 |
 | [Editor (EDT)](#editor-edt) | 23 | 0 | 0 | 1 | 22 | 0 | 0 |
 | [Settings (SET)](#settings-set) | 7 | 1 | 0 | 2 | 4 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 0 | 0 | 2 | 8 | 0 | 0 |
-| **All** | **219** | **57** | **1** | **46** | **114** | **1** | **6** |
+| **All** | **219** | **58** | **1** | **45** | **114** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -136,7 +136,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-TRG-010](REQUIREMENTS.md#req-trg-010-triggers-react-at-once-whatever-the-load) | L1126-1135 | Triggers react at once, whatever the load | no | partial | must | port | S0003 (the hotkey part of the measurement while the engine is busy: owner decision on keys; the rest measured, MS-0038) |
+| [REQ-TRG-010](REQUIREMENTS.md#req-trg-010-triggers-react-at-once-whatever-the-load) | L1126-1135 | Triggers react at once, whatever the load | no | done | must | port | S0003 (measured, MS-0038 and MS-0040) |
 | [REQ-TRG-020](REQUIREMENTS.md#req-trg-020-triggers-follow-the-enabled-state-also-after-a-restart) | L1137-1146 | Triggers follow the enabled state, also after a restart | yes | partial | must | port | S0003 (the hotkey trigger with real keys: owner decision) |
 | [REQ-TRG-040](REQUIREMENTS.md#req-trg-040-conflicting-hotkeys-are-reported) | L1148-1156 | Conflicting hotkeys are reported | no | open | should | later | - |
 | [REQ-TRG-030](REQUIREMENTS.md#req-trg-030-several-triggers-per-flow) | L1158-1167 | Several triggers per flow | yes | partial | must | port | S0003 (WI-0060 done), S0006 |

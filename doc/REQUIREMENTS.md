@@ -1126,13 +1126,13 @@ Talking to a console program is an element of its own, because it is much more c
 ### REQ-TRG-010 Triggers react at once, whatever the load
 
 - **v1:** no (triggers live in the execution thread)
-- **v2:** partial
+- **v2:** done
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003 (the hotkey part of the measurement while the engine is busy: owner decision on keys; the rest measured, MS-0038)
-- **Evidence:** `tests/stress/test_trigger_host_busy.py` (WI-0067: the host keeps its timer while the engine is blocked for 3 s; no event lost), `tests/integration/test_triggerhost.py` (WI-0061: an error of one trigger is reported, the others and the host keep running), `tests/integration/test_trigger_arming.py` (WI-0062: the engine arms the triggers, a refused or failing trigger does not stop the others)
+- **Plan:** S0003 (measured, MS-0038 and MS-0040)
+- **Evidence:** `tests/stress/test_trigger_host_busy.py` (WI-0067: the host keeps its timer and its hotkeys, plain and hook, while the engine is blocked for 3 s; no event lost; the hook works after the block), `tests/integration/test_triggerhost.py` (WI-0061: an error of one trigger is reported, the others and the host keep running), `tests/integration/test_trigger_arming.py` (WI-0062: the engine arms the triggers, a refused or failing trigger does not stop the others)
 
-Hotkeys, hooks and timers react at once, no matter how busy the running flows are (Windows removes a low-level hook that answers too slowly). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. How: a trigger host process, `ARCHITECTURE.md` D8. The engine arms the triggers of the enabled flows (WI-0062). Measured without keys (MS-0038): while the engine is blocked for 3 s, the host keeps its timer on schedule, and the engine processes the queued events after the block. Still missing: a hotkey during the block, which waits for the owner's decision on how keys are delivered in tests.
+Hotkeys, hooks and timers react at once, no matter how busy the running flows are (Windows removes a low-level hook that answers too slowly). An error of one trigger (a hotkey that cannot be registered) is reported and does not stop the others. How: a trigger host process, `ARCHITECTURE.md` D8. The engine arms the triggers of the enabled flows (WI-0062). Measured without keys (MS-0038): while the engine is blocked for 3 s, the host keeps its timer on schedule, and the engine processes the queued events after the block. The same with real keys on a plain and a hook hotkey (MS-0040): the keys sent during the block are processed right after it, none is lost, and the hook still works.
 
 ### REQ-TRG-020 Triggers follow the enabled state, also after a restart
 
