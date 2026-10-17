@@ -372,11 +372,16 @@ class ManagerWindow {
 
     ; --- the questions of ManagerOps (the ask seam) -------------------------------------------------------------------
 
+    ; The buttons of a question: "Yes" left, "No" right, as in every question of the manager. A question with a third key
+    ; "no" is preselected "No" (the import, E0068): the default button is No, the order stays (pure).
+    static ConfirmButtons(kind) {
+        keys := ManagerWindow.ASK[kind]
+        return [["yes", "Yes"], keys.Length >= 3 ? ["no", "No", true] : ["no", "No"]]
+    }
+
     Confirm(kind, args, done) {
         keys := ManagerWindow.ASK[kind]
-        ; a question with a third key "no" is preselected "No" (the import, E0068)
-        buttons := (keys.Length >= 3) ? [["no", "No"], ["yes", "Yes"]] : [["yes", "Yes"], ["no", "No"]]
-        opened := UiDialogs.Confirm(this.win.Hwnd, keys[1], keys[2], buttons
+        opened := UiDialogs.Confirm(this.win.Hwnd, keys[1], keys[2], ManagerWindow.ConfirmButtons(kind)
             , (answered, id) => done(answered && id = "yes"), args*)
         if (!opened)
             done(false)

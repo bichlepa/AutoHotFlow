@@ -25,7 +25,8 @@ class UiDialogs {
     static EDIT_H := 24
     static LIST_H := 200
 
-    ; Confirm: buttons is an Array of [id, labelKey]. callback(true, id) for a button, callback(false, "close") otherwise.
+    ; Confirm: buttons is an Array of [id, labelKey, isDefault]; the buttons stand in this order, from the left. The default
+    ; button (Enter) is the one DefaultIndex names. callback(true, id) for a button, callback(false, "close") otherwise.
     static Confirm(owner, titleKey, textKey, buttons, callback, args*) {
         if (buttons.Length = 0)
             throw ValueError("Confirm needs at least one button")
@@ -43,8 +44,9 @@ class UiDialogs {
         GuiLayout.Place(lay, text, m, m, width - 2 * m, textH)
         UiTexts.Register(st["hwnd"], text, textKey, "Text", args*)
         x := width - m - (buttons.Length * this.BUTTON_W + (buttons.Length - 1) * m)
+        defaultIdx := UiDialogs.DefaultIndex(buttons)
         for i, button in buttons {
-            ctl := g.AddButton(i = 1 ? "Default" : "")
+            ctl := g.AddButton(i = defaultIdx ? "Default" : "")
             GuiLayout.Place(lay, ctl, x, y, this.BUTTON_W, this.BUTTON_H)
             UiTexts.Register(st["hwnd"], ctl, button[2])
             ctl.OnEvent("Click", this._Pick(st, true, button[1]))
@@ -53,6 +55,23 @@ class UiDialogs {
         this._OnCancel(st, "close")
         GuiLayout.Show(lay)
         return true
+    }
+
+    ; The index of the default button of a Confirm (pure). A button with a third element true is the default. When no
+    ; button has a third element, the first one is. A flag on no button of a list with flags gives the first one too.
+    static DefaultIndex(buttons) {
+        flagged := false
+        for button in buttons {
+            if (button.Length >= 3)
+                flagged := true
+        }
+        if (flagged) {
+            for i, button in buttons {
+                if (button.Length >= 3 && button[3])
+                    return i
+            }
+        }
+        return 1
     }
 
     ; Input: a text field with the default text. check is a function (value) that returns "" when the value is accepted

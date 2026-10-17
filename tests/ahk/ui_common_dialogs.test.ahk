@@ -43,6 +43,17 @@ TestRun.Case("Claim: kinds and owners are independent", () => (
     Assert.True(UiDialogs._Claim(8, "confirm"), "the same kind of another owner is free"),
     Assert.True(UiDialogs._Claim(0, "confirm"), "owner 0 (no owner) is its own owner")))
 
+TestRun.Case("DefaultIndex: without flags the first button is the default", () => (
+    Assert.Equal(UiDialogs.DefaultIndex([["yes", "Yes"], ["no", "No"]]), 1),
+    Assert.Equal(UiDialogs.DefaultIndex([["ok", "OK"]]), 1)))
+
+TestRun.Case("DefaultIndex: a flagged button is the default, the order of the buttons does not change", () => (
+    Assert.Equal(UiDialogs.DefaultIndex([["yes", "Yes"], ["no", "No", true]]), 2, "the flagged No is the default"),
+    Assert.Equal(UiDialogs.DefaultIndex([["yes", "Yes", true], ["no", "No"]]), 1)))
+
+TestRun.Case("DefaultIndex: flags on no button of a list give the first button", () => (
+    Assert.Equal(UiDialogs.DefaultIndex([["yes", "Yes"], ["no", "No", false]]), 1)))
+
 TestRun.Case("FitTextHeight: a text that fits keeps its height", () => (
     Assert.Equal(UiDialogs.FitTextHeight(30, 100, 1000), 30)))
 
