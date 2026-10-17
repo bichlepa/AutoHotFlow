@@ -34,6 +34,9 @@ class FlowLifecycle {
 
     IsDeleting(flowId) => this._deleting.Has(flowId)
 
+    ; Throws busy when a command of the flow is pending (used by the category commands, WI-0071).
+    CheckIdle(flowId) => this._RequireIdle(flowId)
+
     ; --- commands --------------------------------------------------------------------------------
 
     ; cmd.flow.create { name?, category?, definition? }: the empty v1 flow (one manual trigger, disabled) or the given
@@ -61,6 +64,7 @@ class FlowLifecycle {
         raw["name"] := name
         if (category != "" || !raw.Has("category"))
             raw["category"] := category
+        this._CheckCategory(raw.Get("category", ""))
         return this._Create(msg, raw, "", convert, 1)
     }
 
@@ -97,6 +101,8 @@ class FlowLifecycle {
             this._CheckName(name, flowId)
         if (name == rec.Def.Name && category == rec.Def.Category)
             return Map("rev", rec.Rev)
+        if (!(category == rec.Def.Category))
+            this._CheckCategory(category)
         raw := FlowDefinition.CopyValue(rec.Def.Raw)
         raw["name"] := name
         raw["category"] := category
@@ -145,6 +151,7 @@ class FlowLifecycle {
             this._UnreserveName(def.Name, flowId)
             if (res.payload.Get("ok", false)) {
                 this._engine.flows.Insert(FlowRecord(flowId, def, 1))
+                this._engine.categories.Sync(true)
                 this._engine.Emit("topic:engine", "evt.flow.list.changed"
                     , Map("added", [flowId], "removed", [], "changed", []))
                 this._engine._Log("a1", "engine", "flow '" flowId "' created: " def.Name)
@@ -217,6 +224,7 @@ class FlowLifecycle {
                 return
             }
             rec.Commit(def)
+            this._engine.categories.Sync(true)
             this._engine.Emit("topic:flow:" flowId, "evt.flow.committed"
                 , Map("flowId", flowId, "rev", rec.Rev, "byMeta", Json.True))
             this._engine.Emit("topic:engine", "evt.flow.list.changed", Map("added", [], "removed", [], "changed", [flowId]))
@@ -239,6 +247,7 @@ class FlowLifecycle {
                 return
             }
             this._engine.RemoveFlow(flowId)
+            this._engine.categories.Sync(true)
             this._engine.flowState.Forget(flowId)
             this._engine.vars.DropStatic(flowId)
             this._engine.varWriter.Forget(flowId)
@@ -327,6 +336,66 @@ class FlowLifecycle {
         if (IsObject(v))
             throw AhfError("payload field '" key "' must be a value", ErrCode.BAD_PAYLOAD)
         return String(v)
+    }
+
+    ; --- categories (WI-0071) --------------------------------------------------------------------
+
+    ; The category of a flow is "" (uncategorized) or a category of the list (PROTOCOL 4.2). Busy while a category command
+    ; writes the flows.
+    _CheckCategory(category) {
+        if (IsObject(category))
+            throw AhfError("payload field 'category' must be a value", ErrCode.BAD_PAYLOAD)
+        if (this._engine.categories.IsBusy)
+            throw AhfError("a category change is still being saved; try again", ErrCode.BUSY)
+        if (category != "" && !this._engine.categories.Has(String(category)))
+            throw AhfError("unknown category '" category "'", ErrCode.BAD_PAYLOAD)
+    }
+
+    ; Sets the category of one flow for a rename or delete of a category (WI-0071): the flow file is written at once and
+    ; the committed definition follows when storage has written it (as cmd.flow.meta.update). done(ok, err) runs then;
+    ; err is the error Map when ok is false. The caller checked the flows with CheckIdle first; a request that cannot
+    ; leave throws.
+    SetCategory(flowId, category, done) {
+        rec := this._engine.flows.Require(flowId)
+        this._RequireIdle(flowId)
+        raw := FlowDefinition.CopyValue(rec.Def.Raw)
+        raw["category"] := category
+        def := FlowDefinition(flowId, raw, rec.Rev + 1)
+        def.Pending := rec.Def.Pending.Clone()
+        this._metaPending[flowId] := true
+        try {
+            this._engine.peer.Request("storage", "cmd.storage.flow.write"
+                , Map("path", "Flows/" flowId ".json", "text", def.ToFileText(), "backup", Json.True)
+                , (res) => this._OnCategorySet(flowId, rec, def, res, done), FlowLifecycle.TIMEOUT_MS)
+        } catch as e {
+            this._metaPending.Delete(flowId)
+            throw e
+        }
+    }
+
+    _OnCategorySet(flowId, rec, def, res, done) {
+        ok := false
+        err := Map()
+        try {
+            this._metaPending.Delete(flowId)
+            if (!res.payload.Get("ok", false)) {
+                storageErr := res.payload.Get("error", "")
+                err := (storageErr is Map) ? storageErr
+                    : Map("code", ErrCode.INTERNAL, "message", "storage did not write the flow")
+            } else if (!(this._engine.flows.Get(flowId) == rec)) {
+                err := Map("code", ErrCode.NOT_FOUND, "message", "flow '" flowId "' is not loaded any more")
+            } else {
+                rec.Commit(def)
+                this._engine.Emit("topic:flow:" flowId, "evt.flow.committed"
+                    , Map("flowId", flowId, "rev", rec.Rev, "byMeta", Json.True))
+                this._engine.Emit("topic:engine", "evt.flow.list.changed", Map("added", [], "removed", [], "changed", [flowId]))
+                ok := true
+            }
+        } catch as e {
+            this._engine._Log("a0", "engine", "changing the category of flow '" flowId "' failed: " Type(e) ": " e.Message)
+            err := Map("code", ErrCode.INTERNAL, "message", "the engine could not finish the change of a category")
+        }
+        done(ok, err)
     }
 
     ; --- answers ---------------------------------------------------------------------------------

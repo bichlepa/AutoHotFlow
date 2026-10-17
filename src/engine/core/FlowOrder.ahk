@@ -89,6 +89,13 @@ class FlowOrder {
 
     ; --- building ----------------------------------------------------------------------------------
 
+    ; An independent copy of the order (a command changes the copy and keeps it only when every check passed).
+    Clone() {
+        copy := FlowOrder()
+        copy.Load(this.Entries())
+        return copy
+    }
+
     ; Replaces the order with the entries of a file (Parse). The uncategorized group is taken from its entry, wherever it
     ; stands in the file, and placed last.
     Load(entries) {

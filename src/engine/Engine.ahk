@@ -8,6 +8,7 @@
 #Include FlowTable.ahk
 #Include FlowStateFile.ahk
 #Include FlowLifecycle.ahk
+#Include FlowCategories.ahk
 #Include Executor.ahk
 #Include TriggerArms.ahk
 #Include WorkerBridge.ahk
@@ -67,6 +68,7 @@ class Engine extends Role {
         this.flows := FlowTable()
         this.flowState := FlowStateFile(this, this.flows)   ; enabled state of the triggers (WI-0060)
         this.lifecycle := FlowLifecycle(this)               ; create, duplicate, rename and delete a flow (WI-0070)
+        this.categories := FlowCategories(this)             ; categories and the order of the list (WI-0071)
         this.arms := TriggerArms(this)                       ; arming of the enabled triggers in the trigger host (WI-0062)
         this.vars := EngineVars()      ; global and static variables (WI-0040)
         this.varLoader := VarLoader(this, this.vars)
@@ -107,6 +109,11 @@ class Engine extends Role {
         this.On("cmd.flow.duplicate", (msg) => this.lifecycle.CmdDuplicate(msg))
         this.On("cmd.flow.meta.update", (msg) => this.lifecycle.CmdMetaUpdate(msg))
         this.On("cmd.flow.delete", (msg) => this.lifecycle.CmdDelete(msg))
+        this.On("cmd.category.create", (msg) => this.categories.CmdCreate(msg))
+        this.On("cmd.category.rename", (msg) => this.categories.CmdRename(msg))
+        this.On("cmd.category.delete", (msg) => this.categories.CmdDelete(msg))
+        this.On("cmd.category.order", (msg) => this.categories.CmdOrder(msg))
+        this.On("cmd.category.sort", (msg) => this.categories.CmdSort(msg))
         this.On("evt.worker.done", (msg) => this.workers.OnDone(msg))
         this.On("evt.trigger.fired", (msg) => this._OnTriggerFired(msg))
         this.On("evt.trigger.error", (msg) => this._OnTriggerError(msg))
@@ -159,6 +166,11 @@ class Engine extends Role {
             this.flowState.FlushAll(deadlineMs)
         } catch as e {
             this._Log("a0", "engine", "shutdown: sending the trigger state failed: " Type(e) ": " e.Message)
+        }
+        try {
+            this.categories.FlushAll(deadlineMs)
+        } catch as e {
+            this._Log("a0", "engine", "shutdown: sending the category order failed: " Type(e) ": " e.Message)
         }
         sent := this.varWriter.FlushAll(deadlineMs)
         if (sent > 0)
@@ -414,6 +426,13 @@ class Engine extends Role {
     _Loaded() {
         if (this._flowsLoaded)
             return
+        ; The order of the list is read first (WI-0071): storage gone or silent makes the start wait, as the variables do.
+        this.categories.Load(() => this._VariablesNext(), (why) => this._LoadInterrupted(why))
+    }
+
+    _VariablesNext() {
+        if (this._flowsLoaded)
+            return
         flowIds := []
         for rec in this.flows.All()
             flowIds.Push(rec.FlowId)
@@ -467,8 +486,8 @@ class Engine extends Role {
         }
         ; "ready": the start is complete (evt.engine.ready was sent). A client that subscribed late cannot know it from the
         ; event (F-0090).
-        return Map("epoch", this.epoch, "seq", this.seq, "flows", list, "settings", Map()
-            , "ready", Json.Bool(this._flowsLoaded))
+        return Map("epoch", this.epoch, "seq", this.seq, "flows", list, "categories", this.categories.Entries()
+            , "settings", Map(), "ready", Json.Bool(this._flowsLoaded))
     }
 
     _CmdFlowGet(msg) {
