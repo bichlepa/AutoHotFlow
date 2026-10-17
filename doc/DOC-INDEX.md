@@ -152,7 +152,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (24.4 KB, 177 lines)
+## doc/howto/gui-and-hotkeys.md (25.6 KB, 185 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -176,6 +176,7 @@ L148-153 A Ctrl click in a TreeView is read in the ItemSelect handler with GetKe
 L155-161 TVM_GETITEMRECT (and other messages with a pointer) returns 0 for a tree of another process (verified) (verified)
 L163-169 A tray notice (TrayTip) is shown by the process that owns the tray icon (assumed) (assumed)
 L171-177 A Text control is clipped to its newlines when its height is counted from them (verified) (verified)
+L179-185 The default button of a question was the first one, so a preselected "No" put No on the left (verified) (partly verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (11.0 KB, 135 lines)

@@ -175,3 +175,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Measure the text as the control wraps it: `DrawTextW` with `DT_CALCRECT | DT_WORDBREAK | DT_NOPREFIX` (0xC10), the font of the control and the width of the control; the return value is the height of the text (the rectangle is not changed). Convert it to the 100 % sizes of the layout. In a probe, read the control with `ControlGetPos` (`Static1`) to compare the two heights.
 - **Status:** verified at 96 dpi (`src/core/GuiLayout.ahk` `TextHeight`; probe `tests/ahk/helpers/ui_dialog_text.ahk` with `tools/ahkrun.py`: the delete question gave a 20 px control before the fix, 30 px (two lines of 15 px) after it; unit cases in `tests/ahk/core_gui_layout.test.ahk`). The gui test compares in pixels at the dialog DPI, so it discriminates at 96 dpi (run here) and, by the same arithmetic, at 225 % (old control 45 px, two lines about 68 px; not run). Not checked: the same control at 225 % on a real display.
 - **Source:** `src/core/GuiLayout.ahk`, `src/ui_common/UiDialogs.ahk`
+
+### The default button of a question was the first one, so a preselected "No" put No on the left (verified)
+
+- **Problem:** The three questions of the import that are preselected "No" (`importCopies`, `autostartV1`, `importWarning`) were built with the buttons in the order No, Yes, because the default button of a Confirm was the first one in the list. Every other question of the manager shows Yes left, No right. The order of the buttons was used as the preselection, so the two could not be set apart.
+- **Wrong:** Expressing the preselection by the order of the buttons (the first button gets the Enter key).
+- **Right:** The buttons of a question stand in one fixed order, and the default is a flag on the button: `[id, labelKey, true]` (`UiDialogs.DefaultIndex`, pure, unit-tested in `tests/ahk/ui_common_dialogs.test.ahk`; the order per question in `ManagerWindow.ConfirmButtons`, `tests/ahk/manager_window.test.ahk`). Without any flag the first button is the default, as before.
+- **Status:** verified by the unit tests (the Yes/No order of all manager questions and the default of each); the look of the dialog is not checked by hand (not checked).
+- **Source:** `src/ui_common/UiDialogs.ahk` (`Confirm`, `DefaultIndex`), `src/manager/ManagerWindow.ahk` (`ConfirmButtons`)
