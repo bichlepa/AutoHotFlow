@@ -118,7 +118,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Status:** open, verified in code, not checked on screen. Action: a gui test that selects two flows and then creates a category.
 **Evidence:** `src/manager/ManagerWindow.ahk` (`_OnTreeSelect`).
 
-### F-9000*: The text of the question dialogs was clipped to its first line (closed, fixed)
+### F-0128: The text of the question dialogs was clipped to its first line (closed, fixed)
 
 **What:** The text control of `UiDialogs.Confirm`, `Input` and `Choose` was as high as the number of newlines in the text (`_TextHeight`, 20 px per line). The manager's question texts are one line in the language file but wrap at the dialog width (380 px at 100 %), so only the first line was shown (the delete question: a 20 px control for two lines of text, measured by `tests/fault/test_manager_window.py::test_a_wrapped_question_text_of_a_dialog_is_shown_in_full` before the fix). The same count applied to the status line of the input dialog (fixed 18 px).
 **Fix:** `GuiLayout.TextHeight` measures the text with DrawText (wrapping at the dialog width, the font of the layout at the DPI of the window); the dialogs use it for the text and the status line (two lines). The height is measured once when the dialog is built; the wrapping at 225 % is the same as at 100 % because the font and the width scale together, but this was not seen on a scaled display.

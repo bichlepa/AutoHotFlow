@@ -45,7 +45,7 @@ class GuiLayout {
 
     ; The height at 100 % of a text shown in a Text control of the width (at 100 %) of the Gui g. The text is wrapped at
     ; the width the way a Text control wraps it (DrawText with the font of the layout at the DPI of the window), and
-    ; every line counts. A height from the number of newlines alone clips a wrapped text to its first line (F-9000*).
+    ; every line counts. A height from the number of newlines alone clips a wrapped text to its first line (F-0128).
     ; Measured once when the dialog is built: a later DPI change keeps the height of the first DPI.
     static TextHeight(g, text, width) {
         dpi := DllCall("user32\GetDpiForWindow", "ptr", g.Hwnd, "uint")

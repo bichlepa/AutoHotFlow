@@ -30,7 +30,7 @@ TestRun.Case("OnScreen: a point at the top left of the primary monitor is on a m
 TestRun.Case("OnScreen: a far away point is not on a monitor", () => (
     Assert.True(!GuiLayout.OnScreen(-30000, -30000), "no monitor at -30000,-30000")))
 
-; TextHeight measures the text as a Text control wraps it (F-9000*): a long text is more lines than one, a newline adds a
+; TextHeight measures the text as a Text control wraps it (F-0128): a long text is more lines than one, a newline adds a
 ; line, and a narrower width gives more lines. A hidden Gui is enough (nothing is shown).
 TestRun.Case("TextHeight: a wrapped text counts every line, not only its newlines", () => (
     g := Gui("-DPIScale"),
