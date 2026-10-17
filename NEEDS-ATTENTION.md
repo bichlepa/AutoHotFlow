@@ -4,11 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **Log bursts (F-0116, WI-0080).** A burst of 5000 log lines reached the manager as 1991 (the topic `log` drops lines, PROTOCOL 4.6). Options: (a) keep the drop; (b) the log window reads the file again after a burst. Recommendation: (b).
-- **Instance count in the tree (WI-0074, F-0117).** REQ-MGR-010 asks for the number of running instances; the manager snapshot does not carry it. Options: (a) extend the protocol (snapshot field); (b) drop it from REQ-MGR-010. 
-- **Missing packages of non-trigger elements (WI-0074, F-0120).** They are not marked in the tree. Say if that is wanted for S0004 or later.
-- **Source group of the log filter (WI-0080).** "App, flow, thread" is built as the v1 level letters a, f, t, only a stand-in. Say if you meant something else (for example the sender or the source name).
-- **Time stamps of the log tail (WI-0080).** The local stamp is converted with the current UTC offset; entries from before a DST change are up to 1 hour off (the window itself is not affected). A fix is about 10 lines (store UTC). Recommendation: leave it, as documented.
+None open. (Decided 2026-10-17, E0078 to E0081: log burst re-read, instance count, marks for missing packages, no thread group. The follow-up task is queued after WI-0075.)
 
 ## Manual checks
 
