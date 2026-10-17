@@ -8,7 +8,7 @@ None open.
 
 ## Manual checks
 
-- **Manual check 3, rest (REQ-USE-090):** the dialog windows were moved to the shared layout (`core/GuiLayout.ahk`, WI-0069). The check at 125 % and 150 %, a second monitor, and the DPI change of an open window are still open. The manager window at 225 % and the minimize-then-hide case (WI-0073) are not checked either.
+None open.
 
 ## To know
 
