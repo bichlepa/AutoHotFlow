@@ -76,6 +76,7 @@ TEST_GROUPS = {
     "ahk/vars_model.test.ahk": ["variables", "expr"],
     "e2e/test_manager.py": ["manager"],
     "e2e/test_manager_flows.py": ["manager"],
+    "e2e/test_manager_archive.py": ["manager", "storage"],
     "e2e/test_manager_import.py": ["manager"],
     "e2e/test_manager_log.py": ["manager"],
     "fault/test_debug_dump.py": ["diagnosis"],
