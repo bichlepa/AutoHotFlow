@@ -15,7 +15,8 @@ class V1Source {
     static FLOWS_DIR := "Saved Flows"
     static VARS_DIR := "Variables"
     static SHORTCUT := "AutoHotFlow.lnk"
-    static V1_EXE := "autohotflow.exe"
+    ; v1 writes the path of AutoHotFlow.exe when it is in the folder, else the path of AutoHotFlow.ahk (v1 GetAhfPath)
+    static V1_NAMES := ["autohotflow.exe", "autohotflow.ahk"]
 
     ; The folder as an absolute path of an existing folder. Throws bad_payload for a relative path, not_found for a missing one.
     static Root(dir) {
@@ -82,7 +83,7 @@ class V1Source {
             throw AhfError("the shortcut '" filePath "' cannot be read: " e.Message, ErrCode.INTERNAL)
         }
         SplitPath(target, &targetName)
-        return Map("exists", Json.Bool(true), "v1", Json.Bool(StrLower(targetName) = V1Source.V1_EXE), "target", target)
+        return Map("exists", Json.Bool(true), "v1", Json.Bool(V1Source._IsV1Name(targetName)), "target", target)
     }
 
     ; Deletes the shortcut when it points to v1. Map(removed): false when there is no shortcut. denied for a shortcut of another
@@ -103,6 +104,14 @@ class V1Source {
 
     ; A truth value of a state Map (Json.Bool gives the sentinel objects, which are true or false too).
     static _Truth(v) => (v == Json.True || (!IsObject(v) && (v = 1 || v = "true")))
+
+    static _IsV1Name(fileName) {
+        for name in V1Source.V1_NAMES {
+            if (StrLower(fileName) = name)
+                return true
+        }
+        return false
+    }
 
     static _Shortcut(startupDir) {
         text := String(startupDir)
