@@ -750,3 +750,19 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 **Action:** On the next slow run compare the header with the run record (`sha`) for a plain `--ref` run and for a `--with-changes` run.
 
 **Closed 2026-10-16:** observed once, not reproduced; every run record of the history carries the commit (`code.sha`), so a recurrence can be compared.
+
+### F-0117: The tree shows that a flow runs, not how many instances run
+
+**What:** WI-0074 asks the tree to show a running flow with the number of its instances (REQ-MGR-010). The engine reports only `executing` (0 or 1) in `evt.flow.state` and in the snapshot (PROTOCOL 4.2, 4.3); the count of running and waiting instances is not sent. The tree shows "running" without a number.
+**Status:** open, verified (read of PROTOCOL 4.2 and 4.3, `ManagerWindow._FlowLabel`). Decision needed from the owner: add the count to the snapshot and `evt.flow.state` (an engine and protocol change), or take the count out of REQ-MGR-010.
+**Evidence:** `doc/PROTOCOL.md` 4.2 and 4.3; `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`.
+
+**Closed 2026-10-17 (E0079, bug hunter):** fixed: `Executor.RunningCount` (instances that run or stop) is in the snapshot and in `evt.flow.state` (`instances`); the state is sent on every start, also for a promoted waiting instance; the label shows "running (n)". Test: `tests/e2e/test_manager_flows.py::test_the_running_instances_are_counted_in_the_snapshot_and_the_state` (failed before with KeyError `instances`). The label text itself is not tested (F-0121).
+
+### F-0120: A flow that has no trigger message but a missing package is not marked
+
+**What:** REQ-MIG-070 asks the manager to show at the flow which packages are missing. The manager marks a flow only when one of its triggers has an arming error (`message` of `evt.trigger.state`, which a missing package causes). An element of a missing package that is not a trigger is not marked, because the snapshot does not list missing packages.
+**Status:** open, verified in code, not checked for a flow with a missing non-trigger element. Action: a snapshot field for the missing packages (protocol change, owner decision).
+**Evidence:** `tests/e2e/test_manager_flows.py::test_enabling_a_flow_with_a_missing_package_reports_the_trigger` (trigger case only).
+
+**Closed 2026-10-17 (E0080, bug hunter):** fixed: the snapshot carries `missingPackages` per flow (the packages of all its elements that the engine process does not have, `Engine._MissingPackages`, PROTOCOL 4.2); the manager label shows "missing package: <names>" for every element type. Test: `tests/e2e/test_manager_flows.py::test_a_flow_with_a_missing_package_of_an_action_is_marked_with_the_package` (an action element; failed before with KeyError `missingPackages`).
