@@ -16,7 +16,7 @@
 #Include ..\..\..\src\engine\Engine.ahk
 #Include ..\..\..\src\worker\Worker.ahk
 #Include ..\..\..\src\storage\Storage.ahk
-#Include ..\..\..\src\manager\StubManager.ahk
+#Include ..\..\..\src\manager\Manager.ahk
 #Include ..\..\..\src\tray\Tray.ahk
 #Include ..\..\..\src\debugview\DebugView.ahk
 #Include ..\..\..\src\triggerhost\TriggerHost.ahk
@@ -34,7 +34,7 @@ TestDialogProvider.Register()   ; dialogs of elements are answered from the scri
 RoleRegistry.Register("engine", Engine)
 RoleRegistry.Register("worker", Worker)
 RoleRegistry.Register("storage", Storage)
-RoleRegistry.Register("manager", StubManager)
+RoleRegistry.Register("manager", Manager)
 RoleRegistry.Register("tray", Tray)
 RoleRegistry.Register("debug", DebugView)
 RoleRegistry.Register("triggerhost", TriggerHost)

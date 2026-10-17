@@ -15,6 +15,20 @@ class UiTexts {
         return ctl
     }
 
+    ; Gives a registered control another text key (a button that changes its label) and sets the text. A control that is
+    ; not registered is registered. Returns ctl.
+    static SetKey(owner, ctl, key, prop := "Text", args*) {
+        for item in UiTexts._items {
+            if (item["owner"] = owner && item["ctl"] = ctl && item["prop"] = prop) {
+                item["key"] := key
+                item["args"] := args
+                UiTexts._Set(ctl, prop, key, args)
+                return ctl
+            }
+        }
+        return UiTexts.Register(owner, ctl, key, prop, args*)
+    }
+
     ; Removes every entry of owner (call it before the window is destroyed).
     static Forget(owner) {
         kept := []

@@ -30,7 +30,8 @@ class UiWindow {
         }
         this.Gui := Gui("-DPIScale")
         this.Hwnd := this.Gui.Hwnd
-        this.Gui.OnEvent("Close", (*) => this.Close())
+        this.hideOnClose := false   ; true: the close box hides the window (the manager, E0014) instead of closing it
+        this.Gui.OnEvent("Close", (*) => this._OnCloseBox())
         this.lay := GuiLayout.Create(this.Gui, width, height)
         UiTexts.Register(this.Hwnd, this.Gui, titleKey, "Title")
     }
@@ -53,6 +54,28 @@ class UiWindow {
         this._shown := true
     }
 
+    ; The close box and Escape: closes the window, or only hides it with hideOnClose. The result 1 keeps Windows from
+    ; destroying the window itself.
+    _OnCloseBox() {
+        if (this.hideOnClose)
+            this.Hide()
+        else
+            this.Close()
+        return 1
+    }
+
+    ; True while the window is shown.
+    Visible => !this._closed && this._shown && DllCall("user32\IsWindowVisible", "ptr", this.Hwnd, "int") != 0
+
+    ; Remembers the position and the size and hides the window; Show brings it back at the same place and size.
+    Hide() {
+        if (this._closed || !this._shown)
+            return
+        this.Remember()
+        this.Gui.Hide()
+        this._shown := false
+    }
+
     ; Remembers the position and the size, then removes the texts and the window. A second call does nothing.
     Close() {
         if (this._closed)
@@ -67,6 +90,8 @@ class UiWindow {
     ; Stores the current outer position and the client size (at 100 %) under the window name.
     Remember() {
         if (this._closed || !this._shown)   ; a window that was never shown has no position worth keeping
+            return
+        if (WinGetMinMax(this.Hwnd) != 0)   ; minimized or maximized: the position is not the one of the normal window
             return
         this.Gui.GetPos(&x, &y)
         this.Gui.GetClientPos(, , &cw, &ch)

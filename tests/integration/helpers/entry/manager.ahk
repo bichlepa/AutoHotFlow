@@ -8,7 +8,7 @@
 ; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
 #Warn All, StdOut
 #Include ..\..\..\..\src\AhfBoot.ahk
-#Include ..\..\..\..\src\manager\StubManager.ahk
+#Include ..\..\..\..\src\manager\Manager.ahk
 
-RoleRegistry.Register("manager", StubManager)
+RoleRegistry.Register("manager", Manager)
 AhfMain()

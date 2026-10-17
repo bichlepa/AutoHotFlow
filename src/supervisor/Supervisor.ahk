@@ -34,7 +34,7 @@
 ;   --restart-max  (only with --test-roles) restarts per RESTART_WINDOW_MS, default Children.RESTART_MAX (3);
 ;               lets the tests restart a child many times (handle leaks).
 ;   --worker-limit  (only with --test-roles) most workers alive at once, default Children.WORKER_LIMIT (16).
-;   --ui=<word>, --headless, --stub-cancel-exit  passed on to every role (WI-0013: --ui=stub for the manager stub).
+;   --headless, --cancel-exit  passed on to every role (the manager and the tray have no window or icon and answer test commands, WI-0073).
 ;   --tray, --no-tray  start the role tray (the tray icon and menu of the application, WI-0072, E0075) or not. Default: the
 ;               product entry starts it, the test entry does not (Supervisor.TrayDefault), so that no test run shows an icon.
 ;   --windows-startup  passed on to every role; the engine arms the triggers with the start context windowsStartup
@@ -452,18 +452,12 @@ class Supervisor {
         return 1
     }
 
-    ; Options the supervisor passes on to every role process (WI-0013): --ui=<word> selects the UI role
-    ; (manager: --ui=stub), --headless and --stub-cancel-exit are the stub's test options.
+    ; Options the supervisor passes on to every role process: --headless (no window, test commands, WI-0013, WI-0073) and
+    ; --cancel-exit (the manager cancels the exit, a test option).
     _RoleOpts(opts) {
         text := ""
         if (opts.Has("log-level"))
             text .= " --log-level=" this.logLevel
-        if (opts.Has("ui")) {
-            ui := String(opts["ui"])
-            if (!RegExMatch(ui, "^[a-z]+$"))
-                throw AhfError("supervisor: --ui must be a single word, e.g. --ui=stub", ErrCode.BAD_ARGS)
-            text .= " --ui=" ui
-        }
         if (opts.Has("headless"))
             text .= " --headless"
         if (opts.Has("windows-startup"))
@@ -478,8 +472,8 @@ class Supervisor {
                 text .= " --" key "=" value
             }
         }
-        if (opts.Has("stub-cancel-exit"))
-            text .= " --stub-cancel-exit"
+        if (opts.Has("cancel-exit"))
+            text .= " --cancel-exit"
         return text
     }
 

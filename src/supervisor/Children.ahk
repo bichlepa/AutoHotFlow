@@ -566,7 +566,7 @@ class Children {
             cmd .= ' --test-roles'
         if (isRestart)
             cmd .= ' --restarted=' rec["restartTimes"].Length   ; the role knows it is a restart (engine: evt.engine.restarted)
-        cmd .= cfg["roleOpts"]   ; --ui, --headless, --stub-cancel-exit (WI-0013), --windows-startup (WI-0062), "" when not given
+        cmd .= cfg["roleOpts"]   ; --headless, --cancel-exit (WI-0013), --windows-startup (WI-0062), "" when not given
         ; The state is reset BEFORE the process starts. AHK may interrupt this thread between CreateProcessW and the
         ; assignment of the pid (the hub handles messages meanwhile, and other requests such as cmd.process.spawn can
         ; take long). The child can say sys.hello in that time: OnHello then sets "ready" first, and a reset after
