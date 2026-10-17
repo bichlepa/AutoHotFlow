@@ -31,6 +31,21 @@ def shown(procs, datadir, session_id):
     runner.close()
 
 
+def start_shown(runner):
+    """Starts the session and waits until the manager and the tray role subscribe to topic notice. A notice that is sent
+    before a subscriber is connected is lost (PROTOCOL 5a), so the test may not start an error before this."""
+    runner.start(extra=START_EXTRA)
+    deadline = time.monotonic() + HELD_WAIT_S
+
+    def subscribed():
+        links = runner.request("supervisor", "cmd.diag.snapshot", {}).get("snapshot", {}).get("hub", {}).get("links", [])
+        return {l["name"] for l in links if "notice" in l.get("topics", [])} >= {"manager", "tray"}
+    while not subscribed():
+        if time.monotonic() > deadline:
+            raise AssertionError("manager or tray did not subscribe to topic notice")
+        time.sleep(0.05)
+
+
 def throwing_flow(name):
     """Every start ends with an unhandled exception: Action_TestThrow has no connection for it."""
     fb = FlowBuilder(name)
@@ -64,25 +79,35 @@ def notices_of(runner, flow_id=None):
 
 
 def manager_flow(runner, flow_id):
-    state = runner.request_ok("manager", "cmd.test.state", {})["state"]
-    return [f for f in state["flows"] if f["flowId"] == flow_id][0]
+    """The flow's record in the manager, or None while the manager has not answered or has not loaded the flow yet."""
+    answer = runner.request("manager", "cmd.test.state", {})
+    if not answer.get("ok"):
+        return None
+    found = [f for f in answer["state"]["flows"] if f["flowId"] == flow_id]
+    return found[0] if found else None
 
 
 def tray_info(runner):
-    return runner.request_ok("tray", "cmd.diag.snapshot", {})["snapshot"]["info"]
+    """The info part of the tray role's snapshot. The tray connects after the engine: the first asks may find no peer."""
+    deadline = time.monotonic() + WAIT_S
+    while True:
+        answer = runner.request("tray", "cmd.diag.snapshot", {})
+        if answer.get("ok") or time.monotonic() > deadline:
+            return runner.request_ok("tray", "cmd.diag.snapshot", {})["snapshot"]["info"]
+        time.sleep(0.05)
 
 
 def test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray(shown):
     fb = throwing_flow("throws")
     flow_id = shown.add(fb)
-    shown.start(extra=START_EXTRA)
+    start_shown(shown)
     shown.begin(flow_id)
     hit = shown.wait_message(lambda m: m.get("type") == "evt.ui.notice", timeout=WAIT_S)
     assert hit is not None, "no notice for the unhandled exception"
     p = hit[1]["payload"]
     assert (p["kind"], p["level"], p["flowId"], p["key"]) == ("exception", "error", flow_id, "Notice_exception"), p
     assert p["args"][0] == "throws" and p["args"][1] and p["args"][2] and p["held"] == 0, p
-    assert wait_for(lambda: manager_flow(shown, flow_id)["unseen"] is True, WAIT_S), "the flow is not marked"
+    assert wait_for(lambda: (manager_flow(shown, flow_id) or {}).get("unseen") is True, WAIT_S), "the flow is not marked"
     assert wait_for(lambda: tray_info(shown)["notices"] == 1, WAIT_S), "the tray role did not receive the notice"
     assert "The flow throws" in tray_info(shown)["lastNotice"], tray_info(shown)
     assert tray_info(shown)["noticesHeld"] == 0
@@ -94,7 +119,7 @@ def test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_
 def test_opening_the_list_of_notices_removes_the_marks_and_keeps_the_entries(shown):
     first = shown.add(throwing_flow("first"))
     second = shown.add(throwing_flow("second"))
-    shown.start(extra=START_EXTRA)
+    start_shown(shown)
     shown.begin(first)
     shown.begin(second)                       # another flow: its own throttle key, so it is not held back
     assert wait_for(lambda: len(notices_of(shown)) == 2, WAIT_S), notices_of(shown)
@@ -107,7 +132,7 @@ def test_opening_the_list_of_notices_removes_the_marks_and_keeps_the_entries(sho
 @pytest.mark.slow
 def test_a_burst_of_errors_gives_one_notice_at_once_and_the_count_when_the_window_ends(shown):
     flow_id = shown.add(throwing_flow("burst"))
-    shown.start(extra=START_EXTRA)
+    start_shown(shown)
     for _ in range(5):
         shown.begin(flow_id)
     assert len(shown.ended(flow_id, count=5, timeout=WAIT_S)) == 5, "the five starts did not end"
@@ -120,12 +145,12 @@ def test_a_burst_of_errors_gives_one_notice_at_once_and_the_count_when_the_windo
 
 def test_a_stop_by_the_runaway_guard_gives_a_notice_with_the_limit(shown):
     flow_id = shown.add(endless_loop(limit=2000))
-    shown.start(extra=START_EXTRA)
+    start_shown(shown)
     shown.begin(flow_id)
     hit = shown.wait_message(lambda m: m.get("type") == "evt.ui.notice", timeout=LIMIT_S)
     assert hit is not None, "no notice for the stop by the limit"
     p = hit[1]["payload"]
     assert (p["kind"], p["level"], p["flowId"], p["key"]) == ("limit", "warning", flow_id, "Notice_limit"), p
     assert p["args"] == ["runaway-notice", 2000], p
-    assert wait_for(lambda: manager_flow(shown, flow_id)["limit"] == "executionsPerMinute", WAIT_S)
+    assert wait_for(lambda: (manager_flow(shown, flow_id) or {}).get("limit") == "executionsPerMinute", WAIT_S)
     assert manager_flow(shown, flow_id)["limitValue"] == 2000, manager_flow(shown, flow_id)

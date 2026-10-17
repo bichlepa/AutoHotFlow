@@ -397,6 +397,17 @@ CheckNoticeList() {
     Assert.Equal(m.Flow("B")["unseen"], false, "opening the list removes the marks")
 }
 
+TestRun.Case("An error notice that came before the first snapshot marks the flow when the snapshot comes", () => CheckNoticeBeforeSnapshot())
+CheckNoticeBeforeSnapshot() {
+    pm := NewModel()
+    m := pm[2]
+    m.OnEvent("evt.ui.notice", Evt(100, 1, Map("kind", "exception", "level", "error", "flowId", "A", "key", "Notice_exception"
+        , "args", ["Name A", "t1", "boom"], "held", 0)))
+    pm[1].Answer(Snap(100, 10, ["A", "B"]))
+    Assert.Equal(m.Flow("A")["unseen"], true, "the snapshot brings the mark of the notice")
+    Assert.Equal(m.Flow("B")["unseen"], false)
+}
+
 TestRun.Finish()
 
 HasValue(list, value) {

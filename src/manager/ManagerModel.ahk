@@ -103,6 +103,7 @@ class ManagerModel {
         ; Notices (WI-0075, PROTOCOL 4.8): the newest NOTICE_KEEP of topic notice, in memory only.
         this.notices := []
         this.noticeCount := 0          ; n of the newest notice (numbers are not reused)
+        this.unseenIds := Map()        ; flowId -> true: an error notice the user has not looked at (kept until a snapshot knows the flow)
     }
 
     ; --- listeners and trace -------------------------------------------------------------------
@@ -229,8 +230,9 @@ class ManagerModel {
                 recs[id]["limit"] := this.flows[id]["limit"]
                 recs[id]["limitValue"] := this.flows[id]["limitValue"]
             }
-            ; An error notice keeps its mark until the user has looked at it (the snapshot does not carry it either).
-            if (this.flows.Has(id) && this.flows[id]["unseen"])
+            ; An error notice keeps its mark until the user has looked at it: the marks are kept by flow ID, so a notice that
+            ; came before the first snapshot marks the flow too.
+            if (this.unseenIds.Has(id))
                 recs[id]["unseen"] := true
             ids.Push(id)
         }
@@ -330,15 +332,19 @@ class ManagerModel {
         if (this.notices.Length > ManagerModel.NOTICE_KEEP)
             this.notices.RemoveAt(1)
         id := entry["flowId"]
-        if (entry["kind"] = "exception" && this.flows.Has(id)) {
-            this.flows[id]["unseen"] := true
-            this._Notify("flow", this.flows[id])
+        if (entry["kind"] = "exception" && id != "") {
+            this.unseenIds[id] := true
+            if (this.flows.Has(id)) {
+                this.flows[id]["unseen"] := true
+                this._Notify("flow", this.flows[id])
+            }
         }
         this._Notify("notice", entry)
     }
 
     ; The user opened the list of notices: the marks of the flows go (PROTOCOL 4.8).
     OpenNotices() {
+        this.unseenIds := Map()
         for id, rec in this.flows {
             if (rec["unseen"]) {
                 rec["unseen"] := false
@@ -359,10 +365,13 @@ class ManagerModel {
 
     ; The user selected a flow: its error mark goes.
     _Seen(flowId) {
-        if (flowId = "" || !this.flows.Has(flowId) || !this.flows[flowId]["unseen"])
+        if (flowId = "" || !this.unseenIds.Has(flowId))
             return
-        this.flows[flowId]["unseen"] := false
-        this._Notify("flow", this.flows[flowId])
+        this.unseenIds.Delete(flowId)
+        if (this.flows.Has(flowId)) {
+            this.flows[flowId]["unseen"] := false
+            this._Notify("flow", this.flows[flowId])
+        }
     }
 
     ; Process events of the supervisor. Only the engine matters to the model.
