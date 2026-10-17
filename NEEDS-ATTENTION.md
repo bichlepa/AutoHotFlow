@@ -4,8 +4,11 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **Default limit of executions per minute for the runaway guard (WI-0066, F-9000 provisional).** Proposed: 50,000 executions per minute, 100 waiting and 100 parallel instances. At 50,000 a runaway flow is stopped after about 8 to 11 seconds; a 10,000-member loop with up to four body elements passes. The alternative, 25,000, would stop a 10,000-member loop with two body elements. Your call: 50,000, 25,000, or another value. Measurements: MS-0036 and MS-0037 in `doc/MEASUREMENTS.md`.
 - **How the hotkey input tests send keys (WI-0064, escalated by the agent).** The spike did not settle it: unassigned keys fired in three of four runs (one run missed both hook keys, cause unknown). A real `Trigger_Hotkey` registration of an unassigned key did not fire on `SendInput` in one run, while calling its callback directly does fire. The input desktop then closed (the PC locked) and `SendInput` returned 0. Two questions for you: (1) which key-delivery method the input tests use (a hook-only probe, another unassigned key set, or the `gui` tier only); (2) whether these tests may run on this PC at all, given that they cannot run while it is locked. Until you decide, the tests skip with a reason. The uncommitted test files are in the workspace `wi-0064`.
+
+## To know
+
+- **Default limits of the runaway guard are accepted (owner, 2026-10-17):** 50,000 executions per minute, 100 waiting and 100 parallel instances (WI-0066; measurements MS-0036 and MS-0037). The owner also said the guard was designed too strictly; since the defaults are accepted, that point is moot and nothing was changed.
 
 ## Manual checks
 
