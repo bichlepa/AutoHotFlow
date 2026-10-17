@@ -4,11 +4,13 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-None open.
+- **Log bursts (F-0116, WI-0080).** A burst of 5000 log lines reached the manager as 1991 (the topic `log` drops lines, PROTOCOL 4.6). Options: (a) keep the drop; (b) the log window reads the file again after a burst. Recommendation: (b).
+- **Source group of the log filter (WI-0080).** "App, flow, thread" is built as the v1 level letters a, f, t, only a stand-in. Say if you meant something else (for example the sender or the source name).
+- **Time stamps of the log tail (WI-0080).** The local stamp is converted with the current UTC offset; entries from before a DST change are up to 1 hour off (the window itself is not affected). A fix is about 10 lines (store UTC). Recommendation: leave it, as documented.
 
 ## Manual checks
 
-None open.
+- **Log window (WI-0080):** never shown by an agent (only the class load and the window tests run). Check it with WI-0082 or earlier: open it, filters, a flood of lines, DPI. Review the German texts in `assets/language/manager/de.ini`.
 
 ## To know
 
