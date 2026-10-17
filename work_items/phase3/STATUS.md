@@ -62,7 +62,7 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI-0072 | Tray icon and tray menu of the application (own role `tray`, E0075) | done, verified (fast, foundation, slow green on 3a32a30) | sonnet (review sonnet) | 3a32a30 | 2026-10-17 | block A; unlimited restart with growing pause, decided by the owner |
 | WI-0073 | Manager: window, model, resync, headless driver, replaces the stub | done, verified on 72da2f6 (fast, foundation, slow green; stress 201 flows: filled after 0.54 s, snapshot 0.2 s; gui test 4 passed) | sonnet (review sonnet) | ec2a38b–72da2f6 | 2026-10-17 | block A; the product start does not start the manager yet (the tray does) |
 | WI-0074 | Flow tree and operations | done, verified on 5590990a (fast, foundation green) | haiku/sonnet (review sonnet) | fd0de334–5590990a | 2026-10-17 | block A; owner decisions F-0117, F-0120; drag test fixed by sonnet (cross-process RECT) |
-| WI-0075 | Notices | open | | | | block A |
+| WI-0075 | Notices | review done (fixes in progress on wip/wi-75) | | | | block A |
 | WI-0076 | Import from v1, manual check of block A | open | | | | block A |
 | WI-0077 | Settings model | open | | | | block B |
 | WI-0078 | Settings dialog, language, about | open | | | | block B |
@@ -81,10 +81,11 @@ None.
 
 ## Running agents
 
-- WI-0075 (notices): haiku, workspace `wi-75`.
-- Bug hunter for F-0116, F-0117, F-0120 and E0081: haiku, workspace `hunt-1`.
+- WI-0075 (notices): haiku, workspace `wi-75`, review fixes (F-9100 to F-9104).
 
 ## Last verified state
+
+Commit `50aba53d` (hunter fixes E0079 to E0081 plus the test fix for the evt.flow.state count) verified by `tools/verify.py --tiers fast,foundation`: VERDICT green (fast 1405 passed, foundation 470 passed). `93d30e25` was red (wait-policy test counted the new state events; fixed by `50aba53d`).
 
 Commit `5590990a` (WI-0074 integrated) verified by `tools/verify.py --tiers fast,foundation`: VERDICT green. Fast run `20261017-162956-5590990a-2` (1403 passed, 1 skipped), foundation run `20261017-162956-5590990a` (470 passed, 1 skipped). Before that `d6331fb8` (WI-0080): foundation and slow green (`20261017-154520-d6331fb8`, `-3`), fast red by 2 `pipe_write_gone` tests under heavy load (`-2`), green alone (run `20261017-162931-26520`).
 
