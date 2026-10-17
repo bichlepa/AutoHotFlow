@@ -31,28 +31,28 @@ L398-409 9. Performance budgets (targets, measured in Phase 2)
 L411-421 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (110.6 KB, 583 lines)
+## doc/PROTOCOL.md (114.9 KB, 591 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-92 3. Addresses and Topics
-L94-556 4. Message Catalog
+L94-564 4. Message Catalog
 L110-137   4.1 Lifecycle (`sys.*`)
 L139-156   4.1a Process events (topic `process`, supervisor → subscribers)
 L158-167   4.1b Test roles (only with `--test-roles`)
 L169-177   4.1c Unhandled errors (`evt.diag.error`, WI-0023)
-L179-225   4.2 Engine commands (clients → `engine`)
-L227-270   4.3 Engine events (`evt.*`, engine → topics)
-L272-302   4.4 Engine ↔ trigger host
-L304-369   4.5 Engine ↔ worker
-L371-420   4.6 Engine ↔ storage and log
-L422-441   4.7 Dialogs
-L443-475   4.8 Manager (WI-0073, `src/manager/`)
-L477-537   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
-L539-556   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L558-577 5. Connection setup, reconnection, resync
-L568-577   5a Events before subscription (design question, WI-0007)
-L579-583 6. Versioning and extension
+L179-227   4.2 Engine commands (clients → `engine`)
+L229-272   4.3 Engine events (`evt.*`, engine → topics)
+L274-304   4.4 Engine ↔ trigger host
+L306-371   4.5 Engine ↔ worker
+L373-427   4.6 Engine ↔ storage and log
+L429-448   4.7 Dialogs
+L450-483   4.8 Manager (WI-0073, `src/manager/`)
+L485-545   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
+L547-564   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
+L566-585 5. Connection setup, reconnection, resync
+L576-585   5a Events before subscription (design question, WI-0007)
+L587-591 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (53.0 KB, 324 lines)
