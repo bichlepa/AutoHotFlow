@@ -66,6 +66,8 @@ None. The manual-check start path (section 3 of MANUAL-CHECKS) is integrated; th
 
 ## Last verified state
 
+Commit `e495a8cc` (review fixes of the input tests and the input lock, after WI-0067) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261017-090407-e495a8cc` (1240 passed, 1 skipped), foundation run `20261017-090407-e495a8cc-2` (466 passed, 1 skipped). Before that, `aca17d96` (hotkeys with real keys while the engine is blocked): fast `20261017-085945-aca17d96` (1234 passed, 3 skipped), foundation `20261017-085945-aca17d96-2` (466 passed, 1 skipped). Open: owner decision on whether the non-gui input tests run in the fast tier (NEEDS-ATTENTION.md).
+
 Commit `251e86bc` (WI-0067 integrated) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261017-011502-251e86bc` (1226 passed, 1 skipped). Acceptance runs of the implementer on `8e7d403` are in the WI-0067 result.
 
 Commit `8e37e0b8` (WI-0064 integrated, without the input tests) verified by `tools/verify.py --auto`: VERDICT green. Fast run `20261017-001911-8e37e0b8` (1224 passed, 1 skipped).
