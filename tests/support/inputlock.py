@@ -117,3 +117,24 @@ def wait_modifiers_released(wait_s=1.0):
         time.sleep(wait_s)
         held = held_modifiers()
     return held
+
+
+def baseline_skip_reason():
+    """After a baseline key did not arrive: why that is the desktop's fault (a reason text), or None when the desktop is
+    usable. Only the reasons named here may skip a test; any other miss is a failure of the hotkey path."""
+    if not input_desktop_open():
+        return "the input desktop was lost (locked workstation or a secure desktop in front)"
+    held = held_modifiers()
+    if held:
+        return "a modifier is held by the user (VK %s)" % held
+    return None
+
+
+def baseline_missed(what):
+    """Call when a baseline key did not arrive: skips for a desktop reason, otherwise fails (never a silent skip)."""
+    import pytest
+    reason = baseline_skip_reason()
+    if reason:
+        pytest.skip("%s did not arrive and %s" % (what, reason))
+    pytest.fail("%s did not arrive although the input desktop is usable and no modifier is held: "
+                "hotkey path, not the desktop" % what)

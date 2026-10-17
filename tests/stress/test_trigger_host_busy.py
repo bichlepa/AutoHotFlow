@@ -211,7 +211,7 @@ def test_the_host_keeps_its_hotkeys_while_the_engine_is_blocked(host_flows):
             assert wait_armed(host_flows, hot_ids[name], trigger.id), (name, host_flows.stderr_text())
         press_all()                                                       # before the block: the baseline
         if not (wait_count("plain", 1) and wait_count("hook", 1)):
-            pytest.skip("the keys did not arrive: keys do not reach the hotkeys (no input desktop?)")
+            inputlock.baseline_missed("the baseline keys vk%X and vk%X" % (PLAIN_VK, HOOK_VK))
         psutil.cpu_percent(interval=None)
         busy_run = host_flows.begin(busy_id)
         time.sleep(scaled(0.7))                                           # the block runs now

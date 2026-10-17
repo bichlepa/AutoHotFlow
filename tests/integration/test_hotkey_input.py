@@ -2,7 +2,7 @@
 
 The keys are unassigned virtual keys (vk88 to vk8F, vkE8) without modifiers, sent with SendInput. Every input test holds the
 machine-wide input lock (tests/support/inputlock.py), so two runs never send keys at the same time. A test is skipped
-with a reason when there is no input desktop or when a probe key does not arrive. A test waits briefly when the user
+with a reason when there is no input desktop; a probe key that does not arrive on a usable desktop fails. A test waits briefly when the user
 holds a modifier, and skips when it stays held.
 
 The gui tier (marker gui, run by the project owner only, never by an agent) sends key combinations with modifiers.
@@ -45,7 +45,7 @@ TWO_VK = 0xE8
 
 class InputRunner(FlowRunner):
     """A flow runner whose session starts at the first enable: the flows of the test are added before that, together
-    with a probe flow. The probe key must arrive, otherwise the test is skipped (the keys do not reach the desktop)."""
+    with a probe flow. The probe key must arrive: the test is skipped only when the desktop is unusable, otherwise it fails."""
 
     def enable(self, *flow_ids):
         if self._sup is None:
@@ -58,10 +58,10 @@ class InputRunner(FlowRunner):
         self.start()
         super().enable(probe_id)
         assert wait_armed(self, probe_id, probe.id), (trigger_state(self, probe_id, probe.id), self.stderr_text())
-        if inputlock.send_key(PROBE_VK) == 0:
+        if press(PROBE_VK) == 0:                  # skips when a modifier is held
             pytest.skip("SendInput refused the probe key: no input desktop")
         if not self.ended(probe_id, count=1, timeout=scaled(5.0)):
-            pytest.skip("the probe key did not arrive: keys do not reach the hotkey (no input desktop?)")
+            inputlock.baseline_missed("the probe key vk%X" % PROBE_VK)    # skip only for a desktop reason, else fail
 
 
 @pytest.fixture
