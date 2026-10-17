@@ -316,10 +316,11 @@ def send_delete_then(flows, follow_type, follow_payload):
 def test_a_save_right_after_a_delete_is_busy_and_does_not_re_create_the_file(flows):
     add_skeleton(flows)
     flows.start()
+    listen_to_engine(flows)
     answer = send_delete_then(flows, "cmd.flow.save", {"flowId": FLOW})
     assert error_code(answer) == "busy", answer
-    flows.wait_message(lambda m: m.get("type") == "evt.flow.list.changed"
-                       and FLOW in m["payload"].get("removed", []), timeout=WAIT_S)
+    assert flows.wait_message(lambda m: m.get("type") == "evt.flow.list.changed"
+                              and FLOW in m["payload"].get("removed", []), timeout=WAIT_S) is not None
     assert snapshot_flow(flows, FLOW) is None
     assert not (flows.datadir / "Flows" / (FLOW + ".json")).exists()
     flows.stop()
@@ -332,8 +333,9 @@ def test_a_save_right_after_a_delete_is_busy_and_does_not_re_create_the_file(flo
 def test_a_trigger_switch_right_after_a_delete_is_busy(flows):
     add_skeleton(flows)
     flows.start()
+    listen_to_engine(flows)
     answer = send_delete_then(flows, "cmd.trigger.enable", {"flowId": FLOW, "elementId": TRIGGER})
     assert error_code(answer) == "busy", answer
-    flows.wait_message(lambda m: m.get("type") == "evt.flow.list.changed"
-                       and FLOW in m["payload"].get("removed", []), timeout=WAIT_S)
+    assert flows.wait_message(lambda m: m.get("type") == "evt.flow.list.changed"
+                              and FLOW in m["payload"].get("removed", []), timeout=WAIT_S) is not None
     assert not (flows.datadir / "Flows" / (FLOW + ".json")).exists()
