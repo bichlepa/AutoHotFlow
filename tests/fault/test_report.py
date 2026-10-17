@@ -74,7 +74,7 @@ def test_a_report_has_one_entry_per_role_and_a_readable_summary(chains, datadir)
     summary = (folder / "summary.txt").read_text(encoding="utf-8")
     for needle in ("AutoHotFlow diagnostic report", "reason:   manual", "== Processes", "== Roles ==",
                    "storage  (pid", "engine  (pid", "manager  (pid", "worker:1  (pid", "supervisor  (pid",
-                   "worker pool: size 4"):
+                   "worker pool: size 8"):
         assert needle in summary, (needle, summary)
     # the log files are copied next to the report
     assert (folder / "Log.txt").exists()
