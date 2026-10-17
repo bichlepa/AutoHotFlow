@@ -59,6 +59,10 @@ class ManagerOps {
         id := ids[i]
         rec := this.m.Flow(id)
         next := (ans) => this._SwitchNext(ids, i + 1, enable, ans, done)
+        if (rec = "") {                      ; removed meanwhile (a resync while a question was open)
+            next(last)
+            return
+        }
         if (!enable && !rec["enabled"] && rec["independentActive"] > 0) {
             this._Confirm("independent", [rec["name"], rec["independentActive"]]
                 , (yes) => (yes ? this._SwitchOne(id, false, true, next) : next(last)))
@@ -84,7 +88,7 @@ class ManagerOps {
         if (enable && !ans["ok"])
             this.m.UnwatchPackages(id)
         if (!forced && !ans["ok"] && InStr(ans["message"], "cannot be read (")) {
-            this._Confirm("force", [this.m.Flow(id)["name"]]
+            this._Confirm("force", [this.m.Flow(id) = "" ? id : this.m.Flow(id)["name"]]
                 , (yes) => (yes ? this._SwitchOne(id, enable, all, next, true) : next(ans)))
             return
         }
@@ -117,6 +121,10 @@ class ManagerOps {
             return
         }
         id := ids[i]
+        if (this.m.Flow(id) = "") {          ; removed meanwhile (a resync while a question was open)
+            this._DeleteNext(ids, i + 1, last, done)
+            return
+        }
         this._Confirm("delete", [this.m.Flow(id)["name"]], (yes) => (yes
             ? this.m.Command("cmd.flow.delete", Map("flowId", id), (ans) => this._DeleteNext(ids, i + 1, ans, done))
             : this._DeleteNext(ids, i + 1, last, done)))

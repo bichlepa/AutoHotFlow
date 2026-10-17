@@ -1328,7 +1328,7 @@ Creates a shortcut file (default on the desktop) that starts the flow through th
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`, `tests/e2e/test_manager_flows.py::test_new_flow_is_added_to_the_list_and_another_client_sees_its_flow_too`, `tests/fault/test_manager_window.py::test_the_tree_shows_each_category_with_its_flow_and_the_flow_state (gui)`
+- **Evidence:** `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`, `tests/e2e/test_manager_flows.py::test_new_flow_is_added_to_the_list_and_another_client_sees_its_flow_too`, `tests/fault/test_manager_window.py::test_the_tree_shows_each_category_and_the_flow_below_its_category (gui)`
 
 The manager shows all flows in a tree of categories, with their state (enabled, running). Flows without a category are under "Uncategorized".
 
