@@ -35,6 +35,7 @@ class ManagerWindow {
     __New(model) {
         this.model := model
         this.dirty := true
+        this.treeDirty := true
         this.filling := false
         this.treeItems := Map()       ; tree item ID -> flow ID
         this.itemOfFlow := Map()      ; flow ID -> tree item ID
@@ -112,8 +113,18 @@ class ManagerWindow {
         this.win.Close()
     }
 
+    ; Only a change of the flows or the categories needs the tree to be built again. A flow state (running), the engine state
+    ; and the selection change the buttons and the status line only; a rebuild would discard the selection of the user.
     _OnModel(kind, data) {
         this.dirty := true
+        if (kind = "snapshot" || kind = "categories" || kind = "settings")
+            this.treeDirty := true
+        else if (kind = "selection") {
+            ; Selected by the model (the driver), not by a click: the tree must follow.
+            cur := this.tree.GetSelection()
+            if ((this.treeItems.Has(cur) ? this.treeItems[cur] : "") != data)
+                this.treeDirty := true
+        }
     }
 
     ; A handler per button (a closure over the loop variable would see the last button).
@@ -128,10 +139,14 @@ class ManagerWindow {
         }
     }
 
+    ; The event may be late: a timer thread is uninterruptible for its first 15 ms, so the events that Delete() and Add() of
+    ; _FillTree raise are delivered after the fill, when "filling" is false again, with item IDs that no longer exist. Only the
+    ; tree itself knows the current selection.
     _OnTreeSelect(item) {
         if (this.filling)
             return
-        this.model.Select(this.treeItems.Has(item) ? this.treeItems[item] : "")
+        cur := this.tree.GetSelection()
+        this.model.Select(this.treeItems.Has(cur) ? this.treeItems[cur] : "")
     }
 
     ; Timer, 20 Hz. Draws only when something changed and the window is shown.
@@ -142,7 +157,10 @@ class ManagerWindow {
             return
         }
         this.dirty := false
-        this._FillTree()
+        if (this.treeDirty) {
+            this.treeDirty := false
+            this._FillTree()
+        }
         this._SetButtons()
         this._SetStatus()
     }

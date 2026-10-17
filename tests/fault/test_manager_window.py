@@ -24,12 +24,16 @@ WINDOW_TITLE = "Manager"
 WM_CLOSE = 0x10
 BM_CLICK = 0xF5
 TVM_GETCOUNT = 0x1105
+TVM_GETNEXTITEM = 0x110A
+TVM_SELECTITEM = 0x110B
+TVGN_ROOT, TVGN_CHILD, TVGN_CARET = 0, 4, 9
 
 user32 = ctypes.WinDLL("user32")      # not windll.user32: other test modules set argtypes on that shared object
 user32.SendMessageW.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_size_t, ctypes.c_ssize_t]
 user32.SendMessageW.restype = ctypes.c_ssize_t
 user32.PostMessageW.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_size_t, ctypes.c_ssize_t]
 user32.IsWindowVisible.argtypes = [ctypes.c_void_p]
+user32.IsWindowEnabled.argtypes = [ctypes.c_void_p]
 
 
 def _text(hwnd):
@@ -98,6 +102,30 @@ def test_the_window_opens_visible_and_the_tree_holds_the_categories_and_the_flow
     snap = request_ok(chain.obs, "manager", "cmd.diag.snapshot", {})["snapshot"]
     assert snap["info"]["windowVisible"] == 1 and snap["info"]["flows"] == 1, snap["info"]
     assert snap["errors"]["count"] == 0, snap["errors"]
+
+
+def test_the_selection_survives_a_flow_run_and_the_run_button_stays_enabled(window_chain):
+    """Regression: a redraw built the tree again and the late ItemSelect events of Delete()/Add() cleared the selection
+    (doc/howto/gui-and-hotkeys.md, "Events of a tree that is built again arrive late")."""
+    chain, pid, hwnd = window_chain
+    assert wait_until(lambda: visible(hwnd), 10.0)
+    tree = [c for c in children_of(hwnd) if _classname(c) == "SysTreeView32"][0]
+    run = [c for c in children_of(hwnd) if _classname(c) == "Button" and _text(c) in ("Run", "Stop")][0]
+    assert wait_until(lambda: user32.SendMessageW(tree, TVM_GETCOUNT, 0, 0) >= 2, 10.0)
+
+    def flow_item():
+        group = user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_ROOT, 0)
+        return user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_CHILD, group) if group else 0
+
+    item = flow_item()
+    assert item, "no flow in the tree"
+    user32.SendMessageW(tree, TVM_SELECTITEM, TVGN_CARET, item)       # the click on the flow
+    assert wait_until(lambda: user32.IsWindowEnabled(run), 5.0), "Run is not enabled after the selection"
+    assert request_ok(chain.obs, "engine", "cmd.flow.start", {"flowId": "skeleton"})    # redraws: flow state events
+    for _ in range(15):                                                # about 3 s, many redraws
+        time.sleep(0.2)
+        assert user32.SendMessageW(tree, TVM_GETNEXTITEM, TVGN_CARET, 0), "the selection vanished"
+        assert user32.IsWindowEnabled(run), "Run lost its enabled state"
 
 
 def test_closing_the_window_only_hides_it_and_the_application_runs_on(window_chain):

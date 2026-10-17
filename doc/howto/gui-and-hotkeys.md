@@ -121,3 +121,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Copy the function object first (`hook := this.onHide`, then `hook()`), or give the closure a `*` parameter. A probe script with `tools/ahkrun.py` shows the error dialog that the role hides.
 - **Status:** verified (probe script and `tests/fault/test_manager_window.py`, run 20261017-144622-6636).
 - **Source:** `src/ui_common/UiWindow.ahk`
+
+### Events of a tree that is built again arrive late; do not clear the selection in them (verified)
+
+- **Problem:** The manager rebuilt its TreeView (`Delete()`, `Add()`, `Modify(..., "Select")`) in a timer on every model change, with a `filling` flag so the `ItemSelect` handler ignored the events of the rebuild. The user's selection still vanished within a second, and the Run button went disabled. A timer thread is uninterruptible for its first 15 ms (`Thread "Interrupt"`), so the GUI events of the rebuild were queued and ran after the timer function had ended: `filling` was `false` again, and the item IDs of the event no longer existed.
+- **Wrong:** Trusting the `item` parameter of the event; guarding by a flag that is only set while the timer function runs; rebuilding the tree for changes that do not touch it (a flow state).
+- **Right:** In the handler read the current selection with `tree.GetSelection()` and ignore the parameter. Rebuild only when the content changes (snapshot, categories). Same applies to other controls that raise events from a script-made change (`ListView`, `DropDownList`).
+- **Status:** verified by the owner's manual check (2026-10-17); the regression test `tests/fault/test_manager_window.py::test_the_selection_survives_a_flow_run_and_the_run_button_stays_enabled` is a gui test and not run by an agent.
+- **Source:** `src/manager/ManagerWindow.ahk`
