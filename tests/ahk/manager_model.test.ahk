@@ -170,6 +170,22 @@ CheckStale() {
     Assert.Equal(pm[1].requests[1]["type"], "cmd.engine.snapshot")
 }
 
+TestRun.Case("A snapshot of an old epoch that arrives after an event of the new epoch is discarded", () => CheckOldEpoch())
+CheckOldEpoch() {
+    pm := ReadyModel()
+    m := pm[2]
+    m.RequestSnapshot("test")                         ; asked in the old epoch (100)
+    m.OnEvent("evt.flow.state", Evt(200, 1, Map("flowId", "A", "enabled", 1, "executing", 1)))   ; the engine restarted
+    pm[1].Answer(Snap(100, 12, ["A", "B"]))           ; the old answer arrives late
+    Assert.Equal(m.epoch, 200, "the epoch was not set back")
+    Assert.Equal(m.lastSeq, 1, "the seq was not set back")
+    Assert.Equal(m.snapshotCount, 1, "the old answer was not taken")
+    Assert.True(pm[1].requests.Length >= 1, "asked again")
+    pm[1].Answer(Snap(200, 2, ["A"]))
+    Assert.Equal(m.epoch, 200)
+    Assert.Equal(m.flowIds.Length, 1)
+}
+
 TestRun.Case("flow.state sets the state of the flow and stateError comes and goes", () => CheckFlowState())
 CheckFlowState() {
     pm := ReadyModel()

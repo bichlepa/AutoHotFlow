@@ -155,8 +155,9 @@ class ManagerModel {
         }
         ep := p.Get("epoch", 0)
         sq := p.Get("seq", 0)
-        if (ep = this.epoch && sq < this.lastSeq) {
-            ; Events newer than this answer were already applied: the answer would undo them. Ask again.
+        if (ep < this.epoch || (ep = this.epoch && sq < this.lastSeq)) {
+            ; Events newer than this answer were already applied (an event of a newer epoch, or a later seq of this one; the
+            ; epoch is the start time of the engine process): the answer would undo them. Ask again.
             this.Note("manager.snapshot", Map("reason", reason, "ok", Json.True, "stale", Json.True))
             this.RequestSnapshot("stale")
             return
