@@ -31,7 +31,7 @@ L398-409 9. Performance budgets (targets, measured in Phase 2)
 L411-421 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (98.4 KB, 553 lines)
+## doc/PROTOCOL.md (98.5 KB, 553 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
@@ -152,7 +152,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (15.8 KB, 116 lines)
+## doc/howto/gui-and-hotkeys.md (16.6 KB, 123 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -168,6 +168,7 @@ L82-94 Standard dialogs (`FileSelect`, `DirSelect`, `MsgBox`) keep the message h
 L96-101 A Gui created and closed without Show leaves no window and no remembered place (verified) (verified)
 L103-109 A field and a method whose names differ only in case make the constructor fail with "Property is read-only" (verified) (verified)
 L111-116 The close box hides a window only when its Close handler hides it and returns 1 (verified) (verified)
+L118-123 `this.callback()` on a function stored in a property passes `this` as the first argument (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (11.0 KB, 135 lines)

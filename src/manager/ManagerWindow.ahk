@@ -62,8 +62,27 @@ class ManagerWindow {
         this.statusKey := "Manager_engine_waiting"
         model.AddListener((kind, data) => this._OnModel(kind, data))
         this.renderFn := () => this.Render()
+        this.timerOn := false
+        this.win.onHide := () => this._StopTimer()
+    }
+
+    ; The redraw timer runs only while the window is visible (owner decision, 2026-10-17): it starts when the window is shown
+    ; and stops when it is hidden, also by the close box. A change while hidden only sets the flag; the first redraw after
+    ; the window is shown draws it.
+    _StartTimer() {
+        if (this.timerOn)
+            return
+        this.timerOn := true
         SetTimer(this.renderFn, ManagerWindow.RENDER_MS)
     }
+
+    _StopTimer() {
+        this.timerOn := false
+        SetTimer(this.renderFn, 0)
+    }
+
+    ; The decision of the redraw: only a visible window, and only after a change since the last redraw.
+    static ShouldRedraw(visible, changed) => visible && changed
 
     ; The window is visible (not hidden by the close box).
     Visible => this.win.Visible
@@ -71,12 +90,13 @@ class ManagerWindow {
     Show() {
         this.win.Show()
         this.dirty := true
+        this._StartTimer()
     }
 
     ; cmd.manager.show: makes the window visible if it is hidden, restores it if it is minimized, and brings it to the front.
     Raise() {
         if (!this.win.Visible)
-            this.win.Show()
+            this.Show()
         else if (WinGetMinMax(this.win.Hwnd) = -1)
             WinRestore(this.win.Hwnd)
         try WinActivate(this.win.Hwnd)
@@ -88,7 +108,7 @@ class ManagerWindow {
     }
 
     Close() {
-        SetTimer(this.renderFn, 0)
+        this._StopTimer()
         this.win.Close()
     }
 
@@ -116,8 +136,11 @@ class ManagerWindow {
 
     ; Timer, 20 Hz. Draws only when something changed and the window is shown.
     Render() {
-        if (!this.dirty || !this.win.Visible)
+        if (!ManagerWindow.ShouldRedraw(this.win.Visible, this.dirty)) {
+            if (!this.win.Visible)
+                this._StopTimer()
             return
+        }
         this.dirty := false
         this._FillTree()
         this._SetButtons()

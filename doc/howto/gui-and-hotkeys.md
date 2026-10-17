@@ -114,3 +114,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `UiWindow` has `hideOnClose`: the Close event calls `Hide()` (remembers the place, `Gui.Hide()`) and returns 1, so Windows does not destroy the window; `Show()` later puts it back with `GuiLayout.Show`. A minimized or maximized window is not remembered (its position is not the one of the normal window).
 - **Status:** verified (`tests/fault/test_manager_window.py`, run 20261017-142607-22544: WM_CLOSE hides the window, the process and the application run on, `cmd.manager.show` shows it again). Not checked: a window that was minimized when it was hidden.
 - **Source:** `src/ui_common/UiWindow.ahk`
+
+### `this.callback()` on a function stored in a property passes `this` as the first argument (verified)
+
+- **Problem:** `UiWindow.Hide` called `this.onHide()` where `onHide` held a closure `() => ...`. AHK v2 treats `obj.name()` as a method call and passes `obj` as the first parameter, so the call failed with a parameter error inside the Close event: the window stayed visible, and the process snapshot showed no error (`errors.count` 0).
+- **Right:** Copy the function object first (`hook := this.onHide`, then `hook()`), or give the closure a `*` parameter. A probe script with `tools/ahkrun.py` shows the error dialog that the role hides.
+- **Status:** verified (probe script and `tests/fault/test_manager_window.py`, run 20261017-144622-6636).
+- **Source:** `src/ui_common/UiWindow.ahk`

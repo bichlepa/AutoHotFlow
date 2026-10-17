@@ -25,7 +25,7 @@ INFO = {
                 "logLinesDropped": int},
     "worker": {"job": (str, dict)},
     "manager": {"topics": list, "engine": str, "epoch": int, "lastSeq": int, "flows": int, "events": int, "resyncs": int,
-                "selectedFlow": str, "windowVisible": int, "headless": int},
+                "selectedFlow": str, "windowVisible": int, "redrawTimer": int, "headless": int},
     "debug": {"topics": list, "processes": list, "snapshots": list, "logEntries": int, "engineEvents": int,
               "dumps": list, "paused": bool},
     "tray": {"iconHidden": bool, "tip": str, "items": list, "requests": int, "lastResult": str},

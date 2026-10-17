@@ -30,6 +30,7 @@ class UiWindow {
         }
         this.Gui := Gui("-DPIScale")
         this.Hwnd := this.Gui.Hwnd
+        this.onHide := ""           ; optional fn(): called after Hide (the owner stops its timers)
         this.hideOnClose := false   ; true: the close box hides the window (the manager, E0014) instead of closing it
         this.Gui.OnEvent("Close", (*) => this._OnCloseBox())
         this.lay := GuiLayout.Create(this.Gui, width, height)
@@ -74,6 +75,10 @@ class UiWindow {
         this.Remember()
         this.Gui.Hide()
         this._shown := false
+        if (IsObject(this.onHide)) {
+            hook := this.onHide      ; not this.onHide(): that would pass this as the first argument
+            hook()
+        }
     }
 
     ; Remembers the position and the size, then removes the texts and the window. A second call does nothing.

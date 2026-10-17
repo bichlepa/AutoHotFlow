@@ -104,8 +104,11 @@ def test_closing_the_window_only_hides_it_and_the_application_runs_on(window_cha
     chain, pid, hwnd = window_chain
     assert wait_until(lambda: visible(hwnd), 10.0)
     user32.PostMessageW(hwnd, WM_CLOSE, 0, 0)               # the user clicks the X button
-    assert wait_until(lambda: not visible(hwnd), 10.0), "the window is still visible"
+    assert wait_until(lambda: not visible(hwnd), 10.0), "the window is still visible: " + str(
+        request_ok(chain.obs, "manager", "cmd.diag.snapshot", {})["snapshot"]["errors"])
     time.sleep(1.0)
+    info = request_ok(chain.obs, "manager", "cmd.diag.snapshot", {})["snapshot"]["info"]
+    assert info["windowVisible"] == 0 and info["redrawTimer"] == 0, info      # the redraw timer is off while hidden
     states = chain.states()
     assert states["manager"]["pid"] == pid and states["manager"]["state"] == "ready", states["manager"]
     assert states["engine"]["state"] == "ready" and states["storage"]["state"] == "ready"
@@ -118,7 +121,7 @@ def test_closing_the_window_only_hides_it_and_the_application_runs_on(window_cha
     request_ok(chain.obs, "manager", "cmd.manager.show", {})
     assert wait_until(lambda: visible(hwnd), 10.0), "cmd.manager.show did not show the window"
     snap = request_ok(chain.obs, "manager", "cmd.diag.snapshot", {})["snapshot"]
-    assert snap["info"]["windowVisible"] == 1
+    assert snap["info"]["windowVisible"] == 1 and snap["info"]["redrawTimer"] == 1, snap["info"]
 
 
 def test_the_exit_button_ends_the_application_cleanly(window_chain):

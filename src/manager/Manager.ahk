@@ -62,7 +62,8 @@ class Manager extends Role {
         m := this.model
         return Map("topics", this.peer.Topics(), "engine", m.engineState, "epoch", m.epoch, "lastSeq", m.lastSeq, "flows", m.flows.Count
             , "events", m.eventCount, "resyncs", m.resyncCount, "selectedFlow", m.selectedFlow
-            , "windowVisible", IsObject(this.view) ? (this.view.Visible ? 1 : 0) : 0, "headless", this.headless ? 1 : 0)
+            , "windowVisible", IsObject(this.view) ? (this.view.Visible ? 1 : 0) : 0
+            , "redrawTimer", IsObject(this.view) ? (this.view.timerOn ? 1 : 0) : 0, "headless", this.headless ? 1 : 0)
     }
 
     OnShutdown(deadlineMs) {
