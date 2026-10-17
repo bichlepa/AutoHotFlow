@@ -63,7 +63,7 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI-0073 | Manager: window, model, resync, headless driver, replaces the stub | done, verified on 72da2f6 (fast, foundation, slow green; stress 201 flows: filled after 0.54 s, snapshot 0.2 s; gui test 4 passed) | sonnet (review sonnet) | ec2a38b–72da2f6 | 2026-10-17 | block A; the product start does not start the manager yet (the tray does) |
 | WI-0074 | Flow tree and operations | done, verified on 5590990a (fast, foundation green) | haiku/sonnet (review sonnet) | fd0de334–5590990a | 2026-10-17 | block A; owner decisions F-0117, F-0120; drag test fixed by sonnet (cross-process RECT) |
 | WI-0075 | Notices | done, verified on dcafa042 (fast, foundation green; slow 2 load flakes, green alone) | | | | block A |
-| WI-0076 | Import from v1, manual check of block A | open | | | | block A |
+| WI-0076 | Import from v1, manual check of block A | done, verified on 1248aa10 (foundation green; fast and slow 1 load flake each, green alone); owner manual check of block A is next | | | | block A |
 | WI-0077 | Settings model | open | | | | block B |
 | WI-0078 | Settings dialog, language, about | open | | | | block B |
 | WI-0079 | Start with Windows, run as administrator | open | | | | block B, manual check |
@@ -83,6 +83,8 @@ None.
 
 
 ## Last verified state
+
+Commit `1248aa10` (WI-0076 import from v1) verified by `--auto` (fast, foundation, slow): foundation 470 green; fast red by `test_new_category_rename_and_the_delete_answered_no`, slow red by `test_a_burst_of_5000_lines_does_not_stall_the_manager_and_the_model_keeps_the_limit`, both green alone (rechecks `20261017-194249`, `-194300`). Manager e2e tests flake under load three times today (also the closing-log test): watch.
 
 Commit `dcafa042` (WI-0075 notices and F-0116 closed by E0082) verified by `tools/verify.py --tiers fast,foundation,slow`: fast 1421 passed, foundation 470 passed, slow red by 2 tests (`test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor`, `test_two_dialogs_of_two_instances_are_open_at_the_same_time`) that are green alone (recheck `20261017-184130-recheck`, load flakes).
 
