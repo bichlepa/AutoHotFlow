@@ -3,9 +3,11 @@
 #Include ..\core\Time.ahk
 #Include ..\ui_common\UiWindow.ahk
 #Include ..\ui_common\UiDialogs.ahk
+#Include ..\ui_common\UiFileDialogs.ahk
 #Include ManagerModel.ahk
 #Include LogWindow.ahk
 #Include NoticeWindow.ahk
+#Include ImportReportWindow.ahk
 
 ; The main window of the manager (WI-0073, WI-0074; REQ-MGR-010 to REQ-MGR-040): the view of the ManagerModel. It holds no
 ; logic of its own: it draws what the model holds and calls the operations of ManagerOps.
@@ -42,7 +44,7 @@ class ManagerWindow {
         ["ImportExport", 328, 252, 200, "Import_and_export"],
         ["About", 328, 292, 200, "About_AutoHotFlow"], ["Help", 538, 292, 200, "Help_#noun"],
         ["ShowLog", 328, 332, 200, "Show_log"], ["Exit", 538, 332, 200, "Exit_#verb"],
-        ["Notices", 328, 372, 200, "Notices"]]
+        ["Notices", 328, 372, 200, "Notices"], ["ImportV1", 328, 412, 200, "Import_from_v1"]]
     ; The questions: kind -> [title key, text key]. Texts take the arguments of the question.
     static ASK := Map("independent", ["Ask_independent_title", "Ask_independent_text"]
         , "force", ["Ask_force_title", "Ask_force_text"]
@@ -52,7 +54,9 @@ class ManagerWindow {
         , "changeCategory", ["Change_category", "Ask_change_category_text"]
         , "rename", ["Rename_flow", "Ask_rename_text"]
         , "categoryNew", ["New_category", "Ask_category_new_text"]
-        , "categoryRename", ["Rename_category", "Ask_category_rename_text"])
+        , "categoryRename", ["Rename_category", "Ask_category_rename_text"]
+        , "importCopies", ["Import_from_v1", "Ask_import_copies_text", "no"]
+        , "autostartV1", ["Import_from_v1", "Ask_autostart_v1_text", "no"])
 
     __New(model, role := "") {
         this.model := model
@@ -61,6 +65,7 @@ class ManagerWindow {
         this.ops.ask := this
         this.logView := ""             ; the LogWindow, made at the first "Show log"
         this.noticeView := ""          ; the NoticeWindow (WI-0075), made at the first "Notices"
+        this.importView := ""         ; the report of the import from v1 (WI-0076), made at the first import
         this.dirty := true
         this.treeDirty := true
         this.labelDirty := Map()      ; flow ID -> true: its state mark changed (the item text only, no rebuild)
@@ -161,7 +166,16 @@ class ManagerWindow {
             this.logView.Close()
         if (IsObject(this.noticeView))
             this.noticeView.Close()
+        if (IsObject(this.importView))
+            this.importView.Close()
         this.win.Close()
+    }
+
+    ; The report of the import from v1 (WI-0076): made at the first call, then shown with its text.
+    ShowImport(text) {
+        if (!IsObject(this.importView))
+            this.importView := ImportReportWindow()
+        this.importView.Show(text)
     }
 
     ; The log window (WI-0080): made at the first call, then shown. The model is opened by the role (OpenLog).
@@ -235,7 +249,18 @@ class ManagerWindow {
                 this.role.OpenLog("")
             case "Notices":
                 this.role.OpenNotices()
+            case "ImportV1":
+                this._ImportV1()
         }
+    }
+
+    ; Import from v1 (WI-0076): the folder dialog of the user (default: the data folder of v1), then the import. The dialog is
+    ; only opened by this click (E0076). The startup folder is the real one: the autostart step of the import asks first.
+    _ImportV1() {
+        dir := UiFileDialogs.Dir(this.win.Hwnd, A_AppData "\AutoHotFlow", 1, Lang("Import_choose_folder"))
+        if (dir = "")
+            return
+        this.role.ImportV1(dir, A_Startup, (res) => 0)
     }
 
     ; The category a new flow goes to: the selected category, the category of the focused flow, or Uncategorized.
@@ -273,7 +298,9 @@ class ManagerWindow {
 
     Confirm(kind, args, done) {
         keys := ManagerWindow.ASK[kind]
-        opened := UiDialogs.Confirm(this.win.Hwnd, keys[1], keys[2], [["yes", "Yes"], ["no", "No"]]
+        ; a question with a third key "no" is preselected "No" (the import, E0068)
+        buttons := (keys.Length >= 3) ? [["no", "No"], ["yes", "Yes"]] : [["yes", "Yes"], ["no", "No"]]
+        opened := UiDialogs.Confirm(this.win.Hwnd, keys[1], keys[2], buttons
             , (answered, id) => done(answered && id = "yes"), args*)
         if (!opened)
             done(false)

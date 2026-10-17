@@ -34,6 +34,7 @@ class ManagerDriver {
         this.ops["log"] := (args, done) => this._OpLog(args, done)
         this.ops["logFilter"] := (args, done) => this._OpLogFilter(args, done)
         this.ops["notices"] := (args, done) => this._OpNotices(args, done)
+        this.ops["importV1"] := (args, done) => this._OpImportV1(args, done)
         this.ops["answers"] := (args, done) => this._OpAnswers(args, done)
         this.ops["selectToggle"] := (args, done) => this._OpSelectToggle(args, done)
         this.ops["selectCategory"] := (args, done) => this._OpSelectCategory(args, done)
@@ -135,6 +136,12 @@ class ManagerDriver {
             throw AhfError("cmd.test.op answers: answers must be an object", ErrCode.BAD_PAYLOAD)
         this.answers := given
         done(Map("ok", true))
+    }
+
+    ; WI-0076: the import from v1 (ManagerImport) of the folder dir; startupDir is the startup folder of the autostart step, and
+    ; without it the step is left out (a test never touches the real startup folder). The answer is the report.
+    _OpImportV1(args, done) {
+        this.role.ImportV1(args.Get("dir", ""), args.Get("startupDir", ""), (res) => done(ManagerDriver.Wire(res)))
     }
 
     _OpSelectToggle(args, done) {

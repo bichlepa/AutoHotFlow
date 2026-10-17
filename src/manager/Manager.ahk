@@ -6,6 +6,7 @@
 #Include ..\core\Role.ahk
 #Include ManagerModel.ahk
 #Include ManagerOps.ahk
+#Include ManagerImport.ahk
 #Include ManagerDriver.ahk
 #Include ManagerWindow.ahk
 
@@ -29,6 +30,7 @@ class Manager extends Role {
         this.cancelExit := args.Has("cancel-exit")
         this.model := ""
         this.ops := ""               ; the operations on flows and categories (WI-0074), made with the model
+        this.importer := ""          ; the import from v1 (WI-0076), made with the model
         this.view := ""
         this.driver := ""
         this.started := false
@@ -37,12 +39,15 @@ class Manager extends Role {
     RegisterHandlers() {
         this.model := ManagerModel(this.peer)
         this.ops := ManagerOps(this.model)
+        this.importer := ManagerImport(this.model)
+        this.importer.log := (level, text) => this._Log(level, "manager", text)
         this.On("evt.", (msg) => this._OnEvent(msg))
         this.On("cmd.app.prepareExit", (msg) => this._OnPrepareExit(msg))
         this.On("cmd.manager.show", (msg) => this._OnShow(msg))
         if (this.headless) {
             this.model.TraceOn()
             this.driver := ManagerDriver(this, this.model)
+            this.importer.ask := this.driver
         }
     }
 
@@ -53,6 +58,7 @@ class Manager extends Role {
             this.model.Note("manager.ready", Map("headless", this.headless ? 1 : 0))
             if (!this.headless) {
                 this.view := ManagerWindow(this.model, this)
+                this.importer.ask := this.view
                 this.view.Show()
             }
         }
@@ -102,6 +108,18 @@ class Manager extends Role {
         this.model.OpenNotices()
         if (IsObject(this.view))
             this.view.ShowNotices()
+    }
+
+    ; Import from v1 (WI-0076, REQ-MIG-060): the import runs in ManagerImport. done(result) runs when it is over; the report
+    ; (ManagerImport.Text) is shown when there is a window.
+    ImportV1(dir, startupDir, done) {
+        this.importer.Start(dir, startupDir, (res) => this._ImportDone(res, done))
+    }
+
+    _ImportDone(res, done) {
+        if (IsObject(this.view))
+            this.view.ShowImport(ManagerImport.Text(res))
+        ManagerImport._Done(done, res)
     }
 
     CloseLog() {
