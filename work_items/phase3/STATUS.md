@@ -86,6 +86,8 @@ Step-independent work item: WI-0059 (test admission, load report, run history), 
 
 ## Last verified state
 
+Commit `c31d126a` (import entry in the choice dialog, Yes/No order of the questions) verified: fast 1466 green; foundation red by 2 cases of `supervisor_tick.test.ahk` (load flake: 46 cases green alone, run `20261018-004804-c31d126a`).
+
 Commit `4e510dc1` (WI-0081 `.ahf`) verified by `--auto`: fast 1461, foundation 470, slow 203, VERDICT green. `19fb1ba8` (dialog text fix F-0128) green too (1444 / 470 / 203).
 
 Commit `1248aa10` (WI-0076 import from v1) verified by `--auto` (fast, foundation, slow): foundation 470 green; fast red by `test_new_category_rename_and_the_delete_answered_no`, slow red by `test_a_burst_of_5000_lines_does_not_stall_the_manager_and_the_model_keeps_the_limit`, both green alone (rechecks `20261017-194249`, `-194300`). Manager e2e tests flake under load three times today (also the closing-log test): watch.
