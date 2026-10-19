@@ -364,3 +364,25 @@ Notes: The first attempt showed no tooltip at all: the Start tasks passed
   document). Section 4 step 5 was reworded (a plain text editor shows nothing
   for this key; VS Code "Record Keys" does). All expectations met after that.
 ```
+
+Run record (2026-10-19, block B of S0004, sections 1, 7 and 8):
+
+```
+Date: 2026-10-19
+Tester: Paul
+Manager (section 1, parts A to E): pass
+Start with Windows, administrator, start without parameters (section 7): pass
+Settings dialog, language and about window (section 8): pass, one cosmetic defect (see notes)
+Notes: The tester reported "all manual checks work" and gave no step numbers, so no
+  step is listed as failed. One cosmetic defect: in the settings dialog a checkbox was
+  too wide and covered the text on its right, visible only after the mouse moved over
+  it. Cause: the checkbox was 600 px wide and overlapped the note column. Fixed in
+  commit dae9fee6 (width measured from the label; a probe test checks that no two
+  controls of the dialog overlap at 96 and 216 dpi). The fix was not looked at on
+  the tester's screen yet. Earlier findings of the same checks, fixed before this
+  record: question dialogs showed only their first text line (F-0128), the import
+  from v1 was a button of its own (now the third choice of "Import and export"), and
+  the Yes and No buttons of three questions were in the other order (all questions
+  now have Yes left, No right). The gui test of the settings dialog
+  (tests/fault/test_manager_settings_window.py) was not run after its fixes.
+```
