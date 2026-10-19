@@ -378,8 +378,8 @@ Notes: The tester reported "all manual checks work" and gave no step numbers, so
   too wide and covered the text on its right, visible only after the mouse moved over
   it. Cause: the checkbox was 600 px wide and overlapped the note column. Fixed in
   commit dae9fee6 (width measured from the label; a probe test checks that no two
-  controls of the dialog overlap at 96 and 216 dpi). The fix was not looked at on
-  the tester's screen yet. Earlier findings of the same checks, fixed before this
+  controls of the dialog overlap at 96 and 216 dpi). The tester looked at the fix
+  on his screen afterwards: pass. Earlier findings of the same checks, fixed before this
   record: question dialogs showed only their first text line (F-0128), the import
   from v1 was a button of its own (now the third choice of "Import and export"), and
   the Yes and No buttons of three questions were in the other order (all questions
