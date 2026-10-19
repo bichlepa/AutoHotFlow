@@ -21,6 +21,9 @@ class StartupEntry {
     ; enabled: the shortcut exists with target, args and workDir afterwards (Map(action): created, repaired, unchanged).
     ; Not enabled: it does not exist afterwards (removed, none).
     static Sync(startupDir, enabled, target := "", args := "", workDir := "") {
+        ; Switched off and no startup folder (a user profile without one): nothing to remove, not a failure.
+        if (!enabled && !IsObject(startupDir) && RegExMatch(String(startupDir), "^[A-Za-z]:\\") && !DirExist(startupDir))
+            return Map("action", "none")
         path := StartupEntry._Path(startupDir)
         exists := FileExist(path) != ""
         if (!enabled) {
