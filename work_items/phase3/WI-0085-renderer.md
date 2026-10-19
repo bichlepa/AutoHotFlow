@@ -10,7 +10,7 @@ Size: M · Depends on: WI-0083 (and the owner's decision if R0002 failed), WI-00
 
 `AGENTS.md`; `doc/ARCHITECTURE.md` 2.1, 8; `doc/CONVENTIONS.md`; WI-0083 and WI-0084 (results); `v1/Source_Draw/GDIp/GDIp.ahk` (what is drawn in which order); the screenshot `v1/Documentation/screenshots/Flow Editor.png`; `v1/Icons/`.
 
-**Decision E0090 (R0002):** the frame is built from caches, see task 7. Model: sonnet (the layer cache and its invalidation are a design task).
+**Decision E0090 (R0002):** the frame is built from caches, see task 7. Start with haiku (owner, 2026-10-19: budget); escalate by the usual rule.
 
 ## Tasks
 
