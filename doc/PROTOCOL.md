@@ -87,7 +87,7 @@ Every message is a JSON object with a fixed schema. The serializer writes the he
 |---|---|---|
 | `engine` | `evt.engine.*`, `evt.flow.list.changed`, `evt.category.changed`, `evt.storage.error` | all UIs |
 | `settings` | `evt.settings.changed` (WI-0077); every role except the engine subscribes (`Role.FollowSettings`) | all roles, the manager too |
-| `flow:<flowId>` | `evt.flow.*`, `evt.element.state`, `evt.connection.state`, `evt.instance.*` for this flow | `editor:<flowId>`, `manager` |
+| `flow:<flowId>` | `evt.flow.*`, `evt.element.state`, `evt.instance.*` for this flow | `editor:<flowId>`, `manager` |
 | `log` | `evt.log.entry` | `manager` (log window) |
 | `process` | `evt.process.*` (fields see 4.1a), `evt.app.exitCancelled` | `manager`, tests |
 | `debug` | `evt.debug.dump` (values that code outputs with `Debug.Dump`, 4.9) | `debug` (debug window), tests |
@@ -96,15 +96,9 @@ Every message is a JSON object with a fixed schema. The serializer writes the he
 
 All payloads are objects. `flowId`, `elementId`, `connectionId` are the identifiers from the flow files (e.g. `Flow 1010290492`, `element0000000001`).
 
-**Implementation status at the end of Phase 2 (WI-0017, comparison with `src/`, verified by searching the type names in the source code):** All message types that `src/` sends or registers are in this catalog. Conversely, the following types of the catalog are **not yet implemented** (draft for Phase 3 or later). A client must not rely on them yet:
+**Implementation status (comparison with `src/` on 2026-10-19, WI-0082; verified by a script that compares the `cmd.*`, `evt.*` and `sys.*` strings of this catalog with `src/`):** every message type that `src/` sends or registers is in this catalog, and every type of the catalog exists in `src/`, with these exceptions: the test commands `cmd.test.*` (only the test entries and test roles have them), the names that are built from a prefix in the code (`cmd.storage.var.*`, `res.flow.start`) and the types of later steps, which this catalog marks where they are described. The types `evt.connection.state` (the connection taken is a field of `evt.element.state` from WI-0086 on, S0005) and `cmd.ui.confirmDeleteFlowFile` (a flow with missing packages is not deleted and nobody is asked, M-0008) were removed from the catalog on 2026-10-19 (F-0142).
 
-| Area | Not yet implemented |
-|---|---|
-| 4.3 Engine events | `evt.connection.state` |
-| 4.4 Engine ↔ trigger host | all (`cmd.trigger.arm`, `cmd.trigger.disarm`, `cmd.trigger.reset`, `evt.trigger.fired`, `evt.trigger.error`); the trigger host is built (WI-0061), the engine side follows (WI-0062) |
-| 4.7 Dialogs | `evt.ui.notice`, `cmd.ui.confirmDeleteFlowFile` |
-
-`cmd.flow.patch` is implemented, but only knows the schema and the revision check (the operations themselves come in Phase 3, see 4.2). The role `editor` is a placeholder (exit 3), `manager` is the real manager of WI-0073 (4.8).
+`cmd.flow.patch` is implemented, but only knows the schema and the revision check (the operations themselves come with the editor, S0006, see 4.2). The role `editor` is a placeholder (exit 3), `manager` is the real manager of WI-0073 (4.8).
 
 ### 4.1 Lifecycle (`sys.*`)
 
@@ -261,7 +255,6 @@ Each event carries `seq` (increasing per engine epoch) and `epoch`.
 | `evt.flow.committed` | `flow:<id>` | `{ flowId, rev, byMeta: bool }` (for the editor after a rename in the manager) |
 | `evt.flow.saved` | `flow:<id>` | `{ flowId, savedRev }` |
 | `evt.element.state` | `flow:<id>` | `{ flowId, elementId, state: "idle"/"running"/"finished"/"exception", countRuns, lastRun }` |
-| `evt.connection.state` | `flow:<id>` | `{ flowId, connectionId, state }` |
 | `evt.instance.queued` | `flow:<id>` | `{ flowId, instanceId, position }` (policy `wait`: the instance waits, `position` from 1 in the queue of the flow) |
 | `evt.instance.started` / `evt.instance.ended` | `flow:<id>` | `{ flowId, instanceId, reason? }`. For a waiting instance, `started` comes only at the transition to `running` |
 | `evt.settings.changed` | `settings` (and a direct message to `supervisor`) | `{ settings }` (WI-0077): the whole set, every key of the table "Settings" in 4.2. Sent when the engine has read `Settings.json` at its start and after every change that `cmd.settings.set` wrote. Carries `epoch` and `seq` like every engine event (the manager checks them). A role that starts later asks `cmd.settings.get` |
@@ -472,7 +465,6 @@ The engine never shows dialogs. If the user must react, the engine uses a worker
 | Type | From → To | Payload | Response |
 |---|---|---|---|
 | `evt.ui.notice` (WI-0075) | engine → topic `notice` (subscribers: `manager`, `tray`) | `{ kind, level, flowId?, key, args, epoch, seq }` (`held` see below) | – (tray notice instead of MsgBox) |
-| `cmd.ui.confirmDeleteFlowFile` | engine → `manager` | `{ path, reason: "missing_packages", packages }` | `res: { ok, delete: bool }` (v1: MsgBox in `LoadFlow`) |
 
 **Notices (WI-0075, REQ-USE-030, REQ-USE-080 part 1, REQ-EXE-170).** An error or warning that has no window of its own is sent as `evt.ui.notice`. The engine sends it, so it is numbered with `epoch` and `seq` like every `evt.*` of the engine. The storage errors reach it through the engine: a storage error is still sent as `evt.storage.error` (4.3) and, when the engine is connected, also as a notice of kind `storage`.
 

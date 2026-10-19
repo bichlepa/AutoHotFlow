@@ -74,6 +74,7 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0105 | A role's summary line is written lazily: after a burst of log lines it can come late or not at all | closed 2026-10-16: suspicion without an observation |  |
 | F-0112 | The per-minute limit counts every element execution, so a legitimate flow with many big runs can reach it | accepted (owner, 2026-10-17, E0071): the defaults stay and become global settings in S0004; revisit after the port | |
 | F-0106 | The header of a slow-run output in `run_suite` named another commit than the run folder | closed 2026-10-16: not reproduced; the run record carries the commit |  |
+| F-0142 | PROTOCOL documents message types that no source string uses | closed 2026-10-19: `evt.connection.state` and `cmd.ui.confirmDeleteFlowFile` removed from PROTOCOL (dead; M-0008, WI-0086), the status table brought to the code | WI-0082 |
 | F-0143 | A `-m stress` run opens a real manager window | closed 2026-10-19: fixed in `tests/conftest.py` (a run that names stress, soak or idle but not gui leaves gui tests out, also with `--all`), test `tests/test_tier_selection.py` | WI-0082 |
 
 ## Findings
@@ -248,6 +249,11 @@ This document lists findings that are closed or accepted. Entries are moved here
 **Options:** a higher default per flow; counting the trigger starts only (a runaway loop would then not be caught); a rate per instance instead of per minute. The project owner decides, the limit is a constant until S0004.
 **Evidence:** `doc/MEASUREMENTS.md` MS-0036; `src/engine/core/RunawayGuard.ahk` (`DEFAULT_PER_MINUTE`).
 **Accepted (owner, 2026-10-17, E0071):** the values stay (50,000 per minute, 100 waiting, 100 running) and become global settings in S0004 (WI-0077, WI-0078). The owner questions the numbers after the port, when he can use v2.
+
+### F-0142: PROTOCOL documents message types that no source string uses
+
+**What:** `evt.connection.state` and `cmd.ui.confirmDeleteFlowFile` were documented in PROTOCOL, but no string of these types existed in `src/`.
+**Closed (2026-10-19):** both are dead. `cmd.ui.confirmDeleteFlowFile` is the v1 query for missing packages, replaced by M-0008 (nothing is deleted, nobody is asked); `evt.connection.state` is dropped by the plan of S0005 (the connection taken is a field of `evt.element.state`, WI-0086). Both were removed from `doc/PROTOCOL.md`; the other documented types without a string in `src/` are the test commands and prefix-built names. The out-of-date status table at the start of section 4 was rewritten.
 
 ### F-0143: A `-m stress` run opens a real manager window
 
