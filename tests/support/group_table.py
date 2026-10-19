@@ -182,6 +182,7 @@ TEST_GROUPS = {
     "test_gitattributes.py": ["architecture"],
     "test_groups.py": ["architecture"],
     "test_history_tools.py": ["tools"],
+    "test_tier_selection.py": ["tools"],
     "test_json_flows.py": ["base"],
     "test_load_history.py": ["tools"],
     "test_manual_check.py": ["tools"],

@@ -289,13 +289,20 @@ def pytest_collection_modifyitems(config, items):
         # smoke variants in tests/stress are not marked themselves: they count as slow
         if "stress" in item.path.parts and not any(item.get_closest_marker(m) for m in ("stress", "soak")):
             item.add_marker(pytest.mark.slow)
+    if "gui" not in asked and any(m in asked for m in admission.EXCLUSIVE_MARKERS):
+        # F-0143: a run that asks for stress, soak or idle tests does not open windows. A test that is stress and gui
+        # at once (the window variants in tests/stress) needs "gui" in -m, also with --all.
+        kept = [i for i in items if i.get_closest_marker("gui") is None]
+        if len(kept) != len(items):
+            config.hook.pytest_deselected(items=[i for i in items if i not in kept])
+            items[:] = kept
     lifted = ("slow", "foundation", "gui") if run_all else ("slow", "foundation") if selection is not None else ()
     for marker in ("stress", "soak", "idle", "slow", "foundation", "gui"):
         if marker == "gui" and only_foundation:
             continue          # already removed above
         if marker not in asked and marker not in lifted:
             # a stress, soak or idle test that was asked for is not dropped because it is also foundation or slow
-            exempt = marker in ("slow", "foundation", "gui")
+            exempt = marker in ("slow", "foundation")
             kept = [i for i in items if i.get_closest_marker(marker) is None
                     or (exempt and any(i.get_closest_marker(m) for m in admission.EXCLUSIVE_MARKERS))]
             if len(kept) != len(items):

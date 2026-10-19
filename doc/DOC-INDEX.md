@@ -55,7 +55,7 @@ L617-626   5a Events before subscription (design question, WI-0007)
 L628-632 6. Versioning and extension
 ```
 
-## doc/TEST-STRATEGY.md (54.7 KB, 338 lines)
+## doc/TEST-STRATEGY.md (55.3 KB, 338 lines)
 ```text
 L5-11 1. Principles
 L13-22 2. Levels

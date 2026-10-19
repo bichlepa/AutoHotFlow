@@ -74,6 +74,7 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0105 | A role's summary line is written lazily: after a burst of log lines it can come late or not at all | closed 2026-10-16: suspicion without an observation |  |
 | F-0112 | The per-minute limit counts every element execution, so a legitimate flow with many big runs can reach it | accepted (owner, 2026-10-17, E0071): the defaults stay and become global settings in S0004; revisit after the port | |
 | F-0106 | The header of a slow-run output in `run_suite` named another commit than the run folder | closed 2026-10-16: not reproduced; the run record carries the commit |  |
+| F-0143 | A `-m stress` run opens a real manager window | closed 2026-10-19: fixed in `tests/conftest.py` (a run that names stress, soak or idle but not gui leaves gui tests out, also with `--all`), test `tests/test_tier_selection.py` | WI-0082 |
 
 ## Findings
 
@@ -247,6 +248,11 @@ This document lists findings that are closed or accepted. Entries are moved here
 **Options:** a higher default per flow; counting the trigger starts only (a runaway loop would then not be caught); a rate per instance instead of per minute. The project owner decides, the limit is a constant until S0004.
 **Evidence:** `doc/MEASUREMENTS.md` MS-0036; `src/engine/core/RunawayGuard.ahk` (`DEFAULT_PER_MINUTE`).
 **Accepted (owner, 2026-10-17, E0071):** the values stay (50,000 per minute, 100 waiting, 100 running) and become global settings in S0004 (WI-0077, WI-0078). The owner questions the numbers after the port, when he can use v2.
+
+### F-0143: A `-m stress` run opens a real manager window
+
+**What:** `-m stress` replaces the default `not gui` filter, so it selects the gui variant `test_the_window_fills_its_tree_with_200_big_flows` and a stress run opens a real window (about 50 s).
+**Closed (2026-10-19):** the cause was the exemption in `tests/conftest.py` that kept a stress test although `gui` was not asked for. A run that names `stress`, `soak` or `idle` in `-m` without `gui` now leaves the gui tests out, also with `--all`; `-m "stress or gui"` runs the window variant. Evidence: `tests/test_tier_selection.py`, `doc/TEST-STRATEGY.md` section 6.
 
 ## Sources
 
