@@ -80,6 +80,7 @@ class ParamEvaluator {
         } else if (ParamEvaluator.EXPRESSION_CONTENT.Has(c)) {
             text := String(raw)
             res := Expr.Evaluate(text, src.vars, src.logFn)
+            ParamEvaluator.Report(src, id, res)
             value := res["value"]
             if (res["errors"].Length)
                 err := Lang("An error occured while parsing expression '%1%'", text) "`n`n" ExprDiag.FormatAll(res["errors"])
@@ -170,6 +171,23 @@ class ParamEvaluator {
 
     ; True for a set flag of a description: true, 1, "1", "true" (a description may come from a parsed file).
     static Truthy(v) => !IsObject(v) && v != "" && v != 0 && v != "0" && v != "false"
+
+    ; Hands the errors and warnings of one evaluation to src.onWarn (WI-0086, the engine counts them per element). Only in
+    ; compatibility mode: in strict mode they end the element with an exception and are no warnings. src is an object
+    ; with the fields of EvalSource; a source without onWarn is ignored.
+    static Report(src, paramId, res) {
+        if (src.strict || !src.HasProp("onWarn") || !IsObject(src.onWarn))
+            return
+        list := []
+        for rec in res["errors"]
+            list.Push(rec)
+        for rec in res["warnings"]
+            list.Push(rec)
+        ; a local name: src.onWarn(...) would pass src as an extra argument (a bound method called as a property, verified)
+        onWarn := src.onWarn
+        if (list.Length)
+            onWarn(paramId, list)
+    }
 
     static _Result(id, value, err) => Map("id", id, "value", value, "error", err)
 }

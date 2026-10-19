@@ -26,6 +26,7 @@ class ExecContext {
         this.vars := vars                ; VarAccess of the engine, or "" (no variables)
         this.cls := ""                   ; the element class (set by the engine): its Parameters() for EvalParams
         this.host := ""                  ; the engine side of the flow functions (GetElementIdsOfClass ...), or "" (WI-0052)
+        this.onWarn := ""                ; onWarn(paramId, records): the errors and warnings of compatibility mode (WI-0086)
         this.strictTypes := 0            ; the flow option strictTypes of the revision the element started with (E0034)
         this.onFinish := onFinish
         this.finished := false
@@ -340,7 +341,7 @@ class ExecContext {
     EvalSource() {
         vars := this._Vars()
         at := {param: ""}
-        src := {vars: vars, strict: this.strictTypes, at: at, logFn: ObjBindMethod(this, "_EvalLog", at)}
+        src := {vars: vars, strict: this.strictTypes, at: at, logFn: ObjBindMethod(this, "_EvalLog", at), onWarn: this.onWarn}
         src.workingDir := (vars.HasProp("env") && vars.env is Map) ? vars.env.Get("workingDir", "") : ""
         return src
     }
@@ -352,6 +353,7 @@ class ExecContext {
     _Evaluate(text, kind) {
         src := this.EvalSource()
         res := Expr.Evaluate(String(text), src.vars, src.logFn, kind)
+        ParamEvaluator.Report(src, "", res)
         if (res["errors"].Length)
             throw ElementError(ExprDiag.FormatAll(res["errors"]))
         if (this.strictTypes && res["warnings"].Length)

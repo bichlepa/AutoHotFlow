@@ -73,8 +73,11 @@ class Executor {
     __New(owner) {
         this._owner := owner
         this._runs := Map()       ; instanceId -> run (Map, see _NewRun)
-        this._counts := Map()     ; "flowId/elementId" -> countRuns (v1 semantics)
-        this._lastRun := Map()    ; "flowId/elementId" -> "yyyy-MM-dd HH:mm:ss" of the last start
+        this._elems := Map()      ; flowId -> Map elementId -> element record (_Elem): state, countRuns (v1), warnings (WI-0086)
+        this._elems.CaseSense := "Off"
+        this._dirty := []         ; element records with a warning count that was not sent yet (_Mark, WI-0086)
+        this._flushScheduled := false  ; the flush timer of _Mark is set
+        this._flushFn := ObjBindMethod(this, "_FlushTimer")
         this._guard := RunawayGuard()  ; the runaway limits: counts of element executions per flow (WI-0066)
         this._overLimit := Map()  ; flowId -> limit exceeded, the flow is stopped at the next dispatch (WI-0066)
         this._waiting := Map()    ; flowId -> Array of instance IDs in the order they were queued (policy wait)
@@ -84,8 +87,6 @@ class Executor {
         this._ticking := false    ; a Tick is running (see Tick)
         this._tickAgain := false  ; a Tick was asked for while one was running
         this._notes := []         ; [call, outcome] of called instances that ended, delivered by Tick (CallFlow)
-        this._counts.CaseSense := "Off"
-        this._lastRun.CaseSense := "Off"
     }
 
     ; True if an instance of the flow is running, stopping or waiting.
@@ -568,11 +569,12 @@ class Executor {
         flowId := run["flowId"]
         elementId := thread.ElementId
         classId := Executor._QidOf(def, elementId)    ; the qualified ID "<package>.<class>" (E0045)
-        this._ElementStarted(run, elementId)
+        this._ElementStarted(run, elementId, thread.ConnectionId)
         ctx := ExecContext(flowId, elementId, run["instanceId"], thread.Id
             , ObjBindMethod(this, "_OnFinish", run["instanceId"], thread.Id)
             , this._VarAccess(run, thread, def, elementId))
         ctx.entryPoint := thread.EntryPoint      ; "head" or "tail" for a loop (v1 x_getEntryPoint)
+        ctx.onWarn := ObjBindMethod(this, "_Warned", flowId, elementId)   ; the warnings of its evaluations (WI-0086)
         ctx.host := this                         ; the flow functions of the context: element lookup, stop (WI-0052)
         if (!def.HasElement(elementId)) {
             ; The element was deleted while the thread waited (ARCHITECTURE 4.2, M-0017).
@@ -845,38 +847,161 @@ class Executor {
 
     ; --- element events ------------------------------------------------------------------------
 
-    _ElementStarted(run, elementId) {
-        key := run["flowId"] "/" elementId
+    ; connectionId: the connection the thread took to the element ("" at a trigger), sent with the start (WI-0086).
+    _ElementStarted(run, elementId, connectionId := "") {
         prev := Critical("On")  ; reason: read, change and store of the count is one step (a dispatch tick may interrupt)
-        n := this._counts.Get(key, 0) + 1
-        this._counts[key] := n
-        this._lastRun[key] := FormatTime(A_NowUTC, "yyyy-MM-dd HH:mm:ss")
+        rec := this._Elem(run["flowId"], elementId)
+        rec["countRuns"] := rec["countRuns"] + 1
+        rec["lastRun"] := FormatTime(A_NowUTC, "yyyy-MM-dd HH:mm:ss")
         this._CountExecution(run)      ; the runaway guard (WI-0066): the one counting point of an element execution
         Critical(prev)
-        this._EmitElement(run["flowId"], elementId, "running", n, "")
+        rec["state"] := "running"
+        rec["message"] := ""
+        this._EmitElement(rec, connectionId)
     }
 
     ; result "normal", "yes", "no", "head", "tail", "exception" or "stopped" (stop by the engine).
     _ElementStopped(run, elementId, result, msg) {
-        key := run["flowId"] "/" elementId
         prev := Critical("On")  ; reason: read, change and store of the count is one step (see _ElementStarted)
-        n := Max(0, this._counts.Get(key, 0) - 1)
-        this._counts[key] := n
+        rec := this._Elem(run["flowId"], elementId)
+        n := Max(0, rec["countRuns"] - 1)
+        rec["countRuns"] := n
         Critical(prev)
         if (n > 0)
             state := "running"
         else
             state := (result = "exception") ? "exception" : "finished"
-        this._EmitElement(run["flowId"], elementId, state, n, (result = "exception") ? msg : "")
+        rec["state"] := state
+        rec["message"] := (result = "exception") ? msg : ""
+        this._EmitElement(rec, "")
     }
 
-    _EmitElement(flowId, elementId, state, countRuns, message) {
-        key := flowId "/" elementId
-        payload := Map("flowId", flowId, "elementId", elementId, "state", state, "countRuns", countRuns
-            , "lastRun", this._lastRun.Get(key, ""))
-        if (message != "")
-            payload["message"] := message
-        this._owner.Emit("topic:flow:" flowId, "evt.element.state", payload)
+    ; The record of one element of a flow (WI-0086), created by its first start or warning. Its fields: flowId, elementId,
+    ; state (idle, running, finished, exception), countRuns, lastRun, message, warnings and lastWarning (the warnings of
+    ; the evaluations, see _Warned), and dirty and sentAt for the coalesced events (_Mark).
+    _Elem(flowId, elementId) {
+        flow := this._elems.Get(flowId, "")
+        if (!IsObject(flow)) {
+            flow := Map()
+            flow.CaseSense := "Off"
+            this._elems[flowId] := flow
+        }
+        rec := flow.Get(elementId, "")
+        if (!IsObject(rec)) {
+            rec := Map("flowId", flowId, "elementId", elementId, "state", "idle", "countRuns", 0, "lastRun", ""
+                , "message", "", "warnings", 0, "lastWarning", "", "dirty", false, "sentAt", -2000)
+            flow[elementId] := rec
+        }
+        return rec
+    }
+
+    ; The errors and warnings of one evaluation of an element, in compatibility mode (ExecContext.onWarn, WI-0086). The
+    ; count is exact; the event is coalesced by _Mark. An error here is logged and does not reach the element.
+    _Warned(flowId, elementId, paramId, records) {
+        try {
+            prev := Critical("On")  ; reason: the count and the last text change as one step (a flush may interrupt)
+            try {
+                rec := this._Elem(flowId, elementId)
+                rec["warnings"] := rec["warnings"] + records.Length
+                rec["lastWarning"] := Executor._WarningText(paramId, records[records.Length])
+            } finally {
+                Critical(prev)
+            }
+            this._Mark(rec)
+        } catch as e {
+            Log.Write("a0", "engine", "warnings of element " elementId " could not be counted: " e.Message, flowId)
+        }
+    }
+
+    ; The text of the last warning: parameter, message, line and column, at most 500 characters.
+    static _WarningText(paramId, rec) {
+        text := (paramId != "" ? "parameter '" paramId "': " : "") rec["message"]
+            . " (line " rec["line"] ", column " rec["col"] ")"
+        return SubStr(text, 1, 500)
+    }
+
+    ; Marks a record for evt.element.warning and sends what is due. At most one event per second and element: a record
+    ; sent less than a second ago waits, and the flush timer sends it when the second is over (the count is then the
+    ; exact one, as it is read at the send).
+    _Mark(rec) {
+        if (!rec["dirty"]) {
+            rec["dirty"] := true
+            this._dirty.Push(rec)
+        }
+        this._FlushWarnings()
+    }
+
+    _FlushWarnings() {
+        now := A_TickCount
+        rest := []
+        for rec in this._dirty {
+            if (!rec["dirty"])
+                continue                    ; dropped by ForgetFlow
+            if (now - rec["sentAt"] < 1000) {
+                rest.Push(rec)
+                continue
+            }
+            rec["dirty"] := false
+            rec["sentAt"] := now
+            this._owner.Emit("topic:flow:" rec["flowId"], "evt.element.warning"
+                , Map("flowId", rec["flowId"], "elementId", rec["elementId"], "count", rec["warnings"]
+                    , "text", rec["lastWarning"]))
+        }
+        this._dirty := rest
+        if (rest.Length && !this._flushScheduled) {
+            this._flushScheduled := true
+            SetTimer(this._flushFn, -1000)
+        }
+    }
+
+    _FlushTimer() {
+        this._flushScheduled := false
+        this._FlushWarnings()
+    }
+
+    ; Drops the counts and warnings of a flow that was deleted (WI-0086). Its waiting warning events are not sent.
+    ForgetFlow(flowId) {
+        flow := this._elems.Get(flowId, "")
+        if (!IsObject(flow))
+            return
+        for elementId, rec in flow
+            rec["dirty"] := false
+        this._elems.Delete(flowId)
+    }
+
+    ; The states of the elements of a flow that ran or have warnings, for cmd.flow.runstate (PROTOCOL 4.2). The counts of an
+    ; element that def no longer has are dropped here. def: the committed definition of the flow.
+    ElementStates(flowId, def) {
+        list := []
+        flow := this._elems.Get(flowId, "")
+        if (!IsObject(flow))
+            return list
+        for elementId in Executor._Keys(flow) {
+            rec := flow[elementId]
+            if (!def.HasElement(elementId)) {
+                rec["dirty"] := false
+                flow.Delete(elementId)
+                continue
+            }
+            entry := Map("elementId", elementId, "state", rec["state"], "countRuns", rec["countRuns"]
+                , "lastRun", rec["lastRun"], "warnings", rec["warnings"])
+            if (rec["message"] != "")
+                entry["message"] := rec["message"]
+            if (rec["warnings"] > 0)
+                entry["lastWarning"] := rec["lastWarning"]
+            list.Push(entry)
+        }
+        return list
+    }
+
+    _EmitElement(rec, connectionId) {
+        payload := Map("flowId", rec["flowId"], "elementId", rec["elementId"], "state", rec["state"]
+            , "countRuns", rec["countRuns"], "lastRun", rec["lastRun"])
+        if (rec["message"] != "")
+            payload["message"] := rec["message"]
+        if (connectionId != "")
+            payload["connectionId"] := connectionId      ; the connection taken, on running only (PROTOCOL 4.3)
+        this._owner.Emit("topic:flow:" rec["flowId"], "evt.element.state", payload)
     }
 
     _OnSlow(flowId, classId, ms) {

@@ -126,6 +126,7 @@ TEST_GROUPS = {
     "integration/test_dialog_windows_gui.py": ["ui"],
     "integration/test_dialogs.py": ["ui"],
     "integration/test_engine.py": ["engine"],
+    "integration/test_engine_runstate.py": ["engine"],
     "integration/test_entry.py": ["supervisor"],
     "integration/test_flow_convert.py": ["expr", "engine"],
     "integration/test_flow_lifecycle.py": ["storage"],

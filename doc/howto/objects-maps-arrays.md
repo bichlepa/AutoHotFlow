@@ -133,3 +133,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Set `map.CaseSense := "On"` explicitly where the case is part of the key (the order model does), and check names that must be unique ignoring case with `StrLower` (`FlowCategories._CheckName`).
 - **Status:** verified (`tests/ahk/engine_categories.test.ahk`, the case test of the fresh order)
 - **Source:** `src/engine/core/FlowOrder.ahk` (`__New`, `Load`, `Reconcile`)
+
+### A bound method stored in an object property gets the object as an extra argument when it is called as `obj.prop(...)`
+
+- **Problem:** The engine stored `ObjBindMethod(this, "_Warned", flowId, elementId)` in a property of a plain object literal and called `src.onWarn(paramId, list)`. The call failed with "Too many parameters passed to function" inside the bound method, although the arguments matched its parameters. The element that evaluated the expression failed, and the failure was not in the code of the handler.
+- **Wrong:** `src.onWarn(a, b)` where `onWarn` is a bound method: AutoHotkey passes `src` as the first argument, the object the property belongs to.
+- **Right:** Copy the function object into a local variable first and call the local: `onWarn := src.onWarn` then `onWarn(a, b)`. The same holds for `this.callback()` (see the GUI file); `onFinish := this.onFinish` in `ExecContext.Finish` was already written this way.
+- **Status:** verified (scratch script, `ObjBindMethod` method with two bound and two call arguments: the property call fails, the local call works)
+- **Source:** `src/elements/base/ParamEvaluator.ahk` (`Report`), `src/engine/Executor.ahk` (`_Dispatch`, `_Warned`)

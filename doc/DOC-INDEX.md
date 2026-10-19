@@ -184,7 +184,7 @@ L203-209 GdiplusShutdown raises an exception when the token is passed as Ptr (ve
 L211-217 GdipLoadImageFromFile reports a missing file as OutOfMemory (verified) (verified)
 ```
 
-## doc/howto/objects-maps-arrays.md (11.0 KB, 135 lines)
+## doc/howto/objects-maps-arrays.md (12.2 KB, 143 lines)
 ```text
 L5-9 Map with `CaseSense "Off"` keeps the spelling of the first insertion (verified)
 L12-17 Copy keys into an array before deleting from a Map (not checked)
@@ -202,6 +202,7 @@ L105-111 Json.True and Json.False are objects: test them before IsObject (verifi
 L113-119 `Map.Delete` of a missing key throws: check `Has` first, or the callback dies silently (verified)
 L121-127 `Array` has no `Sort` method in AHK v2 (verified)
 L129-135 `Map` keys are case-sensitive by default; compare names with `==` when the case matters (verified)
+L137-143 A bound method stored in an object property gets the object as an extra argument when it is called as `obj.prop(...)` (verified)
 ```
 
 ## doc/howto/processes-pipes-messages.md (45.0 KB, 389 lines)

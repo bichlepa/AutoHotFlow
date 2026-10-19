@@ -205,7 +205,7 @@ Relative paths in file and folder parameters refer to the working directory. Eac
 ### REQ-EXE-140 Every element and flow shows its state
 
 - **v1:** yes
-- **v2:** partial (the states are reported; the manager holds the state of every flow, the tree shows the flows without their state until WI-0074; the editor does not show them yet)
+- **v2:** partial (the states are reported, and the engine gives all element states of a flow at once, `cmd.flow.runstate`, WI-0086; the manager holds the state of every flow, the tree shows the flows without their state until WI-0074; the editor does not show them yet)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (manager), S0005 (editor)
@@ -366,11 +366,11 @@ Each parameter is evaluated by its content type: `String` (with `%var%`), `RawSt
 ### REQ-VAR-100 Type errors: compatible or strict per flow
 
 - **v1:** no (only the lenient behaviour)
-- **v2:** partial (both modes work; the warnings are not shown in the editor yet)
+- **v2:** partial (both modes work; the engine counts the warnings per element, WI-0086; the editor does not show them yet)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (display of the warnings, WI-0086, WI-0089)
-- **Evidence:** `tests/ahk/element_evalparams.test.ahk` (strict mode case)
+- **Evidence:** `tests/ahk/element_evalparams.test.ahk` (strict mode case), `tests/integration/test_engine_runstate.py::test_strict_mode_gives_an_exception_and_no_warning`
 
 Each flow has the option `strictTypes` (E0034). Migrated flows use the compatibility mode (a type error gives the empty text and a warning, as in v1); new flows use the strict mode (a type error ends the element with `exception`). In both modes the warnings are shown to the user in the editor.
 
@@ -1526,7 +1526,7 @@ Zoom, and move the view by dragging with the right (or left) mouse button. Zoom 
 ### REQ-EDT-040 Live execution state in the editor
 
 - **v1:** yes
-- **v2:** open (the states are reported, REQ-EXE-140)
+- **v2:** partial (the engine gives the states of all elements of a flow at once and the connection a thread took, WI-0086; the editor does not highlight them yet, REQ-EXE-140)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
@@ -1637,10 +1637,11 @@ Execution policy (REQ-EXE-050), working directory (REQ-EXE-130), the type mode (
 ### REQ-EDT-150 Warnings of the evaluation are visible in the editor
 
 - **v1:** no
-- **v2:** open
+- **v2:** partial (the engine counts the warnings per element and sends them, WI-0086; the editor does not show them yet)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (counted per element by the engine, WI-0086; shown at the element, WI-0089)
+- **Evidence:** `tests/integration/test_engine_runstate.py::test_warnings_of_a_loop_are_counted_exactly_and_sent_coalesced`
 
 The `f1` warnings of an element (for example a type error in compatibility mode) are shown at the element in the editor (E0034). Also the places of a migrated flow that carry a MIGRATION ID (REQ-MIG-040).
 
@@ -2251,7 +2252,7 @@ No blocking call on the message path. Every request has a timeout; a late answer
 ### REQ-ROB-040 Recovery after a crash of the flow execution
 
 - **v1:** no
-- **v2:** partial (restart and resync work; the triggers are armed again after a restart of the engine or of the trigger host, WI-0062; the editor shows the state again only with S0005)
+- **v2:** partial (restart and resync work; the triggers are armed again after a restart of the engine or of the trigger host, WI-0062; the engine gives the states of all elements of a flow at once for the resync of the editor, WI-0086; the editor shows the state again only with S0005)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (editor)

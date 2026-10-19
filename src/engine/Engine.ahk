@@ -108,6 +108,7 @@ class Engine extends Role {
     RegisterHandlers() {
         this.On("cmd.engine.snapshot", (msg) => this._CmdSnapshot(msg))
         this.On("cmd.flow.get", (msg) => this._CmdFlowGet(msg))
+        this.On("cmd.flow.runstate", (msg) => this._CmdFlowRunstate(msg))
         this.On("cmd.flow.start", (msg) => this._CmdFlowStart(msg))
         this.On("cmd.flow.stop", (msg) => this._CmdFlowStop(msg))
         this.On("cmd.flow.toggle", (msg) => this._CmdFlowToggle(msg))
@@ -246,6 +247,7 @@ class Engine extends Role {
     ; A flow leaves the flow table (no command does it yet, S0004): its instances stop, its triggers are disarmed.
     RemoveFlow(flowId) {
         this.executor.FlowDeleted(flowId)
+        this.executor.ForgetFlow(flowId)
         this.arms.FlowRemoved(flowId)
         return this.flows.Remove(flowId)
     }
@@ -620,6 +622,20 @@ class Engine extends Role {
     _CmdFlowGet(msg) {
         rec := this.flows.Require(Engine.Text(msg, "flowId"))
         return Map("rev", rec.Rev, "definition", rec.Def.WireDefinition())
+    }
+
+    ; The states of one flow at once (WI-0086, PROTOCOL 4.2): the flow fields of evt.flow.state, the triggers of the
+    ; snapshot and the elements that ran or have warnings. not_found for an unknown flow (Require).
+    _CmdFlowRunstate(msg) {
+        rec := this.flows.Require(Engine.Text(msg, "flowId"))
+        flow := Map("enabled", Json.Bool(rec.IsFlowEnabled()), "independentActive", rec.IndependentActiveCount()
+            , "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))
+            , "instances", this.executor.RunningCount(rec.FlowId))
+        stateError := this.flowState.ErrorOf(rec.FlowId)
+        if (stateError != "")
+            flow["stateError"] := stateError
+        return Map("epoch", this.epoch, "seq", this.seq, "flow", flow, "triggers", this.arms.Snapshot(rec)
+            , "elements", this.executor.ElementStates(rec.FlowId, rec.Def))
     }
 
     _CmdFlowStart(msg) {

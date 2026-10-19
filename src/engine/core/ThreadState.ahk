@@ -46,6 +46,7 @@ class ThreadState {
         this.InstanceId := instanceId
         this.ElementId := elementId
         this.EntryPoint := ""
+        this.ConnectionId := ""         ; the connection the thread took to ElementId ("" at a trigger, WI-0086)
         this.State := state
         this.Result := result
         this.Message := ""
@@ -104,6 +105,7 @@ class ThreadState {
     Clone(newId) {
         copy := ThreadState(newId, this.InstanceId, this.ElementId, this.State, this.Result, this.OnInvalid)
         copy.EntryPoint := this.EntryPoint
+        copy.ConnectionId := this.ConnectionId
         copy.Message := this.Message
         copy.Loops := this.Loops.Clone()
         copy.Vars := VarValues.Copy(this.Vars)

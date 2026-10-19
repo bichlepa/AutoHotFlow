@@ -93,6 +93,7 @@ class Scheduler {
             target := targets[i]
             target.ElementId := String(connRec["to"])
             target.EntryPoint := connRec.Has("toPart") ? String(connRec["toPart"]) : ""
+            target.ConnectionId := connRec.Has("ID") ? String(connRec["ID"]) : ""     ; the connection taken (WI-0086)
             if (flow.ElementKind(target.ElementId) = "loop" && StrLower(target.EntryPoint) = "head")
                 target.Loops.Push()
             idList.Push(target.Id)
