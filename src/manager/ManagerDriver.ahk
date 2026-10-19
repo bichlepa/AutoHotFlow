@@ -94,12 +94,29 @@ class ManagerDriver {
         done(Map("ok", true, "selectedFlow", this.model.selectedFlow))
     }
 
-    ; WI-0087: the editor of a flow (flowId, without it the selected flow), as the Edit button and a double click do it.
+    ; WI-0087: the editor of a flow, as the Edit button and a double click do it: flowId (without it the selected flow), or
+    ; flowIds, one request after the other, each sent when the answer of the one before has come (a test of a second Edit
+    ; or of the editor limit needs the requests to follow each other at once). done({ok, results}) with one result per flow.
     _OpEdit(args, done) {
-        flowId := args.Get("flowId", "")
-        if (flowId = "")
-            flowId := this.model.selectedFlow
-        this.model.OpenEditor(flowId, (ans) => done(ManagerDriver.AnswerResult(ans)))
+        ids := args.Get("flowIds", "")
+        if (!(ids is Array))
+            ids := [args.Get("flowId", "")]
+        if (ids.Length = 1 && ids[1] = "")
+            ids[1] := this.model.selectedFlow
+        this._EditNext(ids, 1, [], done)
+    }
+
+    _EditNext(ids, i, results, done) {
+        if (i > ids.Length) {
+            done(Map("ok", true, "results", results))
+            return
+        }
+        this.model.OpenEditor(ids[i], (ans) => this._EditAnswered(ids, i, results, ans, done))
+    }
+
+    _EditAnswered(ids, i, results, ans, done) {
+        results.Push(ManagerDriver.AnswerResult(ans))
+        this._EditNext(ids, i + 1, results, done)
     }
 
     _OpShow(args, done) {
