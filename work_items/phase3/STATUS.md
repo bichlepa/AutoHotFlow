@@ -71,6 +71,21 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI-0081 | `.ahf` export and import | done, verified on 4e510dc1 (fast, foundation, slow green); owner decisions: 4 MB unpacked cap, UNC refused, ActsOnSystem list | | | | block B |
 | WI-0082 | Acceptance S0004 | running (sonnet, `wi-82`) | | | | |
 
+Step S0005 (editor I: display), detailed on 2026-10-19 (E0085 to E0088), not started. WI-0083, WI-0084, WI-0086 and WI-0087 may start now (WI-0087's manager part after WI-0078); WI-0083 stops for the owner if R0002 fails.
+
+| WI | Title | State | Model | Commits | Date | Note |
+|---|---|---|---|---|---|---|
+| WI-0083 | GDI+ wrapper and the R0002 measurement | open | | | | |
+| WI-0084 | Geometry and scene (headless) | open | | | | |
+| WI-0085 | Renderer: draw the scene, style, icons | open | | | | owner accepts the look (E0088) |
+| WI-0086 | Engine: run states, connection taken, warnings per element | open | | | | |
+| WI-0087 | Open and close an editor: supervisor and manager | open | | | | |
+| WI-0088 | Editor role: model, resync, window, headless driver | open | | | | |
+| WI-0089 | Live states, marks and the event load | open | | | | |
+| WI-0090 | View: zoom, move, tooltip, status bar, DPI | open | | | | |
+| WI-0091 | Tray icon and tray menu of the editor | open | | | | |
+| WI-0092 | Acceptance S0005 | open | | | | manual check of the owner |
+
 Step S0008 (remaining elements) is planned, not started.
 
 Step-independent work item: WI-0059 (test admission, load report, run history), done, closed by the owner's criterion, commits 9cefa8c–ce1024f (plus AGENTS.md commits 2524a5d, 1120c28).

@@ -369,7 +369,7 @@ Each parameter is evaluated by its content type: `String` (with `%var%`), `RawSt
 - **v2:** partial (both modes work; the warnings are not shown in the editor yet)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004/S0005 (display of the warnings)
+- **Plan:** S0005 (display of the warnings, WI-0086, WI-0089)
 - **Evidence:** `tests/ahk/element_evalparams.test.ahk` (strict mode case)
 
 Each flow has the option `strictTypes` (E0034). Migrated flows use the compatibility mode (a type error gives the empty text and a warning, as in v1); new flows use the strict mode (a type error ends the element with `exception`). In both modes the warnings are shown to the user in the editor.
@@ -1519,7 +1519,7 @@ Elements with icon and name, connections with their type, loops with their adjus
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0005
+- **Plan:** S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086)
 
 Zoom, and move the view by dragging with the right (or left) mouse button. Zoom and offset are saved with the flow (`flowSettings`).
 
@@ -1600,7 +1600,7 @@ Every completed edit takes effect at once, also for running instances (REQ-EXE-0
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0006
+- **Plan:** S0005 (run and enable from the tray menu of the editor, E0087, WI-0091), S0006 (the menu bar)
 
 The menu bar of the editor has: save, run, stop, enable/disable, edit (undo, redo), flow settings, exit.
 
@@ -1640,7 +1640,7 @@ Execution policy (REQ-EXE-050), working directory (REQ-EXE-130), the type mode (
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004/S0005
+- **Plan:** S0005 (counted per element by the engine, WI-0086; shown at the element, WI-0089)
 
 The `f1` warnings of an element (for example a type error in compatibility mode) are shown at the element in the editor (E0034). Also the places of a migrated flow that carry a MIGRATION ID (REQ-MIG-040).
 
@@ -1728,7 +1728,7 @@ The element settings offer typical settings and examples of the element, which t
 - **v2:** open
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0005 (icon), S0006 (menu)
+- **Plan:** S0005 (icon and menu, E0087, WI-0091)
 
 Every open editor has a tray icon of its own besides the icon of the application (REQ-MGR-090). The icon shows the state of its flow (disabled, enabled, running; REQ-EXE-140), as does the icon of the editor window; the tooltip names the flow ("Flow: <name>").
 
@@ -2778,7 +2778,7 @@ When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the us
 - **v2:** partial (dialogs done; the window base for the UI roles is written, `ui_common/UiWindow.ahk` with the layout in `core/GuiLayout.ahk` (WI-0069), the manager window (WI-0073) uses it, opened in the gui test but not checked at another scaling; editor and zoom missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0006
+- **Plan:** dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0005
 - **Evidence:** `doc/MANUAL-CHECKS.md` (manual check 3, steps 17 and 18, owner, 2026-10-16: dialog windows at 100 % and 225 %, DPI change with the window open, message box, debug dialog and tooltip), `src/elements/base/DialogWindow.ahk`, `src/core/GuiLayout.ahk` (the layout moved there in WI-0069; the manual check was made before the move, so the owner has to check again)
 
 Manager, editor, dialogs and the tray icon are sharp and have the right size with a display scaling above 100 %, also when a window moves to a screen with another scaling. The editor draws the flow sharp at every zoom.

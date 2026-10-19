@@ -65,7 +65,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-VAR-070](REQUIREMENTS.md#req-var-070-built-in-variables) | L333-342 | Built-in variables | yes | done | must | port | - |
 | [REQ-VAR-080](REQUIREMENTS.md#req-var-080-values-of-the-trigger-reach-the-instance) | L344-353 | Values of the trigger reach the instance | yes | partial | must | port | S0003 |
 | [REQ-VAR-090](REQUIREMENTS.md#req-var-090-parameter-evaluation-by-content-type) | L355-364 | Parameter evaluation by content type | yes | done | must | port | - |
-| [REQ-VAR-100](REQUIREMENTS.md#req-var-100-type-errors-compatible-or-strict-per-flow) | L366-375 | Type errors: compatible or strict per flow | no | partial | must | port | S0004/S0005 (display of the warnings) |
+| [REQ-VAR-100](REQUIREMENTS.md#req-var-100-type-errors-compatible-or-strict-per-flow) | L366-375 | Type errors: compatible or strict per flow | no | partial | must | port | S0005 (display of the warnings, WI-0086, WI-0089) |
 | [REQ-VAR-110](REQUIREMENTS.md#req-var-110-waiting-elements-can-use-all-variables) | L377-386 | Waiting elements can use all variables | yes | done | must | port | - |
 | [REQ-VAR-120](REQUIREMENTS.md#req-var-120-rounding-option-for-decimal-numbers) | L388-396 | Rounding option for decimal numbers | no | open | could | later | - |
 | [REQ-VAR-130](REQUIREMENTS.md#req-var-130-hints-on-global-and-static-variables) | L398-408 | Hints on global and static variables | no | open | could | later | - |
@@ -177,7 +177,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 |---|---|---|---|---|---|---|---|
 | [REQ-EDT-010](REQUIREMENTS.md#req-edt-010-one-editor-per-flow-several-at-the-same-time) | L1496-1504 | One editor per flow, several at the same time | partial | open | must | port | S0005 |
 | [REQ-EDT-020](REQUIREMENTS.md#req-edt-020-draw-the-flow) | L1506-1514 | Draw the flow | yes | open | must | port | S0005 |
-| [REQ-EDT-030](REQUIREMENTS.md#req-edt-030-zoom-and-move-the-view) | L1516-1524 | Zoom and move the view | yes | open | must | port | S0005 |
+| [REQ-EDT-030](REQUIREMENTS.md#req-edt-030-zoom-and-move-the-view) | L1516-1524 | Zoom and move the view | yes | open | must | port | S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086) |
 | [REQ-EDT-040](REQUIREMENTS.md#req-edt-040-live-execution-state-in-the-editor) | L1526-1534 | Live execution state in the editor | yes | open | must | port | S0005 |
 | [REQ-EDT-050](REQUIREMENTS.md#req-edt-050-add-elements) | L1536-1544 | Add elements | yes | open | must | port | S0006, S0007 |
 | [REQ-EDT-060](REQUIREMENTS.md#req-edt-060-select-and-move) | L1546-1554 | Select and move | yes | open | must | port | S0006 |
@@ -185,11 +185,11 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-EDT-080](REQUIREMENTS.md#req-edt-080-delete-cut-copy-and-paste) | L1566-1574 | Delete, cut, copy and paste | yes | open | must | port | S0006 |
 | [REQ-EDT-090](REQUIREMENTS.md#req-edt-090-undo-and-redo) | L1576-1584 | Undo and redo | yes | open | must | port | S0006 |
 | [REQ-EDT-100](REQUIREMENTS.md#req-edt-100-save-and-changes-during-execution) | L1586-1595 | Save, and changes during execution | yes | partial | must | port | S0006 |
-| [REQ-EDT-110](REQUIREMENTS.md#req-edt-110-run-stop-and-enable-from-the-editor) | L1597-1605 | Run, stop and enable from the editor | yes | open | must | port | S0006 |
+| [REQ-EDT-110](REQUIREMENTS.md#req-edt-110-run-stop-and-enable-from-the-editor) | L1597-1605 | Run, stop and enable from the editor | yes | open | must | port | S0005 (run and enable from the tray menu of the editor, E0087, WI-0091), S0006 (the menu bar) |
 | [REQ-EDT-120](REQUIREMENTS.md#req-edt-120-element-settings-dialog) | L1607-1615 | Element settings dialog | yes | open | must | port | S0007 |
 | [REQ-EDT-130](REQUIREMENTS.md#req-edt-130-assistants-in-the-element-settings) | L1617-1625 | Assistants in the element settings | yes | open | should | port | S0007 |
 | [REQ-EDT-140](REQUIREMENTS.md#req-edt-140-flow-settings-dialog) | L1627-1635 | Flow settings dialog | yes | open | must | port | S0007 |
-| [REQ-EDT-150](REQUIREMENTS.md#req-edt-150-warnings-of-the-evaluation-are-visible-in-the-editor) | L1637-1645 | Warnings of the evaluation are visible in the editor | no | open | must | port | S0004/S0005 |
+| [REQ-EDT-150](REQUIREMENTS.md#req-edt-150-warnings-of-the-evaluation-are-visible-in-the-editor) | L1637-1645 | Warnings of the evaluation are visible in the editor | no | open | must | port | S0005 (counted per element by the engine, WI-0086; shown at the element, WI-0089) |
 | [REQ-EDT-160](REQUIREMENTS.md#req-edt-160-flow-check-with-warnings) | L1647-1663 | Flow check with warnings | no | open | should | later | - |
 | [REQ-EDT-170](REQUIREMENTS.md#req-edt-170-refuse-invalid-edits) | L1665-1673 | Refuse invalid edits | partial | open | could | later | - |
 | [REQ-EDT-180](REQUIREMENTS.md#req-edt-180-quick-fixes-for-warnings) | L1675-1683 | Quick fixes for warnings | no | open | could | later | - |
@@ -197,7 +197,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-EDT-200](REQUIREMENTS.md#req-edt-200-expressions-are-checked-while-editing) | L1695-1703 | Expressions are checked while editing | no | open | should | later | - (could fit into S0007) |
 | [REQ-EDT-210](REQUIREMENTS.md#req-edt-210-syntax-highlighting-and-auto-completion) | L1705-1713 | Syntax highlighting and auto-completion | no | open | could | later | - |
 | [REQ-EDT-220](REQUIREMENTS.md#req-edt-220-examples-and-templates-in-the-element-settings) | L1715-1723 | Examples and templates in the element settings | no | open | could | later | - |
-| [REQ-EDT-230](REQUIREMENTS.md#req-edt-230-tray-icon-of-an-editor) | L1725-1742 | Tray icon of an editor | yes | open | should | port | S0005 (icon), S0006 (menu) |
+| [REQ-EDT-230](REQUIREMENTS.md#req-edt-230-tray-icon-of-an-editor) | L1725-1742 | Tray icon of an editor | yes | open | should | port | S0005 (icon and menu, E0087, WI-0091) |
 
 ## Settings (SET)
 
@@ -354,4 +354,4 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-USE-060](REQUIREMENTS.md#req-use-060-amount-of-hints) | L2744-2752 | Amount of hints | no | open | should | later | - |
 | [REQ-USE-070](REQUIREMENTS.md#req-use-070-hints-can-be-switched-off-one-by-one) | L2754-2762 | Hints can be switched off one by one | no | open | should | later | - |
 | [REQ-USE-080](REQUIREMENTS.md#req-use-080-unhandled-errors-of-a-flow-are-noticed) | L2764-2773 | Unhandled errors of a flow are noticed | yes | partial | should | port | S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables), E0072 |
-| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2775-2784 | Sharp and correctly sized on high-resolution displays | no | partial | should | port | dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0006 |
+| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2775-2784 | Sharp and correctly sized on high-resolution displays | no | partial | should | port | dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0005 |

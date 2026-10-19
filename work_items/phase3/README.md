@@ -28,8 +28,8 @@ Each step is worked through individually: **detail** (package files WI-xx with t
 | **S0002** | Element foundation and core set | oracle of the expression language (native AHK v2, E0035), migration markers, R0003 measurement, element layout per package (E0037), L0001 smoke test, flow builder for tests, R0004 (`ctx.Request`), dialog test seam (E0038), core set of 29 elements, test corpus from the "Automatic tests" flows | see below, packages WI-0044 to WI-0058 | **done** (acceptance WI-0058, 2026-10-16; F-0107 and F-0108 closed by the owner) |
 | **S0003** | Trigger host and a few triggers | enabled state per trigger, kept across starts (E0056, E0057), role `triggerhost` (WI-0014), `cmd.trigger.arm/disarm`, `evt.trigger.fired/error`, re-arming after a restart of engine or trigger host, activate/deactivate flow. Triggers: Manual, Hotkey (with window conditions, E0060), Periodic_Timer, Start_up; elements `Set_Flow_Status`, `Condition_Flow_Enabled`; guard against runaway flows (REQ-EXE-170, E0062) | see below, packages WI-0060 to WI-0067 | **done** (2026-10-17) |
 | **S0004** | UI foundation and manager | `ui_common/`, manager (category tree with free order, start/stop/enable, new/rename/delete/duplicate, settings, log display), **import from v1** (flows, variables, settings), `.ahf` export/import, engine commands `cmd.flow.create/delete/meta.update`, `cmd.category.*`, `cmd.settings.*`, global setting for the number of workers (E0048). Closing the window only hides it (E0014). Tray icon and tray menu in the supervisor (E0064, REQ-MGR-090, REQ-MGR-140), start with Windows, run as administrator, user level setting, about window. Notice and mark on unhandled flow errors (REQ-USE-080 part 1, E0072), imported flows disabled with a warning (REQ-SEC-060), the manager can be reopened after a crash (REQ-ROB-120), sharp on high-resolution displays (REQ-USE-090). From S0003: the display of active independent triggers and the dialog that disables a flow completely (E0056), the question before `force` (E0063), the notice when a flow was stopped by a limit and the global defaults of the limits (E0062, E0071), the autostart entry passes `--windows-startup` | see below, packages WI-0069 to WI-0082 | **detailed** |
-| S0005 | Editor I: display | `Renderer`/`Scene`, GDI+ in v2, zoom, panning the view, live states, resync, tray icon of the editor with the state of the flow (REQ-EDT-230) | R0002 measurement (300 elements, under 16 ms per frame), memory with 5 editors | rough |
-| S0006 | Editor II: editing | selection, moving, connecting, copy/paste, undo/redo, patch operations, `baseRev` conflict, automatic saving and the backup rhythm (E0065: no unsaved state, no prompt when quitting), a crashed editor loses nothing (REQ-ROB-120), tray menu of the editor (REQ-EDT-230). From S0003: a changed, added or removed trigger of an enabled flow is re-armed or disarmed; the enabled state of a new trigger | e2e: editing during execution (E0001) | rough |
+| **S0005** | Editor I: display | own GDI+ wrapper (E0085), geometry and `Scene` as v1, `Renderer` with a modernized look (E0088), opening an editor from the manager, live states (running, recently run, connection taken, trigger switches, exceptions, warnings and MIGRATION places per element), resync, zoom, panning the view, tooltip, status bar, DPI, tray icon of the editor with the state of the flow and its full menu (REQ-EDT-230, E0087). The view is read only; it is written in S0006 (E0086) | see below, packages WI-0083 to WI-0092 | **detailed** |
+| S0006 | Editor II: editing | selection, moving, connecting, copy/paste, undo/redo, patch operations, `baseRev` conflict, automatic saving and the backup rhythm (E0065: no unsaved state, no prompt when quitting), a crashed editor loses nothing (REQ-ROB-120), the view (zoom, offset) written with the automatic saving (E0086), menu bar and context menus of the editor. From S0003: a changed, added or removed trigger of an enabled flow is re-armed or disarmed; the enabled state of a new trigger | e2e: editing during execution (E0001) | rough |
 | S0007 | Editor III: settings dialogs | parameter schema to GUI, `form` API for `CheckSettings`, flow settings, wizards (window info, color, mouse), help, element list filtered by user level (REQ-USE-010). From S0003: the checkbox "Switch with the flow" (`followsFlow`, E0056) in every trigger dialog, the limits of a flow in the flow settings (REQ-EXE-170). From S0004: the window of an unhandled error with the variables of the branch (REQ-USE-080 part 2, E0072) | every element of the core set editable | rough |
 | S0008 | Remaining elements | first the converter `tools/convert_element.py` (E0036, tested with the core set of S0002 as before/after cases), then the elements in groups: dialogs/worker, file/drive/process/internet/power/sound, window/user simulation/image, unsafe elements (AHK script with v2 code only, E0039; DllCall, TTS, Eject, Monitor, screen, input block), remaining triggers, demonstration flows (REQ-MGR-060) | the "Automatic tests" flows of the test corpus (WI-0057, adapted to v2 where needed) run green | rough |
 | S0009 | Distribution and release | compiled program (one program or one per role, R0007), installer with start menu entry and uninstaller, release checklist, translations brought up to date, translation tools for contributors, newer file formats are not destroyed (REQ-DST-010, REQ-DST-020, REQ-DST-050, REQ-LNG-050, REQ-MIG-080) | install, start, use and uninstall on a Windows without AutoHotkey | rough |
@@ -107,9 +107,18 @@ Decisions of the project owner while S0004 was detailed (2026-10-17; details in 
 | E0074 | **S0004 in two blocks** with a manual check in between; hints (REQ-USE-060, REQ-USE-070) stay `later`. | S0004 |
 | E0075 | **Tray icon and tray menu in their own process (option b of the WI-0072 measurement, 2026-10-17).** The menus of a running process stop its threads and timers while open (measured, MEASUREMENTS), so the icon and menu move out of the supervisor into a small role. This changes E0064 (the supervisor starts and restarts that role; the icon still lives as long as the application). The manager menus (WI-0074) need the same decision: its context menus stop its threads too. | WI-0072, WI-0073, WI-0074 |
 
+Decisions of the project owner while S0005 was detailed (2026-10-19; details in `doc/DECISIONS.md`):
+
+| # | Decision | Affects |
+|---|---|---|
+| E0085 | **GDI+ through a small wrapper of our own** (`src/editor/render/`), no third-party library. | WI-0083, WI-0085 |
+| E0086 | **The editor of S0005 only reads the view** (zoom, offset in `flowSettings`); it is written in S0006 with the automatic saving (E0065), delayed. | WI-0084, WI-0090, S0006 |
+| E0087 | **The tray menu of the editor is complete in S0005:** Show, Run, Enable or disable, Close. | WI-0091 |
+| E0088 | **Geometry as v1, look modernized:** positions, sizes and shapes of v1 stay; font and colors are reworked, from one style table, accepted by the owner. | WI-0085 |
+
 ## Open questions for the project owner
 
-None at the moment (E0064 to E0074 answered on 2026-10-17).
+None at the moment (E0085 to E0088 answered on 2026-10-19).
 
 ## Required reading for every package
 
@@ -388,3 +397,71 @@ Block B (settings and system integration):
 
 - [x] WI-0069  - [x] WI-0070  - [x] WI-0071  - [x] WI-0072  - [x] WI-0073  - [ ] WI-0074  - [ ] WI-0075  - [ ] WI-0076 (block A)
 - [ ] WI-0077  - [ ] WI-0078  - [ ] WI-0079  - [ ] WI-0080  - [ ] WI-0081  - [ ] WI-0082 (block B)
+
+## S0005: Editor I: display
+
+**Goal:** The owner opens any flow from the manager ("Edit" or a double click) and sees it drawn in a window of its own process, with the geometry of v1 and a modernized look (E0088): elements with icon and name, connections with their type, loops with their bar. He zooms with the wheel and moves the view by dragging; a tooltip names the element under the mouse. He sees live which elements run, which elements and connections ran a moment ago, which triggers are enabled, where an exception happened, the warnings of the evaluation and the MIGRATION places. After a restart of the engine the editor shows the current state again. Each editor has a tray icon with the state of its flow and the menu Show, Run, Enable or disable, Close (E0087). Several editors run at the same time; one that hangs or crashes harms nothing else. The editor of S0005 changes nothing in the flow.
+
+**Not part of S0005:** selecting, moving, connecting, adding, deleting, copy and paste, undo and redo, the patch operations, the automatic saving and writing the view (E0086), the menu bar of the window, the "new element" fields that v1 draws in the canvas, the context menus (all S0006); the settings dialogs, the element list and the window of an unhandled error (S0007); the elements beyond the core set (S0008; an element of an unknown class is drawn as a placeholder).
+
+### Findings for S0005 (2026-10-19)
+
+- **Verified (read):** `src/entry/editor.ahk` is the placeholder (`PlaceholderRole`, exit 3, `#NoTrayIcon`); `src/editor/` does not exist (ARCHITECTURE 8 plans `editor/render/`). The button "Edit" of the manager is disabled (`ManagerWindow.ahk:42`, `ManagerModel.ahk:650`).
+- **Verified (read):** no command starts an editor. The supervisor passes `--flow=<id>` without quotes (`Children._Launch`, `Children.ahk:563`), and every flow ID has a space (`Flow 1010290492`); the editor would get `--flow=Flow` and a stray word (not tested). WI-0087 fixes it.
+- **Verified (read):** the engine keeps the run count and the last start per element (`Executor._counts`, `_lastRun`) and sends `evt.element.state` (two events per element pass, accepted by the owner on 2026-10-16, CLOSED-ITEMS). No command returns these states for one flow, so an editor opened while the flow runs could not show it. `evt.connection.state` is listed in PROTOCOL 4.3 but never sent (no hit in `src/`).
+- **Verified (read):** the warnings of the evaluation are only log lines (`ExprEvaluator._Warn`, `f1` with the flow ID, without the element); nothing reports them per element (REQ-EDT-150, REQ-VAR-100). The MIGRATION places are in the definition (`migration` key, ARCHITECTURE 7).
+- **Verified (read):** `cmd.flow.get` returns `FlowDefinition.Raw` with `flowSettings`, zoom and offset included (`FlowDefinition.WireDefinition`), contrary to the wording "without the editor's view data" in PROTOCOL 4.2.
+- **Verified (read, v1):** the drawing is `gdip_DrawEverything` in `v1/Source_Draw/GDIp/GDIp.ahk` (about 1000 lines), the sizes are in `v1/Source_Common/Other/Design.ahk` (element 140×105, grid 35, text 15 bold Arial, zoom 0.1 to 3, default zoom 0.7 and offset −200). A connection is five segments with a minimum height of 15; a loop has head, bar (`HeightOfVerticalBar`) and foot with a break field; an element or connection that ran is tinted for 1 s; triggers carry a switch and the default manual trigger a star; grid dots above zoom 1. One draw thread drew one flow at a time under the global lock. The editor scrolled in a loop with `Sleep 10` (rule 3 forbids it in v2); the wheel zooms by 1.1 around the mouse point.
+- **Verified (read):** `assets/` holds only `language/`; the icons of v1 (`v1/Icons/`: `enabled.ico`, `disabled.ico`, `running.ico`, switch, star, edit, plus, trash, move) are not copied yet. The element icons are in `src/elements/Default/Icons/` (`static Icon`, WI-0047). There is no GDI+ code in `src/`.
+- **Verified (measured, WI-0072; decided for the manager, E0077):** an open menu stops the timers and usually the running thread of its own process, not the pings. For the editor this pauses only its own drawing.
+- **Verified (count):** the biggest flow of the test data has 133 elements and 130 connections (`tests/data/flows/v1_examples/Flow 1010290492.json`); the 300-element flow of R0002 is generated.
+- **Not checked:** how fast GDI+ draws 300 elements from AutoHotkey v2 (R0002, WI-0083 measures it first); the memory of an editor process with all element classes and GDI+ (WI-0092).
+
+### Design fixed while detailing
+
+No owner decision needed; a package may refine it and says so in its result.
+
+- **Model, geometry, scene, renderer, window** (ARCHITECTURE 2.1): `EditorModel` holds the definition, the run states and the view and resyncs; `FlowGeometry` computes the shapes, the five segments of a connection and the hit test, without GDI; `SceneBuilder` makes an immutable `Scene`; `Renderer.Draw(scene, target)` draws with GDI+ into a bitmap; `EditorWindow` shows the bitmap and turns input into changes of the view. Model, geometry and renderer work without a window, so the e2e tests check drawn pixels headless in the normal tiers (as the manager's model, PROTOCOL 4.8).
+- **Draw on change only:** a dirty flag, at most one frame per 33 ms; the back buffer is copied in `WM_PAINT`, `WM_ERASEBKGND` is answered (no flicker). The fading of "recently run" has a timer that runs only while something fades.
+- **Geometry as v1, look from one style table** (E0088): positions, sizes and shapes as v1, so an old flow keeps its layout; font, colors and line widths in `EditorStyle`, accepted by the owner by screenshots (WI-0085).
+- **Own GDI+ wrapper** (E0085) in `src/editor/render/`: only the calls the renderer needs; every object is freed.
+- **The editor reads the icons itself:** program files, read once, as the language files (`arch-ok: file-io`, ARCHITECTURE 4). The icons of v1 move to `assets/icons/`.
+- **Engine side** (WI-0086): `cmd.flow.runstate` returns the states of one flow for the resync; `evt.element.state` with `running` names the connection taken (`connectionId`), so the connection needs no event of its own (`evt.connection.state` leaves the protocol); warnings are counted per element and sent coalesced (`evt.element.warning`, at most once per second per element).
+- **Resync** of the editor: at the start, after `evt.engine.ready` or `evt.engine.restarted`, on a new `epoch` and after a reconnect: `cmd.flow.get` and `cmd.flow.runstate`. Gaps in `seq` are not a reason (the editor sees only a few topics, so gaps are normal); `seq` only discards events older than the answer.
+- **One editor per flow** (D0002): the manager asks the supervisor (`cmd.editor.open`), which starts `editor:<flowId>` or brings the running one to the front; at most `Children.EDITOR_LIMIT` (proposal 20) editors. An editor is never restarted. It ends by its close box or its tray menu (clean bye), when its flow is deleted, and at the exit (`cmd.app.prepareExit`: nothing unsaved in S0005, no cancel).
+- **Menus of the editor** (the tray menu now, the context menus in S0006) run in the editor process, as E0077 decided for the manager: an open menu pauses only this editor.
+- **The view** (E0086) is read from `flowSettings` when the editor opens and then kept in the process. The status bar shows offset, zoom and the number of elements as v1. **DPI:** the canvas is drawn in physical pixels with the scale zoom × DPI/96, so a flow has the same physical size on every screen (REQ-USE-090).
+
+### Packages
+
+| ID | Title | Size | Depends on |
+|---|---|---|---|
+| [WI-0083](WI-0083-gdip-r0002.md) | GDI+ wrapper and the R0002 measurement | M | – |
+| [WI-0084](WI-0084-geometry-scene.md) | Geometry and scene (headless) | M | – |
+| [WI-0085](WI-0085-renderer.md) | Renderer: draw the scene, style, icons | M | WI-0083, WI-0084 |
+| [WI-0086](WI-0086-engine-runstate.md) | Engine: run states of a flow, the connection taken, warnings per element | M | – |
+| [WI-0087](WI-0087-open-editor.md) | Open and close an editor: supervisor and manager | M | – (manager part after WI-0078) |
+| [WI-0088](WI-0088-editor-shell.md) | Editor role: model, resync, window, headless driver | L | WI-0085, WI-0086, WI-0087 |
+| [WI-0089](WI-0089-live-states.md) | Live states, marks and the event load | M | WI-0088 |
+| [WI-0090](WI-0090-view-interaction.md) | View: zoom, move, tooltip, status bar, DPI | M | WI-0088 |
+| [WI-0091](WI-0091-editor-tray.md) | Tray icon and tray menu of the editor | S | WI-0088 |
+| [WI-0092](WI-0092-acceptance-s5.md) | Acceptance S0005 | M | all |
+
+**Order.** WI-0083 and WI-0084 add only new files and may start before WI-0082 (S0004 acceptance); WI-0086 (engine) and WI-0087 (supervisor, manager) touch other files and may run beside them, WI-0087's manager part after WI-0078 is integrated. **WI-0083 stops after the measurement if a frame of 300 elements takes more than 16 ms on average:** the owner decides how to go on (cache, render process of ARCHITECTURE 2.1) before WI-0085 starts. Then WI-0085, WI-0088, and WI-0089, WI-0090, WI-0091 one after the other (the same files in `src/editor/`). As before, the column "Depends on" is binding, the order is not. The retrospective of WI-0082 (what S0005 needs from `ui_common/` and the manager) may refine these packages.
+
+**Files with conflict risk in S0005:** `doc/PROTOCOL.md` (WI-0086, WI-0087, WI-0088, WI-0091), `src/engine/Executor.ahk` and `src/elements/base/` (WI-0086), `src/supervisor/Children.ahk` (WI-0087), `src/manager/` (WI-0087, and WI-0078 of S0004), `src/editor/` (WI-0085, WI-0088 to WI-0091), `src/entry/editor.ahk` (WI-0088, WI-0091), `doc/MEASUREMENTS.md` (WI-0083, WI-0089, WI-0092), `tests/support/group_table.py`, `.vscode/tasks.json`.
+
+### Acceptance S0005
+
+- **R0002:** a frame of a generated flow of 300 elements and about 350 connections takes below 16 ms on average at 1920×1080 with the whole flow visible; 3840×2160 and zoom 1 are measured too. Otherwise the owner's decision after WI-0083 is implemented.
+- **REQ-PRF-060:** a state change of the engine is drawn by a non-blocked editor within 50 ms.
+- **Memory with 5 open editors** is measured (private bytes per editor, with the Default package and with the 150 synthetic classes of MS-0033); editors are outside the budget (E0040), the numbers are recorded, and the background processes do not grow with editors open.
+- An editor that hangs or is killed harms no other editor and no running flow; after a restart of the engine every open editor shows the current state again (REQ-ROB-040, REQ-EDT-010).
+- Every e2e test of the editor runs headless in the normal tiers; the windows are checked by `gui` tests of the owner and by the manual check.
+- The owner's imported v1 flows open and look right; the owner accepted the look (E0088), the tray icon and menu, zoom, moving and the tooltip at 100 % and 225 % (manual check).
+- Serial, parallel, `-m stress`, foundation and slow runs are green.
+
+### Progress S0005
+
+- [ ] WI-0083  - [ ] WI-0084  - [ ] WI-0085  - [ ] WI-0086  - [ ] WI-0087
+- [ ] WI-0088  - [ ] WI-0089  - [ ] WI-0090  - [ ] WI-0091  - [ ] WI-0092
