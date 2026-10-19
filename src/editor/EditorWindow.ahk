@@ -157,6 +157,7 @@ class EditorWindow {
         if (this.closed)
             return
         this.closed := true
+        this.scheduled := false
         SetTimer(this.frameFn, 0)
         OnMessage(EditorWindow.WM_PAINT, this.paintFn, 0)
         OnMessage(EditorWindow.WM_ERASEBKGND, this.eraseFn, 0)

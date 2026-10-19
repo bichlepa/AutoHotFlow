@@ -105,10 +105,12 @@ class Renderer {
     }
 
     ; The counters for the status of the role: frames, time of the last and the slowest frame, rebuilds.
+    ; The times are whole milliseconds: the JSON of the snapshot keeps numbers as whole numbers (a float would be text).
     Snapshot() {
         mean := this.FramesDrawn ? this.TotalFrameMs / this.FramesDrawn : 0
-        return Map("frames", this.FramesDrawn, "meanFrameMs", Round(mean, 2), "lastFrameMs", this.LastFrameMs,
-            "slowestFrameMs", this.SlowestFrameMs, "rebuilds", this.Rebuilds, "lastRebuildMs", this.LastRebuildMs)
+        return Map("frames", this.FramesDrawn, "meanFrameMs", Round(mean), "lastFrameMs", Round(this.LastFrameMs)
+            , "slowestFrameMs", Round(this.SlowestFrameMs), "rebuilds", this.Rebuilds
+            , "lastRebuildMs", Round(this.LastRebuildMs))
     }
 
     ; Releases everything the renderer holds (GDI+ objects). Call it before Gdip.Shutdown.

@@ -235,3 +235,23 @@ def test_two_editors_of_two_flows_run_at_once(procs, datadir, session_id):
         assert editor_state(obs, "editor:" + SECOND)["flowId"] == SECOND
     finally:
         finish(sup, obs)
+
+
+def test_the_snapshot_of_the_editor_names_the_flow_the_revision_and_the_frames(procs, datadir, session_id):
+    """PROTOCOL 4.9, role part of the editor (WI-0088): the flow, the revision, the counts and the last resync."""
+    sup, obs = start_manager(procs, datadir, session_id)
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        render(obs)
+        ans = obs.request(EDITOR, "cmd.diag.snapshot", {}, timeout=scaled(5))
+        assert ans["payload"]["ok"], ans
+        info = ans["payload"]["snapshot"]["info"]
+        assert info["flowId"] == FLOW and info["rev"] == 1, info
+        assert info["elements"] == 3 and info["connections"] == 2, info
+        assert info["frames"] >= 1 and info["meanFrameMs"] >= 0 and info["slowestFrameMs"] >= info["meanFrameMs"], info
+        assert info["lastResync"]["reason"] == "start", info
+        assert info["headless"] is True and info["windowVisible"] is False, info
+        assert info["engine"] == "ready", info
+    finally:
+        finish(sup, obs)

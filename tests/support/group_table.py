@@ -205,6 +205,8 @@ TEST_GROUPS = {
     "ahk/editor_scene.test.ahk": ["editor-geometry"],
     "ahk/editor_model.test.ahk": ["editor"],
     "e2e/test_editor.py": ["editor"],
+    "ahk/editor_window.test.ahk": ["editor"],
+    "fault/test_editor_window.py": ["editor"],
 }
 
 # Element source file -> the tests that cover exactly that element: a test file (a unit or a whole file) or a single

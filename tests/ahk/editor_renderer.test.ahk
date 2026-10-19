@@ -245,9 +245,12 @@ CheckTriggerSwitchIsDrawn() {
 }
 
 CheckStarOnlyForTheDefaultTrigger() {
+    ; the star comes from the definition (DefaultTrigger of Trigger_Manual, WI-0088), not from a trigger-state key
     view := ViewAt()
-    plain := SceneOf(view, "", Map("T", Map("enabled", 1, "armed", 0, "message", "", "default", 0)))
-    star := SceneOf(view, "", Map("T", Map("enabled", 1, "armed", 0, "message", "", "default", 1)))
+    plain := SceneOf(view, "", Map("T", Map("enabled", 1, "armed", 0, "message", "")))
+    raw := Json.Parse(FlowText())
+    raw["allElements"]["T"]["DefaultTrigger"] := "1"
+    star := SceneBuilder.Build(raw, view, "", Map("T", Map("enabled", 1, "armed", 0, "message", "")))
     c := NewCanvas()
     r := Renderer()
     try {
