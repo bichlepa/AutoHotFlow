@@ -74,6 +74,13 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0105 | A role's summary line is written lazily: after a burst of log lines it can come late or not at all | closed 2026-10-16: suspicion without an observation |  |
 | F-0112 | The per-minute limit counts every element execution, so a legitimate flow with many big runs can reach it | accepted (owner, 2026-10-17, E0071): the defaults stay and become global settings in S0004; revisit after the port | |
 | F-0106 | The header of a slow-run output in `run_suite` named another commit than the run folder | closed 2026-10-16: not reproduced; the run record carries the commit |  |
+| F-0058 | Debug window, Snapshots tab: text jumps to the top on every refresh | closed (fixed in ca9fbc6; owner check 2026-10-14) | |
+| F-0113 | Warning of AutoHotkey on stdout from Trigger_Start_up (local `type`) at every load | merged into F-0114 (2026-10-19, the same warning class) | |
+| F-0116 | The log window misses lines of a burst (5000 lines, about 2000 reached storage) | accepted (E0082, owner 2026-10-17: the drop in the hub stays) | |
+| F-0117 | The tree shows that a flow runs, not how many instances run | closed 2026-10-17 (E0079): the count is in the snapshot and `evt.flow.state` | |
+| F-0120 | A flow with a missing package but no trigger message is not marked | closed 2026-10-17 (E0080): `missingPackages` in the snapshot | |
+| F-0128 | The text of the question dialogs was clipped to its first line | closed (fixed: `GuiLayout.TextHeight`) | WI-0076 |
+| F-0140 | The checkboxes of the settings dialog were 600 px wide and painted over the note column on hover | closed (fixed, unit test `ControlsOfATabDoNotOverlap`; the owner saw the fix on 2026-10-19) | WI-0078 |
 | F-0142 | PROTOCOL documents message types that no source string uses | closed 2026-10-19: `evt.connection.state` and `cmd.ui.confirmDeleteFlowFile` removed from PROTOCOL (dead; M-0008, WI-0086), the status table brought to the code | WI-0082 |
 | F-0143 | A `-m stress` run opens a real manager window | closed 2026-10-19: fixed in `tests/conftest.py` (a run that names stress, soak or idle but not gui leaves gui tests out, also with `--all`), test `tests/test_tier_selection.py` | WI-0082 |
 
@@ -259,14 +266,6 @@ This document lists findings that are closed or accepted. Entries are moved here
 
 **What:** `-m stress` replaces the default `not gui` filter, so it selects the gui variant `test_the_window_fills_its_tree_with_200_big_flows` and a stress run opens a real window (about 50 s).
 **Closed (2026-10-19):** the cause was the exemption in `tests/conftest.py` that kept a stress test although `gui` was not asked for. A run that names `stress`, `soak` or `idle` in `-m` without `gui` now leaves the gui tests out, also with `--all`; `-m "stress or gui"` runs the window variant. Evidence: `tests/test_tier_selection.py`, `doc/TEST-STRATEGY.md` section 6.
-
-## Sources
-
-All sources are at the tag `v2-phase2-final` and can be read with `git show v2-phase2-final:<path>`:
-
-- `work_items/STATUS.md`: table "Funde", "Beobachtungsliste (E0007)", "Bekannte Probleme", "Nicht geprüft", "Nächste Schritte", "Abnahmelauf WI-0034", "Abnahmelauf WI-0035".
-- `work_items/HANDOVER.md`: "Offene Entscheidungen", "Offene Punkte", "Nicht gebaut", "Nicht geprüft".
-- The package files `work_items/phase2b/WI-*.md` and `work_items/phase2/WI-*.md` as cited above.
 
 ### F-0072: `#Warn` warning dialog from the variable loader (manual run)
 
@@ -786,3 +785,34 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 **Evidence:** `tests/e2e/test_manager_log.py::test_a_burst_of_5000_lines_does_not_stall_the_manager_and_the_model_keeps_the_limit`.
 
 **Closed 2026-10-17 (E0082, bug hunter):** decided by the owner (drop stays). The test asserts what storage wrote, not that all lines arrive; the model shows the newest lines of the file.
+
+### F-0128: The text of the question dialogs was clipped to its first line (closed, fixed)
+
+**What:** The text control of `UiDialogs.Confirm`, `Input` and `Choose` was as high as the number of newlines in the text (`_TextHeight`, 20 px per line). The manager's question texts are one line in the language file but wrap at the dialog width (380 px at 100 %), so only the first line was shown (the delete question: a 20 px control for two lines of text, measured before the fix by `tests/fault/test_manager_window.py::test_a_wrapped_question_text_of_a_dialog_is_shown_in_full`). The same count applied to the status line of the input dialog (fixed 18 px).
+**Fix:** `GuiLayout.TextHeight` measures the text with DrawText as the control wraps it (the font and the width of the layout at the DPI of the window). The dialogs use it for the text and, in the input dialog, for a status line of two lines (a refusal text may wrap). Follow-ups of the review, fixed:
+- the gui test compares the control height with one line in pixels at the DPI of the dialog (before, the test compared pixels with 100 % units, so at 225 % the old 45 px control passed);
+- the Text controls of the dialogs have SS_NOPREFIX (`+0x80`), as the measurement assumes: "&" in a flow or category name is shown, not eaten;
+- a text is capped at the work area of the primary monitor minus the rest of the dialog (`UiDialogs.FitTextHeight`, pure, unit-tested): the text is clipped at its end, the buttons stay on the screen;
+- a language change while a dialog is open can wrap its text differently; the height is measured once when the dialog is built and not measured again (accepted).
+**Status:** closed (fixed). Checked: the unit tests `tests/ahk/core_gui_layout.test.ahk` (TextHeight) and `tests/ahk/ui_common_dialogs.test.ahk` (FitTextHeight); the gui test above, run once at 96 dpi (run 20261017-203439-22844: the control is 30 px, one line 15 px, SS_NOPREFIX set). The gui test discriminates at 96 dpi; at 225 % only by arithmetic (old control 45 px, two lines about 68 px). Not checked: a real display at 225 % (owner's manual check); the `Choose` dialog with a long text; a dialog while the DPI changes; a text capped by a small screen.
+**Evidence:** `src/core/GuiLayout.ahk` (`TextHeight`), `src/ui_common/UiDialogs.ahk` (`_TextH`, `FitTextHeight`), `tests/ahk/core_gui_layout.test.ahk`, `tests/ahk/ui_common_dialogs.test.ahk`, `tests/fault/test_manager_window.py`.
+
+### F-0140: The checkboxes of the settings dialog were 600 px wide and painted over the note column on hover (closed, fixed)
+
+**What:** The checkbox of a General-tab row (`Notify_unhandled_errors`, `Start_with_windows`, `Run_as_admin`) was placed as wide as label, control and 100 px (`LABEL_W + CTL_W + 100` = 600 px at 100 %). Its right edge (624 px) lay over the note column (starts at 544 px). The note text stayed visible until the mouse moved over the checkbox: the hover repaint of the checkbox then covered it. Measured with a headless probe (`GuiLayout.Apply` at 96 dpi and 216 dpi, then `GetPos`): checkbox 24 to 624 and note 544 to 668 at 96 dpi; at 216 dpi the checkbox ends at 1404 and the note starts at 1224.
+**Fix:** The checkbox is as wide as its box and its text (`GuiLayout.TextWidth`, a single-line DrawText measurement, plus `SettingsWindow.CHECK_BOX_W`), and never wider than the space before the note column. The unit test `ControlsOfATabDoNotOverlap` (`tests/ahk/manager_settings_window.test.ahk`) checks at 96 dpi and 216 dpi that no two controls of a tab overlap and that each checkbox ends before the note column; with the old width it fails (`dpi 96, tab general: two controls overlap`).
+**Status:** closed (fixed). Verified: the measurement above, the unit test with and without the fix. Assumed: the box width `CHECK_BOX_W` (22 px at 100 %). Not checked: the owner's screen at his DPI, the hover look itself (the test checks rectangles, not the repaint).
+**Source:** `src/manager/SettingsWindow.ahk` (`_Row`, case "check"), `src/core/GuiLayout.ahk` (`TextWidth`).
+
+### F-0113: Warning of AutoHotkey on stdout from Trigger_Start_up (local `type`) at every load
+
+**What:** AutoHotkey prints `Warning: This local variable has the same name as a global variable. Specifically: type (in function Default.Trigger_Start_up.Enable)` on the output of every test that loads the element classes.
+**Closed (2026-10-19):** merged into F-0114 (`doc/OPEN-ITEMS.md`), which describes the same warning class for the trigger host and `Trigger_Start_up`.
+
+## Sources
+
+All sources are at the tag `v2-phase2-final` and can be read with `git show v2-phase2-final:<path>`:
+
+- `work_items/STATUS.md`: table "Funde", "Beobachtungsliste (E0007)", "Bekannte Probleme", "Nicht geprüft", "Nächste Schritte", "Abnahmelauf WI-0034", "Abnahmelauf WI-0035".
+- `work_items/HANDOVER.md`: "Offene Entscheidungen", "Offene Punkte", "Nicht gebaut", "Nicht geprüft".
+- The package files `work_items/phase2b/WI-*.md` and `work_items/phase2/WI-*.md` as cited above.

@@ -39,6 +39,10 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0124 | `ManagerModel.unseenIds` keeps an entry for a flow that is deleted before the user looks at its error (a tiny leak; the mark is never shown again) | open, found in WI-0075; the entries are small and bounded by the flows deleted in one session | WI-0075 |
 | F-0125 | No test provokes a storage-error notice (`Notice_storage`, `Engine._StorageError`) | open, found in WI-0075; the path is built but not checked | WI-0075 |
 | F-0114 | Load warnings in the trigger host and in `Trigger_Start_up`: a local `message` (`TriggerHost._CmdArm`, `ReportCallbackError`) and a local `type` (`Trigger_Start_up.Enable`) are reported as the same name as a global variable on every start of the trigger host (seen in the engine and triggerhost logs, WI-0064); the same trap as in `doc/howto/gui-and-hotkeys.md` (case-insensitive names) | observed, not checked whether it changes behaviour; a rename of the locals removes the warnings | |
+| F-0118 | The question for an unknown state recognises the refusal by its text ("cannot be read (") instead of an error code | open, assumed; robust option needs an owner decision (`code: state_unknown`) | WI-0074 |
+| F-0119 | A multi-selection of flows is not visible in the tree (only the focused item is highlighted) | open, verified in code; the owner decides on a mark | WI-0074 |
+| F-0121 | The tree label of a running flow (`ManagerWindow._FlowLabel`) has no automated test | open, verified in code | WI-0074 |
+| F-0122 | A multi-selection was lost on a later rebuild of the tree (fixed; no automated test, the path is only reachable through a real tree) | open, verified in code, not checked on screen | WI-0074 |
 
 ## Findings
 
@@ -129,7 +133,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 ### F-0114: Load warnings in the trigger host and in `Trigger_Start_up`
 
-**What:** A local `message` (`TriggerHost._CmdArm`, `ReportCallbackError`) and a local `type` (`Trigger_Start_up.Enable`) are reported as the same name as a global variable on every start of the trigger host (seen in the engine and triggerhost logs, WI-0064). It is the same trap as in `doc/howto/gui-and-hotkeys.md` (case-insensitive names).
+**What:** (F-0113 is merged here: the same warning for a local `type` in `Trigger_Start_up.Enable`, seen on stdout of every test that loads the element classes, line 46 of `src/elements/Default/Triggers/Trigger_Start_up.ahk`, outside WI-0066, not a failure.) A local `message` (`TriggerHost._CmdArm`, `ReportCallbackError`) and a local `type` (`Trigger_Start_up.Enable`) are reported as the same name as a global variable on every start of the trigger host (seen in the engine and triggerhost logs, WI-0064). It is the same trap as in `doc/howto/gui-and-hotkeys.md` (case-insensitive names).
 **Status:** observed, not checked whether it changes behaviour. A rename of the locals removes the warnings.
 
 ### F-0073: Stress test with 200 big flows: a snapshot answer during the load takes 2.3 s (budget 1 s)
@@ -165,12 +169,6 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Action:** watch the history of the test; if it recurs, decide whether the test must skip the idle report or the worker must not send it at start.
 **Evidence:** run 20261016-225151-4328 (fast tier, `python -m pytest tests -q`).
 
-### F-0113: Warning of AutoHotkey on stdout from Trigger_Start_up (local `type`) at every load
-
-**What:** AutoHotkey prints `Warning: This local variable has the same name as a global variable. Specifically: type (in function Default.Trigger_Start_up.Enable)` (`src/elements/Default/Triggers/Trigger_Start_up.ahk` line 46) on the output of every test that loads the element classes. It is outside WI-0066 and not a failure.
-**Status:** open, not checked whether the engine output shows it in the product (it goes to stdout, not a dialog). The fix is to rename the local (the rule `#Warn` with `StdOut` is in CONVENTIONS section 3).
-**Evidence:** the output of `tests/ahk/helpers/element_rate_bench.ahk` and `tests/ahk/engine_runaway.test.ahk` runs.
-
 ### F-0118: The question for an unknown state recognises the refusal by its text
 
 **What:** The question "write the state of this session to the file?" (E0063, `ManagerOps._AfterSwitch`) is asked when the answer of the engine is `ok: false` with the text "cannot be read (". The engine gives this refusal no error code, so the text is the only mark. A change of the text in `Engine.ahk` would silently remove the question.
@@ -195,29 +193,11 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Status:** open, verified in code, not checked on screen. Action: a gui test that selects two flows and then creates a category.
 **Evidence:** `src/manager/ManagerWindow.ahk` (`_OnTreeSelect`).
 
-### F-0128: The text of the question dialogs was clipped to its first line (closed, fixed)
-
-**What:** The text control of `UiDialogs.Confirm`, `Input` and `Choose` was as high as the number of newlines in the text (`_TextHeight`, 20 px per line). The manager's question texts are one line in the language file but wrap at the dialog width (380 px at 100 %), so only the first line was shown (the delete question: a 20 px control for two lines of text, measured before the fix by `tests/fault/test_manager_window.py::test_a_wrapped_question_text_of_a_dialog_is_shown_in_full`). The same count applied to the status line of the input dialog (fixed 18 px).
-**Fix:** `GuiLayout.TextHeight` measures the text with DrawText as the control wraps it (the font and the width of the layout at the DPI of the window). The dialogs use it for the text and, in the input dialog, for a status line of two lines (a refusal text may wrap). Follow-ups of the review, fixed:
-- the gui test compares the control height with one line in pixels at the DPI of the dialog (before, the test compared pixels with 100 % units, so at 225 % the old 45 px control passed);
-- the Text controls of the dialogs have SS_NOPREFIX (`+0x80`), as the measurement assumes: "&" in a flow or category name is shown, not eaten;
-- a text is capped at the work area of the primary monitor minus the rest of the dialog (`UiDialogs.FitTextHeight`, pure, unit-tested): the text is clipped at its end, the buttons stay on the screen;
-- a language change while a dialog is open can wrap its text differently; the height is measured once when the dialog is built and not measured again (accepted).
-**Status:** closed (fixed). Checked: the unit tests `tests/ahk/core_gui_layout.test.ahk` (TextHeight) and `tests/ahk/ui_common_dialogs.test.ahk` (FitTextHeight); the gui test above, run once at 96 dpi (run 20261017-203439-22844: the control is 30 px, one line 15 px, SS_NOPREFIX set). The gui test discriminates at 96 dpi; at 225 % only by arithmetic (old control 45 px, two lines about 68 px). Not checked: a real display at 225 % (owner's manual check); the `Choose` dialog with a long text; a dialog while the DPI changes; a text capped by a small screen.
-**Evidence:** `src/core/GuiLayout.ahk` (`TextHeight`), `src/ui_common/UiDialogs.ahk` (`_TextH`, `FitTextHeight`), `tests/ahk/core_gui_layout.test.ahk`, `tests/ahk/ui_common_dialogs.test.ahk`, `tests/fault/test_manager_window.py`.
-
 ### F-0139: The log and notice windows follow a language change without a test (open)
 
 **What:** `LogWindow.Relabel` and `NoticeWindow.Relabel` set the column titles and the drop-down lists again (ManagerWindow.Refresh). No test reads their texts: the headless tests have no window, the gui test covers the settings dialog and the about window only.
 **Status:** open, verified in code, not checked on screen. Action: step 50 of MANUAL-CHECKS section 8 by the owner; a gui test later.
 **Evidence:** `src/manager/LogWindow.ahk`, `src/manager/NoticeWindow.ahk`, `src/manager/ManagerWindow.ahk` (`Refresh`).
-
-### F-0140: The checkboxes of the settings dialog were 600 px wide and painted over the note column on hover (closed, fixed)
-
-**What:** The checkbox of a General-tab row (`Notify_unhandled_errors`, `Start_with_windows`, `Run_as_admin`) was placed as wide as label, control and 100 px (`LABEL_W + CTL_W + 100` = 600 px at 100 %). Its right edge (624 px) lay over the note column (starts at 544 px). The note text stayed visible until the mouse moved over the checkbox: the hover repaint of the checkbox then covered it. Measured with a headless probe (`GuiLayout.Apply` at 96 dpi and 216 dpi, then `GetPos`): checkbox 24 to 624 and note 544 to 668 at 96 dpi; at 216 dpi the checkbox ends at 1404 and the note starts at 1224.
-**Fix:** The checkbox is as wide as its box and its text (`GuiLayout.TextWidth`, a single-line DrawText measurement, plus `SettingsWindow.CHECK_BOX_W`), and never wider than the space before the note column. The unit test `ControlsOfATabDoNotOverlap` (`tests/ahk/manager_settings_window.test.ahk`) checks at 96 dpi and 216 dpi that no two controls of a tab overlap and that each checkbox ends before the note column; with the old width it fails (`dpi 96, tab general: two controls overlap`).
-**Status:** closed (fixed). Verified: the measurement above, the unit test with and without the fix. Assumed: the box width `CHECK_BOX_W` (22 px at 100 %). Not checked: the owner's screen at his DPI, the hover look itself (the test checks rectangles, not the repaint).
-**Source:** `src/manager/SettingsWindow.ahk` (`_Row`, case "check"), `src/core/GuiLayout.ahk` (`TextWidth`).
 
 ## Observed only (not for the bug hunter)
 
