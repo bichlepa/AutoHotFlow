@@ -209,6 +209,26 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **What:** see the table row. The placeholder editor ends with exit 3 after about 200 ms; the supervisor judges it at its next 200 ms tick.
 **Status:** open, verified in code. Next step: WI-0088 gives a long-lived editor; then make the two tests deterministic, add the missing tests, and relaunch or check `ProcessExist` when the show answer is empty.
 
+### F-9000*: A state change costs more in SceneBuilder.Build than in the frame
+
+**What:** `SceneBuilder.Build` takes about 18 ms for 300 elements (MS-0046), more than the frame of a state change (6 ms). The window builds a new scene at every state change, so a state change costs about 25 ms before it is on the screen.
+**Status:** open, found in the measurement of WI-0085. Option: a build that changes only the run states. Decision in WI-0088.
+
+### F-9001*: The static layer rebuild is slow at 4K
+
+**What:** the layer is rebuilt in 152 ms at 3840×2160 (106 ms at 1920×1080) on a change of the flow, the zoom, the DPI or a pan out of the layer, and takes about 52 MB at 4K. That is above the 150 ms the owner was to hear about (E0090).
+**Status:** open, owner decision (MS-0046). Options: a smaller margin, a rebuild in parts over several frames, or a separate process.
+
+### F-9002*: The word "break" of the loop break field is a literal
+
+**What:** the renderer draws the literal "break" in the break field of a loop, not a language text.
+**Status:** open, low (WI-0085).
+
+### F-9003*: The tint of a running element lies over a later element
+
+**What:** the tint of a running element is drawn after all elements, so where it overlaps a later element of the scene, the tint lies over that element; v1 draws the tint with its element.
+**Status:** open, low (WI-0085); the sample flows show no such overlap, not checked on a larger flow.
+
 ## Observed only (not for the bug hunter)
 
 Entries that the bug hunter does not take (`doc/ORCHESTRATOR.md` 3c): they were observed once or only under parallel load, were not reproduced when run alone, or are assumed and not checked. Each one has its sign (what to look for in a run) and its action. Hunter-eligible entries stay in the summary table and the findings above.
