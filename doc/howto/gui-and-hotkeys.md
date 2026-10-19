@@ -194,7 +194,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 
 ### A checkbox was wider than its label and painted over the note of its row on hover (verified)
 
-- **Problem:** The checkboxes of the settings dialog were placed as wide as a label, a control and 100 px together (600 px at 100 %). The right part of each box covered the note column of the row. The note stayed visible until the mouse moved over the checkbox, because the hover repaint of the checkbox redrew its whole rectangle (F-9101*).
+- **Problem:** The checkboxes of the settings dialog were placed as wide as a label, a control and 100 px together (600 px at 100 %). The right part of each box covered the note column of the row. The note stayed visible until the mouse moved over the checkbox, because the hover repaint of the checkbox redrew its whole rectangle (F-0140).
 - **Wrong:** Giving a checkbox a width "to be safe" (a fixed number of pixels, or the width of a column plus a margin). Nothing measures the text, and the control can run into the next column.
 - **Right:** Measure the label as one line (`GuiLayout.TextWidth`, DrawText with `DT_CALCRECT | DT_SINGLELINE | DT_NOPREFIX`), add the box width, and cap the result at the start of the next column. A unit test checks the rectangles of all controls of a tab at 96 dpi and 216 dpi (headless: `GuiLayout.Apply(lay, dpi)` moves the controls without a show, then `GetPos`).
 - **Status:** verified by the rectangle test (`tests/ahk/manager_settings_window.test.ahk`, fails with the old width); the box width (22 px at 100 %) is assumed; the hover look on the owner's screen is not checked.

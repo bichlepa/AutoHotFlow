@@ -206,7 +206,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Status:** open, verified in code, not checked on screen. Action: step 50 of MANUAL-CHECKS section 6 by the owner; a gui test later.
 **Evidence:** `src/manager/LogWindow.ahk`, `src/manager/NoticeWindow.ahk`, `src/manager/ManagerWindow.ahk` (`Refresh`).
 
-### F-9101*: The checkboxes of the settings dialog were 600 px wide and painted over the note column on hover (closed, fixed)
+### F-0140: The checkboxes of the settings dialog were 600 px wide and painted over the note column on hover (closed, fixed)
 
 **What:** The checkbox of a General-tab row (`Notify_unhandled_errors`, `Start_with_windows`, `Run_as_admin`) was placed as wide as label, control and 100 px (`LABEL_W + CTL_W + 100` = 600 px at 100 %). Its right edge (624 px) lay over the note column (starts at 544 px). The note text stayed visible until the mouse moved over the checkbox: the hover repaint of the checkbox then covered it. Measured with a headless probe (`GuiLayout.Apply` at 96 dpi and 216 dpi, then `GetPos`): checkbox 24 to 624 and note 544 to 668 at 96 dpi; at 216 dpi the checkbox ends at 1404 and the note starts at 1224.
 **Fix:** The checkbox is as wide as its box and its text (`GuiLayout.TextWidth`, a single-line DrawText measurement, plus `SettingsWindow.CHECK_BOX_W`), and never wider than the space before the note column. The unit test `ControlsOfATabDoNotOverlap` (`tests/ahk/manager_settings_window.test.ahk`) checks at 96 dpi and 216 dpi that no two controls of a tab overlap and that each checkbox ends before the note column; with the old width it fails (`dpi 96, tab general: two controls overlap`).
