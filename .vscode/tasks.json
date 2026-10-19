@@ -712,7 +712,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test data: copy skeleton flow to the data folder",
+            "label": "Setup: copy skeleton flow to a data folder (asks for the folder)",
             "type": "process",
             "command": "powershell",
             "args": [
