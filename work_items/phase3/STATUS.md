@@ -71,7 +71,7 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI-0081 | `.ahf` export and import | done, verified on 4e510dc1 (fast, foundation, slow green); owner decisions: 4 MB unpacked cap, UNC refused, ActsOnSystem list | | | | block B |
 | WI-0082 | Acceptance S0004 | running (sonnet, `wi-82`) | | | | |
 
-Step S0005 (editor I: display), detailed on 2026-10-19 (E0085 to E0088), not started. WI-0083, WI-0084, WI-0086 and WI-0087 may start now (WI-0087's manager part after WI-0078); WI-0083 stops for the owner if R0002 fails.
+Step S0005 (editor I: display), detailed on 2026-10-19 (E0085 to E0088), not started. WI-0083, WI-0084, WI-0086 and WI-0087 may start now; WI-0083 stops for the owner if R0002 fails.
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|

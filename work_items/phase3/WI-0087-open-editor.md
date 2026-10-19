@@ -1,6 +1,6 @@
 # WI-0087 Open and close an editor: supervisor and manager
 
-Size: M · Depends on: – (the manager part after WI-0078 is integrated, same files) · Blocks: WI-0088
+Size: M · Depends on: – · Blocks: WI-0088
 
 ## Goal
 

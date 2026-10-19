@@ -440,14 +440,14 @@ No owner decision needed; a package may refine it and says so in its result.
 | [WI-0084](WI-0084-geometry-scene.md) | Geometry and scene (headless) | M | – |
 | [WI-0085](WI-0085-renderer.md) | Renderer: draw the scene, style, icons | M | WI-0083, WI-0084 |
 | [WI-0086](WI-0086-engine-runstate.md) | Engine: run states of a flow, the connection taken, warnings per element | M | – |
-| [WI-0087](WI-0087-open-editor.md) | Open and close an editor: supervisor and manager | M | – (manager part after WI-0078) |
+| [WI-0087](WI-0087-open-editor.md) | Open and close an editor: supervisor and manager | M | – |
 | [WI-0088](WI-0088-editor-shell.md) | Editor role: model, resync, window, headless driver | L | WI-0085, WI-0086, WI-0087 |
 | [WI-0089](WI-0089-live-states.md) | Live states, marks and the event load | M | WI-0088 |
 | [WI-0090](WI-0090-view-interaction.md) | View: zoom, move, tooltip, status bar, DPI | M | WI-0088 |
 | [WI-0091](WI-0091-editor-tray.md) | Tray icon and tray menu of the editor | S | WI-0088 |
 | [WI-0092](WI-0092-acceptance-s5.md) | Acceptance S0005 | M | all |
 
-**Order.** WI-0083 and WI-0084 add only new files and may start before WI-0082 (S0004 acceptance); WI-0086 (engine) and WI-0087 (supervisor, manager) touch other files and may run beside them, WI-0087's manager part after WI-0078 is integrated. **WI-0083 stops after the measurement if a frame of 300 elements takes more than 16 ms on average:** the owner decides how to go on (cache, render process of ARCHITECTURE 2.1) before WI-0085 starts. Then WI-0085, WI-0088, and WI-0089, WI-0090, WI-0091 one after the other (the same files in `src/editor/`). As before, the column "Depends on" is binding, the order is not. The retrospective of WI-0082 (what S0005 needs from `ui_common/` and the manager) may refine these packages.
+**Order.** WI-0083 and WI-0084 add only new files and may start before WI-0082 (S0004 acceptance); WI-0086 (engine) and WI-0087 (supervisor, manager) touch other files and may run beside them (WI-0078 is integrated). **WI-0083 stops after the measurement if a frame of 300 elements takes more than 16 ms on average:** the owner decides how to go on (cache, render process of ARCHITECTURE 2.1) before WI-0085 starts. Then WI-0085, WI-0088, and WI-0089, WI-0090, WI-0091 one after the other (the same files in `src/editor/`). As before, the column "Depends on" is binding, the order is not. The retrospective of WI-0082 (what S0005 needs from `ui_common/` and the manager) may refine these packages.
 
 **Files with conflict risk in S0005:** `doc/PROTOCOL.md` (WI-0086, WI-0087, WI-0088, WI-0091), `src/engine/Executor.ahk` and `src/elements/base/` (WI-0086), `src/supervisor/Children.ahk` (WI-0087), `src/manager/` (WI-0087, and WI-0078 of S0004), `src/editor/` (WI-0085, WI-0088 to WI-0091), `src/entry/editor.ahk` (WI-0088, WI-0091), `doc/MEASUREMENTS.md` (WI-0083, WI-0089, WI-0092), `tests/support/group_table.py`, `.vscode/tasks.json`.
 
