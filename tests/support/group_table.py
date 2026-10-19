@@ -198,6 +198,7 @@ TEST_GROUPS = {
     "test_run_suite.py": ["tools"],
     "test_runtool_runs.py": ["tools"],
     "test_verify.py": ["tools"],
+    "ahk/editor_geometry.test.ahk": ["editor-geometry"],
 }
 
 # Element source file -> the tests that cover exactly that element: a test file (a unit or a whole file) or a single
@@ -442,6 +443,10 @@ SOURCE_AREAS = [
     ("elements-gen", ["src/entry/generated/*"]),
     ("manager", ["src/manager/*", "src/entry/manager.ahk", "src/core/NoticeThrottle.ahk"]),
     ("tray", ["src/tray/*", "src/entry/tray.ahk"]),
+    ("editor-geometry", ["src/editor/FlowRect.ahk", "src/editor/FlowGeometry.ahk", "src/editor/EditorView.ahk",
+                         "src/editor/FlowHit.ahk", "src/editor/FlowHitTest.ahk", "src/editor/Scene.ahk",
+                         "src/editor/SceneElement.ahk", "src/editor/SceneConnection.ahk",
+                         "src/editor/SceneBuilder.ahk"]),
 ]
 
 # Test groups that run in full when a file of the source area changes. An area that is not listed runs the test group
