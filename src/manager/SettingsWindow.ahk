@@ -53,6 +53,9 @@ class SettingsWindow {
 
     Visible => !this.done && this.win.Visible
 
+    ; True while the window exists (the close box of UiWindow destroys it without setting done).
+    _Alive() => !this.done && DllCall("user32\IsWindow", "ptr", this.win.Hwnd, "int") != 0
+
     ; Makes the window again with the texts of the current language, with the values the user has typed.
     Relabel() {
         if (this.done)
@@ -157,7 +160,7 @@ class SettingsWindow {
 
     ; The answer of the engine to the set: a saved set closes the dialog, a refusal is shown and the dialog stays open.
     _Answered(answer) {
-        if (this.done)
+        if (!this._Alive())            ; the close box may have closed the window while the engine answered (F-9104)
             return
         if (answer["ok"]) {
             this.Close()

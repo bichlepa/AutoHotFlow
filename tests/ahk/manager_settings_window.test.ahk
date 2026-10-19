@@ -158,6 +158,17 @@ UnlistedLanguageIsKept() {
     }
 }
 
+; An answer of the engine that comes after the close box is ignored: the window is gone (F-9104).
+AnswerAfterTheCloseBoxIsIgnored() {
+    model := FakeSettingsModel()
+    win := SettingsWindow(model)
+    OpenAt(win, model)
+    win.win.Close()                                    ; what the close box does (UiWindow), done stays false
+    win._Answered(Map("ok", false, "code", "internal", "message", "late refusal"))
+    win._Answered(Map("ok", true, "code", "", "message", ""))
+    Assert.True(!win._Alive(), "the window is gone and nothing touched it")
+}
+
 ; A change of the language keeps a refused value as typed and the refusal in the status line (F-9101).
 RelabelKeepsARefusedValueAndTheStatus() {
     model := FakeSettingsModel()
@@ -212,6 +223,7 @@ TestRun.Case("A refusal of the engine stays in the dialog with its message", Eng
 TestRun.Case("A change of the language keeps the values the user typed", RelabelKeepsTheTypedValues)
 TestRun.Case("OK without a change sends nothing and closes the dialog", PlainOkSendsNothing)
 TestRun.Case("A language code the program does not list is kept", UnlistedLanguageIsKept)
+TestRun.Case("An answer after the close box is ignored", AnswerAfterTheCloseBoxIsIgnored)
 TestRun.Case("A change of the language keeps a refused value and the refusal in the status", RelabelKeepsARefusedValueAndTheStatus)
 TestRun.Case("The language list starts with the language of Windows", LanguageListHasWindowsLanguageFirst)
 TestRun.Case("The about window has the versions, the license and the project site", AboutShowsVersionsLicenseAndSite)
