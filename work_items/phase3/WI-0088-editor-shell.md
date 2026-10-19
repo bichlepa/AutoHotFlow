@@ -20,6 +20,8 @@ The real editor replaces the placeholder: a role that loads its flow, follows it
 6. **Snapshot of the role** (PROTOCOL 4.9): flow ID, rev, element count, frames, mean and slowest frame time, the last resync and its reason.
 7. **Tests** (e2e, headless): open, loaded and drawn (probes); a rename in the manager changes the title; a deletion closes the editor; an editor opened while the flow runs shows the running element; the engine killed: the editor shows the current state again; the editor killed: the flow keeps running and the other editor too; two editors of two flows at once; a missing flow ends the editor cleanly. `gui` test (owner): the window opens and shows the flow.
 
+**Carried over from WI-0087 (see the finding about editor-open tests):** the editor of WI-0088 stays alive, so make the two tests with a running editor deterministic (they depend on back-to-back requests today), add tests for `FlowIdOk`, the clean bye as a planned end, the crashed editor that is not restarted and the slot of a dead editor in the limit, and close the short race of `cmd.editor.show` to an editor that just died.
+
 ## Acceptance criteria
 
 - The tests of task 7 are green; foundation tier green; PROTOCOL and ARCHITECTURE updated; REQ-EDT-010, REQ-EDT-020, REQ-ROB-040, REQ-EXE-140, REQ-MIG-070 updated.
