@@ -194,6 +194,12 @@ def test_a_path_that_no_rule_knows_selects_everything():
     assert groups.select(["something/new.bin"]).everything
 
 
+def test_the_render_bench_helper_selects_its_groups_not_everything():
+    sel = groups.select(["tests/ahk/helpers/render_bench.ahk"])
+    assert not sel.everything
+    assert {"render", "tools"} <= sel.groups
+
+
 @pytest.mark.parametrize("path,area", [
     ("src/core/GuiLayout.ahk", "ui"), ("src/core/ipc/Frame.ahk", "transport"), ("src/supervisor/Stall.ahk", "recovery"),
     ("src/supervisor/Hub.ahk", "supervisor"), ("src/supervisor/DiagReport.ahk", "diagnosis"),

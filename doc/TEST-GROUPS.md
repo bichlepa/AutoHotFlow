@@ -62,7 +62,7 @@ The first matching pattern wins; `*` also matches `/`. Test groups that run in f
 | `manager` | `manager/`, `NoticeThrottle` | `manager` |
 | `tray` | `tray/` | `tray` |
 
-Outside `src/`: `doc/` runs `docs` and `architecture` only (`doc/PROTOCOL.md` also `transport`); `tools/<tool>.py` runs the group `tools` (exceptions in `OTHER_RULES` in `tests/support/groups.py`); a changed test file selects itself; `work_items/`, `.claude/` and `NEEDS-ATTENTION.md` select nothing.
+Outside `src/`: `doc/` runs `docs` and `architecture` only (`doc/PROTOCOL.md` also `transport`); `tools/<tool>.py` runs the group `tools` (exceptions in `OTHER_RULES` in `tests/support/groups.py`); a helper of `tests/ahk/helpers/` that is a benchmark or a probe (not read by the unit tests) needs its own `OTHER_RULES` entry, otherwise the change selects everything (as `render_bench.ahk` did before WI-0083); a changed test file selects itself; `work_items/`, `.claude/` and `NEEDS-ATTENTION.md` select nothing.
 
 ## 4. Test groups (`TEST_GROUPS`)
 

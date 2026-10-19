@@ -22,6 +22,7 @@ EVERYTHING_AREA = "base-hub"
 OTHER_RULES = [
     ("tests/support/group_table.py", ["architecture"]),
     ("tests/support/groups.py", ["architecture"]),
+    ("tests/ahk/helpers/render_bench.ahk", ["render", "tools"]),   # the renderer bench, driven by tools/measure_render.py
     ("tests/golden/*", ["expr"]),
     ("tests/oracle/*", ["expr"]),
     ("doc/PROTOCOL.md", ["transport", "docs"]),
