@@ -279,7 +279,7 @@ class SettingsModel {
         return entry["default"]
     }
 
-    ; A refusal of a check with its reason: reason is an Array [Lang key, arguments...] for the settings dialog (F-9000). The
+    ; A refusal of a check with its reason: reason is an Array [Lang key, arguments...] for the settings dialog. The
     ; message stays English: the engine answers it so.
     static _Refuse(text, reason) {
         err := AhfError(text, ErrCode.BAD_PAYLOAD)

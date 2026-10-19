@@ -97,7 +97,7 @@ class SettingsForm {
                 if (!(e is AhfError))
                     throw e
                 out["ok"] := false
-                out["errors"][key] := SettingsForm._Reason(e)     ; translated; the label names the key (F-9000)
+                out["errors"][key] := SettingsForm._Reason(e)     ; translated; the label names the key
             }
         }
         return out
@@ -106,7 +106,7 @@ class SettingsForm {
     ; The text of the refusal: one line per refused value, "<label>: <message>", the labels as given (the caller translates
     ; them). labelOf(key) returns the label of a key.
     ; The text of a refusal of a check: the translated reason when the check gave one (AhfError.reason, SettingsModel), the
-    ; message without its "setting '<key>': " prefix otherwise (F-9000).
+    ; message without its "setting '<key>': " prefix otherwise.
     static _Reason(e) {
         if (!e.HasProp("reason"))
             return RegExReplace(e.Message, "^setting '[^']*': ", "")

@@ -17,7 +17,7 @@
 ; language makes the dialog again (Relabel): the values the user typed are kept, and UiWindow remembers the position.
 ; Sizes are pixels at 100 % (GuiLayout scales them).
 class SettingsWindow {
-    static WIDTH := 680         ; at 100 %; the height is measured when the dialog is made (F-9105)
+    static WIDTH := 680         ; at 100 %; the height is measured when the dialog is made
     static MARGIN := 12
     static TAB_TOP := 12
     static TAB_HEAD := 30       ; the rows start below the tab headers
@@ -28,7 +28,7 @@ class SettingsWindow {
     static NOTE_X := 544
     static NOTE_W := 124
     static ROW_MIN := 30
-    static STATUS_LINES := 4    ; the refusal field shows this many lines and scrolls for more (F-9105)
+    static STATUS_LINES := 4    ; the refusal field shows this many lines and scrolls for more
     static BUTTON_W := 110
     static BUTTON_H := 30
 
@@ -45,7 +45,7 @@ class SettingsWindow {
     ; Shows the dialog with the settings of the engine.
     Show() {
         this.Fill(this.model.settings)
-        this.opened := this.Read()     ; the values as they are shown: OK sends only what the user changed (F-9103)
+        this.opened := this.Read()     ; the values as they are shown: OK sends only what the user changed
         this.win.Show()
     }
 
@@ -58,7 +58,7 @@ class SettingsWindow {
     Relabel() {
         if (this.done)
             return
-        values := this.Read()      ; the raw values the user typed: not checked again here (F-9101)
+        values := this.Read()      ; the raw values the user typed: not checked again here
         status := this.statusCtl.Text
         visible := this.win.Visible
         this.win.Close()           ; its texts are forgotten by UiWindow, its position is remembered
@@ -124,7 +124,7 @@ class SettingsWindow {
             switch field["kind"] {
                 case "language":
                     if (value != "" && this._IndexOf(this.codes, value) = 1 && this.codes[1] != value)
-                        this._AddLanguage(value)    ; a code the program does not list stays in the list (F-9103)
+                        this._AddLanguage(value)    ; a code the program does not list stays in the list
                     ctl.Choose(this._IndexOf(this.codes, value))
                 case "list":
                     ctl.Choose(this._IndexOf(this.lists[key], value))
@@ -138,7 +138,7 @@ class SettingsWindow {
 
     ; The button OK: checks the values; a refusal stays in the dialog, a checked set goes to the engine.
     OnOk() {
-        changed := Map()               ; the keys whose value differs from the value at open (F-9103)
+        changed := Map()               ; the keys whose value differs from the value at open
         for key, value in this.Read() {
             if (!this.opened.Has(key) || String(this.opened[key]) != String(value))
                 changed[key] := value
@@ -159,7 +159,7 @@ class SettingsWindow {
 
     ; The answer of the engine to the set: a saved set closes the dialog, a refusal is shown and the dialog stays open.
     _Answered(answer) {
-        if (!this._Alive())            ; the close box may have closed the window while the engine answered (F-9104)
+        if (!this._Alive())            ; the close box may have closed the window while the engine answered
             return
         if (answer["ok"]) {
             this.Close()
@@ -289,7 +289,7 @@ class SettingsWindow {
                 this.win.Place(list, SettingsWindow.CTL_X, y + 2, SettingsWindow.CTL_W)
                 this.ctl[key] := list
             case "check":
-                ; the box and its own text in one control, as wide as the row: a narrow box clips the text (F-9100)
+                ; the box and its own text in one control, as wide as the row: a narrow box clips the text
                 check := g.AddCheckBox(, "")
                 this.win.Place(check, SettingsWindow.LABEL_X, y + 4, SettingsWindow.LABEL_W + SettingsWindow.CTL_W + 100, h - 8)
                 this.win.Text(check, field["label"])

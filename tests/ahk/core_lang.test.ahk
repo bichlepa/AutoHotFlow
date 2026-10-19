@@ -49,7 +49,7 @@ CheckUnderscoreIsASpace() {
     Assert.Equal(Lang("line %1%, col %2%", 3, 14), "line 3, col 14")
 }
 
-; The trailing spaces of a value are not part of the text (the German v1 files have them, F-9003*).
+; The trailing spaces of a value are not part of the text (the German v1 files have them).
 CheckTrailingSpacesAreTrimmed() {
     dir := TempDir()
     DirCreate(dir "\basic")

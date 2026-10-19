@@ -76,7 +76,7 @@ class ManagerWindow {
         this.importView := ""         ; the report of the import from v1 (WI-0076), made at the first import
         this.settingsView := ""       ; the settings dialog (WI-0078), made by each click on "Settings"
         this.aboutView := ""          ; the about window (WI-0078), made by each click on "About"
-        this.codeShown := LangTable.Code   ; the language the open windows show (Refresh, F-9102)
+        this.codeShown := LangTable.Code   ; the language the open windows show (Refresh)
         this.dirty := true
         this.treeDirty := true
         this.labelDirty := Map()      ; flow ID -> true: its state mark changed (the item text only, no rebuild)
@@ -193,7 +193,7 @@ class ManagerWindow {
     ; A change of the language (WI-0078, Manager.OnSettings after UiTexts.Reload): the tree and the list of the flows are
     ; drawn again with the new texts; the windows that hold translated lists or tab names are made again (Relabel).
     Refresh() {
-        if (LangTable.Code = this.codeShown)     ; another setting changed (also the dialog's own OK): nothing to draw again (F-9102)
+        if (LangTable.Code = this.codeShown)     ; another setting changed (also the dialog's own OK): nothing to draw again
             return
         this.codeShown := LangTable.Code
         this.dirty := true

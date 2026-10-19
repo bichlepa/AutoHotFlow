@@ -49,7 +49,7 @@ RefusedValuesAreNamed() {
     Assert.True(!res["errors"].Has("userLevel"), "a valid value is not listed")
 }
 
-; The refusal reasons of the dialog are translated (F-9000): in German the same refusal names the range in German; the
+; The refusal reasons of the dialog are translated: in German the same refusal names the range in German; the
 ; engine's message (SettingsModel.Check) stays English.
 GermanRefusalReasons() {
     LangTable.Code := "de"

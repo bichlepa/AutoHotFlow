@@ -49,7 +49,7 @@ OpensWithTheSettingsOfTheEngine() {
         Assert.Equal(win.Read()["workers"], "8")
         Assert.Equal(win.Read()["language"], "")
         Assert.True(!win.Visible, "not shown by the test")
-        ; the checkbox carries its own text: as wide as the row, or the text is clipped to the box (F-9100)
+        ; the checkbox carries its own text: as wide as the row, or the text is clipped to the box
         box := CtlOf(win, "notifyUnhandledErrors")       ; the width is the one of the layout (applied at Show, not before)
         for item in win.win.lay["items"] {
             if (item[1] = box)
@@ -88,7 +88,7 @@ ValidValuesAreSentAndTheDialogCloses() {
         win.OnOk()
         Assert.Equal(model.sent["workers"], 4)
         Assert.Equal(model.sent["logLevelThread"], 3)
-        Assert.Equal(model.sent.Count, 2, "only the two keys the user changed are sent (F-9103)")
+        Assert.Equal(model.sent.Count, 2, "only the two keys the user changed are sent")
         Assert.True(win.done, "a saved set closes the dialog")
     } finally {
         win.Close()
@@ -127,7 +127,7 @@ RelabelKeepsTheTypedValues() {
     }
 }
 
-; OK without a change sends nothing and closes the dialog (F-9103).
+; OK without a change sends nothing and closes the dialog.
 PlainOkSendsNothing() {
     model := FakeSettingsModel()
     win := SettingsWindow(model)
@@ -141,7 +141,7 @@ PlainOkSendsNothing() {
     }
 }
 
-; A language code that the program does not list stays selected and is sent as it is (F-9103).
+; A language code that the program does not list stays selected and is sent as it is.
 UnlistedLanguageIsKept() {
     model := FakeSettingsModel()
     model.settings["language"] := "fr"
@@ -158,7 +158,7 @@ UnlistedLanguageIsKept() {
     }
 }
 
-; The refusal field shows every refused value on its own line; its height is the one of four measured lines (F-9105).
+; The refusal field shows every refused value on its own line; its height is the one of four measured lines.
 RefusalFieldShowsEveryValue() {
     model := FakeSettingsModel()
     win := SettingsWindow(model)
@@ -178,7 +178,7 @@ RefusalFieldShowsEveryValue() {
     }
 }
 
-; The dialog is made in German with its texts measured: no error, the same values (F-9105).
+; The dialog is made in German with its texts measured: no error, the same values.
 GermanDialogIsMade() {
     model := FakeSettingsModel()
     LangTable.Code := "de"
@@ -197,7 +197,7 @@ GermanDialogIsMade() {
     }
 }
 
-; An answer of the engine that comes after the close box is ignored: the window is gone (F-9104).
+; An answer of the engine that comes after the close box is ignored: the window is gone.
 AnswerAfterTheCloseBoxIsIgnored() {
     model := FakeSettingsModel()
     win := SettingsWindow(model)
@@ -208,7 +208,7 @@ AnswerAfterTheCloseBoxIsIgnored() {
     Assert.True(!win._Alive(), "the window is gone and nothing touched it")
 }
 
-; A change of the language keeps a refused value as typed and the refusal in the status line (F-9101).
+; A change of the language keeps a refused value as typed and the refusal in the status line.
 RelabelKeepsARefusedValueAndTheStatus() {
     model := FakeSettingsModel()
     win := SettingsWindow(model)
