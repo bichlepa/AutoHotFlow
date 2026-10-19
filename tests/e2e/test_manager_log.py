@@ -157,12 +157,18 @@ def test_a_burst_of_5000_lines_does_not_stall_the_manager_and_the_model_keeps_th
     assert max_entries <= LOG_KEEP
     assert final["entries"] == min(LOG_KEEP, before + final["seen"]), (before, final)
     # E0082: the drop of lines in the hub stays, so not all 5000 lines arrive. The model must show what storage wrote:
-    # its newest entries are the newest lines of Log.txt (the tail reads the current file only, so it may hold fewer
-    # lines than the model keeps; the model's newest entries must then be the same).
-    tail = obs.request("storage", "cmd.storage.log.tail", {"limit": LOG_KEEP}, timeout=scaled(10))["payload"]
+    # the burst lines of the model are the newest lines of the file of the source "burst" (Log_burst.txt, which holds
+    # only that source), in the same order. The lines of the hub itself (drop notices, the end of the client) are not
+    # compared: the hub writes them at a moment the manager may not have received yet. Log.txt is not used: it rotates
+    # at 100 KB, so right after the burst it may hold only the hub's lines. The shorter of the two suffixes must be equal.
+    tail = obs.request("storage", "cmd.storage.log.tail", {"limit": LOG_KEEP, "source": "burst"},
+                       timeout=scaled(10))["payload"]
     assert tail["ok"], tail
     written = ["%s|%s|%s" % (e["ts"], e["source"], e["text"]) for e in tail["entries"]]
-    assert written, "storage has no entries"
-    assert final["keys"][-len(written):] == written, (len(written), final["keys"][-3:], written[-3:])
+    assert written, "storage has no burst lines"
+    model_burst = [k for k in final["keys"] if k.split("|")[1] == "burst"]
+    n = min(len(model_burst), len(written))
+    assert n > 0, "the model has no burst lines"
+    assert model_burst[-n:] == written[-n:], (n, model_burst[-3:], written[-3:])
     log_op(obs, "close")
     assert finish(sup, obs) == 0
