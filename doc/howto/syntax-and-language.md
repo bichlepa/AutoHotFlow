@@ -144,7 +144,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 
 ### Class used from a file that is not included: load-time dialog
 
-- **Problem:** `src/manager/StubManager.ahk` called `StubGui(this)`, but `StubGui.ahk` was not included. AHK reports this at load time as a warning dialog ("This local variable appears to never be assigned a value. Specifically: StubGui"). Without a guard the process hangs.
+- **Problem:** the former stub manager (removed in WI-0073) called `StubGui(this)`, but `StubGui.ahk` was not included. AHK reports this at load time as a warning dialog ("This local variable appears to never be assigned a value. Specifically: StubGui"). Without a guard the process hangs.
 - **Right:** Include every file whose classes a file uses. Dialogs of role processes are stored under `%TEMP%\ahf_dialogs\` (text and PNG).
 - **Status:** verified (dialog captured at role start; green after adding the `#Include`)
 - **Source:** `src/manager/Manager.ahk` (the includes of the manager parts)

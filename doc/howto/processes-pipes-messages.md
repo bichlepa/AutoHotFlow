@@ -147,7 +147,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 
 - **Problem:** The stub should compare arrival times with timestamps from the Python test. `Time.NowMs` is a performance counter (QueryPerformanceCounter) with a zero point in each process.
 - **Wrong:** Comparing `Time.NowMs()` in AHK with `time.perf_counter()` in Python.
-- **Right:** Use wall-clock time via `GetSystemTimePreciseAsFileTime` (8-byte buffer): `NumGet(buf, 0, "Int64") / 10000 - 11644473600000` gives ms since 1970 UTC, the same as `time.time() * 1000` in Python. See `StubManager.WallMs`.
+- **Right:** Use wall-clock time via `GetSystemTimePreciseAsFileTime` (8-byte buffer): `NumGet(buf, 0, "Int64") / 10000 - 11644473600000` gives ms since 1970 UTC, the same as `time.time() * 1000` in Python. See `ManagerModel.WallMs` (`src/manager/ManagerModel.ahk`).
 - **Status:** verified (probe: latencies 2 to 4 ms between command and first event)
 - **Source:** `src/manager/ManagerModel.ahk` (`WallMs`)
 

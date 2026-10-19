@@ -31,7 +31,7 @@ L400-411 9. Performance budgets (targets, measured in Phase 2)
 L413-423 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (133.5 KB, 624 lines)
+## doc/PROTOCOL.md (133.6 KB, 624 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
@@ -201,7 +201,7 @@ L121-127 `Array` has no `Sort` method in AHK v2 (verified)
 L129-135 `Map` keys are case-sensitive by default; compare names with `==` when the case matters (verified)
 ```
 
-## doc/howto/processes-pipes-messages.md (44.9 KB, 389 lines)
+## doc/howto/processes-pipes-messages.md (45.0 KB, 389 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L13-17 `PostMessageW` with a NULL handle reports success (verified)
