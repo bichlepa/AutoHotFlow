@@ -64,9 +64,9 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI-0074 | Flow tree and operations | done, verified on 5590990a (fast, foundation green) | haiku/sonnet (review sonnet) | fd0de334–5590990a | 2026-10-17 | block A; owner decisions F-0117, F-0120; drag test fixed by sonnet (cross-process RECT) |
 | WI-0075 | Notices | done, verified on dcafa042 (fast, foundation green; slow 2 load flakes, green alone) | | | | block A |
 | WI-0076 | Import from v1, manual check of block A | done, verified on 1248aa10 (foundation green; fast and slow 1 load flake each, green alone); owner manual check of block A is next | | | | block A |
-| WI-0077 | Settings model | implemented on `wip/wi-77` (base afdc0acf, 3 commits), review running; not integrated | | | | block B |
-| WI-0078 | Settings dialog, language, about | open | | | | block B |
-| WI-0079 | Start with Windows, run as administrator | open | | | | block B, manual check |
+| WI-0077 | Settings model | done, verified on 501ef089 (fast 1560, foundation 471 green; slow 1 flake of the burst log test, green alone 3 of 3; the implementer's own run on b09c3560: slow 204, stress 2 green) | sonnet (review sonnet) | | 2026-10-19 | block B; M-0086 | | | | block B |
+| WI-0078 | Settings dialog, language, about | running (haiku, `wi-78`) | | | | block B |
+| WI-0079 | Start with Windows, run as administrator | running (sonnet, `wi-79`); the owner also wants the product to start without parameters | | | | block B, manual check |
 | WI-0080 | Log display | done, verified (foundation, slow green; fast red by 2 load flakes, green alone) on d6331fb8 | haiku (review sonnet) | dcacd43b–d6331fb8 | 2026-10-17 | block B; F-0116 and source group wait for the owner |
 | WI-0081 | `.ahf` export and import | done, verified on 4e510dc1 (fast, foundation, slow green); owner decisions: 4 MB unpacked cap, UNC refused, ActsOnSystem list | | | | block B |
 | WI-0082 | Acceptance S0004 | open | | | | |
@@ -77,12 +77,11 @@ Step-independent work item: WI-0059 (test admission, load report, run history), 
 
 ## Pending integrations
 
-- `wip/wi-77` after the review (rebase onto `v2-port`, M-0085 may collide with the M number of WI-0081: renumber), cherry-pick, `verify.py --auto` plus stress if the engine changed.
-- `wip/wi-77` fix round (D1 to D3, S4 to S6, S2/S10) and its own rebase are with the implementer; WI-0081 took the M number M-0085 and F-0129 to F-0134 first: the implementer of WI-0077 must renumber on rebase.
 
 ## Running agents
 
-- WI-0077 implementer (sonnet, workspace `wi-77`, id aa65dd2fabfc7688c): review fixes, rebase, fast, foundation, slow and stress.
+- WI-0078 implementer (haiku, `wi-78`, id acee71b98a0ce18ca) and WI-0079 implementer (sonnet, `wi-79`, id acaa68d23afd468f2): running.
+- Bug hunter (haiku, `hunt-5`, id aef15cc8304f37f6c): flaky burst log test (comparison against the hub's own drop lines).
 
 ## Last verified state
 
