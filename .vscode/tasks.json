@@ -579,6 +579,18 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: render measurement (R0002)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/measure_render.py",
+                "--set",
+                "all"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: long loop does not block the engine (100,000 passes; MEASURE line in the output)",
             "type": "shell",
             "command": "python",

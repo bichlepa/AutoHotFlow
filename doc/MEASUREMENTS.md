@@ -122,6 +122,39 @@ Notes on the table:
 
 **Consequence (open).** No case stopped the message handling for good, and every pause ended with the close. But a running thread of the process and its timers stop while a menu is open, and under load the wake handling stops too. E0064 says the risk of the supervisor is low; for the supervisor's tray menu this is so as long as the menu is short and the hub is not under load. Not checked: a menu open for minutes, several menus, a supervisor whose children judge it hung while its menu is open (the supervisor's own timers stop as well, so it judges nothing in that time). The result goes to the owner (WI-0072, task 5).
 
+## Frame of the editor renderer (WI-0083, R0002, MS-0044)
+
+**What and how.** `tools/measure_render.py` (VS Code task "Tool: render measurement (R0002)") runs `tests/ahk/helpers/render_bench.ahk` for each case, one after the other, on a DIB of the given size without a window (the GDI+ wrapper of `src/editor/render/`). The scene draws the way v1 draws (`v1/Source_Draw/GDIp/GDIp.ahk`): 300 elements of four kinds with names of 10 to 30 characters and an icon, 350 connections of five line segments (a third with a label yes/no), 30 elements tinted as running, pens, brushes and icons created once, font and format created per name and label, as `Gdip_TextToGraphics` does. Frame time = one `Clear`, all draws and all destroys of the frame. 10 warm-up frames, then 100 frames; mean, median and p95 per case. **Assumed:** the icon size (48 px at 100 %) and the element layout are not taken from v1 (the v1 values are not in the source the bench reads); the connections are straight elbows, not the real geometry of WI-0084. Not measured: the `BitBlt` to a window (no gui run; the BitBlt to a DIB is in the list of parts), and the grid dots in the main cases (v1 draws them only above zoom 1, and the cases are at zoom 0.47 and 0.96 or 1.00; the case "grid dots on" measures them).
+
+**Machine and state.** Windows 11 Pro, 8 logical CPUs (the machine of the table above). Code state: commit `c7ed8b5d` (bench and tool; the wrapper of commit `7fe35672`). Run alone, serially: CPU load 4.7 % over 2 s before the start; the other AutoHotkey and Python processes were the tool itself and one other. One run of 15 cases, about 16 minutes. Frames of the whole flow have a few outliers (maximum 3,016 ms in one frame of the first case), so the p95 and the median are the figures to read.
+
+| Case (render_bench parts) | Frame: mean | median | p95 | min to max | Drawn |
+|---|---:|---:|---:|---:|---|
+| 1920×1080, whole flow, anti-aliasing on (eticl, big icons) | **300.3 ms** | 259.5 | 317.4 | 254.3 to 3016.1 | 300 elements, 350 connections, 116 labels |
+| 1920×1080, whole flow, anti-aliasing off | 307.5 ms | 272.8 | 363.9 | 264.3 to 1994.2 | the same |
+| 1920×1080, zoom 1, anti-aliasing on | 99.3 ms | 98.7 | 101.7 | 96.6 to 118.9 | 80 elements, see the table of the run |
+| 1920×1080, zoom 1, anti-aliasing off | 95.3 ms | 94.3 | 100.1 | 91.9 to 120.0 | the same |
+| 3840×2160, whole flow, anti-aliasing on | 357.0 ms | 330.5 | 410.5 | 321.3 to 678.5 | 300 elements, 350 connections |
+| 3840×2160, whole flow, anti-aliasing off | 328.1 ms | 327.7 | 349.1 | 301.9 to 380.7 | the same |
+| 3840×2160, zoom 1, anti-aliasing on | 209.6 ms | 207.3 | 231.0 | 195.5 to 304.4 | 180 elements |
+| 3840×2160, zoom 1, anti-aliasing off | 210.6 ms | 195.9 | 314.4 | 186.3 to 996.0 | the same |
+
+**Breakdown (1920×1080, whole, anti-aliasing on, 30 frames each, one run per part, not in the table above; the machine was quiet):** clear 1.0 ms; element shapes (fill and border) 43 ms; icons 108 ms; names 53 ms; connection segments 29 ms; labels 10 ms. The icon files of the Default package are large (`Sleep.ico` 201 × 232 px, `Bug.png` 195 × 259 px): GDI+ scales each one down from its full size on every draw (about 0.36 ms per icon). The per-call cost, not the pixel count, dominates: 3840×2160 at zoom 0.96 costs only 10 to 25 % more than 1920×1080 at zoom 0.47.
+
+**Remedies (1920×1080, whole, anti-aliasing on; the same scene, 100 frames each):**
+
+| Remedy | Frame: mean | median | p95 | Reading |
+|---|---:|---:|---:|---|
+| Names left out (below a size of a few pixels; at zoom 0.47 the names are 7 px) | 201.9 ms | 201.5 | 208.0 | saves about 100 ms of the 300 ms, not enough alone |
+| Icons scaled in advance (proxy: `Tooltip.png`, 80 × 50 px, drawn at the same size) | 175.9 ms | 175.3 | 181.0 | proxy for icons cached at element size; saves about 125 ms |
+| Names left out and icons in advance | 114.1 ms | 113.7 | 117.7 | still 7 times the budget |
+| Static layer (a cached layer blitted, 30 running elements drawn on top with shape, icon and name) | 24.9 ms | 24.7 | 26.7 | above the budget of 16 ms |
+| Static layer and icons in advance (proxy) | 15.2 ms | 15.1 | 16.0 | the one frame that meets 16 ms; it is a frame with no change of the flow, zoom or pan |
+| Only the BitBlt of a cached layer (1920×1080) | 1.9 ms | 1.9 | 2.3 | cost of showing a cached layer |
+| Grid dots on (above zoom 1 in v1; 2×2 rectangles at 35 units) | 315.4 ms | 313.4 | 321.8 | the dots add about 15 ms at this zoom |
+
+**Reading (for the owner, not decided here).** The frame of a flow with 300 elements is about 300 ms at 1920×1080, about 18 times the 16 ms of R0002 (`ARCHITECTURE.md` 2.1 and 10). Without any cache the frame stays above 16 ms in every case that draws the whole flow. A static layer (a cached DIB of the flow, blitted each frame, only the running elements drawn on top) meets 16 ms only together with icons scaled in advance; a change of the flow, the zoom or the pan redraws the layer, and that redraw costs the full frame (about 300 ms) in every variant measured. The option of a separate render process (`ARCHITECTURE.md` 2.1, criterion [A]) is what R0002 names for a frame above 16 ms. Not checked: the input latency of a real editor with these frames; the real icon and element geometry of v1 (WI-0084); a window (BitBlt to a window).
+
 ## Not measured
 
 These points are missing from the measurements. The first group is listed in the source as "not measured" or "not checked".

@@ -199,3 +199,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Measure the label as one line (`GuiLayout.TextWidth`, DrawText with `DT_CALCRECT | DT_SINGLELINE | DT_NOPREFIX`), add the box width, and cap the result at the start of the next column. A unit test checks the rectangles of all controls of a tab at 96 dpi and 216 dpi (headless: `GuiLayout.Apply(lay, dpi)` moves the controls without a show, then `GetPos`).
 - **Status:** verified by the rectangle test (`tests/ahk/manager_settings_window.test.ahk`, fails with the old width); the box width (22 px at 100 %) is assumed; the hover look on the owner's screen is not checked.
 - **Source:** `src/manager/SettingsWindow.ahk` (`_Row`), `src/core/GuiLayout.ahk` (`TextWidth`).
+
+### GdiplusShutdown raises an exception when the token is passed as Ptr (verified)
+
+- **Problem:** A minimal script, `GdiplusStartup` with `"Ptr*"` for the token and `GdiplusShutdown` with `"Ptr"`, starts GDI+ and then stops with "An exception was thrown" (raised by the DllCall, not by Python). The same calls from Python ctypes work, and so does v1's pattern (`UInt` for the token, `LoadLibrary("gdiplus")` before the start).
+- **Wrong:** Passing the token as `Ptr` in AutoHotkey 2.0.30 on 64 bit (`Ptr*` out, `Ptr` in).
+- **Right:** `DllCall("gdiplus\GdiplusStartup", "UInt*", &tok, ...)` and `DllCall("gdiplus\GdiplusShutdown", "UInt", tok)`, after `LoadLibrary` when `GetModuleHandle` finds no `gdiplus`. The token must fit 32 bits; `Gdip.Startup` throws otherwise.
+- **Status:** verified (the unit test `tests/ahk/gdip.test.ahk` runs start and stop; the cause of the exception is not known, not checked)
+- **Source:** `src/editor/render/Gdip.ahk` (`Startup`, `Shutdown`)
+
+### GdipLoadImageFromFile reports a missing file as OutOfMemory (verified)
+
+- **Problem:** A path that does not exist gives GDI+ status 3 (OutOfMemory), not 10 (FileNotFound), so the status name in an error message points the wrong way.
+- **Wrong:** Expecting `FileNotFound` from the status.
+- **Right:** Check the file with `FileExist` before the call when the message must be exact. The wrapper names the call and the status; its test checks that a status name is given, not which one.
+- **Status:** verified (`tests/ahk/gdip.test.ahk`, the missing-file case, AutoHotkey 2.0.30, 2026-10-19)
+- **Source:** `src/editor/render/GdipImage.ahk`, `tests/ahk/gdip.test.ahk`
