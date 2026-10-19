@@ -2375,11 +2375,11 @@ Below 1 % of the whole system without running flows (E0005).
 ### REQ-PRF-030 Memory
 
 - **v1:** n/a (not measured)
-- **v2:** partial (measured with the real trigger host and armed timer and start-up triggers, MS-0039; without editors, the manager is the stub)
+- **v2:** partial (measured with the real trigger host, tray, headless manager or none, 1 and 3 workers: 53 to 77 MB, MS-0042; the manager with its window costs 1 to 2 MB more, MS-0043; not measured: the editors, which are not counted, and a whole session with the real window; S0008 measures again with the editor)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004, S0008 (measure again with the editor and the manager)
-- **Evidence:** `doc/MEASUREMENTS.md` (MS-0032, MS-0033, MS-0039), `tools/measure_r3.py`, `tests/stress/test_trigger_host_memory.py` (WI-0067)
+- **Evidence:** `doc/MEASUREMENTS.md` (MS-0032, MS-0033, MS-0039, MS-0042, MS-0043), `tools/measure_r3.py`, `tests/stress/test_trigger_host_memory.py` (WI-0067), `tests/stress/test_background_memory.py` (WI-0082)
 
 The background processes (supervisor, storage, engine, trigger host, manager and the workers) need below 100 MB private bytes together in the normal state: small flows that run now and then, up to about three elements waiting at the same time (REQ-EXE-100). Editors are not counted. When more elements wait at the same time, the memory may exceed the budget: each one costs about 10 MB, so the default limit of 8 (REQ-SET-070) means about 115 MB (extrapolated from MS-0033, not measured). The user can lower the limit. Decision E0040, details `ARCHITECTURE.md` section 9.
 
