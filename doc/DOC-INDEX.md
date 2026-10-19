@@ -152,7 +152,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (26.8 KB, 193 lines)
+## doc/howto/gui-and-hotkeys.md (28.1 KB, 201 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -178,6 +178,7 @@ L163-169 A tray notice (TrayTip) is shown by the process that owns the tray icon
 L171-177 A Text control is clipped to its newlines when its height is counted from them (verified) (verified)
 L179-185 The default button of a question was the first one, so a preselected "No" put No on the left (verified) (partly verified)
 L187-193 A dialog with translated tab names and lists is made again on a language change (verified in unit tests, look not checked) (verified)
+L195-201 A checkbox was wider than its label and painted over the note of its row on hover (verified) (partly verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (11.0 KB, 135 lines)
