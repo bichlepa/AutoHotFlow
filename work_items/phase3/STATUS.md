@@ -22,7 +22,7 @@ WI-0086 and WI-0087 may start now; WI-0085 waits for WI-0086 only as far as the 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
 | WI-0083 | GDI+ wrapper and the R0002 measurement | done | haiku | e0febbf1..92b9cac5 | 2026-10-19 | R0002 failed: 300 ms vs 16 ms (MS-0044); owner decided E0090 (caches), added to WI-0085 |
-| WI-0084 | Geometry and scene (headless) | done | haiku | 98f467b0..e065b5d1 | 2026-10-19 | review approved; verification follows |
+| WI-0084 | Geometry and scene (headless) | done | haiku | 98f467b0..e065b5d1 | 2026-10-19 | review approved; verified green |
 | WI-0085 | Renderer: draw the scene, style, icons | open | sonnet | | | owner accepts the look (E0088) |
 | WI-0086 | Engine: run states, connection taken, warnings per element | running | haiku | | | workspace wi-86 |
 | WI-0087 | Open and close an editor: supervisor and manager | open | | | | |
@@ -41,6 +41,8 @@ None.
 Strict test selection (haiku), workspace sel-strict. WI-0086 implementer (haiku), workspace wi-86.
 
 ## Last verified state
+
+Commit `28558ead` (WI-0084 integrated, selection of the group editor-geometry): 131 passed (1 skipped), VERDICT green (run 20261019-214248-28558ead).
 
 Commit `3b89cad0` (WI-0083 integrated, all three tiers because the selection said everything): fast 1614 passed (11 skipped), foundation 471, slow 204, VERDICT green (runs 20261019-212108-3b89cad0, -2, -3).
 
