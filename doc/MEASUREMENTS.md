@@ -126,7 +126,7 @@ Notes on the table:
 
 **What and how.** `tools/measure_render.py` (VS Code task "Tool: render measurement (R0002)") runs `tests/ahk/helpers/render_bench.ahk` for each case, one after the other, on a DIB of the given size without a window (the GDI+ wrapper of `src/editor/render/`). The scene draws the way v1 draws (`v1/Source_Draw/GDIp/GDIp.ahk`): 300 elements of four kinds with names of 10 to 30 characters and an icon, 350 connections of five line segments (a third with a label yes/no), 30 elements tinted as running, pens, brushes and icons created once, font and format created per name and label, as `Gdip_TextToGraphics` does. Frame time = one `Clear`, all draws and all destroys of the frame. 10 warm-up frames, then 100 frames; mean, median and p95 per case. **Assumed:** the icon size (48 px at 100 %) and the element layout are not taken from v1 (the v1 values are not in the source the bench reads); the connections are straight elbows, not the real geometry of WI-0084. Not measured: the `BitBlt` to a window (no gui run; the BitBlt to a DIB is in the list of parts), and the grid dots in the main cases (v1 draws them only above zoom 1, and the cases are at zoom 0.47 and 0.96 or 1.00; the case "grid dots on" measures them).
 
-**Machine and state.** Windows 11 Pro, 8 logical CPUs (the machine of the table above). Code state: commit `c7ed8b5d` (bench and tool; the wrapper of commit `7fe35672`). Run alone, serially: CPU load 4.7 % over 2 s before the start; the other AutoHotkey and Python processes were the tool itself and one other. One run of 15 cases, about 16 minutes. Frames of the whole flow have a few outliers (maximum 3,016 ms in one frame of the first case), so the p95 and the median are the figures to read.
+**Machine and state.** Windows 11 Pro, 8 logical CPUs (the machine of the table above). Code state: the bench and the tool of WI-0083 as they were when the measurement ran (the wrapper unchanged since its unit test). Run alone, serially: CPU load 4.7 % over 2 s before the start; the other AutoHotkey and Python processes were the tool itself and one other. One run of 15 cases, about 16 minutes. Frames of the whole flow have a few outliers (maximum 3,016 ms in one frame of the first case), so the p95 and the median are the figures to read.
 
 | Case (render_bench parts) | Frame: mean | median | p95 | min to max | Drawn |
 |---|---:|---:|---:|---:|---|
@@ -146,7 +146,7 @@ Notes on the table:
 | Remedy | Frame: mean | median | p95 | Reading |
 |---|---:|---:|---:|---|
 | Names left out (below a size of a few pixels; at zoom 0.47 the names are 7 px) | 201.9 ms | 201.5 | 208.0 | saves about 100 ms of the 300 ms, not enough alone |
-| Icons scaled in advance (proxy: `Tooltip.png`, 80 × 50 px, drawn at the same size) | 175.9 ms | 175.3 | 181.0 | proxy for icons cached at element size; saves about 125 ms |
+| Icons scaled in advance (proxy: `Tooltip.png`, 80 × 50 px, scaled into the 48 px box; a small source, so the figure is slightly optimistic against a real pre-scaled cache) | 175.9 ms | 175.3 | 181.0 | proxy for icons cached at element size; saves about 125 ms |
 | Names left out and icons in advance | 114.1 ms | 113.7 | 117.7 | still 7 times the budget |
 | Static layer (a cached layer blitted, 30 running elements drawn on top with shape, icon and name) | 24.9 ms | 24.7 | 26.7 | above the budget of 16 ms |
 | Static layer and icons in advance (proxy) | 15.2 ms | 15.1 | 16.0 | the one frame that meets 16 ms; it is a frame with no change of the flow, zoom or pan |

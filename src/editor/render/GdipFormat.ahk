@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; A string format (GDI+ GpStringFormat) for GdipCanvas.Text: horizontal and vertical alignment, ellipsis when the
+; A string format (GDI+ GpStringFormat) for GdipCanvas.DrawText: horizontal and vertical alignment, ellipsis when the
 ; text does not fit the box, no wrapping. The text is clipped to the box (the default of GDI+ without NoClip).
 ; Destroy() deletes it.
 class GdipFormat {
