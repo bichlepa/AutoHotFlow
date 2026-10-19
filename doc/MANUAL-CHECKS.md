@@ -244,6 +244,27 @@ The same flow, started as after a start of Windows. The supervisor option `--win
 | 16 | Switch both settings on, exit AutoHotFlow, log off and log on. At the Windows question first accept, then repeat the logon and decline. | Accept: the question appears at the logon, then only the tray icon; all processes elevated. Decline: only the tray icon, not elevated, and a tray notice. | |
 | 17 | Cleanup: start the task, switch both settings off, check `shell:startup`, exit. | `AutoHotFlow v2.lnk` is gone. | |
 
+## 8. Settings dialog, language and about window (WI-0078, REQ-SET-010, REQ-SET-070, REQ-LNG-010, REQ-LNG-020, REQ-MGR-100)
+
+Not automated in full: the values and the messages are tested headless (`tests/e2e/test_manager_settings.py`, `tests/ahk/manager_settings_*.test.ahk`) and the windows are made in a unit test, but the look (the texts at other DPI, the clipping) and the drawn windows are checked here. The gui test `tests/fault/test_manager_settings_window.py` (VS Code task "Test: settings dialog and about window") covers the opening, Cancel, the language change of an open dialog and the About window, and is run by the owner only.
+
+Start with the VS Code task of part A (or its terminal command), in the fresh folder. The DPI steps need the display scaling of Windows at 100 % and at 225 % (Settings, System, Display).
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 44 | Click "Settings". | A window "Settings" opens with the tabs General, Flow settings and Debugging. Its texts are complete (no cut-off word or line), the buttons OK and Cancel are at the bottom. At 225 % the same holds. | |
+| 45 | On the tab Flow settings, read the field "Elements waiting at the same time". | The value is 8, the note "1 to 16" stands beside it. The three runaway guard fields show "0 means no limit". | |
+| 46 | Type 17 in "Elements waiting at the same time" and click OK. | The dialog stays open. The status line says that the settings are not changed and names the field with the range (1 to 16). Nothing is written (no `Settings.json` in `%TEMP%hf_manual_check`). | |
+| 47 | Type 4 there, click OK. | The dialog closes. `%TEMP%hf_manual_check\Settings.json` has `"workers": 4`. | |
+| 48 | Click "Settings" again. On the tab General choose "Deutsch", leave the dialog open with the choice, and click OK. | The dialog closes. The manager window shows German texts (the button "Einstellungen", the tree and the status line) without a restart. | |
+| 49 | Right-click the tray icon. | The menu shows "Manager zeigen" and "Beenden". The old English entries are gone. | |
+| 50 | Open the log window and the list of notices (their buttons), then open "Settings" again. | Their column titles and the drop-down lists are German. The settings dialog is German, its tabs are "Allgemein", "Flow-Einstellungen" and "Debugging". | |
+| 51 | In the German dialog click "Durchsuchen..." on the tab General, then Cancel in the folder dialog. | The folder dialog opens and closes. The working directory of the dialog is unchanged. | |
+| 52 | In the dialog choose the first item of the language list ("Sprache von Windows"), click OK. | The texts return to the language of Windows (English on the test PC) at once. The tray menu follows. | |
+| 53 | Click "About". | A window "About AutoHotFlow" shows "AutoHotFlow version 2.0.0-phase2b", "AutoHotkey version" with the version of the installed AutoHotkey, the license line (GNU General Public License 3) and the project site. The site text is complete. | |
+| 54 | Click "Open the project site". | The browser opens https://github.com/bichlepa/AutoHotFlow. | |
+| 55 | Watch for dialogs during the part. | Only the folder dialog of step 51 appears as a dialog window (class `#32770`). | |
+
 ## Result
 
 Record one result per run. Copy the template.
