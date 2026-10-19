@@ -411,3 +411,27 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** collect the strings as lines and let the built-in sort them: `text := Sort(RTrim(text, "`n"), "")`, then `loop parse Sort(...), "`n"`. Case-insensitive, alphabetical, no numeric conversion.
 - **Status:** verified (tests/ahk/manager_settings_form.test.ahk, WI-0078)
 - **Source:** src/core/LangTable.ahk (`Languages`).
+
+### SplitPath splits at backslashes only; a forward-slash path gives a wrong name (verified)
+
+- **Problem:** A path with forward slashes (`C:/Users/x/Flow 1.json`, as the shell passes it) gave `SplitPath(path, , , , &name)` a "name" that still held the folder (`/Users/x/Flow 1`), so the PNG file name was invalid.
+- **Wrong:** `SplitPath(path, , , , &name)` on a path that was not normalised.
+- **Right:** `SplitPath(StrReplace(path, "/", "\"), , , , &name)`. Normalise the separators of every path that comes from outside the script.
+- **Status:** verified (`tests/ahk/helpers/render_samples.ahk`, AutoHotkey 2.0.30, 2026-10-19)
+- **Source:** `tests/ahk/helpers/render_samples.ahk` (`BaseName`)
+
+### An Array has no Sort method, and a function returns one value (verified)
+
+- **Problem:** `list.Sort("N")` on an Array raised "This value of type "Array" has no method named "Sort"". `return a, b` from a function is a syntax error, and `a, b := f()` does not take two values.
+- **Wrong:** `sorted.Sort("N")`; `return Map(...), ids` and `raw, ids := BuildFlow()`.
+- **Right:** a short insertion sort for the few numbers a bench needs (`while (j >= 1 && sorted[j] > v)`); return an Array, `return [Map(...), ids]`, and read `built[1]`, `built[2]`.
+- **Status:** verified (`tests/ahk/helpers/renderer_bench.ahk`, AutoHotkey 2.0.30, 2026-10-19)
+- **Source:** `tests/ahk/helpers/renderer_bench.ahk` (`Stats`, `BuildFlow`)
+
+### Names are case-insensitive: a global `W` makes every local `w` of the included files a warning (verified)
+
+- **Problem:** A helper script with the globals `W := 1100` and `H := 800` made the included files (`GdipBrush.ahk` with `h`, `Renderer.ahk` with `W` and `w`) print "This local variable has the same name as a global variable". The warnings are noise, and they hide the real ones in a run.
+- **Wrong:** `W := 1100` at the top of a script that includes the renderer.
+- **Right:** names that cannot be mistaken for the locals of the classes, e.g. `SAMPLE_W`.
+- **Status:** verified (AutoHotkey 2.0.30, 2026-10-19)
+- **Source:** `tests/ahk/helpers/render_samples.ahk`

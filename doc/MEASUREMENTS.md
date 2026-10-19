@@ -155,6 +155,24 @@ Notes on the table:
 
 **Reading (for the owner, not decided here).** The frame of a flow with 300 elements is about 300 ms at 1920×1080, about 18 times the 16 ms of R0002 (`ARCHITECTURE.md` 2.1 and 10). Without any cache the frame stays above 16 ms in every case that draws the whole flow. A static layer (a cached DIB of the flow, blitted each frame, only the running elements drawn on top) meets 16 ms only together with icons scaled in advance; a change of the flow, the zoom or the pan redraws the layer, and that redraw costs the full frame (about 300 ms) in every variant measured. The option of a separate render process (`ARCHITECTURE.md` 2.1, criterion [A]) is what R0002 names for a frame above 16 ms. Not checked: the input latency of a real editor with these frames; the real icon and element geometry of v1 (WI-0084); a window (BitBlt to a window).
 
+## Frame and layer rebuild of the real renderer (WI-0085, E0090, MS-0046)
+
+**What and how.** `tests/ahk/helpers/renderer_bench.ahk` (VS Code task "Tool: renderer measurement of the editor frame (WI-0085)") measures `Renderer` of `src/editor/render/` itself, not the drawing code of MS-0044. The scene is built by `SceneBuilder` from a flow Map: 300 elements (action, condition, loop and trigger in turn, names of 10 to 30 characters, the icons of their classes), 350 connections (every third labelled "yes"), 30 elements running. Three series on one renderer into a canvas of the window size, after warm-up frames: **states**: each frame draws the other of two scenes that differ only in the running elements, so the static layer is not rebuilt (the frame includes building the static key); **same**: the same scene again; **rebuild**: the layer is invalidated and built again. Also the time of `SceneBuilder.Build` of a changed flow (what a state change costs before the frame). Times in milliseconds, `Renderer.Now` (performance counter). The target is the DIB; the BitBlt to a window is not part of the bench.
+
+**Code state.** Renderer and style as in commit `ed1c9039` (the bench as committed with the VS Code task, `53d7058d`). Not a pytest run: no run ID.
+
+**Machine and state.** Windows 11 Pro, 8 logical CPUs, AutoHotkey 2.0.30. One sample of the CPU load before the start: 8 %. The three cases ran one after another, alone as far as the machine shows; the other agents of the same machine were not checked. One run each.
+
+| Case | Zoom | States: mean (median, p95, max) | Same scene: mean | Rebuild: mean (median, max), n | Scene build: mean (max) |
+|---|---:|---|---:|---|---|
+| 1920×1080, whole flow, 300 frames, 20 rebuilds | 0.47 | **6.30 ms** (6.42, 7.00, 8.40) | 5.72 ms | 106.5 ms (106.4, 108.8), 20 | 18.2 ms (19.0) |
+| 1920×1080, zoom 1 (part of the flow), 300 frames, 20 rebuilds | 1.00 | 3.97 ms (3.99, 4.60, 6.34) | 3.28 ms | 65.4 ms (64.8, 74.2), 20 | 17.4 ms (17.8) |
+| 3840×2160, whole flow, 100 frames, 10 rebuilds | 0.96 | 11.82 ms (12.09, 12.94, 15.34) | 10.97 ms | **151.8 ms** (151.4, 154.2), 10 | 17.6 ms (17.8) |
+
+**Reading.** The frame of a state change is 6.3 ms at 1920×1080 with 300 elements, below the 16 ms of R0002 (REQ-PRF-060, frame part); the whole flow at 3840×2160 is 11.8 ms, still below 16 ms. A rebuild of the static layer costs 106 ms at 1920×1080 and **152 ms at 3840×2160** (above the 150 ms the owner was to hear about; the owner decides, see OPEN-ITEMS F-9001). The rebuild happens on a change of the flow (not of the states), of the zoom, of the DPI, and of a pan that leaves the layer; a pan within the layer is a copy. Memory of the layer (arithmetic, not measured): 2400 × 1350 × 4 bytes ≈ 13 MB at 1920×1080, 4800 × 2700 × 4 bytes ≈ 52 MB at 3840×2160 (the layer is the window plus 1/8 of its size on each side). A state change costs the build of the new scene (18 ms, larger than the frame itself, F-9000) plus the frame (6 ms): about 25 ms at 1920×1080 with this flow. That sum is not the 16 ms of the frame; it is part of the path of REQ-PRF-060 (50 ms from the engine to the screen), which is not measured end to end.
+
+**Not measured.** The BitBlt of the layer to a window (WI-0088); the input latency; a state change from the engine to the redraw (MS-0007); the look on a screen (the screenshots of WI-0085 are offscreen); the memory of five editors (MS-0006); the frame of the 4K case with the real icon files at another scale.
+
 ## Not measured
 
 These points are missing from the measurements. The first group is listed in the source as "not measured" or "not checked".

@@ -215,3 +215,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Check the file with `FileExist` before the call when the message must be exact. The wrapper names the call and the status; its test checks that a status name is given, not which one.
 - **Status:** verified (`tests/ahk/gdip.test.ahk`, the missing-file case, AutoHotkey 2.0.30, 2026-10-19)
 - **Source:** `src/editor/render/GdipImage.ahk`, `tests/ahk/gdip.test.ahk`
+
+### GdipSaveImageToFile returns Win32Error (7) for an invalid file name (verified)
+
+- **Problem:** A PNG save of a rendered canvas failed with "GDI+ GdipSaveImageToFile returned 7 (Win32Error)". The same canvas saved fine to other names. The file name had slashes in it, from a path split by `SplitPath` at the wrong separator (see the entry on `SplitPath` in the syntax file).
+- **Wrong:** `c.SavePng(outDir "\" name ".png")` with a `name` that contains `/`.
+- **Right:** a valid file name (no separators, no `:` apart from the drive). `GdipCanvas.SavePng` writes through `GdipCreateBitmapFromHBITMAP` and `GdipSaveImageToFile` with the PNG encoder CLSID from `Gdip.EncoderClsid("image/png")` (`tests/ahk/gdip.test.ahk`, `CheckSavePngWritesAPngFile`).
+- **Status:** verified (the unit test with a valid name; the failing name by the helper run, AutoHotkey 2.0.30, 2026-10-19; a folder with forward slashes was not tested on its own)
+- **Source:** `src/editor/render/GdipCanvas.ahk` (`SavePng`), `src/editor/render/Gdip.ahk` (`EncoderClsid`)

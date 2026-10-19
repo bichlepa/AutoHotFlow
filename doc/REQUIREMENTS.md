@@ -1506,7 +1506,7 @@ Each open flow has its own editor window in its own process (D0002). An editor t
 ### REQ-EDT-020 Draw the flow
 
 - **v1:** yes
-- **v2:** partial (the geometry of the elements and connections, the scene and the hit test are unit-tested, WI-0084; nothing is drawn yet, WI-0085)
+- **v2:** partial (the geometry, the scene and the hit test are unit-tested, WI-0084; the renderer draws the elements with icon and name, the connections with their type and label, the loops with their parts, the trigger marks and the state overlays, pixel-tested, WI-0085; no window yet, and the hover is missing: WI-0088, WI-0090)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
@@ -2409,10 +2409,11 @@ While 200 big flows load, AutoHotFlow stays responsive: the engine answers a sna
 ### REQ-PRF-060 Editor redraw
 
 - **v1:** n/a
-- **v2:** open
+- **v2:** partial (the frame part is measured: a state change of a flow with 300 elements takes 6.3 ms at 1920×1080 with the renderer; a rebuild of the static layer takes 106 ms at 1920×1080 and 152 ms at 3840×2160, F-9001; the way from the engine to the screen is not measured)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
+- **Evidence:** `doc/MEASUREMENTS.md` (MS-0046, the renderer of `src/editor/render/`, one machine, 2026-10-19; the frame part only)
 
 A state change of the engine is visible in a non-blocked editor within 50 ms. A frame of a flow with 300 elements takes below 16 ms on average; otherwise drawing moves to its own process (risk R0002, `ARCHITECTURE.md` 2.1).
 
@@ -2777,7 +2778,7 @@ When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the us
 ### REQ-USE-090 Sharp and correctly sized on high-resolution displays
 
 - **v1:** no (not checked)
-- **v2:** partial (dialogs done; the window base for the UI roles is written, `ui_common/UiWindow.ahk` with the layout in `core/GuiLayout.ahk` (WI-0069), the manager window (WI-0073) uses it, opened in the gui test but not checked at another scaling; the view math scales the flow with the DPI, unit-tested (WI-0084); the editor window is missing)
+- **v2:** partial (dialogs done; the window base for the UI roles is written, `ui_common/UiWindow.ahk` with the layout in `core/GuiLayout.ahk` (WI-0069), the manager window (WI-0073) uses it, opened in the gui test but not checked at another scaling; the view math scales the flow with the DPI, unit-tested (WI-0084); the renderer draws at the DPI of the view and rebuilds its layer at another DPI, unit-tested (WI-0085); the editor window is missing)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0005
