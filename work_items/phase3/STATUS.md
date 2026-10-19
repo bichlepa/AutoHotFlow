@@ -38,11 +38,11 @@ None.
 
 ## Running agents
 
-WI-0084 implementer (haiku), workspace wi-84.
+WI-0084 implementer (haiku), workspace wi-84. Strict test selection (haiku), workspace sel-strict.
 
 ## Last verified state
 
-Commit `5e576f19` (WI-0083 integrated): verify.py --auto started, verdict follows.
+Commit `3b89cad0` (WI-0083 integrated, all three tiers because the selection said everything): fast 1614 passed (11 skipped), foundation 471, slow 204, VERDICT green (runs 20261019-212108-3b89cad0, -2, -3).
 
 Latest three verdicts (the older ones are in the git history of this file).
 
