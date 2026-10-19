@@ -199,6 +199,7 @@ TEST_GROUPS = {
     "test_runtool_runs.py": ["tools"],
     "test_verify.py": ["tools"],
     "ahk/editor_geometry.test.ahk": ["editor-geometry"],
+    "ahk/editor_scene.test.ahk": ["editor-geometry"],
 }
 
 # Element source file -> the tests that cover exactly that element: a test file (a unit or a whole file) or a single
