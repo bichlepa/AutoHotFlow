@@ -2,8 +2,7 @@
 
 The product supervisor (src/AutoHotFlow.ahk, no test options) starts storage, engine, manager, debug and, on request
 of the engine, a worker. Each of them answers cmd.diag.snapshot (WI-0028) with the state ready, and the command line of
-its process names the entry of its role. The placeholders (triggerhost, editor) start and say that they are not
-implemented. An entry knows only its own role. Which classes a role registers: tests/test_element_includes.py.
+its process names the entry of its role. The editor entry needs a flow (WI-0088). An entry knows only its own role. Which classes a role registers: tests/test_element_includes.py.
 """
 
 import subprocess
@@ -27,7 +26,6 @@ ENTRY_DIR = ROOT / "src" / "entry"
 AHKRUN = ROOT / "tools" / "ahkrun.py"
 READY_S = 30.0
 EXIT_BAD_ARGS = 2
-EXIT_NOT_IMPLEMENTED = 3
 
 
 def test_every_role_of_the_product_starts_from_its_own_entry_and_reports_ready(chains, datadir, monkeypatch):
@@ -59,12 +57,12 @@ def run_role_entry(procs, datadir, entry, *args):
     return code, out.read_bytes().decode("utf-8", "replace")
 
 
-@pytest.mark.parametrize("role", ["editor"])
-def test_the_placeholder_entries_start_and_say_that_they_are_not_implemented(procs, datadir, session_id, role):
-    code, text = run_role_entry(procs, datadir, ENTRY_DIR / (role + ".ahk"), "--role=" + role,
+def test_the_editor_entry_without_a_flow_exits_2(procs, datadir, session_id):
+    # WI-0088: the editor needs --flow (the supervisor always passes it); the message says so, no dialog
+    code, text = run_role_entry(procs, datadir, ENTRY_DIR / "editor.ahk", "--role=editor",
                                 "--session=" + session_id, "--hub=ahf." + session_id + ".hub", "--data=" + str(datadir))
-    assert code == EXIT_NOT_IMPLEMENTED, (code, text)
-    assert "role '%s' is not implemented yet" % role in text
+    assert code == EXIT_BAD_ARGS, (code, text)
+    assert "needs --flow" in text
 
 
 @pytest.mark.parametrize("entry_role, other", [("worker", "engine"), ("engine", "worker"), ("storage", "manager"),

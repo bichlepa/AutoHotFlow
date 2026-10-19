@@ -32,5 +32,4 @@ class RoleRegistry {
 
 ; Nothing is registered here. Each entry script registers its own role before it calls AhfMain (WI-0047-PREP, E0041),
 ; so a process knows only the role it was started for: src/entry/<role>.ahk. "supervisor" is not a Role (WI-0007);
-; src/AutoHotFlow.ahk runs it directly. PlaceholderRole (core/PlaceholderRole.ahk) is included by the entries of the roles that are
-; not written yet (triggerhost, editor).
+; src/AutoHotFlow.ahk runs it directly. Every role is written now (the placeholder of WI-0047-PREP is gone, WI-0088).

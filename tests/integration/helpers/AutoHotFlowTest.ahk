@@ -20,7 +20,7 @@
 #Include ..\..\..\src\tray\Tray.ahk
 #Include ..\..\..\src\debugview\DebugView.ahk
 #Include ..\..\..\src\triggerhost\TriggerHost.ahk
-#Include ..\..\..\src\core\PlaceholderRole.ahk
+#Include ..\..\..\src\editor\Editor.ahk
 #Include ..\..\..\src\entry\generated\Elements_engine.ahk
 #Include entry\generated\TestElements_engine.ahk
 #Include TestDialogProvider.ahk
@@ -38,7 +38,7 @@ RoleRegistry.Register("manager", Manager)
 RoleRegistry.Register("tray", Tray)
 RoleRegistry.Register("debug", DebugView)
 RoleRegistry.Register("triggerhost", TriggerHost)
-RoleRegistry.Register("editor", PlaceholderRole)
+RoleRegistry.Register("editor", Editor)
 AhfTestRolesFn := AhfRegisterTestRoles
 Supervisor.StartDefault := ""          ; a test names its roles with --start (E0083)
 Supervisor.TrayDefault := false      ; a test run starts the role tray only with --tray (no icon in a test run, E0046)

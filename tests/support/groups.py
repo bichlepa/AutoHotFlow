@@ -62,7 +62,7 @@ OTHER_RULES = [
     ("tests/integration/helpers/entry/generated/*", ["element-units"]),
     ("tests/integration/helpers/entry/test/*", ROLE_TESTS),       # echo, crasher, hanger, slow_shutdown
     ("tests/integration/helpers/entry/debug.ahk", ["diagnosis"]),
-    ("tests/integration/helpers/entry/editor.ahk", ["ui"]),
+    ("tests/integration/helpers/entry/editor.ahk", ["editor"]),
     ("tests/integration/helpers/entry/engine.ahk", ["engine"]),
     ("tests/integration/helpers/entry/manager.ahk", ["manager"]),
     ("tests/integration/helpers/entry/storage.ahk", ["storage"]),

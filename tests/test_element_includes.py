@@ -295,7 +295,7 @@ def test_a_test_class_in_the_product_is_refused(small_tree, capsys):
 
 ROLE_FILE = {"storage": r"storage\Storage.ahk", "engine": r"engine\Engine.ahk", "worker": r"worker\Worker.ahk",
              "manager": r"manager\Manager.ahk", "debug": r"debugview\DebugView.ahk",
-             "triggerhost": r"triggerhost\TriggerHost.ahk", "editor": r"core\PlaceholderRole.ahk",
+             "triggerhost": r"triggerhost\TriggerHost.ahk", "editor": r"editor\Editor.ahk",
              "tray": r"tray\Tray.ahk"}
 
 

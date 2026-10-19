@@ -5,11 +5,8 @@ The supervisor starts the real manager (--headless) with storage and engine. The
 driver (cmd.test.op, the same call as the Edit button; "flowIds" sends several requests one after the other from the
 manager) and reads the process table and the supervisor's log.
 
-Until WI-0088 the role editor is a placeholder that ends at once with exit 3 (src/core/PlaceholderRole.ahk). A request
-that the supervisor answers as running (started false) therefore needs the editor to be alive when the request comes: the
-supervisor judges an ended process at its next tick (200 ms), so requests sent from the manager back to back see a running
-editor; a request sent by the test over the hub (about 250 ms of latency for a Python client) does not. That is why the
-"running" cases use one cmd.test.op with several flows. WI-0088 makes the editor a real process that stays up.
+The editor is a real process that stays up (WI-0088, tests/e2e/test_editor.py), so a second request for a running editor
+is answered as running whenever it comes. The "running" cases still send their requests in one cmd.test.op (back to back).
 
 The test roles of the supervisor (--test-roles) lower the editor limit (--editor-limit), so the limit needs no 21 processes.
 """
@@ -41,8 +38,10 @@ def edit_results(obs, **args):
     return out
 
 
-def start_manager(procs, datadir, session_id, extra=()):
+def start_manager(procs, datadir, session_id, extra=(), prepare=None):
     flow_data(datadir)
+    if prepare is not None:
+        prepare(datadir)           # the test's own flow files (after the skeleton flow, which it may replace)
     sup = Sup(procs, datadir, session_id, ["--start=storage,engine,manager", "--headless", *extra])
     obs = connect_obs(sup.pipe)
     wait_ready(obs, ["storage", "engine", "manager"])

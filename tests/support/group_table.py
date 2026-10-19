@@ -203,6 +203,8 @@ TEST_GROUPS = {
     "test_verify.py": ["tools"],
     "ahk/editor_geometry.test.ahk": ["editor-geometry"],
     "ahk/editor_scene.test.ahk": ["editor-geometry"],
+    "ahk/editor_model.test.ahk": ["editor"],
+    "e2e/test_editor.py": ["editor"],
 }
 
 # Element source file -> the tests that cover exactly that element: a test file (a unit or a whole file) or a single
@@ -422,8 +424,7 @@ SOURCE_AREAS = [
     ("settings", ["src/core/SettingsModel.ahk", "src/engine/EngineSettings.ahk", "src/storage/SettingsFile.ahk"]),
     ("util", ["src/core/Args.ahk", "src/core/Ids.ahk", "src/core/Time.ahk", "src/core/AhfVersion.ahk"]),
     ("lang", ["src/core/Lang.ahk", "src/core/LangTable.ahk"]),
-    ("transport", ["src/core/ipc/*", "src/core/PipeNames.ahk", "src/core/Role.ahk", "src/core/RoleRegistry.ahk",
-                   "src/core/PlaceholderRole.ahk"]),
+    ("transport", ["src/core/ipc/*", "src/core/PipeNames.ahk", "src/core/Role.ahk", "src/core/RoleRegistry.ahk"]),
     ("recovery", ["src/supervisor/Heartbeat.ahk", "src/supervisor/Shutdown.ahk", "src/supervisor/Stall.ahk"]),
     ("diagnosis", ["src/supervisor/DiagLog.ahk", "src/supervisor/DiagReport.ahk", "src/supervisor/ReportText.ahk",
                    "src/core/Snapshot.ahk", "src/core/ProcInfo.ahk", "src/core/Debug.ahk", "src/debugview/*",
@@ -439,7 +440,7 @@ SOURCE_AREAS = [
                        "src/elements/base/ElementRunner.ahk", "src/elements/base/ExecContext.ahk",
                        "src/elements/base/ParamEvaluator.ahk"]),
     ("ui", ["src/ui_common/*", "src/core/GuiLayout.ahk", "src/elements/base/DialogWindow.ahk",
-            "src/elements/base/Dialogs.ahk", "src/entry/editor.ahk"]),
+            "src/elements/base/Dialogs.ahk"]),
     ("render", ["src/editor/render/*"]),
     ("element", ["src/elements/Default/Actions/*", "src/elements/Default/Conditions/*", "src/elements/Default/Loops/*",
                  "src/elements/Default/Triggers/*", "src/elements/Default/lib/*"]),
@@ -447,6 +448,8 @@ SOURCE_AREAS = [
     ("elements-gen", ["src/entry/generated/*"]),
     ("manager", ["src/manager/*", "src/entry/manager.ahk", "src/core/NoticeThrottle.ahk"]),
     ("tray", ["src/tray/*", "src/entry/tray.ahk"]),
+    ("editor", ["src/editor/Editor.ahk", "src/editor/EditorModel.ahk", "src/editor/EditorDriver.ahk",
+                "src/editor/EditorWindow.ahk", "src/entry/editor.ahk"]),
     ("editor-geometry", ["src/editor/FlowRect.ahk", "src/editor/FlowGeometry.ahk", "src/editor/EditorView.ahk",
                          "src/editor/FlowHit.ahk", "src/editor/FlowHitTest.ahk", "src/editor/Scene.ahk",
                          "src/editor/SceneElement.ahk", "src/editor/SceneConnection.ahk",
@@ -459,7 +462,7 @@ OWN_TEST_GROUPS = {
     "elements-base": ["element-units"],
     "elements-pkg": ["element-units", "packages"],
     "elements-gen": ["element-units"],
-    "editor": ["ui", "render"],
+    "editor": ["editor", "render"],
 }
 
 # Smoke tests: one or a few fast tests per user of a shared module. A key is a test file or `file::test function`; the

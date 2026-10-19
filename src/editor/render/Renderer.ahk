@@ -53,6 +53,7 @@ class Renderer {
     assetRoot := ""
 
     FramesDrawn := 0
+    TotalFrameMs := 0
     LastFrameMs := 0
     SlowestFrameMs := 0
     Rebuilds := 0
@@ -93,6 +94,7 @@ class Renderer {
         this.DrawMarks(scene, target, view)
         ms := Renderer.Now() - t0
         this.FramesDrawn += 1
+        this.TotalFrameMs += ms
         this.LastFrameMs := ms
         this.SlowestFrameMs := Max(this.SlowestFrameMs, ms)
     }
@@ -104,7 +106,8 @@ class Renderer {
 
     ; The counters for the status of the role: frames, time of the last and the slowest frame, rebuilds.
     Snapshot() {
-        return Map("frames", this.FramesDrawn, "lastFrameMs", this.LastFrameMs,
+        mean := this.FramesDrawn ? this.TotalFrameMs / this.FramesDrawn : 0
+        return Map("frames", this.FramesDrawn, "meanFrameMs", Round(mean, 2), "lastFrameMs", this.LastFrameMs,
             "slowestFrameMs", this.SlowestFrameMs, "rebuilds", this.Rebuilds, "lastRebuildMs", this.LastRebuildMs)
     }
 

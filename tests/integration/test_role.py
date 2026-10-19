@@ -26,7 +26,6 @@ AHKRUN = ROOT / "tools" / "ahkrun.py"
 
 EXIT_OK = 0
 EXIT_BAD_ARGS = 2
-EXIT_NOT_IMPLEMENTED = 3
 EXIT_HUB_LOST = 4
 ORPHAN_BUDGET_S = 3.0      # Role.ORPHAN_MS
 ORPHAN_SLACK_S = scaled(3.0)       # reconnect and scheduling slack on top of the budget
@@ -175,12 +174,12 @@ def test_missing_connection_arguments_exit_2(procs, datadir, runs, session_id):
     assert "--hub" in run.stderr_text() and "--data" in run.stderr_text()
 
 
-def test_role_without_implementation_reports_not_implemented(procs, datadir, runs, session_id, pipe):
-    # "engine" (WI-0010), "worker" (WI-0011), "storage" (WI-0012) and "triggerhost" (WI-0061) are implemented; "editor" is still a placeholder.
+def test_the_editor_without_a_flow_exits_2_with_message(procs, datadir, runs, session_id, pipe):
+    # WI-0088: the editor shows one flow; without --flow it is a bad argument (the supervisor always passes --flow).
     run = launch(procs, datadir, runs, pipe, session_id, "editor")
     code = run.wait_exit(timeout=30)
-    assert code == EXIT_NOT_IMPLEMENTED, "exit %s, stderr: %s" % (code, run.stderr_text())
-    assert "role 'editor' is not implemented yet" in run.stderr_text()
+    assert code == EXIT_BAD_ARGS, "exit %s, stderr: %s" % (code, run.stderr_text())
+    assert "needs --flow" in run.stderr_text(), run.stderr_text()
 
 
 # --- echo role against the Python hub -------------------------------------------------------------
