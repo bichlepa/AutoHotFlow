@@ -49,16 +49,48 @@ OpensWithTheSettingsOfTheEngine() {
         Assert.Equal(win.Read()["workers"], "8")
         Assert.Equal(win.Read()["language"], "")
         Assert.True(!win.Visible, "not shown by the test")
-        ; the checkbox carries its own text: as wide as the row, or the text is clipped to the box
-        box := CtlOf(win, "notifyUnhandledErrors")       ; the width is the one of the layout (applied at Show, not before)
-        for item in win.win.lay["items"] {
-            if (item[1] = box)
-                Assert.True(item[4] >= 300, "the checkbox is wide enough for its text: " item[4])
+    } finally {
+        win.Close()
+    }
+}
+
+; The controls of one tab never overlap (at 100 % and at 225 %, the layout applied without a show), and a checkbox ends before
+; the note column: a checkbox wider than its text painted over the note on hover.
+ControlsOfATabDoNotOverlap() {
+    model := FakeSettingsModel()
+    win := SettingsWindow(model)
+    try {
+        for dpi in [96, 216] {
+            GuiLayout.Apply(win.win.lay, dpi)
+            for tab in SettingsForm.TABS {
+                span := win.tabItems[tab["id"]]
+                rects := []
+                loop span[2] - span[1] + 1 {
+                    ctl := win.win.lay["items"][span[1] + A_Index - 1][1]
+                    ctl.GetPos(&x, &y, &w, &h)
+                    rects.Push(Map("l", x, "t", y, "r", x + w, "b", y + h))
+                }
+                for a in rects {
+                    for b in rects {
+                        if (a != b && RectsOverlap(a, b))
+                            Assert.True(false, "dpi " dpi ", tab " tab["id"] ": two controls overlap: " a["l"] "," a["t"] " "
+                                . a["r"] "," a["b"] " and " b["l"] "," b["t"] " " b["r"] "," b["b"])
+                    }
+                }
+            }
+            noteX := GuiLayout.Scale(win.win.lay, SettingsWindow.NOTE_X)
+            for key in ["notifyUnhandledErrors", "startWithWindows", "runAsAdmin"] {
+                CtlOf(win, key).GetPos(&x, , &w)
+                Assert.True(x + w <= noteX, "dpi " dpi ": the checkbox " key " ends before the note column: " (x + w) " > " noteX)
+            }
         }
     } finally {
         win.Close()
     }
 }
+
+; True when two rectangles (Map l, t, r, b) share an area.
+RectsOverlap(a, b) => a["l"] < b["r"] && b["l"] < a["r"] && a["t"] < b["b"] && b["t"] < a["b"]
 
 ; OK with a refused value keeps the dialog open, names the value in the status line and sends nothing.
 RefusedValueStaysAndSendsNothing() {
@@ -256,6 +288,7 @@ AboutShowsVersionsLicenseAndSite() {
 
 TestRun.Init()
 TestRun.Case("The dialog opens with the settings of the engine and the language of Windows first", OpensWithTheSettingsOfTheEngine)
+TestRun.Case("The controls of a tab do not overlap, and a checkbox ends before the note column, at 100 % and 225 %", ControlsOfATabDoNotOverlap)
 TestRun.Case("OK with a refused value stays open, names the value and sends nothing", RefusedValueStaysAndSendsNothing)
 TestRun.Case("OK with valid values sends the checked set and closes the dialog", ValidValuesAreSentAndTheDialogCloses)
 TestRun.Case("A refusal of the engine stays in the dialog with its message", EngineRefusalStaysInTheDialog)

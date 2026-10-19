@@ -27,6 +27,8 @@ class SettingsWindow {
     static CTL_W := 250
     static NOTE_X := 544
     static NOTE_W := 124
+    static CHECK_BOX_W := 22    ; at 100 %: the box of a checkbox and the space before its text (assumed, not measured)
+    static CHECK_GAP := 8       ; at 100 %: the space between a checkbox and the note column
     static ROW_MIN := 30
     static STATUS_LINES := 4    ; the refusal field shows this many lines and scrolls for more
     static BUTTON_W := 110
@@ -182,6 +184,7 @@ class SettingsWindow {
         this.ctl := Map()
         this.lists := Map()
         this.codes := [""]
+        this.tabItems := Map()     ; tab id -> [first, last] index of its controls in the layout (the test checks overlaps per tab)
         heights := this._Heights()
         M := SettingsWindow.MARGIN
         this.win := UiWindow("manager.settings", "Settings", SettingsWindow.WIDTH, this._Height(heights), false)
@@ -197,11 +200,13 @@ class SettingsWindow {
             tabs.UseTab(i)
             y := SettingsWindow.TAB_TOP + SettingsWindow.TAB_HEAD
             row := 1
+            first := this.win.lay["items"].Length + 1
             for field in SettingsForm.FieldsOf(tab["id"]) {
                 this._Row(g, field, y, heights[tab["id"]][row])
                 y += heights[tab["id"]][row]
                 row += 1
             }
+            this.tabItems[tab["id"]] := [first, this.win.lay["items"].Length]
         }
         tabs.UseTab()
         y := SettingsWindow.TAB_TOP + heights["tabH"] + M
@@ -289,9 +294,12 @@ class SettingsWindow {
                 this.win.Place(list, SettingsWindow.CTL_X, y + 2, SettingsWindow.CTL_W)
                 this.ctl[key] := list
             case "check":
-                ; the box and its own text in one control, as wide as the row: a narrow box clips the text
+                ; the box and its own text in one control: as wide as the box and the text (a narrow box clips the text), and
+                ; never into the note column (a wider control paints over the note on hover)
                 check := g.AddCheckBox(, "")
-                this.win.Place(check, SettingsWindow.LABEL_X, y + 4, SettingsWindow.LABEL_W + SettingsWindow.CTL_W + 100, h - 8)
+                w := GuiLayout.TextWidth(g, Lang(field["label"])) + SettingsWindow.CHECK_BOX_W
+                w := Min(w, SettingsWindow.NOTE_X - SettingsWindow.LABEL_X - SettingsWindow.CHECK_GAP)
+                this.win.Place(check, SettingsWindow.LABEL_X, y + 4, w, h - 8)
                 this.win.Text(check, field["label"])
                 this.ctl[key] := check
             case "folder":

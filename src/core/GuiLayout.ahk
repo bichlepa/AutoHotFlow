@@ -66,6 +66,24 @@ class GuiLayout {
         return Ceil(px * 96 / dpi)
     }
 
+    ; The width at 100 % of a text shown on one line in the Gui g (font and DPI as TextHeight). A checkbox takes its width
+    ; from it: its own text is one line and does not wrap.
+    static TextWidth(g, text) {
+        dpi := DllCall("user32\GetDpiForWindow", "ptr", g.Hwnd, "uint")
+        dpi := dpi > 0 ? dpi : 96
+        font := this.MakeFont(dpi)
+        hdc := DllCall("user32\GetDC", "ptr", g.Hwnd, "ptr")
+        old := DllCall("gdi32\SelectObject", "ptr", hdc, "ptr", font, "ptr")
+        rc := Buffer(16, 0)         ; all 0: DT_CALCRECT sets the right edge to the width of the text
+        ; DT_CALCRECT (0x400) | DT_SINGLELINE (0x20) | DT_NOPREFIX (0x800)
+        DllCall("user32\DrawTextW", "ptr", hdc, "str", StrReplace(text, "`n", " "), "int", -1, "ptr", rc, "uint", 0xC20, "int")
+        right := NumGet(rc, 8, "int")
+        DllCall("gdi32\SelectObject", "ptr", hdc, "ptr", old, "ptr")
+        DllCall("gdi32\DeleteObject", "ptr", font)
+        DllCall("user32\ReleaseDC", "ptr", g.Hwnd, "ptr", hdc)
+        return Ceil(right * 96 / dpi)
+    }
+
     ; Moves the controls and sets the font for the DPI dpi (0: the DPI of the window).
     static Apply(lay, dpi := 0) {
         if (dpi <= 0)
