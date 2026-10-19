@@ -89,11 +89,13 @@ class SceneBuilder {
             try icon := cls.Icon
         }
         trig := (kind = "trigger") ? SceneBuilder.TriggerStateOf(trigger.Get(id, "")) : ""
+        ; The text on the element is the name the user gave it (v1 draws `name`); the class name is the fallback.
+        label := SceneBuilder.TextOf(elem, "name")
         return SceneElement(id, kind, displayName, icon,
             SceneBuilder.NumberOf(elem.Get("x", 0)), SceneBuilder.NumberOf(elem.Get("y", 0)),
             SceneBuilder.NumberOf(elem.Get("HeightOfVerticalBar", 0)),
             run.Get(id, ""), trig, SceneBuilder.CopyMigration(elem.Get("migration", "")), placeholder,
-            warnings.Get(id, ""))
+            warnings.Get(id, ""), (package = "") ? "Default" : package, (label = "") ? displayName : label)
     }
 
     static MakeConnection(id, conn, from, to, run) {
@@ -118,6 +120,7 @@ class SceneBuilder {
         out["enabled"] := (state is Map && state.Get("enabled", 0)) ? 1 : 0
         out["armed"] := (state is Map && state.Get("armed", 0)) ? 1 : 0
         out["message"] := (state is Map) ? SceneBuilder.TextOf(state, "message") : ""
+        out["default"] := (state is Map && state.Get("default", 0)) ? 1 : 0    ; the default manual trigger (star)
         return out
     }
 

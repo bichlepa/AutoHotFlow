@@ -4,13 +4,18 @@
 ; An element of a Scene (WI-0084): everything the window needs to draw it, copied out of the flow. Nothing refers into the
 ; flow model. Run is "" (idle), "running" or "recent" (ran less than a second ago, v1). Trigger is "" for a non-trigger
 ; element, else Map("enabled", bool, "armed", bool, "message", text). Migration is a list of Maps (the `migration` key,
-; copied). Placeholder is the reason text when the element class is unknown, "" otherwise.
+; copied). Placeholder is the reason text when the element class is unknown, "" otherwise. Package is the package folder
+; of the class (the icon is in its Icons folder); Name is the text drawn on the element (the name the user gave it,
+; else the display name of the class).
 class SceneElement {
-    __New(id, kind, className, icon, x, y, heightOfVerticalBar, run, trigger, migration, placeholder, warning) {
+    __New(id, kind, className, icon, x, y, heightOfVerticalBar, run, trigger, migration, placeholder, warning,
+        package := "Default", name := "") {
         this.Id := id
         this.Kind := kind
         this.ClassName := className
         this.Icon := icon
+        this.Package := package
+        this.Name := (name = "") ? className : name
         this.X := x
         this.Y := y
         this.HeightOfVerticalBar := heightOfVerticalBar

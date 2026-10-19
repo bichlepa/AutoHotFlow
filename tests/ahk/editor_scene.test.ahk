@@ -44,6 +44,7 @@ TestRun.Case("Scene: every v1 example flow builds a scene with all its elements 
 TestRun.Case("Scene: an element of an unknown class is a placeholder with its reason", UnknownClassIsPlaceholder)
 TestRun.Case("Scene: an element of a package that is not installed is a placeholder naming the package", MissingPackage)
 TestRun.Case("Scene: a known class gets its display name and its icon", KnownClassHasName)
+TestRun.Case("Scene: the drawn text is the user's name, the package is kept", TextAndPackage)
 TestRun.Case("Scene: run states, trigger states, migration places and warnings are copied", StatesAreCopied)
 TestRun.Case("Scene: a connection without its source or target is a warning, not a connection", DanglingConnection)
 TestRun.Case("Scene: positions given as text are numbers", TextPositions)
@@ -95,6 +96,18 @@ KnownClassHasName() {
     Assert.Equal(el.Placeholder, "", "a known class has no placeholder")
     Assert.Equal(el.ClassName, Default.Action_Sleep.Name(), "the display name of the class")
     Assert.True(el.ClassName != "action_Sleep", "the name is a text of the language, not the class ID")
+}
+
+; The text on an element is the name the user gave it; without a name the display name of the class; the package is
+; kept for the icon path.
+TextAndPackage() {
+    sc := SceneBuilder.Build(SmallFlow())
+    Assert.Equal(sc.Elements[1].Name, "a", "the user's name of element A")
+    Assert.Equal(sc.Elements[1].Package, "Default", "the package of the class")
+    nameless := FlowOf('{"allElements": {"N": {"ID": "N", "type": "action", "class": "action_Sleep", '
+        . '"package": "Default", "x": 0, "y": 0}}, "allConnections": {}}')
+    el := SceneBuilder.Build(nameless).Elements[1]
+    Assert.Equal(el.Name, Default.Action_Sleep.Name(), "without a name the display name is drawn")
 }
 
 StatesAreCopied() {
