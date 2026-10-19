@@ -121,6 +121,23 @@ RelabelKeepsTheTypedValues() {
     }
 }
 
+; A change of the language keeps a refused value as typed and the refusal in the status line (F-9101).
+RelabelKeepsARefusedValueAndTheStatus() {
+    model := FakeSettingsModel()
+    win := SettingsWindow(model)
+    try {
+        win.Fill(model.settings)
+        CtlOf(win, "workers").Value := "17"
+        win.OnOk()
+        win.Relabel()
+        Assert.Equal(win.Read()["workers"], "17", "the typed value is not replaced by the default")
+        Assert.True(InStr(win.statusCtl.Text, "1 to 16") > 0, "the refusal is still shown: " win.statusCtl.Text)
+        Assert.True(model.sent = "", "still nothing was sent")
+    } finally {
+        win.Close()
+    }
+}
+
 ; The language list starts with the language of Windows and has the languages of the program.
 LanguageListHasWindowsLanguageFirst() {
     model := FakeSettingsModel()
@@ -156,6 +173,7 @@ TestRun.Case("OK with a refused value stays open, names the value and sends noth
 TestRun.Case("OK with valid values sends the checked set and closes the dialog", ValidValuesAreSentAndTheDialogCloses)
 TestRun.Case("A refusal of the engine stays in the dialog with its message", EngineRefusalStaysInTheDialog)
 TestRun.Case("A change of the language keeps the values the user typed", RelabelKeepsTheTypedValues)
+TestRun.Case("A change of the language keeps a refused value and the refusal in the status", RelabelKeepsARefusedValueAndTheStatus)
 TestRun.Case("The language list starts with the language of Windows", LanguageListHasWindowsLanguageFirst)
 TestRun.Case("The about window has the versions, the license and the project site", AboutShowsVersionsLicenseAndSite)
 TestRun.Finish()

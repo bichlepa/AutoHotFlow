@@ -55,11 +55,13 @@ class SettingsWindow {
     Relabel() {
         if (this.done)
             return
-        values := this.Read()
+        values := this.Read()      ; the raw values the user typed: not checked again here (F-9101)
+        status := this.statusCtl.Text
         visible := this.win.Visible
         this.win.Close()           ; its texts are forgotten by UiWindow, its position is remembered
         this._Build()
-        this.Fill(values)
+        this.FillRaw(values)
+        this.statusCtl.Text := status
         if (visible)
             this.win.Show()
     }
@@ -95,9 +97,26 @@ class SettingsWindow {
     ; Sets the controls from a Map of values. A value that the checks of SettingsModel refuse, or a key that is missing, shows
     ; its default (the engine's value is checked again here, so the dialog never shows a value the engine would refuse).
     Fill(values) {
+        checked := Map()
+        for field in SettingsForm.FIELDS
+            checked[field["key"]] := this._Checked(field["key"], values)
+        this._Show(checked)
+    }
+
+    ; Sets the controls from raw values, as they were read from them (a language change keeps an invalid typed value).
+    FillRaw(values) {
+        raw := Map()
         for field in SettingsForm.FIELDS {
             key := field["key"]
-            value := this._Checked(key, values)
+            raw[key] := values.Has(key) ? values[key] : SettingsModel.Default(key)
+        }
+        this._Show(raw)
+    }
+
+    _Show(values) {
+        for field in SettingsForm.FIELDS {
+            key := field["key"]
+            value := values[key]
             ctl := this.ctl[key]
             switch field["kind"] {
                 case "language":
