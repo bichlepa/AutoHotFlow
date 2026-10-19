@@ -1,6 +1,6 @@
 # Closed Items
 
-Status: 2026-10-16.
+Status: 2026-10-19.
 
 This document lists findings that are closed or accepted. Entries are moved here from `doc/OPEN-ITEMS.md` unchanged, with a closing note at the end. Open findings are in `doc/OPEN-ITEMS.md`.
 
