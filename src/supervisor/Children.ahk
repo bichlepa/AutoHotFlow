@@ -560,8 +560,8 @@ class Children {
         cmd := '"' A_AhkPath '" /ErrorStdOut=UTF-8 "' rec["script"] '"'
             . ' --role=' rec["role"] ' --session=' cfg["session"] ' --hub=' cfg["pipe"]
             . ' --data="' cfg["data"] '" --hubHwnd=' cfg["hubHwnd"]
-        if (rec["flow"] != "")
-            cmd .= ' --flow=' rec["flow"]
+        if (rec["flow"] != "")          ; quoted: a flow ID with a space is one value (WI-0087, PROTOCOL 4.1)
+            cmd .= ' --flow="' rec["flow"] '"'
         if (cfg["testRoles"])
             cmd .= ' --test-roles'
         if (isRestart)

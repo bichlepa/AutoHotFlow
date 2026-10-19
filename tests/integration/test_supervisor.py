@@ -224,6 +224,24 @@ def test_required_roles_are_ready_within_3_seconds(started, session_id):
         assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
 
 
+def test_a_flow_id_with_a_space_reaches_the_role_whole(started, session_id):
+    """WI-0087: the supervisor quotes --flow, so a flow ID with a space (every flow ID has one: "Flow 1010290492") is one
+    value on the command line; Args gives the role the same flow ID back (cmd.test.args of the echo role)."""
+    flow = "Flow 1010290492"
+    name = "echo:" + flow
+    sup = started("--start=" + name, "--test-roles")
+    py = connect(sup.pipe, "py")
+    try:
+        assert wait_ready(py, (name,)) is not None, "%s not ready; supervisor said:\n%s" % (name, sup.text())
+        answer = request_ok(py, name, "cmd.test.args")
+        assert answer["flowId"] == flow, answer
+        assert answer["name"] == name, answer
+    finally:
+        request_ok(py, "supervisor", "cmd.app.exit", {})
+        py.close()
+        assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
+
+
 def test_data_directory_comes_from_the_environment_when_data_is_missing(started, datadir, monkeypatch):
     """Without --data the supervisor uses AHF_DATA_DIR (the tests rely on it to keep processes away from the real
     application data directory). The storage role gets the resolved path and writes its log there."""

@@ -16,6 +16,8 @@
 ;   cmd.test.throwlater {count}  -> count errors thrown from timers (default 1); the role keeps running
 ;                                   until the limit of Role.ERROR_LIMIT is exceeded (WI-0023)
 ;
+;   cmd.test.args               -> {flowId, name}: what the command line gave the role (WI-0087, round trip of --flow)
+;
 ; sys.shutdown is handled by the base class (sys.bye, exit 0).
 ;
 ; Test option in the name (WI-0034, F-0037): "echo:slowhello<ms>" (the flow part of the name) starts its connection to the
@@ -48,6 +50,7 @@ class EchoRole extends Role {
         this.On("cmd.test.setlogtarget", (msg) => this._SetTarget(msg.payload["to"]))
         this.On("cmd.test.throwlater", (msg) => this._ScheduleThrow(msg.payload.Get("count", 1)))
         this.On("cmd.test.dump", (msg) => this._Dump(msg.payload))
+        this.On("cmd.test.args", (msg) => Map("flowId", this.flowId, "name", this.name))   ; WI-0087: command line round trip
     }
 
     _LogMany(count, level, text) {
