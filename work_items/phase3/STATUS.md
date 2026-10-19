@@ -24,7 +24,7 @@ WI-0086 and WI-0087 may start now; WI-0085 waits for WI-0086 only as far as the 
 | WI-0083 | GDI+ wrapper and the R0002 measurement | done | haiku | e0febbf1..92b9cac5 | 2026-10-19 | R0002 failed: 300 ms vs 16 ms (MS-0044); owner decided E0090 (caches), added to WI-0085 |
 | WI-0084 | Geometry and scene (headless) | done | haiku | 98f467b0..e065b5d1 | 2026-10-19 | review approved; verified green |
 | WI-0085 | Renderer: draw the scene, style, icons | open | sonnet | | | owner accepts the look (E0088) |
-| WI-0086 | Engine: run states, connection taken, warnings per element | running | haiku | | | workspace wi-86 |
+| WI-0086 | Engine: run states, connection taken, warnings per element | done | haiku | f2846ee2..19c91fdf | 2026-10-19 | review approved with one fix; verification follows; F-0148 |
 | WI-0087 | Open and close an editor: supervisor and manager | open | | | | |
 | WI-0088 | Editor role: model, resync, window, headless driver | open | | | | |
 | WI-0089 | Live states, marks and the event load | open | | | | |
@@ -38,7 +38,7 @@ None.
 
 ## Running agents
 
-WI-0086 implementer (haiku), workspace wi-86.
+WI-0087 implementer (haiku), workspace wi-87.
 
 ## Last verified state
 
