@@ -22,6 +22,8 @@ Size: M · Depends on: WI-0083 (and the owner's decision if R0002 failed), WI-00
 6. **Numbers for the role:** the renderer keeps the count of frames and the time of the last and the slowest frame, for the snapshot of the role (WI-0088).
 7. **Caches (E0090):** a static layer (background, connections, elements without run state) in its own bitmap, rebuilt only when the scene, the zoom or the view change and drawn with one `BitBlt`; the run states and marks are drawn on top each frame; icons pre-scaled to the drawn size and cached; names cached per element (text bitmap or font and format objects); a layer larger than the window so that a pan does not rebuild. Measure with the bench of WI-0083: the frame with only states changing (target below 16 ms at 1920x1080, 300 elements) and the rebuild time; write both into MEASUREMENTS.md and the result. If the rebuild is above about 150 ms, say so for the owner.
 
+8. **Draw order and hit order must agree (review of WI-0084):** the scene lists elements in Map order (sorted by ID text, not by creation) and the hit test lets the last drawn win; v1 additionally draws selected elements on top, which the scene does not model yet. The renderer draws in the scene order; if the order changes (selection on top), change the hit order with it (S0006).
+
 ## Acceptance criteria
 
 - The tests of task 5 are green; `python tools/arch_check.py` is green.
