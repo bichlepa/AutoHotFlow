@@ -591,6 +591,43 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: renderer measurement of the editor frame (WI-0085; run alone; result in temp/renderer_bench.txt)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/ahkrun.py",
+                "--timeout",
+                "900",
+                "tests/ahk/helpers/renderer_bench.ahk",
+                "${workspaceFolder}/temp/renderer_bench.txt",
+                "1920",
+                "1080",
+                "whole",
+                "300",
+                "20",
+                "20"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: editor screenshots of two example flows (WI-0085; PNG files in temp/editor-screenshots)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/ahkrun.py",
+                "--timeout",
+                "300",
+                "tests/ahk/helpers/render_samples.ahk",
+                "${workspaceFolder}/temp/editor-screenshots",
+                "${workspaceFolder}/temp/editor-screenshots/result.txt",
+                "${workspaceFolder}/tests/data/flows/v1_examples/Flow 2052424815.json",
+                "${workspaceFolder}/tests/data/flows/v1_examples/Flow 806132298.json"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: long loop does not block the engine (100,000 passes; MEASURE line in the output)",
             "type": "shell",
             "command": "python",
