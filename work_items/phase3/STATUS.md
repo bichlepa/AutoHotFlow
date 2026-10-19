@@ -17,15 +17,15 @@ Step-independent: WI-0059 (test admission, load report, run history) is done. St
 
 ## Work items of the next step
 
-WI-0085 (Depends: WI-0083, WI-0084, decision E0090) may start; WI-0087 is running.
+WI-0085 is running; WI-0088 needs WI-0085 to WI-0087.
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
 | WI-0083 | GDI+ wrapper and the R0002 measurement | done | haiku | e0febbf1..92b9cac5 | 2026-10-19 | R0002 failed: 300 ms vs 16 ms (MS-0044); owner decided E0090 (caches), added to WI-0085 |
 | WI-0084 | Geometry and scene (headless) | done | haiku | 98f467b0..e065b5d1 | 2026-10-19 | review approved; verified green |
-| WI-0085 | Renderer: draw the scene, style, icons | open | haiku | | | owner accepts the look (E0088) |
+| WI-0085 | Renderer: draw the scene, style, icons | running | haiku | | | workspace wi-85; owner accepts the look (E0088) |
 | WI-0086 | Engine: run states, connection taken, warnings per element | done | haiku | f2846ee2..19c91fdf | 2026-10-19 | review approved with one fix; verified green; F-0148 |
-| WI-0087 | Open and close an editor: supervisor and manager | running | haiku | | | workspace wi-87 |
+| WI-0087 | Open and close an editor: supervisor and manager | done | haiku | 1646a787..e147d1f4 (see git log) | 2026-10-19 | review approved with one text fix; verification follows; F-0149 carried to WI-0088 |
 | WI-0088 | Editor role: model, resync, window, headless driver | open | | | | |
 | WI-0089 | Live states, marks and the event load | open | | | | |
 | WI-0090 | View: zoom, move, tooltip, status bar, DPI | open | | | | |
@@ -38,7 +38,7 @@ None.
 
 ## Running agents
 
-WI-0087 implementer (haiku), workspace wi-87.
+WI-0085 implementer (haiku), workspace wi-85.
 
 ## Last verified state
 
