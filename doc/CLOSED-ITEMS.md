@@ -75,6 +75,9 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0112 | The per-minute limit counts every element execution, so a legitimate flow with many big runs can reach it | accepted (owner, 2026-10-17, E0071): the defaults stay and become global settings in S0004; revisit after the port | |
 | F-0106 | The header of a slow-run output in `run_suite` named another commit than the run folder | closed 2026-10-16: not reproduced; the run record carries the commit |  |
 | F-0058 | Debug window, Snapshots tab: text jumps to the top on every refresh | closed (fixed in ca9fbc6; owner check 2026-10-14) | |
+| F-0101 | Slow tier: `test_start_stop_storm_leaves_a_consistent_engine[smoke]` saw the engine's handle count grow by 19 (limit 5) | closed 2026-10-19: 35 runs of the test since 2026-10-17, all green (run history); the symptom was seen on 2026-10-16 only | |
+| F-0110 | Foundation tier: `test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` found the storage process still alive after the session ended (the symptom of F-0095) | closed 2026-10-19: 83 runs of the test since 2026-10-17, all green (run history); seen once on 2026-10-16 | |
+| F-0115 | Fast tier: 10 tests of `tests/integration/test_hotkey_input.py` (`@input`) failed in run 20261017-105241-27428 (commit 237441d plus uncommitted test changes, WI-0070 branch): "the probe key vk88 did not arrive although the input desktop is usable and no modifier is held: hotkey path, not the desktop" | closed 2026-10-19: the cause (a locked input desktop and an undecodable `tasklist` output) was fixed in 91b08a7 and cb7bee9 (WI-0064) | |
 | F-0113 | Warning of AutoHotkey on stdout from Trigger_Start_up (local `type`) at every load | merged into F-0114 (2026-10-19, the same warning class) | |
 | F-0116 | The log window misses lines of a burst (5000 lines, about 2000 reached storage) | accepted (E0082, owner 2026-10-17: the drop in the hub stays) | |
 | F-0117 | The tree shows that a flow runs, not how many instances run | closed 2026-10-17 (E0079): the count is in the snapshot and `evt.flow.state` | |
@@ -808,6 +811,29 @@ This document lists findings that are closed or accepted. Entries are moved here
 
 **What:** AutoHotkey prints `Warning: This local variable has the same name as a global variable. Specifically: type (in function Default.Trigger_Start_up.Enable)` on the output of every test that loads the element classes.
 **Closed (2026-10-19):** merged into F-0114 (`doc/OPEN-ITEMS.md`), which describes the same warning class for the trigger host and `Trigger_Start_up`.
+
+### F-0101: the storm smoke test sees the engine's handle count grow now and then
+
+**What:** `tests/stress/test_start_stop_storm.py::test_start_stop_storm_leaves_a_consistent_engine[smoke]` failed in the slow tier with the engine's handle count rising from 145 to 164 (limit +5). It failed twice in a row, and once alone; then it was green three times on `9f1d403` and `c27ff8f`, whose code changes do not touch the engine.
+**Status (before closing):** observed, not reproduced in the green runs; cause not known (assumed: a handle that is released late, not a leak by a code change). Open.
+**Action:** watch the history of the test (`python tools/test_history.py --test "tests/stress/test_start_stop_storm.py::test_start_stop_storm_leaves_a_consistent_engine[smoke]"`). If it fails again alone, read the handle types of the engine process in the run log and open a work package; if it fails only under load, add it to the load flakes.
+**Evidence:** runs 20261016-172834-c27ff8f4-3 (red) and its recheck at 17:36 (red alone), in the run history of the main checkout.
+**Update 2026-10-16 (cleanup of the open items):** green in every run since (6 runs from 17:36 on, run history). The numbers are exactly those of F-0092 (closed): 145 handles before, 164 after, the 19 handles that the first instance of a flow opens once. The churn test was fixed there by a warm-up instance before the baseline; the storm test already has a warm-up of 20 cycles (`WARMUP_CYCLES`) and still saw 145 in the two red runs, so the 19 handles do not always come with the first instance (assumed: something opened lazily, later than the warm-up; not checked). Next step if it fails again: answer the open question of F-0092, which 19 handles these are (handle types of the engine before and after).
+**Closed (2026-10-19, rule of the owner 2026-10-16):** the test passed in 35 runs since 2026-10-17 (`python tools/test_history.py --test <id> --since 2026-10-17`), no failure. The cause was never found; a recurrence is a new finding that cites F-0101.
+
+### F-0110: storage still alive after a session with a child that says hello during the shutdown
+
+**What:** `tests/fault/test_shutdown.py::test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` failed in the foundation tier: the storage process (started 21:18:10) was still running when the check ran after the session had exited with the expected code. It is the same symptom as F-0095 (storage alive after the end of a session, under load), in a sibling test.
+**Status (before closing):** observed once (run 20261016-211715-c03b628b, commit `c03b628`, 1 failed of 461). Not reproduced in the same run's other foundation tests. Not caused by WI-0060 as far as the code shows: the engine writes FlowState.json at shutdown only when a switch is pending, which this scenario does not do.
+**Action:** watch the history of the test. If it recurs, treat it together with F-0095 (the end of storage after `sys.bye`).
+**Evidence:** run 20261016-211715-c03b628b (output of the run, line 43).
+**Closed (2026-10-19, rule of the owner 2026-10-16):** the test passed in 83 runs since 2026-10-17, no failure. The cause was never found; a recurrence is a new finding that cites F-0110.
+
+### F-0115: Fast tier: hotkey input tests fail when the input desktop is locked
+
+**What:** 10 tests of `tests/integration/test_hotkey_input.py` (`@input`) failed in run 20261017-105241-27428 (commit 237441d plus uncommitted test changes): "the probe key vk88 did not arrive although the input desktop is usable and no modifier is held: hotkey path, not the desktop". A serial rerun at 11:01 skipped all of them ("no input desktop": the desktop was locked or secure).
+**Status (before closing):** observed once; not reproduced; not checked against a base commit; cause not known. The change of WI-0070 touches the engine trigger path only in a guard (`IsDeleting`). Watch the next fast runs. A locked PC explains the skips (LogonUI was running during the session, verified).
+**Closed (2026-10-19):** the cause was found and fixed (see the table row: the input desktop was locked, LogonUI was running, the `tasklist` output could not be decoded). The skip on a real lock screen has not been seen since.
 
 ## Sources
 

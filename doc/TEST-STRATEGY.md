@@ -16,7 +16,7 @@ Status: Draft. Tools checked in this environment: AutoHotkey v2 at `C:\Program F
 |---|---|---|---|
 | **L0001 Unit (AHK)** | `tests/ahk/*.test.ahk` | Small assert library `tests/ahk/lib/Assert.ahk`, one script per file, result as JSON lines in a file. pytest collects the files, starts them and evaluates the result. | pure logic: JSON, IDs, state machines, parser/evaluator, frame building |
 | **L0002 Integration** | `tests/integration/` | Start one or two roles for real, Python client as the counterpart. | IPC, dispatcher, timeouts, supervisor hub, storage queue |
-| **L0003 e2e** | `tests/e2e/` | Whole system (supervisor, engine, storage, trigger host, UI stub). Python behaves like an editor/manager. | flow runs, events arrive, start/stop/shutdown |
+| **L0003 e2e** | `tests/e2e/` | Whole system (supervisor, engine, storage, trigger host, headless manager). Python behaves like an editor/manager. | flow runs, events arrive, start/stop/shutdown |
 | **L0004 Fault injection** | `tests/fault/` | Terminate processes (`kill`), freeze them (`psutil.Process.suspend()`), close the pipe, delay responses. | crash, hang, timeout without hanging in the whole system |
 | **L0005 Stress** | `tests/stress/` | many instances, rapid start/stop sequences, clients connect and disconnect under load. Fixed time budget, result as a report. | race conditions, leaks, message backlog |
 | **L0006 Characterization** | `tests/golden/` | Inputs and outputs of the v1 behavior as data (JSON). v2 must reproduce them. | expression evaluation, variable substitution, connection selection, load/save (expressions and variables: section 7) |
