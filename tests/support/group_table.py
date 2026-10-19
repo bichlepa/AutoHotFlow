@@ -456,6 +456,7 @@ OWN_TEST_GROUPS = {
     "elements-base": ["element-units"],
     "elements-pkg": ["element-units", "packages"],
     "elements-gen": ["element-units"],
+    "editor": ["ui", "render"],
 }
 
 # Smoke tests: one or a few fast tests per user of a shared module. A key is a test file or `file::test function`; the

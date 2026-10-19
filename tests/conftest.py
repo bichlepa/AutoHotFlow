@@ -230,13 +230,16 @@ def _selection(config):
     ref = config.getoption("--changed-from")
     names = config.getoption("--groups")
     listed = config.getoption("--changed-paths")
-    if listed:
-        return groups.select([p.strip() for p in listed.split(",") if p.strip()])
-    if ref:
-        try:
+    # a path that no rule knows is a usage error, never a run of everything (doc/TEST-GROUPS.md, section 6)
+    try:
+        if listed:
+            return groups.select([p.strip() for p in listed.split(",") if p.strip()])
+        if ref:
             return groups.select(groups.changed_paths(ref, TESTS_DIR.parent))
-        except RuntimeError as e:
-            raise pytest.UsageError("--changed-from: %s" % e)
+    except RuntimeError as e:
+        raise pytest.UsageError("--changed-from: %s" % e)
+    except groups.UnknownPathError as e:
+        raise pytest.UsageError("--changed-from: %s" % e)
     if names:
         return groups.select_groups([n.strip() for n in names.split(",") if n.strip()])
     return None

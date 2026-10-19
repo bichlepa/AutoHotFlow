@@ -12,6 +12,7 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "tools"))
 
 import verify  # noqa: E402
+from support import groups  # noqa: E402
 
 SHA = "abcdef12" + "3" * 32          # a fake full sha for the run folder names (its first 8 digits are "abcdef12")
 
@@ -37,13 +38,21 @@ ALL = ["fast", "foundation", "slow"]
     (["tools/ahkrun.py"], ALL),
     (["tests/conftest.py"], ALL),
     (["tests/support/procs.py"], ALL),
-    (["tests/integration/helpers/x.py"], ALL),
+    (["tests/support/x.py"], ALL),                        # shared test infrastructure (explicit rule)
     (["pytest.ini"], ALL),
-    (["assets/x.png"], ALL),                              # no rule for the path: any test may read it
-    (["src/new_folder/x.ahk"], ALL),                      # no area for the file: the guard test of the table fails too
 ])
 def test_tiers_follow_the_changed_paths(changed, expected):
     assert verify.select_tiers(changed) == (expected, None)
+
+
+@pytest.mark.parametrize("changed", [
+    ["assets/x.png"],                                     # no rule for the path: an error, never a full run
+    ["src/new_folder/x.ahk"],                             # no area for the file
+    ["tests/integration/helpers/x.py"],                   # no rule for a helper of the tests
+])
+def test_a_path_no_rule_knows_is_an_error(changed):
+    with pytest.raises(groups.UnknownPathError):
+        verify.select_tiers(changed)
 
 
 @pytest.mark.parametrize("changed, reason", [
@@ -233,6 +242,18 @@ def test_auto_skips_changes_that_no_test_reads(repo, tmp_path, capsys):
     assert verify.main(["--auto"], runner=runner, repo=repo) == 0
     assert runner.calls == []
     assert "VERDICT: skipped (not read by any test)" in capsys.readouterr().out
+
+
+def test_auto_with_a_path_no_rule_knows_is_an_error_and_runs_nothing(repo, tmp_path, capsys):
+    runner = FakeRunner(tmp_path / "runs")
+    verify.main([], runner=runner, repo=repo)
+    before = state_of(repo)
+    commit(repo, {"assets/unknown.png": "x"}, "a file no rule knows")
+    runner.calls.clear()
+    assert verify.main(["--auto"], runner=runner, repo=repo) == verify.EXIT_ERROR
+    assert runner.calls == []
+    assert "VERDICT: error" in capsys.readouterr().out
+    assert state_of(repo) == before           # no green state for it
 
 
 def test_auto_without_base_writes_and_picks_tiers_from_the_change(repo, tmp_path):

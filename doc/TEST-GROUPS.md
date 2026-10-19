@@ -12,7 +12,9 @@ Every source file belongs to one **area** (`SOURCE_AREAS`), every test belongs t
 
 1. **Own tests, in full.** The test group of the area. For one element file only the tests of that element (`COVERS`), not the flow tests of all elements.
 2. **Smoke tests of the users.** A shared module has users (the manager, a flow run, the trigger host, a dialog element, the worker). For each user one or a few fast tests (`SMOKE_FOR`) show that the features the user needs from the shared module still work. They run whenever the shared module changes.
-3. **Everything.** Only when the change can break anything (`base-hub` files such as `Errors.ahk`, `Log.ahk`, `Json.ahk`, `AhfBoot.ahk`; test infrastructure; `tools/ahkrun.py`; a path no rule knows), and at the end of every larger block of work.
+3. **Everything.** Only when the change can break anything: the `base-hub` files (`Errors.ahk`, `Log.ahk`, `Json.ahk`, `AhfBoot.ahk`), the shared test infrastructure (`tests/conftest.py`, `tests/support/`, `Assert.ahk`, the test entry `AutoHotFlowTest.ahk`), `tools/ahkrun.py`, `pytest.ini`, and the pinned test dependencies. Each of them is an explicit rule with the word everything in its comment, and the end of every larger block of work.
+
+A changed path that **no rule knows is an error**, not a full run: `select_tests.py` exits 2, `verify.py --auto` gives the verdict `error`, and `pytest --changed-from` is a usage error. The message names the file and says what to add (section 6). The guard test `tests/test_groups.py` checks that every tracked file of the repository is known, so the gap shows on the commit that adds the file.
 
 Two cheap groups always run with any change that tests may read: `docs` and `architecture` (together about 2 s). A test that is **not** in the table always runs: a forgotten entry costs time, never a missed test.
 
@@ -63,7 +65,7 @@ The first matching pattern wins; `*` also matches `/`. Test groups that run in f
 | `tray` | `tray/` | `tray` |
 | `editor-geometry` | `editor/` (the geometry, the view, the scene and the hit test, WI-0084) | `editor-geometry` |
 
-Outside `src/`: `doc/` runs `docs` and `architecture` only (`doc/PROTOCOL.md` also `transport`); `tools/<tool>.py` runs the group `tools` (exceptions in `OTHER_RULES` in `tests/support/groups.py`); a helper of `tests/ahk/helpers/` that is a benchmark or a probe (not read by the unit tests) needs its own `OTHER_RULES` entry, otherwise the change selects everything (as `render_bench.ahk` did before WI-0083); a changed test file selects itself; `work_items/`, `.claude/` and `NEEDS-ATTENTION.md` select nothing.
+Outside `src/` the rules are `OTHER_RULES` in `tests/support/groups.py` (first match wins): `doc/` runs `docs` and `architecture` only (`doc/PROTOCOL.md` also `transport`); `tools/<tool>.py` runs the group `tools` (exceptions listed first); a helper or a data file of `tests/` names the groups of the tests that read it, or `None` (everything) for shared infrastructure, or `[]` when no test reads it (`tests/stress/stresskit.py`: only the stress tests read it, and the selection never runs them); benchmarks and probes that no test calls name the groups of the code they exercise; `v1/` is the reference code and names no group except the golden data (`v1/AutoHotKey/`, `v1/Source_Elements/`); a changed test file selects itself; `work_items/`, `.claude/` and `NEEDS-ATTENTION.md` select nothing. A file of `src/` that no area pattern matches is an error as well: a new folder needs an area in `SOURCE_AREAS`.
 
 ## 4. Test groups (`TEST_GROUPS`)
 
@@ -117,6 +119,9 @@ Example (verified, summed time of the selected tests): `Loop_SimpleLoop.ahk`: 12
 2. A new element file needs a `COVERS` entry: its tests (its own test file, or the functions of a shared file as `file::function`); `[]` only if it really has none yet. Prefer a test function that names the element, so the entry stays short and exact.
 3. A new area (a new module family, a new role) needs: a pattern, a test group of the same name (or an entry in `OWN_TEST_GROUPS`), the test files in that group, and, when other modules use it, smoke tests for its users.
 4. A new **shared** module (used by several areas): add one smoke test per user in `SMOKE_FOR`.
+5. A new file that is **not** code (a helper, data, a library, a document): a rule in `OTHER_RULES` (`tests/support/groups.py`). Name the groups of the tests that read it. Use `None` only for shared infrastructure that any test may depend on, with a comment that says so; `[]` only when no test reads it.
+
+**A path that no rule knows** (the selection says `... is not classified by any test rule`): the fix is one of the rules above, not a full run. Do not add a catch-all pattern to get past the error; `tests/test_groups.py` (`test_every_tracked_file_is_classified_by_a_rule`) fails for every tracked file that stays unknown.
 
 **New test file or test function:**
 
@@ -161,7 +166,7 @@ The "Tests" column includes the AHK case items of the selected units (a unit fil
 | What | Where |
 |---|---|
 | The table (areas, test groups, element coverage, smoke tests) | `tests/support/group_table.py` |
-| The selection rules and `--changed-from` support | `tests/support/groups.py`, `tests/conftest.py` |
+| The selection rules, the rules of the paths outside `src/` (`OTHER_RULES`), the error of an unknown path | `tests/support/groups.py`, `tests/conftest.py` (`--changed-from` support) |
 | Verification with the selection | `tools/verify.py --auto` |
 | Explanation and simulation | `tools/select_tests.py` |
 | Guard (the table is complete and true; examples of what is selected) | `tests/test_groups.py` |

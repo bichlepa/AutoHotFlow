@@ -18,16 +18,87 @@ ALWAYS_GROUPS = ("docs", "architecture")        # cheap (about 2 s together), ru
 ELEMENT_SMOKE = "ahk/element_smoke.test.ahk"    # every registered element: runs for every element change
 EVERYTHING_AREA = "base-hub"
 
-# Paths outside src/ that name test groups. First match wins. "*" matches a path separator too.
+# Paths outside src/ that name test groups. First match wins (put the specific patterns first). "*" matches a path
+# separator too. A group list of None means: every test may depend on the path (explicit everything, commented);
+# an empty list means: no test reads it. A path that matches no rule is an error (UnknownPathError), never a full run.
+# The groups of a helper or a data file are the groups of the tests that read it (grep the tests before you change one).
+FAULT_GROUPS = ["diagnosis", "engine", "expr", "manager", "recovery", "settings", "storage", "supervisor", "transport",
+                "tray", "triggers", "variables", "workers"]     # the union of the fault tests (faultkit is used by most)
+ROLE_TESTS = ["diagnosis", "recovery", "storage", "supervisor", "transport", "workers"]   # the test roles (entry/test/)
+EXECUTOR_KIT_USERS = ["engine", "element-units", "triggers", "variables", "expr"]   # the users of ExecutorKit/EngineOwner
 OTHER_RULES = [
+    # tests/: shared infrastructure (explicit everything), helpers and data (the tests that read them)
     ("tests/support/group_table.py", ["architecture"]),
     ("tests/support/groups.py", ["architecture"]),
+    ("tests/golden/*", ["expr"]),                        # the golden data of the expression language (frozen)
+    ("tests/oracle/*", ["expr"]),                        # the oracle corpus and harness of the expression language
+    ("tests/conftest.py", None),                         # fixtures, options and the run record of every test
+    ("tests/support/*", None),                           # process kit, admission, history, dialogs: any test may use them
+    ("tests/requirements.txt", None),                    # pinned test dependencies: a new version may break any test
+    ("tests/ahk/lib/Assert.ahk", None),                  # the assertions of every AHK unit test
+    ("tests/ahk/lib/ElementSmoke.ahk", ["element-units"]),
+    ("tests/ahk/lib/EvalCheck.ahk", ["expr"]),
+    ("tests/ahk/lib/ExprCheck.ahk", ["expr"]),
+    ("tests/ahk/lib/ExprDump.ahk", ["expr"]),
+    ("tests/ahk/lib/ExprTestResolver.ahk", ["expr"]),
+    ("tests/ahk/helpers/ExecutorKit.ahk", EXECUTOR_KIT_USERS),
+    ("tests/ahk/helpers/EngineOwner.ahk", EXECUTOR_KIT_USERS),
     ("tests/ahk/helpers/render_bench.ahk", ["render", "tools"]),   # the renderer bench, driven by tools/measure_render.py
-    ("tests/golden/*", ["expr"]),
-    ("tests/oracle/*", ["expr"]),
+    ("tests/ahk/helpers/element_rate_bench.ahk", ["element-units", "engine"]),   # benches: run by hand (VS Code tasks)
+    ("tests/ahk/helpers/loop_bench.ahk", ["element-units", "engine"]),
+    ("tests/ahk/helpers/evalparams_bench.ahk", ["element-units", "expr"]),
+    ("tests/ahk/helpers/expr_bench.ahk", ["expr"]),
+    ("tests/ahk/helpers/expr_eval_bench.ahk", ["expr"]),
+    ("tests/ahk/helpers/json_bench.ahk", ["base"]),      # used by tests/test_json_flows.py
+    ("tests/ahk/helpers/json_flows.ahk", ["base"]),
+    ("tests/ahk/helpers/hub_frame_cost.ahk", ["transport"]),     # used by the stress tests (not selected)
+    ("tests/ahk/helpers/modal_spike.ahk", ["ui"]),
+    ("tests/ahk/helpers/tray_menu_probe.ahk", ["tray"]),
+    ("tests/ahk/helpers/ui_dialog_text.ahk", ["manager", "ui"]),  # used by tests/fault/test_manager_window.py
+    ("tests/integration/helpers/AutoHotFlowTest.ahk", None),      # the test entry of every role
+    ("tests/integration/helpers/entry/generated/*", ["element-units"]),
+    ("tests/integration/helpers/entry/test/*", ROLE_TESTS),       # echo, crasher, hanger, slow_shutdown
+    ("tests/integration/helpers/entry/debug.ahk", ["diagnosis"]),
+    ("tests/integration/helpers/entry/editor.ahk", ["ui"]),
+    ("tests/integration/helpers/entry/engine.ahk", ["engine"]),
+    ("tests/integration/helpers/entry/manager.ahk", ["manager"]),
+    ("tests/integration/helpers/entry/storage.ahk", ["storage"]),
+    ("tests/integration/helpers/entry/tray.ahk", ["tray"]),
+    ("tests/integration/helpers/entry/triggerhost.ahk", ["triggers"]),
+    ("tests/integration/helpers/entry/worker.ahk", ["workers"]),
+    ("tests/integration/helpers/CrasherRole.ahk", ["diagnosis", "storage", "supervisor", "workers"]),
+    ("tests/integration/helpers/HangerRole.ahk", ["diagnosis", "storage", "supervisor", "workers"]),
+    ("tests/integration/helpers/SlowShutdownRole.ahk", ["recovery", "supervisor"]),
+    ("tests/integration/helpers/EchoRole.ahk", ["diagnosis", "recovery", "storage", "supervisor", "transport"]),
+    ("tests/integration/helpers/RegisterFailure.ahk", ["supervisor"]),
+    ("tests/integration/helpers/IconProbe.ahk", ["supervisor", "tray"]),
+    ("tests/integration/helpers/IconProbeShown.ahk", ["supervisor", "tray"]),
+    ("tests/integration/helpers/PipeTestKit.ahk", ["transport"]),
+    ("tests/integration/helpers/peer_probe.ahk", ["transport"]),
+    ("tests/integration/helpers/pipe_client.ahk", ["transport"]),
+    ("tests/integration/helpers/pipe_echo_server.ahk", ["transport"]),
+    ("tests/integration/helpers/rawpipe.py", ["transport"]),
+    ("tests/integration/helpers/TestDialogProvider.ahk", ["element-units", "elements-e2e", "engine", "ui", "workers"]),
+    ("tests/integration/helpers/hotkey_window.ahk", ["triggers"]),
+    ("tests/integration/helpers/key_observer.ahk", ["triggers"]),
+    ("tests/fault/faultkit.py", FAULT_GROUPS),
+    ("tests/fault/faultfixtures.py", FAULT_GROUPS),
+    ("tests/stress/stresskit.py", []),                   # read by the stress tests only, which the selection never runs
+    ("tests/elements/TestTwin/*", ["element-units", "packages"]),
+    ("tests/elements/Test/*", ["element-units", "elements-e2e", "engine", "expr", "packages", "triggers", "ui", "workers"]),
+    ("tests/data/README.md", ["docs"]),
+    ("tests/data/skeleton_flow.json", ["engine", "manager", "recovery", "storage", "tools", "triggers"]),
+    ("tests/data/flows/v1_examples/*", ["base", "elements-e2e", "engine", "expr", "manager", "storage"]),
+    ("tests/data/flows/personal/*", ["base", "storage"]),
+    ("tests/data/flows/s1_acceptance/*", ["engine"]),
+    ("tests/data/flows/v2_adapted/*", ["engine", "expr"]),
+    ("tests/data/ahf/*", ["manager", "storage"]),
+    ("tests/data/variables/*", ["engine", "storage", "variables"]),
+    ("tests/data/manual/*", ["elements-e2e", "manager", "storage", "tools", "ui"]),
+    # doc/, tools/, root and the language texts of the program
     ("doc/PROTOCOL.md", ["transport", "docs"]),
     ("doc/*", ["docs"]),
-    ("tools/ahkrun.py", None),                                  # None: every test runs it
+    ("tools/ahkrun.py", None),                                  # every test runs it
     ("tools/gen_element_includes.py", ["element-units", "architecture"]),
     ("tools/arch_check.py", ["architecture"]),
     ("tools/doc_index.py", ["docs"]),
@@ -35,10 +106,30 @@ OTHER_RULES = [
     ("tools/golden_*.py", ["expr"]),
     ("tools/*", ["tools"]),
     (".vscode/*", ["tools"]),
+    (".gitignore", ["tools"]),                                  # run_suite copies the files that are not ignored
     (".gitattributes", ["architecture"]),
     (".editorconfig", ["architecture"]),
+    ("pytest.ini", None),                                       # the options of every run
+    ("assets/language/*", ["lang", "manager", "settings", "tray", "ui"]),   # the texts the dialogs and the tray show
+    # v1/: the reference code, changed never (AGENTS.md rule 4); only the golden data and the element smoke test read it
+    ("v1/Source_Elements/*", ["element-units", "lang"]),         # ElementSmoke, core_lang
+    ("v1/AutoHotKey/*", ["expr", "tools"]),                     # the v1 interpreter of the golden data
+    ("v1/*", []),
 ]
 ROOT_DOCS = ("AGENTS.md", "README.md", "CLAUDE.md")
+
+
+class UnknownPathError(ValueError):
+    """A changed path that no rule classifies. The selection refuses to guess: a run of everything would hide the gap
+    and a silent skip would hide the missing test (doc/TEST-GROUPS.md, section 6)."""
+
+    def __init__(self, path):
+        super().__init__(
+            "%s is not classified by any test rule. Add a rule: a source file needs an area in SOURCE_AREAS, a test "
+            "file an entry in TEST_GROUPS (tests/support/group_table.py); any other path needs a rule in OTHER_RULES "
+            "(tests/support/groups.py) with the groups of the tests that read it, None when every test may depend on "
+            "it, or [] when no test reads it. See doc/TEST-GROUPS.md, section 6." % path)
+        self.path = path
 
 
 class Selection:
@@ -81,9 +172,11 @@ def smoke_tests(areas):
 
 def _add_source(sel, path):
     area = area_of(path)
-    if area is None or area == EVERYTHING_AREA:
+    if area is None:
+        raise UnknownPathError(path)
+    if area == EVERYTHING_AREA:
         sel.everything = True
-        sel.reasons.append((path, "everything" if area else "no source area (everything)"))
+        sel.reasons.append((path, "base-hub: everything"))
     elif area == "element":
         covered = COVERS.get(path) or []
         sel.nodes.update(c for c in covered if "::" in c)
@@ -103,33 +196,57 @@ def _add_source(sel, path):
         sel.reasons.append((path, "area %s: groups %s, smoke" % (area, ", ".join(own))))
 
 
+def is_test_file(path):
+    key = path[len("tests/"):]
+    return key in TEST_GROUPS or key.endswith(".test.ahk") or Path(key).name.startswith("test_")
+
+
 def _add_test_path(sel, path):
     key = path[len("tests/"):]
     if path == "tests/test_ahk_runner.py":
         sel.everything = True
         sel.reasons.append((path, "the runner of all AHK units (everything)"))
-    elif key in TEST_GROUPS or key.endswith(".test.ahk") or Path(key).name.startswith("test_"):
+    elif is_test_file(path):
         sel.files.add(key)
         sel.reasons.append((path, "the test itself"))
-    else:       # the table itself, golden and oracle data have rules; conftest, support, helpers, test data and AHK
-        _add_other(sel, path)       # libraries may be read by any test, so they select everything
+    else:       # helpers, data, support and AHK libraries: OTHER_RULES says which tests read them
+        _add_other(sel, path)
+
+
+def other_rule(path):
+    """(pattern, groups) of the OTHER_RULES entry that classifies a path outside src/, ("documentation", []) for a
+    root document, or None when no rule knows the path."""
+    for pattern, rule_groups in OTHER_RULES:
+        if fnmatch.fnmatchcase(path, pattern):
+            return pattern, rule_groups
+    if "/" not in path and path in ROOT_DOCS:
+        return "documentation", []
+    return None
 
 
 def _add_other(sel, path):
-    for pattern, groups in OTHER_RULES:
-        if fnmatch.fnmatchcase(path, pattern):
-            if groups is None:
-                sel.everything = True
-                sel.reasons.append((path, "everything"))
-            else:
-                sel.groups.update(groups)
-                sel.reasons.append((path, "groups %s" % ", ".join(groups)))
-            return
-    if "/" not in path and path in ROOT_DOCS:
-        sel.reasons.append((path, "documentation"))
-        return
-    sel.everything = True
-    sel.reasons.append((path, "no rule: any test may read it (everything)"))
+    rule = other_rule(path)
+    if rule is None:
+        raise UnknownPathError(path)
+    pattern, rule_groups = rule
+    if rule_groups is None:
+        sel.everything = True
+        sel.reasons.append((path, "everything (%s)" % pattern))
+    else:
+        sel.groups.update(rule_groups)
+        sel.reasons.append((path, "groups %s (%s)" % (", ".join(rule_groups) or "none", pattern)))
+
+
+def classified(path):
+    """True when a rule knows the path (ignored paths count as known: no test reads them). tests/test_groups.py checks
+    every tracked file with it, so a new file cannot be selected silently."""
+    if path.startswith(IGNORED_PREFIXES):
+        return True
+    if path.startswith("src/"):
+        return area_of(path) is not None
+    if path.startswith("tests/") and (path == "tests/test_ahk_runner.py" or is_test_file(path)):
+        return True
+    return other_rule(path) is not None
 
 
 def select(paths):

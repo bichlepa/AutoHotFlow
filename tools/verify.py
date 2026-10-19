@@ -336,8 +336,14 @@ def main(argv=None, runner=None, repo=REPO):
         if provisional:
             notes.append("provisional finding IDs in doc/OPEN-ITEMS.md: %s (renumber before integration)"
                          % ", ".join(provisional))
-    except VerifyError as e:
-        print("verify: %s" % e, file=sys.stderr)
+    except (VerifyError, groups.UnknownPathError) as e:
+        # an unclassified path is an error, not a green run and not a run of everything (doc/TEST-GROUPS.md, section 6)
+        if args.json:
+            print(json.dumps({"ref": args.ref, "verdict": "error", "detail": str(e), "exit": EXIT_ERROR,
+                              "tiers": [], "notes": []}, indent=2))
+        else:
+            print("verify: %s" % e, file=sys.stderr)
+            print("VERDICT: error (a changed path is not classified by any test rule, see stderr)")
         return EXIT_ERROR
 
     short = sha[:8]

@@ -134,7 +134,11 @@ def main(argv=None):
     if not paths:
         print("no changed files")
         return 0
-    sel = groups.select(paths)
+    try:
+        sel = groups.select(paths)
+    except groups.UnknownPathError as e:       # an error, not a full run: the message says what to add
+        print("select_tests: %s" % e, file=sys.stderr)
+        return 2
     print("\n".join(groups.describe(sel)))
     if args.time:
         known = medians()

@@ -6,6 +6,7 @@ the rules promise. When one of them fails, the message says what to add to the t
 """
 
 import re
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -190,8 +191,38 @@ def test_the_table_itself_runs_only_the_guard():
     assert not sel.accepts("integration/test_supervisor.py")
 
 
-def test_a_path_that_no_rule_knows_selects_everything():
-    assert groups.select(["something/new.bin"]).everything
+def test_a_path_that_no_rule_knows_is_an_error_naming_the_file_and_the_fix():
+    with pytest.raises(groups.UnknownPathError, match="something/new.bin") as info:
+        groups.select(["something/new.bin"])
+    assert "OTHER_RULES" in str(info.value) and "doc/TEST-GROUPS.md" in str(info.value)
+
+
+def test_an_unknown_helper_or_data_file_is_an_error_not_a_full_run():
+    for path in ("tests/integration/helpers/new_helper.ahk", "tests/data/flows/new/x.json", "assets/x.png",
+                 "src/new_folder/x.ahk", "tests/ahk/helpers/new_bench.ahk"):
+        assert not groups.classified(path), path
+        with pytest.raises(groups.UnknownPathError):
+            groups.select([path])
+
+
+def test_the_editor_files_have_their_own_areas_render_and_editor_geometry():
+    assert groups.area_of("src/editor/render/GdipFont.ahk") == "render"
+    assert groups.area_of("src/editor/Scene.ahk") == "editor-geometry"
+    sel = groups.select(["src/editor/render/GdipFont.ahk"])
+    assert not sel.everything and "render" in sel.groups
+    assert not sel.accepts("integration/test_supervisor.py", "test_required_roles_are_ready_within_3_seconds")
+
+
+def test_every_tracked_file_is_classified_by_a_rule():
+    """The table cannot rot silently: a tracked file that no rule knows would be an error for the first change that
+    touches it, so this fails on the commit that adds it."""
+    try:
+        out = subprocess.run(["git", "ls-files"], cwd=str(REPO), capture_output=True, text=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        pytest.skip("not a git checkout")
+    unknown = [p for p in out.splitlines() if p and not groups.classified(p)]
+    assert not unknown, ("no rule for %s: add a rule to OTHER_RULES in tests/support/groups.py (or an area / a test "
+                         "entry), doc/TEST-GROUPS.md section 6" % ", ".join(unknown))
 
 
 def test_the_render_bench_helper_selects_its_groups_not_everything():
