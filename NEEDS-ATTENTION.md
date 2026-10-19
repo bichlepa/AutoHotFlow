@@ -4,7 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **Time of the fast tier (F-9001*, `doc/OPEN-ITEMS.md`).** Your decision of 2026-10-16 (F-0108) wanted a fast tier of about 1 minute, up to 2 minutes at the end of the port. With about 1600 tests it takes 4 to 13 minutes on the development PC (run history, `python tools/test_history.py --last`). Decide: accept the new size (and change the rule in `AGENTS.md`), or move more tests into the slow tier.
+- **Time of the fast tier (F-0144, `doc/OPEN-ITEMS.md`).** Your decision of 2026-10-16 (F-0108) wanted a fast tier of about 1 minute, up to 2 minutes at the end of the port. With about 1600 tests it takes 4 to 13 minutes on the development PC (run history, `python tools/test_history.py --last`). Decide: accept the new size (and change the rule in `AGENTS.md`), or move more tests into the slow tier.
 
 ## Manual checks
 

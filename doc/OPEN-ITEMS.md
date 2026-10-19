@@ -40,9 +40,9 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0119 | A multi-selection of flows is not visible in the tree (only the focused item is highlighted) | open, verified in code; the owner decides on a mark | WI-0074 |
 | F-0121 | The tree label of a running flow (`ManagerWindow._FlowLabel`) has no automated test | open, verified in code | WI-0074 |
 | F-0122 | A multi-selection was lost on a later rebuild of the tree (fixed; no automated test, the path is only reachable through a real tree) | open, verified in code, not checked on screen | WI-0074 |
-| F-9001* | The fast tier takes 4 to 13 minutes, not the 1 to 2 minutes of the owner decision F-0108 | open, owner decision (NEEDS-ATTENTION): accept the size or move tests to the slow tier | documentation review |
-| F-9002* | The status "planned" of the oldest MIGRATION entries (M-0001 to M-0005, M-0010, M-0012 to M-0014) was never re-checked against the code | open, found in the documentation review; M-0014 is implemented in `LoopStack.Pop` (read) | documentation review |
-| F-9003* | The `README.md` in the repository root describes v1 (downloads, installer, `find modules.ahk`, screenshots of v1) while the branch is the v2 port | open, low; rewrite at the end of the port (S0009/S0010) | documentation review |
+| F-0144 | The fast tier takes 4 to 13 minutes, not the 1 to 2 minutes of the owner decision F-0108 | open, owner decision (NEEDS-ATTENTION): accept the size or move tests to the slow tier | documentation review |
+| F-0145 | The status "planned" of the oldest MIGRATION entries (M-0001 to M-0005, M-0010, M-0012 to M-0014) was never re-checked against the code | open, found in the documentation review; M-0014 is implemented in `LoopStack.Pop` (read) | documentation review |
+| F-0146 | The `README.md` in the repository root describes v1 (downloads, installer, `find modules.ahk`, screenshots of v1) while the branch is the v2 port | open, low; rewrite at the end of the port (S0009/S0010) | documentation review |
 
 ## Findings
 
@@ -178,18 +178,18 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Status:** open, verified in code, not checked on screen. Action: step 50 of MANUAL-CHECKS section 8 by the owner; a gui test later.
 **Evidence:** `src/manager/LogWindow.ahk`, `src/manager/NoticeWindow.ahk`, `src/manager/ManagerWindow.ahk` (`Refresh`).
 
-### F-9001*: The fast tier takes 4 to 13 minutes
+### F-0144: The fast tier takes 4 to 13 minutes
 
 **What:** The owner decision of 2026-10-16 (F-0108, `doc/CLOSED-ITEMS.md`) set the fast tier to about 1 minute, up to 2 minutes at the end of the port. The fast tier now has about 1600 tests (`python -m pytest tests --collect-only -q`: 1609 of 2292 collected); the run history shows 255 s (run `20261019-195119-a94365a0`, 1605 passed) to 793 s (run `20261019-200110-a94365a0`, 1605 passed, external CPU 16 %) for it with `run_suite.py` (4 workers).
 **Status:** open, an owner decision. Options: accept the size and change the rule in `AGENTS.md` and `doc/TEST-STRATEGY.md`; or mark more tests `slow`/`foundation` (the largest cost per `python tools/test_history.py --durations`). The test groups (`doc/TEST-GROUPS.md`) already keep most changes below the fast tier: `verify.py --auto` runs only the selection.
 **Evidence:** `python tools/test_history.py --last 12` (2026-10-19).
 
-### F-9002*: MIGRATION entries from phase 1 still say "planned"
+### F-0145: MIGRATION entries from phase 1 still say "planned"
 
 **What:** M-0001 (restart of the engine), M-0002 (dialogs in a worker), M-0004 (errors of elements as exceptions), M-0005 (`storage` is the only log writer), M-0010 (two-phase exit), M-0012 (deadline 2 s for policy `stop`), M-0013 (dangling connections reported) and M-0014 (empty loop stack) have the status `planned` in `doc/MIGRATION.md`. Most of them are built (read: `LoopStack.Pop` throws `AhfError` on an empty stack, `Instance.StopDeadlineMs` is 2000, `LogSink` in storage writes the log), but each needs its test named, as the newer entries have.
 **Status:** open, not checked entry by entry. Action: for each entry find the test, then set the status `implemented (WI-..., test ...)` or correct the text. Rule 6 of AGENTS.md: no status without a read or a test.
 
-### F-9003*: README.md of the repository is the README of v1
+### F-0146: README.md of the repository is the README of v1
 
 **What:** `README.md` in the root describes v1: the download of the installer, the screenshots in `Documentation/`, `find modules.ahk`. On the branch `v2-port` it is wrong for a visitor.
 **Status:** open, low. Write the v2 README at the end of the port (S0009 distribution); until then `AGENTS.md` and `doc/README.md` are the entry points.

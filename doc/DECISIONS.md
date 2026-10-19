@@ -101,7 +101,7 @@ Where the detailed wording is in a repository document, the table names that doc
 
 ## Open
 
-None. Phase 3 is approved by the project owner (2026-10-13); the plan is `work_items/phase3/README.md`. The decision of the fast tier time (F-9001*) is in `NEEDS-ATTENTION.md`.
+None. Phase 3 is approved by the project owner (2026-10-13); the plan is `work_items/phase3/README.md`. The decision of the fast tier time (F-0144) is in `NEEDS-ATTENTION.md`.
 
 Findings that wait for the project owner are in `NEEDS-ATTENTION.md`, not here (F-0032 and F-0039, named here before, are closed, `doc/CLOSED-ITEMS.md`).
 
