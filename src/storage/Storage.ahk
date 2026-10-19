@@ -16,6 +16,7 @@
 #Include CategoryFile.ahk
 #Include SettingsFile.ahk
 #Include V1Source.ahk
+#Include StartupEntry.ahk
 #Include ArchivePack.ahk
 #Include ArchiveUnpack.ahk
 
@@ -99,6 +100,8 @@ class Storage extends Role {
         this.On("cmd.storage.v1.read", (msg) => this._CmdV1Read(msg))
         this.On("cmd.storage.autostart.check", (msg) => this._CmdAutostartCheck(msg))
         this.On("cmd.storage.autostart.remove", (msg) => this._CmdAutostartRemove(msg))
+        this.On("cmd.storage.startup.check", (msg) => this._CmdStartupCheck(msg))
+        this.On("cmd.storage.startup.sync", (msg) => this._CmdStartupSync(msg))
         this.On("cmd.storage.ahf.pack", (msg) => this._CmdAhfPack(msg))
         this.On("cmd.storage.ahf.unpack", (msg) => this._CmdAhfUnpack(msg))
         this.On("cmd.storage.log.tail", (msg) => this._CmdLogTail(msg))
@@ -286,6 +289,22 @@ class Storage extends Role {
         startupDir := msg.payload.Get("startupDir", "")
         v1Dir := msg.payload.Get("v1Dir", "")
         return this._Defer(msg, "autostart.remove", startupDir, () => V1Source.RemoveAutostart(startupDir, v1Dir))
+    }
+
+    ; cmd.storage.startup.* (WI-0079, E0070): the shortcut of the start with Windows in the startup folder the supervisor names.
+    _CmdStartupCheck(msg) {
+        startupDir := msg.payload.Get("startupDir", "")
+        return this._Defer(msg, "startup.check", startupDir, () => StartupEntry.Check(startupDir))
+    }
+
+    _CmdStartupSync(msg) {
+        p := msg.payload
+        startupDir := p.Get("startupDir", "")
+        enabled := V1Source._Truth(p.Get("enabled", 0))
+        target := p.Get("target", "")
+        args := p.Get("args", "")
+        workDir := p.Get("workDir", "")
+        return this._Defer(msg, "startup.sync", startupDir, () => StartupEntry.Sync(startupDir, enabled, target, args, workDir))
     }
 
     ; cmd.storage.ahf.pack / unpack (WI-0081, PROTOCOL 4.6): the .ahf archives. The job runs in the background queue (AddLow),

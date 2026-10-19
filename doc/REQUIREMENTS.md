@@ -1767,20 +1767,22 @@ The global execution policy (REQ-EXE-050) and the global working directory (REQ-
 ### REQ-SET-030 Start with Windows
 
 - **v1:** yes (a shortcut in the startup folder with the parameter `WindowsStartup`)
-- **v2:** open
+- **v2:** partial (the shortcut `AutoHotFlow v2.lnk` is created, removed and repaired, a start with Windows starts no manager; the log on itself is a manual check, `doc/MANUAL-CHECKS.md` section 7)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004
+- **Plan:** S0004 (WI-0079; the owner's manual check 7 is open, listed for WI-0082)
+- **Evidence:** `tests/integration/test_startup_elevation.py::test_the_shortcut_is_created_removed_and_not_taken_for_the_one_of_v1`, `tests/integration/test_startup_elevation.py::test_a_shortcut_that_does_not_match_is_repaired_at_the_start`, `tests/integration/test_startup_elevation.py::test_a_start_with_windows_starts_no_manager_and_a_normal_start_does`
 
 If the user wants it, AutoHotFlow starts in the background when the user logs on to Windows: only the tray icon appears, no manager window. It is an option in the settings; the setup assistant (REQ-USE-100) proposes it switched on, and the user can switch it off there. The start-up trigger knows that it was a start with Windows (REQ-TRG-220). The entry is a shortcut in the startup folder of the user, as in v1 (E0070). Together with "Run as administrator" (REQ-SET-040) Windows asks at every logon; a start without the question is REQ-SET-080.
 
 ### REQ-SET-040 Run as administrator
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the restart logic is tested with a fake elevation hook: before any child, a declined question, the restart command; the real UAC question and the rights of every process are the manual check 7)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0004
+- **Plan:** S0004 (WI-0079; the owner's manual check 7 is open, listed for WI-0082)
+- **Evidence:** `tests/integration/test_startup_elevation.py::test_with_the_setting_on_the_supervisor_restarts_elevated_before_it_starts_any_child`, `tests/integration/test_startup_elevation.py::test_a_declined_elevation_leaves_the_session_running_without_rights`, `tests/integration/test_startup_elevation.py::test_the_command_restart_ends_the_session_and_starts_it_elevated`, `tests/ahk/manager_model.test.ahk`
 
 AutoHotFlow restarts itself with administrator rights, so that flows can control windows of elevated programs. To check: all processes of a session must run with the same rights, or the pipes and wake-up messages fail (UIPI). Checked by hand only, because the UAC prompt cannot be automated (E0073).
 

@@ -40,6 +40,7 @@ RoleRegistry.Register("debug", DebugView)
 RoleRegistry.Register("triggerhost", TriggerHost)
 RoleRegistry.Register("editor", PlaceholderRole)
 AhfTestRolesFn := AhfRegisterTestRoles
+Supervisor.StartDefault := ""          ; a test names its roles with --start (E0083)
 Supervisor.TrayDefault := false      ; a test run starts the role tray only with --tray (no icon in a test run, E0046)
 
 AhfMain((opts) => Supervisor.Run(opts))

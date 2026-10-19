@@ -138,6 +138,7 @@ TEST_GROUPS = {
     "integration/test_settings.py": ["settings"],
     "integration/test_storage.py": ["storage"],
     "integration/test_supervisor.py": ["supervisor"],
+    "integration/test_startup_elevation.py": ["supervisor", "storage"],
     "integration/test_time_triggers.py": ["triggers"],
     "integration/test_tray.py": ["tray"],
     "integration/test_trigger_arming.py": ["triggers"],

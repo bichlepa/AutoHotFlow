@@ -17,7 +17,7 @@ Nothing waits for a decision now. (F-0116 decided: keep the drop, E0082; test ad
 
 - **Owner decisions taken for you (WI-0081):** `Action_Execute_Flow` and `Action_Set_Flow_Status` count as acting on the system (the warning lists them); `Action_Message_Box` and `Action_Tooltip` do not. The unpacked size of an `.ahf` is limited to 4 MB, UNC paths are refused (F-0132). Say so if you want it differently.
 
-- **The product start does not start the manager yet.** Only the tray role starts it ("Show manager"). Decide with block B (WI-0077 to WI-0080) when the start should show the manager.
+- ~~The product start does not start the manager yet.~~ Decided (E0083, WI-0079): a start without parameters runs storage, engine, triggerhost, manager and tray; a start with `--windows-startup` shows only the tray. Check by hand: `doc/MANUAL-CHECKS.md` section 7 part A.
 - **Numbering:** the decision on file dialogs (`FileSelect`/`DirSelect` for UI roles) is E0076. E0075 is the tray decision.
 - **Stress tests:** run when a work item requires them (your permission of 2026-10-17). Last runs: 200 flows, ready after 45 s, largest snapshot 0.6 s (WI-0071); manager with 201 flows filled after 0.54 s (WI-0073).
 - **Slow tier:** relevant again (your decision of 2026-10-17). The verification of the last state included it, and it was green.

@@ -1061,6 +1061,31 @@
             "problemMatcher": []
         },
         {
+            "label": "Start: AutoHotFlow without parameters (the real data folder, manager and tray, as a double click)",
+            "type": "process",
+            "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
+            "args": ["/ErrorStdOut=UTF-8", "src\\AutoHotFlow.ahk"],
+            "options": {"cwd": "${workspaceFolder}"},
+            "problemMatcher": []
+        },
+        {
+            "label": "Start: manual check 7, start with Windows and run as administrator (manual_check.py)",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/manual_check.py",
+                "start",
+                "--flow",
+                "triggers_check",
+                "--",
+                "--startup-dir=default"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Start: product with --windows-startup (the engine arms its startup triggers as after a Windows start)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",

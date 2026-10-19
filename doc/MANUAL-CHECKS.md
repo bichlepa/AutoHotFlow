@@ -182,7 +182,7 @@ This check runs in the manual-check data folder, not in the default folder `%APP
 | 6 | Watch for dialogs during the whole check. | No dialog (window class `#32770`) appears. | pass |
 | 7 | Quit the application (button Beenden, or close the window). | The task terminal prints `AutoHotFlow ended with exit code 0`. | pass |
 
-**Not covered by these checks:** the hotkey with window conditions (the flow uses "Everywhere"), a second flow with the same hotkey, and the start with Windows at log on (the autostart entry comes with S0004). Not checked: the hotkey while another application holds the key.
+**Not covered by these checks:** the hotkey with window conditions (the flow uses "Everywhere"), a second flow with the same hotkey, and the start with Windows at log on (section 7). Not checked: the hotkey while another application holds the key.
 
 ## 5. Start with `--windows-startup` (REQ-TRG-220)
 
@@ -194,12 +194,55 @@ The same flow, started as after a start of Windows. The supervisor option `--win
 
 | # | Step | Expected result | Result |
 |---|---|---|---|
-| 1 | Start the application (see above). | The manager window opens. No dialog. | pass |
+| 1 | Start the application (see above). | No manager window opens (a start with Windows shows only the tray icon, E0083); the tray icon is there. No dialog. A double click on the tray icon shows the manager. | |
 | 2 | Look at the screen within 5 s after the start. | Exactly one tooltip "Started with Windows" appears. | pass |
 | 3 | Wait 12 s. | The periodic timer tooltips appear as in section 4, step 2. The start-up tooltip does not come again. | pass |
 | 4 | Press `Ctrl+Alt+Shift+F12` once. | The tooltip "Hotkey fired" appears (as in section 4, step 3). | pass |
 | 5 | Quit the application, then start it again with the task of section 4 (no option). | The second start shows no tooltip "Started with Windows". | pass |
 | 6 | Watch for dialogs during the whole check. | No dialog appears. | pass |
+
+## 7. Start with Windows, run as administrator, start without parameters (WI-0079, REQ-SET-030, REQ-SET-040, REQ-TRG-220, E0070, E0073, E0083)
+
+**Warning for the owner.** Parts B to D change your real startup folder (`shell:startup`, the shortcut `AutoHotFlow v2.lnk`; the shortcut of v1, `AutoHotFlow.lnk`, is never touched), and parts C and D show the Windows question (UAC) several times. Parts B and D need a log off and log on. The settings are switched in the settings dialog of the manager (WI-0078). Switch both settings off at the end (step 17), so that no shortcut stays behind.
+
+**Starts.** VS Code task "Start: AutoHotFlow without parameters" (part A; the real data folder `%APPDATA%\AutoHotFlow v2`). VS Code task "Start: manual check 7, start with Windows and run as administrator (manual_check.py)" (parts B to D; the data folder `%TEMP%\ahf_manual_check` with the flow `triggers_check`, session `manual`; the option `--startup-dir=default` lets this start handle the real startup folder, and the shortcut carries `--data` of this folder, so a log on starts the same data). In a terminal: `python tools/manual_check.py start --flow triggers_check -- --startup-dir=default`. To see the processes: Task Manager, tab Details, right click on a column header, "Select columns", "Elevated".
+
+### Steps, part A (a start without parameters)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 1 | Start the task "Start: AutoHotFlow without parameters". | The manager window opens (an empty list on a first start), one tray icon appears. No dialog. In Task Manager: the processes storage, engine, trigger host, manager, tray (command lines with `--role=...`). No debug window. | |
+| 2 | Start the same task a second time while the first runs. | No second tray icon and no second set of processes; the running manager window comes to the front. The second start ends at once. | |
+| 3 | Exit through the tray menu. | All processes end. | |
+
+### Steps, part B (start with Windows)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 4 | Start the task of check 7. Open `shell:startup` in the Explorer. Switch "Start with Windows" on in the settings. | Within 2 s `AutoHotFlow v2.lnk` appears; its properties: target `AutoHotkey64.exe`, arguments with `AutoHotFlow.ahk`, `--data=...ahf_manual_check`, `--start=storage,engine,triggerhost` and `--windows-startup`. A v1 shortcut `AutoHotFlow.lnk` (if any) is unchanged. | |
+| 5 | Switch the setting off, then on again. | The shortcut disappears, then comes back. | |
+| 6 | Exit AutoHotFlow. Change the target in the properties of the shortcut (for example to `notepad.exe`), start the task again. | The shortcut has its old target and arguments again (repaired at the start). | |
+| 7 | Exit AutoHotFlow. Log off and log on again (setting on). | After the logon only the tray icon appears, no manager window. The tooltip "Started with Windows" appears (the start-up trigger of `triggers_check` sees "Windows"). | |
+| 8 | Double click the tray icon. | The manager window opens. | |
+
+### Steps, part C (run as administrator)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 9 | Exit AutoHotFlow, start the task of check 7 (not elevated), switch "Start with Windows" off. Open Notepad as administrator and click into it. Press `Ctrl+Alt+Shift+F12` (flow `triggers_check`, enabled). | No tooltip "Hotkey fired": Windows does not give a not elevated program the keys of an elevated window. (This is the reason for the setting.) | |
+| 10 | Switch "Run as administrator" on, answer No to the question "restart now?". | Nothing changes: the processes stay not elevated. | |
+| 11 | Switch it off and on again, answer Yes. | AutoHotFlow closes, the Windows question (UAC) appears, accept it: the manager window comes back. In Task Manager every AutoHotkey64.exe process of AutoHotFlow (supervisor, storage, engine, trigger host, manager, tray, worker) shows "Elevated: Yes". No dialog of AutoHotFlow. | |
+| 12 | Click into the elevated Notepad and press `Ctrl+Alt+Shift+F12`. | The tooltip "Hotkey fired" appears. The manager still lists and runs the flows (pipes and messages work between the elevated processes). | |
+| 13 | Exit AutoHotFlow, start the task again, decline the question of Windows. | AutoHotFlow runs without elevation: manager window, all processes "Elevated: No", and a tray notice says that it runs without administrator rights. No second question. | |
+| 14 | Exit. Start the task, accept the question. While the elevated session runs, start the same task of check 7 a second time (it is not elevated). | Known limit: the second start cannot reach the elevated session; it ends at once and the terminal shows the log line about higher rights. The elevated session is not disturbed. Start it elevated, or end the session first. | |
+| 15 | In the elevated session switch "Run as administrator" off, exit. Start the task. | No question; all processes "Elevated: No". | |
+
+### Steps, part D (both together)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 16 | Switch both settings on, exit AutoHotFlow, log off and log on. At the Windows question first accept, then repeat the logon and decline. | Accept: the question appears at the logon, then only the tray icon; all processes elevated. Decline: only the tray icon, not elevated, and a tray notice. | |
+| 17 | Cleanup: start the task, switch both settings off, check `shell:startup`, exit. | `AutoHotFlow v2.lnk` is gone. | |
 
 ## Result
 
@@ -211,6 +254,7 @@ Tester:
 Stub (section 1): steps 1 to 7 pass / fail (list failed steps)
 Debug window (section 2): steps 1 to 9 pass / fail (list failed steps)
 Triggers (sections 4 and 5): steps 1 to 7 and 1 to 6 pass / fail (list failed steps)
+Start with Windows and administrator (section 7): steps 1 to 17 pass / fail (list failed steps)
 Notes:
 ```
 

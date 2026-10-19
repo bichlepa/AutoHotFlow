@@ -15,6 +15,7 @@
 #Include DiagLog.ahk
 #Include DiagReport.ahk
 #Include Shutdown.ahk
+#Include Elevation.ahk
 #Include SupervisorCommand.ahk
 
 ; Role "supervisor" (doc/ARCHITECTURE 3, 6; v2-phase2-final:v2-phase2-final:work_items/phase2/WI-0007-supervisor.md-supervisor.md). The supervisor is the hub of the
@@ -40,6 +41,12 @@
 ;               product entry starts it, the test entry does not (Supervisor.TrayDefault), so that no test run shows an icon.
 ;   --windows-startup  passed on to every role; the engine arms the triggers with the start context windowsStartup
 ;               in its first pass (WI-0062, PROTOCOL 4.4). The autostart entry of S0004 sets it.
+;   (no --start)  the default roles of a normal start: storage, engine, triggerhost and manager (Supervisor.StartDefault, plus the
+;               tray); --start replaces the list. The test entry has an empty default. --windows-startup leaves the manager out
+;               (a start with Windows shows only the tray icon, E0070, E0083).
+;   --startup-dir=<folder|default>  the startup folder of the shortcut of "Start with Windows" (WI-0079); without it only a default
+;               data folder uses the real one. --elevation-tried (internal), --fake-elevation=accept|decline and --fake-admin
+;               (test hook, only with --test-roles): "Run as administrator", ARCHITECTURE 6.1 item 8.
 ;   --log-level=<0..3>  highest log level that is forwarded to storage (default 2; level 3 stays in the ring of
 ;               Log only). Valid for the supervisor and passed on to every role (WI-0023). It wins over the three log
 ;               thresholds of the settings (WI-0077); without it the supervisor and the processes it starts use the
@@ -64,6 +71,9 @@ class Supervisor {
     static Current := ""
     ; Whether the supervisor starts the role tray when neither --tray nor --no-tray is given. The test entry sets it to false.
     static TrayDefault := true
+    ; The roles a start without --start runs (E0083). The test entry sets it to "": a test names its roles.
+    static StartDefault := "storage,engine,triggerhost,manager"
+    static STARTUP_ARGS := "--start=storage,engine,triggerhost --windows-startup"
 
     static TickFn := () => Supervisor.Current._Tick()
     static ErrorFn := (e, mode) => Supervisor._OnError(e, mode)
@@ -85,6 +95,16 @@ class Supervisor {
         if (fromEnv != "")
             return fromEnv
         return A_AppData "\" Supervisor.DEFAULT_DATA_SUBDIR
+    }
+
+    ; The startup folder of the shortcut of "Start with Windows" (ARCHITECTURE 6.1 item 7): --startup-dir (default = the real one),
+    ; else the real one only for the default data folder, else "" (not handled: a test never touches the real folder).
+    static StartupDir(opts, data) {
+        if (opts.Has("startup-dir"))
+            return opts["startup-dir"] = "default" ? A_Startup : opts["startup-dir"]
+        if (!opts.Has("data") && EnvGet(Supervisor.DATA_DIR_ENV) = "" && data = A_AppData "\" Supervisor.DEFAULT_DATA_SUBDIR)
+            return A_Startup
+        return ""
     }
 
     __New(opts) {
@@ -124,11 +144,25 @@ class Supervisor {
             throw AhfError("supervisor: --tray and --no-tray exclude each other", ErrCode.BAD_ARGS)
         this.startTray := opts.Has("tray") ? true : (opts.Has("no-tray") ? false : Supervisor.TrayDefault)
         this.startList := []
-        for entry in StrSplit(String(opts.Get("start", "")), ",") {
+        for entry in StrSplit(String(opts.Get("start", Supervisor.StartDefault)), ",") {
             entry := Trim(entry)
-            if (entry != "")
+            ; A start with Windows shows only the tray icon: no manager window (E0064, E0070).
+            if (entry != "" && !(opts.Has("windows-startup") && Role.BaseName(entry) = "manager"))
                 this.startList.Push(entry)
         }
+        this.fakeElevation := ""
+        if (opts.Has(Elevation.FAKE)) {
+            this.fakeElevation := opts[Elevation.FAKE]
+            if (!this.testRoles || (this.fakeElevation != "accept" && this.fakeElevation != "decline"))
+                throw AhfError("supervisor: --fake-elevation (accept or decline) needs --test-roles", ErrCode.BAD_ARGS)
+        }
+        this.startupDir := Supervisor.StartupDir(opts, this.data)
+        this.startupSynced := false
+        this.startupWanted := false
+        this.startupAction := ""
+        this.pendingNotices := []
+        this.elevationState := "not wanted"      ; for the snapshot: not wanted, declined
+        this.restart := ""                       ; "" or Map(elevate) when cmd.app.restart started the exit
         ; Only with --test-roles: how long a finished report waits for storage (DiagReport.STORAGE_WAIT_MS).
         this.reportWaitMs := DiagReport.STORAGE_WAIT_MS
         if (this.testRoles && opts.Has("report-wait")) {
@@ -156,6 +190,8 @@ class Supervisor {
         OnError(Supervisor.ErrorFn)
         Ids.Configure("supervisor")
         if (this._ForwardIfRunning())
+            return
+        if (this._ElevateAtStart())
             return
         config := Map("session", this.session, "pipe", this.pipe, "data", this.data
             , "hubHwnd", Wake.Hwnd, "testRoles", this.testRoles
@@ -216,6 +252,22 @@ class Supervisor {
             this.report.OnStorageHello()
         }
         this.shutdown.OnHello(link["name"])
+        if (link["name"] = "tray")
+            this._SendNotices()
+    }
+
+    ; The notices the supervisor itself has (the elevation did not happen): to the tray, as soon as it is connected.
+    _SendNotices() {
+        while (this.pendingNotices.Length > 0) {
+            notice := this.pendingNotices.RemoveAt(1)
+            this.hub.Send("tray", "evt.ui.notice", notice)
+        }
+    }
+
+    _Notice(key, args := []) {
+        this.pendingNotices.Push(Map("kind", "app", "level", "warning", "key", key, "args", args))
+        if (IsObject(this.hub) && this.hub.HasLink("tray"))      ; before the hub runs, the notice waits for the tray
+            this._SendNotices()
     }
 
     ; evt.diag.error of a role: kept in the ring and logged; a burst of them starts an automatic report (WI-0028).
@@ -237,6 +289,8 @@ class Supervisor {
     ; Commands to the supervisor itself. cmd.app.exit starts the exit and answers at once.
     _OnApp(msg) {
         if (msg.type = "cmd.app.exit") {
+            if (this.shutdown.phase = "idle")
+                this.restart := ""         ; an exit after a cancelled restart is a plain exit
             deadline := this.deadlineMs
             if (msg.payload.Has("deadlineMs")) {
                 d := msg.payload["deadlineMs"]
@@ -246,6 +300,14 @@ class Supervisor {
                 deadline := d
             }
             return Map("started", Json.Bool(this.shutdown.BeginExit("user", deadline, msg.from)))
+        }
+        if (msg.type = "cmd.app.restart") {
+            elevate := msg.payload.Get("elevate", 1)
+            this.restart := Map("elevate", (elevate == Json.True || (!IsObject(elevate) && elevate)) ? true : false)
+            started := this.shutdown.BeginExit("restart", this.deadlineMs, msg.from)
+            if (!started)
+                this.restart := ""
+            return Map("started", Json.Bool(started))
         }
         if (msg.type = "cmd.app.command") {
             argv := msg.payload.Get("argv", "")
@@ -282,6 +344,8 @@ class Supervisor {
         snap["diagLog"] := stats
         snap["processEvents"] := this.hub.ProcessEvents()
         snap["reports"] := this.report.Stats()
+        snap["elevation"] := Map("admin", Json.Bool(Elevation.IsAdmin(this.opts)), "state", this.elevationState)
+        snap["startup"] := Map("dir", this.startupDir, "wanted", Json.Bool(this.startupWanted), "action", this.startupAction)
         return snap
     }
 
@@ -374,6 +438,9 @@ class Supervisor {
     _ForwardIfRunning() {
         h := DllCall("CreateMutexW", "ptr", 0, "int", 0, "str", this.mutexName, "ptr")
         err := A_LastError
+        if (h = 0 && err = 5)
+            throw AhfError("another AutoHotFlow session runs with higher rights (administrator): end it or start this one as "
+                . "administrator (error 5 at the instance mutex)", ErrCode.DENIED)
         if (h = 0)
             throw AhfError("could not create the instance mutex (error " err ")", ErrCode.INTERNAL)
         if (err != Supervisor.ERROR_ALREADY_EXISTS) {
@@ -385,6 +452,72 @@ class Supervisor {
         Log.Write("a1", "supervisor", "already running for session " this.session ", forwarding the command")
         SupervisorCommand(this.pipe, argv).Start()
         return true
+    }
+
+    ; --- run as administrator (WI-0079) ---------------------------------------------------------
+
+    ; Before any child starts: the setting runAsAdmin is on and this supervisor is not elevated, so it starts itself again
+    ; elevated (UAC) and ends. True when this process is done. The mutex is released first, else the new supervisor would find
+    ; it and forward its start to this one. When the user declines, the mutex is taken again and the session runs without rights.
+    _ElevateAtStart() {
+        if (Elevation.IsAdmin(this.opts) || !Elevation.WantsElevation(this.data))
+            return false
+        if (this.opts.Has(Elevation.TRIED)) {
+            this._ElevationFailed("the start with administrator rights did not give them")
+            return false
+        }
+        DllCall("CloseHandle", "ptr", this.mutex)
+        this.mutex := 0
+        if (Elevation.Launch(A_Args, ["--" Elevation.TRIED], true, this.fakeElevation)) {
+            Log.Write("a1", "supervisor", "restarted with administrator rights, this process ends")
+            ExitApp(0)
+        }
+        this.mutex := DllCall("CreateMutexW", "ptr", 0, "int", 0, "str", this.mutexName, "ptr")
+        this._ElevationFailed("the question of Windows was declined")
+        return false
+    }
+
+    _ElevationFailed(why) {
+        this.elevationState := "declined"
+        Log.Write("a0", "supervisor", "runs without administrator rights: " why)
+        this._Notice("Notice_elevation_failed")
+    }
+
+    ; --- startup entry (WI-0079) -------------------------------------------------------------
+
+    ; The settings are known (first evt.settings.changed of the engine, and each change of startWithWindows): storage creates,
+    ; repairs or removes the shortcut.
+    _SyncStartup(settings) {
+        if (this.startupDir = "" || !settings.Has("startWithWindows"))
+            return
+        wanted := settings["startWithWindows"] ? true : false
+        if (this.startupSynced && wanted = this.startupWanted)
+            return
+        this.startupSynced := true
+        this.startupWanted := wanted
+        lnkArgs := '"' A_ScriptFullPath '"'
+        if (this.opts.Has("data"))
+            lnkArgs .= ' "--data=' this.data '"'
+        lnkArgs .= " " Supervisor.STARTUP_ARGS
+        payload := Map("startupDir", this.startupDir, "enabled", Json.Bool(wanted), "target", A_AhkPath, "args", lnkArgs
+            , "workDir", A_ScriptDir)
+        try {
+            this.hub.Request("storage", "cmd.storage.startup.sync", payload, (ans) => this._OnStartupSynced(ans), 15000)
+        } catch as e {
+            Log.Write("a0", "supervisor", "start with Windows not handled: " e.Message)
+        }
+    }
+
+    _OnStartupSynced(ans) {
+        if (IsObject(ans) && ans.payload.Get("ok", 0)) {
+            this.startupAction := ans.payload.Get("action", "")
+            Log.Write("a1", "supervisor", "start with Windows: shortcut " this.startupAction)
+            return
+        }
+        this.startupAction := "error"
+        detail := IsObject(ans) && ans.payload.Has("error") ? ans.payload["error"]["message"] : "no answer"
+        Log.Write("a0", "supervisor", "start with Windows: the shortcut could not be handled: " detail)
+        this._Notice("Notice_startup_failed", [detail])
     }
 
     ; --- timer and end -----------------------------------------------------------------------
@@ -447,7 +580,21 @@ class Supervisor {
             Log.Write("a0", "supervisor", "hub close failed: " Type(e) ": " e.Message)
         }
         Log.Write("a1", "supervisor", "ends with exit " code)
+        if (IsObject(this.restart))
+            this._Relaunch(this.restart["elevate"])
         ExitApp(code)
+    }
+
+    ; cmd.app.restart: the session is over, the new supervisor starts with the options of this one. The mutex is released first.
+    ; An elevated start that Windows does not carry out (declined) is replaced by a plain start that tells it.
+    _Relaunch(elevate) {
+        if (this.mutex)
+            DllCall("CloseHandle", "ptr", this.mutex)
+        this.mutex := 0
+        if (Elevation.Launch(A_Args, elevate ? ["--" Elevation.TRIED] : [], elevate, this.fakeElevation))
+            return
+        if (elevate)
+            Elevation.Launch(A_Args, ["--" Elevation.TRIED], false)
     }
 
     static _OnError(e, mode) {
@@ -510,6 +657,7 @@ class Supervisor {
             return
         }
         this.settings := settings
+        this._SyncStartup(settings)
         if (IsObject(this.children))
             this.children.config["settingsOpts"] := text
     }
