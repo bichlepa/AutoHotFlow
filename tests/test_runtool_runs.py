@@ -135,6 +135,23 @@ def test_run_in_a_worktree_leaves_no_worktree_and_a_result(tmp_path):
 
 
 @pytest.mark.slow
+def test_a_stalled_run_is_killed_and_reported(tmp_path):
+    """The watchdog of run_suite: a test that hangs (no output, no live.log line) ends the run with exit 76, and
+    stall.txt names the test that was running."""
+    env = innerpytest.env_for(tmp_path)
+    env["AHF_PROBE"] = "hang"
+    started = time.time()
+    proc = subprocess.run([sys.executable, str(REPO / "tools" / "run_suite.py"), "--with-changes", "--workers", "0",
+                           "--stall-timeout", "5", "--", innerpytest.PROBES + "::test_probe_hang", "-q",
+                           "-p", "no:cacheprovider"], cwd=str(REPO), env=env, capture_output=True, timeout=120)
+    out = proc.stdout.decode("utf-8", "replace") + proc.stderr.decode("utf-8", "replace")
+    assert proc.returncode == run_suite.EXIT_STALLED, out
+    assert time.time() - started < 90, "the watchdog did not end the run early"
+    (stall,) = (tmp_path / "runs").glob("*/stall.txt")
+    assert "test_probe_hang" in stall.read_text(encoding="utf-8"), stall.read_text(encoding="utf-8")
+
+
+@pytest.mark.slow
 def test_a_failing_run_returns_the_exit_code_of_pytest(tmp_path):
     env = innerpytest.env_for(tmp_path)
     proc = subprocess.run([sys.executable, str(REPO / "tools" / "run_suite.py"), "--workers", "0", "--",

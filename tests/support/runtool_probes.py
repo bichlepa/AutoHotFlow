@@ -4,6 +4,7 @@ Not collected by a normal run (the file name does not match test_*.py); the test
 their own with this file as an explicit argument. AHF_PROBE selects the behaviour, comma separated:
   sleep=<s>        test_probe_pass sleeps that long (keeps a run busy, for the concurrency test)
   fail             test_probe_fail fails
+  hang             test_probe_hang sleeps 100 s (the stall watchdog test of run_suite ends the run earlier)
   interrupt        test_probe_interrupt raises KeyboardInterrupt (ends the run as Ctrl+C would)
   load=<dir>       the three load probes run (about 3 s each, see below), coordinated through files in <dir>
 Without AHF_PROBE every probe passes at once.
@@ -50,6 +51,11 @@ def test_probe_pass():
 def test_probe_fail():
     if "fail" in _modes():
         assert 1 == 2, "probe failure on request"
+
+
+def test_probe_hang():
+    if "hang" in _modes():
+        time.sleep(100)
 
 
 def test_probe_interrupt():

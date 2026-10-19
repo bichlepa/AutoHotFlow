@@ -8,7 +8,9 @@ Environment variables:
   AHF_MAX_WORKERS, AHF_ADMISSION_TIMEOUT, AHF_NO_ADMISSION, AHF_ADMITTED, AHF_HISTORY_DIR, AHF_LOAD_SAMPLER
                  machine-wide admission, load figures and run history (WI-0059, tests/support/runrecord.py)
 
-Run log: every run writes %TEMP%/ahf_testruns/<time>-<pid>/ with summary.txt (command, counts, failed tests,
+Run log: every run writes %TEMP%/ahf_testruns/<time>-<pid>/ with live.log (written while the run goes: every phase of
+every test with the worker, so the last START without its end shows where a hung run stands; follow it with
+`Get-Content -Wait live.log`), summary.txt (command, counts, failed tests,
 slowest tests), results.txt (one line per test, in start order, with UTC and local start time), failures/<test>.txt
 (message, traceback, captured output, times, session) and data/<test>/ (evidence of every failed test: the data
 directory with Log/ and Reports/, stderr of the processes, and diagnosis/: snapshot of the supervisor and a crash
@@ -305,6 +307,8 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
     setattr(item, "rep_" + report.when, report)
+    if getattr(item.config, "workerinput", None) is not None or not getattr(item.config.option, "numprocesses", 0):
+        _live(item.config, "%-8s %s -> %s (%.1f s)" % (report.when + " end", item.nodeid, report.outcome, report.duration))
     # Fixture teardown comes after this hook: a failed test's supervisor still runs, so it can be asked now.
     if report.when == "call" and report.failed and os.environ.get(RUNLOG_ENV):
         session = item.funcargs.get("session_id") if hasattr(item, "funcargs") else None
@@ -315,8 +319,58 @@ def pytest_runtest_makereport(item, call):
                 pass
 
 
+def _live(config, text):
+    """One line into <run log>/live.log, written at once (open, append, close), so `Get-Content -Wait` shows where a
+    run is, also when it hangs. Only the process that runs the tests writes (a worker, or the plain run): the
+    controller of an xdist run replays the hooks of its workers and would write every line twice."""
+    worker = getattr(config, "workerinput", None)
+    if worker is None and getattr(config.option, "numprocesses", 0):
+        who = "ctrl"
+    else:
+        who = worker["workerid"] if worker else "main"
+    try:
+        run_dir = _runlog_dir()
+        if run_dir is not None:
+            with open(run_dir / "live.log", "a", encoding="utf-8") as f:
+                f.write("%s %-5s %s\n" % (time.strftime("%H:%M:%S") + ".%03d" % (int(time.time() * 1000) % 1000), who, text))
+    except OSError:
+        pass            # no log is better than no test run
+
+
+def _live_phase(item, when):
+    config = item.config
+    if getattr(config, "workerinput", None) is not None or not getattr(config.option, "numprocesses", 0):
+        _live(config, "%-8s %s" % (when, item.nodeid))
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_runtest_setup(item):
+    _live_phase(item, "setup")
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_runtest_call(item):
+    _live_phase(item, "call")
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_runtest_teardown(item):
+    _live_phase(item, "teardown")
+
+
+def pytest_report_header(config):
+    if not hasattr(config, "workerinput") and os.environ.get(RUNLOG_ENV):
+        return "live log: " + str(Path(os.environ[RUNLOG_ENV]) / "live.log")
+    return None
+
+
+def pytest_collection_finish(session):
+    _live(session.config, "collected %d tests" % len(session.items))
+
+
 def pytest_sessionstart(session):
     _CONFIG[0] = session.config
+    _live(session.config, "session start")
 
 
 def pytest_runtest_logreport(report):
@@ -353,6 +407,7 @@ def pytest_runtest_logreport(report):
 
 def pytest_sessionfinish(session, exitstatus):
     config = session.config
+    _live(config, "session finish, exit status %s" % exitstatus)
     recorder = runrecord.recorder_of(config)
     if recorder is not None:
         recorder.finish_record(exitstatus)          # frees the admission slots, writes the history record

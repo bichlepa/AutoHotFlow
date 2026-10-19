@@ -143,6 +143,15 @@ stay comparable. Timing tests (`scaled()`) can still become flaky when other pro
 clean comparison use `--max-runs 1`. The run needs everything in the commit: a dependency on an untracked or
 ignored file shows up as a failure here (this is how the `v1/AppData/Variables` dependency was found).
 
+**Hanging runs.** Every test has a hard limit of 120 s (`tests/conftest.py`, `@pytest.mark.timeout(n)` raises it per
+test). That does not cover a hang outside a test (collection, start of the workers, end of the run). Two tools do:
+`live.log` in the run log folder (one line per phase of every test with the worker name, written while the run goes;
+`Get-Content -Wait live.log`; the last phase without its end shows where a worker stands), and the stall watchdog of
+`run_suite.py`: no output and no new `live.log` line for `--stall-timeout` seconds (default 300, 1800 for stress, soak
+and idle runs, 0 = off) writes `stall.txt` into the run folder (process tree, last line of every worker), kills the
+process tree and exits with 76. After pytest has ended, `run_suite` does not wait for its output pipe any longer and
+kills processes that still run from the worktree.
+
 **Admission, load figures and run history (WI-0059).** Every pytest run takes part, however it was started
 (`python -m pytest`, a VS Code task, `run_suite.py`, `recheck.py`); agents no longer coordinate their test runs by
 hand.

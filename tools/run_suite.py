@@ -22,8 +22,16 @@ What it does:
   * keeps the result in <temp>\\ahf_runs\\<id>\\: output.txt (everything pytest printed), status.json, and
     pytest-log\\ (the run log of tests/conftest.py: summary, failures, data of failed tests). The last 20 runs are kept.
 
+  * watches for a stalled run: when neither the output nor live.log of the run log (written by tests/conftest.py at
+    every test phase) grows for --stall-timeout seconds (default 300; 1800 for stress/soak/idle runs; 0 = off), the
+    tool writes stall.txt (process tree, last line of every worker, end of live.log), kills the process tree and
+    exits with 76. This covers hangs outside a test too (collection, start of the workers, teardown, end of the run).
+    A test that legitimately needs longer without any phase change must carry a higher --stall-timeout.
+  * does not wait for the pipe of pytest after pytest has ended: an orphaned child process that inherited it would
+    keep it open for ever. Processes that still run from the worktree are killed.
+
 Exit code: the one of pytest (0 = all passed), 70 = the tool itself failed (git, worktree, patch), 75 = the admission
-gave up (AHF_ADMISSION_TIMEOUT).
+gave up (AHF_ADMISSION_TIMEOUT), 76 = the run stalled and was killed.
 Not covered: runs of different checkouts share the machine (pipe names, CPU), and timing tests (scaled()) can
 become flaky when the machine is loaded; use --max-runs 1 for a clean comparison.
 """
@@ -35,6 +43,7 @@ import re
 import shutil
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -49,6 +58,9 @@ from support.admission import (Admission, AdmissionError, AdmissionTimeout, EXIT
 
 KEEP_RUNS = 20
 EXIT_TOOL_FAILED = 70
+EXIT_STALLED = 76
+STALL_DEFAULT = 300             # seconds without new output or live.log lines
+STALL_DEFAULT_EXCLUSIVE = 1800  # stress, soak and idle tests run long without phase changes
 
 
 class ToolError(Exception):
@@ -120,6 +132,59 @@ def kill_tree(pid):
         pass
 
 
+def kill_leftovers(tree):
+    """Kills processes that still run from the worktree (command line contains its path): orphans of the test run
+    hold the pipe of pytest and block the removal of the worktree."""
+    marker = str(tree).lower()
+    killed = 0
+    for p in psutil.process_iter(["pid", "cmdline"]):
+        try:
+            if p.pid != os.getpid() and marker in " ".join(p.info["cmdline"] or []).lower():
+                p.kill()
+                killed += 1
+        except psutil.Error:
+            pass
+    return killed
+
+
+def live_logs(log_dir):
+    return list(log_dir.glob("*/live.log")) if log_dir.is_dir() else []
+
+
+def last_activity(log_dir, seen):
+    """Newest of: the last output of pytest (`seen`) and the modification time of live.log."""
+    latest = seen
+    for f in live_logs(log_dir):
+        try:
+            latest = max(latest, f.stat().st_mtime)
+        except OSError:
+            pass
+    return latest
+
+
+def stall_report(pid, log_dir, idle):
+    lines = ["no output and no live.log line for %d s" % idle, "", "process tree of pytest (pid %d):" % pid]
+    try:
+        root = psutil.Process(pid)
+        for p in [root] + root.children(recursive=True):
+            try:
+                lines.append("  %6d  %s" % (p.pid, " ".join(p.cmdline())[:200]))
+            except psutil.Error:
+                pass
+    except psutil.Error:
+        lines.append("  (gone)")
+    for f in live_logs(log_dir):
+        text = f.read_text(encoding="utf-8", errors="replace").splitlines()
+        last = {}
+        for line in text:
+            parts = line.split(None, 2)
+            if len(parts) == 3:
+                last[parts[1]] = line
+        lines += ["", "last line of every process (%s):" % f] + ["  " + v for v in last.values()]
+        lines += ["", "end of live.log:"] + ["  " + t for t in text[-30:]]
+    return "\n".join(lines) + "\n"
+
+
 def summary_line(output_path):
     """The last line of the pytest output that looks like '12 passed, 1 failed in 3.4s'."""
     try:
@@ -172,6 +237,9 @@ def main(argv=None):
                         help="HEAD plus the uncommitted changes (tracked) and the untracked, not ignored files")
     parser.add_argument("--workers", type=int, default=4, help="pytest-xdist workers (default 4; 0 = serial)")
     parser.add_argument("--max-runs", type=int, default=2, help="runs at the same time on this machine (default 2)")
+    parser.add_argument("--stall-timeout", type=int, default=None, metavar="S",
+                        help="kill the run when neither its output nor its live.log grows for S seconds (default "
+                             "%d, %d for stress/soak/idle runs, 0 = off)" % (STALL_DEFAULT, STALL_DEFAULT_EXCLUSIVE))
     parser.add_argument("--keep", action="store_true", help="keep the worktree (for debugging, remove it yourself)")
     parser.add_argument("--status", action="store_true", help="list the last runs and exit")
     parser.add_argument("pytest_args", nargs="*", help="after --: arguments for pytest (default: tests -q)")
@@ -217,15 +285,43 @@ def main(argv=None):
         env["AHF_ADMITTED"] = run_id            # the conftest inside registers no second time
         cmd = [sys.executable, "-m", "pytest", "-n", str(workers), *pytest_args]
         say("pytest %s  (workers %d, cwd %s)" % (" ".join(cmd[3:]), workers, tree))
+        stall_limit = args.stall_timeout
+        if stall_limit is None:
+            stall_limit = STALL_DEFAULT_EXCLUSIVE if exclusive else STALL_DEFAULT
         with open(output, "wb") as out:
             child = subprocess.Popen(cmd, cwd=str(tree), env=env, stdin=subprocess.DEVNULL,
                                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            for chunk in iter(child.stdout.readline, b""):
-                out.write(chunk)
-                out.flush()
-                sys.stdout.write(chunk.decode("utf-8", "replace"))
-                sys.stdout.flush()
-            exit_code = child.wait()
+            seen = [time.time()]
+
+            def pump():
+                for chunk in iter(child.stdout.readline, b""):
+                    seen[0] = time.time()
+                    out.write(chunk)
+                    out.flush()
+                    sys.stdout.write(chunk.decode("utf-8", "replace"))
+                    sys.stdout.flush()
+
+            reader = threading.Thread(target=pump, daemon=True)
+            reader.start()
+            stalled = False
+            while child.poll() is None:
+                time.sleep(1.0)
+                idle = time.time() - last_activity(log_dir, seen[0])
+                if stall_limit and idle > stall_limit:
+                    stalled = True
+                    report = stall_report(child.pid, log_dir, idle)
+                    (run_dir / "stall.txt").write_text(report, encoding="utf-8")
+                    say("STALLED: %s" % report.splitlines()[0])
+                    say("details: %s" % (run_dir / "stall.txt"))
+                    kill_tree(child.pid)
+                    break
+            exit_code = EXIT_STALLED if stalled else child.wait()
+            reader.join(5.0)        # pytest has ended: only an orphan that holds the pipe can keep it open
+            if reader.is_alive():
+                say("the output pipe is still open after pytest ended (an orphaned child process holds it)")
+            leftovers = kill_leftovers(tree)
+            if leftovers:
+                say("killed %d process(es) that still ran from the worktree" % leftovers)
     except KeyboardInterrupt:
         say("interrupted")
         if child is not None:
