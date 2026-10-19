@@ -56,6 +56,28 @@ class Gdip {
         return (status >= 0 && status < names.Length) ? names[status + 1] : "Unknown"
     }
 
+    ; The CLSID (16 bytes) of the image encoder for a MIME type, e.g. "image/png". The ImageCodecInfo records of GDI+ are
+    ; 104 bytes each on 64 bit; the MIME type is the pointer at offset 64.
+    static EncoderClsid(mime) {
+        num := 0
+        size := 0
+        Gdip.Check(DllCall("gdiplus\GdipGetImageEncodersSize", "UInt*", &num, "UInt*", &size, "Int")
+            , "GdipGetImageEncodersSize")
+        buf := Buffer(size)
+        Gdip.Check(DllCall("gdiplus\GdipGetImageEncoders", "UInt", num, "UInt", size, "Ptr", buf, "Int")
+            , "GdipGetImageEncoders")
+        loop num {
+            base := (A_Index - 1) * 104
+            if (StrGet(NumGet(buf, base + 64, "Ptr"), "UTF-16") = mime) {
+                clsid := Buffer(16)
+                loop 16
+                    NumPut("UChar", NumGet(buf, base + A_Index - 1, "UChar"), clsid, A_Index - 1)
+                return clsid
+            }
+        }
+        throw AhfError("GDI+ has no encoder for " mime, ErrCode.INTERNAL)
+    }
+
     ; A point list for the polygon and line calls: an array of [x, y] pairs to a buffer of PointF.
     static Points(pts) {
         buf := Buffer(8 * pts.Length)

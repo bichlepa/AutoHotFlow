@@ -200,6 +200,51 @@ class GdipCanvas {
             throw AhfError("BitBlt failed, Windows error " A_LastError, ErrCode.INTERNAL)
     }
 
+    ; Copies the w x h pixels of this canvas that start at (sx, sy) into dest at (dx, dy) (BitBlt, SRCCOPY). The renderer
+    ; shows its cached layer with it: the layer is larger than the window, so a pan is a copy with another offset.
+    CopyRegionTo(dest, dx, dy, w, h, sx, sy) {
+        ok := DllCall("gdi32\BitBlt", "Ptr", dest.hdc, "Int", dx, "Int", dy, "Int", w, "Int", h
+            , "Ptr", this.hdc, "Int", sx, "Int", sy, "UInt", 0x00CC0020, "Int")
+        if (!ok)
+            throw AhfError("BitBlt failed, Windows error " A_LastError, ErrCode.INTERNAL)
+    }
+
+    ; Restricts the following drawing to the rectangle (x, y, w, h). ResetClip removes the restriction.
+    SetClip(x, y, w, h) {
+        Gdip.Check(DllCall("gdiplus\GdipSetClipRect", "Ptr", this.graphics, "Float", x, "Float", y, "Float", w
+            , "Float", h, "Int", 0, "Int"), "GdipSetClipRect")   ; CombineModeReplace
+    }
+
+    ResetClip() {
+        Gdip.Check(DllCall("gdiplus\GdipResetClip", "Ptr", this.graphics, "Int"), "GdipResetClip")
+    }
+
+    FillEllipse(brush, x, y, w, h) {
+        Gdip.Check(DllCall("gdiplus\GdipFillEllipse", "Ptr", this.graphics, "Ptr", brush.handle, "Float", x
+            , "Float", y, "Float", w, "Float", h, "Int"), "GdipFillEllipse")
+    }
+
+    ; Text rendering hint: 1 no anti-aliasing, 4 anti-aliased with grid fitting, 5 ClearType grid fitting (the text
+    ; needs an opaque background, which the renderer has).
+    SetTextHint(hint) {
+        Gdip.Check(DllCall("gdiplus\GdipSetTextRenderingHint", "Ptr", this.graphics, "Int", hint, "Int")
+            , "GdipSetTextRenderingHint")
+    }
+
+    ; Writes the canvas as a PNG file. The file is replaced if it exists.
+    SavePng(path) {
+        bmp := 0
+        Gdip.Check(DllCall("gdiplus\GdipCreateBitmapFromHBITMAP", "Ptr", this.hbm, "Ptr", 0, "Ptr*", &bmp, "Int")
+            , "GdipCreateBitmapFromHBITMAP")
+        try {
+            clsid := Gdip.EncoderClsid("image/png")
+            Gdip.Check(DllCall("gdiplus\GdipSaveImageToFile", "Ptr", bmp, "WStr", path, "Ptr", clsid, "Ptr", 0
+                , "Int"), "GdipSaveImageToFile")
+        } finally {
+            DllCall("gdiplus\GdipDisposeImage", "Ptr", bmp, "Int")
+        }
+    }
+
     ; Copies the canvas into the client area of a window at x, y.
     CopyToWindow(hwnd, x, y) {
         hdcWin := DllCall("user32\GetDC", "Ptr", hwnd, "Ptr")

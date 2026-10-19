@@ -272,10 +272,112 @@ CheckFramesLeaveNoGdiObjects() {
     }
 }
 
+CheckClipRestrictsDrawing() {
+    c := NewCanvas(100, 100)
+    try {
+        b := GdipBrush(BLUE)
+        try {
+            c.SetClip(10, 10, 20, 20)
+            c.FillRect(b, 0, 0, 100, 100)
+            c.ResetClip()
+        } finally
+            b.Destroy()
+        Assert.Equal(c.Pixel(15, 15), BLUE, "inside the clip")
+        Assert.Equal(c.Pixel(5, 5), WHITE, "outside the clip")
+        Assert.Equal(c.Pixel(50, 50), WHITE, "outside the clip, far away")
+    } finally {
+        c.Destroy()
+    }
+}
+
+CheckEllipseIsFilled() {
+    c := NewCanvas()
+    try {
+        b := GdipBrush(BLUE)
+        try
+            c.FillEllipse(b, 10, 10, 60, 40)
+        finally
+            b.Destroy()
+        Assert.Equal(c.Pixel(40, 30), BLUE, "centre of the ellipse")
+        Assert.Equal(c.Pixel(11, 11), WHITE, "corner of the box, outside the ellipse")
+    } finally {
+        c.Destroy()
+    }
+}
+
+CheckRegionCopyUsesTheOffset() {
+    src := NewCanvas(100, 100)
+    dst := NewCanvas(60, 60)
+    try {
+        b := GdipBrush(BLUE)
+        try
+            src.FillRect(b, 0, 0, 50, 50)
+        finally
+            b.Destroy()
+        src.CopyRegionTo(dst, 0, 0, 30, 30, 20, 20)
+        Assert.Equal(dst.Pixel(0, 0), BLUE, "source pixel (20, 20) is blue")
+        Assert.Equal(dst.Pixel(29, 29), BLUE, "source pixel (49, 49) is blue")
+        Assert.Equal(dst.Pixel(30, 30), WHITE, "outside the copied part (not drawn)")
+    } finally {
+        src.Destroy()
+        dst.Destroy()
+    }
+}
+
+CheckScaledImageHasTheSizeAndIsDrawn() {
+    img := GdipImage(ICON_DIR "Sleep.ico")
+    try {
+        s := GdipImage.Scaled(img, 40, 30)
+        try {
+            Assert.Equal(s.width, 40, "width of the scaled copy")
+            Assert.Equal(s.height, 30, "height of the scaled copy")
+            c := NewCanvas(40, 30)
+            try {
+                c.DrawImage(s, 0, 0, 40, 30)
+                changed := 0
+                loop 30 {
+                    y := A_Index - 1
+                    loop 40 {
+                        if (c.Pixel(A_Index - 1, y) != WHITE)
+                            changed += 1
+                    }
+                }
+                Assert.True(changed > 100, "the scaled icon changes at least 100 pixels, got " changed)
+            } finally {
+                c.Destroy()
+            }
+        } finally {
+            s.Destroy()
+        }
+    } finally {
+        img.Destroy()
+    }
+}
+
+CheckSavePngWritesAPngFile() {
+    c := NewCanvas(20, 10)
+    path := A_Temp "\ahf_gdip_test_" A_TickCount ".png"
+    try {
+        c.SavePng(path)
+        data := FileRead(path, "RAW")
+        Assert.True(FileGetSize(path) > 60, "the file has the size of a small PNG")
+        Assert.Equal(NumGet(data, 0, "UChar"), 0x89, "the PNG signature starts with 0x89")
+        Assert.Equal(NumGet(data, 1, "UChar"), 0x50, "the PNG signature continues with P")
+    } finally {
+        c.Destroy()
+        try FileDelete(path)
+    }
+}
+
 Gdip.Startup()
 TestRun.Init()
 
 TestRun.Case("GdiplusStartup can be called twice", CheckStartupIsIdempotent)
+TestRun.Case("SetClip restricts the drawing until ResetClip", CheckClipRestrictsDrawing)
+TestRun.Case("an ellipse is filled inside its box only", CheckEllipseIsFilled)
+TestRun.Case("CopyRegionTo copies the part at the source offset", CheckRegionCopyUsesTheOffset)
+TestRun.Case("a scaled copy of an icon has the new size and is drawn", CheckScaledImageHasTheSizeAndIsDrawn)
+TestRun.Case("SavePng writes a PNG file", CheckSavePngWritesAPngFile)
 TestRun.Case("a filled rectangle has its color inside and white outside", CheckFilledRectangle)
 TestRun.Case("a rounded rectangle is filled and its corner is cut", CheckRoundedCornersAreCut)
 TestRun.Case("a line is drawn where it is, nowhere else", CheckLineIsDrawn)
