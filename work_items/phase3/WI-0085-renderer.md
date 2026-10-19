@@ -56,9 +56,9 @@ Code state: the renderer as committed in `ed1c9039` (the bench and the screensho
 |---|---|---|
 | 1920×1080, whole flow, 300 elements, 350 connections, 30 running | **6.30 ms** (7.00, 8.40) | 106.5 ms (108.8) |
 | 1920×1080, zoom 1, part of the flow | 3.97 ms (4.60, 6.34) | 65.4 ms (74.2) |
-| 3840×2160, whole flow | 11.82 ms (12.94, 15.34) | **151.8 ms** (154.2): above about 150 ms, flagged for the owner (F-9001) |
+| 3840×2160, whole flow | 11.82 ms (12.94, 15.34) | **151.8 ms** (154.2): above about 150 ms, flagged for the owner (F-0151) |
 
-The frame of the 300-element scene is below 16 ms at 1920×1080. The build of the scene itself takes 18 ms per state change (F-9000). Memory of the layer: about 13 MB at 1920×1080, about 52 MB at 3840×2160 (arithmetic, not measured).
+The frame of the 300-element scene is below 16 ms at 1920×1080. The build of the scene itself takes 18 ms per state change (F-0150). Memory of the layer: about 13 MB at 1920×1080, about 52 MB at 3840×2160 (arithmetic, not measured).
 
 **Screenshots (for the owner, E0088; not committed, `temp/` is ignored):** `temp/wi0085-screenshots/` in this workspace, i.e. `C:\Users\bichl\Documents\git\AutoHotFlow-wt\wi-85\temp\wi0085-screenshots\`: the two v1 example flows `Flow 2052424815` and `Flow 806132298` at zoom 0.7 and 1.5, four PNG files of 23 to 31 KB. They are drawn offscreen by the real renderer (`tests/ahk/helpers/render_samples.ahk`, VS Code task "Tool: editor screenshots"). **The look is not accepted yet**: the owner decides (E0088). The look table (`src/editor/render/EditorStyle.ahk`) can change without code changes.
 
@@ -71,6 +71,6 @@ The frame of the 300-element scene is below 16 ms at 1920×1080. The build of th
 6. The layer uses ClearType grid-fitted text (`SetTextHint(5)`); not checked on a screen.
 7. The look values are a proposal: light grey background, pastel fills per kind, slate borders, Segoe UI Semibold 15 px at zoom 1 (E0088).
 
-**Findings:** F-9000 (the scene build of 18 ms per state change), F-9001 (the 4K rebuild of 152 ms and the 52 MB layer, owner decision), F-9002 (the word "break" is a literal), F-9003 (the tint of a running element lies over a later overlapping element). Found in the code while working: the scene did not carry the drawn name (fixed, `bcffb12c`).
+**Findings:** F-0150 (the scene build of 18 ms per state change), F-0151 (the 4K rebuild of 152 ms and the 52 MB layer, owner decision), F-0152 (the word "break" is a literal), F-0153 (the tint of a running element lies over a later overlapping element). Found in the code while working: the scene did not carry the drawn name (fixed, `bcffb12c`).
 
 **Not checked:** the BitBlt to a window and the frame scheduling (WI-0088); the look on a screen and at other scalings; a flow with many more elements or with the icons of other packages (only `Default` has icons); a long name at a very small zoom; the memory of five editors; the state path from the engine to the screen (MS-0007).

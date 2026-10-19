@@ -2409,7 +2409,7 @@ While 200 big flows load, AutoHotFlow stays responsive: the engine answers a sna
 ### REQ-PRF-060 Editor redraw
 
 - **v1:** n/a
-- **v2:** partial (the frame part is measured: a state change of a flow with 300 elements takes 6.3 ms at 1920×1080 with the renderer; a rebuild of the static layer takes 106 ms at 1920×1080 and 152 ms at 3840×2160, F-9001; the way from the engine to the screen is not measured)
+- **v2:** partial (the frame part is measured: a state change of a flow with 300 elements takes 6.3 ms at 1920×1080 with the renderer; a rebuild of the static layer takes 106 ms at 1920×1080 and 152 ms at 3840×2160, F-0151; the way from the engine to the screen is not measured)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005

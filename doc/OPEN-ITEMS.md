@@ -45,10 +45,10 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0148 | A thread of a flow that was just deleted may call `Executor._ElementStopped` after `ForgetFlow` and re-create a run-state record (a small leak and a stale `finished` event) | open, found in the review of WI-0086; read in code, not reproduced; a guard for a flow that is no longer in `flows` would close it | WI-0086 |
 | F-0149 | WI-0087 tests: the two tests with a running editor (`test_a_second_edit_of_a_running_flow_starts_no_second_process`, `test_the_editor_limit_refuses_a_new_editor_with_busy`) depend on the manager sending its requests back to back, because the placeholder editor ends within about 200 ms; under heavy load they can fail. Also untested: `FlowIdOk` (quote, control character, trailing backslash, non-text), a clean bye as planned end, a crashed editor not restarted, the slot of a dead editor in the limit. Race: an editor that just died but is not yet judged still counts as running, so `cmd.editor.show` goes nowhere and the click shows nothing (at most 200 ms) | open, found in the review of WI-0087; WI-0088 (a long-lived editor) makes the tests deterministic and can check `ProcessExist` in `OpenEditor` | WI-0087 |
 | F-0147 | The GDI leak check of `tests/ahk/gdip.test.ahk` counts only GDI handles (`GetGuiResources`): GDI+ brushes, pens, fonts and paths are not GDI handles, so a missing `GdipDelete*` would not fail it | open, found in the review of WI-0083; the deletes were verified by reading the code | WI-0083 |
-| F-9000 | `SceneBuilder.Build` takes about 18 ms for 300 elements (MS-0046), more than the frame of a state change (6 ms): the window builds a new scene at every state change, so a state change costs about 25 ms before it is on the screen. A build that changes only the run states would save it | open, found in the measurement of WI-0085 (MS-0046); decision in WI-0088 | WI-0085 |
-| F-9001 | The static layer of the renderer is rebuilt in 152 ms at 3840×2160 (106 ms at 1920×1080) on a change of the flow, the zoom, the DPI or a pan out of the layer, and it takes about 52 MB at 4K: above the 150 ms the owner was to hear about (E0090). Options: a smaller margin, a rebuild in parts over several frames, or a separate process (owner decision) | open, owner decision; measured in MS-0046 | WI-0085 |
-| F-9002 | The word "break" in the break field of a loop is a literal in the renderer, not a language text | open, low | WI-0085 |
-| F-9003 | The tint of a running element is drawn after all elements, so where a running element overlaps a later element of the scene, the tint lies over that element; v1 draws the tint with its element, so the later element covers it | open, low; the sample flows show no such overlap, not checked on a larger flow | WI-0085 |
+| F-0150 | `SceneBuilder.Build` takes about 18 ms for 300 elements (MS-0046), more than the frame of a state change (6 ms): the window builds a new scene at every state change, so a state change costs about 25 ms before it is on the screen. A build that changes only the run states would save it | open, found in the measurement of WI-0085 (MS-0046); decision in WI-0088 | WI-0085 |
+| F-0151 | The static layer of the renderer is rebuilt in 152 ms at 3840×2160 (106 ms at 1920×1080) on a change of the flow, the zoom, the DPI or a pan out of the layer, and it takes about 52 MB at 4K: above the 150 ms the owner was to hear about (E0090). Options: a smaller margin, a rebuild in parts over several frames, or a separate process (owner decision) | open, owner decision; measured in MS-0046 | WI-0085 |
+| F-0152 | The word "break" in the break field of a loop is a literal in the renderer, not a language text | open, low | WI-0085 |
+| F-0153 | The tint of a running element is drawn after all elements, so where a running element overlaps a later element of the scene, the tint lies over that element; v1 draws the tint with its element, so the later element covers it | open, low; the sample flows show no such overlap, not checked on a larger flow | WI-0085 |
 
 ## Findings
 
@@ -209,22 +209,22 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **What:** see the table row. The placeholder editor ends with exit 3 after about 200 ms; the supervisor judges it at its next 200 ms tick.
 **Status:** open, verified in code. Next step: WI-0088 gives a long-lived editor; then make the two tests deterministic, add the missing tests, and relaunch or check `ProcessExist` when the show answer is empty.
 
-### F-9000*: A state change costs more in SceneBuilder.Build than in the frame
+### F-0150: A state change costs more in SceneBuilder.Build than in the frame
 
 **What:** `SceneBuilder.Build` takes about 18 ms for 300 elements (MS-0046), more than the frame of a state change (6 ms). The window builds a new scene at every state change, so a state change costs about 25 ms before it is on the screen.
 **Status:** open, found in the measurement of WI-0085. Option: a build that changes only the run states. Decision in WI-0088.
 
-### F-9001*: The static layer rebuild is slow at 4K
+### F-0151: The static layer rebuild is slow at 4K
 
 **What:** the layer is rebuilt in 152 ms at 3840×2160 (106 ms at 1920×1080) on a change of the flow, the zoom, the DPI or a pan out of the layer, and takes about 52 MB at 4K. That is above the 150 ms the owner was to hear about (E0090).
 **Status:** open, owner decision (MS-0046). Options: a smaller margin, a rebuild in parts over several frames, or a separate process.
 
-### F-9002*: The word "break" of the loop break field is a literal
+### F-0152: The word "break" of the loop break field is a literal
 
 **What:** the renderer draws the literal "break" in the break field of a loop, not a language text.
 **Status:** open, low (WI-0085).
 
-### F-9003*: The tint of a running element lies over a later element
+### F-0153: The tint of a running element lies over a later element
 
 **What:** the tint of a running element is drawn after all elements, so where it overlaps a later element of the scene, the tint lies over that element; v1 draws the tint with its element.
 **Status:** open, low (WI-0085); the sample flows show no such overlap, not checked on a larger flow.

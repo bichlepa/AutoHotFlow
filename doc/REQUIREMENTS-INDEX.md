@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 0 | 0 | 5 | 5 | 0 | 0 |
-| **All** | **221** | **64** | **1** | **63** | **92** | **1** | **6** |
+| **All** | **221** | **64** | **1** | **64** | **91** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
