@@ -158,6 +158,45 @@ UnlistedLanguageIsKept() {
     }
 }
 
+; The refusal field shows every refused value on its own line; its height is the one of four measured lines (F-9105).
+RefusalFieldShowsEveryValue() {
+    model := FakeSettingsModel()
+    win := SettingsWindow(model)
+    try {
+        OpenAt(win, model)
+        CtlOf(win, "workers").Value := "17"
+        CtlOf(win, "maxParallelInstances").Value := "-1"
+        win.OnOk()
+        Assert.True(InStr(win.statusCtl.Text, "`r`n") > 0, "one line per value")
+        Assert.True(InStr(win.statusCtl.Text, "1 to 16") > 0 && InStr(win.statusCtl.Text, "0 to 1000000") > 0, win.statusCtl.Text)
+        for item in win.win.lay["items"] {
+            if (item[1] = win.statusCtl)
+                Assert.True(item[5] >= 40, "the field has the height of about four lines: " item[5])
+        }
+    } finally {
+        win.Close()
+    }
+}
+
+; The dialog is made in German with its texts measured: no error, the same values (F-9105).
+GermanDialogIsMade() {
+    model := FakeSettingsModel()
+    LangTable.Code := "de"
+    LangTable.Load()
+    try {
+        win := SettingsWindow(model)
+        try {
+            OpenAt(win, model)
+            Assert.Equal(win.Read()["workers"], "8", "the values are kept in German")
+        } finally {
+            win.Close()
+        }
+    } finally {
+        LangTable.Code := "en"
+        LangTable.Load()
+    }
+}
+
 ; An answer of the engine that comes after the close box is ignored: the window is gone (F-9104).
 AnswerAfterTheCloseBoxIsIgnored() {
     model := FakeSettingsModel()
@@ -223,6 +262,8 @@ TestRun.Case("A refusal of the engine stays in the dialog with its message", Eng
 TestRun.Case("A change of the language keeps the values the user typed", RelabelKeepsTheTypedValues)
 TestRun.Case("OK without a change sends nothing and closes the dialog", PlainOkSendsNothing)
 TestRun.Case("A language code the program does not list is kept", UnlistedLanguageIsKept)
+TestRun.Case("The refusal field shows every refused value, four lines high", RefusalFieldShowsEveryValue)
+TestRun.Case("The dialog is made in German with measured heights", GermanDialogIsMade)
 TestRun.Case("An answer after the close box is ignored", AnswerAfterTheCloseBoxIsIgnored)
 TestRun.Case("A change of the language keeps a refused value and the refusal in the status", RelabelKeepsARefusedValueAndTheStatus)
 TestRun.Case("The language list starts with the language of Windows", LanguageListHasWindowsLanguageFirst)

@@ -17,20 +17,18 @@
 ; language makes the dialog again (Relabel): the values the user typed are kept, and UiWindow remembers the position.
 ; Sizes are pixels at 100 % (GuiLayout scales them).
 class SettingsWindow {
-    static WIDTH := 520
-    static HEIGHT := 356
+    static WIDTH := 680         ; at 100 %; the height is measured when the dialog is made (F-9105)
     static MARGIN := 12
     static TAB_TOP := 12
-    static TAB_H := 226
-    static ROW_TOP := 42        ; first row, below the tab headers
-    static ROW_H := 30
+    static TAB_HEAD := 30       ; the rows start below the tab headers
     static LABEL_X := 24
-    static LABEL_W := 196
-    static CTL_X := 228
-    static CTL_W := 150
-    static NOTE_X := 388
-    static NOTE_W := 112
-    static STATUS_H := 52       ; three lines of a refusal at 100 %
+    static LABEL_W := 250
+    static CTL_X := 282
+    static CTL_W := 250
+    static NOTE_X := 544
+    static NOTE_W := 124
+    static ROW_MIN := 30
+    static STATUS_LINES := 4    ; the refusal field shows this many lines and scrolls for more (F-9105)
     static BUTTON_W := 110
     static BUTTON_H := 30
 
@@ -151,7 +149,8 @@ class SettingsWindow {
         }
         res := SettingsForm.Collect(changed)
         if (!res["ok"]) {
-            this.statusCtl.Text := Lang("Settings_refused") "`n" SettingsForm.ErrorText(res["errors"], (key) => this._LabelOf(key))
+            text := SettingsForm.ErrorText(res["errors"], (key) => this._LabelOf(key))
+            this.statusCtl.Text := Lang("Settings_refused") "`r`n" StrReplace(text, "`n", "`r`n")   ; the field is an Edit: CR LF
             return
         }
         this.statusCtl.Text := ""
@@ -183,7 +182,9 @@ class SettingsWindow {
         this.ctl := Map()
         this.lists := Map()
         this.codes := [""]
-        this.win := UiWindow("manager.settings", "Settings", SettingsWindow.WIDTH, SettingsWindow.HEIGHT)
+        heights := this._Heights()
+        M := SettingsWindow.MARGIN
+        this.win := UiWindow("manager.settings", "Settings", SettingsWindow.WIDTH, this._Height(heights), false)
         this.win.hideOnClose := false
         this.done := false
         g := this.win.Gui
@@ -191,43 +192,79 @@ class SettingsWindow {
         for tab in SettingsForm.TABS
             tabNames.Push(Lang(tab["label"]))
         tabs := g.AddTab3("", tabNames)
-        this.win.Place(tabs, SettingsWindow.MARGIN, SettingsWindow.TAB_TOP, SettingsWindow.WIDTH - 2 * SettingsWindow.MARGIN
-            , SettingsWindow.TAB_H)
+        this.win.Place(tabs, M, SettingsWindow.TAB_TOP, SettingsWindow.WIDTH - 2 * M, heights["tabH"])
         for i, tab in SettingsForm.TABS {
             tabs.UseTab(i)
-            row := 0
+            y := SettingsWindow.TAB_TOP + SettingsWindow.TAB_HEAD
+            row := 1
             for field in SettingsForm.FieldsOf(tab["id"]) {
-                this._Row(g, field, row)
+                this._Row(g, field, y, heights[tab["id"]][row])
+                y += heights[tab["id"]][row]
                 row += 1
             }
         }
         tabs.UseTab()
-        y := SettingsWindow.TAB_TOP + SettingsWindow.TAB_H + SettingsWindow.MARGIN
-        this.statusCtl := g.AddText("+0x80")
-        this.win.Place(this.statusCtl, SettingsWindow.MARGIN, y, SettingsWindow.WIDTH - 2 * SettingsWindow.MARGIN
-            , SettingsWindow.STATUS_H)
-        y += SettingsWindow.STATUS_H + SettingsWindow.MARGIN
+        y := SettingsWindow.TAB_TOP + heights["tabH"] + M
+        this.statusCtl := g.AddEdit("ReadOnly Multi VScroll")
+        this.win.Place(this.statusCtl, M, y, SettingsWindow.WIDTH - 2 * M, heights["status"])
+        y += heights["status"] + M
         ok := g.AddButton("Default")
-        this.win.Place(ok, SettingsWindow.WIDTH - SettingsWindow.MARGIN - (2 * SettingsWindow.BUTTON_W + SettingsWindow.MARGIN), y
-            , SettingsWindow.BUTTON_W, SettingsWindow.BUTTON_H)
+        this.win.Place(ok, SettingsWindow.WIDTH - M - (2 * SettingsWindow.BUTTON_W + M), y, SettingsWindow.BUTTON_W, SettingsWindow.BUTTON_H)
         this.win.Text(ok, "OK")
         ok.OnEvent("Click", (*) => this.OnOk())
         cancel := g.AddButton()
-        this.win.Place(cancel, SettingsWindow.WIDTH - SettingsWindow.MARGIN - SettingsWindow.BUTTON_W, y
-            , SettingsWindow.BUTTON_W, SettingsWindow.BUTTON_H)
+        this.win.Place(cancel, SettingsWindow.WIDTH - M - SettingsWindow.BUTTON_W, y, SettingsWindow.BUTTON_W, SettingsWindow.BUTTON_H)
         this.win.Text(cancel, "Cancel")
         cancel.OnEvent("Click", (*) => this.Close())
         this.win.Gui.OnEvent("Escape", (*) => this.Close())
     }
 
-    ; One row of a tab: the label, the control (the Browse button of a folder) and the note of the value.
-    _Row(g, field, row) {
+    ; The heights at 100 % of everything that depends on the language: the rows of each tab (a label, a note or a checkbox
+    ; text wraps at its column, GuiLayout.TextHeight), the tab control and the refusal field. Map: tab id -> Array of row
+    ; heights, "tabH", "status". A probe window is made and destroyed here (the measure needs a window).
+    _Heights() {
+        GuiLayout.EnableDpi()
+        probe := Gui("-DPIScale")
+        out := Map()
+        try {
+            maxSum := 0
+            for tab in SettingsForm.TABS {
+                rows := []
+                sum := 0
+                for field in SettingsForm.FieldsOf(tab["id"]) {
+                    h := SettingsWindow.ROW_MIN
+                    if (field["kind"] != "check")
+                        h := Max(h, GuiLayout.TextHeight(probe, Lang(field["label"]), SettingsWindow.LABEL_W) + 8)
+                    if (field["note"] != "")
+                        h := Max(h, GuiLayout.TextHeight(probe, Lang(field["note"]), SettingsWindow.NOTE_W) + 8)
+                    rows.Push(h)
+                    sum += h
+                }
+                out[tab["id"]] := rows
+                maxSum := Max(maxSum, sum)
+            }
+            out["tabH"] := SettingsWindow.TAB_HEAD + maxSum + 12
+            lines := ""
+            loop SettingsWindow.STATUS_LINES
+                lines .= (A_Index > 1 ? "`n" : "") "A"
+            out["status"] := GuiLayout.TextHeight(probe, lines, SettingsWindow.WIDTH - 2 * SettingsWindow.MARGIN) + 8
+        } finally {
+            probe.Destroy()
+        }
+        return out
+    }
+
+    ; The height of the whole dialog at 100 %: the tabs, the refusal field, the buttons.
+    _Height(heights) => SettingsWindow.TAB_TOP + heights["tabH"] + SettingsWindow.MARGIN + heights["status"]
+        + SettingsWindow.MARGIN + SettingsWindow.BUTTON_H + SettingsWindow.MARGIN
+
+    ; One row of a tab, at the height h of its text: the label, the control (the Browse button of a folder), the note.
+    _Row(g, field, y, h) {
         key := field["key"]
-        y := SettingsWindow.ROW_TOP + row * SettingsWindow.ROW_H
         kind := field["kind"]
         if (kind != "check") {
             label := g.AddText("+0x80")
-            this.win.Place(label, SettingsWindow.LABEL_X, y + 4, SettingsWindow.LABEL_W, 20)
+            this.win.Place(label, SettingsWindow.LABEL_X, y + 4, SettingsWindow.LABEL_W, h - 8)
             this.win.Text(label, field["label"])
         }
         switch kind {
@@ -238,7 +275,7 @@ class SettingsWindow {
                     items.Push(entry[2] " (" entry[1] ")")
                 }
                 list := g.AddDropDownList(, items)
-                this.win.Place(list, SettingsWindow.CTL_X, y, SettingsWindow.CTL_W + 20)
+                this.win.Place(list, SettingsWindow.CTL_X, y + 2, SettingsWindow.CTL_W)
                 this.ctl[key] := list
             case "list":
                 values := []
@@ -249,30 +286,30 @@ class SettingsWindow {
                 }
                 this.lists[key] := values
                 list := g.AddDropDownList(, items)
-                this.win.Place(list, SettingsWindow.CTL_X, y, SettingsWindow.CTL_W + 20)
+                this.win.Place(list, SettingsWindow.CTL_X, y + 2, SettingsWindow.CTL_W)
                 this.ctl[key] := list
             case "check":
                 ; the box and its own text in one control, as wide as the row: a narrow box clips the text (F-9100)
                 check := g.AddCheckBox(, "")
-                this.win.Place(check, SettingsWindow.LABEL_X, y + 4, SettingsWindow.LABEL_W + SettingsWindow.CTL_W + 100, 20)
+                this.win.Place(check, SettingsWindow.LABEL_X, y + 4, SettingsWindow.LABEL_W + SettingsWindow.CTL_W + 100, h - 8)
                 this.win.Text(check, field["label"])
                 this.ctl[key] := check
             case "folder":
                 edit := g.AddEdit("ReadOnly")
-                this.win.Place(edit, SettingsWindow.CTL_X, y, SettingsWindow.CTL_W - 10, 24)
+                this.win.Place(edit, SettingsWindow.CTL_X, y + 4, SettingsWindow.CTL_W - 80, 24)
                 this.ctl[key] := edit
                 browse := g.AddButton(, "")
-                this.win.Place(browse, SettingsWindow.CTL_X + SettingsWindow.CTL_W, y, 70, 24)
+                this.win.Place(browse, SettingsWindow.CTL_X + SettingsWindow.CTL_W - 70, y + 4, 70, 24)
                 this.win.Text(browse, "Browse")
                 browse.OnEvent("Click", (*) => this.OnBrowse())
             default:
                 edit := g.AddEdit()
-                this.win.Place(edit, SettingsWindow.CTL_X, y, 80, 24)
+                this.win.Place(edit, SettingsWindow.CTL_X, y + 4, 100, 24)
                 this.ctl[key] := edit
         }
         if (field["note"] != "") {
             note := g.AddText("+0x80")
-            this.win.Place(note, SettingsWindow.NOTE_X, y + 4, SettingsWindow.NOTE_W, 20)
+            this.win.Place(note, SettingsWindow.NOTE_X, y + 4, SettingsWindow.NOTE_W, h - 8)
             this.win.Text(note, field["note"])
         }
     }

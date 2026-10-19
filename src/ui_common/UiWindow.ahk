@@ -18,13 +18,14 @@ class UiWindow {
     static _memory := Map()   ; window name -> Map("x", "y", "w", "h"): outer position in pixels, client size at 100 %
 
     ; name: the key of the window (remembered); title: a Lang key; width and height at 100 % (a remembered size wins).
-    __New(name, titleKey, width, height) {
+    ; useMemorySize false: the size given here wins over the remembered one (a window whose height depends on its texts, F-9105).
+    __New(name, titleKey, width, height, useMemorySize := true) {
         GuiLayout.EnableDpi()   ; before the first Gui of the thread
         this.name := name
         this._closed := false
         this._shown := false
         mem := UiWindow.Recall(name)
-        if (mem != "") {
+        if (useMemorySize && mem != "") {
             width := mem["w"]
             height := mem["h"]
         }
