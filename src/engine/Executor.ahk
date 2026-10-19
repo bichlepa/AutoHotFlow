@@ -934,7 +934,10 @@ class Executor {
     _FlushWarnings() {
         now := A_TickCount
         rest := []
-        for rec in this._dirty {
+        ; take the list first: a warning that arrives while an Emit below is interrupted must not be lost by the store of rest
+        pending := this._dirty
+        this._dirty := []
+        for rec in pending {
             if (!rec["dirty"])
                 continue                    ; dropped by ForgetFlow
             if (now - rec["sentAt"] < 1000) {
@@ -947,8 +950,9 @@ class Executor {
                 , Map("flowId", rec["flowId"], "elementId", rec["elementId"], "count", rec["warnings"]
                     , "text", rec["lastWarning"]))
         }
-        this._dirty := rest
-        if (rest.Length && !this._flushScheduled) {
+        for rec in rest
+            this._dirty.Push(rec)
+        if (this._dirty.Length && !this._flushScheduled) {
             this._flushScheduled := true
             SetTimer(this._flushFn, -1000)
         }
