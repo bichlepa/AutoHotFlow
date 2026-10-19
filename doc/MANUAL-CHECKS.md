@@ -252,6 +252,7 @@ Start with the VS Code task of part A (or its terminal command), in the fresh fo
 
 | # | Step | Expected result | Result |
 |---|---|---|---|
+| 44a | On the tab General, read the checkbox "Notify about unhandled errors". | The whole text is shown beside the box (not cut to the box). | |
 | 44 | Click "Settings". | A window "Settings" opens with the tabs General, Flow settings and Debugging. Its texts are complete (no cut-off word or line), the buttons OK and Cancel are at the bottom. At 225 % the same holds. | |
 | 45 | On the tab Flow settings, read the field "Elements waiting at the same time". | The value is 8, the note "1 to 16" stands beside it. The three runaway guard fields show "0 means no limit". | |
 | 46 | Type 17 in "Elements waiting at the same time" and click OK. | The dialog stays open. The status line says that the settings are not changed and names the field with the range (1 to 16). Nothing is written (no `Settings.json` in `%TEMP%hf_manual_check`). | |

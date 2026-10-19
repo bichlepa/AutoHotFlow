@@ -217,8 +217,9 @@ class SettingsWindow {
                 this.win.Place(list, SettingsWindow.CTL_X, y, SettingsWindow.CTL_W + 20)
                 this.ctl[key] := list
             case "check":
+                ; the box and its own text in one control, as wide as the row: a narrow box clips the text (F-9100)
                 check := g.AddCheckBox(, "")
-                this.win.Place(check, SettingsWindow.LABEL_X, y + 4, 20, 20)
+                this.win.Place(check, SettingsWindow.LABEL_X, y + 4, SettingsWindow.LABEL_W + SettingsWindow.CTL_W + 100, 20)
                 this.win.Text(check, field["label"])
                 this.ctl[key] := check
             case "folder":

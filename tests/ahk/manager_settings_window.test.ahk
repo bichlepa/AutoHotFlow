@@ -43,6 +43,12 @@ OpensWithTheSettingsOfTheEngine() {
         Assert.Equal(win.Read()["workers"], "8")
         Assert.Equal(win.Read()["language"], "")
         Assert.True(!win.Visible, "not shown by the test")
+        ; the checkbox carries its own text: as wide as the row, or the text is clipped to the box (F-9100)
+        box := CtlOf(win, "notifyUnhandledErrors")       ; the width is the one of the layout (applied at Show, not before)
+        for item in win.win.lay["items"] {
+            if (item[1] = box)
+                Assert.True(item[4] >= 300, "the checkbox is wide enough for its text: " item[4])
+        }
     } finally {
         win.Close()
     }
