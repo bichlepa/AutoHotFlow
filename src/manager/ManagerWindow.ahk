@@ -16,7 +16,8 @@
 ;
 ;   - The tree: the categories in their order (the uncategorized group last), the flows in their order, with their state as
 ;     a text mark. Several flows can be selected (Ctrl click); the tree shows the focused one.
-;   - The buttons as v1, enabled by the selection (ManagerModel.ButtonStates). "Edit" is disabled until the editor (S0005).
+;   - The buttons as v1, enabled by the selection (ManagerModel.ButtonStates). "Edit" and a double click open the editor of
+;     the flow (WI-0087, ManagerModel.OpenEditor).
 ;   - Context menus of the tree (E0077: they run in this process; while a menu is open its threads stop, accepted).
 ;   - Drag and drop: a flow onto a flow or a category moves it; a category onto a category moves it. The drag is followed by a
 ;     timer (the mouse button is read at 30 ms), so no mouse capture is needed.
@@ -99,6 +100,7 @@ class ManagerWindow {
         this.tree := g.AddTreeView("+Border")
         this.win.Place(this.tree, 12, 12, 300, 456)
         this.tree.OnEvent("ItemSelect", (ctl, item) => this._OnTreeSelect(item))
+        this.tree.OnEvent("DoubleClick", (*) => this._OnTreeDouble())
         this.tree.OnEvent("ContextMenu", (ctl, item, isRight, x, y) => this._OnContext())
         for b in ManagerWindow.BUTTONS {
             ctl := g.AddButton()
@@ -294,6 +296,10 @@ class ManagerWindow {
                 this._ChangeCategory(this.model.SelectedFlows())
             case "Duplicate":
                 this.ops.Duplicate(this.model.selectedFlow)
+            case "Edit":
+                ids := this.model.SelectedFlows()
+                if (ids.Length = 1)
+                    this.model.OpenEditor(ids[1])
             case "Delete":
                 this._DeleteSelection()
             case "Exit":
@@ -456,6 +462,14 @@ class ManagerWindow {
     ; The event may be late: a timer thread is uninterruptible for its first 15 ms (doc/howto/gui-and-hotkeys.md), so an
     ; event can come after the tree was built again. The current selection of the tree is read (not the event's item), and
     ; a selection that the model already has changes nothing.
+    ; A double click on a flow opens its editor, as the Edit button does (WI-0087, v1 Manager GUI). The click selected the
+    ; item already (ItemSelect); a category does nothing.
+    _OnTreeDouble() {
+        item := this.tree.GetSelection()
+        if (this.treeItems.Has(item))
+            this.model.OpenEditor(this.treeItems[item])
+    }
+
     _OnTreeSelect(item) {
         if (this.filling || this.dragging)
             return

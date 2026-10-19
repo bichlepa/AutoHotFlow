@@ -44,6 +44,7 @@ class ManagerDriver {
         this.ops["selectCategory"] := (args, done) => this._OpSelectCategory(args, done)
         this.ops["enable"] := (args, done) => this._OpSwitch(args, done, true)
         this.ops["disable"] := (args, done) => this._OpSwitch(args, done, false)
+        this.ops["edit"] := (args, done) => this._OpEdit(args, done)
         this.ops["create"] := (args, done) => this.flowOps.NewFlow(args.Get("category", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
         this.ops["duplicate"] := (args, done) => this.flowOps.Duplicate(args.Get("flowId", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
         this.ops["delete"] := (args, done) => this.flowOps.Delete(ManagerDriver.Ids(args), (ans) => done(ManagerDriver.AnswerResult(ans)))
@@ -91,6 +92,14 @@ class ManagerDriver {
     _OpSelect(args, done) {
         this.model.Select(args.Get("flowId", ""))
         done(Map("ok", true, "selectedFlow", this.model.selectedFlow))
+    }
+
+    ; WI-0087: the editor of a flow (flowId, without it the selected flow), as the Edit button and a double click do it.
+    _OpEdit(args, done) {
+        flowId := args.Get("flowId", "")
+        if (flowId = "")
+            flowId := this.model.selectedFlow
+        this.model.OpenEditor(flowId, (ans) => done(ManagerDriver.AnswerResult(ans)))
     }
 
     _OpShow(args, done) {

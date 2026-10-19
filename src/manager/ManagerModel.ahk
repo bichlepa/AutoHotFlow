@@ -648,13 +648,14 @@ class ManagerModel {
     }
 
     ; The state of the buttons from the selection: Map(name -> true/false). Operations of later packages are false until
-    ; their package exists (Edit: the editor, S0005).
+    ; their package exists.
     ButtonStates() {
         up := this.engineState != ManagerModel.ENGINE_DOWN
         flows := this.SelectedFlows().Length > 0
         one := this.selectedFlow != "" && this.flows.Has(this.selectedFlow)
+        ; Edit: exactly one flow (WI-0087). It needs no engine: the editor opens the flow from storage.
         return Map("NewCategory", up, "NewFlow", up, "ChangeCategory", flows && up, "Duplicate", one && up
-            , "Delete", (flows || this.catSelected) && up, "Edit", false   ; arch-ok: wire-bool UI state of the buttons, not a protocol field
+            , "Delete", (flows || this.catSelected) && up, "Edit", this.SelectedFlows().Length = 1
             , "Enable", flows && up, "Run", flows && up
             , "Settings", up, "ImportExport", up, "About", true, "Help", false, "ShowLog", true, "Exit", true, "Notices", true)
     }
@@ -849,6 +850,41 @@ class ManagerModel {
             return
         }
         this.Command(this.flows[flowId]["executing"] ? "cmd.flow.stop" : "cmd.flow.start", Map("flowId", flowId), done)
+    }
+
+    ; The editor of a flow (WI-0087, PROTOCOL 4.1, 4.8): cmd.editor.open to the supervisor, which starts the editor process or
+    ; shows the running one. The answer goes to done(answer) like a command's answer. A refused answer is also a notice
+    ; (the list of notices, key Editor_open_failed). The flow is not checked here: the editor does it (WI-0088).
+    OpenEditor(flowId, done := "") {
+        t0 := Time.NowMs()
+        this.Note("manager.editor", Map("flowId", flowId))
+        try {
+            this.peer.Request("supervisor", "cmd.editor.open", Map("flowId", flowId)
+                , (ans) => this._OnEditorAnswer(flowId, t0, ans, done), ManagerModel.COMMAND_MS)
+        } catch as e {
+            this._EditorFailed(flowId, "not_sent", e.Message, 0, done)
+        }
+    }
+
+    _OnEditorAnswer(flowId, t0, ans, done) {
+        p := ans.payload
+        ms := Integer(Time.NowMs() - t0)
+        if (p.Get("ok", 0)) {
+            this._Answered(Map("type", "cmd.editor.open", "flowId", flowId, "ok", true, "code", ""
+                , "message", "", "payload", p, "ms", ms), done)
+            return
+        }
+        message := ""
+        if (p.Has("error") && IsObject(p["error"]))
+            message := p["error"].Get("message", "")
+        this._EditorFailed(flowId, ManagerModel.Outcome(p), message, ms, done, p)
+    }
+
+    _EditorFailed(flowId, code, message, ms, done, payload := "") {
+        this._Answered(Map("type", "cmd.editor.open", "flowId", flowId, "ok", false, "code", code
+            , "message", message, "payload", IsObject(payload) ? payload : Map(), "ms", ms), done)
+        this._OnNotice(Map("kind", "app", "level", "error", "key", "Editor_open_failed"
+            , "args", [flowId, code (message != "" ? " " message : "")]))
     }
 
     ; Restarts the application with administrator rights (cmd.app.restart, WI-0079): the clean exit, then the new start with the question of Windows.
