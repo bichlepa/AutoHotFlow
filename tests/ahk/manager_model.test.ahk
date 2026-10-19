@@ -225,6 +225,20 @@ CheckTriggerAndCategory() {
     Assert.Equal(m.OrderedFlowIds()[1], "B")
 }
 
+TestRun.Case("Run as administrator switched on offers the restart once, and RestartElevated sends cmd.app.restart", () => CheckElevationOffer())
+CheckElevationOffer() {
+    pm := ReadyModel()
+    m := pm[2]
+    seen := []
+    m.AddListener((kind, data) => (kind = "elevationOffer" ? seen.Push(kind) : 0))
+    m.OnEvent("evt.settings.changed", Evt(100, 11, Map("settings", Map("runAsAdmin", 0))))
+    m.OnEvent("evt.settings.changed", Evt(100, 12, Map("settings", Map("runAsAdmin", 1))))
+    m.OnEvent("evt.settings.changed", Evt(100, 13, Map("settings", Map("runAsAdmin", 1))))
+    Assert.Equal(seen.Length, A_IsAdmin ? 0 : 1, "the offer comes at the change from off to on, not elevated only")
+    m.RestartElevated()
+    Assert.Equal(pm[1].Count("cmd.app.restart"), 1)
+}
+
 TestRun.Case("The engine going down and coming back: state down, then a snapshot", () => CheckEngineDown())
 CheckEngineDown() {
     pm := ReadyModel()

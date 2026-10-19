@@ -61,7 +61,8 @@ class ManagerWindow {
         , "importWarning", ["Import_file_title", "Archive_warning_dialog", "no"]     ; WI-0081: preselection No
         , "importConflict", ["Import_conflict_title", "Archive_conflict_text"]
         , "importName", ["Import_name_title", "Archive_name_text"]
-        , "importExport", ["Import_and_export", "Archive_choose_text"])
+        , "importExport", ["Import_and_export", "Archive_choose_text"]
+        , "elevation", ["Ask_elevation_title", "Ask_elevation_text"])
 
     __New(model, role := "") {
         this.model := model
@@ -207,6 +208,8 @@ class ManagerWindow {
             this._ShowSelection()
         else if (kind = "trigger")
             this._NoticeTrigger(data)
+        else if (kind = "elevationOffer")
+            this.ops.OfferElevatedRestart()
         else if ((kind = "notice" || kind = "notices") && IsObject(this.noticeView))
             this.noticeView.Refresh()
     }

@@ -296,6 +296,11 @@ class ManagerOps {
         return out
     }
 
+    ; "Run as administrator" was switched on (WI-0079): asks whether to restart now.
+    OfferElevatedRestart() {
+        this._Confirm("elevation", [], (yes) => (yes ? this.m.RestartElevated() : 0))
+    }
+
     _Confirm(kind, args, done) {
         if (!IsObject(this.ask)) {
             done(false)

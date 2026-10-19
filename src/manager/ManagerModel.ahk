@@ -308,8 +308,12 @@ class ManagerModel {
                 this._Notify("categories")
             case "evt.settings.changed":
                 settings := p.Get("settings", Map())
+                before := this.settings
                 this.settings := IsObject(settings) ? settings : Map()
                 this._Notify("settings")
+                ; "Run as administrator" switched on in a session that is not elevated: offer the restart (WI-0079, E0073)
+                if (before.Count > 0 && !before.Get("runAsAdmin", 0) && this.settings.Get("runAsAdmin", 0) && !A_IsAdmin)
+                    this._Notify("elevationOffer")
             case "evt.flow.limit":
                 id := p.Get("flowId", "")
                 if (this.flows.Has(id)) {
@@ -838,6 +842,16 @@ class ManagerModel {
             return
         }
         this.Command(this.flows[flowId]["executing"] ? "cmd.flow.stop" : "cmd.flow.start", Map("flowId", flowId), done)
+    }
+
+    ; Restarts the application with administrator rights (cmd.app.restart, WI-0079): the clean exit, then the new start with the question of Windows.
+    RestartElevated() {
+        this.Note("manager.restartElevated")
+        try {
+            this.peer.Request("supervisor", "cmd.app.restart", Map("elevate", Json.True), (ans) => 0, ManagerModel.EXIT_MS)
+        } catch as e {
+            Log.Write("a0", "manager", "restart not sent: " e.Message)
+        }
     }
 
     ; The exit button: asks the supervisor for the clean exit of the application (ARCHITECTURE 6.3).
