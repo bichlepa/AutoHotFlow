@@ -65,11 +65,11 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI-0075 | Notices | done, verified on dcafa042 (fast, foundation green; slow 2 load flakes, green alone) | | | | block A |
 | WI-0076 | Import from v1, manual check of block A | done, verified on 1248aa10 (foundation green; fast and slow 1 load flake each, green alone); owner manual check of block A is next | | | | block A |
 | WI-0077 | Settings model | done, verified on 501ef089 (fast 1560, foundation 471 green; slow 1 flake of the burst log test, green alone 3 of 3; the implementer's own run on b09c3560: slow 204, stress 2 green) | sonnet (review sonnet) | | 2026-10-19 | block B; M-0086 | | | | block B |
-| WI-0078 | Settings dialog, language, about | implemented on `wip/wi-78`, review said FIX FIRST (clipped checkbox, relabel/rebuild, changed-keys-only, measured layout, German refusal texts), fixes in progress incl. the two WI-0079 checkboxes; not integrated | | | | block B |
+| WI-0078 | Settings dialog, language, about | done, verified on 832078da (fast 1605, foundation 471, slow 204 green); gui test and look of the dialog: owner (MANUAL-CHECKS 8) | haiku (review sonnet) | | 2026-10-19 | block B; includes the two WI-0079 checkboxes | | | | block B |
 | WI-0079 | Start with Windows, run as administrator | done, verified on b7d3f020 (foundation, slow green; fast 1 load flake, green alone 3 of 3); no checkbox in a dialog yet: WI-0078 adds them; owner manual check 7 (real UAC) open | | | | block B, manual check |
 | WI-0080 | Log display | done, verified (foundation, slow green; fast red by 2 load flakes, green alone) on d6331fb8 | haiku (review sonnet) | dcacd43b–d6331fb8 | 2026-10-17 | block B; F-0116 and source group wait for the owner |
 | WI-0081 | `.ahf` export and import | done, verified on 4e510dc1 (fast, foundation, slow green); owner decisions: 4 MB unpacked cap, UNC refused, ActsOnSystem list | | | | block B |
-| WI-0082 | Acceptance S0004 | open | | | | |
+| WI-0082 | Acceptance S0004 | running (sonnet, `wi-82`) | | | | |
 
 Step S0008 (remaining elements) is planned, not started.
 
@@ -80,14 +80,15 @@ Step-independent work item: WI-0059 (test admission, load report, run history), 
 
 ## Running agents
 
-- WI-0078 implementer (haiku, `wi-78`, id acee71b98a0ce18ca): running.
-- WI-0078 gets the two WI-0079 checkboxes too (same agent).
+- WI-0082 acceptance agent (sonnet, `wi-82`): running.
 
 ## Last verified state
 
 Commit `d0165a5f` (test groups of the owner, group entry for `test_manager_archive.py`, race fix in the skeleton event test) verified by `--auto`: fast 1505, foundation 470, slow 203, VERDICT green. Load flakes seen on the way: `test_the_engine_is_restarted_and_rearms_without_the_startup_context` (red under load 4 times today, green alone), `test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor` (once).
 
 Commit `c31d126a` (import entry in the choice dialog, Yes/No order of the questions) verified: fast 1466 green; foundation red by 2 cases of `supervisor_tick.test.ahk` (load flake: 46 cases green alone, run `20261018-004804-c31d126a`).
+
+Commit `832078da` (WI-0078 settings dialog and the checkboxes of WI-0079): fast 1605, foundation 471, slow 204, VERDICT green.
 
 Commit `b7d3f020` (WI-0079 and WI-0077 follow-ups): fast 1576 (1 load flake `test_an_unreadable_state_file_refuses_a_switch_until_it_can_be_read`, green alone 3 of 3), foundation 471, slow 204 green.
 
