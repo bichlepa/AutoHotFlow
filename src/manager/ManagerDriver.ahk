@@ -115,7 +115,7 @@ class ManagerDriver {
     }
 
     _EditAnswered(ids, i, results, ans, done) {
-        results.Push(ManagerDriver.AnswerResult(ans))
+        results.Push(ManagerDriver.Wire(ManagerDriver.AnswerResult(ans)))   ; nested ok: JSON true/false (PROTOCOL 2)
         this._EditNext(ids, i + 1, results, done)
     }
 
