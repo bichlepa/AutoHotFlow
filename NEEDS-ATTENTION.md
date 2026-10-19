@@ -4,7 +4,10 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-Nothing waits for a decision now. (R0002: decided on 2026-10-19, E0090: caches in the editor process. Time of the fast tier: E0089.)
+- **Look of the editor (E0088, WI-0085):** you accept the look of the renderer. Four screenshots of two v1 example flows (zoom 0.7 and 1.5) are in `temp/wi0085-screenshots/` of the main checkout (not committed). The values are a proposal in `src/editor/render/EditorStyle.ahk` (Segoe UI, state colors, icons at full opacity where v1 used 20 %). Say what to change, or accept it.
+- **4K rebuild (F-0151):** the cache of E0090 gives 6.3 ms per frame of a state change (budget 16 ms). Rebuilding the static layer takes 106 ms at 1920x1080 and 152 ms at 3840x2160 (layer about 52 MB), on every change of the flow, zoom or a pan out of the margin. Options: accept it (recommended for now), a smaller margin, a rebuild in parts, or a render process. Not urgent.
+
+(R0002: decided on 2026-10-19, E0090. Time of the fast tier: E0089.)
 
 ## Manual checks
 
