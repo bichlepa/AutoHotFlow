@@ -66,7 +66,7 @@ Step S0004 (UI foundation and manager), detailed on 2026-10-17 (E0064 to E0074),
 | WI-0076 | Import from v1, manual check of block A | done, verified on 1248aa10 (foundation green; fast and slow 1 load flake each, green alone); owner manual check of block A is next | | | | block A |
 | WI-0077 | Settings model | done, verified on 501ef089 (fast 1560, foundation 471 green; slow 1 flake of the burst log test, green alone 3 of 3; the implementer's own run on b09c3560: slow 204, stress 2 green) | sonnet (review sonnet) | | 2026-10-19 | block B; M-0086 | | | | block B |
 | WI-0078 | Settings dialog, language, about | running (haiku, `wi-78`) | | | | block B |
-| WI-0079 | Start with Windows, run as administrator | running (sonnet, `wi-79`); the owner also wants the product to start without parameters | | | | block B, manual check |
+| WI-0079 | Start with Windows, run as administrator | implemented on `wip/wi-79` (E0083 default start, M-0087), review running; not integrated | | | | block B, manual check |
 | WI-0080 | Log display | done, verified (foundation, slow green; fast red by 2 load flakes, green alone) on d6331fb8 | haiku (review sonnet) | dcacd43b–d6331fb8 | 2026-10-17 | block B; F-0116 and source group wait for the owner |
 | WI-0081 | `.ahf` export and import | done, verified on 4e510dc1 (fast, foundation, slow green); owner decisions: 4 MB unpacked cap, UNC refused, ActsOnSystem list | | | | block B |
 | WI-0082 | Acceptance S0004 | open | | | | |
@@ -80,14 +80,16 @@ Step-independent work item: WI-0059 (test admission, load report, run history), 
 
 ## Running agents
 
-- WI-0078 implementer (haiku, `wi-78`, id acee71b98a0ce18ca) and WI-0079 implementer (sonnet, `wi-79`, id acaa68d23afd468f2): running.
-- Bug hunter (haiku, `hunt-5`, id aef15cc8304f37f6c): flaky burst log test (comparison against the hub's own drop lines).
+- WI-0078 implementer (haiku, `wi-78`, id acee71b98a0ce18ca): running.
+- WI-0079 reviewer (sonnet, id adf53870b463310b8): review of `wip/wi-79` (implementer id acaa68d23afd468f2 fixes afterwards).
 
 ## Last verified state
 
 Commit `d0165a5f` (test groups of the owner, group entry for `test_manager_archive.py`, race fix in the skeleton event test) verified by `--auto`: fast 1505, foundation 470, slow 203, VERDICT green. Load flakes seen on the way: `test_the_engine_is_restarted_and_rearms_without_the_startup_context` (red under load 4 times today, green alone), `test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor` (once).
 
 Commit `c31d126a` (import entry in the choice dialog, Yes/No order of the questions) verified: fast 1466 green; foundation red by 2 cases of `supervisor_tick.test.ahk` (load flake: 46 cases green alone, run `20261018-004804-c31d126a`).
+
+Commit `da0d9fae` (burst log test compares the burst file; WI-0077 included) verified: fast 1560, foundation 471, slow 204, VERDICT green.
 
 Commit `4e510dc1` (WI-0081 `.ahf`) verified by `--auto`: fast 1461, foundation 470, slow 203, VERDICT green. `19fb1ba8` (dialog text fix F-0128) green too (1444 / 470 / 203).
 
