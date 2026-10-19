@@ -120,7 +120,7 @@ The reviewer gets: the task (work item file or wish), the author's report, and t
 - **No repeated runs for implementers and reviewers.** Each test selection is run once per code state; a failure is assessed from its run log (`pytest-log\...\failures`, `output.txt`), not by running the same test again. Exceptions: an implementer may repeat runs while it tracks down a bug that its own change caused, the bug hunter may repeat runs as it needs, and `tools/recheck.py` decides whether a failure is a load flake.
 - **Read the exit code and `INTERNALERROR` in `output.txt`, not only the counts.**
 - **Implementers and hunters run short runs:** the tests of the files and groups they changed, plus the fast tier (`python -m pytest tests -q`). Big runs (`--all`, `--foundation`, `-m slow`) only when the change touches `src/core/`, `src/supervisor/`, `src/Ahf*.ahk`, `src/debugview/`, `tests/support/`, `tests/integration/helpers/`, `tests/conftest.py`, `tools/ahkrun.py`, `doc/PROTOCOL.md` or a shared helper; otherwise `verify.py` does it after the integration.
-- Stress and soak (`-m stress`, `-m soak`) only when the project owner asks.
+- Stress and soak (`-m stress`, `-m soak`) when a work item requires them (owner permission of 2026-10-17: no extra question) or when the project owner asks. Such a run does not open windows: gui tests are left out of a stress, soak or idle selection unless `gui` is named in `-m` (F-0143).
 
 **Verification** replaces the verifier agent. After an integration, run in the main checkout, in the background (the script itself decides what a change needs; documents are read by fast-tier tests too):
 
