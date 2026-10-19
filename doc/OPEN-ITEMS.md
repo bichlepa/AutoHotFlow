@@ -42,6 +42,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0122 | A multi-selection was lost on a later rebuild of the tree (fixed; no automated test, the path is only reachable through a real tree) | open, verified in code, not checked on screen | WI-0074 |
 | F-0145 | The status "planned" of the oldest MIGRATION entries (M-0001 to M-0005, M-0010, M-0012 to M-0014) was never re-checked against the code | open, found in the documentation review; M-0014 is implemented in `LoopStack.Pop` (read) | documentation review |
 | F-0146 | The `README.md` in the repository root describes v1 (downloads, installer, `find modules.ahk`, screenshots of v1) while the branch is the v2 port | open, low; rewrite at the end of the port (S0009/S0010) | documentation review |
+| F-9001* | A thread of a flow that was just deleted may call `Executor._ElementStopped` after `ForgetFlow` and re-create a run-state record (a small leak and a stale `finished` event) | open, found in the review of WI-0086; read in code, not reproduced; a guard for a flow that is no longer in `flows` would close it | WI-0086 |
 | F-0147 | The GDI leak check of `tests/ahk/gdip.test.ahk` counts only GDI handles (`GetGuiResources`): GDI+ brushes, pens, fonts and paths are not GDI handles, so a missing `GdipDelete*` would not fail it | open, found in the review of WI-0083; the deletes were verified by reading the code | WI-0083 |
 
 ## Findings
@@ -192,6 +193,11 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 **What:** the unit test `tests/ahk/gdip.test.ahk` checks that 1000 frames leave the GDI object count of the process unchanged. GDI+ brushes, pens, fonts, paths and images are objects of the GDI+ library, not GDI handles, so a missing `GdipDelete*` stays invisible.
 **Status:** open, verified by reading the wrapper (every object has its delete). Option: compare the private bytes of the process over many frames, or count the objects the wrapper creates and deletes.
+
+### F-9001*: run-state record of a deleted flow may be re-created
+
+**What:** `StopFlow` is asynchronous. A thread that ends after `ForgetFlow` (flow deleted) calls `_ElementStopped`, which creates a record through `_Elem` again. The record is small, but a stale `finished` event may reach an editor.
+**Status:** open, assumed harmless (the storage round trip of a delete comes first), not reproduced. Fix: ignore `_ElementStopped` for a flow that is no longer known.
 
 ## Observed only (not for the bug hunter)
 
