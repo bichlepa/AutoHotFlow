@@ -23,10 +23,10 @@ WI-0088 may start (WI-0085 to WI-0087 are integrated).
 |---|---|---|---|---|---|---|
 | WI-0083 | GDI+ wrapper and the R0002 measurement | done | haiku | e0febbf1..92b9cac5 | 2026-10-19 | R0002 failed: 300 ms vs 16 ms (MS-0044); owner decided E0090 (caches), added to WI-0085 |
 | WI-0084 | Geometry and scene (headless) | done | haiku | 98f467b0..e065b5d1 | 2026-10-19 | review approved; verified green |
-| WI-0085 | Renderer: draw the scene, style, icons | done, look not yet accepted | haiku | see git log (WI-0085) | 2026-10-19 | review approved with one fix; frame 6.3 ms, rebuild 106 ms (152 ms at 4K, F-0151); owner accepts the look (E0088); verification follows |
+| WI-0085 | Renderer: draw the scene, style, icons | done, look not yet accepted | haiku | see git log (WI-0085) | 2026-10-19 | review approved with one fix; frame 6.3 ms, rebuild 106 ms (152 ms at 4K, F-0151); owner accepts the look (E0088); verified green |
 | WI-0086 | Engine: run states, connection taken, warnings per element | done | haiku | f2846ee2..19c91fdf | 2026-10-19 | review approved with one fix; verified green; F-0148 |
 | WI-0087 | Open and close an editor: supervisor and manager | done | haiku | 1646a787..e147d1f4 (see git log) | 2026-10-19 | review approved with one text fix; verified (one load flake); F-0149 carried to WI-0088 |
-| WI-0088 | Editor role: model, resync, window, headless driver | open | | | | |
+| WI-0088 | Editor role: model, resync, window, headless driver | running | haiku | | | workspace wi-88 |
 | WI-0089 | Live states, marks and the event load | open | | | | |
 | WI-0090 | View: zoom, move, tooltip, status bar, DPI | open | | | | |
 | WI-0091 | Tray icon and tray menu of the editor | open | | | | |
@@ -38,9 +38,11 @@ None.
 
 ## Running agents
 
-None.
+WI-0088 implementer (haiku), workspace wi-88.
 
 ## Last verified state
+
+Commit `f1d55c17` (WI-0085 integrated; WI-0087 included, selection of 13 groups): 1216 passed (1 skipped), VERDICT green (run 20261019-230236-f1d55c17).
 
 Commit `c20b0d79` (WI-0087 integrated, selection of the manager and supervisor groups): 918 passed, 1 failed under load (`tests/e2e/test_manager_flows.py::test_new_category_rename_and_the_delete_answered_no`, CPU 96 %; green alone in recheck 20261019-224555-recheck, green in 5 earlier runs): a load flake, WI-0087 not affected; run 20261019-224100-c20b0d79.
 
