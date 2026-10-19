@@ -78,6 +78,34 @@ class LogWindow {
         this.win.Hide()
     }
 
+    ; A change of the language (WI-0078, ManagerWindow.Refresh): the drop-downs and the column titles get the new texts; the
+    ; selections of the filter stay, the rows are drawn again.
+    Relabel() {
+        levelChoice := this.levelBox.Value
+        groupChoice := this.groupBox.Value
+        levels := []
+        for key in LogWindow.LEVEL_KEYS
+            levels.Push(Lang(key))
+        groups := []
+        for key in LogWindow.GROUP_KEYS
+            groups.Push(Lang(key))
+        this.levelBox.Delete()
+        this.levelBox.Add(levels)
+        this.groupBox.Delete()
+        this.groupBox.Add(groups)
+        if (levelChoice > 0)
+            this.levelBox.Choose(levelChoice)
+        if (groupChoice > 0)
+            this.groupBox.Choose(groupChoice)
+        this.lv.ModifyCol(1,, Lang("Log_time"))
+        this.lv.ModifyCol(2,, Lang("Log_level"))
+        this.lv.ModifyCol(3,, Lang("Log_source"))
+        this.lv.ModifyCol(4,, Lang("Log_text"))
+        this._FillFlows()
+        this._SetFilterControls()
+        this.dirty := true
+    }
+
     Close() {
         this._StopTimer()
         this.win.Close()

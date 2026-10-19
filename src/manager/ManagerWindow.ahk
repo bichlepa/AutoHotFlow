@@ -8,6 +8,8 @@
 #Include LogWindow.ahk
 #Include NoticeWindow.ahk
 #Include ImportReportWindow.ahk
+#Include SettingsWindow.ahk
+#Include AboutWindow.ahk
 
 ; The main window of the manager (WI-0073, WI-0074; REQ-MGR-010 to REQ-MGR-040): the view of the ManagerModel. It holds no
 ; logic of its own: it draws what the model holds and calls the operations of ManagerOps.
@@ -72,6 +74,8 @@ class ManagerWindow {
         this.logView := ""             ; the LogWindow, made at the first "Show log"
         this.noticeView := ""          ; the NoticeWindow (WI-0075), made at the first "Notices"
         this.importView := ""         ; the report of the import from v1 (WI-0076), made at the first import
+        this.settingsView := ""       ; the settings dialog (WI-0078), made by each click on "Settings"
+        this.aboutView := ""          ; the about window (WI-0078), made by each click on "About"
         this.dirty := true
         this.treeDirty := true
         this.labelDirty := Map()      ; flow ID -> true: its state mark changed (the item text only, no rebuild)
@@ -178,7 +182,40 @@ class ManagerWindow {
             this.noticeView.Close()
         if (IsObject(this.importView))
             this.importView.Close()
+        if (IsObject(this.settingsView))
+            this.settingsView.Close()
+        if (IsObject(this.aboutView))
+            this.aboutView.Close()
         this.win.Close()
+    }
+
+    ; A change of the language (WI-0078, Manager.OnSettings after UiTexts.Reload): the tree and the list of the flows are
+    ; drawn again with the new texts; the windows that hold translated lists or tab names are made again (Relabel).
+    Refresh() {
+        this.dirty := true
+        this.treeDirty := true
+        if (IsObject(this.settingsView) && this.settingsView.Visible)
+            this.settingsView.Relabel()
+        if (IsObject(this.logView))
+            this.logView.Relabel()
+        if (IsObject(this.noticeView))
+            this.noticeView.Relabel()
+    }
+
+    ; The settings dialog (WI-0078): a new one each time it is opened; a dialog that is open is not made twice.
+    ShowSettings() {
+        if (IsObject(this.settingsView) && this.settingsView.Visible)
+            return
+        this.settingsView := SettingsWindow(this.model)
+        this.settingsView.Show()
+    }
+
+    ; The about window (WI-0078).
+    ShowAbout() {
+        if (IsObject(this.aboutView) && this.aboutView.Visible)
+            return
+        this.aboutView := AboutWindow()
+        this.aboutView.Show()
     }
 
     ; The report of the import from v1 (WI-0076): made at the first call, then shown with its text.
@@ -263,6 +300,10 @@ class ManagerWindow {
                 this.role.OpenNotices()
             case "ImportExport":
                 this._ImportExport()
+            case "Settings":
+                this.ShowSettings()
+            case "About":
+                this.ShowAbout()
         }
     }
 

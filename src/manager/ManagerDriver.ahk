@@ -48,6 +48,7 @@ class ManagerDriver {
         this.ops["duplicate"] := (args, done) => this.flowOps.Duplicate(args.Get("flowId", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
         this.ops["delete"] := (args, done) => this.flowOps.Delete(ManagerDriver.Ids(args), (ans) => done(ManagerDriver.AnswerResult(ans)))
         this.ops["rename"] := (args, done) => this._OpRename(args, done)
+        this.ops["settings"] := (args, done) => this._OpSettings(args, done)
         this.ops["move"] := (args, done) => this.flowOps.Move(ManagerDriver.Ids(args), args.Get("category", ""), args.Get("before", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
         this.ops["catNew"] := (args, done) => this.flowOps.CategoryNew((ans) => done(ManagerDriver.AnswerResult(ans)))
         this.ops["catRename"] := (args, done) => this.flowOps.CategoryRename(args.Get("name", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
@@ -146,6 +147,20 @@ class ManagerDriver {
     ; without it the step is left out (a test never touches the real startup folder). The answer is the report.
     _OpImportV1(args, done) {
         this.role.ImportV1(args.Get("dir", ""), args.Get("startupDir", ""), (res) => done(ManagerDriver.Wire(res)))
+    }
+
+    ; WI-0078: the OK of the settings dialog without the window: the values (settings: key -> raw value, as the controls give
+    ; them) are checked by SettingsForm; a refused value answers ok false with the messages (errors: key -> message) and
+    ; nothing is sent (sent false). Otherwise the set goes to the engine and the answer is the answer of cmd.settings.set.
+    _OpSettings(args, done) {
+        res := SettingsForm.Collect(args.Get("settings", Map()))
+        if (!res["ok"]) {
+            done(Map("ok", false, "sent", Json.False, "errors", ManagerDriver.Wire(res["errors"]), "code", "bad_payload"
+                , "message", ""))
+            return
+        }
+        this.model.SetSettings(res["partial"], (ans) => done(Map("ok", ans["ok"], "sent", Json.True, "errors", Map()
+            , "code", ans["code"], "message", ans["message"])))
     }
 
     _OpSelectToggle(args, done) {

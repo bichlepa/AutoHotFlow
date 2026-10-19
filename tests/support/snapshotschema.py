@@ -24,7 +24,7 @@ INFO = {
     "storage": {"queue": dict, "logQueuedEntries": int, "logQueuedChars": int, "logLinesLost": int,
                 "logLinesDropped": int},
     "worker": {"job": (str, dict)},
-    "manager": {"topics": list, "engine": str, "epoch": int, "lastSeq": int, "flows": int, "events": int, "resyncs": int,
+    "manager": {"topics": list, "engine": str, "epoch": int, "lastSeq": int, "flows": int, "events": int, "resyncs": int, "language": str,
                 "selectedFlow": str, "windowVisible": int, "redrawTimer": int, "headless": int},
     "debug": {"topics": list, "processes": list, "snapshots": list, "logEntries": int, "engineEvents": int,
               "dumps": list, "paused": bool},

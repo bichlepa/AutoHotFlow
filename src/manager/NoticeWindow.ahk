@@ -39,6 +39,15 @@ class NoticeWindow {
         this.Refresh()
     }
 
+    ; A change of the language (WI-0078, ManagerWindow.Refresh): the column titles and the rows get the new texts.
+    Relabel() {
+        this.lv.ModifyCol(1,, Lang("Notice_time"))
+        this.lv.ModifyCol(2,, Lang("Notice_level"))
+        this.lv.ModifyCol(3,, Lang("Notice_flow"))
+        this.lv.ModifyCol(4,, Lang("Notice_text"))
+        this.Refresh()
+    }
+
     Hide() {
         this.win.Hide()
     }

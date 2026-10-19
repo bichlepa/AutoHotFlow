@@ -79,7 +79,8 @@ class Manager extends Role {
         return Map("topics", this.peer.Topics(), "engine", m.engineState, "epoch", m.epoch, "lastSeq", m.lastSeq, "flows", m.flows.Count
             , "events", m.eventCount, "resyncs", m.resyncCount, "selectedFlow", m.selectedFlow
             , "windowVisible", IsObject(this.view) ? (this.view.Visible ? 1 : 0) : 0
-            , "redrawTimer", IsObject(this.view) ? (this.view.timerOn ? 1 : 0) : 0, "headless", this.headless ? 1 : 0)
+            , "redrawTimer", IsObject(this.view) ? (this.view.timerOn ? 1 : 0) : 0, "headless", this.headless ? 1 : 0
+            , "language", LangTable.Code)
     }
 
     OnShutdown(deadlineMs) {
@@ -93,6 +94,8 @@ class Manager extends Role {
     ; The settings changed (WI-0077): Role.ApplySettings has loaded the new language; the open windows get its texts.
     OnSettings(settings) {
         UiTexts.Reload()
+        if (IsObject(this.view))
+            this.view.Refresh()      ; the tree, the lists and the open dialogs get the new texts (WI-0078)
     }
 
     ; The event goes to the model too (it checks the sequence and keeps the settings for the dialog).

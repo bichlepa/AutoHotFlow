@@ -2,6 +2,7 @@
 #Include ..\core\Errors.ahk
 #Include ..\core\Json.ahk
 #Include ..\core\Time.ahk
+#Include ..\core\SettingsModel.ahk
 
 ; The model of the manager (WI-0073, doc/ARCHITECTURE.md 3, doc/PROTOCOL.md 4.8). It holds the UI state only: the flows with
 ; their state, the categories and their order, the settings and the state of the connection to the engine. The truth
@@ -655,7 +656,13 @@ class ManagerModel {
         return Map("NewCategory", up, "NewFlow", up, "ChangeCategory", flows && up, "Duplicate", one && up
             , "Delete", (flows || this.catSelected) && up, "Edit", false   ; arch-ok: wire-bool UI state of the buttons, not a protocol field
             , "Enable", flows && up, "Run", flows && up
-            , "Settings", false, "ImportExport", up, "About", false, "Help", false, "ShowLog", true, "Exit", true, "Notices", true)
+            , "Settings", up, "ImportExport", up, "About", true, "Help", false, "ShowLog", true, "Exit", true, "Notices", true)
+    }
+
+    ; The settings dialog's set (WI-0078): the checked partial set (key -> value, SettingsModel form) goes to the engine as
+    ; cmd.settings.set (PROTOCOL 4.2). Booleans become JSON booleans here. done(answer) gets the answer of Command.
+    SetSettings(partial, done := "") {
+        this.Command("cmd.settings.set", Map("settings", SettingsModel.ToWire(partial)), done)
     }
 
     ; The label of the Run button for the focused flow: "Stop" while it runs, "Run" otherwise.
