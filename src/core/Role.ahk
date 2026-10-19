@@ -364,13 +364,13 @@ class Role {
 
     _OnPeerReady() {
         this.lostSince := 0
-        if (this._followSettings)
-            this._AskSettings()
         try {
             this.OnReady()
         } catch as e {
             this._Log("a0", "role", this.name " OnReady failed: " Type(e) ": " e.Message)
         }
+        if (this._followSettings)          ; after OnReady: what the role says first (sys.busy of the worker) stays first
+            this._AskSettings()
         this._FlushLog()
     }
 
