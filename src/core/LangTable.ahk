@@ -122,4 +122,36 @@ class LangTable {
             texts[key] := SubStr(line, pos + 1)
         }
     }
+
+    ; The languages the program has (WI-0078, the choice of the settings dialog): Array of [code, name], sorted by code. The
+    ; code is the file name of folder basic (de.ini -> de); the name is the line "name=" of [language_info] (the native name
+    ; of the language), the code when there is none. Read when the dialog opens, never on the message path of a role.
+    static Languages() {
+        dir := (LangTable.Dir != "") ? LangTable.Dir : LangTable.DefaultDir()
+        codes := []
+        loop files dir "\basic\*.ini" {    ; arch-ok: file-io language assets of the program, read by the dialog on request (ARCHITECTURE 4)
+            codes.Push(RegExReplace(A_LoopFileName, "\.ini$"))
+        }
+        text := ""                         ; the codes as lines, sorted by Sort (an Array has no Sort; "<" compares numbers)
+        for code in codes
+            text .= code "`n"
+        sorted := []
+        loop parse Sort(RTrim(text, "`n"), ""), "`n" {
+            if (A_LoopField != "")
+                sorted.Push(A_LoopField)
+        }
+        out := []
+        for code in sorted {
+            name := code
+            try {
+                text := FileRead(dir "\basic\" code ".ini", "UTF-8")    ; arch-ok: file-io language assets of the program, read by the dialog on request (ARCHITECTURE 4)
+                if (RegExMatch(text, "m)^name=([^\r\n]+)", &m))
+                    name := Trim(m[1])
+            } catch as e {
+                Log.Write("f3", "lang", "cannot read the name of " code ": " e.Message)
+            }
+            out.Push([code, name])
+        }
+        return out
+    }
 }
