@@ -88,7 +88,7 @@ class SceneBuilder {
             try displayName := cls.Name()
             try icon := cls.Icon
         }
-        trig := (kind = "trigger") ? SceneBuilder.TriggerStateOf(trigger.Get(id, "")) : ""
+        trig := (kind = "trigger") ? SceneBuilder.TriggerStateOf(trigger.Get(id, ""), SceneBuilder.IsDefaultTrigger(elem, className, package)) : ""
         ; The text on the element is the name the user gave it (v1 draws `name`); the class name is the fallback.
         label := SceneBuilder.TextOf(elem, "name")
         return SceneElement(id, kind, displayName, icon,
@@ -114,14 +114,32 @@ class SceneBuilder {
     }
 
     ; The trigger state of a scene element from the engine's state (a Map or "" for none): enabled and armed are 1 or 0
-    ; (internal values, no truth values of the protocol), the message is a text.
-    static TriggerStateOf(state) {
+    ; (internal values, no truth values of the protocol), the message is a text. isDefault is the default manual trigger
+    ; (the star): it comes from the definition, see IsDefaultTrigger, not from the state (WI-0088).
+    static TriggerStateOf(state, isDefault := false) {
         out := Map()
         out["enabled"] := (state is Map && state.Get("enabled", 0)) ? 1 : 0
         out["armed"] := (state is Map && state.Get("armed", 0)) ? 1 : 0
         out["message"] := (state is Map) ? SceneBuilder.TextOf(state, "message") : ""
-        out["default"] := (state is Map && state.Get("default", 0)) ? 1 : 0    ; the default manual trigger (star)
+        out["default"] := isDefault ? 1 : 0
         return out
+    }
+
+    ; True for the default manual trigger of a flow: the class Default.Trigger_Manual (any case, a missing package is
+    ; Default) whose key DefaultTrigger is true. The same rule as FlowDefinition.DefaultManualTrigger in the engine.
+    static IsDefaultTrigger(elem, className, package) {
+        if (StrLower(className) != "trigger_manual" || (package != "" && StrLower(package) != "default"))
+            return false
+        v := elem.Get("DefaultTrigger", "")
+        return (v == Json.True) || (!IsObject(v) && (v = 1 || v = "true"))
+    }
+
+    ; True when two trigger states of a scene are the same (for Scene.WithStates). "" (no trigger) equals "".
+    static SameTrigger(a, b) {
+        if (!(a is Map) || !(b is Map))
+            return !(a is Map) && !(b is Map)
+        return a["enabled"] = b["enabled"] && a["armed"] = b["armed"] && a["message"] = b["message"]
+            && a["default"] = b["default"]
     }
 
     ; The text of a key of a parsed object; "" for a missing key or an object value.
