@@ -86,6 +86,7 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0140 | The checkboxes of the settings dialog were 600 px wide and painted over the note column on hover | closed (fixed, unit test `ControlsOfATabDoNotOverlap`; the owner saw the fix on 2026-10-19) | WI-0078 |
 | F-0142 | PROTOCOL documents message types that no source string uses | closed 2026-10-19: `evt.connection.state` and `cmd.ui.confirmDeleteFlowFile` removed from PROTOCOL (dead; M-0008, WI-0086), the status table brought to the code | WI-0082 |
 | F-0143 | A `-m stress` run opens a real manager window | closed 2026-10-19: fixed in `tests/conftest.py` (a run that names stress, soak or idle but not gui leaves gui tests out, also with `--all`), test `tests/test_tier_selection.py` | WI-0082 |
+| F-0144 | The fast tier takes 4 to 13 minutes, not the 1 to 2 minutes of the owner decision F-0108 | closed (owner decision E0089: no fixed budget, the test groups decide) | |
 
 ## Findings
 
@@ -842,3 +843,9 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 - `work_items/STATUS.md`: table "Funde", "Beobachtungsliste (E0007)", "Bekannte Probleme", "Nicht geprüft", "Nächste Schritte", "Abnahmelauf WI-0034", "Abnahmelauf WI-0035".
 - `work_items/HANDOVER.md`: "Offene Entscheidungen", "Offene Punkte", "Nicht gebaut", "Nicht geprüft".
 - The package files `work_items/phase2b/WI-*.md` and `work_items/phase2/WI-*.md` as cited above.
+
+### F-0144: The fast tier takes 4 to 13 minutes
+
+**What:** The owner decision of 2026-10-16 (F-0108, `doc/CLOSED-ITEMS.md`) set the fast tier to about 1 minute, up to 2 minutes at the end of the port. The fast tier now has about 1600 tests (`python -m pytest tests --collect-only -q`: 1609 of 2292 collected); the run history shows 255 s (run `20261019-195119-a94365a0`, 1605 passed) to 793 s (run `20261019-200110-a94365a0`, 1605 passed, external CPU 16 %) for it with `run_suite.py` (4 workers).
+**Status:** closed by the owner's decision of 2026-10-19 (E0089): no fixed time budget; the tests are sorted into groups so that a change runs only what it needs. (Options were: Options: accept the size and change the rule in `AGENTS.md` and `doc/TEST-STRATEGY.md`; or mark more tests `slow`/`foundation` (the largest cost per `python tools/test_history.py --durations`). The test groups (`doc/TEST-GROUPS.md`) already keep most changes below the fast tier: `verify.py --auto` runs only the selection.)
+**Evidence:** `python tools/test_history.py --last 12` (2026-10-19).

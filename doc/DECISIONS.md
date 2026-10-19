@@ -98,6 +98,7 @@ Where the detailed wording is in a repository document, the table names that doc
 | E0086 | 2026-10-19 | **The editor of S0005 only reads the view** (zoom and offset in `flowSettings`). It is written in S0006 with the automatic saving (E0065), delayed, as a patch of the flow settings. Until then an editor always opens with the view saved in the file. | WI-0084, WI-0090, S0006 | `doc/REQUIREMENTS.md` REQ-EDT-030 |
 | E0087 | 2026-10-19 | **The tray menu of the editor is complete in S0005:** Show (default), Run, Enable or disable, Close (REQ-EDT-230). Run and the switch send the existing engine commands, with the questions of the manager. The menu bar and the context menus stay in S0006. | WI-0091 | `doc/REQUIREMENTS.md` REQ-EDT-230, REQ-EDT-110 |
 | E0088 | 2026-10-19 | **The editor keeps the geometry of v1 and gets a modernized look.** Positions, sizes and shapes of elements and connections stay as v1 (an old flow keeps its layout); font and colors are reworked, from one style table, and the owner accepts the look by screenshots. v1 is not the yardstick for the look (E0035). | WI-0085 | `work_items/phase3/README.md` S0005 |
+| E0089 | 2026-10-19 | **The fast tier has no fixed time budget any more** (replaces the budget of F-0108, 2026-10-16). Tests are sorted into the test groups so that a change runs only what it needs: short in the good case, longer when it must be (`python tools/verify.py --auto`, `doc/TEST-GROUPS.md`). The full tiers run at the end of a larger block. | F-0144 | `doc/TEST-GROUPS.md`, `AGENTS.md` |
 
 ## Open
 

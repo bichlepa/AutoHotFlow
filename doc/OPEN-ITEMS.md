@@ -40,7 +40,6 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0119 | A multi-selection of flows is not visible in the tree (only the focused item is highlighted) | open, verified in code; the owner decides on a mark | WI-0074 |
 | F-0121 | The tree label of a running flow (`ManagerWindow._FlowLabel`) has no automated test | open, verified in code | WI-0074 |
 | F-0122 | A multi-selection was lost on a later rebuild of the tree (fixed; no automated test, the path is only reachable through a real tree) | open, verified in code, not checked on screen | WI-0074 |
-| F-0144 | The fast tier takes 4 to 13 minutes, not the 1 to 2 minutes of the owner decision F-0108 | open, owner decision (NEEDS-ATTENTION): accept the size or move tests to the slow tier | documentation review |
 | F-0145 | The status "planned" of the oldest MIGRATION entries (M-0001 to M-0005, M-0010, M-0012 to M-0014) was never re-checked against the code | open, found in the documentation review; M-0014 is implemented in `LoopStack.Pop` (read) | documentation review |
 | F-0146 | The `README.md` in the repository root describes v1 (downloads, installer, `find modules.ahk`, screenshots of v1) while the branch is the v2 port | open, low; rewrite at the end of the port (S0009/S0010) | documentation review |
 
@@ -177,12 +176,6 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **What:** `LogWindow.Relabel` and `NoticeWindow.Relabel` set the column titles and the drop-down lists again (ManagerWindow.Refresh). No test reads their texts: the headless tests have no window, the gui test covers the settings dialog and the about window only.
 **Status:** open, verified in code, not checked on screen. Action: step 50 of MANUAL-CHECKS section 8 by the owner; a gui test later.
 **Evidence:** `src/manager/LogWindow.ahk`, `src/manager/NoticeWindow.ahk`, `src/manager/ManagerWindow.ahk` (`Refresh`).
-
-### F-0144: The fast tier takes 4 to 13 minutes
-
-**What:** The owner decision of 2026-10-16 (F-0108, `doc/CLOSED-ITEMS.md`) set the fast tier to about 1 minute, up to 2 minutes at the end of the port. The fast tier now has about 1600 tests (`python -m pytest tests --collect-only -q`: 1609 of 2292 collected); the run history shows 255 s (run `20261019-195119-a94365a0`, 1605 passed) to 793 s (run `20261019-200110-a94365a0`, 1605 passed, external CPU 16 %) for it with `run_suite.py` (4 workers).
-**Status:** open, an owner decision. Options: accept the size and change the rule in `AGENTS.md` and `doc/TEST-STRATEGY.md`; or mark more tests `slow`/`foundation` (the largest cost per `python tools/test_history.py --durations`). The test groups (`doc/TEST-GROUPS.md`) already keep most changes below the fast tier: `verify.py --auto` runs only the selection.
-**Evidence:** `python tools/test_history.py --last 12` (2026-10-19).
 
 ### F-0145: MIGRATION entries from phase 1 still say "planned"
 
