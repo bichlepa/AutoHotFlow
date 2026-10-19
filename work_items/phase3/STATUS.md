@@ -21,9 +21,9 @@ WI-0083, WI-0084, WI-0086 and WI-0087 may start now; WI-0083 stops for the owner
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
-| WI-0083 | GDI+ wrapper and the R0002 measurement | done, owner decision pending | haiku | e0febbf1..92b9cac5 | 2026-10-19 | R0002 failed: 300 ms vs 16 ms (MS-0044); WI-0085 waits for the owner (NEEDS-ATTENTION) |
+| WI-0083 | GDI+ wrapper and the R0002 measurement | done | haiku | e0febbf1..92b9cac5 | 2026-10-19 | R0002 failed: 300 ms vs 16 ms (MS-0044); owner decided E0090 (caches), added to WI-0085 |
 | WI-0084 | Geometry and scene (headless) | running | haiku | | | workspace wi-84 |
-| WI-0085 | Renderer: draw the scene, style, icons | open | | | | owner accepts the look (E0088) |
+| WI-0085 | Renderer: draw the scene, style, icons | open | sonnet | | | owner accepts the look (E0088) |
 | WI-0086 | Engine: run states, connection taken, warnings per element | open | | | | |
 | WI-0087 | Open and close an editor: supervisor and manager | open | | | | |
 | WI-0088 | Editor role: model, resync, window, headless driver | open | | | | |
