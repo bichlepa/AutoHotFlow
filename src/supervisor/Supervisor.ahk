@@ -36,6 +36,7 @@
 ;   --restart-max  (only with --test-roles) restarts per RESTART_WINDOW_MS, default Children.RESTART_MAX (3);
 ;               lets the tests restart a child many times (handle leaks).
 ;   --worker-limit  (only with --test-roles) most workers alive at once, default Children.WORKER_LIMIT (24, E0048).
+;   --editor-limit  (only with --test-roles) most editors alive at once, default Children.EDITOR_LIMIT (20, WI-0087).
 ;   --headless, --cancel-exit  passed on to every role (the manager and the tray have no window or icon and answer test commands, WI-0073).
 ;   --tray, --no-tray  start the role tray (the tray icon and menu of the application, WI-0072, E0075) or not. Default: the
 ;               product entry starts it, the test entry does not (Supervisor.TrayDefault), so that no test run shows an icon.
@@ -136,6 +137,12 @@ class Supervisor {
             this.workerLimit := this._Integer(opts, "worker-limit", Children.WORKER_LIMIT)
         if (this.workerLimit < 1 || this.workerLimit > Children.WORKER_LIMIT)
             throw AhfError("supervisor: --worker-limit must be between 1 and " Children.WORKER_LIMIT, ErrCode.BAD_ARGS)
+        ; Only with --test-roles (WI-0087): the limit of living editors can be lowered, so a test needs no 21 processes.
+        this.editorLimit := Children.EDITOR_LIMIT
+        if (this.testRoles && opts.Has("editor-limit"))
+            this.editorLimit := this._Integer(opts, "editor-limit", Children.EDITOR_LIMIT)
+        if (this.editorLimit < 1 || this.editorLimit > Children.EDITOR_LIMIT)
+            throw AhfError("supervisor: --editor-limit must be between 1 and " Children.EDITOR_LIMIT, ErrCode.BAD_ARGS)
         this.deadlineMs := this._Integer(opts, "deadline", Supervisor.DEFAULT_DEADLINE_MS)
         if (this.deadlineMs < Supervisor.MIN_DEADLINE_MS || this.deadlineMs > Supervisor.MAX_DEADLINE_MS)
             throw AhfError("supervisor: --deadline must be between " Supervisor.MIN_DEADLINE_MS " and "
@@ -197,7 +204,7 @@ class Supervisor {
             , "hubHwnd", Wake.Hwnd, "testRoles", this.testRoles
             , "entryDir", A_ScriptDir "\entry"
             , "roleOpts", this.roleOpts, "restartMax", this.restartMax
-            , "workerLimit", this.workerLimit)
+            , "workerLimit", this.workerLimit, "editorLimit", this.editorLimit)
         this.hub := Hub(this.pipe, this.session)
         this.diag := DiagLog(this.hub)
         Log.Configure(this.diag.SinkFn)      ; to storage as soon as it is connected, else queued (WI-0023)
@@ -236,6 +243,7 @@ class Supervisor {
         h.On("cmd.app.", (msg) => this._OnApp(msg))
         h.On("cmd.diag.snapshot", (msg) => Map("snapshot", this.Snapshot()))
         h.On("cmd.process.", (msg) => this._OnProcess(msg))
+        h.On("cmd.editor.", (msg) => this._OnEditor(msg))
         h.On("cmd.diag.report", (msg) => this._OnReport(msg))
         h.On("evt.diag.error", (msg) => this._OnDiagError(msg))
         h.On("evt.settings.changed", (msg) => this._OnSettings(msg))
@@ -414,6 +422,23 @@ class Supervisor {
             return Map()
         }
         throw AhfError("unknown command " msg.type, ErrCode.UNKNOWN_TYPE)
+    }
+
+    ; cmd.editor.open {flowId} (WI-0087, PROTOCOL 4.1): the manager asks for the editor of a flow, one editor per flow (D0002).
+    ; The flow is not checked here (the editor does it, WI-0088). A running editor is shown, not started a second time.
+    _OnEditor(msg) {
+        if (msg.type != "cmd.editor.open")
+            throw AhfError("unknown command " msg.type, ErrCode.UNKNOWN_TYPE)
+        if (msg.from != "manager")
+            throw AhfError(msg.type " is reserved for the manager, not for '" msg.from "'", ErrCode.DENIED)
+        flowId := msg.payload.Get("flowId", "")
+        if (!Children.FlowIdOk(flowId))
+            throw AhfError("payload field 'flowId' must be a flow ID that a command line can carry", ErrCode.BAD_PAYLOAD)
+        if (this.children.shuttingDown)
+            throw AhfError("the supervisor is shutting down", ErrCode.SHUTTING_DOWN)
+        started := this.children.OpenEditor(flowId)
+        Log.Write("a1", "supervisor", "editor of '" flowId "' " (started ? "started" : "is running, asked to show itself"))
+        return Map("started", Json.Bool(started))
     }
 
     static _RequireEngine(msg) {

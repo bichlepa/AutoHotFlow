@@ -62,6 +62,9 @@ class Children {
     static OUTPUT_RING_MAX := 100
     ; Most workers alive at the same time (a safeguard against a faulty engine; the pool size N is the engine's).
     static WORKER_LIMIT := 24
+    ; Most editors alive at the same time (WI-0087, PROTOCOL 4.1 cmd.editor.open): one per open flow, so this is a
+    ; safeguard against a runaway manager, not a number a user reaches.
+    static EDITOR_LIMIT := 20
     static GONE_WORKERS_KEEP := 8
     ; Per child and tick: at most 64 KB are read and at most 200 lines are logged. The rest of the lines goes
     ; into the ring only, with one log line that says how many; so a chatty child cannot flood storage.
@@ -85,6 +88,7 @@ class Children {
         this._recs := Map()
         this.restartMax := config.Get("restartMax", Children.RESTART_MAX)
         this.workerLimit := config.Get("workerLimit", Children.WORKER_LIMIT)
+        this.editorLimit := config.Get("editorLimit", Children.EDITOR_LIMIT)
         this._nextWorker := 1
         this._autoRoles := Map()
         for roleName, _ in Children.AUTO_RESTART
@@ -209,6 +213,48 @@ class Children {
             if (rec["role"] = "worker" && !rec["gone"])
                 n += 1
         return n
+    }
+
+    ; Number of editors whose process is still running (WI-0087).
+    LiveEditors() {
+        n := 0
+        for _, rec in this._recs
+            if (rec["role"] = "editor" && !rec["gone"])
+                n += 1
+        return n
+    }
+
+    ; Starts the editor of a flow, or asks the running one to show its window (cmd.editor.open, PROTOCOL 4.1). Returns true
+    ; when a process was started, false when the editor runs already (cmd.editor.show is sent, its answer is only logged).
+    ; A running editor never counts against the limit. Throws AhfError: busy (EDITOR_LIMIT editors alive), and what Open
+    ; throws (internal). The flow ID is checked by FlowIdOk before (the caller).
+    OpenEditor(flowId) {
+        name := "editor:" flowId
+        if (this._recs.Has(name) && !this._recs[name]["gone"]) {
+            this.hub.Request(name, "cmd.editor.show", Map(), (ans) => this._OnEditorShown(name, ans), 3000)
+            return false
+        }
+        if (this.LiveEditors() >= this.editorLimit)
+            throw AhfError("already " this.editorLimit " editors alive", ErrCode.BUSY)
+        return this.Open(name)
+    }
+
+    _OnEditorShown(name, ans) {
+        if (!IsObject(ans)) {
+            Log.Write("a1", "children", name " did not take cmd.editor.show (not connected yet, or gone)")
+            return
+        }
+        Log.Write("a1", "children", name " answered cmd.editor.show: " ans.type)
+    }
+
+    ; True when a flow ID can be an editor's name and the value of --flow: text, not empty, no double quote, no control
+    ; character, and no backslash at the end (before the closing quote of the command line it would escape it). WI-0087.
+    static FlowIdOk(flowId) {
+        if (Type(flowId) != "String" || flowId = "")
+            return false
+        if (InStr(flowId, '"') || RegExMatch(flowId, "[\x01-\x1F\x7F]") || SubStr(flowId, -1) = "\")
+            return false
+        return true
     }
 
     ; Keeps the records of the last GONE_WORKERS_KEEP ended workers; older ones go (the list stays short in a long session).
