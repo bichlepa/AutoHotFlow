@@ -432,3 +432,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** In an AHK unit test (`tests/ahk/*.test.ahk`, `#SingleInstance Off`) make the window (`UiWindow` makes a hidden `Gui`), read and set its controls (`ctl.Value`, `ctl.Text`), call the handler the button calls (`win.OnOk()`), and give the model a fake (a class with the same method name that records the call and answers at once). Never call `Show`; `win.Close()` in a `finally`. The controls of a window are not enumerable in AHK v2 without a list: keep the controls you test in a Map or an Array of the window (`this.lines`, `this.ctl`).
 - **Status:** verified (tests/ahk/manager_settings_window.test.ahk, 7 cases pass; the same windows are shown only by the gui test, owner run).
 - **Source:** WI-0078, tests/ahk/manager_settings_window.test.ahk.
+
+### A session with N workers needs `--workers=N` and `--warm-workers=N`, and `--windows-startup` drops the manager (verified)
+
+- **Problem:** A memory measurement with one and three workers, and with and without a manager, started sessions that did not have the processes the test expected.
+- **Wrong:** `--workers=3` alone: the engine asks for the default number of warm workers (1) at the start, so only one worker process exists until flows need more. A `--start` list with `manager` plus `--windows-startup`, expecting a manager: the supervisor leaves the manager out of a start with Windows (E0064), without a message.
+- **Right:** Pass both options for N living workers at once, and count the `--role=worker` processes before sampling (`tests/stress/test_background_memory.py` waits for them and asserts the count). For "no manager" use `--windows-startup` with the normal start list: the test then also checks the real start-with-Windows path. The roles `tray` and `manager` with `--headless` have no visible icon or window, so a stress run opens nothing; the window itself is measured only by a gui test.
+- **Status:** verified (tests/stress/test_background_memory.py, 12 sessions).
+- **Source:** WI-0082, `Supervisor.ahk` (`startList`), `Engine.ahk` (`--workers`, `--warm-workers`).

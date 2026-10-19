@@ -1414,18 +1414,18 @@ Closing the manager window only hides it. Flows and triggers keep running; the t
 ### REQ-MGR-090 Tray icon of the application
 
 - **v1:** yes
-- **v2:** partial (the icon with the tooltip and the double click are done in the role tray (E0075), also without a manager and after its crash; the tray notices of REQ-USE-030 are missing)
+- **v2:** partial (the icon with the tooltip and the double click are done in the role tray (E0075), also without a manager and after its crash (headless tests); the tray notices of REQ-USE-030 reach the role (WI-0075, counted headless); the real icon, its tooltip and a real notice are checked by the owner only: gui test `test_the_real_icon_...` and MANUAL-CHECKS section 1 step 12)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (notices: WI-0075)
-- **Evidence:** `tests/fault/test_tray_role.py::test_the_real_icon_opens_its_menu_and_a_menu_open_for_8_seconds_does_not_make_the_role_hung`, `tests/fault/test_tray_role.py::test_the_tray_role_always_comes_back_after_a_growing_pause`
+- **Plan:** S0004 (notices: WI-0075, done)
+- **Evidence:** `tests/fault/test_tray_role.py::test_the_real_icon_opens_its_menu_and_a_menu_open_for_8_seconds_does_not_make_the_role_hung`, `tests/fault/test_tray_role.py::test_the_tray_role_always_comes_back_after_a_growing_pause`, `tests/fault/test_tray_role.py::test_a_killed_tray_role_is_started_again_so_the_icon_comes_back`, `tests/fault/test_tray_role.py::test_a_crashed_manager_is_opened_again_by_the_show_manager_entry`
 
 While AutoHotFlow runs, its icon is in the tray, with the tooltip "AutoHotFlow", also when the manager is not running or has crashed (E0064). A double click shows the manager, and starts it if it is not running. The application has one tray icon however many of its processes run; besides it, only open editors have an icon (REQ-EDT-230). Errors and warnings that have no window of their own appear as tray notices (REQ-USE-030). The menu: REQ-MGR-140.
 
 ### REQ-MGR-140 Tray menu of the application
 
 - **v1:** yes
-- **v2:** done (the role tray, E0075; the manager window itself comes with WI-0073: until then "Show manager" shows the stub)
+- **v2:** done (the role tray, E0075; "Show manager" shows the window of the manager, WI-0073, and starts the manager when it is not running; the entries follow a change of the language, `tests/e2e/test_manager_settings.py::test_the_language_changes_the_tray_menu_and_the_manager_without_a_restart`)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
@@ -1890,11 +1890,11 @@ v2 writes `formatVersion: 2`; loading a file saved by v2 converts nothing again.
 ### REQ-MIG-060 Import from the v1 data folder
 
 - **v1:** n/a
-- **v2:** partial
+- **v2:** partial (flows, variables, settings and the autostart question are tested headless; the folder dialog, the report window and the import of the owner's own v1 data folder are checked by the owner only: MANUAL-CHECKS section 1, part B)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** `tests/e2e/test_manager_import.py` (flows with their IDs and disabled, existing IDs skipped or copied, broken file listed, demo flows not imported, variables with v2 winning, source folder unchanged, autostart kept, removed or refused; the settings part is WI-0077, not yet)
+- **Evidence:** `tests/e2e/test_manager_import.py` (flows with their IDs and disabled, existing IDs skipped or copied, broken file listed, demo flows not imported, variables with v2 winning, source folder unchanged, autostart kept, removed or refused), `tests/e2e/test_manager_import_settings.py` (the settings of v1: taken over as E0068 says, a refused value listed, a missing or broken file, the default language not taken over). The folder dialog and the report window are checked by the owner only (MANUAL-CHECKS section 1, part B)
 
 The user imports the flows and variables of v1 into the v2 data folder through the manager, with a report of the marked places. An automatic backup of the v1 data at the switchover may come later (E0021). Rules (E0068):
 
@@ -2337,10 +2337,11 @@ The broken file is reported; all other flows load.
 ### REQ-ROB-120 A crashed editor or manager loses nothing
 
 - **v1:** no (one process; a crash ends everything)
-- **v2:** open
+- **v2:** partial (the manager part: a killed manager is not restarted by itself, the tray icon stays and opens a new one, which holds the 200 flows again; the owner's check of the real crash is MANUAL-CHECKS section 1 step 25; that the rest keeps running and a flow can still be started after a crash of the real manager is the gui test `test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted` (gui tier: the gui tests of WI-0073 are reported as passed in `work_items/phase3/STATUS.md`; not repeated by agents); the editor is S0006)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (manager), S0006 (editor)
+- **Evidence:** `tests/fault/test_tray_role.py::test_a_crashed_manager_is_opened_again_by_the_show_manager_entry`, `tests/fault/test_manager_window.py::test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted (gui)`, `tests/stress/test_manager_big_flows.py::test_the_manager_holds_200_big_flows_quickly_and_in_little_memory`
 - **Doubt:** Still open: whether AutoHotFlow opens a crashed editor again by itself. (The question of unsaved changes is gone with E0065.)
 
 When an editor crashes, no completed edit is lost: every edit is in effect at once and is saved automatically (REQ-EDT-100, E0065). The user learns that the editor has ended; the editor opened again shows the flow with all edits. Only an edit in progress at that moment (an open dialog, a move with the mouse) may be lost. A crashed manager is opened again from the tray icon, which belongs to the application and stays (REQ-MGR-090, E0064). Flows and triggers keep running in both cases (REQ-ROB-010).
@@ -2599,7 +2600,7 @@ Generated expressions run as native AutoHotkey v2 code and in the evaluator; the
 ### REQ-TST-060 Manual checks of the user interfaces
 
 - **v1:** n/a
-- **v2:** partial (guide for the stub and the debug window; the stub passed on 2026-10-14, the debug window is not checked)
+- **v2:** partial (guides for the stub and the debug window (passed 2026-10-14), the dialog windows (DPI, passed 2026-10-17), the triggers (sections 4 and 5; passed 2026-10-17), the manager (section 1, parts A to E), start with Windows and administrator (section 7) and the settings dialog (section 8); the checks of section 1, 7 and 8 and the gui tests of S0004 are open for the owner (WI-0082); the editor guides come with S0005 to S0007)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 to S0007

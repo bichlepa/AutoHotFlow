@@ -404,6 +404,24 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: memory of the background processes (stress, alone, about 8 min, MEASURE lines)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/stress/test_background_memory.py",
+                "-m",
+                "stress",
+                "-n",
+                "0",
+                "-s",
+                "-q"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Test: soak, minutes, serial (-m soak)",
             "type": "shell",
             "command": "python",
