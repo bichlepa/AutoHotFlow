@@ -86,6 +86,7 @@ TEST_GROUPS = {
     "e2e/test_manager_import_settings.py": ["settings", "manager"],
     "e2e/test_manager_settings.py": ["manager", "tray", "settings"],
     "e2e/test_manager_log.py": ["manager"],
+    "e2e/test_manager_editor.py": ["manager", "supervisor"],
     "fault/test_debug_dump.py": ["diagnosis"],
     "fault/test_debug_role.py": ["diagnosis"],
     "fault/test_diagnose.py": ["diagnosis"],
