@@ -61,6 +61,7 @@ TEST_GROUPS = {
     "ahk/expr_v1detect.test.ahk": ["expr"],
     "ahk/frame.test.ahk": ["transport"],
     "ahk/gdip.test.ahk": ["render"],
+    "ahk/editor_renderer.test.ahk": ["render"],
     "ahk/json.test.ahk": ["base"],
     "ahk/manager_model.test.ahk": ["manager"],
     "ahk/manager_settings_form.test.ahk": ["manager", "lang"],

@@ -44,6 +44,7 @@ OTHER_RULES = [
     ("tests/ahk/helpers/ExecutorKit.ahk", EXECUTOR_KIT_USERS),
     ("tests/ahk/helpers/EngineOwner.ahk", EXECUTOR_KIT_USERS),
     ("tests/ahk/helpers/render_bench.ahk", ["render", "tools"]),   # the renderer bench, driven by tools/measure_render.py
+    ("assets/icons/*", ["render"]),                                # the icons of the editor drawing (WI-0085)
     ("tests/ahk/helpers/element_rate_bench.ahk", ["element-units", "engine"]),   # benches: run by hand (VS Code tasks)
     ("tests/ahk/helpers/loop_bench.ahk", ["element-units", "engine"]),
     ("tests/ahk/helpers/evalparams_bench.ahk", ["element-units", "expr"]),
