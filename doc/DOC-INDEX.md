@@ -55,20 +55,20 @@ L590-599   5a Events before subscription (design question, WI-0007)
 L601-605 6. Versioning and extension
 ```
 
-## doc/TEST-STRATEGY.md (54.4 KB, 335 lines)
+## doc/TEST-STRATEGY.md (54.7 KB, 338 lines)
 ```text
 L5-11 1. Principles
 L13-22 2. Levels
 L24-58 3. Important scenarios
 L60-65 4. Round trip and compatibility
 L67-85 5. Structure of the directory `tests/`
-L87-229 6. Execution
-L231-258 7. Golden data from v1 (L0006, WI-0036)
-L260-281 8. Oracle of the expression language: native AHK v2 (E0035, WI-0044)
-L283-285 8a. Smoke test of every element (WI-0048)
-L287-291 8b. Test triggers (WI-0061)
-L293-313 9a. Dialog tests (E0038, WI-0051)
-L315-335 9. Flow builder and headless runner (WI-0049)
+L87-232 6. Execution
+L234-261 7. Golden data from v1 (L0006, WI-0036)
+L263-284 8. Oracle of the expression language: native AHK v2 (E0035, WI-0044)
+L286-288 8a. Smoke test of every element (WI-0048)
+L290-294 8b. Test triggers (WI-0061)
+L296-316 9a. Dialog tests (E0038, WI-0051)
+L318-338 9. Flow builder and headless runner (WI-0049)
 ```
 
 ## doc/ELEMENT-API-V2.md (52.3 KB, 468 lines)

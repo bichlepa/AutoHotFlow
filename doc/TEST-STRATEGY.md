@@ -150,7 +150,10 @@ test). That does not cover a hang outside a test (collection, start of the worke
 `run_suite.py`: no output and no new `live.log` line for `--stall-timeout` seconds (default 300, 1800 for stress, soak
 and idle runs, 0 = off) writes `stall.txt` into the run folder (process tree, last line of every worker), kills the
 process tree and exits with 76. After pytest has ended, `run_suite` does not wait for its output pipe any longer and
-kills processes that still run from the worktree.
+kills processes that still run from the worktree. The limit of 120 s kills the worker (thread method, the only one on
+Windows) and xdist starts a new one for the next test; `pytest.ini` allows 3 such restarts (`--max-worker-restart 3`).
+Without it a file whose tests all hang restarted workers for ever, and the watchdog saw no stall, because every new
+worker writes to `live.log` (found in a run of WI-0077, 2026-10-19).
 
 **Admission, load figures and run history (WI-0059).** Every pytest run takes part, however it was started
 (`python -m pytest`, a VS Code task, `run_suite.py`, `recheck.py`); agents no longer coordinate their test runs by
