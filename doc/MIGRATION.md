@@ -2,6 +2,8 @@
 
 Updated continuously. Silent behavior changes are not allowed: everything that is intentionally different in v2 is recorded here.
 
+The IDs are unique and in order. M-0009 does not exist (an entry about a removed package was deleted; the number stays unused). The status "planned" of the oldest entries (M-0001 to M-0005, M-0010, M-0012 to M-0014) was written in phase 1 and has not been re-checked against the code since: see OPEN-ITEMS.
+
 | ID | Area | v1 | v2 | Reason | Status |
 |---|---|---|---|---|---|
 | M-0001 | Crash of the engine | A crash of the one process ends everything, running instances are gone | The supervisor restarts the engine, running instances are gone, UIs stay connected and resynchronize | Architecture (processes) | planned |
