@@ -1358,11 +1358,11 @@ Create, rename and delete categories; move flows to another category. When a cat
 ### REQ-MGR-040 Operate flows from the manager
 
 - **v1:** yes
-- **v2:** partial (WI-0074: run, stop, enable and disable of the selected flows, several flows by Ctrl click; "Edit" is disabled until the editor, S0005)
+- **v2:** partial (WI-0074: run, stop, enable and disable of the selected flows, several flows by Ctrl click; WI-0087: "Edit" is enabled for exactly one selected flow and starts the editor process of that flow, headless; the double click on a flow does the same but is only checked by hand; the editor window itself comes with WI-0088)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004
-- **Evidence:** `tests/e2e/test_manager_flows.py::test_enable_and_disable_switch_the_flow_and_the_buttons_follow`, `tests/e2e/test_manager_flows.py::test_ctrl_click_selects_several_flows_and_the_operations_act_on_them`
+- **Evidence:** `tests/e2e/test_manager_flows.py::test_enable_and_disable_switch_the_flow_and_the_buttons_follow`, `tests/e2e/test_manager_flows.py::test_ctrl_click_selects_several_flows_and_the_operations_act_on_them`, `tests/e2e/test_manager_editor.py::test_edit_button_is_enabled_for_exactly_one_selected_flow`, `tests/e2e/test_manager_editor.py::test_edit_starts_the_editor_process_of_the_flow`
 
 Buttons for run, stop, enable and disable, and edit (opens the editor of the flow) for the selected flows.
 
@@ -1496,7 +1496,7 @@ A deleted flow is not lost at once (E0066). Ideas of the owner (2026-10-17), to 
 ### REQ-EDT-010 One editor per flow, several at the same time
 
 - **v1:** partial (several editors, but drawing and input share one lock and one draw thread)
-- **v2:** open
+- **v2:** partial (WI-0087: the supervisor starts one editor process per flow for the Edit button and a double click, and a second request shows the running one; the editor window, its live states and its own process life come with WI-0088 to WI-0091)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
