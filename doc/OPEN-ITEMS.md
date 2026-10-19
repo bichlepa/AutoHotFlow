@@ -20,7 +20,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0130 | Drag and drop of an `.ahf` file onto the manager and the file dialogs of the import and export are not automated (the gui tier is not run by agents) | open, WI-0081; only MANUAL-CHECKS part D checks them by hand | WI-0081 |
 | F-0131 | A name outside the ANSI code page may make the listing of tar fail: the listing is read as text in the ANSI code page, and a failed listing reads as "not a ZIP archive" | open, not reproduced (WI-0081) | WI-0081 |
 | F-0132 | UNC paths (`\\server\share\x.ahf`) are refused: the path must start with a drive letter | open decision for the owner | WI-0081 |
-| F-0139 | The windows of the log and of the notices are relabelled on a language change (`LogWindow.Relabel`, `NoticeWindow.Relabel`), no test reads their texts; checked by hand only (MANUAL-CHECKS section 6, step 50) | open, verified in code, not checked on screen | WI-0078 |
+| F-0139 | The windows of the log and of the notices are relabelled on a language change (`LogWindow.Relabel`, `NoticeWindow.Relabel`), no test reads their texts; checked by hand only (MANUAL-CHECKS section 8, step 50) | open, verified in code, not checked on screen | WI-0078 |
 | F-0133 | The link branch of `ArchiveUnpack._CheckTree` and the link refusal of `ArchiveEntries.CheckListing` have no test (a junction, `mklink /J`, would test the tree check) | open, WI-0081 | WI-0081 |
 | F-0134 | The flow JSON of an `.ahf` file is parsed in the manager without a depth limit (the unpacked size is limited to 4 MB, nesting is not): very deep nesting could exhaust the parser | open, not checked, WI-0081 | WI-0081 |
 | F-0135 | A second start without elevation cannot reach a running elevated session (WI-0079): the instance mutex of the elevated process is not accessible (access denied), the start ends with exit 1 and a log line about higher rights; the pipe DACL (`PipeListener.SDDL`: system and owner) was not checked for a not elevated client. The second start from the Explorer shows no window and no message to the user | open, found in the design, not run for real (UAC is a manual check, MANUAL-CHECKS 7 step 14); possible fix: a mutex and a pipe that a not elevated process of the user may open | WI-0079 |
@@ -209,7 +209,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 ### F-0139: The log and notice windows follow a language change without a test (open)
 
 **What:** `LogWindow.Relabel` and `NoticeWindow.Relabel` set the column titles and the drop-down lists again (ManagerWindow.Refresh). No test reads their texts: the headless tests have no window, the gui test covers the settings dialog and the about window only.
-**Status:** open, verified in code, not checked on screen. Action: step 50 of MANUAL-CHECKS section 6 by the owner; a gui test later.
+**Status:** open, verified in code, not checked on screen. Action: step 50 of MANUAL-CHECKS section 8 by the owner; a gui test later.
 **Evidence:** `src/manager/LogWindow.ahk`, `src/manager/NoticeWindow.ahk`, `src/manager/ManagerWindow.ahk` (`Refresh`).
 
 ### F-0140: The checkboxes of the settings dialog were 600 px wide and painted over the note column on hover (closed, fixed)

@@ -2,7 +2,7 @@
 #SingleInstance Off
 ; Unit tests of the settings dialog and the about window of the manager (WI-0078) with real controls, never shown: the windows
 ; are made and read, the model is a fake that records what the OK button sends. The window is not shown (no user is needed),
-; the look is checked by the gui test and the manual check (doc/MANUAL-CHECKS.md, section 6).
+; the look is checked by the gui test and the manual check (doc/MANUAL-CHECKS.md, section 8).
 ; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
 #Warn All, StdOut
 #Include lib\Assert.ahk

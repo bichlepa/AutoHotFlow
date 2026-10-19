@@ -6,7 +6,7 @@ the engine knows the state; no key is pressed, so no input is sent and no lock i
 - after a restart of the trigger host the trigger is armed again.
 
 The hotkey with real input (a key that really fires the flow) is the open decision on how keys are delivered in tests
-(doc/MANUAL-CHECKS.md section 6); it is not in this file.
+(the gui tests of the hotkey, VS Code task "Test: hotkey input with key combinations"; the old section 6 of doc/MANUAL-CHECKS.md was removed); it is not in this file.
 """
 
 import json

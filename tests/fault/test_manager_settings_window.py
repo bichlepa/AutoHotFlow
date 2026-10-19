@@ -3,7 +3,7 @@
 What is checked: the button "Settings" opens the dialog with its texts, Cancel closes it, a change of the language while the
 dialog is open makes it again in the new language (its title and buttons), the button of the manager window follows the
 language too, and the button "About AutoHotFlow" opens the about window. The look (the heights of the texts at other DPI) is the owner's
-manual check (doc/MANUAL-CHECKS.md, section 6).
+manual check (doc/MANUAL-CHECKS.md, section 8).
 
 The windows are found by their process and their titles (English, or German after the change), like test_manager_window.py.
 """

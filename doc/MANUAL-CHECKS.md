@@ -2,7 +2,7 @@
 
 The automated tests do not cover the checks in this document. The project owner runs them by hand. Each step states the expected result. A step passes only if the expected result is seen. A dialog box (window class `#32770`) at any point is a failure.
 
-The checks cover two interfaces: the manager (section 1) and the debug window (section 2). Use the "Result" template at the end to record a run.
+The checks cover the manager (section 1), the debug window (section 2), the dialog windows at other scaling (section 3), triggers (sections 4 and 5), start with Windows and run as administrator (section 7) and the settings dialog (section 8). The numbers are kept as they were: section 6 ("Checks that wait for a decision of the project owner", empty) was removed, and other documents refer to sections 7 and 8. Use the "Result" template at the end to record a run.
 
 Where a step starts the application, the VS Code task is named by its label in `.vscode/tasks.json`, followed by the same call for a terminal.
 
@@ -277,10 +277,12 @@ Record one result per run. Copy the template.
 ```
 Date:
 Tester:
-Stub (section 1): steps 1 to 7 pass / fail (list failed steps)
+Manager (section 1): parts A to E pass / fail (list failed steps)
 Debug window (section 2): steps 1 to 9 pass / fail (list failed steps)
+Dialog windows (section 3): steps pass / fail (list failed steps)
 Triggers (sections 4 and 5): steps 1 to 7 and 1 to 6 pass / fail (list failed steps)
-Start with Windows and administrator (section 7): steps 1 to 17 pass / fail (list failed steps)
+Start with Windows and administrator (section 7): parts A to D pass / fail (list failed steps)
+Settings dialog (section 8): steps 44 to 59 pass / fail (list failed steps)
 Notes:
 ```
 
