@@ -74,8 +74,12 @@ class SettingsModel {
         try {
             return SettingsModel._CheckValue(entry, value)
         } catch as e {
-            if (e is AhfError)
-                throw AhfError("setting '" key "': " e.Message, ErrCode.BAD_PAYLOAD)
+            if (e is AhfError) {
+                wrapped := AhfError("setting '" key "': " e.Message, ErrCode.BAD_PAYLOAD)
+                if (e.HasProp("reason"))
+                    wrapped.reason := e.reason
+                throw wrapped
+            }
             throw e
         }
     }
@@ -275,6 +279,14 @@ class SettingsModel {
         return entry["default"]
     }
 
+    ; A refusal of a check with its reason: reason is an Array [Lang key, arguments...] for the settings dialog (F-9000). The
+    ; message stays English: the engine answers it so.
+    static _Refuse(text, reason) {
+        err := AhfError(text, ErrCode.BAD_PAYLOAD)
+        err.reason := reason
+        return err
+    }
+
     static _CheckValue(entry, value) {
         switch entry["type"] {
             case "language":
@@ -295,12 +307,12 @@ class SettingsModel {
 
     static _CheckLanguage(value) {
         if (IsObject(value))
-            throw AhfError("must be text", ErrCode.BAD_PAYLOAD)
+            throw SettingsModel._Refuse("must be text", ["Refusal_must_be_text"])
         code := Trim(String(value))
         if (code = "")
             return ""
         if (!RegExMatch(code, "^[A-Za-z]{2,3}$"))
-            throw AhfError("must be empty or a language code of 2 or 3 letters", ErrCode.BAD_PAYLOAD)
+            throw SettingsModel._Refuse("must be empty or a language code of 2 or 3 letters", ["Refusal_language"])
         return StrLower(code)
     }
 
@@ -315,21 +327,21 @@ class SettingsModel {
         list := ""
         for item in values
             list .= (list = "" ? "" : ", ") item
-        throw AhfError("must be one of " list, ErrCode.BAD_PAYLOAD)
+        throw SettingsModel._Refuse("must be one of " list, ["Refusal_one_of", list])
     }
 
     static _CheckPath(value) {
         if (IsObject(value))
-            throw AhfError("must be text", ErrCode.BAD_PAYLOAD)
+            throw SettingsModel._Refuse("must be text", ["Refusal_must_be_text"])
         path := Trim(String(value))
         if (path = "")
-            throw AhfError("must not be empty", ErrCode.BAD_PAYLOAD)
+            throw SettingsModel._Refuse("must not be empty", ["Refusal_empty"])
         if (StrLen(path) > 259)
-            throw AhfError("is too long", ErrCode.BAD_PAYLOAD)
+            throw SettingsModel._Refuse("is too long", ["Refusal_too_long"])
         if (!RegExMatch(path, "^([A-Za-z]:\\|\\\\[^\\])"))
-            throw AhfError("must be an absolute path", ErrCode.BAD_PAYLOAD)
+            throw SettingsModel._Refuse("must be an absolute path", ["Refusal_absolute_path"])
         if (RegExMatch(SubStr(path, 3), '[<>"|*?\x00-\x1F]'))
-            throw AhfError("contains a character that is not allowed in a path", ErrCode.BAD_PAYLOAD)
+            throw SettingsModel._Refuse("contains a character that is not allowed in a path", ["Refusal_path_characters"])
         ; no trailing backslash, except the root of a drive ("C:\")
         while (StrLen(path) > 3 && SubStr(path, -1) = "\")
             path := SubStr(path, 1, -1)
@@ -338,10 +350,10 @@ class SettingsModel {
 
     static _CheckInt(value, low, high) {
         if (IsObject(value) || !RegExMatch(String(value), "^-?\d+$"))
-            throw AhfError("must be a whole number from " low " to " high, ErrCode.BAD_PAYLOAD)
+            throw SettingsModel._Refuse("must be a whole number from " low " to " high, ["Refusal_whole_number", low, high])
         n := Integer(value)
         if (n < low || n > high)
-            throw AhfError("must be a whole number from " low " to " high, ErrCode.BAD_PAYLOAD)
+            throw SettingsModel._Refuse("must be a whole number from " low " to " high, ["Refusal_whole_number", low, high])
         return n
     }
 
@@ -357,7 +369,7 @@ class SettingsModel {
             if (text = "0" || text = "false")
                 return 0
         }
-        throw AhfError("must be true or false", ErrCode.BAD_PAYLOAD)
+        throw SettingsModel._Refuse("must be true or false", ["Refusal_bool"])
     }
 
     ; windowPositions: window name -> Map(x, y, w, h), whole numbers. A new Map is returned (the caller's is not kept).

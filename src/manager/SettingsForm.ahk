@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\core\Errors.ahk
 #Include ..\core\SettingsModel.ahk
+#Include ..\core\Lang.ahk
 
 ; The model of the settings dialog (WI-0078, REQ-SET-010, REQ-SET-020, REQ-SET-050, REQ-SET-070, REQ-LNG-020): which keys
 ; the dialog shows, on which tab, and the check of the values the user typed or chose. It has no GUI code and sends nothing:
@@ -93,7 +94,7 @@ class SettingsForm {
                 if (!(e is AhfError))
                     throw e
                 out["ok"] := false
-                out["errors"][key] := RegExReplace(e.Message, "^setting '[^']*': ", "")   ; the label names the key
+                out["errors"][key] := SettingsForm._Reason(e)     ; translated; the label names the key (F-9000)
             }
         }
         return out
@@ -101,6 +102,19 @@ class SettingsForm {
 
     ; The text of the refusal: one line per refused value, "<label>: <message>", the labels as given (the caller translates
     ; them). labelOf(key) returns the label of a key.
+    ; The text of a refusal of a check: the translated reason when the check gave one (AhfError.reason, SettingsModel), the
+    ; message without its "setting '<key>': " prefix otherwise (F-9000).
+    static _Reason(e) {
+        if (!e.HasProp("reason"))
+            return RegExReplace(e.Message, "^setting '[^']*': ", "")
+        reason := e.reason
+        if (reason.Length = 1)
+            return Lang(reason[1])
+        if (reason.Length = 2)
+            return Lang(reason[1], reason[2])
+        return Lang(reason[1], reason[2], reason[3])
+    }
+
     ; The lines follow the order of the dialog (the fields), so that the first refused value of the screen is the first line.
     static ErrorText(errors, labelOf) {
         text := ""

@@ -46,6 +46,27 @@ RefusedValuesAreNamed() {
     Assert.True(!res["errors"].Has("userLevel"), "a valid value is not listed")
 }
 
+; The refusal reasons of the dialog are translated (F-9000): in German the same refusal names the range in German; the
+; engine's message (SettingsModel.Check) stays English.
+GermanRefusalReasons() {
+    LangTable.Code := "de"
+    LangTable.Load()
+    try {
+        res := SettingsForm.Collect(Map("workers", "17", "executionPolicy", "sometimes"))
+        Assert.True(InStr(res["errors"]["workers"], "bis 16") > 0, "German range: " res["errors"]["workers"])
+        Assert.True(InStr(res["errors"]["executionPolicy"], "einer von") > 0, res["errors"]["executionPolicy"])
+        Assert.True(InStr(res["errors"]["workers"], "must") = 0, "no English left in the dialog text")
+        try {
+            SettingsModel.Check("workers", "17")
+        } catch as e {
+            Assert.True(InStr(e.Message, "must be a whole number from 1 to 16") > 0, "the engine message stays English: " e.Message)
+        }
+    } finally {
+        LangTable.Code := "en"
+        LangTable.Load()
+    }
+}
+
 ; A key the dialog does not show is refused by name, not sent: the autostart keys belong to WI-0079.
 NotADialogKeyIsRefused() {
     res := SettingsForm.Collect(Map("startWithWindows", 1))
@@ -94,6 +115,7 @@ TestRun.Case("The keys of the dialog are the settings, without the positions and
 TestRun.Case("A valid set of the controls is checked into the values of the model", ValidSetIsChecked)
 TestRun.Case("A refused value names its key and its message; nothing is accepted", RefusedValuesAreNamed)
 TestRun.Case("A key the dialog does not show is refused by name", NotADialogKeyIsRefused)
+TestRun.Case("The refusal reasons of the dialog are translated, the engine message is not", GermanRefusalReasons)
 TestRun.Case("The error text has one line per refused value", ErrorTextHasOneLinePerValue)
 TestRun.Case("The language list has the codes of folder basic with their names", LanguagesAreListedWithTheirNames)
 TestRun.Finish()
