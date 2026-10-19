@@ -42,7 +42,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0122 | A multi-selection was lost on a later rebuild of the tree (fixed; no automated test, the path is only reachable through a real tree) | open, verified in code, not checked on screen | WI-0074 |
 | F-0145 | The status "planned" of the oldest MIGRATION entries (M-0001 to M-0005, M-0010, M-0012 to M-0014) was never re-checked against the code | open, found in the documentation review; M-0014 is implemented in `LoopStack.Pop` (read) | documentation review |
 | F-0146 | The `README.md` in the repository root describes v1 (downloads, installer, `find modules.ahk`, screenshots of v1) while the branch is the v2 port | open, low; rewrite at the end of the port (S0009/S0010) | documentation review |
-| F-9001* | The GDI leak check of `tests/ahk/gdip.test.ahk` counts only GDI handles (`GetGuiResources`): GDI+ brushes, pens, fonts and paths are not GDI handles, so a missing `GdipDelete*` would not fail it | open, found in the review of WI-0083; the deletes were verified by reading the code | WI-0083 |
+| F-0147 | The GDI leak check of `tests/ahk/gdip.test.ahk` counts only GDI handles (`GetGuiResources`): GDI+ brushes, pens, fonts and paths are not GDI handles, so a missing `GdipDelete*` would not fail it | open, found in the review of WI-0083; the deletes were verified by reading the code | WI-0083 |
 
 ## Findings
 
@@ -188,7 +188,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **What:** `README.md` in the root describes v1: the download of the installer, the screenshots in `Documentation/`, `find modules.ahk`. On the branch `v2-port` it is wrong for a visitor.
 **Status:** open, low. Write the v2 README at the end of the port (S0009 distribution); until then `AGENTS.md` and `doc/README.md` are the entry points.
 
-### F-9001*: GDI+ object leaks are not tested
+### F-0147: GDI+ object leaks are not tested
 
 **What:** the unit test `tests/ahk/gdip.test.ahk` checks that 1000 frames leave the GDI object count of the process unchanged. GDI+ brushes, pens, fonts, paths and images are objects of the GDI+ library, not GDI handles, so a missing `GdipDelete*` stays invisible.
 **Status:** open, verified by reading the wrapper (every object has its delete). Option: compare the private bytes of the process over many frames, or count the objects the wrapper creates and deletes.
