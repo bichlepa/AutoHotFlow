@@ -33,6 +33,7 @@ class UiWindow {
         this.Hwnd := this.Gui.Hwnd
         this.onHide := ""           ; optional fn(): called after Hide (the owner stops its timers)
         this.hideOnClose := false   ; true: the close box hides the window (the manager, E0014) instead of closing it
+        this.onClose := ""          ; optional fn(): called first when the close box is pressed (the editor ends its role, WI-0088)
         this.Gui.OnEvent("Close", (*) => this._OnCloseBox())
         this.lay := GuiLayout.Create(this.Gui, width, height)
         UiTexts.Register(this.Hwnd, this.Gui, titleKey, "Title")
@@ -59,6 +60,10 @@ class UiWindow {
     ; The close box and Escape: closes the window, or only hides it with hideOnClose. The result 1 keeps Windows from
     ; destroying the window itself.
     _OnCloseBox() {
+        if (IsObject(this.onClose)) {
+            hook := this.onClose     ; not this.onClose(): that would pass this as the first argument
+            hook()
+        }
         if (this.hideOnClose)
             this.Hide()
         else

@@ -4,6 +4,7 @@
 #Include ..\core\Role.ahk
 #Include EditorModel.ahk
 #Include render\Renderer.ahk
+#Include EditorWindow.ahk
 #Include EditorDriver.ahk
 
 ; Role "editor" (WI-0088, PROTOCOL 4.11, ARCHITECTURE 2.1 and 3): shows one flow and follows its run states. One process per
@@ -23,6 +24,7 @@ class Editor extends Role {
             throw AhfError("the editor needs --flow=<flowId>", ErrCode.BAD_ARGS)
         this.headless := args.Has("headless")
         this.model := ""
+        this.window := ""             ; the EditorWindow (not with --headless)
         this.renderer := ""           ; the Renderer, created when GDI+ is started (the first frame)
         this.canvas := ""             ; the offscreen bitmap of the headless driver (cmd.test.render)
         this.driver := ""
@@ -48,12 +50,27 @@ class Editor extends Role {
         if (!this.started) {
             this.started := true
             this._Log("a1", "editor", this.name " ready" (this.headless ? " (headless)" : ""))
+            if (!this.headless) {
+                this.window := EditorWindow(this)
+                this.window.Show()
+            }
         }
         this.model.Start()             ; subscriptions and the first resync; every reconnect asks again
     }
 
     OnShutdown(deadlineMs) {
         this._Teardown()
+    }
+
+    ; The settings changed (WI-0077): the language is applied already; the title gets the new text.
+    OnSettings(settings) {
+        if (IsObject(this.window))
+            this.window.Refresh()
+    }
+
+    ; The close box of the window: the planned end of the editor.
+    _OnWindowClose() {
+        this._EndPlanned("closed")
     }
 
     ; The planned end of the editor: the window and the GDI+ objects go, then the role says bye (Role.ByeFn).
@@ -71,6 +88,10 @@ class Editor extends Role {
         if (this.tornDown)
             return
         this.tornDown := true
+        if (IsObject(this.window)) {
+            this.window.Close()
+            this.window := ""
+        }
         if (IsObject(this.canvas)) {
             this.canvas.Destroy()
             this.canvas := ""
@@ -95,6 +116,14 @@ class Editor extends Role {
         switch kind {
             case "ended":
                 this._OnEnded(data)
+            case "state":
+                if (IsObject(this.window))
+                    this.window.Request()
+            case "flow":
+                if (IsObject(this.window)) {
+                    this.window.Refresh()
+                    this.window.Request()
+                }
             case "log":
                 this._Log("a1", "editor", this.name " " data)
         }
@@ -120,6 +149,8 @@ class Editor extends Role {
 
     ; cmd.editor.show (PROTOCOL 4.11): the window comes to the front. Without a window only the call is recorded.
     _OnShow(msg) {
+        if (IsObject(this.window))
+            this.window.Raise()
         return Map("ok", true)
     }
 
@@ -129,7 +160,7 @@ class Editor extends Role {
         info := Map("flowId", this.flowId, "rev", st["rev"], "engine", st["engine"], "epoch", st["epoch"], "seq", st["seq"]
             , "elements", st["elements"], "connections", st["connections"], "resyncs", st["resyncs"]
             , "lastResync", st["lastResync"], "headless", this.headless ? Json.True : Json.False
-            , "windowVisible", Json.False)
+            , "windowVisible", (IsObject(this.window) && this.window.Visible) ? Json.True : Json.False)
         r := IsObject(this.renderer) ? this.renderer.Snapshot() : Map("frames", 0, "meanFrameMs", 0, "slowestFrameMs", 0
             , "rebuilds", 0, "lastFrameMs", 0)
         info["frames"] := r["frames"]

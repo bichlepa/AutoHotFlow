@@ -215,8 +215,10 @@ class Children {
         return n
     }
 
-    ; Number of editors whose process is still running (WI-0087).
+    ; Number of editors whose process is still running (WI-0087). An editor that has ended and whose end is judged here
+    ; (_SettleEditors) does not count; one that has ended and is not judged yet does not count either once it is judged.
     LiveEditors() {
+        this._SettleEditors()
         n := 0
         for _, rec in this._recs
             if (rec["role"] = "editor" && !rec["gone"])
@@ -230,13 +232,32 @@ class Children {
     ; throws (internal). The flow ID is checked by FlowIdOk before (the caller).
     OpenEditor(flowId) {
         name := "editor:" flowId
+        this._SettleEditors()
         if (this._recs.Has(name) && !this._recs[name]["gone"]) {
-            this.hub.Request(name, "cmd.editor.show", Map(), (ans) => this._OnEditorShown(name, ans), 3000)
-            return false
+            rec := this._recs[name]
+            if (!this._HasEnded(rec)) {
+                this.hub.Request(name, "cmd.editor.show", Map(), (ans) => this._OnEditorShown(name, ans), 3000)
+                return false
+            }
+            ; The editor of this flow has just ended, and its end is not judged yet (its connection is still open, the
+            ; tick judges it within 200 ms): nothing can show or start it now. The caller may ask again.
+            throw AhfError("the editor of '" flowId "' is ending, ask again", ErrCode.BUSY)
         }
         if (this.LiveEditors() >= this.editorLimit)
             throw AhfError("already " this.editorLimit " editors alive", ErrCode.BUSY)
         return this.Open(name)
+    }
+
+    ; Judges the editors that have ended and whose end can be judged now (their connection is read to the end, or the grace
+    ; of EXIT_GRACE_MS has passed), so that a flow whose editor just died can be opened again and the slot of a dead
+    ; editor is free for the limit (WI-0088, F-0149). The same rule as the tick (_ExitReadable), not a shortcut.
+    _SettleEditors() {
+        now := Time.NowMs()
+        for name, rec in this._recs {
+            if (rec["role"] = "editor" && !rec["gone"] && rec["handle"] != 0 && this._HasEnded(rec)
+                && this._ExitReadable(rec, now))
+                this._OnGone(rec, now)
+        }
     }
 
     _OnEditorShown(name, ans) {

@@ -11,6 +11,9 @@ is answered as running whenever it comes. The "running" cases still send their r
 The test roles of the supervisor (--test-roles) lower the editor limit (--editor-limit), so the limit needs no 21 processes.
 """
 
+import psutil
+import pytest
+
 from test_manager import FLOW, Sup, connect_obs, flow_data, process_states, wait_flow_loaded, wait_ready, wait_until
 from support.timing import scaled
 
@@ -138,5 +141,49 @@ def test_the_editor_limit_refuses_a_new_editor_with_busy(procs, datadir, session
         assert first[3] is True, first
         assert other[2] == "busy", other
         assert "editor:other" not in process_states(obs)
+    finally:
+        finish(sup, obs)
+
+
+# --- WI-0088: the follow-ups of WI-0087 (F-0149) -------------------------------------------------------------------
+
+@pytest.mark.parametrize("bad", ['Flow "quoted', "control\x01char", "tab\tchar", "backslash\\"],
+                         ids=["double-quote", "control-character", "tab", "trailing-backslash"])
+def test_a_flow_id_that_a_command_line_cannot_carry_is_bad_payload(procs, datadir, session_id, bad):
+    sup, obs = start_manager(procs, datadir, session_id)
+    try:
+        sent, ok, code, _ = edit_results(obs, flowId=bad)[0]
+        assert (sent, ok, code) == (True, False, "bad_payload"), state(obs)["lastAnswer"]
+        assert not any(name.startswith("editor:") and name != EDITOR for name in process_states(obs))
+    finally:
+        finish(sup, obs)
+
+
+def test_the_editor_of_a_flow_that_just_died_is_started_again_and_its_slot_is_free(procs, datadir, session_id):
+    """A killed editor is not restarted. A request for its flow, sent at once, is answered as started (the death was
+    judged) or as busy (the end is not judged yet); the next request then starts it. The slot of the dead editor counts
+    for nothing: with a limit of one, the other flow gets its editor once the first is judged."""
+    sup, obs = start_manager(procs, datadir, session_id, extra=("--test-roles", "--editor-limit=1"))
+    try:
+        assert edit_results(obs, flowId=FLOW)[0][3] is True
+        assert wait_until(lambda: process_states(obs).get(EDITOR, {}).get("state") == "ready", scaled(15))
+        psutil.Process(process_states(obs)[EDITOR]["pid"]).kill()
+        first = edit_results(obs, flowId=FLOW)[0]
+        assert first[1] is True or first[2] == "busy", first
+        assert wait_until(lambda: edit_results(obs, flowId=FLOW)[0][3] is True, scaled(15)), state(obs)["lastAnswer"]
+        assert wait_until(lambda: process_states(obs)[EDITOR]["state"] == "ready", scaled(15)), process_states(obs)[EDITOR]
+        assert process_states(obs)[EDITOR]["restarts"] == 0
+    finally:
+        finish(sup, obs)
+
+
+def test_a_dead_editor_frees_its_slot_for_another_flow(procs, datadir, session_id):
+    sup, obs = start_manager(procs, datadir, session_id, extra=("--test-roles", "--editor-limit=1"))
+    try:
+        assert edit_results(obs, flowId=FLOW)[0][3] is True
+        assert wait_until(lambda: process_states(obs).get(EDITOR, {}).get("state") == "ready", scaled(15))
+        psutil.Process(process_states(obs)[EDITOR]["pid"]).kill()
+        assert wait_until(lambda: edit_results(obs, flowId="other")[0][3] is True, scaled(15)), state(obs)["lastAnswer"]
+        assert wait_until(lambda: process_states(obs)["editor:other"]["state"] == "ready", scaled(15)), process_states(obs)
     finally:
         finish(sup, obs)
