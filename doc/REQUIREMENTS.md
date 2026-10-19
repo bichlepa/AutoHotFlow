@@ -1506,7 +1506,7 @@ Each open flow has its own editor window in its own process (D0002). An editor t
 ### REQ-EDT-020 Draw the flow
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the geometry of the elements and connections, the scene and the hit test are unit-tested, WI-0084; nothing is drawn yet, WI-0085)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
@@ -1516,7 +1516,7 @@ Elements with icon and name, connections with their type, loops with their adjus
 ### REQ-EDT-030 Zoom and move the view
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (zoom, move and the scale with the DPI are unit-tested, WI-0084; the window does not react to the mouse yet, WI-0090)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086)
@@ -2776,7 +2776,7 @@ When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the us
 ### REQ-USE-090 Sharp and correctly sized on high-resolution displays
 
 - **v1:** no (not checked)
-- **v2:** partial (dialogs done; the window base for the UI roles is written, `ui_common/UiWindow.ahk` with the layout in `core/GuiLayout.ahk` (WI-0069), the manager window (WI-0073) uses it, opened in the gui test but not checked at another scaling; editor and zoom missing)
+- **v2:** partial (dialogs done; the window base for the UI roles is written, `ui_common/UiWindow.ahk` with the layout in `core/GuiLayout.ahk` (WI-0069), the manager window (WI-0073) uses it, opened in the gui test but not checked at another scaling; the view math scales the flow with the DPI, unit-tested (WI-0084); the editor window is missing)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0005

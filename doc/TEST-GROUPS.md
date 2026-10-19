@@ -61,6 +61,7 @@ The first matching pattern wins; `*` also matches `/`. Test groups that run in f
 | `elements-gen` | `entry/generated/` (written by `tools/gen_element_includes.py`) | `element-units` |
 | `manager` | `manager/`, `NoticeThrottle` | `manager` |
 | `tray` | `tray/` | `tray` |
+| `editor-geometry` | `editor/` (the geometry, the view, the scene and the hit test, WI-0084) | `editor-geometry` |
 
 Outside `src/`: `doc/` runs `docs` and `architecture` only (`doc/PROTOCOL.md` also `transport`); `tools/<tool>.py` runs the group `tools` (exceptions in `OTHER_RULES` in `tests/support/groups.py`); a helper of `tests/ahk/helpers/` that is a benchmark or a probe (not read by the unit tests) needs its own `OTHER_RULES` entry, otherwise the change selects everything (as `render_bench.ahk` did before WI-0083); a changed test file selects itself; `work_items/`, `.claude/` and `NEEDS-ATTENTION.md` select nothing.
 
@@ -84,6 +85,7 @@ A test file may verify several things; its groups are listed in `tests/support/g
 | `storage` | storage role, write queue, log files, reports, flow lifecycle files |
 | `ui` | dialogs, windows, `GuiLayout`, the UI texts |
 | `manager`, `tray` | the manager headless (flows, import, log, notices), the tray |
+| `editor-geometry` | the flow geometry, the view math (zoom, move, DPI), the scene and the hit test (headless) |
 | `element-units` | the `ahk/element_*.test.ahk` units and the generated include lists |
 | `elements-e2e` | flow-builder tests of single elements (only through `COVERS` or in a full run) |
 | `packages` | loading of element packages |
