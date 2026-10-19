@@ -69,13 +69,13 @@ Notes on the table:
 - The tag commit `fc85151` is the WI-0035 commit "Fix-Block WI-0030 bis WI-0035 abgeschlossen, Abnahme grün". Commits after the tag (on `HEAD`) are documentation translations only, with no WI prefix.
 - The fix-block acceptance runs that were not green (WI-0032, WI-0034) are recorded in `v2-phase2-final:work_items/STATUS.md`, not here.
 
-## Phase 3 (v1 feature scope), up to 2026-10-17
+## Phase 3 (v1 feature scope), up to 2026-10-19
 
-The packages of phase 3 are recorded with their commit ranges in `work_items/phase3/STATUS.md` (the current state) and in the git history (the commits carry the `WI-xxxx:` prefix). Packages finished in this period:
+The packages of phase 3 carry the prefix `WI-xxxx:` in their commit messages, so `git log --grep "WI-0074"` finds the commits of a package. The commit ranges that `work_items/phase3/STATUS.md` once listed are in its git history (commit `6bb1e933`); the file shows only the current state now. Packages finished in this period:
 
 - S0001 and S0002: expressions, variables, element foundation and core set (WI-0036 to WI-0058).
 - S0003: trigger host and triggers (WI-0060 to WI-0068), acceptance WI-0067.
-- S0004, block A, so far: WI-0069 (`ui_common/`, dialogs, DPI), WI-0070 (flow create, duplicate, rename, delete), WI-0071 (categories and order, `Categories.json`), WI-0072 (tray icon as its own role `tray`, E0075), WI-0073 (manager replaces the stub).
-- Work outside the list: WI-0059 (test admission and history), the file dialogs for UI roles (E0076), the input-test skip on a locked PC (WI-0064).
+- S0004 (UI foundation and manager, WI-0069 to WI-0082, decisions E0064 to E0084, acceptance WI-0082 on 2026-10-19; the manual checks of the owner passed on 2026-10-19). Block A: WI-0069 (`ui_common/`, dialogs, DPI), WI-0070 (flow create, duplicate, rename, delete), WI-0071 (categories and order, `Categories.json`), WI-0072 (tray icon as its own role `tray`, E0075), WI-0073 (manager window, model and headless driver replace the stub), WI-0074 (flow tree and operations), WI-0075 (notices), WI-0076 (import from v1). Block B: WI-0077 (settings model, `Settings.json`), WI-0078 (settings dialog, language, about window), WI-0079 (start with Windows, run as administrator, a start without parameters opens manager and tray, E0083), WI-0080 (log window), WI-0081 (export and import of `.ahf` files with a warning for elements that act on the system, `ActsOnSystem`), WI-0082 (acceptance: result `work_items/phase3/WI-0082-result-s4.md`, measurements MS-0042 and MS-0043, findings F-0141 to F-0143).
+- Work outside the list: WI-0059 (test admission and history), the file dialogs for UI roles (E0076), the input-test skip on a locked PC (WI-0064), the test groups (`doc/TEST-GROUPS.md`, 2026-10-18), the stall guard of `run_suite.py` and `--max-worker-restart` (2026-10-19), the documentation review of 2026-10-19.
 
-Still open in S0004: WI-0074 to WI-0076 (block A), the owner's manual check after block A, and block B (WI-0077 to WI-0082).
+Next: S0005 (editor I: display, WI-0083 to WI-0092, E0085 to E0088), detailed, not started.
