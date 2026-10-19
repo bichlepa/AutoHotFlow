@@ -49,6 +49,20 @@ CheckUnderscoreIsASpace() {
     Assert.Equal(Lang("line %1%, col %2%", 3, 14), "line 3, col 14")
 }
 
+; The trailing spaces of a value are not part of the text (the German v1 files have them, F-9003*).
+CheckTrailingSpacesAreTrimmed() {
+    dir := TempDir()
+    DirCreate(dir "\basic")
+    FileAppend("[common]`r`nSpaced=Flow-Einstellungen  `r`nTabbed=Text`t `r`n", dir "\basic\en.ini", "UTF-8-RAW")
+    try {
+        Reset("en", dir)
+        Assert.Equal(Lang("Spaced"), "Flow-Einstellungen")
+        Assert.Equal(Lang("Tabbed"), "Text")
+    } finally {
+        DirDelete(dir, true)
+    }
+}
+
 CheckEveryPlaceholderIsReplaced() {
     dir := TempDir()
     FileAppend("[common]`r`nTwice=%1% and %1%, then %2%`r`n", dir "\basic\en.ini", "UTF-8-RAW")
@@ -158,6 +172,7 @@ TestRun.Case("_ in a key is a space, as in v1", CheckUnderscoreIsASpace)
 TestRun.Case("every occurrence of a placeholder is replaced; a missing argument leaves it", CheckEveryPlaceholderIsReplaced)
 TestRun.Case("a missing key gives the key itself and an f3 log entry", CheckMissingKeyGivesTheKeyAndAnF3Entry)
 TestRun.Case("an empty key gives the empty text", CheckEmptyKey)
+TestRun.Case("trailing spaces of a value are not part of the text", CheckTrailingSpacesAreTrimmed)
 TestRun.Case("the German file (UTF-16) is read; a missing German text falls back to English", CheckGermanFileIsUtf16AndFallsBackToEnglish)
 TestRun.Case("the section language_info holds no texts", CheckLanguageInfoIsNotAText)
 TestRun.Case("texts of further folders are read; a later folder replaces a text; fallback per key", CheckOtherFoldersAndFallback)

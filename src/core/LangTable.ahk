@@ -119,7 +119,7 @@ class LangTable {
             if (!pos)
                 continue
             key := StrReplace(SubStr(line, 1, pos - 1), "_", " ")
-            texts[key] := SubStr(line, pos + 1)
+            texts[key] := RTrim(SubStr(line, pos + 1), " `t")   ; trailing spaces of the v1 files are not part of the text (F-9003*)
         }
     }
 
