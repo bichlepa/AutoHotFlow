@@ -205,7 +205,7 @@ L129-135 `Map` keys are case-sensitive by default; compare names with `==` when 
 L137-143 A bound method stored in an object property gets the object as an extra argument when it is called as `obj.prop(...)` (verified)
 ```
 
-## doc/howto/processes-pipes-messages.md (45.0 KB, 389 lines)
+## doc/howto/processes-pipes-messages.md (46.1 KB, 397 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L13-17 `PostMessageW` with a NULL handle reports success (verified)
@@ -251,6 +251,7 @@ L359-365 An error in a request callback ends that request, the step after it nev
 L367-373 Reading the end of a log file that other processes append to (verified)
 L375-380 A ListView that follows a growing list keeps the row numbers of the model (assumed)
 L382-388 A child process from a queue operation (tar.exe), without waiting (partly verified)
+L390-396 A flow ID with a space on the command line of a child process (verified)
 ```
 
 ## doc/howto/syntax-and-language.md (42.7 KB, 413 lines)

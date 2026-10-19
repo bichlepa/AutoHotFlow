@@ -387,3 +387,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (WI-0081, `tests/e2e/test_manager_archive.py`, 18 tests green serially; the queue and the process check by the e2e tests). The race fix (the answer file exists before cmd has written its word, so an empty answer is no answer) has only the parallel e2e run as its test. The remark on `echo 0>` is assumed
 - **Source:** `src/storage/ArchiveTar.ahk`, `src/storage/Storage.ahk` (`_DeferBackground`), `src/storage/WriteQueue.ahk`
 
+### A flow ID with a space on the command line of a child process
+
+- **Problem:** Every flow ID has a space (`Flow 1010290492`). The supervisor started a role with `--flow=<id>` without quotes, so the role got `--flow=Flow` and a stray word `1010290492`: no editor could be started with its flow (WI-0087).
+- **Wrong:** `cmd .= ' --flow=' rec["flow"]` in `Children._Launch`.
+- **Right:** Quote the value: `cmd .= ' --flow="' rec["flow"] '"'`. `A_Args` takes the value back whole and without the quotes (the quotes are removed where they stand inside a word, as `--data="..."` already relies on). A value that the quotes cannot carry is refused before the start: a double quote, a control character, and a backslash at the end (before the closing quote it escapes that quote), see `Children.FlowIdOk`.
+- **Status:** verified (`tests/integration/test_supervisor.py::test_a_flow_id_with_a_space_reaches_the_role_whole`, run 20261019-222444-2d3caef3, `-m foundation`, 1 passed; the refusals are checked by `tests/e2e/test_manager_editor.py::test_edit_without_a_flow_is_refused_as_bad_payload_and_becomes_a_notice` for the empty ID only).
+- **Source:** `src/supervisor/Children.ahk` (`_Launch`, `FlowIdOk`)
+
