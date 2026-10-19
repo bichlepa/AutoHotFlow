@@ -13,7 +13,7 @@ A requirement says **what** AutoHotFlow does, not how: what the user sees or exp
 Each area is a heading `## <Title> (<CODE>)`. Each requirement is a heading `### REQ-<CODE>-<nnn> <Title>` inside its area, followed by a list of fields and then free text (explanation, tables, sub-items, open questions):
 
 ```markdown
-### REQ-EXE-050 Execution policy per flow
+### REQ-XXX-000 Requirement name
 
 - **v1:** partial (`wait` behaves like `parallel`, M-0011)
 - **v2:** partial (the global default is missing)
@@ -1440,7 +1440,7 @@ The standard entries of AutoHotkey (pause, reload, exit without the shutdown of 
 ### REQ-MGR-100 About window
 
 - **v1:** yes
-- **v2:** done (the window of WI-0078: the versions of AutoHotFlow and AutoHotkey, the license and the project site as a button that opens it; the look is an owner check, MANUAL-CHECKS section 6)
+- **v2:** partial (the window of WI-0078: the versions of AutoHotFlow and AutoHotkey, the license and the project site as a button that opens it; waits for the owner's check of the look, MANUAL-CHECKS section 8)
 - **Prio:** could
 - **Scope:** port
 - **Plan:** S0004 (WI-0078, done)
@@ -1757,7 +1757,7 @@ Settings are stored in the data folder and take effect at once where possible; a
 ### REQ-SET-020 Defaults for execution policy and working directory
 
 - **v1:** yes
-- **v2:** done (both settings work and take effect at once; the settings dialog changes them (WI-0078))
+- **v2:** partial (both settings work and take effect at once; the settings dialog changes them (WI-0078); the owner's check of the dialog is open, MANUAL-CHECKS section 8)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (WI-0077 settings, done; WI-0078 dialog, done)
@@ -1930,7 +1930,7 @@ When a flow, variable or settings file was written by a newer version of AutoHot
 ### REQ-LNG-010 User interface in several languages
 
 - **v1:** yes (English, German, Russian, Korean)
-- **v2:** partial (the language files of v1 load; the language is a setting and every process takes a change at once, the tray menu and the windows of the manager follow it without a restart (`UiTexts.Reload()`, the manager's `Refresh`, the settings dialog is made again); unit and headless tests; the windows themselves are not checked by the agents: owner check, MANUAL-CHECKS section 6)
+- **v2:** partial (the language files of v1 load; the language is a setting and every process takes a change at once, the tray menu and the windows of the manager follow it without a restart (`UiTexts.Reload()`, the manager's `Refresh`, the settings dialog is made again); unit and headless tests; the windows themselves are not checked by the agents: owner check, MANUAL-CHECKS section 8)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (WI-0077 setting, done)

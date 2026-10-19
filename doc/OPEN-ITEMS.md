@@ -20,10 +20,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0130 | Drag and drop of an `.ahf` file onto the manager and the file dialogs of the import and export are not automated (the gui tier is not run by agents) | open, WI-0081; only MANUAL-CHECKS part D checks them by hand | WI-0081 |
 | F-0131 | A name outside the ANSI code page may make the listing of tar fail: the listing is read as text in the ANSI code page, and a failed listing reads as "not a ZIP archive" | open, not reproduced (WI-0081) | WI-0081 |
 | F-0132 | UNC paths (`\\server\share\x.ahf`) are refused: the path must start with a drive letter | open decision for the owner | WI-0081 |
-| F-9000* | The refusals of the settings dialog show the messages of `SettingsModel` in English (literal texts, also in the German dialog, for example "must be a whole number from 1 to 16"); they need Lang keys (WI-0078) | open, verified in code, not checked on screen | WI-0078 |
-| F-9001* | `doc/REQUIREMENTS.md` has the heading `REQ-EXE-050` twice (the entries at the top and at line 95): the index does not refuse it, one of the two blocks must go (WI-0078) | open, verified in the file; the owner decides which block stays | WI-0078 |
-| F-9002* | The windows of the log and of the notices are relabelled on a language change (`LogWindow.Relabel`, `NoticeWindow.Relabel`), no test reads their texts; checked by hand only (MANUAL-CHECKS section 6, step 50) | open, verified in code, not checked on screen | WI-0078 |
-| F-9003* | Many German values of `assets/language/basic/de.ini` (v1 file) end with spaces ("Flow-Einstellungen  "); `LangTable._Parse` keeps them, so the texts carry them (menu, tabs). Visible only as a wider gap | open, verified by reading the file (decoded UTF-16); decide: trim in `_Parse` for all languages, or clean the file | WI-0078 |
+| F-9106* | The windows of the log and of the notices are relabelled on a language change (`LogWindow.Relabel`, `NoticeWindow.Relabel`), no test reads their texts; checked by hand only (MANUAL-CHECKS section 6, step 50) | open, verified in code, not checked on screen | WI-0078 |
 | F-0133 | The link branch of `ArchiveUnpack._CheckTree` and the link refusal of `ArchiveEntries.CheckListing` have no test (a junction, `mklink /J`, would test the tree check) | open, WI-0081 | WI-0081 |
 | F-0134 | The flow JSON of an `.ahf` file is parsed in the manager without a depth limit (the unpacked size is limited to 4 MB, nesting is not): very deep nesting could exhaust the parser | open, not checked, WI-0081 | WI-0081 |
 | F-0135 | A second start without elevation cannot reach a running elevated session (WI-0079): the instance mutex of the elevated process is not accessible (access denied), the start ends with exit 1 and a log line about higher rights; the pipe DACL (`PipeListener.SDDL`: system and owner) was not checked for a not elevated client. The second start from the Explorer shows no window and no message to the user | open, found in the design, not run for real (UAC is a manual check, MANUAL-CHECKS 7 step 14); possible fix: a mutex and a pipe that a not elevated process of the user may open | WI-0079 |
@@ -203,29 +200,11 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Status:** closed (fixed). Checked: the unit tests `tests/ahk/core_gui_layout.test.ahk` (TextHeight) and `tests/ahk/ui_common_dialogs.test.ahk` (FitTextHeight); the gui test above, run once at 96 dpi (run 20261017-203439-22844: the control is 30 px, one line 15 px, SS_NOPREFIX set). The gui test discriminates at 96 dpi; at 225 % only by arithmetic (old control 45 px, two lines about 68 px). Not checked: a real display at 225 % (owner's manual check); the `Choose` dialog with a long text; a dialog while the DPI changes; a text capped by a small screen.
 **Evidence:** `src/core/GuiLayout.ahk` (`TextHeight`), `src/ui_common/UiDialogs.ahk` (`_TextH`, `FitTextHeight`), `tests/ahk/core_gui_layout.test.ahk`, `tests/ahk/ui_common_dialogs.test.ahk`, `tests/fault/test_manager_window.py`.
 
-### F-9000*: The refusals of the settings dialog are English (open)
-
-**What:** `SettingsModel.Check` throws texts such as "must be a whole number from 1 to 16" as literal English. `SettingsForm.Collect` keeps them, so a German user sees an English reason next to a German label.
-**Status:** open, verified in code (`src/core/SettingsModel.ahk`, `src/manager/SettingsForm.ahk`), not checked on screen. Action: Lang keys for the messages of the checks (the engine answers the same messages in English; the keys must also work there).
-**Evidence:** `src/core/SettingsModel.ahk` (`_CheckInt`, `_CheckEnum`), `tests/ahk/manager_settings_form.test.ahk`.
-
-### F-9001*: REQ-EXE-050 is written twice in REQUIREMENTS.md (open)
-
-**What:** The heading `### REQ-EXE-050 Execution policy per flow` stands at the top of the requirements (with the v1 text "partial (wait behaves like parallel)") and again at line 95. The index does not refuse it. Both blocks say partial.
-**Status:** open, verified in the file. Action: the owner decides which block stays; the other one is removed in the same commit.
-**Evidence:** `doc/REQUIREMENTS.md` (the two headings).
-
-### F-9002*: The log and notice windows follow a language change without a test (open)
+### F-9106*: The log and notice windows follow a language change without a test (open)
 
 **What:** `LogWindow.Relabel` and `NoticeWindow.Relabel` set the column titles and the drop-down lists again (ManagerWindow.Refresh). No test reads their texts: the headless tests have no window, the gui test covers the settings dialog and the about window only.
 **Status:** open, verified in code, not checked on screen. Action: step 50 of MANUAL-CHECKS section 6 by the owner; a gui test later.
 **Evidence:** `src/manager/LogWindow.ahk`, `src/manager/NoticeWindow.ahk`, `src/manager/ManagerWindow.ahk` (`Refresh`).
-
-### F-9003*: German values of the v1 language file end with spaces (open)
-
-**What:** `assets/language/basic/de.ini` (a v1 file, UTF-16) has trailing spaces in many values ("Flow-Einstellungen  ", "Manager zeigen  "). `LangTable._Parse` keeps them, so the texts of the tabs and of the tray menu carry them.
-**Status:** open, verified by reading the file. Action: trim the values in `_Parse` (one line, all languages; the tests of the texts must follow) or clean the v1 file (it is a reference copy, so the first is the choice to decide).
-**Evidence:** `assets/language/basic/de.ini`, `src/core/LangTable.ahk` (`_Parse`).
 
 ## Observed only (not for the bug hunter)
 

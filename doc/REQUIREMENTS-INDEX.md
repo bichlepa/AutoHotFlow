@@ -13,9 +13,9 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
 | [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 6 | 16 | 0 | 0 |
 | [Triggers (TRG)](#triggers-trg) | 14 | 1 | 0 | 7 | 6 | 0 | 0 |
-| [Manager (MGR)](#manager-mgr) | 15 | 3 | 0 | 7 | 5 | 0 | 0 |
+| [Manager (MGR)](#manager-mgr) | 15 | 2 | 0 | 8 | 5 | 0 | 0 |
 | [Editor (EDT)](#editor-edt) | 23 | 0 | 0 | 1 | 22 | 0 | 0 |
-| [Settings (SET)](#settings-set) | 8 | 5 | 0 | 2 | 1 | 0 | 0 |
+| [Settings (SET)](#settings-set) | 8 | 4 | 0 | 3 | 1 | 0 | 0 |
 | [Import and migration (MIG)](#import-and-migration-mig) | 8 | 5 | 0 | 2 | 1 | 0 | 0 |
 | [Languages and help (LNG)](#languages-and-help-lng) | 5 | 1 | 0 | 2 | 2 | 0 | 0 |
 | [Logging and diagnostics (DIA)](#logging-and-diagnostics-dia) | 5 | 4 | 0 | 1 | 0 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 0 | 0 | 5 | 5 | 0 | 0 |
-| **All** | **221** | **66** | **1** | **55** | **98** | **1** | **6** |
+| **All** | **221** | **64** | **1** | **57** | **98** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -165,7 +165,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-MGR-080](REQUIREMENTS.md#req-mgr-080-closing-the-manager-window-keeps-autohotflow-running) | L1403-1412 | Closing the manager window keeps AutoHotFlow running | yes | done | must | port | S0004 |
 | [REQ-MGR-090](REQUIREMENTS.md#req-mgr-090-tray-icon-of-the-application) | L1414-1423 | Tray icon of the application | yes | partial | must | port | S0004 (notices: WI-0075) |
 | [REQ-MGR-140](REQUIREMENTS.md#req-mgr-140-tray-menu-of-the-application) | L1425-1439 | Tray menu of the application | yes | done | must | port | S0004 |
-| [REQ-MGR-100](REQUIREMENTS.md#req-mgr-100-about-window) | L1440-1449 | About window | yes | done | could | port | S0004 (WI-0078, done) |
+| [REQ-MGR-100](REQUIREMENTS.md#req-mgr-100-about-window) | L1440-1449 | About window | yes | partial | could | port | S0004 (WI-0078, done) |
 | [REQ-MGR-110](REQUIREMENTS.md#req-mgr-110-restore-an-older-version-of-a-flow) | L1451-1459 | Restore an older version of a flow | no | open | could | later | - |
 | [REQ-MGR-120](REQUIREMENTS.md#req-mgr-120-show-and-change-permanent-variables) | L1461-1469 | Show and change permanent variables | no | open | should | later | - |
 | [REQ-MGR-130](REQUIREMENTS.md#req-mgr-130-search-and-filter-flows) | L1471-1479 | Search and filter flows | no | open | could | later | - |
@@ -204,7 +204,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
 | [REQ-SET-010](REQUIREMENTS.md#req-set-010-global-settings-dialog) | L1746-1755 | Global settings dialog | yes | done | must | port | S0004 (WI-0077 model, done; WI-0078 dialog, done) |
-| [REQ-SET-020](REQUIREMENTS.md#req-set-020-defaults-for-execution-policy-and-working-directory) | L1757-1766 | Defaults for execution policy and working directory | yes | done | must | port | S0004 (WI-0077 settings, done; WI-0078 dialog, done) |
+| [REQ-SET-020](REQUIREMENTS.md#req-set-020-defaults-for-execution-policy-and-working-directory) | L1757-1766 | Defaults for execution policy and working directory | yes | partial | must | port | S0004 (WI-0077 settings, done; WI-0078 dialog, done) |
 | [REQ-SET-030](REQUIREMENTS.md#req-set-030-start-with-windows) | L1768-1777 | Start with Windows | yes | partial | must | port | S0004 (WI-0079; the owner's manual check 7 is open, listed for WI-0082) |
 | [REQ-SET-040](REQUIREMENTS.md#req-set-040-run-as-administrator) | L1779-1788 | Run as administrator | yes | partial | should | port | S0004 (WI-0079; the owner's manual check 7 is open, listed for WI-0082) |
 | [REQ-SET-050](REQUIREMENTS.md#req-set-050-logging-settings) | L1790-1799 | Logging settings | yes | done | must | port | S0004 (WI-0077 settings, done; WI-0078 dialog, done) |
