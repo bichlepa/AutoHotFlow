@@ -25,7 +25,7 @@ WI-0085 is running; WI-0088 needs WI-0085 to WI-0087.
 | WI-0084 | Geometry and scene (headless) | done | haiku | 98f467b0..e065b5d1 | 2026-10-19 | review approved; verified green |
 | WI-0085 | Renderer: draw the scene, style, icons | running | haiku | | | workspace wi-85; owner accepts the look (E0088) |
 | WI-0086 | Engine: run states, connection taken, warnings per element | done | haiku | f2846ee2..19c91fdf | 2026-10-19 | review approved with one fix; verified green; F-0148 |
-| WI-0087 | Open and close an editor: supervisor and manager | done | haiku | 1646a787..e147d1f4 (see git log) | 2026-10-19 | review approved with one text fix; verification follows; F-0149 carried to WI-0088 |
+| WI-0087 | Open and close an editor: supervisor and manager | done | haiku | 1646a787..e147d1f4 (see git log) | 2026-10-19 | review approved with one text fix; verified (one load flake); F-0149 carried to WI-0088 |
 | WI-0088 | Editor role: model, resync, window, headless driver | open | | | | |
 | WI-0089 | Live states, marks and the event load | open | | | | |
 | WI-0090 | View: zoom, move, tooltip, status bar, DPI | open | | | | |
@@ -41,6 +41,8 @@ None.
 WI-0085 implementer (haiku), workspace wi-85.
 
 ## Last verified state
+
+Commit `c20b0d79` (WI-0087 integrated, selection of the manager and supervisor groups): 918 passed, 1 failed under load (`tests/e2e/test_manager_flows.py::test_new_category_rename_and_the_delete_answered_no`, CPU 96 %; green alone in recheck 20261019-224555-recheck, green in 5 earlier runs): a load flake, WI-0087 not affected; run 20261019-224100-c20b0d79.
 
 Commit `79f284cf` (WI-0086 integrated, all tiers): fast 1660 passed (11 skipped), foundation 471, slow 204, VERDICT green (runs 20261019-221605-79f284cf, -2, -3).
 
