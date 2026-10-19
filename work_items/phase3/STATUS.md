@@ -38,9 +38,11 @@ None.
 
 ## Running agents
 
-Strict test selection (haiku), workspace sel-strict. WI-0086 implementer (haiku), workspace wi-86.
+WI-0086 implementer (haiku), workspace wi-86.
 
 ## Last verified state
+
+Commit `db97aa32` (strict test selection integrated; unknown paths are an error): the tree equals the tree that was verified on the branch: fast 1653 passed (11 skipped), foundation 471, slow 204, VERDICT green (runs 20261019-215643-805c609f, -2, -3).
 
 Commit `28558ead` (WI-0084 integrated, selection of the group editor-geometry): 131 passed (1 skipped), VERDICT green (run 20261019-214248-28558ead).
 
