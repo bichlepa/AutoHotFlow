@@ -8,13 +8,16 @@
 #Include ..\..\src\core\LangTable.ahk
 #Include ..\..\src\manager\SettingsForm.ahk
 
-; The keys of the dialog are settings of the model; the window positions, start with Windows and run as administrator are not
-; in the dialog (WI-0079 comes with them).
+; The keys of the dialog are settings of the model; the window positions are not in the dialog (UI state).
 DialogKeys() {
     for key in SettingsForm.Keys()
         Assert.True(SettingsModel.Has(key), key ": a key of the dialog is a setting")
-    for key in ["windowPositions", "startWithWindows", "runAsAdmin"]
-        Assert.True(SettingsForm.FieldOf(key) = "", key ": not in the dialog")
+    Assert.True(SettingsForm.FieldOf("windowPositions") = "", "the window positions are UI state, not in the dialog")
+    for key in ["startWithWindows", "runAsAdmin"] {       ; the options of WI-0079 are checkboxes on the General tab
+        Assert.True(SettingsForm.FieldOf(key) != "", key ": in the dialog")
+        Assert.Equal(SettingsForm.FieldOf(key)["tab"], "general", key ": on the General tab")
+        Assert.Equal(SettingsForm.FieldOf(key)["kind"], "check", key ": a checkbox")
+    }
     Assert.Equal(SettingsForm.FieldsOf("general").Length + SettingsForm.FieldsOf("flow").Length
         + SettingsForm.FieldsOf("debug").Length, SettingsForm.Keys().Length, "every field is on a tab")
 }
@@ -69,9 +72,9 @@ GermanRefusalReasons() {
 
 ; A key the dialog does not show is refused by name, not sent: the autostart keys belong to WI-0079.
 NotADialogKeyIsRefused() {
-    res := SettingsForm.Collect(Map("startWithWindows", 1))
+    res := SettingsForm.Collect(Map("windowPositions", Map()))
     Assert.True(!res["ok"])
-    Assert.True(InStr(res["errors"]["startWithWindows"], "not a setting of the dialog") > 0, res["errors"]["startWithWindows"])
+    Assert.True(InStr(res["errors"]["windowPositions"], "not a setting of the dialog") > 0, res["errors"]["windowPositions"])
     Assert.True(!SettingsForm.Collect("text")["ok"], "the values must be a Map")
 }
 

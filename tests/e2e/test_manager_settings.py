@@ -99,3 +99,29 @@ def test_the_language_changes_the_tray_menu_and_the_manager_without_a_restart(pr
         assert wait_for(lambda: tray_items(runner) == ["Show manager", "Exit"]), "empty means the language of Windows"
     finally:
         runner.close()
+
+
+SHORTCUT = "AutoHotFlow v2.lnk"       # storage/StartupEntry.ahk: the startup shortcut of v2
+
+
+def test_the_startup_option_and_run_as_admin_of_the_dialog_reach_the_engine_and_the_startup_folder(
+        procs, datadir, session_id, tmp_path):
+    """WI-0079 options in the dialog (owner request): the set goes through the same path as OK; the shortcut is made in a
+    temporary startup folder (--startup-dir), never in the real one. The question to restart is the window's and is not here."""
+    startup = tmp_path / "startup"
+    startup.mkdir()
+    runner = FlowRunner(procs, datadir, session_id, roles="storage,engine,manager")
+    runner.start(extra=("--headless", "--startup-dir=" + str(startup)))
+    try:
+        answer = runner.request("manager", "cmd.test.op", {"op": "settings",
+                                                           "settings": {"startWithWindows": True, "runAsAdmin": True}})
+        assert answer["ok"] is True and answer["sent"] is True, answer
+        s = runner.request_ok("engine", "cmd.settings.get", {})["settings"]
+        assert s["startWithWindows"] is True and s["runAsAdmin"] is True, s
+        assert wait_for(lambda: (startup / SHORTCUT).exists()), "the shortcut did not appear in the startup folder"
+        answer = runner.request("manager", "cmd.test.op", {"op": "settings", "settings": {"startWithWindows": False}})
+        assert answer["ok"] is True and answer["sent"] is True, answer
+        assert wait_for(lambda: not (startup / SHORTCUT).exists()), "switched off, the shortcut must go"
+        assert runner.request_ok("engine", "cmd.settings.get", {})["settings"]["runAsAdmin"] is True, "only the changed key"
+    finally:
+        runner.close()

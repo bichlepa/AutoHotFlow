@@ -265,6 +265,10 @@ Start with the VS Code task of part A (or its terminal command), in the fresh fo
 | 53 | Click "About". | A window "About AutoHotFlow" shows "AutoHotFlow version 2.0.0-phase2b", "AutoHotkey version" with the version of the installed AutoHotkey, the license line (GNU General Public License 3) and the project site. The site text is complete. | |
 | 54 | Click "Open the project site". | The browser opens https://github.com/bichlepa/AutoHotFlow. | |
 | 55 | Watch for dialogs during the part. | Only the folder dialog of step 51 appears as a dialog window (class `#32770`). | |
+| 56 | On the tab General, read the two checkboxes "Start with windows" and "Run as admin" with their notes. | Both texts and notes are complete. The notes say that the shortcut is made for the current user only and that Windows asks for permission (UAC) at every start. | |
+| 57 | Switch "Start with windows" on in the dialog, click OK. | Within 2 s `AutoHotFlow v2.lnk` appears in `shell:startup` (part B of section 7 describes it). Switching it off again and clicking OK removes it. | |
+| 58 | Switch "Run as admin" on in the dialog, click OK. | Exactly one question asks whether to restart now (Yes on the left, No on the right). Answer No: nothing changes, the dialog is closed. | |
+| 59 | Repeat step 58 and answer Yes. | AutoHotFlow closes, the Windows question (UAC) appears, and the manager comes back elevated (section 7, part C). The question does not appear a second time. | |
 
 ## Result
 

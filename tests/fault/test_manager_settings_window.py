@@ -50,7 +50,7 @@ def test_settings_opens_its_dialog_and_cancel_closes_it(manager):
     dlg = dialogs[0]
     assert wait_until(lambda: visible(dlg), WAIT_S)
     texts = [_text(c) for c in children_of(dlg)]
-    for expected in ("Language", "Working directory", "OK", "Cancel"):
+    for expected in ("Language", "Working directory", "Start with windows", "Run as admin", "OK", "Cancel"):
         assert expected in texts, (expected, texts)
     assert any(t.startswith("Browse") for t in texts), texts      # the button reads "Browse..."
     click(button_texts(dlg)["Cancel"])

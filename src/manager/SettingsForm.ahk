@@ -8,8 +8,8 @@
 ; the window (SettingsWindow) reads its controls into a Map key -> raw value, Collect checks them with the checks of
 ; SettingsModel (the same checks as the engine uses), and the manager sends the checked set with cmd.settings.set.
 ;
-; Not in the dialog: the window positions (UI state), start with Windows and run as administrator (WI-0079, they come with
-; the autostart entry and the elevation).
+; Not in the dialog: the window positions (UI state). Start with Windows and run as administrator are on the General tab (WI-0079):
+; switching the second one on asks the manager whether to restart now (ManagerModel, the question of the settings event).
 ;
 ; A field: Map("key", key, "tab", "general"|"flow"|"debug", "kind", "language"|"list"|"number"|"check"|"folder",
 ;   "label", Lang key, "items", Array of [value, Lang key] for "list", "note", Lang key of the hint or "").
@@ -26,6 +26,9 @@ class SettingsForm {
             , "items", [["Beginner", "Beginner_level"], ["Advanced", "Advanced_level"], ["Programmer", "Programmer_level"]]),
         Map("key", "workingDir", "tab", "general", "kind", "folder", "label", "Working_directory", "note", ""),
         Map("key", "notifyUnhandledErrors", "tab", "general", "kind", "check", "label", "Notify_unhandled_errors", "note", ""),
+        Map("key", "startWithWindows", "tab", "general", "kind", "check", "label", "Start_with_windows"
+            , "note", "Start_with_windows_note"),
+        Map("key", "runAsAdmin", "tab", "general", "kind", "check", "label", "Run_as_admin", "note", "Run_as_admin_note"),
 
         Map("key", "executionPolicy", "tab", "flow", "kind", "list", "label", "Flow_execution_policy", "note", ""
             , "items", [["parallel", "Parallel_execution_of_multiple_instances"]
