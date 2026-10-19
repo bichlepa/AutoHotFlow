@@ -65,10 +65,10 @@ def test_a_refused_value_is_named_and_nothing_is_sent(started):  # noqa: F811
 
 def test_a_setting_the_dialog_does_not_show_is_refused_by_name(started):  # noqa: F811
     sup, obs = started()
-    answer = settings_op(obs, {"startWithWindows": True})
+    answer = settings_op(obs, {"windowPositions": {}})          # UI state: not a field of the dialog
     assert answer["ok"] is False and answer["sent"] is False, answer
-    assert "startWithWindows" in answer["errors"], answer
-    assert engine_settings(obs)["startWithWindows"] is False, "the autostart keys belong to WI-0079"
+    assert "windowPositions" in answer["errors"], answer
+    assert "not a setting of the dialog" in answer["errors"]["windowPositions"], answer
 
 
 def role_info(runner, name):
@@ -87,6 +87,7 @@ def test_the_language_changes_the_tray_menu_and_the_manager_without_a_restart(pr
     runner.start(extra=("--headless",))
     try:
         assert wait_for(lambda: tray_items(runner)), "the tray role is not there"
+        assert wait_for(lambda: role_info(runner, "manager")), "the manager role is not there"
         assert tray_items(runner) == ["Show manager", "Exit"], tray_items(runner)
         assert role_info(runner, "manager")["language"] == "en"
 
@@ -113,6 +114,7 @@ def test_the_startup_option_and_run_as_admin_of_the_dialog_reach_the_engine_and_
     runner = FlowRunner(procs, datadir, session_id, roles="storage,engine,manager")
     runner.start(extra=("--headless", "--startup-dir=" + str(startup)))
     try:
+        assert wait_for(lambda: role_info(runner, "manager")), "the manager role is not there"
         answer = runner.request("manager", "cmd.test.op", {"op": "settings",
                                                            "settings": {"startWithWindows": True, "runAsAdmin": True}})
         assert answer["ok"] is True and answer["sent"] is True, answer
