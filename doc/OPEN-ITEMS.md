@@ -27,6 +27,9 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0137 | The second start that is denied by an elevated session (F-0135) is silent when it has no console (double click, the shortcut): no window, no notice. A MsgBox is not allowed in the supervisor (no dialog rule), so a tray notice of the elevated session cannot be sent either (it cannot be reached). Possible follow-up: a small message from the failing start through a mechanism outside the supervisor role | open, WI-0079 review | WI-0079 |
 | F-0138 | UAC over the shoulder (the administrator account differs from the user) and the working directory of the elevated start are not checked: the elevated process may see another `A_AppData` and `A_Startup`, so the default data folder and the shortcut may differ from the user's. `Run` passes `A_WorkingDir`, relative paths are not tested for real | open, not checked, manual check 7 step 11 | WI-0079 |
 | F-0136 | The shortcut of Start with Windows has the icon of the interpreter (no own icon file exists in `assets/`), and the working directory is the folder of the script | open, minor, WI-0079 | WI-0079 |
+| F-0141 | The storage and import commands of S0004 have no test that sends them directly | open, low, found in WI-0082 | WI-0082 |
+| F-0142 | PROTOCOL documents message types that no source string uses | open, low, found in WI-0082; the documentation check decides: remove from PROTOCOL or add the code | WI-0082 |
+| F-0143 | A `-m stress` run opens a real manager window | open, tooling; fix: add `and not gui` to the stress selection or drop the `stress` mark from the gui variant | WI-0082 |
 | F-0073 | The stress test with 200 big flows fails its snapshot budget (largest snapshot answer during loading 2326 ms, budget 1000 ms); every flow file is parsed twice in the engine (F-0020 merged in) | budget raised to 3 s (E0042, owner 2026-10-15); stays open as an optimization after the port (pre-filter for inactive flows, one parse instead of two); measurements in WI-0046 | yes |
 | F-0101 | Slow tier: `test_start_stop_storm_leaves_a_consistent_engine[smoke]` saw the engine's handle count grow by 19 (limit 5) | observed, red twice in a row and once alone, green since; the same 145 to 164 as F-0092; cause not known; open, watch the history | |
 | F-0110 | Foundation tier: `test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean[0]` found the storage process still alive after the session ended (the symptom of F-0095) | observed once under load, run 20261016-211715-c03b628b on `c03b628`; not reproduced; the engine's shutdown adds no request to storage in this scenario (the trigger state is not marked); open, watch |  |
@@ -115,6 +118,21 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 **What:** UAC over the shoulder (the administrator account differs from the user) and the working directory of the elevated start are not checked: the elevated process may see another `A_AppData` and `A_Startup`, so the default data folder and the shortcut may differ from the user's. `Run` passes `A_WorkingDir`, relative paths are not tested for real
 **Status:** open, not checked, manual check 7 step 11
+
+### F-0141: The storage and import commands of S0004 have no test that sends them directly
+
+**What:** `cmd.storage.ahf.pack/unpack`, `cmd.storage.startup.sync`, `cmd.storage.v1.list/read`, `cmd.import.scan` and `cmd.import.v1.vars` have no test that sends them directly (error answers of bad payloads are not tested); they run only through the manager chain and the supervisor.
+**Status:** open, low, found in WI-0082
+
+### F-0142: PROTOCOL documents message types that no source string uses
+
+**What:** `evt.connection.state` and `cmd.ui.confirmDeleteFlowFile` are documented in PROTOCOL, but no string of these types exists in `src/` (not investigated whether they are generated names or dead).
+**Status:** open, low, found in WI-0082; the documentation check decides: remove from PROTOCOL or add the code
+
+### F-0143: A `-m stress` run opens a real manager window
+
+**What:** `-m stress` replaces the default `not gui` filter, so it selects the gui variant `test_the_window_fills_its_tree_with_200_big_flows` and a stress run opens a real window (about 50 s).
+**Status:** open, tooling; fix: add `and not gui` to the stress selection or drop the `stress` mark from the gui variant
 
 ### F-0115: Fast tier: hotkey input tests fail when the input desktop is locked
 
