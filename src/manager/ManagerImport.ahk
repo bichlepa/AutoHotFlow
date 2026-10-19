@@ -335,7 +335,7 @@ class ManagerImport {
         if (res["error"] != "")
             lines.Push(res["error"])
         counts := Map("created", 0, "copy", 0, "skipped", 0, "failed", 0, "taken", 0, "kept", 0)
-        for s in res["settings"] {
+        for s in res.Get("settings", []) {
             switch s["state"] {
                 case "taken":
                     lines.Push(Lang("Import_setting_taken", s["name"], s["message"]))
