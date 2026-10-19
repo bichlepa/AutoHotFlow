@@ -17,7 +17,7 @@ Step-independent: WI-0059 (test admission, load report, run history) is done. St
 
 ## Work items of the next step
 
-WI-0086 and WI-0087 may start now; WI-0085 waits for WI-0086 only as far as the plan says (see its Depends line).
+WI-0085 (Depends: WI-0083, WI-0084, decision E0090) may start; WI-0087 is running.
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
@@ -25,7 +25,7 @@ WI-0086 and WI-0087 may start now; WI-0085 waits for WI-0086 only as far as the 
 | WI-0084 | Geometry and scene (headless) | done | haiku | 98f467b0..e065b5d1 | 2026-10-19 | review approved; verified green |
 | WI-0085 | Renderer: draw the scene, style, icons | open | sonnet | | | owner accepts the look (E0088) |
 | WI-0086 | Engine: run states, connection taken, warnings per element | done | haiku | f2846ee2..19c91fdf | 2026-10-19 | review approved with one fix; verification follows; F-0148 |
-| WI-0087 | Open and close an editor: supervisor and manager | open | | | | |
+| WI-0087 | Open and close an editor: supervisor and manager | running | haiku | | | workspace wi-87 |
 | WI-0088 | Editor role: model, resync, window, headless driver | open | | | | |
 | WI-0089 | Live states, marks and the event load | open | | | | |
 | WI-0090 | View: zoom, move, tooltip, status bar, DPI | open | | | | |
