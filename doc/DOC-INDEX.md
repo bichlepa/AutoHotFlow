@@ -31,7 +31,7 @@ L400-411 9. Performance budgets (targets, measured in Phase 2)
 L413-423 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (133.2 KB, 632 lines)
+## doc/PROTOCOL.md (133.7 KB, 632 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
@@ -152,7 +152,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (25.6 KB, 185 lines)
+## doc/howto/gui-and-hotkeys.md (26.8 KB, 193 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -177,6 +177,7 @@ L155-161 TVM_GETITEMRECT (and other messages with a pointer) returns 0 for a tre
 L163-169 A tray notice (TrayTip) is shown by the process that owns the tray icon (assumed) (assumed)
 L171-177 A Text control is clipped to its newlines when its height is counted from them (verified) (verified)
 L179-185 The default button of a question was the first one, so a preselected "No" put No on the left (verified) (partly verified)
+L187-193 A dialog with translated tab names and lists is made again on a language change (verified in unit tests, look not checked) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (11.0 KB, 135 lines)
@@ -247,7 +248,7 @@ L375-380 A ListView that follows a growing list keeps the row numbers of the mod
 L382-388 A child process from a queue operation (tar.exe), without waiting (partly verified)
 ```
 
-## doc/howto/syntax-and-language.md (41.9 KB, 405 lines)
+## doc/howto/syntax-and-language.md (42.7 KB, 413 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -299,9 +300,10 @@ L376-382 `as` and `catch as` are reserved: no parameter named `as` (verified)
 L384-390 A double quote inside a double-quoted string is written `""`, not `\"` (verified)
 L392-398 `Loop files` with the folder flag: check `A_LoopFileAttrib` for "D" and "L" (partly verified)
 L399-405 A parameter or variable named like a class hides the class (names ignore case) (verified)
+L407-413 Sorting strings: an Array has no Sort, and `<` compares numbers (verified) (verified)
 ```
 
-## doc/howto/tests-and-tools.md (42.9 KB, 426 lines)
+## doc/howto/tests-and-tools.md (43.9 KB, 434 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -354,6 +356,7 @@ L397-402 A timer trigger in an integration test needs the trigger host role (ver
 L404-410 Unassigned keys for hotkey input tests: not every virtual key reaches a plain hotkey (verified)
 L412-418 `loop files` takes a mode string, not a number (verified)
 L420-426 A closure over the variable of a `for` loop does not work in a test case (verified)
+L428-434 A window with real controls can be tested without showing it (verified) (verified)
 ```
 
 ## doc/REQUIREMENTS.md

@@ -424,3 +424,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Bind the value: `Assert.Throws(CheckOf.Bind("workers", bad), AhfError)` with `CheckOf(key, value) => SettingsModel.Check(key, value)`.
 - **Status:** verified (WI-0077, tests/ahk/core_settings.test.ahk)
 - **Source:** WI-0077, tests/ahk/core_settings.test.ahk.
+
+### A window with real controls can be tested without showing it (verified)
+
+- **Problem:** The settings dialog and the about window were to be tested without a user and without a visible window.
+- **Wrong:** Building the windows in the end-to-end tests: they are headless, and the window code is not loaded there.
+- **Right:** In an AHK unit test (`tests/ahk/*.test.ahk`, `#SingleInstance Off`) make the window (`UiWindow` makes a hidden `Gui`), read and set its controls (`ctl.Value`, `ctl.Text`), call the handler the button calls (`win.OnOk()`), and give the model a fake (a class with the same method name that records the call and answers at once). Never call `Show`; `win.Close()` in a `finally`. The controls of a window are not enumerable in AHK v2 without a list: keep the controls you test in a Map or an Array of the window (`this.lines`, `this.ctl`).
+- **Status:** verified (tests/ahk/manager_settings_window.test.ahk, 7 cases pass; the same windows are shown only by the gui test, owner run).
+- **Source:** WI-0078, tests/ahk/manager_settings_window.test.ahk.

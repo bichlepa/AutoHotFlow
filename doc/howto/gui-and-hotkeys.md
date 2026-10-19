@@ -183,3 +183,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** The buttons of a question stand in one fixed order, and the default is a flag on the button: `[id, labelKey, true]` (`UiDialogs.DefaultIndex`, pure, unit-tested in `tests/ahk/ui_common_dialogs.test.ahk`; the order per question in `ManagerWindow.ConfirmButtons`, `tests/ahk/manager_window.test.ahk`). Without any flag the first button is the default, as before.
 - **Status:** verified by the unit tests (the Yes/No order of all manager questions and the default of each); the look of the dialog is not checked by hand (not checked).
 - **Source:** `src/ui_common/UiDialogs.ahk` (`Confirm`, `DefaultIndex`), `src/manager/ManagerWindow.ahk` (`ConfirmButtons`)
+
+### A dialog with translated tab names and lists is made again on a language change (verified in unit tests, look not checked)
+
+- **Problem:** The tab names of a `Tab3` control and the items of a drop-down list are texts that a window can set only at creation; `UiTexts` covers the texts of single controls, not the items. A change of the language left the old names in the settings dialog.
+- **Wrong (assumed, not tried):** Calling `Delete()` and `Add()` on the tab control to change its names: the tab pages and the selection may not come back.
+- **Right:** On a change of the language, read the values of the controls (`Read()`), close the window (`UiWindow.Close` remembers its position), make it again with the same constructor, and fill the controls with the values (`Fill()`). The window keeps the values the user typed, and the position comes back from `UiWindow`. The window is made again only when it is open.
+- **Status:** verified by unit tests (`tests/ahk/manager_settings_window.test.ahk`, `Relabel` keeps the typed values); the drawn result in the gui test `tests/fault/test_manager_settings_window.py` (owner run) and by hand (MANUAL-CHECKS 6).
+- **Source:** src/manager/SettingsWindow.ahk (`Relabel`, `_Build`).

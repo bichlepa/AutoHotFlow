@@ -403,3 +403,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Give the class a name that no variable will have (`SettingsModel`), and never use two names that differ only in case in one class (`_table` for the cache, `_Spec()` for the method). A local that has the name of a global variable such as `map` also gives a `#Warn` at load.
 - **Status:** verified (WI-0077, found by tests/ahk/core_settings.test.ahk)
 - **Source:** WI-0077, src/core/SettingsModel.ahk.
+
+### Sorting strings: an Array has no Sort, and `<` compares numbers (verified)
+
+- **Problem:** Sorting the language codes of `LangTable.Languages` failed twice: `Array.Sort()` does not exist in AHK v2, and `code < item` on two strings raised "Expected a Number but got a String" (the operator converts to numbers, as the note in `Json.ahk` says).
+- **Wrong:** `arr.Sort()`; `if (a < b)` for strings.
+- **Right:** collect the strings as lines and let the built-in sort them: `text := Sort(RTrim(text, "`n"), "")`, then `loop parse Sort(...), "`n"`. Case-insensitive, alphabetical, no numeric conversion.
+- **Status:** verified (tests/ahk/manager_settings_form.test.ahk, WI-0078)
+- **Source:** src/core/LangTable.ahk (`Languages`).

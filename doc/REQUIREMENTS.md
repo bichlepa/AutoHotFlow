@@ -95,7 +95,7 @@ Each start of a flow creates an **instance**: one run of the flow, with its own 
 ### REQ-EXE-050 Execution policy per flow
 
 - **v1:** partial (`wait` behaves like `parallel`, MIGRATION M-0011)
-- **v2:** partial (the four policies work; `default` follows the global setting, which takes effect at once; the user cannot change the setting until the dialog of WI-0078 exists)
+- **v2:** partial (the four policies work; `default` follows the global setting, which takes effect at once and is set in the settings dialog (WI-0078); the setting per flow comes with S0007)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (global setting, WI-0077, done)
@@ -238,7 +238,7 @@ Every element that can wait (REQ-EXE-100) has a setting "maximum run time". The 
 ### REQ-EXE-170 Runaway flows are stopped
 
 - **v1:** no
-- **v2:** partial (the three limits work per flow with the defaults from MS-0036, set in the flow file; the notice (tray and manager list, WI-0075) is there; the global defaults and the global switch of the notice are settings and take effect at once (WI-0077); their dialog (WI-0078) and the editing per flow (S0007) are missing)
+- **v2:** partial (the three limits work per flow with the defaults from MS-0036, set in the flow file; the notice (tray and manager list, WI-0075) is there; the global defaults and the global switch of the notice are settings and take effect at once (WI-0077); their dialog is there (WI-0078); the editing per flow (S0007) is missing)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0003 (WI-0066, done), S0004 (global defaults, WI-0077, done; the notice, WI-0075, done), S0007 (per flow, editing)
@@ -1440,10 +1440,11 @@ The standard entries of AutoHotkey (pause, reload, exit without the shutdown of 
 ### REQ-MGR-100 About window
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (the window of WI-0078: the versions of AutoHotFlow and AutoHotkey, the license and the project site as a button that opens it; the look is an owner check, MANUAL-CHECKS section 6)
 - **Prio:** could
 - **Scope:** port
-- **Plan:** S0004
+- **Plan:** S0004 (WI-0078, done)
+- **Evidence:** `tests/ahk/manager_settings_window.test.ahk`
 
 Shows the version of AutoHotFlow and of AutoHotkey, the license and the project site.
 
@@ -1745,22 +1746,22 @@ The standard entries of AutoHotkey are not in the menu. v1 calls the last entry 
 ### REQ-SET-010 Global settings dialog
 
 - **v1:** yes
-- **v2:** partial (the model works: the file, the commands, the effect at once and the import of the settings of v1; the dialog comes with WI-0078)
+- **v2:** done (the model, the file, the commands, the effect at once, the import of the settings of v1, and the settings dialog (WI-0078); the autostart and elevation keys come with WI-0079)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (WI-0077 model, done; WI-0078 dialog)
-- **Evidence:** `tests/ahk/core_settings.test.ahk`, `tests/integration/test_settings.py::test_a_change_is_written_announced_and_survives_a_restart`, `tests/integration/test_settings.py::test_a_broken_file_is_kept_and_the_defaults_are_used`
+- **Plan:** S0004 (WI-0077 model, done; WI-0078 dialog, done)
+- **Evidence:** `tests/ahk/core_settings.test.ahk`, `tests/ahk/manager_settings_form.test.ahk`, `tests/ahk/manager_settings_window.test.ahk`, `tests/e2e/test_manager_settings.py`, `tests/integration/test_settings.py::test_a_change_is_written_announced_and_survives_a_restart`, `tests/integration/test_settings.py::test_a_broken_file_is_kept_and_the_defaults_are_used`
 
 Settings are stored in the data folder and take effect at once where possible; a setting that needs a restart says so and offers it.
 
 ### REQ-SET-020 Defaults for execution policy and working directory
 
 - **v1:** yes
-- **v2:** partial (both settings work and take effect at once; the dialog to change them comes with WI-0078)
+- **v2:** done (both settings work and take effect at once; the settings dialog changes them (WI-0078))
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (WI-0077 settings, done; WI-0078 dialog)
-- **Evidence:** `tests/integration/test_settings.py::test_the_global_execution_policy_decides_for_flows_set_to_default`, `tests/integration/test_settings.py::test_the_global_working_directory_is_a_working_directory_of_flows_at_once`
+- **Plan:** S0004 (WI-0077 settings, done; WI-0078 dialog, done)
+- **Evidence:** `tests/e2e/test_manager_settings.py::test_a_checked_set_from_the_dialog_reaches_the_engine_and_the_file`, `tests/ahk/manager_settings_form.test.ahk`, `tests/integration/test_settings.py::test_the_global_execution_policy_decides_for_flows_set_to_default`, `tests/integration/test_settings.py::test_the_global_working_directory_is_a_working_directory_of_flows_at_once`
 
 The global execution policy (REQ-EXE-050) and the global working directory (REQ-EXE-130). The import of v1 takes over a working directory that the user changed in v1.
 
@@ -1789,11 +1790,11 @@ AutoHotFlow restarts itself with administrator rights, so that flows can control
 ### REQ-SET-050 Logging settings
 
 - **v1:** yes (levels for app, flow and thread; log to file)
-- **v2:** partial (the three thresholds are settings and take effect at once in every process; the dialog comes with WI-0078)
+- **v2:** done (the three thresholds are settings in the dialog (WI-0078, tab Debugging) and take effect at once in every process)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (WI-0077 settings, done; WI-0078 dialog)
-- **Evidence:** `tests/fault/test_diagnose.py::test_the_log_level_decides_what_is_forwarded_to_storage`, `tests/ahk/core_settings.test.ahk`, `tests/integration/test_settings.py::test_the_log_thresholds_change_in_every_role_at_once`, `tests/integration/test_settings.py::test_a_command_line_log_level_wins_over_the_settings`
+- **Plan:** S0004 (WI-0077 settings, done; WI-0078 dialog, done)
+- **Evidence:** `tests/e2e/test_manager_settings.py::test_a_checked_set_from_the_dialog_reaches_the_engine_and_the_file`, `tests/fault/test_diagnose.py::test_the_log_level_decides_what_is_forwarded_to_storage`, `tests/ahk/core_settings.test.ahk`, `tests/integration/test_settings.py::test_the_log_thresholds_change_in_every_role_at_once`, `tests/integration/test_settings.py::test_a_command_line_log_level_wins_over_the_settings`
 
 Three thresholds as in v1, one for each source group: app (`a`), flow (`f`) and thread (`t`), each from 0 to 3. They take effect at once in every process. v2 always writes the log files (rotated at 100 KB); the v1 option "Log to file" is dropped (E0069).
 
@@ -1811,11 +1812,11 @@ v2 keeps its data in `%APPDATA%\AutoHotFlow v2`, or in the folder given by `--da
 ### REQ-SET-070 Number of workers
 
 - **v1:** n/a
-- **v2:** partial (the number is a setting (default 8, 1 to 16) and the pool grows and shrinks at once; the dialog comes with WI-0078)
+- **v2:** done (the number is a setting (default 8, 1 to 16) in the settings dialog (WI-0078) and the pool grows and shrinks at once)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (E0044; WI-0077 setting, done; WI-0078 dialog)
-- **Evidence:** `tests/ahk/engine_worker_bridge.test.ahk`, `tests/integration/test_settings.py::test_the_number_of_workers_grows_and_shrinks_at_once`, `tests/integration/test_settings.py::test_the_command_line_number_of_workers_wins_over_the_setting`
+- **Plan:** S0004 (E0044; WI-0077 setting, done; WI-0078 dialog, done)
+- **Evidence:** `tests/ahk/manager_settings_window.test.ahk`, `tests/e2e/test_manager_settings.py`, `tests/ahk/engine_worker_bridge.test.ahk`, `tests/integration/test_settings.py::test_the_number_of_workers_grows_and_shrinks_at_once`, `tests/integration/test_settings.py::test_the_command_line_number_of_workers_wins_over_the_setting`
 
 A global setting limits how many waiting elements (REQ-EXE-100) run at the same time. **Default: 8, from 1 to 16.** The memory is used only while elements wait, not for the limit itself. A lower number limits the memory when many elements wait at the same time (REQ-PRF-030); a higher number lets more of them run at the same time.
 
@@ -1929,7 +1930,7 @@ When a flow, variable or settings file was written by a newer version of AutoHot
 ### REQ-LNG-010 User interface in several languages
 
 - **v1:** yes (English, German, Russian, Korean)
-- **v2:** partial (the language files of v1 load; the language is a setting and every process takes a change at once; an open window follows a change of the language without a rebuild: `UiTexts.Reload()`, unit-tested only, the window itself not checked)
+- **v2:** partial (the language files of v1 load; the language is a setting and every process takes a change at once, the tray menu and the windows of the manager follow it without a restart (`UiTexts.Reload()`, the manager's `Refresh`, the settings dialog is made again); unit and headless tests; the windows themselves are not checked by the agents: owner check, MANUAL-CHECKS section 6)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (WI-0077 setting, done)
@@ -1940,11 +1941,11 @@ All texts go through `Lang()` with the v1 language files (`assets/language/`, an
 ### REQ-LNG-020 Choice of the language
 
 - **v1:** yes
-- **v2:** partial (the setting and the language of Windows as its default work; the dialog to choose comes with WI-0078)
+- **v2:** done (the setting, the language of Windows as its default, and the choice in the settings dialog (WI-0078) with the languages the program has)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (WI-0077 setting, done; WI-0078 dialog)
-- **Evidence:** `tests/ahk/core_settings.test.ahk`, `tests/integration/test_settings.py::test_the_language_changes_the_texts_of_two_roles_at_once`
+- **Plan:** S0004 (WI-0077 setting, done; WI-0078 dialog, done)
+- **Evidence:** `tests/ahk/core_settings.test.ahk`, `tests/ahk/manager_settings_form.test.ahk`, `tests/e2e/test_manager_settings.py::test_the_language_changes_the_tray_menu_and_the_manager_without_a_restart`, `tests/integration/test_settings.py::test_the_language_changes_the_texts_of_two_roles_at_once`
 
 The language is the setting, or the language of Windows when nothing is set.
 
