@@ -86,6 +86,24 @@ def snapshot(client):
 
 
 @pytest.fixture
+def relaunched(session_id):
+    """A test whose session starts itself again (the new supervisor is not a child of the test): at the end, whatever is
+    still listening on the session is asked to exit, also when the test failed halfway."""
+    yield
+    for _ in range(3):
+        try:
+            c = AhfClient(pipenames.hub_pipe(session_id), "cleanup", connect_timeout=1.0)
+        except Exception:
+            return
+        try:
+            c.request("supervisor", "cmd.app.exit", {}, timeout=5)
+        except Exception:
+            pass
+        c.close()
+        time.sleep(0.5)
+
+
+@pytest.fixture
 def startup(tmp_path):
     folder = tmp_path / "Startup"
     folder.mkdir()
@@ -130,6 +148,15 @@ def test_a_shortcut_that_does_not_match_is_repaired_at_the_start(procs, datadir,
     assert fixed, "the shortcut was not repaired"
     assert fixed["target"].lower().endswith("autohotkey64.exe"), fixed
     assert wait_for(lambda: snapshot(client)["startup"]["action"] == "repaired")
+    client.close()
+
+
+def test_switched_off_with_a_missing_startup_folder_is_not_a_failure(procs, datadir, session_id, tmp_path):
+    sup, _ = start(procs, datadir, TEST_ENTRY, ["--session=" + session_id, "--data=" + str(datadir),
+                                                "--startup-dir=" + str(tmp_path / "NoSuchFolder"), "--start=storage,engine"])
+    client = connect(session_id)
+    assert wait_for(lambda: snapshot(client)["startup"]["action"] != "")
+    assert snapshot(client)["startup"]["action"] == "none"
     client.close()
 
 
@@ -184,9 +211,27 @@ def test_the_product_started_with_windows_starts_only_the_tray(procs, datadir, s
     client.close()
 
 
+def test_the_product_entry_ignores_the_test_hooks_of_the_elevation(procs, datadir, session_id, monkeypatch):
+    """--fake-admin and --fake-elevation exist only in the test entry. The setting stays off here, so nothing can elevate."""
+    if ctypes_is_admin():
+        pytest.skip("the test process is elevated")
+    monkeypatch.setenv("AHF_DATA_DIR", str(datadir))
+    sup, _ = start(procs, datadir, PRODUCT_ENTRY, ["--session=" + session_id, "--headless", "--start=storage,engine",
+                                                   "--test-roles", "--fake-admin", "--fake-elevation=bogus"])
+    client = connect(session_id)
+    assert wait_for(lambda: roles_up(client, ["storage", "engine"]))
+    assert snapshot(client)["elevation"]["admin"] is False
+    client.close()
+
+
+def ctypes_is_admin():
+    import ctypes
+    return bool(ctypes.windll.shell32.IsUserAnAdmin())
+
+
 # --- Run as administrator ------------------------------------------------------------------------------------------
 
-def test_with_the_setting_on_the_supervisor_restarts_elevated_before_it_starts_any_child(procs, datadir, session_id):
+def test_with_the_setting_on_the_supervisor_restarts_elevated_before_it_starts_any_child(procs, datadir, session_id, relaunched):
     settings_file(datadir, runAsAdmin=True)
     sup, err = start(procs, datadir, TEST_ENTRY, ["--session=" + session_id, "--data=" + str(datadir), "--test-roles",
                                                   "--fake-elevation=accept", "--start=storage,engine"])
@@ -214,7 +259,7 @@ def test_a_declined_elevation_leaves_the_session_running_without_rights(procs, d
     client.close()
 
 
-def test_the_command_restart_ends_the_session_and_starts_it_elevated(procs, datadir, session_id):
+def test_the_command_restart_ends_the_session_and_starts_it_elevated(procs, datadir, session_id, relaunched):
     sup, err = start(procs, datadir, TEST_ENTRY, ["--session=" + session_id, "--data=" + str(datadir), "--test-roles",
                                                   "--fake-elevation=accept", "--start=storage,engine"])
     client = connect(session_id)
@@ -233,7 +278,7 @@ def test_the_command_restart_ends_the_session_and_starts_it_elevated(procs, data
         client2.close()
 
 
-def test_a_declined_restart_starts_the_application_again_without_rights(procs, datadir, session_id):
+def test_a_declined_restart_starts_the_application_again_without_rights(procs, datadir, session_id, relaunched):
     sup, err = start(procs, datadir, TEST_ENTRY, ["--session=" + session_id, "--data=" + str(datadir), "--test-roles",
                                                   "--fake-elevation=decline", "--start=storage,engine"])
     client = connect(session_id)

@@ -46,7 +46,7 @@
 ;               (a start with Windows shows only the tray icon, E0070, E0083).
 ;   --startup-dir=<folder|default>  the startup folder of the shortcut of "Start with Windows" (WI-0079); without it only a default
 ;               data folder uses the real one. --elevation-tried (internal), --fake-elevation=accept|decline and --fake-admin
-;               (test hook, only with --test-roles): "Run as administrator", ARCHITECTURE 6.1 item 8.
+;               (test hooks, only in the test entry): "Run as administrator", ARCHITECTURE 6.1 item 8.
 ;   --log-level=<0..3>  highest log level that is forwarded to storage (default 2; level 3 stays in the ring of
 ;               Log only). Valid for the supervisor and passed on to every role (WI-0023). It wins over the three log
 ;               thresholds of the settings (WI-0077); without it the supervisor and the processes it starts use the
@@ -151,10 +151,10 @@ class Supervisor {
                 this.startList.Push(entry)
         }
         this.fakeElevation := ""
-        if (opts.Has(Elevation.FAKE)) {
+        if (opts.Has(Elevation.FAKE) && Elevation.HooksAllowed()) {      ; the product entry ignores the hook
             this.fakeElevation := opts[Elevation.FAKE]
-            if (!this.testRoles || (this.fakeElevation != "accept" && this.fakeElevation != "decline"))
-                throw AhfError("supervisor: --fake-elevation (accept or decline) needs --test-roles", ErrCode.BAD_ARGS)
+            if (this.fakeElevation != "accept" && this.fakeElevation != "decline")
+                throw AhfError("supervisor: --fake-elevation must be accept or decline", ErrCode.BAD_ARGS)
         }
         this.startupDir := Supervisor.StartupDir(opts, this.data)
         this.startupSynced := false
@@ -289,8 +289,7 @@ class Supervisor {
     ; Commands to the supervisor itself. cmd.app.exit starts the exit and answers at once.
     _OnApp(msg) {
         if (msg.type = "cmd.app.exit") {
-            if (this.shutdown.phase = "idle")
-                this.restart := ""         ; an exit after a cancelled restart is a plain exit
+            this.restart := ""             ; an exit that comes after a restart began (or a cancelled one) is a plain exit, no relaunch
             deadline := this.deadlineMs
             if (msg.payload.Has("deadlineMs")) {
                 d := msg.payload["deadlineMs"]

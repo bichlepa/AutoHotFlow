@@ -70,6 +70,7 @@ TEST_GROUPS = {
     "ahk/selfcheck.test.ahk": ["test-support"],
     "ahk/storage_logbuf.test.ahk": ["storage"],
     "ahk/storage_queue.test.ahk": ["storage"],
+    "ahk/supervisor_elevation.test.ahk": ["supervisor"],
     "ahk/supervisor_tick.test.ahk": ["supervisor"],
     "ahk/ui_common_dialogs.test.ahk": ["ui"],
     "ahk/ui_common_file_dialogs.test.ahk": ["ui"],
