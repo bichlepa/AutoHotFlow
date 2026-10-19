@@ -29,6 +29,12 @@ class FakeSettingsModel {
     }
 }
 
+; Opens the dialog the way Show does, without showing it: the values of the engine, and the values at open (OK sends the changes).
+OpenAt(win, model) {
+    win.Fill(model.settings)
+    win.opened := win.Read()
+}
+
 ; The control of a key of the dialog.
 CtlOf(win, key) => win.ctl[key]
 
@@ -76,13 +82,13 @@ ValidValuesAreSentAndTheDialogCloses() {
     model := FakeSettingsModel()
     win := SettingsWindow(model)
     try {
-        win.Fill(model.settings)
+        OpenAt(win, model)
         CtlOf(win, "workers").Value := "4"
         CtlOf(win, "logLevelThread").Choose(4)            ; All logs
         win.OnOk()
         Assert.Equal(model.sent["workers"], 4)
         Assert.Equal(model.sent["logLevelThread"], 3)
-        Assert.Equal(model.sent.Count, SettingsForm.Keys().Length, "every field of the dialog is sent, checked")
+        Assert.Equal(model.sent.Count, 2, "only the two keys the user changed are sent (F-9103)")
         Assert.True(win.done, "a saved set closes the dialog")
     } finally {
         win.Close()
@@ -116,6 +122,37 @@ RelabelKeepsTheTypedValues() {
         Assert.Equal(win.Read()["userLevel"], "Programmer", "the choice is kept")
         Assert.Equal(win.Read()["workers"], "5", "the typed value is kept")
         Assert.True(!win.done)
+    } finally {
+        win.Close()
+    }
+}
+
+; OK without a change sends nothing and closes the dialog (F-9103).
+PlainOkSendsNothing() {
+    model := FakeSettingsModel()
+    win := SettingsWindow(model)
+    try {
+        OpenAt(win, model)
+        win.OnOk()
+        Assert.True(model.sent = "", "no key was changed: nothing is sent")
+        Assert.True(win.done, "the dialog closes")
+    } finally {
+        win.Close()
+    }
+}
+
+; A language code that the program does not list stays selected and is sent as it is (F-9103).
+UnlistedLanguageIsKept() {
+    model := FakeSettingsModel()
+    model.settings["language"] := "fr"
+    win := SettingsWindow(model)
+    try {
+        OpenAt(win, model)
+        Assert.Equal(win.Read()["language"], "fr", "the unlisted code is shown, not replaced by the language of Windows")
+        CtlOf(win, "workers").Value := "5"
+        win.OnOk()
+        Assert.Equal(model.sent.Count, 1, "only the workers are sent")
+        Assert.True(!model.sent.Has("language"), "the language is not part of the set")
     } finally {
         win.Close()
     }
@@ -173,6 +210,8 @@ TestRun.Case("OK with a refused value stays open, names the value and sends noth
 TestRun.Case("OK with valid values sends the checked set and closes the dialog", ValidValuesAreSentAndTheDialogCloses)
 TestRun.Case("A refusal of the engine stays in the dialog with its message", EngineRefusalStaysInTheDialog)
 TestRun.Case("A change of the language keeps the values the user typed", RelabelKeepsTheTypedValues)
+TestRun.Case("OK without a change sends nothing and closes the dialog", PlainOkSendsNothing)
+TestRun.Case("A language code the program does not list is kept", UnlistedLanguageIsKept)
 TestRun.Case("A change of the language keeps a refused value and the refusal in the status", RelabelKeepsARefusedValueAndTheStatus)
 TestRun.Case("The language list starts with the language of Windows", LanguageListHasWindowsLanguageFirst)
 TestRun.Case("The about window has the versions, the license and the project site", AboutShowsVersionsLicenseAndSite)

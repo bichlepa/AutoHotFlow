@@ -39,6 +39,7 @@ class SettingsWindow {
         this.ctl := Map()          ; key -> control
         this.lists := Map()        ; key -> the values of a drop-down list, in the order of its items
         this.codes := []           ; the language codes of the language list: "" (language of Windows) first
+        this.opened := Map()       ; the values at open (OK sends the changed ones)
         this.done := false
         this._Build()
     }
@@ -46,6 +47,7 @@ class SettingsWindow {
     ; Shows the dialog with the settings of the engine.
     Show() {
         this.Fill(this.model.settings)
+        this.opened := this.Read()     ; the values as they are shown: OK sends only what the user changed (F-9103)
         this.win.Show()
     }
 
@@ -120,6 +122,8 @@ class SettingsWindow {
             ctl := this.ctl[key]
             switch field["kind"] {
                 case "language":
+                    if (value != "" && this._IndexOf(this.codes, value) = 1 && this.codes[1] != value)
+                        this._AddLanguage(value)    ; a code the program does not list stays in the list (F-9103)
                     ctl.Choose(this._IndexOf(this.codes, value))
                 case "list":
                     ctl.Choose(this._IndexOf(this.lists[key], value))
@@ -133,7 +137,16 @@ class SettingsWindow {
 
     ; The button OK: checks the values; a refusal stays in the dialog, a checked set goes to the engine.
     OnOk() {
-        res := SettingsForm.Collect(this.Read())
+        changed := Map()               ; the keys whose value differs from the value at open (F-9103)
+        for key, value in this.Read() {
+            if (!this.opened.Has(key) || String(this.opened[key]) != String(value))
+                changed[key] := value
+        }
+        if (changed.Count = 0) {       ; nothing changed: nothing is sent
+            this.Close()
+            return
+        }
+        res := SettingsForm.Collect(changed)
         if (!res["ok"]) {
             this.statusCtl.Text := Lang("Settings_refused") "`n" SettingsForm.ErrorText(res["errors"], (key) => this._LabelOf(key))
             return
@@ -259,6 +272,12 @@ class SettingsWindow {
             this.win.Place(note, SettingsWindow.NOTE_X, y + 4, SettingsWindow.NOTE_W, 20)
             this.win.Text(note, field["note"])
         }
+    }
+
+    ; A language code that the list of the program does not have is added to it, so that OK does not reset it.
+    _AddLanguage(code) {
+        this.codes.Push(code)
+        this.ctl["language"].Add([code])
     }
 
     ; The value of a list item (1-based index of the drop-down list); a list without a selection gives "".
