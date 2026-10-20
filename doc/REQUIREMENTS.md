@@ -205,11 +205,11 @@ Relative paths in file and folder parameters refer to the working directory. Eac
 ### REQ-EXE-140 Every element and flow shows its state
 
 - **v1:** yes
-- **v2:** partial (the states are reported, and the engine gives all element states of a flow at once, `cmd.flow.runstate`, WI-0086; the manager holds the state of every flow, the tree shows the flows without their state until WI-0074; the editor does not show them yet)
+- **v2:** partial (the states are reported, and the engine gives all element states of a flow at once, `cmd.flow.runstate`, WI-0086; the manager holds the state of every flow, the tree shows the flows without their state until WI-0074; the editor shows a running element when it opens and while it runs, WI-0088; the fading of the recently run elements, the exception mark and the warnings come with WI-0089)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (manager), S0005 (editor)
-- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/ahk/manager_model.test.ahk` (the model of the manager), `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`
+- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/ahk/manager_model.test.ahk` (the model of the manager), `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`, `tests/e2e/test_editor.py::test_an_editor_opened_while_the_flow_runs_shows_the_running_element`
 
 Each element has a state (idle, running, finished, exception) and counts its runs. Each flow shows whether it is enabled and whether it runs, and its running and queued instances. Manager and editor show these states live, also a window that was opened later or that reconnected after a fault.
 
@@ -1496,7 +1496,7 @@ A deleted flow is not lost at once (E0066). Ideas of the owner (2026-10-17), to 
 ### REQ-EDT-010 One editor per flow, several at the same time
 
 - **v1:** partial (several editors, but drawing and input share one lock and one draw thread)
-- **v2:** partial (WI-0087: the supervisor starts one editor process per flow for the Edit button and a double click, and a second request shows the running one; the editor window, its live states and its own process life come with WI-0088 to WI-0091)
+- **v2:** partial (WI-0087: the supervisor starts one editor process per flow for the Edit button and a double click, and a second request shows the running one; WI-0088: the editor is a process of its own that shows its flow in a window, and an editor that crashes or is closed leaves the flow and the other editors running (`tests/e2e/test_editor.py`); the live states come with WI-0089, the tray icon with WI-0091)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
@@ -1506,7 +1506,7 @@ Each open flow has its own editor window in its own process (D0002). An editor t
 ### REQ-EDT-020 Draw the flow
 
 - **v1:** yes
-- **v2:** partial (the geometry, the scene and the hit test are unit-tested, WI-0084; the renderer draws the elements with icon and name, the connections with their type and label, the loops with their parts, the trigger marks and the state overlays, pixel-tested, WI-0085; no window yet, and the hover is missing: WI-0088, WI-0090)
+- **v2:** partial (the geometry, the scene and the hit test are unit-tested, WI-0084; the renderer draws the elements with icon and name, the connections with their type and label, the loops with their parts, the trigger marks and the state overlays, pixel-tested, WI-0085; WI-0088: the editor process draws its flow into the back buffer of its window and copies it in WM_PAINT, without a background erase, the window itself is checked by the owner (gui test `tests/fault/test_editor_window.py`); the hover is missing: WI-0090)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
@@ -1526,7 +1526,7 @@ Zoom, and move the view by dragging with the right (or left) mouse button. Zoom 
 ### REQ-EDT-040 Live execution state in the editor
 
 - **v1:** yes
-- **v2:** partial (the engine gives the states of all elements of a flow at once and the connection a thread took, WI-0086; the editor does not highlight them yet, REQ-EXE-140)
+- **v2:** partial (the engine gives the states of all elements of a flow at once and the connection a thread took, WI-0086; the editor shows the running elements since WI-0088 (`tests/e2e/test_editor.py`); the connection taken, the fading and the exception mark come with WI-0089)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
@@ -1908,7 +1908,7 @@ The user imports the flows and variables of v1 into the v2 data folder through t
 ### REQ-MIG-070 Flows with missing element packages
 
 - **v1:** yes (the flow is not loaded; a dialog under the global lock asks, on "Yes" the file is deleted)
-- **v2:** partial (the flow loads, the element is kept and fails with `exception` when run, WI-0047; the manager marks the flow with its missing packages for every element type, E0080; the editor is missing)
+- **v2:** partial (the flow loads, the element is kept and fails with `exception` when run, WI-0047; the manager marks the flow with its missing packages for every element type, E0080; the editor draws such an element as a placeholder with its name and the reason (scene and renderer unit tests, WI-0084 and WI-0085; the window of the editor is a gui test of the owner)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0004 (manager and the notice), S0005 to S0007 (editor)
@@ -2252,11 +2252,11 @@ No blocking call on the message path. Every request has a timeout; a late answer
 ### REQ-ROB-040 Recovery after a crash of the flow execution
 
 - **v1:** no
-- **v2:** partial (restart and resync work; the triggers are armed again after a restart of the engine or of the trigger host, WI-0062; the engine gives the states of all elements of a flow at once for the resync of the editor, WI-0086; the editor shows the state again only with S0005)
+- **v2:** partial (restart and resync work; the triggers are armed again after a restart of the engine or of the trigger host, WI-0062; the engine gives the states of all elements of a flow at once for the resync of the editor, WI-0086; the editor shows the current state again after an engine restart, WI-0088; the states of the editor after a crash of the editor itself are the business of the supervisor (the editor is not restarted, WI-0087))
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (editor)
-- **Evidence:** `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/fault/test_worker_lifecycle.py::test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs`, `tests/integration/test_trigger_arming.py::test_the_engine_is_restarted_and_rearms_without_the_startup_context`, `tests/integration/test_trigger_arming.py::test_the_trigger_host_is_restarted_and_its_triggers_fire_again`
+- **Evidence:** `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/fault/test_worker_lifecycle.py::test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs`, `tests/integration/test_trigger_arming.py::test_the_engine_is_restarted_and_rearms_without_the_startup_context`, `tests/integration/test_trigger_arming.py::test_the_trigger_host_is_restarted_and_its_triggers_fire_again`, `tests/e2e/test_editor.py::test_killed_engine_restarts_and_the_editor_shows_the_state_again`
 
 When the part that runs the flows (the engine) crashes, it starts again by itself. Open windows stay open and show the current state again; the triggers of enabled flows are active again. Instances that were running are lost (MIGRATION M-0001).
 
