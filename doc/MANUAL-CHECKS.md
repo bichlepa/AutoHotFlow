@@ -453,7 +453,7 @@ Run record (2026-10-20, editor, section 9):
 ```
 Date: 2026-10-20
 Tester: Paul
-Editor (section 9): steps 1 to 25 pass; look accepted yes (step 3, E0088)
+Editor (section 9): steps 1 to 24 pass; step 25 (4K) not run, no 4K screen; look accepted yes (step 3, E0088)
 Notes: The tester reported that he did manual check 9 and is satisfied. He gave no step
   numbers, so no step is listed as failed. The look was reworked after his first
   review (loop drawn as one object, square corners for loops and actions, icons faded and
@@ -461,8 +461,10 @@ Notes: The tester reported that he did manual check 9 and is satisfied. He gave 
   tasks of part D (three gui tests) and part E (renderer measurement with a window)
   did not start at first; they were fixed (see the how-to entries on gui tests) and
   the gui tests of part D pass now, as the tester reported. The numbers of the
-  measurement with a window (the WINDOW line at 1920 x 1080, and whether a 4K screen
-  was available for step 25) were not given for this record. Postponed by the tester:
+  measurement with a window (the WINDOW line at 1920 x 1080) were not given for this
+  record. Step 25 (4K) was not run: the tester has no 4K screen, only a 2K one; the
+  4K numbers stay open (a measurement, not a requirement of the check). Postponed
+  by the tester:
   the latency with 300 changing elements (F-0156) and the order inside a batch of
   element states (F-0161).
 ```
