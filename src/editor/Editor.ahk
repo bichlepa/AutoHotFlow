@@ -146,7 +146,7 @@ class Editor extends Role {
         if (this.frameScheduled || this.tornDown || !IsObject(this.canvas))
             return
         this.frameScheduled := true
-        wait := Max(0, EditorWindow.FRAME_MS - (Time.NowMs() - this.lastFrameMs))
+        wait := Max(1, EditorWindow.FRAME_MS - (Time.NowMs() - this.lastFrameMs))   ; SetTimer(fn, -0) would switch it off
         SetTimer(this.frameFn, -wait)
     }
 

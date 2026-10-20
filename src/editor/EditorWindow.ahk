@@ -80,7 +80,7 @@ class EditorWindow {
         if (this.closed || this.scheduled)
             return
         this.scheduled := true
-        wait := Max(0, EditorWindow.FRAME_MS - (Time.NowMs() - this.lastFrameMs))
+        wait := Max(1, EditorWindow.FRAME_MS - (Time.NowMs() - this.lastFrameMs))   ; SetTimer(fn, -0) would switch it off
         SetTimer(this.frameFn, -wait)
     }
 

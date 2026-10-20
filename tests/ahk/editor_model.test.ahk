@@ -85,6 +85,18 @@ class FakeLater {
 
 FLOW := "Flow 7"
 
+; An evt.element.states of the engine (PROTOCOL 4.3) with one element: the fields of p are the element's, flowId, epoch and seq
+; belong to the batch. The element tests of the model use it.
+OnElementStates(model, p) {
+    entry := Map()
+    for key, value in p {
+        if (key != "flowId" && key != "epoch" && key != "seq")
+            entry[key] := value
+    }
+    model.OnEvent("evt.element.states", Map("flowId", p["flowId"], "elements", [entry], "epoch", p["epoch"]
+        , "seq", p["seq"]))
+}
+
 ; Two actions and a trigger; the connection from the trigger to A (normal) and from A to B.
 FlowDefinition() {
     return Json.Parse('{"name": "Demo", "category": "", "flowSettings": {"zoomFactor": "1.000000", "Offsetx": "0", "Offsety": "0"},'
@@ -161,7 +173,7 @@ RunningElementIsDrawnAndFinishes() {
     t := Loaded()
     model := t["model"]
     before := model.CurrentScene()
-    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1
+    OnElementStates(model, Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1
         , "lastRun", "2026-10-19 10:00:00", "epoch", 100, "seq", 11))
     Assert.Equal(model.run["A"], "running", "A runs")
     sc := model.CurrentScene()
@@ -170,7 +182,7 @@ RunningElementIsDrawnAndFinishes() {
     Assert.True(ElementOf(sc, "B") == ElementOf(before, "B"), "B did not change: the same object")
     now := 1000
     model.clock := () => now
-    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "finished", "countRuns", 0
+    OnElementStates(model, Map("flowId", FLOW, "elementId", "A", "state", "finished", "countRuns", 0
         , "lastRun", "2026-10-19 10:00:00", "epoch", 100, "seq", 12))
     Assert.Equal(model.run["A"], 1, "A fades out from full strength")
     Assert.True(IsNumber(ElementOf(model.CurrentScene(), "A").Run), "A is drawn as a fade")
@@ -192,7 +204,7 @@ ExceptionKeepsItsLook() {
     model := t["model"]
     now := 1000
     model.clock := () => now
-    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "exception", "countRuns", 0
+    OnElementStates(model, Map("flowId", FLOW, "elementId", "A", "state", "exception", "countRuns", 0
         , "message", "the expression is wrong", "epoch", 100, "seq", 11))
     Assert.Equal(model.run["A"], "exception", "A keeps the exception look")
     Assert.Equal(model.messages["A"], "the expression is wrong", "the message for the tooltip")
@@ -201,7 +213,7 @@ ExceptionKeepsItsLook() {
     t["later"].RunLater()
     Assert.Equal(model.run["A"], "exception", "still the exception look after a while")
     Assert.Equal(ElementOf(model.CurrentScene(), "A").Run, "exception", "drawn as an exception")
-    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1
+    OnElementStates(model, Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1
         , "epoch", 100, "seq", 12))
     Assert.Equal(model.run["A"], "running", "the next start ends the look")
     Assert.True(!model.messages.Has("A"), "the message is gone with it")
@@ -213,7 +225,7 @@ ConnectionTakenFades() {
     model := t["model"]
     now := 1000
     model.clock := () => now
-    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1
+    OnElementStates(model, Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1
         , "connectionId", "c1", "epoch", 100, "seq", 11))
     Assert.Equal(model.run["c1"], 1, "the connection is tinted")
     Assert.Equal(model.run["A"], "running", "the element runs")
@@ -246,7 +258,7 @@ WarningsAreShownAndCoalescedPerFrame() {
         "epoch", 100, "seq", 11))
     model.OnEvent("evt.element.warning", Map("flowId", FLOW, "elementId", "A", "count", 3, "text", "f1 line 2",
         "epoch", 100, "seq", 12))
-    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "B", "state", "running", "countRuns", 1,
+    OnElementStates(model, Map("flowId", FLOW, "elementId", "B", "state", "running", "countRuns", 1,
         "epoch", 100, "seq", 13))
     Assert.Equal(model.warnings["A"]["count"], 3, "the count of the last event")
     sc := model.CurrentScene()
@@ -275,7 +287,7 @@ LatencyOfFrames() {
     model.pendingAt := 0
     now := 1000
     model.clock := () => now
-    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1,
+    OnElementStates(model, Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1,
         "epoch", 100, "seq", 11))
     now := 1040
     model.CurrentScene()
@@ -288,7 +300,7 @@ LatencyOfFrames() {
     ; twenty more frames of 1 to 20 ms: the 21 values are 1..20 and 40; the median is the 11th (11 ms), the 95 % point the 20th
     for v in [5, 1, 9, 3, 7, 2, 8, 4, 6, 10, 12, 11, 15, 13, 14, 20, 18, 19, 17, 16] {
         now := 2000 + A_Index * 100
-        model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1,
+        OnElementStates(model, Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1,
             "epoch", 100, "seq", 12 + A_Index))
         now := now + v
         model.CurrentScene()
@@ -335,7 +347,7 @@ EventsAtOrBelowTheAnswerAreDiscarded() {
 GapInSeqIsNormal() {
     t := Loaded(100, 10)
     model := t["model"]
-    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "epoch", 100, "seq", 40))
+    OnElementStates(model, Map("flowId", FLOW, "elementId", "A", "state", "running", "epoch", 100, "seq", 40))
     Assert.Equal(model.run["A"], "running", "applied after a gap of 29")
     Assert.Equal(t["peer"].Count("cmd.flow.runstate"), 0, "no request for a gap")
 }
@@ -390,7 +402,7 @@ OneRequestOfAKindInFlight() {
 StaleAnswerIsAskedAgain() {
     t := Started(100, 10)
     model := t["model"]
-    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "epoch", 100, "seq", 30))
+    OnElementStates(model, Map("flowId", FLOW, "elementId", "A", "state", "running", "epoch", 100, "seq", 30))
     AnswerRunstate(t, 100, 10)            ; the answer is older than the event applied
     Assert.Equal(t["peer"].Count("cmd.flow.runstate"), 1, "stale: asked again")
     Assert.True(model.run.Has("A"), "the stale answer did not undo the event: A stays running")
@@ -468,8 +480,8 @@ DuplicateEventsAreIgnored() {
     model := t["model"]
     changes := 0
     model.AddListener((kind, data) => (kind = "state") ? changes++ : 0)
-    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "epoch", 100, "seq", 11))
-    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "epoch", 100, "seq", 11))
+    OnElementStates(model, Map("flowId", FLOW, "elementId", "A", "state", "running", "epoch", 100, "seq", 11))
+    OnElementStates(model, Map("flowId", FLOW, "elementId", "A", "state", "running", "epoch", 100, "seq", 11))
     Assert.Equal(changes, 1, "the second copy of seq 11 changes nothing")
 }
 

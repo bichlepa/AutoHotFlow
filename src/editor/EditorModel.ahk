@@ -319,8 +319,10 @@ class EditorModel {
                     this.triggers[p["elementId"]] := EditorModel._TriggerOf(p)
                     this._Changed("state")
                 }
-            case "evt.element.state":
-                this._OnElementState(p)
+            case "evt.element.states":
+                ; one batch of the flow (PROTOCOL 4.3): each entry is one element, in the order the engine sent them
+                for entry in p.Get("elements", [])
+                    this._OnElementState(entry)
             case "evt.element.warning":
                 this._OnWarning(p)
             case "evt.flow.committed":
@@ -351,6 +353,10 @@ class EditorModel {
                 this.run[id] := "exception"
                 this.messages[id] := EditorModel.TextOf(p, "message")
             case "finished":
+                ; the connection of a start that ended in the same batch is tinted as well (PROTOCOL 4.11)
+                connectionId := p.Get("connectionId", "")
+                if (connectionId != "")
+                    this._Fade(connectionId, 1)
                 if (this.run.Has(id) && this.run[id] = "running")
                     this._Fade(id, 1)
                 else
