@@ -463,5 +463,5 @@ No owner decision needed; a package may refine it and says so in its result.
 
 ### Progress S0005
 
-- [ ] WI-0083  - [ ] WI-0084  - [ ] WI-0085  - [ ] WI-0086  - [ ] WI-0087
-- [ ] WI-0088  - [ ] WI-0089  - [ ] WI-0090  - [ ] WI-0091  - [ ] WI-0092
+- [x] WI-0083  - [x] WI-0084  - [x] WI-0085  - [x] WI-0086  - [x] WI-0087
+- [x] WI-0088  - [x] WI-0089  - [x] WI-0090  - [x] WI-0091  - [x] WI-0092 (agent part; the owner closes manual check 9)
