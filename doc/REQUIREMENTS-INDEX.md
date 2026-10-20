@@ -184,7 +184,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-EDT-070](REQUIREMENTS.md#req-edt-070-connect-elements) | L1561-1569 | Connect elements | yes | open | must | port | S0006 (WI-0100) |
 | [REQ-EDT-080](REQUIREMENTS.md#req-edt-080-delete-cut-copy-and-paste) | L1571-1579 | Delete, cut, copy and paste | yes | open | must | port | S0006 (WI-0101, E0091) |
 | [REQ-EDT-090](REQUIREMENTS.md#req-edt-090-undo-and-redo) | L1581-1589 | Undo and redo | yes | open | must | port | S0006 (WI-0096) |
-| [REQ-EDT-100](REQUIREMENTS.md#req-edt-100-save-and-changes-during-execution) | L1591-1600 | Save, and changes during execution | yes | partial | must | port | S0006 (commit WI-0093, automatic saving WI-0095, editor WI-0096) |
+| [REQ-EDT-100](REQUIREMENTS.md#req-edt-100-save-and-changes-during-execution) | L1591-1600 | Save, and changes during execution | yes | partial | must | port | S0006 (automatic saving WI-0095, editor WI-0096) |
 | [REQ-EDT-110](REQUIREMENTS.md#req-edt-110-run-stop-and-enable-from-the-editor) | L1602-1611 | Run, stop and enable from the editor | yes | partial | must | port | S0005 (run and enable from the tray menu of the editor, E0087, WI-0091), S0006 (the menu bar, WI-0102) |
 | [REQ-EDT-120](REQUIREMENTS.md#req-edt-120-element-settings-dialog) | L1613-1621 | Element settings dialog | yes | open | must | port | S0007 (model WI-0105, window WI-0106) |
 | [REQ-EDT-130](REQUIREMENTS.md#req-edt-130-assistants-in-the-element-settings) | L1623-1631 | Assistants in the element settings | yes | open | should | port | S0007 (WI-0110) |

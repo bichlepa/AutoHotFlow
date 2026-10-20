@@ -141,3 +141,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Copy the function object into a local variable first and call the local: `onWarn := src.onWarn` then `onWarn(a, b)`. The same holds for `this.callback()` (see the GUI file); `onFinish := this.onFinish` in `ExecContext.Finish` was already written this way.
 - **Status:** verified (scratch script, `ObjBindMethod` method with two bound and two call arguments: the property call fails, the local call works)
 - **Source:** `src/elements/base/ParamEvaluator.ahk` (`Report`), `src/engine/Executor.ahk` (`_Dispatch`, `_Warned`)
+
+### Copy on write: clone a shared map before its first write, and remember that it is owned
+
+- **Problem:** A patch must leave the committed revision unchanged (other instances and the undo read it), but copying the whole flow for every patch would copy all maps, most of which do not change.
+- **Right:** Keep one flag per map that the operation list owns (`w["owned"]`). The first write goes through a helper that clones the map (or the one element) and stores the clone in the new root; later writes reuse it. Clone the nested value you change (the `pars` of an element), not only the element. Nothing reachable from the input is written. Removing a key from the owned flags checks `Has` first (`Map.Delete` throws on a missing key).
+- **Status:** verified (`tests/ahk/core_flow_patch.test.ahk`, cases "revisions share the maps that do not change" and "a refused operation refuses the whole list"; the `Delete` error was seen in the first run)
+- **Source:** `src/core/FlowPatch.ahk` (`_ElsW`, `_ElW`, `_Forget`)

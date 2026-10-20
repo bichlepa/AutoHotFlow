@@ -435,3 +435,17 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** names that cannot be mistaken for the locals of the classes, e.g. `SAMPLE_W`.
 - **Status:** verified (AutoHotkey 2.0.30, 2026-10-19)
 - **Source:** `tests/ahk/helpers/render_samples.ahk`
+
+### A one-line `if (...) continue` is flagged by the editor's analyzer
+
+- **Problem:** The VS Code analyzer reported `The following reserved word 'continue' must not be used as a variable name` for `if (!fe.Has(id)) continue` on one line in a `for` loop. The code was rewritten with a block (`if (...) { ... }`), so the warning went away; the one-line form was not run.
+- **Right:** Use a block around the statement after an `if` in a loop; it reads the same and the analyzer accepts it.
+- **Status:** not checked (whether the one-line form is wrong at run time; the block form runs, verified by `tests/ahk/core_flow_patch.test.ahk`)
+- **Source:** `src/core/FlowPatch.ahk` (`Diff`)
+
+### A function and a local with the same name: the `Op` helper of a test
+
+- **Problem:** A test helper `Op(name, ...)` and a local `op` in the same file gave `Warning: This local variable has the same name as a global variable` under `#Warn All` (the names differ only in case).
+- **Right:** Name the local `item`; the warning is a check that the function is not hidden. The same rule as before: a local must not share a name with a function or class of the script.
+- **Status:** verified (warning seen in the run of `tests/ahk/core_flow_patch.test.ahk`, gone after the rename)
+- **Source:** `tests/ahk/core_flow_patch.test.ahk`

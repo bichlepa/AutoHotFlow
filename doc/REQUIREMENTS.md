@@ -142,7 +142,7 @@ Enabling a flow activates its triggers that switch with the flow; disabling deac
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/ahk/engine_revision.test.ahk`
+- **Evidence:** `tests/ahk/engine_revision.test.ahk`, `tests/integration/test_flow_patch.py::test_a_running_instance_follows_a_connection_added_during_its_run`, `tests/integration/test_flow_patch.py::test_a_removed_next_element_is_not_run_and_the_running_element_ends_normally`
 
 A change in the editor applies to running instances at their next step: the next element and the next connection are taken from the changed flow (decision E0001). An element that runs while it is deleted runs to its end; a waiting branch whose element was deleted ends with `exception` (MIGRATION M-0017, M-0018).
 
@@ -1591,11 +1591,11 @@ Ctrl+Z and Ctrl+Y and menu entries. A cancelled action (a move cancelled with Es
 ### REQ-EDT-100 Save, and changes during execution
 
 - **v1:** yes (unsaved flows are saved automatically at exit)
-- **v2:** partial (revisions, conflict detection and saving work internally; edit operations are refused until the editor exists)
+- **v2:** partial (the commit of a change works: revisions, conflicts, the rules and the rename race; the automatic saving and the editor are still missing)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0006 (commit WI-0093, automatic saving WI-0095, editor WI-0096)
-- **Evidence:** `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`
+- **Plan:** S0006 (automatic saving WI-0095, editor WI-0096)
+- **Evidence:** `tests/integration/test_flow_patch.py` (commit, conflict, refused list, busy deletion, rename race), `tests/ahk/core_flow_patch.test.ahk` (rules, inverse, shared revisions), `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`
 
 Every completed edit takes effect at once, also for running instances (REQ-EXE-080), and is saved automatically a few seconds later (E0065): about 3 s after the last change, at the latest every 10 s while the user keeps editing. A flow has no unsaved state, so closing the editor or the application asks nothing. Saving by hand (Ctrl+S, menu) only writes at once. Mistakes are undone with undo (REQ-EDT-090) or by a backup: a backup is made at the first write of an editing session and then at most every 10 minutes (REQ-ROB-060, REQ-MGR-110). A rename by the manager while the editor is open is merged.
 

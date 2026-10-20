@@ -124,7 +124,7 @@ L503-520   19.1 The subset that is compared
 L522-539   19.2 Deliberate deviations from native AutoHotkey v2
 ```
 
-## doc/MEASUREMENTS.md (68.9 KB, 312 lines)
+## doc/MEASUREMENTS.md (68.8 KB, 309 lines)
 ```text
 L11-21 Important: one machine, not an idle machine
 L23-76 Overview
@@ -134,14 +134,14 @@ L125-156 Frame of the editor renderer (WI-0083, R0002, MS-0044)
 L158-174 Frame and layer rebuild of the real renderer (WI-0085, E0090, MS-0046)
 L176-195 Not measured
 L197-214 Editor under the event load and the state scene (WI-0089, REQ-PRF-060, MS-0047)
-L216-268 Editor with the real renderer, five editors, batch of 300 (WI-0092, MS-0048 to MS-0050)
+L216-266 Editor with the real renderer, five editors, batch of 300 (WI-0092, MS-0048 to MS-0050)
 L220-233   MS-0048: frame of the real renderer, 300 elements, headless (task 2 of WI-0092, R0002, REQ-PRF-060)
 L235-250   MS-0049: memory of five open editors (task 3 of WI-0092, E0040, MS-0006)
-L252-268   MS-0050: element states of a flow of 300 elements that all change in one interval; latency of the editor (F-0156, REQ-PRF-060)
-L269-283 Editing: frame of a drag and the layer rebuilds (WI-0097, MS-0051)
-L284-312 Patches of the engine on a flow of 300 elements (WI-0093, MS-0051, MS-0052)
-L286-296   MS-0051: engine time of one patch on a flow of 300 elements (WI-0093, task 6)
-L298-312   MS-0052: steps of a running flow during 100 patches in a row, and a patch of 30 operations on the biggest flow (WI-0093)
+L252-266   MS-0050: element states of a flow of 300 elements that all change in one interval; latency of the editor (F-0156, REQ-PRF-060)
+L268-281 Editing: frame of a drag and the layer rebuilds (WI-0097, MS-0051)
+L282-309 Patches of the engine on a flow of 300 elements (WI-0093, MS-0053, MS-0054)
+L284-294   MS-0053: engine time of one patch on a flow of 300 elements (WI-0093, task 6)
+L296-309   MS-0054: steps of a running flow during 100 patches in a row, and a patch of 30 operations on the biggest flow (WI-0093)
 ```
 
 ## doc/CONVENTIONS.md (8.5 KB, 63 lines)
@@ -210,7 +210,7 @@ L227-233 The status bar of a window is laid out by the parent's WM_SIZE, and its
 L235-241 Round(x, n) returns text with n decimals, so Round(1, 2) shows "1.00" (verified) (verified)
 ```
 
-## doc/howto/objects-maps-arrays.md (12.2 KB, 143 lines)
+## doc/howto/objects-maps-arrays.md (13.2 KB, 150 lines)
 ```text
 L5-9 Map with `CaseSense "Off"` keeps the spelling of the first insertion (verified)
 L12-17 Copy keys into an array before deleting from a Map (not checked)
@@ -229,6 +229,7 @@ L113-119 `Map.Delete` of a missing key throws: check `Has` first, or the callbac
 L121-127 `Array` has no `Sort` method in AHK v2 (verified)
 L129-135 `Map` keys are case-sensitive by default; compare names with `==` when the case matters (verified)
 L137-143 A bound method stored in an object property gets the object as an extra argument when it is called as `obj.prop(...)` (verified)
+L145-150 Copy on write: clone a shared map before its first write, and remember that it is owned (verified)
 ```
 
 ## doc/howto/processes-pipes-messages.md (46.1 KB, 397 lines)
@@ -280,7 +281,7 @@ L382-388 A child process from a queue operation (tar.exe), without waiting (part
 L390-396 A flow ID with a space on the command line of a child process (verified)
 ```
 
-## doc/howto/syntax-and-language.md (44.7 KB, 437 lines)
+## doc/howto/syntax-and-language.md (46.0 KB, 451 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -336,6 +337,8 @@ L407-413 Sorting strings: an Array has no Sort, and `<` compares numbers (verifi
 L415-421 SplitPath splits at backslashes only; a forward-slash path gives a wrong name (verified) (verified)
 L423-429 An Array has no Sort method, and a function returns one value (verified) (verified)
 L431-437 Names are case-insensitive: a global `W` makes every local `w` of the included files a warning (verified) (verified)
+L439-444 A one-line `if (...) continue` is flagged by the editor's analyzer (partly verified)
+L446-451 A function and a local with the same name: the `Op` helper of a test (verified)
 ```
 
 ## doc/howto/tests-and-tools.md (49.2 KB, 482 lines)
