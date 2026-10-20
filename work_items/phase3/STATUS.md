@@ -17,7 +17,7 @@ Step-independent: WI-0059 (test admission, load report, run history) is done. St
 
 ## Work items of the next step
 
-WI-0088 may start (WI-0085 to WI-0087 are integrated).
+WI-0089 is running (WI-0085 to WI-0088 are integrated).
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
@@ -26,8 +26,8 @@ WI-0088 may start (WI-0085 to WI-0087 are integrated).
 | WI-0085 | Renderer: draw the scene, style, icons | done, look not yet accepted | haiku | see git log (WI-0085) | 2026-10-19 | review approved with one fix; frame 6.3 ms, rebuild 106 ms (152 ms at 4K, F-0151); owner accepts the look (E0088); verified green |
 | WI-0086 | Engine: run states, connection taken, warnings per element | done | haiku | f2846ee2..19c91fdf | 2026-10-19 | review approved with one fix; verified green; F-0148 |
 | WI-0087 | Open and close an editor: supervisor and manager | done | haiku | 1646a787..e147d1f4 (see git log) | 2026-10-19 | review approved with one text fix; verified (one load flake); F-0149 carried to WI-0088 |
-| WI-0088 | Editor role: model, resync, window, headless driver | running | haiku | | | workspace wi-88 |
-| WI-0089 | Live states, marks and the event load | open | | | | |
+| WI-0088 | Editor role: model, resync, window, headless driver | done | haiku | see git log (WI-0088), tip 663c5adf | 2026-10-20 | review approved; verified green; gui window test left to the owner; F-0149 closed |
+| WI-0089 | Live states, marks and the event load | running | haiku | | | workspace wi-89 |
 | WI-0090 | View: zoom, move, tooltip, status bar, DPI | open | | | | |
 | WI-0091 | Tray icon and tray menu of the editor | open | | | | |
 | WI-0092 | Acceptance S0005 | open | | | | manual check of the owner |
@@ -38,9 +38,11 @@ None.
 
 ## Running agents
 
-WI-0088 implementer (haiku), workspace wi-88.
+WI-0089 implementer (haiku), workspace wi-89. Bug hunter (haiku): F-9000 selection of deleted files, workspace hunt-1, in review (sonnet).
 
 ## Last verified state
+
+Commit `663c5adf` (WI-0088 integrated, all tiers; `--auto` failed on a deleted file, fix in review): fast 1739 passed (11 skipped), foundation 471, slow 204, VERDICT green (runs 20261020-162905-663c5adf, -2, -3).
 
 Commit `f1d55c17` (WI-0085 integrated; WI-0087 included, selection of 13 groups): 1216 passed (1 skipped), VERDICT green (run 20261019-230236-f1d55c17).
 
