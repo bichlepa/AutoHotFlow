@@ -16,7 +16,7 @@
 #Include ..\..\..\src\editor\render\Renderer.ahk
 
 SAMPLE_W := 1100
-SAMPLE_H := 800
+SAMPLE_H := EnvGet("AHF_SAMPLE_H") != "" ? Integer(EnvGet("AHF_SAMPLE_H")) : 800   ; the picture height (px)
 ; the zooms of the pictures; AHF_SAMPLE_ZOOMS="1.0,1.5" (comma separated) overrides them for one run
 ZOOMS := EnvZooms()
 
