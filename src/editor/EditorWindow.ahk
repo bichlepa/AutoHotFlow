@@ -255,7 +255,7 @@ class EditorWindow {
     UpdateStatus() {
         if (this.closed)
             return
-        text := FlowStatus.Text(this.role.model.view, this.role.model.ElementCount())
+        text := this.role.model.StatusText()
         if (text = this.statusText)
             return
         this.statusText := text

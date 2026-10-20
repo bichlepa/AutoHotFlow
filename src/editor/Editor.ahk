@@ -44,6 +44,7 @@ class Editor extends Role {
     RegisterHandlers() {
         this.model := EditorModel(this.peer, this.flowId)
         this.model.later := (ms, fn) => SetTimer(fn, -ms)
+        this.model.session := this.session
         this.model.AddListener((kind, data) => this._OnModel(kind, data))
         this.On("evt.", (msg) => this.model.OnEvent(msg.type, msg.payload))
         this.On("cmd.editor.show", (msg) => this._OnShow(msg))
@@ -88,12 +89,21 @@ class Editor extends Role {
         this._EndPlanned("closed")
     }
 
-    ; The planned end of the editor: the window and the GDI+ objects go, then the role says bye (Role.ByeFn).
+    ; The planned end of the editor: the view is written (E0086, at most EditorModel.FLUSH_MS), the window and the GDI+
+    ; objects go, then the role says bye (Role.ByeFn). A deleted flow or one that does not exist has no view to write.
     _EndPlanned(reason) {
         if (this.endReason != "")
             return
         this.endReason := reason
         this._Log("a1", "editor", this.name " ends: " reason)
+        bye := () => this._Bye()
+        if (reason = "deleted" || reason = "not_found")
+            bye()
+        else
+            this.model.FlushView(bye)      ; the window stays until the view is answered (or FLUSH_MS have passed)
+    }
+
+    _Bye() {
         this._Teardown()
         SetTimer(Role.ByeFn, -1)
     }

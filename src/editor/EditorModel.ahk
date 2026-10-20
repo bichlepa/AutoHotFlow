@@ -2,6 +2,8 @@
 #Include ..\core\Errors.ahk
 #Include ..\core\Time.ahk
 #Include SceneBuilder.ahk
+#Include FlowStatus.ahk
+#Include EditorDraft.ahk
 
 ; The model of the editor of one flow (WI-0088, PROTOCOL 4.11, ARCHITECTURE 4.1): what the editor shows of the flow. It holds no
 ; truth: the definition comes from the engine (cmd.flow.get), the states are the engine's events (evt.flow.state,
@@ -31,6 +33,8 @@ class EditorModel {
     static DEFINITION_MS := 5000
     static RETRY_MS := 1000
     static RETRY_LIMIT := 30          ; not_found after the flow was seen: retries before the editor ends (the flow is gone)
+    static VIEW_SAVE_MS := 2000      ; the view is written this long after its last change (E0086, WI-0096)
+    static FLUSH_MS := 1000          ; the view is written when the editor closes; the bye waits at most this long
     static ENGINE_WAITING := "waiting"
     static ENGINE_READY := "ready"
     static ENGINE_DOWN := "down"
@@ -41,8 +45,9 @@ class EditorModel {
         this.later := ""             ; fn(ms, callback): runs callback after ms (the role sets it; tests use a fake)
         this.listeners := []
         this.name := ""
-        this.rev := -1
-        this.definition := ""        ; the Map of cmd.flow.get as the engine sent it, "" before the first answer
+        this.session := ""           ; the session of this editor (cmd.flow.patch), set by the role
+        this.draft := EditorDraft(peer, flowId, this)   ; the committed definition, the queue, undo, redo, selection
+        this.viewSeq := 0            ; counts the view changes: the view is written only after the last one
         this.scene := ""             ; the Scene of the last state, "" before the definition
         this.sceneVersion := 0
         this.view := EditorView()
@@ -166,6 +171,8 @@ class EditorModel {
             this._AskRunstate("stale")
             return
         }
+        if (ep != this.epoch)
+            this.draft.NewEpoch()    ; a new engine process: the queue and the undo steps go (WI-0096)
         this.epoch := ep
         this.lastSeq := sq
         this.seen := true
@@ -195,13 +202,31 @@ class EditorModel {
         definition := p.Get("definition", "")
         if (!(definition is Map))
             definition := Map()
-        this.rev := p.Get("rev", this.rev)
-        this.definition := definition
         this.name := EditorModel.TextOf(definition, "name")
         this.view := EditorView.FromFlowSettings(definition.Get("flowSettings", ""), this.view.Dpi, this.view.Width, this.view.Height)
+        this.draft.Accept(definition, p.Get("rev", this.draft.rev))   ; the draft tells the model (DraftChanged)
+        this._AgainDefinition()
+    }
+
+    ; The draft changed (a definition, an edit, an undo, a refusal): the scene is built again and the role follows.
+    DraftChanged(kind) {
         this._Rebuild()
         this._Changed("flow")
-        this._AgainDefinition()
+    }
+
+    ; The selection changed (EditorDraft.SetSelection): the scene takes it, the scene is not built again.
+    SelectionChanged() {
+        if (this.scene != "")
+            this.scene := this.scene.WithInteraction(this.draft.selection)
+        this._Changed("state")
+    }
+
+    ; Runs fn after ms through the role's timer (none in a test without one).
+    Schedule(ms, fn) {
+        if (IsObject(this.later)) {
+            later := this.later          ; not this.later(...): that would pass this as the first argument (HOW-TO, callbacks)
+            later(ms, fn)
+        }
     }
 
     _AgainRunstate() {
@@ -297,7 +322,8 @@ class EditorModel {
             return
         }
         if (type = "evt.engine.ready" || type = "evt.engine.restarted") {
-            this._Check(p)
+            if (this._Check(p) = "epoch")
+                this.draft.NewEpoch()          ; a new engine process (WI-0096): the queue and the undo steps go
             this.Resync(type)
             return
         }
@@ -309,8 +335,10 @@ class EditorModel {
                 this.Finish("deleted")
             return
         }
-        if (check = "epoch")
+        if (check = "epoch") {
+            this.draft.NewEpoch()
             this.Resync("epoch", false)
+        }
         switch type {
             case "evt.flow.state":
                 this._SetFlowState(p)
@@ -327,7 +355,9 @@ class EditorModel {
             case "evt.element.warning":
                 this._OnWarning(p)
             case "evt.flow.committed":
-                if (p.Get("rev", -1) != this.rev)
+                ; our own patch (its answer follows, or came already) is no reason to ask again (PROTOCOL 4.11)
+                rev := p.Get("rev", -1)
+                if (rev != this.draft.rev && !this.draft.OwnCommit(rev))
                     this._AskDefinition("committed")
         }
     }
@@ -498,12 +528,13 @@ class EditorModel {
 
     ; The definition is new (or the view changed): the scene is built from the definition and the states.
     _Rebuild() {
-        if (!(this.definition is Map))
+        root := this.draft.root
+        if (!(root is Map))
             return
         this.sceneVersion += 1
         this.restateDirty := false
-        this.scene := SceneBuilder.Build(this.definition, this.view, this.run, this.triggers, this.warnings, ""
-            , this.sceneVersion)
+        this.scene := SceneBuilder.Build(root, this.view, this.run, this.triggers, this.warnings, ""
+            , this.sceneVersion).WithInteraction(this.draft.selection)
     }
 
     ; Only the states changed: the scene shares its unchanged items (Scene.WithStates, F-0150). Called by CurrentScene.
@@ -534,7 +565,44 @@ class EditorModel {
             this.restateDirty := false
             this.scene := this.scene.WithStates(this.view, this.run, this.triggers, this.sceneVersion, this.warnings)
         }
+        this._ScheduleViewSave()
         this._Changed("view")
+    }
+
+    ; The view is written 2 s after its last change (E0086): the timer of an older change does nothing.
+    _ScheduleViewSave() {
+        this.viewSeq += 1
+        seq := this.viewSeq
+        this.Schedule(EditorModel.VIEW_SAVE_MS, () => this._SaveViewIf(seq))
+    }
+
+    _SaveViewIf(seq) {
+        if (seq = this.viewSeq && this.ended = "")
+            this.draft.SaveView(this.view)
+    }
+
+    ; The view is written now, before the editor says bye (a short wait, EditorModel.FLUSH_MS). done() is called once.
+    FlushView(done) {
+        this.viewSeq += 1
+        state := Map("fired", false)
+        finish := (ok := false) => EditorModel._Once(state, done)
+        this.Schedule(EditorModel.FLUSH_MS, () => finish())
+        this.draft.SaveView(this.view, finish)
+    }
+
+    static _Once(state, done) {
+        if (state["fired"])
+            return
+        state["fired"] := true
+        done()
+    }
+
+    ; The text of the status bar: the view, the number of elements, and the last refusal of the draft (if any).
+    StatusText() {
+        text := FlowStatus.Text(this.view, this.ElementCount())
+        if (this.draft.message != "")
+            text .= FlowStatus.SEPARATOR this.draft.message
+        return text
     }
 
     ; The scene to draw now (Scene, "" before the definition arrived). Events only mark the scene as changed: it is built
@@ -589,18 +657,24 @@ class EditorModel {
 
     ; The state for the test command and the snapshot (PROTOCOL 4.11). Without the view and the frames.
     ; The number of elements of the flow (0 before the definition arrived). WI-0090: the status bar shows it.
-    ElementCount() => (this.definition is Map) ? this.definition.Get("allElements", Map()).Count : 0
+    ElementCount() => (this.draft.root is Map) ? this.draft.root.Get("allElements", Map()).Count : 0
 
+    ; The state as the test commands and the snapshot report it: the draft (rev of the committed revision, the counts of
+    ; the draft), the selection, the stacks and the queue of patches (WI-0096).
     State() {
         elements := this.ElementCount()
         connections := 0
-        if (this.definition is Map)
-            connections := this.definition.Get("allConnections", Map()).Count
-        return Map("flowId", this.flowId, "name", this.name, "rev", this.rev, "elements", elements
+        if (this.draft.root is Map)
+            connections := this.draft.root.Get("allConnections", Map()).Count
+        selection := []
+        for id in this.draft.selection
+            selection.Push(id)
+        return Map("flowId", this.flowId, "name", this.name, "rev", this.draft.rev, "elements", elements
             , "connections", connections, "run", this.run.Clone(), "triggers", this.triggers.Clone()
             , "warnings", this.warnings.Clone(), "messages", this.messages.Clone(), "fading", this.fading.Count
             , "flowState", this.flowState.Clone(), "engine", this.engineState
             , "epoch", this.epoch, "seq", this.lastSeq, "resyncs", this.resyncCount, "lastResync", this.lastResync.Clone()
-            , "latency", this.Latency(), "ended", this.ended)
+            , "latency", this.Latency(), "ended", this.ended, "selection", selection, "undo", this.draft.undoSteps.Length
+            , "redo", this.draft.redoSteps.Length, "pending", this.draft.queue.Length)
     }
 }

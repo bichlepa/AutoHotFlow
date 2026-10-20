@@ -210,6 +210,8 @@ TEST_GROUPS = {
     "ahk/editor_geometry.test.ahk": ["editor-geometry"],
     "ahk/editor_scene.test.ahk": ["editor-geometry"],
     "ahk/editor_model.test.ahk": ["editor"],
+    "ahk/editor_draft.test.ahk": ["editor"],
+    "e2e/test_editor_draft.py": ["editor"],
     "e2e/test_editor.py": ["editor"],
     "e2e/test_editor_tray.py": ["editor"],
     "ahk/editor_window.test.ahk": ["editor"],
@@ -462,6 +464,7 @@ SOURCE_AREAS = [
     ("manager", ["src/manager/*", "src/entry/manager.ahk", "src/core/NoticeThrottle.ahk"]),
     ("tray", ["src/tray/*", "src/entry/tray.ahk"]),
     ("editor", ["src/editor/Editor.ahk", "src/editor/EditorModel.ahk", "src/editor/EditorDriver.ahk",
+                "src/editor/EditorDraft.ahk",
                 "src/editor/EditorWindow.ahk", "src/editor/FlowStatus.ahk", "src/editor/FlowTooltip.ahk",
                 "src/editor/EditorTray.ahk", "src/editor/EditorFlowOps.ahk", "src/entry/editor.ahk"]),
     ("editor-geometry", ["src/editor/FlowRect.ahk", "src/editor/FlowGeometry.ahk", "src/editor/EditorView.ahk",
@@ -482,6 +485,8 @@ OWN_TEST_GROUPS = {
 # Smoke tests: one or a few fast tests per user of a shared module. A key is a test file or `file::test function`; the
 # value names the source areas for which the test stands in ("a change there must not break what this consumer needs").
 SMOKE_FOR = {
+    # the patch operations: the editor draft applies them to its copy of the flow (WI-0096)
+    "ahk/editor_draft.test.ahk": ["engine"],
     # the settings: the engine start reads them before the flows, the manager import writes them
     "integration/test_engine.py::test_start_emits_the_documented_event_order": ["settings"],
     "e2e/test_manager_import.py::test_every_flow_of_the_folder_is_imported_with_its_id_and_disabled": ["settings"],

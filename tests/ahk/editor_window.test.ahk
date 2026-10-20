@@ -58,9 +58,10 @@ FlowDef() {
 ; A window of a loaded model (the definition is set, the states follow by Restate).
 Made() {
     model := EditorModel(QuietPeer(), "flow")
-    model.definition := FlowDef()
+    model.draft.committed := FlowDef()     ; the draft takes the definition as the engine's answer (EditorDraft.Accept)
+    model.draft.root := model.draft.committed
     model.name := "Demo"
-    model.rev := 1
+    model.draft.rev := 1
     model.view := EditorView(1, 0, 0, 96, 0, 0)
     model._Rebuild()
     role := FakeRole(model)

@@ -157,7 +157,7 @@ StartSubscribesAndAsks() {
 AnswersBuildTheScene() {
     t := Loaded()
     model := t["model"]
-    Assert.Equal(model.rev, 1, "rev")
+    Assert.Equal(model.draft.rev, 1, "rev")
     Assert.Equal(model.name, "Demo", "name")
     Assert.Equal(model.engineState, EditorModel.ENGINE_READY, "engine ready")
     Assert.Equal(model.flowState["enabled"], 1, "flow enabled")

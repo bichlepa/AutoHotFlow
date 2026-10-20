@@ -16,6 +16,9 @@
 ;   cmd.test.hover {x, y}               the tooltip text under a canvas pixel (WI-0090)
 ;   cmd.test.command {item, answer?}    a menu entry of the tray as if it was clicked (WI-0091, PROTOCOL 4.11): item show,
 ;                                       run, toggle or close; answer yes or no (default no) answers the questions of the entry
+;   cmd.test.edit {ops}                 the operations as one undo step (WI-0096, EditorDraft.Commit)
+;   cmd.test.undo {}, cmd.test.redo {}  one step of the undo or the redo stack
+;   cmd.test.select {mode, ids?}        the selection: one, toggle, all or none (WI-0096)
 ;
 ; Booleans on the wire are Json.True and Json.False (PROTOCOL 2): the state fields enabled and armed are written with Json.Bool.
 class EditorDriver {
@@ -33,6 +36,43 @@ class EditorDriver {
         role.On("cmd.test.view", (msg) => this._OnView(msg))
         role.On("cmd.test.hover", (msg) => this._OnHover(msg))
         role.On("cmd.test.command", (msg) => this._OnCommand(msg))
+        role.On("cmd.test.edit", (msg) => this._OnEdit(msg))
+        role.On("cmd.test.undo", (msg) => this._OnStep(msg, "undo"))
+        role.On("cmd.test.redo", (msg) => this._OnStep(msg, "redo"))
+        role.On("cmd.test.select", (msg) => this._OnSelect(msg))
+    }
+
+    ; cmd.test.edit {ops}: the operations as one undo step (EditorDraft.Commit). Answers at once; the engine's answer comes
+    ; later (cmd.test.state shows pending while it is on its way).
+    _OnEdit(msg) {
+        ops := msg.payload.Get("ops", "")
+        if (!(ops is Array))
+            throw AhfError("cmd.test.edit: ops is a list of operations", ErrCode.BAD_PAYLOAD)
+        res := this.model.draft.Commit(ops, true)
+        if (!res["ok"])
+            return Map("ok", false, "error", Map("code", res["code"], "message", res["message"]))
+        return Map("ok", true)
+    }
+
+    ; cmd.test.undo and cmd.test.redo: one step. done is false when there is no step; a refused step is not ok.
+    _OnStep(msg, what) {
+        res := (what = "undo") ? this.model.draft.Undo() : this.model.draft.Redo()
+        if (!res["ok"])
+            return Map("ok", false, "done", false, "error", Map("code", ErrCode.BAD_PAYLOAD
+                , "message", res.Get("message", "")), "status", this.model.StatusText())
+        return Map("ok", true, "done", res["done"], "status", this.model.StatusText())
+    }
+
+    ; cmd.test.select {mode, ids?}: one, toggle, all or none (EditorDraft.SetSelection).
+    _OnSelect(msg) {
+        p := msg.payload
+        mode := p.Get("mode", "")
+        ids := p.Get("ids", [])
+        if (!EditorDraft.SELECT_MODES.Has(mode) || !(ids is Array))
+            throw AhfError("cmd.test.select: mode is one, toggle, all or none, ids a list", ErrCode.BAD_PAYLOAD)
+        this.model.draft.SetSelection(ids, mode)
+        this.model.SelectionChanged()
+        return Map("ok", true, "selection", this.model.State()["selection"])
     }
 
     ; The question of a flow command (the ask seam of EditorFlowOps): answered at once with the answer of the test.
@@ -112,7 +152,7 @@ class EditorDriver {
     }
 
     ; The status bar text of the current view (FlowStatus).
-    _Status() => FlowStatus.Text(this.model.view, this.model.ElementCount())
+    _Status() => this.model.StatusText()
 
     static ViewText(view) => Map("zoom", view.Zoom, "offsetX", view.OffsetX, "offsetY", view.OffsetY, "dpi", view.Dpi
         , "width", view.Width, "height", view.Height)
@@ -138,6 +178,10 @@ class EditorDriver {
         r := IsObject(this.role.renderer) ? this.role.renderer.Snapshot() : Map("frames", 0, "meanFrameMs", 0
             , "lastFrameMs", 0, "slowestFrameMs", 0, "rebuilds", 0, "lastRebuildMs", 0)
         st["status"] := this._Status()
+        st["selection"] := m["selection"]
+        st["undo"] := m["undo"]
+        st["redo"] := m["redo"]
+        st["pending"] := m["pending"]
         st["tray"] := this.role.tray.State()
         st["asked"] := this.asked.Clone()
         st["frames"] := r["frames"]
