@@ -80,6 +80,13 @@ class FlowRecord {
         return false
     }
 
+    ; Drops the target state of a trigger that the flow no longer has (WI-0094): an undo that brings it back with the same
+    ; ID starts from the rules of a new trigger, not from its old state.
+    ForgetTrigger(triggerId) {
+        if (this._enabled.Has(triggerId))
+            this._enabled.Delete(triggerId)
+    }
+
     ; Sets the target state of every trigger that follows the flow, or of every trigger when all is true. Returns the
     ; IDs of the triggers whose state changed (an Array, possibly empty).
     SetFollowingEnabled(enabled, all := false) {

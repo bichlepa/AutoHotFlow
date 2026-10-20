@@ -46,6 +46,7 @@ TEST_GROUPS = {
     "ahk/engine_states.test.ahk": ["engine"],
     "ahk/engine_trigger_arms.test.ahk": ["triggers"],
     "ahk/engine_trigger_state.test.ahk": ["triggers", "storage"],
+    "ahk/engine_trigger_changes.test.ahk": ["triggers", "engine"],
     "ahk/engine_var_files.test.ahk": ["variables", "storage"],
     "ahk/engine_var_requests.test.ahk": ["variables"],
     "ahk/engine_vars.test.ahk": ["variables"],
