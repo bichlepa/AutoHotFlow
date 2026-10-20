@@ -38,9 +38,11 @@ None.
 
 ## Running agents
 
-WI-0089 implementer (haiku), workspace wi-89. Bug hunter (haiku): F-9000 selection of deleted files, workspace hunt-1, in review (sonnet).
+WI-0089 implementer (haiku), workspace wi-89.
 
 ## Last verified state
+
+Commit `33f4e961` (F-0154 fix integrated: `--auto` handles deleted files; all tiers): fast 1742 passed (11 skipped), foundation 471, slow 204, VERDICT green (runs 20261020-163838-33f4e961, -2, -3).
 
 Commit `663c5adf` (WI-0088 integrated, all tiers; `--auto` failed on a deleted file, fix in review): fast 1739 passed (11 skipped), foundation 471, slow 204, VERDICT green (runs 20261020-162905-663c5adf, -2, -3).
 
