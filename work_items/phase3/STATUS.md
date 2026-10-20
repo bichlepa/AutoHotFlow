@@ -10,7 +10,7 @@ Kept by the orchestrator as described in `doc/ORCHESTRATOR.md`. This file shows 
 | S0002 Element foundation and core set | WI-0044 to WI-0058 | done (acceptance WI-0058, 2026-10-16) |
 | S0003 Trigger host and triggers | WI-0060 to WI-0068 | done (acceptance WI-0067, 2026-10-17) |
 | S0004 UI foundation and manager | WI-0069 to WI-0082 | done (acceptance WI-0082 on 2026-10-19; the manual checks of the owner passed on 2026-10-19) |
-| S0005 Editor I: display | WI-0083 to WI-0092 | all work items integrated; waiting for the manual check 9 and decisions of the owner |
+| S0005 Editor I: display | WI-0083 to WI-0092 | all work items integrated; the owner did check 9 by hand and the gui tests pass; waiting for the recorded result (window measurement) |
 | S0006 to S0010 | | rough, see the plan |
 
 Step-independent: WI-0059 (test admission, load report, run history) is done. Step S0008 (remaining elements) is planned, not started.

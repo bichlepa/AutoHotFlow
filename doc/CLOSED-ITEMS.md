@@ -89,6 +89,7 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0143 | A `-m stress` run opens a real manager window | closed 2026-10-19: fixed in `tests/conftest.py` (a run that names stress, soak or idle but not gui leaves gui tests out, also with `--all`), test `tests/test_tier_selection.py` | WI-0082 |
 | F-0144 | The fast tier takes 4 to 13 minutes, not the 1 to 2 minutes of the owner decision F-0108 | closed (owner decision E0089: no fixed budget, the test groups decide) | |
 | F-0151 | The static layer rebuild is slow at 4K | accepted | WI-0085 |
+| F-0158 | Three basic language files are UTF-16 but are read as UTF-8 | closed (files re-saved as UTF-8) | WI-0091 |
 
 ## Findings
 
@@ -862,3 +863,10 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 
 **What:** the layer is rebuilt in 152 ms at 3840×2160 (106 ms at 1920×1080) on a change of the flow, the zoom, the DPI or a pan out of the layer, and takes about 52 MB at 4K. That is above the 150 ms the owner was to hear about (E0090).
 **Status:** accepted by the owner on 2026-10-20: a rebuild that exceeds the budget a little is fine, the numbers were chosen arbitrarily (MS-0046). Options that were open: a smaller margin, a rebuild in parts over several frames, or a separate process.
+
+### F-0158: Three basic language files are UTF-16 but are read as UTF-8
+
+**What:** `assets/language/basic/de.ini`, `ko.ini` and `ru.ini` are UTF-16 LE with BOM and CRLF. `LangTable` reads every language file with `FileRead(path, "UTF-8")` (two places), so the keys of these files are probably not found and the program falls back to English. `basic/en.ini` and `assets/language/manager/*.ini` are ASCII or UTF-8. Seen while reviewing WI-0091, whose new key exists in `en.ini` only.
+**Status:** open; verified: the encodings and the read calls; not checked: what a run with the language German shows. Fix: convert the files to UTF-8 (or read them by their BOM) and add a test that every language file loads.
+**Closed:** the owner re-saved the three files as UTF-8 on 2026-10-20 (the language tests pass).
+
