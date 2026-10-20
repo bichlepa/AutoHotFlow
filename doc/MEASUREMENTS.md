@@ -267,7 +267,7 @@ Latency of the editor (change to end of frame, cumulative over the five starts, 
 
 ## Editing: frame of a drag and the layer rebuilds (WI-0097, MS-0051)
 
-**Machine and state.** The machine of MS-0048, one measurement at a time, but other agents worked on the same machine during the run (the load was not recorded). The renderer is the one of WI-0097 (the drag layer, commit "Renderer: selection, buttons, new-element fields and the live drag layer"). No pytest run ID: a hand measurement with `tests/ahk/helpers/renderer_bench.ahk` (DRAG lines, VS Code task "Tool: renderer measurement ..."). Output: `temp/bench/drag-1920-b.txt` in the workspace of WI-0097 (ignored).
+**Machine and state.** The machine of MS-0048, one measurement at a time, but other agents worked on the same machine during the run (the load was not recorded). The renderer is the one of WI-0097 (the drag layer, commit "Renderer: selection, buttons, new-element fields and the live drag layer"). No pytest run ID: a hand measurement with `tests/ahk/helpers/renderer_bench.ahk` (DRAG lines, VS Code task "Tool: renderer measurement ...").
 
 Setup: the plain flow of 300 elements and 350 connections (as MS-0048), the whole flow visible at 1920 × 1080 (zoom 0.47). The first elements of the flow are dragged (1 or 30) by an offset that grows by 2 units per frame. 100 frames; the first frame of the drag (the rebuild at its start) is reported apart and is not in the frame statistics. Times in milliseconds.
 
