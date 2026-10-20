@@ -14,6 +14,7 @@
 #Include EngineSettings.ahk
 #Include Executor.ahk
 #Include TriggerArms.ahk
+#Include TriggerChanges.ahk
 #Include WorkerBridge.ahk
 #Include VarRequests.ahk
 #Include ImportV1Vars.ahk
@@ -837,9 +838,48 @@ class Engine extends Role {
             if (def.HasElement(elementId))
                 def.Pending[elementId] := true
         }
+        changes := TriggerChanges.Diff(rec.Def, def)
         rec.Commit(def)
         this.Emit("topic:flow:" flowId, "evt.flow.committed", Map("flowId", flowId, "rev", rec.Rev, "byMeta", Json.False))
+        this._ApplyTriggerChanges(rec, changes)
         return Map("rev", rec.Rev)
+    }
+
+    ; The triggers that a patch added, removed or changed (WI-0094, PROTOCOL 4.2 "Triggers", E0092). A removed one is
+    ; disarmed and forgotten, so the state file does not list it. The flow counts as active by the triggers that remain;
+    ; an added trigger is enabled when it follows the flow and the flow is active, else it starts disabled. Enabled
+    ; triggers are armed (added) or armed again (changed). Nothing is enabled while the state of the flow cannot be read
+    ; (E0063). Every touched trigger sends evt.trigger.state, then one evt.flow.state; the state file is marked.
+    _ApplyTriggerChanges(rec, changes) {
+        flowId := rec.FlowId
+        touched := []
+        for triggerId in changes["removed"] {
+            rec.ForgetTrigger(triggerId)
+            this.arms.Removed(flowId, triggerId)
+            touched.Push(triggerId)
+        }
+        if (changes["added"].Length > 0 && this.flowState.IsKnown(flowId)) {
+            active := rec.IsFlowEnabled()
+            for triggerId in changes["added"] {
+                if (active && rec.Def.FollowsFlow(triggerId))
+                    rec.SetTriggerEnabled(triggerId, true)
+            }
+        }
+        for triggerId in changes["added"] {
+            this.arms.Changed(rec, triggerId)     ; arms it when it is enabled, else nothing
+            touched.Push(triggerId)
+        }
+        for triggerId in changes["changed"] {
+            if (rec.TriggerEnabled(triggerId))
+                this.arms.Rearm(rec, triggerId)
+            touched.Push(triggerId)
+        }
+        if (touched.Length = 0)
+            return
+        for triggerId in touched
+            this.EmitTriggerState(flowId, triggerId)
+        this.EmitFlowState(flowId)
+        this.flowState.Touch(flowId)
     }
 
     ; cmd.flow.save (PROTOCOL 4.2, WI-0039): writes the committed definition through storage and answers when storage has

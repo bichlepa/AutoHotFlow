@@ -129,6 +129,23 @@ class TriggerArms {
         this._Pump()
     }
 
+    ; A changed trigger of an edited flow is enabled (WI-0094): it is armed again with its new parameters. The generation
+    ; changes at once, so the events of the old arming are dropped from now on; the arm replaces the old one in the host
+    ; (the host disarms it first). The caller checks that the trigger is enabled.
+    Rearm(rec, triggerId) {
+        entry := this._entries.Get(TriggerArms.KeyOf(rec.FlowId, triggerId), "")
+        if (IsObject(entry)) {
+            entry["gen"] := this._NewGen()
+            entry["sent"] := false
+        }
+        this.Changed(rec, triggerId)
+    }
+
+    ; A trigger that the flow no longer has (WI-0094): disarmed at once; events and answers of its arming are dropped.
+    Removed(flowId, triggerId) {
+        this._Disarm(flowId, triggerId)
+    }
+
     ; --- queries (the engine, the snapshot, the start path) -----------------------------------------------------------
 
     ; True if an event of this arming may start an instance: the trigger is armed with this generation, or its arm is on

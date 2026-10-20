@@ -1162,8 +1162,8 @@ When two enabled flows, or two triggers of one flow, use the same hotkey or hots
 - **v2:** partial (each trigger has its own enabled state and can be switched on its own; no trigger is armed yet, and the editor cannot add or switch one yet)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003 (WI-0060 done), S0006 (WI-0094, WI-0102)
-- **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`
+- **Plan:** S0003 (WI-0060 done), S0006 (WI-0094 done, WI-0102)
+- **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_flow_patch_triggers.py::test_a_changed_interval_of_an_enabled_trigger_fires_at_the_new_interval`, `tests/integration/test_flow_patch_triggers.py::test_a_removed_trigger_fires_no_more_and_leaves_the_state_file`
 
 A flow can have several triggers. Each trigger can be enabled and disabled on its own, and can be set to switch with the flow or on its own (REQ-TRG-050). One manual trigger is the default trigger, used when the flow is started without naming a trigger.
 
@@ -1173,8 +1173,8 @@ A flow can have several triggers. Each trigger can be enabled and disabled on it
 - **v2:** partial (the engine has the option "switch with the flow" and the independent triggers, and the flow is active by the following ones only; the elements Set flow status and Flow enabled switch and ask by it (WI-0065); the manager and the editor are missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0003 (WI-0060 done, WI-0065 done), S0004 (manager), S0006 (new triggers, WI-0094, E0092), S0007 (the checkbox, WI-0107)
-- **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_engine.py::test_a_flow_without_a_following_trigger_answers_with_a_message`, `tests/integration/test_flow_status_elements.py::test_set_flow_status_every_choice_for_another_flow`, `tests/integration/test_flow_status_elements.py::test_condition_flow_enabled_every_choice`, `tests/e2e/test_manager_flows.py::test_disable_of_an_inactive_flow_with_independent_triggers_yes_disables_them`
+- **Plan:** S0003 (WI-0060 done, WI-0065 done), S0004 (manager), S0006 (new triggers, WI-0094 done, E0092), S0007 (the checkbox, WI-0107)
+- **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_engine.py::test_a_flow_without_a_following_trigger_answers_with_a_message`, `tests/integration/test_flow_status_elements.py::test_set_flow_status_every_choice_for_another_flow`, `tests/integration/test_flow_status_elements.py::test_condition_flow_enabled_every_choice`, `tests/e2e/test_manager_flows.py::test_disable_of_an_inactive_flow_with_independent_triggers_yes_disables_them`, `tests/integration/test_flow_patch_triggers.py::test_a_trigger_added_to_an_inactive_flow_starts_disabled`, `tests/integration/test_flow_patch_triggers.py::test_an_undo_of_a_removal_brings_the_trigger_back_with_its_old_id_and_the_rules_of_a_new_one`
 
 Each trigger has the option "Switch with the flow", on by default, so that a flow behaves as in v1 (decision E0056).
 
