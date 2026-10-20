@@ -137,6 +137,9 @@ class TriggerArms {
         if (IsObject(entry)) {
             entry["gen"] := this._NewGen()
             entry["sent"] := false
+            ; The new arm may fail before it reaches the host (parameters that cannot be evaluated, an unknown class): the
+            ; old arming must not live on in the host then. The pipe keeps the order: disarm, then the new arm.
+            this._SendDisarm(TriggerArms.KeyOf(rec.FlowId, triggerId))
         }
         this.Changed(rec, triggerId)
     }

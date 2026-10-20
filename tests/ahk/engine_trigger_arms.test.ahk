@@ -294,6 +294,22 @@ SwitchingOffDisarmsAndDropsTheTrigger() {
     Off(owner.arms.Info("f", "t1")["armed"])
 }
 
+RearmDropsTheOldGenerationAndDisarmsTheOldArming() {
+    owner := ArmOwnerWith([ArmTrig("t1", "Test_Number", '{"N":"1"}')])
+    PassAfterReset(owner)
+    owner.peer.Answer(owner.peer.Find("cmd.trigger.arm"), Map("ok", true))
+    gen := owner.peer.Find("cmd.trigger.arm")["payload"]["gen"]
+    rec := owner.flows.Get("f")
+    owner.arms.Rearm(rec, "t1")
+    Assert.Equal(owner.peer.Count("cmd.trigger.disarm"), 1, "the old arming is disarmed in the host (WI-0094 review)")
+    Off(owner.arms.Accepts("f/t1", gen), "an event of the old generation is dropped")
+    Assert.Equal(owner.peer.Count("cmd.trigger.arm"), 2, "armed again")
+    newGen := owner.peer.Find("cmd.trigger.arm", 2)["payload"]["gen"]
+    Assert.True(newGen > gen, "a new generation")
+    Assert.True(owner.arms.Accepts("f/t1", newGen), "the new arm is on its way")
+    Off(owner.arms.Accepts("f/t1", gen), "the old generation stays dropped")
+}
+
 SwitchingOnWhileTheHostIsDownSaysSo() {
     owner := ArmOwnerWith([ArmTrig("t1", "Test_Trig")], [], "", false)
     PassAfterReset(owner)
@@ -378,6 +394,7 @@ TestRun.Case("Trigger arms: an arm without answer is retried at the next pass on
 TestRun.Case("Trigger arms: an unknown class and a non-trigger are not sent to the host", UnknownClassAndNotATriggerAreNotSentToTheHost)
 TestRun.Case("Trigger arms: a parameter that cannot be evaluated is not armed", AParameterThatCannotBeEvaluatedIsNotArmed)
 TestRun.Case("Trigger arms: switching a trigger off disarms it and drops its events", SwitchingOffDisarmsAndDropsTheTrigger)
+TestRun.Case("Trigger arms: a rearm drops the old generation and disarms the old arming", RearmDropsTheOldGenerationAndDisarmsTheOldArming)
 TestRun.Case("Trigger arms: switching on while the host is down says so", SwitchingOnWhileTheHostIsDownSaysSo)
 TestRun.Case("Trigger arms: a flow that leaves the table is disarmed", FlowRemovedDisarmsItsTriggers)
 TestRun.Case("Trigger arms: the snapshot lists enabled, armed and failed triggers", SnapshotListsEnabledArmedAndFailedTriggers)
