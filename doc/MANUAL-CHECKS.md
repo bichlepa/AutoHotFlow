@@ -447,3 +447,22 @@ Notes: The tester reported "all manual checks work" and gave no step numbers, so
   now have Yes left, No right). The gui test of the settings dialog
   (tests/fault/test_manager_settings_window.py) was not run after its fixes.
 ```
+
+Run record (2026-10-20, editor, section 9):
+
+```
+Date: 2026-10-20
+Tester: Paul
+Editor (section 9): steps 1 to 25 pass; look accepted yes (step 3, E0088)
+Notes: The tester reported that he did manual check 9 and is satisfied. He gave no step
+  numbers, so no step is listed as failed. The look was reworked after his first
+  review (loop drawn as one object, square corners for loops and actions, icons faded and
+  filling the element behind a centered name) and accepted afterwards. The VS Code
+  tasks of part D (three gui tests) and part E (renderer measurement with a window)
+  did not start at first; they were fixed (see the how-to entries on gui tests) and
+  the gui tests of part D pass now, as the tester reported. The numbers of the
+  measurement with a window (the WINDOW line at 1920 x 1080, and whether a 4K screen
+  was available for step 25) were not given for this record. Postponed by the tester:
+  the latency with 300 changing elements (F-0156) and the order inside a batch of
+  element states (F-0161).
+```
