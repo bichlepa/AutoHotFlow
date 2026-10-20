@@ -113,7 +113,10 @@ Main(args) {
         FileAppend("ERROR usage: result width height whole|zoom1 [frames] [warm-up] [rebuilds]`n", args[1])
         return 2
     }
-    resultFile := args[1]
+    resultFile := StrReplace(args[1], "/", "\")  ; the tasks pass slashes; SplitPath needs backslashes
+    SplitPath(resultFile, , &resultDir)
+    if (resultDir != "")
+        DirCreate(resultDir)                     ; the folder temp/s5 is not in a fresh checkout
     W := Integer(args[2])
     H := Integer(args[3])
     view := args[4]
@@ -121,6 +124,16 @@ Main(args) {
     warm := args.Length >= 6 ? Integer(args[6]) : 10
     rebuilds := args.Length >= 7 ? Integer(args[7]) : 10
     winMode := args.Length >= 8 && args[8] = "window"
+    if (winMode) {
+        DllCall("user32\SetProcessDPIAware")     ; physical pixels: the screen is measured in the same units as the window
+        MonitorGet(MonitorGetPrimary(), &mLeft, &mTop, &mRight, &mBottom)
+        if (W > mRight - mLeft || H > mBottom - mTop) {
+            ; the window would be cut: no WINDOW series, the result file says so (a 4K screen is needed for 3840 x 2160)
+            FileAppend(Format("WINDOW skipped width={1} height={2}: the primary screen is {3}x{4}, the window does not fit "
+                . "(a 4K screen is needed)`n", W, H, mRight - mLeft, mBottom - mTop), resultFile)
+            winMode := false
+        }
+    }
     built := BuildFlow()
     raw := built[1]
     ids := built[2]
@@ -131,7 +144,6 @@ Main(args) {
     r := Renderer()
     g := ""
     if (winMode) {
-        DllCall("user32\SetProcessDPIAware")      ; physical pixels: the window has the size W x H on the screen
         g := Gui("-Caption +AlwaysOnTop", "AutoHotFlow renderer bench")
         g.Show("x0 y0 w" W " h" H " NoActivate")
     }
