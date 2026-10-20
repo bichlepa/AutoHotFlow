@@ -55,5 +55,5 @@ Entries for the drawing of the editor (`src/editor/render/`, `src/editor/Scene*.
 
 - **Problem:** Drawing the dragged elements and their connections every frame costs about 20 ms for 30 elements at 1920 × 1080 (MS-0051), and 7 ms for 1 element. The frame budget is 16 ms.
 - **Wrong:** Assuming a live draw of a moving group is cheap because the layer is cached.
-- **Right:** Not decided. Options are in `doc/OPEN-ITEMS.md` (F-9000*): a group layer for the dragged elements, or accepting it for big drags.
+- **Right:** Not decided. Options are in `doc/OPEN-ITEMS.md` (F-0162): a group layer for the dragged elements, or accepting it for big drags.
 - **Status:** verified (MS-0051, one run); the split between elements and connections not checked.
