@@ -7,6 +7,10 @@
 ; A_Args[1] = output folder (created if missing), [2] = result file (one line per PNG is appended), [3..] = flow files
 ; (the parsed flow of each is drawn, as the editor reads it).
 ;
+; Besides the plain picture (name as in WI-0085), each flow gives the editing states of WI-0097 (Variants): the first
+; action selected (suffix _selected: outline and buttons), the first action dragged by 40 units (_dragged: the drag
+; layer), and the first connection selected (_connection: its buttons). The fields for new elements are in every picture.
+;
 ; Usage: python tools/ahkrun.py --timeout 300 tests/ahk/helpers/render_samples.ahk <folder> <result file> <flow file>...
 #Include ..\..\..\src\core\AhfError.ahk
 #Include ..\..\..\src\core\Json.ahk
@@ -30,6 +34,27 @@ EnvZooms() {
     return zooms
 }
 
+; The pictures of one scene as Array of Maps("suffix", text, "scene", Scene): the plain flow (suffix "") and the editing
+; states of WI-0097 for the first action and the first connection (the ones that exist).
+Variants(scene) {
+    list := [Map("suffix", "", "scene", scene)]
+    first := ""
+    for element in scene.Elements {
+        if (element.Kind = "action") {
+            first := element.Id
+            break
+        }
+    }
+    if (first != "") {
+        list.Push(Map("suffix", "_selected", "scene", scene.WithInteraction(Map(first, true))))
+        selected := scene.WithInteraction(Map(first, true))
+        list.Push(Map("suffix", "_dragged", "scene", selected.WithDrag(Map(first, true), 40, 40)))
+    }
+    if (scene.Connections.Length > 0)
+        list.Push(Map("suffix", "_connection", "scene", scene.WithInteraction(Map(scene.Connections[1].Id, true))))
+    return list
+}
+
 ; The base name of a path without the folder and the extension.
 BaseName(path) {
     SplitPath(StrReplace(path, "/", "\"), , , , &name)   ; SplitPath splits at backslashes only
@@ -46,20 +71,23 @@ Main(args) {
             flowPath := args[A_Index + 2]
             raw := Json.Parse(FileRead(flowPath, "UTF-8"))
             for zoom in ZOOMS {
-                ; the view starts 40 pixels before the flow's box, so the whole flow is in the picture at the top left
+                ; the view starts 40 pixels before the flow's box, and 130 pixels above it so that the fields for new
+                ; elements (about 90 pixels at the top left, WI-0097) do not cover the top of the flow
                 probe := SceneBuilder.Build(raw, EditorView(zoom, 0, 0, 96, SAMPLE_W, SAMPLE_H))
                 ox := probe.Bounds.X - 40 / zoom
-                oy := probe.Bounds.Y - 40 / zoom
+                oy := probe.Bounds.Y - 130 / zoom
                 scene := SceneBuilder.Build(raw, EditorView(zoom, ox, oy, 96, SAMPLE_W, SAMPLE_H))
-                c := GdipCanvas(SAMPLE_W, SAMPLE_H)
-                try {
-                    r.Draw(scene, c)
-                    png := outDir "\" BaseName(flowPath) "_zoom" Format("{:.1f}", zoom) ".png"
-                    c.SavePng(png)
-                    FileAppend("PNG " png " elements=" scene.Elements.Length " connections="
-                        . scene.Connections.Length " warnings=" scene.Warnings.Length "`n", resultFile)
-                } finally
-                    c.Destroy()
+                for variant in Variants(scene) {
+                    c := GdipCanvas(SAMPLE_W, SAMPLE_H)
+                    try {
+                        r.Draw(variant["scene"], c)
+                        png := outDir "\" BaseName(flowPath) "_zoom" Format("{:.1f}", zoom) variant["suffix"] ".png"
+                        c.SavePng(png)
+                        FileAppend("PNG " png " elements=" scene.Elements.Length " connections="
+                            . scene.Connections.Length " warnings=" scene.Warnings.Length "`n", resultFile)
+                    } finally
+                        c.Destroy()
+                }
             }
         }
     } finally
