@@ -99,6 +99,7 @@ FrameOnlyWhenTheSceneChanged() {
     t := Made()
     win := t["win"]
     win._OnSize(SizeParam(400, 300), win.hwnd)
+    SetTimer(win.frameFn, 0)       ; the request of _OnSize would draw on its own timer; the test draws by hand
     win._Frame()
     Assert.Equal(win.frames, 1, "the first scene is drawn")
     win._Frame()
