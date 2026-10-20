@@ -579,6 +579,21 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: flow patch benchmark (engine time of a patch on a flow of 300 elements; result in %TEMP%/ahf_flow_patch_bench.txt)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/ahkrun.py",
+                "--timeout",
+                "300",
+                "tests/ahk/helpers/flow_patch_bench.ahk",
+                "${env:TEMP}/ahf_flow_patch_bench.txt",
+                "200"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: render measurement (R0002)",
             "type": "shell",
             "command": "python",
