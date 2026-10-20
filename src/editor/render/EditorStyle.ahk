@@ -36,10 +36,10 @@ class EditorStyle {
     static NameTop := 58                 ; flow units from the top of the element to the name
 
     ; shapes: corner radius by kind (flow units); a condition is a diamond
-    static Radius := Map("trigger", 30, "action", 14, "loop", 14)
+    static Radius := Map("trigger", 30, "action", 0, "loop", 0)   ; 0: square corners (owner feedback, E0088)
     static IconBox := 44                 ; flow units, the box an element icon is fitted into (aspect kept)
     static IconTop := 10                 ; flow units from the top of the element to the icon
-    static IconAlpha := 1.0
+    static IconAlpha := 0.2              ; faded, drawn behind the name (v1 Gdip_DrawImage opacity 0.2)
 
     ; marks of a trigger: the switch (enabled or not) at 80 % x and 25 % y, the star (default manual trigger) at 15 %
     ; x and 20 % y, both MarkSize flow units (v1 SizeOfButtons 35, v1 positions)

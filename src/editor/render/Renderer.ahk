@@ -431,10 +431,8 @@ class Renderer {
         }
         head := parts[1]
         if (element.Kind = "loop") {
-            canvas.FillRoundRect(brush, (head.X - ox) * s, (head.Y - oy) * s, head.W * s, head.H * s,
-                Renderer.RadiusOf(element.Kind) * s)
-            this.FillPart(canvas, brush, parts[2], ox, oy, s)
-            this.FillPart(canvas, brush, parts[3], ox, oy, s)
+            ; one polygon for the whole body (no seams between the parts), the break field on top of it
+            canvas.FillPolygon(brush, this.LoopPoints(parts, ox, oy, s))
             this.FillPart(canvas, (breakBrush = "") ? brush : breakBrush, parts[4], ox, oy, s)
             return
         }
@@ -442,21 +440,38 @@ class Renderer {
             Renderer.RadiusOf(element.Kind) * s)
     }
 
+    ; The outline of an element. A loop is one outline around the whole body: the seams between its parts (the bar,
+    ; the foot, the break field) are not drawn, the break field is told by its fill (owner feedback, E0088).
     OutlineShape(canvas, pen, element, ox, oy, s) {
         parts := element.Parts
         if (element.Kind = "condition") {
             canvas.DrawPolygon(pen, this.DiamondPoints(parts[1], ox, oy, s))
             return
         }
+        if (element.Kind = "loop") {
+            canvas.DrawPolygon(pen, this.LoopPoints(parts, ox, oy, s))
+            return
+        }
         head := parts[1]
         canvas.DrawRoundRect(pen, (head.X - ox) * s, (head.Y - oy) * s, head.W * s, head.H * s,
             Renderer.RadiusOf(element.Kind) * s)
-        if (element.Kind = "loop") {
-            loop 3 {
-                part := parts[A_Index + 1]
-                canvas.DrawRect(pen, (part.X - ox) * s, (part.Y - oy) * s, part.W * s, part.H * s)
-            }
-        }
+    }
+
+    ; The outline of the body of a loop as one closed polygon (head, bar on the left, foot with the break field on the
+    ; right). The bar is narrower than the head, so the outline steps in at the bar's right edge.
+    LoopPoints(parts, ox, oy, s) {
+        head := parts[1]
+        bar := parts[2]
+        foot := parts[3]
+        left := (head.X - ox) * s
+        right := (head.X + head.W - ox) * s
+        top := (head.Y - oy) * s
+        headBottom := (head.Y + head.H - oy) * s
+        barRight := (bar.X + bar.W - ox) * s
+        footTop := (foot.Y - oy) * s
+        bottom := (foot.Y + foot.H - oy) * s
+        return [[left, top], [right, top], [right, headBottom], [barRight, headBottom], [barRight, footTop]
+            , [right, footTop], [right, bottom], [left, bottom]]
     }
 
     FillPart(canvas, brush, part, ox, oy, s) {

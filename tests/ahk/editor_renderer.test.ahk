@@ -197,6 +197,100 @@ CheckIconIsDrawn() {
     }
 }
 
+; The distance of two colors: the sum of the absolute differences of the four channels (0 to 1020).
+ColorDistance(a, b) {
+    d := 0
+    for shift in [0, 8, 16, 24]
+        d += Abs(((a >> shift) & 0xFF) - ((b >> shift) & 0xFF))
+    return d
+}
+
+; The largest color distance from color of a pixel in the canvas box (x, y, w, h).
+MaxDistance(c, x, y, w, h, color) {
+    m := 0
+    loop h {
+        py := y + A_Index - 1
+        loop w {
+            d := ColorDistance(c.Pixel(x + A_Index - 1, py), color)
+            if (d > m)
+                m := d
+        }
+    }
+    return m
+}
+
+; The largest distance from the fill of an action inside its icon box, drawn with the given icon alpha.
+IconDistanceAt(alpha, sc, p) {
+    saved := EditorStyle.IconAlpha
+    EditorStyle.IconAlpha := alpha
+    c := NewCanvas()
+    r := Renderer()
+    try {
+        r.Draw(sc, c)
+        return MaxDistance(c, p[1], p[2], 44, 44, EditorStyle.Fill["action"])
+    } finally {
+        EditorStyle.IconAlpha := saved
+        r.Destroy()
+        c.Destroy()
+    }
+}
+
+CheckIconIsFaded() {
+    view := ViewAt()
+    sc := SceneOf(view)
+    p := ProbeOf(view, sc, "A", 48, 10)
+    faded := IconDistanceAt(EditorStyle.IconAlpha, sc, p)
+    full := IconDistanceAt(1.0, sc, p)
+    Assert.True(EditorStyle.IconAlpha <= 0.3, "the icon alpha of the style is faded (<= 0.3)")
+    Assert.True(faded > 0, "the faded icon is still visible, distance " faded)
+    Assert.True(faded * 100 <= full * 35, "the icon at the style alpha is faded versus full alpha, " faded " vs " full)
+}
+
+CheckCornersAreSquare() {
+    view := ViewAt()
+    sc := SceneOf(view)
+    c := NewCanvas()
+    r := Renderer()
+    try {
+        r.Draw(sc, c)
+        p := ProbeOf(view, sc, "A", 1, 1)
+        Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.Fill["action"], "the top left corner of an action is square")
+        p := ProbeOf(view, sc, "L", 1, 1)
+        Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.Fill["loop"], "the top left corner of a loop is square")
+    } finally {
+        r.Destroy()
+        c.Destroy()
+    }
+}
+
+CheckLoopIsOneObject() {
+    view := ViewAt()
+    sc := SceneOf(view)
+    c := NewCanvas()
+    r := Renderer()
+    try {
+        r.Draw(sc, c)
+        ; the seam between the head and the bar (flow y 105) and between the foot and the break field (flow x 105)
+        p := ProbeOf(view, sc, "L", 8, 105)
+        Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.Fill["loop"], "no outline at the seam of head and bar")
+        p := ProbeOf(view, sc, "L", 104, 162)
+        Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.Fill["loop"], "no outline at the seam of foot and break field")
+        p := ProbeOf(view, sc, "L", 105, 162)
+        argb := c.Pixel(p[1], p[2])
+        Assert.True(ColorDistance(argb, EditorStyle.Border) > 200, "no dark outline on the seam pixel, got " argb)
+        p := ProbeOf(view, sc, "L", 110, 150)     ; above the word "break"
+        Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.BreakFill, "the break field has the break fill")
+        ; the outer outline of the foot is drawn: its pixel is nearer to the border than to the fill
+        p := ProbeOf(view, sc, "L", 70, 180)
+        argb := c.Pixel(p[1], p[2])
+        Assert.True(ColorDistance(argb, EditorStyle.Border) < ColorDistance(argb, EditorStyle.Fill["loop"])
+            , "the outer outline of a loop is drawn at its foot")
+    } finally {
+        r.Destroy()
+        c.Destroy()
+    }
+}
+
 CheckUnknownClassIsAPlaceholder() {
     view := ViewAt()
     sc := SceneOf(view)
@@ -370,6 +464,9 @@ TestRun.Case("a connection segment is a dark line on its path", CheckConnectionI
 TestRun.Case("the label of a yes connection is drawn left of its target", CheckLabelOfAYesConnectionIsDrawn)
 TestRun.Case("the name of an element puts ink into its name area", CheckNameIsDrawn)
 TestRun.Case("the icon of an element is drawn into its box", CheckIconIsDrawn)
+TestRun.Case("the icon is faded (style alpha) against full alpha", CheckIconIsFaded)
+TestRun.Case("the corners of an action and a loop are square", CheckCornersAreSquare)
+TestRun.Case("a loop is one object: no outline at its seams", CheckLoopIsOneObject)
 TestRun.Case("an unknown class is drawn as a placeholder", CheckUnknownClassIsAPlaceholder)
 TestRun.Case("a warning puts a badge in the bottom right corner", CheckWarningBadgeIsDrawn)
 TestRun.Case("the switch of a trigger is drawn over its fill", CheckTriggerSwitchIsDrawn)

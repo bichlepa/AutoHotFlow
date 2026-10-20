@@ -72,8 +72,11 @@ class GdipCanvas {
             , "Float", y, "Float", w, "Float", h, "Int"), "GdipDrawRectangle")
     }
 
-    ; A rectangle with rounded corners of radius r (clamped to half the smaller side), as a path.
+    ; A rectangle with rounded corners of radius r (clamped to half the smaller side), as a path. r 0 or less: square
+    ; corners, drawn as a plain rectangle.
     FillRoundRect(brush, x, y, w, h, r) {
+        if (r <= 0)
+            return this.FillRect(brush, x, y, w, h)
         path := this.RoundPath(x, y, w, h, r)
         try {
             Gdip.Check(DllCall("gdiplus\GdipFillPath", "Ptr", this.graphics, "Ptr", brush.handle, "Ptr", path
@@ -84,6 +87,8 @@ class GdipCanvas {
     }
 
     DrawRoundRect(pen, x, y, w, h, r) {
+        if (r <= 0)
+            return this.DrawRect(pen, x, y, w, h)
         path := this.RoundPath(x, y, w, h, r)
         try {
             Gdip.Check(DllCall("gdiplus\GdipDrawPath", "Ptr", this.graphics, "Ptr", pen.handle, "Ptr", path
