@@ -69,7 +69,7 @@ class EditorWindow {
         this.frameFn := () => this._Frame()
         this.hoverFn := () => this._HoverTimer()
         this.mouseFns := Map(
-            EditorWindow.WM_MOUSEMOVE, (wParam, lParam, msg, hwnd) => this._OnMove(lParam, hwnd),
+            EditorWindow.WM_MOUSEMOVE, (wParam, lParam, msg, hwnd) => this._OnMove(wParam, lParam, hwnd),
             EditorWindow.WM_LBUTTONDOWN, (wParam, lParam, msg, hwnd) => this._OnDown("left", lParam, hwnd),
             EditorWindow.WM_LBUTTONUP, (wParam, lParam, msg, hwnd) => this._OnUp("left", hwnd),
             EditorWindow.WM_RBUTTONDOWN, (wParam, lParam, msg, hwnd) => this._OnDown("right", lParam, hwnd),
@@ -211,12 +211,16 @@ class EditorWindow {
     }
 
     ; WM_MOUSEMOVE: the drag moves the view by the pointer's movement; otherwise the tooltip waits for the rest.
-    _OnMove(lParam, hwnd) {
+    _OnMove(wParam, lParam, hwnd) {
         if (hwnd != this.hwnd || this.closed)
             return
         pt := EditorWindow._Point(lParam)
         if (!this.tracking)
             this._TrackLeave()
+        if (IsObject(this.drag) && !(wParam & (this.drag["button"] = "left" ? 0x1 : 0x2))) {
+            this.drag := ""                     ; the button went up elsewhere (capture lost, e.g. by Alt+Tab)
+            DllCall("user32\ReleaseCapture")
+        }
         if (IsObject(this.drag)) {
             dx := pt[1] - this.drag["x"]
             dy := pt[2] - this.drag["y"]
