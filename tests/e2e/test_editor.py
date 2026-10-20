@@ -8,6 +8,7 @@ for a timing of a short-lived process.
 """
 
 import json
+import time
 from pathlib import Path
 
 import psutil
@@ -51,11 +52,17 @@ def editor_process(obs, flow=FLOW):
     return process_states(obs).get("editor:" + flow, {})
 
 
-def write_flow(datadir, flow, duration=None):
-    """A copy of the skeleton flow under another ID (the file name is the ID); a Duration makes the action run long."""
+def write_flow(datadir, flow, duration=None, strict=None, migration=False):
+    """A copy of the skeleton flow under another ID (the file name is the ID); a Duration makes the action run long
+    (an expression such as "x + 1" makes it a type error); strict sets the type mode of the flow; migration adds a
+    MIGRATION place to the action."""
     data = json.loads(SKELETON_SRC.read_text(encoding="utf-8"))
     if duration is not None:
         data["allElements"][ACTION]["pars"]["Duration"] = str(duration)
+    if strict is not None:
+        data["flowSettings"]["strictTypes"] = strict
+    if migration:
+        data["allElements"][ACTION]["migration"] = [{"par": "Duration", "ids": ["M-0025"], "v1": "%a%"}]
     path = Path(datadir) / "Flows" / (flow + ".json")
     path.parent.mkdir(exist_ok=True)
     path.write_text(json.dumps(data), encoding="utf-8")
@@ -253,5 +260,99 @@ def test_the_snapshot_of_the_editor_names_the_flow_the_revision_and_the_frames(p
         assert info["lastResync"]["reason"] == "start", info
         assert info["headless"] is True and info["windowVisible"] is False, info
         assert info["engine"] == "ready", info
+    finally:
+        finish(sup, obs)
+
+
+# --- WI-0089: live states, marks and warnings -------------------------------------------------------------------------
+
+CONNECTION = "connection0000000004"  # the trigger -> action connection of the skeleton flow
+ACTION_X, ACTION_Y = 0, 210          # the position of the action element (skeleton flow); its box is 140 x 105
+MIGRATION_BADGE = "FF3B82F6"         # EditorStyle.MigrationBadge, top right of the element
+WARNING_BADGE = "FFF39C12"           # EditorStyle.WarningBadge, bottom right of the element (the count is drawn in it)
+
+
+def states(obs, name=EDITOR):
+    st = editor_state(obs, name)
+    return (st or {}).get("states", {})
+
+
+def test_a_running_element_and_its_connection_are_tinted_and_fade_out_after_the_end(procs, datadir, session_id):
+    """Task 1 (v1 tint): the element is tinted while it runs, the connection its thread took is tinted for one second
+    after the start, and the finished element fades out (state recent) before it is drawn as idle again."""
+    sup, obs = start_manager(procs, datadir, session_id, prepare=lambda d: write_flow(d, FLOW, duration=3000))
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        start_running_flow(obs)
+        assert wait_until(lambda: states(obs).get(ACTION) == "running", scaled(15)), editor_state(obs)
+        assert wait_until(lambda: states(obs).get(CONNECTION) == "recent", scaled(5)), editor_state(obs)
+        assert wait_until(lambda: states(obs).get(ACTION) == "recent", scaled(15)), editor_state(obs)
+        assert wait_until(lambda: ACTION not in states(obs), scaled(5)), editor_state(obs)
+        assert wait_until(lambda: CONNECTION not in states(obs), scaled(5)), editor_state(obs)
+        assert editor_state(obs)["fading"] == 0, editor_state(obs)
+    finally:
+        finish(sup, obs)
+
+
+def test_the_trigger_mark_follows_the_enabled_state_of_the_engine(procs, datadir, session_id):
+    """Task 2: the switch mark of a trigger follows evt.trigger.state (the enabled state of the engine)."""
+    sup, obs = start_manager(procs, datadir, session_id)
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        ans = obs.request("engine", "cmd.trigger.enable", {"flowId": FLOW, "elementId": TRIGGER}, timeout=scaled(5))
+        assert ans["payload"]["ok"], ans
+        assert wait_until(lambda: (editor_state(obs) or {}).get("triggers", {}).get(TRIGGER, {}).get("enabled") is True,
+                          scaled(10)), editor_state(obs)
+        ans = obs.request("engine", "cmd.trigger.disable", {"flowId": FLOW, "elementId": TRIGGER}, timeout=scaled(5))
+        assert ans["payload"]["ok"], ans
+        assert wait_until(lambda: (editor_state(obs) or {}).get("triggers", {}).get(TRIGGER, {}).get("enabled") is False,
+                          scaled(10)), editor_state(obs)
+        assert editor_state(obs)["flowState"]["enabled"] is False, editor_state(obs)
+        ans = obs.request("engine", "cmd.trigger.enable", {"flowId": FLOW, "elementId": TRIGGER}, timeout=scaled(5))
+        assert ans["payload"]["ok"], ans
+        assert wait_until(lambda: (editor_state(obs) or {}).get("triggers", {}).get(TRIGGER, {}).get("enabled") is True,
+                          scaled(10)), editor_state(obs)
+    finally:
+        finish(sup, obs)
+
+
+def test_an_exception_keeps_the_element_marked_and_its_message_is_kept(procs, datadir, session_id):
+    """Task 3: a strict flow whose duration is a wrong expression ends the action with an exception; the element keeps
+    the exception look (not faded) and the message of the exception for the tooltip."""
+    sup, obs = start_manager(procs, datadir, session_id,
+                             prepare=lambda d: write_flow(d, FLOW, duration="x + 1", strict=True))
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        start_running_flow(obs)
+        assert wait_until(lambda: states(obs).get(ACTION) == "exception", scaled(15)), editor_state(obs)
+        st = editor_state(obs)
+        assert isinstance(st["messages"].get(ACTION), str) and st["messages"][ACTION] != "", st
+        time.sleep(scaled(1.5))             # longer than a fade: the exception look stays
+        st = editor_state(obs)
+        assert st["states"].get(ACTION) == "exception" and st["fading"] == 0, st
+        out = render(obs, probes=[(ACTION_X + 70, ACTION_Y + 52)])
+        assert out["colors"][0] != BACKGROUND, out
+    finally:
+        finish(sup, obs)
+
+
+def test_warnings_show_a_count_badge_and_migration_places_a_badge(procs, datadir, session_id):
+    """Task 4 (REQ-EDT-150): the warnings of a compatibility-mode evaluation are counted at the element (badge with the
+    count, bottom right), and the MIGRATION place of the element has its own badge (top right, from the definition)."""
+    sup, obs = start_manager(procs, datadir, session_id,
+                             prepare=lambda d: write_flow(d, FLOW, duration="x + 1", strict=False, migration=True))
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        start_running_flow(obs)
+        assert wait_until(lambda: (editor_state(obs) or {}).get("warnings", {}).get(ACTION, {}).get("count", 0) >= 1,
+                          scaled(15)), editor_state(obs)
+        st = editor_state(obs)
+        assert st["warnings"][ACTION]["text"] != "", st
+        out = render(obs, probes=[(ACTION_X + 123, ACTION_Y + 90), (ACTION_X + 128, ACTION_Y + 12)])
+        assert out["colors"] == [WARNING_BADGE, MIGRATION_BADGE], out
     finally:
         finish(sup, obs)

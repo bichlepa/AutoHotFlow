@@ -48,10 +48,14 @@ class EditorStyle {
     static SwitchOff := "e_switch_off.ico"
     static StarFilled := "e_star_filled.ico"
 
-    ; badges in the top right corner of an element: a warning, or a place to migrate (v1 MIGRATION places)
+    ; badges (radius BadgeRadius, flow units): the places to migrate (v1 MIGRATION places) at the top right corner of an
+    ; element, the warnings and the arming errors of a trigger at the bottom corners (see Renderer.DrawBadges)
     static BadgeRadius := 7
-    static WarningBadge := 0xFFF39C12
-    static MigrationBadge := 0xFF3B82F6
+    static BadgeTextSize := 9            ; flow units, the count in a warning badge (WI-0089)
+    static BadgeText := 0xFFFFFFFF
+    static WarningBadge := 0xFFF39C12    ; warnings of the evaluation, at the bottom right (with their count)
+    static ErrorBadge := 0xFFC62828      ; an arming error of a trigger, at the bottom left
+    static MigrationBadge := 0xFF3B82F6  ; places of a migrated flow, at the top right
 
     ; connections
     static ConnectionColor := 0xFF4A5566

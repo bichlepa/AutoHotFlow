@@ -26,9 +26,10 @@ class EditorDriver {
     State() {
         m := this.model.State()
         st := Map("flowId", m["flowId"], "name", m["name"], "rev", m["rev"], "elements", m["elements"]
-            , "connections", m["connections"], "states", m["run"].Clone(), "warnings", m["warnings"].Clone()
+            , "connections", m["connections"], "states", EditorDriver._StatesText(m["run"]), "fading", m["fading"]
+            , "warnings", m["warnings"].Clone(), "messages", m["messages"].Clone()
             , "engine", m["engine"], "epoch", m["epoch"], "seq", m["seq"], "resyncs", m["resyncs"]
-            , "lastResync", m["lastResync"], "ended", m["ended"])
+            , "lastResync", m["lastResync"], "latency", m["latency"], "ended", m["ended"])
         triggers := Map()
         for id, t in m["triggers"]
             triggers[id] := Map("enabled", Json.Bool(t["enabled"]), "armed", Json.Bool(t["armed"]), "message", t["message"])
@@ -47,6 +48,15 @@ class EditorDriver {
         st["slowestFrameMs"] := r["slowestFrameMs"]
         st["rebuilds"] := r["rebuilds"]
         return st
+    }
+
+    ; The run states as the frame shows them: "running", "exception", or "recent" for a fade. The strength of a fade is not
+    ; sent (it is a float; the snapshot keeps whole numbers); "fading" counts the IDs that fade.
+    static _StatesText(run) {
+        out := Map()
+        for id, state in run
+            out[id] := IsNumber(state) ? "recent" : state
+        return out
     }
 
     ; cmd.test.render {w, h, dpi?, probes?}: the scene drawn into an offscreen bitmap of w x h pixels. The view takes the size.
@@ -74,6 +84,7 @@ class EditorDriver {
             this.role.canvas := canvas
         }
         renderer.Draw(sc, canvas)
+        this.model.NoteFrame()
         colors := []
         for probe in probes {
             if (!(probe is Array) || probe.Length != 2 || !IsNumber(probe[1]) || !IsNumber(probe[2]))

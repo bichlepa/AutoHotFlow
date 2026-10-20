@@ -220,8 +220,9 @@ CheckWarningBadgeIsDrawn() {
     r := Renderer()
     try {
         r.Draw(sc, c)
-        p := ProbeOf(view, sc, "A", 128, 12)
-        Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.WarningBadge, "the warning badge in the top right corner")
+        ; the badge is at the bottom right (radius 7 around (128, 93)); the probe is inside the disc, left of the digit
+        p := ProbeOf(view, sc, "A", 123, 90)
+        Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.WarningBadge, "the warning badge in the bottom right corner")
     } finally {
         r.Destroy()
         c.Destroy()
@@ -370,7 +371,7 @@ TestRun.Case("the label of a yes connection is drawn left of its target", CheckL
 TestRun.Case("the name of an element puts ink into its name area", CheckNameIsDrawn)
 TestRun.Case("the icon of an element is drawn into its box", CheckIconIsDrawn)
 TestRun.Case("an unknown class is drawn as a placeholder", CheckUnknownClassIsAPlaceholder)
-TestRun.Case("a warning puts a badge in the top right corner", CheckWarningBadgeIsDrawn)
+TestRun.Case("a warning puts a badge in the bottom right corner", CheckWarningBadgeIsDrawn)
 TestRun.Case("the switch of a trigger is drawn over its fill", CheckTriggerSwitchIsDrawn)
 TestRun.Case("the star is drawn for the default trigger only", CheckStarOnlyForTheDefaultTrigger)
 TestRun.Case("a run or trigger state does not rebuild the static layer", CheckStateChangeDoesNotRebuildTheLayer)

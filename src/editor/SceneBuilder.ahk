@@ -17,9 +17,10 @@
 ;
 ; Inputs besides the flow (all optional):
 ;   view     EditorView (default: the default view)
-;   run      Map: element or connection ID -> "running" or "recent" (a connection shows its last run as an element does)
+;   run      Map: element or connection ID -> "running", "exception" or a fade (a number 0 < n <= 1)
 ;   trigger  Map: trigger element ID -> Map("enabled", 1 or 0, "armed", 1 or 0, "message", text) (the engine's state)
-;   warnings Map: element or connection ID -> text (for example a warning of the evaluation)
+;   warnings Map: element ID -> Map("count", n, "text", text) (the warnings of the evaluation, WI-0089; a plain text is
+;            one warning). Connection ID -> text.
 ;   hovered  FlowHit or "" (the item under the mouse)
 ;   version  number, see Scene
 class SceneBuilder {
@@ -51,7 +52,7 @@ class SceneBuilder {
             element := SceneBuilder.MakeElement(id, elem, run, trigger, warnings)
             elements.Push(element)
             if (element.Warning != "")
-                issues.Push(Map("id", id, "text", element.Warning))
+                issues.Push(Map("id", id, "text", element.Warning, "kind", "evaluation"))
         }
 
         connections := []
@@ -68,9 +69,17 @@ class SceneBuilder {
             }
             connections.Push(SceneBuilder.MakeConnection(id, conn, from, to, run))
             if (warnings.Has(id))
-                issues.Push(Map("id", id, "text", warnings[id]))
+                issues.Push(Map("id", id, "text", SceneBuilder.WarningOf(warnings[id])["text"], "kind", "evaluation"))
         }
         return Scene(view, version, hovered, elements, connections, issues)
+    }
+
+    ; The warnings of one element as Map("count", n, "text", text): a Map from the engine's events, or a plain text (one warning).
+    static WarningOf(value) {
+        if (value is Map)
+            return Map("count", value.Get("count", 0), "text", SceneBuilder.TextOf(value, "text"))
+        text := IsObject(value) ? "" : String(value)
+        return Map("count", (text = "") ? 0 : 1, "text", text)
     }
 
     static MakeElement(id, elem, run, trigger, warnings) {
@@ -91,11 +100,12 @@ class SceneBuilder {
         trig := (kind = "trigger") ? SceneBuilder.TriggerStateOf(trigger.Get(id, ""), SceneBuilder.IsDefaultTrigger(elem, className, package)) : ""
         ; The text on the element is the name the user gave it (v1 draws `name`); the class name is the fallback.
         label := SceneBuilder.TextOf(elem, "name")
+        w := SceneBuilder.WarningOf(warnings.Get(id, ""))
         return SceneElement(id, kind, displayName, icon,
             SceneBuilder.NumberOf(elem.Get("x", 0)), SceneBuilder.NumberOf(elem.Get("y", 0)),
             SceneBuilder.NumberOf(elem.Get("HeightOfVerticalBar", 0)),
             run.Get(id, ""), trig, SceneBuilder.CopyMigration(elem.Get("migration", "")), placeholder,
-            warnings.Get(id, ""), (package = "") ? "Default" : package, (label = "") ? displayName : label)
+            w["text"], (package = "") ? "Default" : package, (label = "") ? displayName : label, w["count"])
     }
 
     static MakeConnection(id, conn, from, to, run) {

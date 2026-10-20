@@ -1,5 +1,6 @@
 #Requires AutoHotkey v2.0
 #Include ..\core\Errors.ahk
+#Include ..\core\Time.ahk
 #Include SceneBuilder.ahk
 
 ; The model of the editor of one flow (WI-0088, PROTOCOL 4.11, ARCHITECTURE 4.1): what the editor shows of the flow. It holds no
@@ -22,6 +23,9 @@
 ;   "ended"    the editor must end: data is the reason ("deleted", "not_found", "closed", "test")
 ;   "resync"   a resync was asked; data is the reason
 class EditorModel {
+    static FADE_MS := 1000           ; a tint of a finished element or of a connection fades out this long (v1)
+    static FADE_TICK_MS := 33        ; the fade is drawn about 30 times per second; its timer runs only while a tint fades
+    static LATENCY_KEEP := 1000      ; the frame latencies kept for the measurement (the last ones)
     static RUNSTATE_MS := 5000
     static DEFINITION_MS := 5000
     static RETRY_MS := 1000
@@ -46,9 +50,16 @@ class EditorModel {
         this.engineState := EditorModel.ENGINE_WAITING
         this.flowState := EditorModel._NoFlowState()
         this.triggers := Map()       ; elementId -> Map(enabled, armed, message), the engine's trigger states
-        this.run := Map()            ; elementId -> "running" (the states drawn in S0005, WI-0089 adds the others)
+        this.run := Map()            ; elementId or connectionId -> "running", "exception" or a number 0 < n <= 1 (a fade)
+        this.fading := Map()         ; ID -> Time.NowMs() at the start of its fade (elements and connections, WI-0089)
+        this.messages := Map()       ; elementId -> the message of the exception it ended with (for the tooltip, WI-0090)
         this.states := Map()         ; elementId -> the last state text of evt.element.state (kept for tests and the snapshot)
-        this.warnings := Map()       ; elementId -> Map(count, text), the warnings of the evaluation (drawn with WI-0089)
+        this.warnings := Map()       ; elementId -> Map(count, text), the warnings of the evaluation (WI-0089)
+        this.clock := ""             ; fn() -> ms for the fades and the latencies (tests set it; "" = Time.NowMs)
+        this.fadeScheduled := false
+        this.restateDirty := false   ; a state changed: the scene is made when it is asked for (one build per frame)
+        this.pendingAt := 0          ; the time of the first change that no frame has shown yet (0 = none)
+        this.latencies := []         ; ms from a change to the end of the frame that showed it (NoteFrame)
         this.seen := false           ; the flow was found by the engine at least once
         this.notFoundTries := 0
         this.ended := ""             ; the reason the editor ends, "" while it runs
@@ -222,22 +233,29 @@ class EditorModel {
 
     ; Applies the answer of cmd.flow.runstate: flow state, trigger states, element states and warnings.
     _ApplyRunstate(p) {
-        flow := p.Get("flow", "")
-        if (flow is Map)
-            this._SetFlowState(flow)
+        flowInfo := p.Get("flow", "")
+        if (flowInfo is Map)
+            this._SetFlowState(flowInfo)
         this.triggers := Map()
         for t in p.Get("triggers", [])
             this.triggers[t["elementId"]] := EditorModel._TriggerOf(t)
-        this.run := Map()
+        this.run := Map()            ; the answer is the truth: a fade of an earlier event is dropped
+        this.fading := Map()
+        this.messages := Map()
         this.states := Map()
         this.warnings := Map()
         for e in p.Get("elements", []) {
             id := e["elementId"]
-            this.states[id] := e.Get("state", "")
-            if (e.Get("state", "") = "running")
+            state := e.Get("state", "")
+            this.states[id] := state
+            if (state = "running") {
                 this.run[id] := "running"
+            } else if (state = "exception") {
+                this.run[id] := "exception"
+                this.messages[id] := EditorModel.TextOf(e, "message")
+            }
             if (e.Get("warnings", 0) > 0)
-                this.warnings[id] := Map("count", e["warnings"], "text", e.Get("lastWarning", ""))
+                this.warnings[id] := Map("count", e["warnings"], "text", EditorModel.TextOf(e, "lastWarning"))
         }
     }
 
@@ -311,17 +329,73 @@ class EditorModel {
         }
     }
 
+    ; The run state of an element (v1 tint, WI-0089): running while it runs; a finished element and the connection its
+    ; thread took fade out over FADE_MS; an exception keeps its own look (no fade) until the element starts again.
     _OnElementState(p) {
         id := p.Get("elementId", "")
         if (id = "")
             return
         state := p.Get("state", "")
         this.states[id] := state
-        if (state = "running")
-            this.run[id] := "running"
-        else if (this.run.Has(id))
-            this.run.Delete(id)
+        switch state {
+            case "running":
+                this._Unfade(id)
+                if (this.messages.Has(id))
+                    this.messages.Delete(id)
+                this.run[id] := "running"
+                connectionId := p.Get("connectionId", "")
+                if (connectionId != "")
+                    this._Fade(connectionId, 1)
+            case "exception":
+                this._Unfade(id)
+                this.run[id] := "exception"
+                this.messages[id] := EditorModel.TextOf(p, "message")
+            case "finished":
+                if (this.run.Has(id) && this.run[id] = "running")
+                    this._Fade(id, 1)
+                else
+                    this._Unfade(id)
+        }
         this._Changed("state")
+    }
+
+    ; Starts the fade of an ID at the strength given (1 = full tint) and schedules the fade timer.
+    _Fade(id, strength) {
+        this.run[id] := strength
+        this.fading[id] := this._Now()
+        this._ScheduleFade()
+    }
+
+    _Unfade(id) {
+        if (this.fading.Has(id))
+            this.fading.Delete(id)
+        if (this.run.Has(id) && IsNumber(this.run[id]))
+            this.run.Delete(id)
+    }
+
+    ; One step of the fades: the strength of each fading ID by the time since its start; a finished fade is removed.
+    ; The timer is set again only while a fade is still running.
+    _FadeTick() {
+        this.fadeScheduled := false
+        now := this._Now()
+        for id, startedAt in this.fading.Clone() {
+            strength := 1 - (now - startedAt) / EditorModel.FADE_MS
+            if (strength <= 0)
+                this._Unfade(id)
+            else
+                this.run[id] := strength
+        }
+        this._Changed("state")
+        if (this.fading.Count > 0)
+            this._ScheduleFade()
+    }
+
+    _ScheduleFade() {
+        if (this.fadeScheduled || !IsObject(this.later))
+            return
+        this.fadeScheduled := true
+        later := this.later          ; not this.later(...): that would pass this as the first argument (HOW-TO, callbacks)
+        later(EditorModel.FADE_TICK_MS, () => this._FadeTick())
     }
 
     _OnWarning(p) {
@@ -329,6 +403,58 @@ class EditorModel {
         if (id = "")
             return
         this.warnings[id] := Map("count", p.Get("count", 0), "text", EditorModel.TextOf(p, "text"))
+        this._Changed("state")
+    }
+
+    ; The time now in ms: the clock of the test, or Time.NowMs.
+    _Now() {
+        if (this.clock = "")
+            return Time.NowMs()
+        clock := this.clock
+        return clock()
+    }
+
+    ; A frame was drawn with the scene of CurrentScene: the time since the first change it shows is a latency. REQ-PRF-060:
+    ; from the arrival of the event at the editor to the end of its frame (the event carries no time of the engine).
+    NoteFrame() {
+        if (this.pendingAt = 0)
+            return
+        this.latencies.Push(this._Now() - this.pendingAt)
+        if (this.latencies.Length > EditorModel.LATENCY_KEEP)
+            this.latencies.RemoveAt(1)
+        this.pendingAt := 0
+    }
+
+    ; The latency of the frames as Map(n, medianUs, p95Us), whole microseconds (0 when there is none).
+    Latency() {
+        n := this.latencies.Length
+        if (n = 0)
+            return Map("n", 0, "medianUs", 0, "p95Us", 0)
+        sorted := EditorModel._Sorted(this.latencies)
+        return Map("n", n, "medianUs", Round(sorted[Max(1, Ceil(n * 0.5))] * 1000)
+            , "p95Us", Round(sorted[Max(1, Ceil(n * 0.95))] * 1000))
+    }
+
+    ; A sorted copy of a list of numbers (shell sort: an Array has no Sort in AHK v2, HOW-TO objects-maps-arrays).
+    static _Sorted(list) {
+        out := []
+        for v in list
+            out.Push(v)
+        gap := out.Length // 2
+        while (gap > 0) {
+            for i, v in out {
+                if (i <= gap)
+                    continue
+                j := i
+                while (j > gap && out[j - gap] > v) {
+                    out[j] := out[j - gap]
+                    j -= gap
+                }
+                out[j] := v
+            }
+            gap := gap // 2
+        }
+        return out
     }
 
     ; Process events of the supervisor: only the engine matters.
@@ -368,15 +494,18 @@ class EditorModel {
         if (!(this.definition is Map))
             return
         this.sceneVersion += 1
-        this.scene := SceneBuilder.Build(this.definition, this.view, this.run, this.triggers, "", "", this.sceneVersion)
+        this.restateDirty := false
+        this.scene := SceneBuilder.Build(this.definition, this.view, this.run, this.triggers, this.warnings, ""
+            , this.sceneVersion)
     }
 
-    ; Only the states changed: the scene shares its unchanged items (Scene.WithStates, F-0150).
+    ; Only the states changed: the scene shares its unchanged items (Scene.WithStates, F-0150). Called by CurrentScene.
     _Restate() {
+        this.restateDirty := false
         if (this.scene = "")
             return
         this.sceneVersion += 1
-        this.scene := this.scene.WithStates(this.view, this.run, this.triggers, this.sceneVersion)
+        this.scene := this.scene.WithStates(this.view, this.run, this.triggers, this.sceneVersion, this.warnings)
     }
 
     ; The view of a canvas of this size and DPI (the window and the headless driver call it). Only the view changes.
@@ -384,16 +513,24 @@ class EditorModel {
         this.view := this.view.Resized(width, height, dpi)
         if (this.scene != "") {
             this.sceneVersion += 1
-            this.scene := this.scene.WithStates(this.view, this.run, this.triggers, this.sceneVersion)
+            this.restateDirty := false
+            this.scene := this.scene.WithStates(this.view, this.run, this.triggers, this.sceneVersion, this.warnings)
         }
     }
 
-    ; The scene to draw now (Scene, "" before the definition arrived).
-    CurrentScene() => this.scene   ; (a method, not Scene(): AHK property names are not case sensitive)
+    ; The scene to draw now (Scene, "" before the definition arrived). Events only mark the scene as changed: it is built
+    ; here, once for all the events since the last frame (the event load, WI-0089).
+    CurrentScene() {
+        if (this.restateDirty)
+            this._Restate()
+        return this.scene
+    }
 
     _Changed(kind) {
+        if (this.pendingAt = 0)
+            this.pendingAt := this._Now()
         if (kind = "state")
-            this._Restate()
+            this.restateDirty := true
         this._Notify(kind)
     }
 
@@ -440,8 +577,9 @@ class EditorModel {
         }
         return Map("flowId", this.flowId, "name", this.name, "rev", this.rev, "elements", elements
             , "connections", connections, "run", this.run.Clone(), "triggers", this.triggers.Clone()
-            , "warnings", this.warnings.Clone(), "flowState", this.flowState.Clone(), "engine", this.engineState
+            , "warnings", this.warnings.Clone(), "messages", this.messages.Clone(), "fading", this.fading.Count
+            , "flowState", this.flowState.Clone(), "engine", this.engineState
             , "epoch", this.epoch, "seq", this.lastSeq, "resyncs", this.resyncCount, "lastResync", this.lastResync.Clone()
-            , "ended", this.ended)
+            , "latency", this.Latency(), "ended", this.ended)
     }
 }

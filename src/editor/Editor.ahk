@@ -2,6 +2,7 @@
 #Include ..\core\Errors.ahk
 #Include ..\core\Json.ahk
 #Include ..\core\Role.ahk
+#Include ..\core\Time.ahk
 #Include EditorModel.ahk
 #Include render\Renderer.ahk
 #Include EditorWindow.ahk
@@ -31,6 +32,9 @@ class Editor extends Role {
         this.started := false
         this.tornDown := false
         this.endReason := ""
+        this.frameScheduled := false  ; headless only: a frame timer is set (the window has its own, EditorWindow)
+        this.lastFrameMs := 0
+        this.frameFn := () => this._HeadlessFrame()
     }
 
     RegisterHandlers() {
@@ -88,6 +92,8 @@ class Editor extends Role {
         if (this.tornDown)
             return
         this.tornDown := true
+        SetTimer(this.frameFn, 0)
+        this.frameScheduled := false
         if (IsObject(this.window)) {
             this.window.Close()
             this.window := ""
@@ -117,16 +123,49 @@ class Editor extends Role {
             case "ended":
                 this._OnEnded(data)
             case "state":
-                if (IsObject(this.window))
-                    this.window.Request()
+                this._Repaint()
             case "flow":
-                if (IsObject(this.window)) {
+                if (IsObject(this.window))
                     this.window.Refresh()
-                    this.window.Request()
-                }
+                this._Repaint()
             case "log":
                 this._Log("a1", "editor", this.name " " data)
         }
+    }
+
+    ; A frame is wanted: the window asks for one, the headless editor draws one itself (the same renderer, the same rule of
+    ; at most one frame per FRAME_MS; without a canvas, from cmd.test.render on, there is nothing to draw).
+    _Repaint() {
+        if (IsObject(this.window))
+            this.window.Request()
+        else if (this.headless)
+            this._RequestHeadless()
+    }
+
+    _RequestHeadless() {
+        if (this.frameScheduled || this.tornDown || !IsObject(this.canvas))
+            return
+        this.frameScheduled := true
+        wait := Max(0, EditorWindow.FRAME_MS - (Time.NowMs() - this.lastFrameMs))
+        SetTimer(this.frameFn, -wait)
+    }
+
+    ; The timer of a headless frame: draws the scene into the offscreen bitmap, as the window does (WI-0089, REQ-PRF-060).
+    _HeadlessFrame() {
+        this.frameScheduled := false
+        if (this.tornDown || !IsObject(this.canvas))
+            return
+        sc := this.model.CurrentScene()
+        if (sc = "")
+            return
+        this.lastFrameMs := Time.NowMs()
+        try {
+            this._Renderer().Draw(sc, this.canvas)
+        } catch as e {
+            this._Log("a0", "editor", "frame failed: " Type(e) ": " e.Message)
+            return
+        }
+        this.model.NoteFrame()
     }
 
     ; The end of the model. A flow that does not exist at the start gets a notice (the manager shows it); a deleted flow does

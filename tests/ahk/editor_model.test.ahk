@@ -168,10 +168,148 @@ RunningElementIsDrawnAndFinishes() {
     Assert.Equal(sc.Version, before.Version + 1, "a new version for a state change")
     Assert.Equal(ElementOf(sc, "A").Run, "running", "A is drawn running")
     Assert.True(ElementOf(sc, "B") == ElementOf(before, "B"), "B did not change: the same object")
+    now := 1000
+    model.clock := () => now
     model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "finished", "countRuns", 0
         , "lastRun", "2026-10-19 10:00:00", "epoch", 100, "seq", 12))
-    Assert.True(!model.run.Has("A"), "A is no longer running")
-    Assert.Equal(ElementOf(model.CurrentScene(), "A").Run, "", "A is not drawn running")
+    Assert.Equal(model.run["A"], 1, "A fades out from full strength")
+    Assert.True(IsNumber(ElementOf(model.CurrentScene(), "A").Run), "A is drawn as a fade")
+    Assert.Equal(t["later"].pending.Length, 1, "one fade timer while a tint fades")
+    now := 1500
+    t["later"].RunLater()
+    Assert.True(Abs(model.run["A"] - 0.5) < 0.001, "half faded after half a second")
+    Assert.Equal(t["later"].pending.Length, 1, "the timer runs again while the fade goes on")
+    now := 2100
+    t["later"].RunLater()
+    Assert.True(!model.run.Has("A"), "faded out after one second")
+    Assert.Equal(ElementOf(model.CurrentScene(), "A").Run, "", "A is not drawn any more")
+    Assert.Equal(t["later"].pending.Length, 0, "no fade timer once every fade is over")
+}
+
+; An exception keeps its look until the element starts again; its message is kept for the tooltip.
+ExceptionKeepsItsLook() {
+    t := Loaded()
+    model := t["model"]
+    now := 1000
+    model.clock := () => now
+    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "exception", "countRuns", 0
+        , "message", "the expression is wrong", "epoch", 100, "seq", 11))
+    Assert.Equal(model.run["A"], "exception", "A keeps the exception look")
+    Assert.Equal(model.messages["A"], "the expression is wrong", "the message for the tooltip")
+    Assert.Equal(t["later"].pending.Length, 0, "no fade of an exception")
+    now := 9000
+    t["later"].RunLater()
+    Assert.Equal(model.run["A"], "exception", "still the exception look after a while")
+    Assert.Equal(ElementOf(model.CurrentScene(), "A").Run, "exception", "drawn as an exception")
+    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1
+        , "epoch", 100, "seq", 12))
+    Assert.Equal(model.run["A"], "running", "the next start ends the look")
+    Assert.True(!model.messages.Has("A"), "the message is gone with it")
+}
+
+; The connection a thread took is tinted at the start of the thread and fades out over one second, while the element runs on.
+ConnectionTakenFades() {
+    t := Loaded()
+    model := t["model"]
+    now := 1000
+    model.clock := () => now
+    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1
+        , "connectionId", "c1", "epoch", 100, "seq", 11))
+    Assert.Equal(model.run["c1"], 1, "the connection is tinted")
+    Assert.Equal(model.run["A"], "running", "the element runs")
+    Assert.True(ConnectionOf(model.CurrentScene(), "c1").Run != "" && IsNumber(ConnectionOf(model.CurrentScene(), "c1").Run)
+        , "the connection is drawn as a fade")
+    now := 1400
+    t["later"].RunLater()
+    Assert.True(Abs(model.run["c1"] - 0.6) < 0.001, "the fade of the connection goes on")
+    Assert.Equal(model.run["A"], "running", "the element still runs")
+    now := 2100
+    t["later"].RunLater()
+    Assert.True(!model.run.Has("c1"), "the connection faded out")
+    Assert.Equal(model.run["A"], "running", "the element still runs")
+}
+
+ConnectionOf(sc, id) {
+    for connection in sc.Connections {
+        if (connection.Id = id)
+            return connection
+    }
+    throw AssertFailed("no connection " id)
+}
+
+; Warnings change the scene without a build, and events between two frames cost one scene (one WithStates) only.
+WarningsAreShownAndCoalescedPerFrame() {
+    t := Loaded()
+    model := t["model"]
+    before := model.CurrentScene()
+    model.OnEvent("evt.element.warning", Map("flowId", FLOW, "elementId", "A", "count", 2, "text", "f1 line 1",
+        "epoch", 100, "seq", 11))
+    model.OnEvent("evt.element.warning", Map("flowId", FLOW, "elementId", "A", "count", 3, "text", "f1 line 2",
+        "epoch", 100, "seq", 12))
+    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "B", "state", "running", "countRuns", 1,
+        "epoch", 100, "seq", 13))
+    Assert.Equal(model.warnings["A"]["count"], 3, "the count of the last event")
+    sc := model.CurrentScene()
+    Assert.Equal(sc.Version, before.Version + 1, "three events, one scene")
+    Assert.Equal(ElementOf(sc, "A").WarningCount, 3, "the badge shows the count")
+    Assert.Equal(ElementOf(sc, "A").Warning, "f1 line 2", "the text of the last warning")
+    Assert.True(ElementOf(sc, "T") == ElementOf(before, "T"), "T did not change: the same object")
+    Assert.True(ElementOf(sc, "A") != ElementOf(before, "A"), "A changed: a new object")
+    Assert.Equal(CountIssues(sc, "A"), 1, "the warning is listed once in the scene")
+    Assert.Equal(model.CurrentScene().Version, sc.Version, "a second ask builds nothing")
+}
+
+CountIssues(sc, id) {
+    n := 0
+    for issue in sc.Warnings {
+        if (issue["id"] = id)
+            n += 1
+    }
+    return n
+}
+
+; The frame latency (REQ-PRF-060): from the first change a frame shows to the end of that frame.
+LatencyOfFrames() {
+    t := Loaded()                    ; the answers changed the scene with the real clock: that change is not measured here
+    model := t["model"]
+    model.pendingAt := 0
+    now := 1000
+    model.clock := () => now
+    model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1,
+        "epoch", 100, "seq", 11))
+    now := 1040
+    model.CurrentScene()
+    model.NoteFrame()
+    lat := model.Latency()
+    Assert.Equal(lat["n"], 1, "one frame measured")
+    Assert.Equal(lat["medianUs"], 40000, "40 ms from the change to the frame")
+    model.NoteFrame()
+    Assert.Equal(model.Latency()["n"], 1, "a frame without a change is not measured")
+    ; twenty more frames of 1 to 20 ms: the 21 values are 1..20 and 40; the median is the 11th (11 ms), the 95 % point the 20th
+    for v in [5, 1, 9, 3, 7, 2, 8, 4, 6, 10, 12, 11, 15, 13, 14, 20, 18, 19, 17, 16] {
+        now := 2000 + A_Index * 100
+        model.OnEvent("evt.element.state", Map("flowId", FLOW, "elementId", "A", "state", "running", "countRuns", 1,
+            "epoch", 100, "seq", 12 + A_Index))
+        now := now + v
+        model.CurrentScene()
+        model.NoteFrame()
+    }
+    lat := model.Latency()
+    Assert.Equal(lat["n"], 21, "all frames are kept")
+    Assert.Equal(lat["medianUs"], 11000, "the median of the 21 values")
+    Assert.Equal(lat["p95Us"], 20000, "the 95 % point")
+}
+
+; The sorted copy of the shell sort is sorted and keeps every value.
+SortedCopy() {
+    sorted := EditorModel._Sorted([5, 3, 9, 1, 7, 3, 0, 12, 8, 2])
+    Assert.Equal(sorted.Length, 10, "same count")
+    for i, v in sorted {
+        if (i > 1)
+            Assert.True(sorted[i - 1] <= v, "ascending at " i)
+    }
+    Assert.Equal(sorted[1], 0, "smallest")
+    Assert.Equal(sorted[10], 12, "largest")
 }
 
 ElementOf(sc, id) {
@@ -359,7 +497,12 @@ TestRun.Init()
 
 TestRun.Case("Editor model: start subscribes to the topics and asks the state and the definition", StartSubscribesAndAsks)
 TestRun.Case("Editor model: the answers give the states and the scene", AnswersBuildTheScene)
-TestRun.Case("Editor model: a running element is drawn running and stops being drawn so", RunningElementIsDrawnAndFinishes)
+TestRun.Case("Editor model: a running element is drawn running and fades out after a finish", RunningElementIsDrawnAndFinishes)
+TestRun.Case("Editor model: an exception keeps its look and its message until the next start", ExceptionKeepsItsLook)
+TestRun.Case("Editor model: the connection a thread took is tinted and fades in one second", ConnectionTakenFades)
+TestRun.Case("Editor model: warnings show in the scene, and the events of a frame cost one scene", WarningsAreShownAndCoalescedPerFrame)
+TestRun.Case("Editor model: the frame latency is the time from the change to the end of its frame", LatencyOfFrames)
+TestRun.Case("Editor model: the sorted copy of the latencies is sorted", SortedCopy)
 TestRun.Case("Editor model: events at or below the answered seq are discarded", EventsAtOrBelowTheAnswerAreDiscarded)
 TestRun.Case("Editor model: a gap in seq is normal and causes no resync", GapInSeqIsNormal)
 TestRun.Case("Editor model: a new epoch asks the state again and takes the new answer", NewEpochAsksAgain)

@@ -17,11 +17,12 @@
 ; Frame (Draw): the static part of the flow (background, grid dots, connections, elements with their icons and names)
 ; is a cached layer, rebuilt only when the static content of the scene, the zoom or the DPI changes, or when the view
 ; leaves the layer. The layer is larger than the target (MARGIN on each side), so a pan is a copy with another offset.
-; Each frame: one BitBlt of the layer, then the state overlays (running, exception, recently run) and the marks of the
-; triggers (switch, star), drawn on top. A state change therefore costs an overlay, not a rebuild.
+; Each frame: one BitBlt of the layer, then the state overlays (running, exception, fading), the marks of the triggers
+; (switch, star) and the badges (warning count, arming error; WI-0089), drawn on top. A state change therefore costs an
+; overlay, not a rebuild. The badges come last, so that they stay readable on a running or fading element.
 ;
-; The static content is compared with StaticKey: everything that is not a run state or a trigger state. Run states
-; and trigger states are copied into the scene and only drawn over the layer.
+; The static content is compared with StaticKey: everything that is not a run state, a trigger state or a warning count.
+; Those are copied into the scene and drawn over the layer.
 ;
 ; Order (as v1): background, grid dots (zoom above 1), connections (in scene order), elements (in scene order: the
 ; last one is on top, as FlowHitTest assumes), then the overlays and marks. A selection on top (S0006) changes the
@@ -92,6 +93,7 @@ class Renderer {
         this.layer.CopyRegionTo(target, 0, 0, W, H, sx, sy)
         this.DrawStates(scene, target, view)
         this.DrawMarks(scene, target, view)
+        this.DrawBadges(scene, target, view)
         ms := Renderer.Now() - t0
         this.FramesDrawn += 1
         this.TotalFrameMs += ms
@@ -134,7 +136,7 @@ class Renderer {
         for element in scene.Elements
             key .= element.Id "|" element.Kind "|" element.ClassName "|" element.Name "|" element.Icon "|"
                 . element.Package "|" element.X "|" element.Y "|" element.HeightOfVerticalBar "|"
-                . element.Placeholder "|" element.Warning "|" element.Migration.Length ";"
+                . element.Placeholder "|" element.Migration.Length ";"
         for connection in scene.Connections
             key .= "c" connection.Id "|" connection.From "|" connection.To "|" connection.Type "|"
                 . connection.FromPart "|" connection.ToPart "|" connection.StartX "|" connection.StartY "|"
@@ -257,13 +259,6 @@ class Renderer {
         if (element.Kind = "loop")
             this.DrawBreakWord(canvas, element, ox, oy, s)
         this.DrawName(canvas, element, x, y, w, h, s, placeholder ? this.tools["placeholderText"] : this.tools["text"])
-        if (element.Warning != "" || element.Migration.Length > 0) {
-            brush := (element.Warning != "") ? this.tools["warning"] : this.tools["migration"]
-            r := EditorStyle.BadgeRadius * s
-            cx := x + w - 12 * s
-            cy := y + 12 * s
-            canvas.FillEllipse(brush, cx - r, cy - r, 2 * r, 2 * r)
-        }
     }
 
     ; The icon of the element's class, fitted into its box at the top of the element.
@@ -313,8 +308,9 @@ class Renderer {
             if (connection.Run = "" || !FlowGeometry.ConnectionVisible(connection.StartX, connection.StartY
                     , connection.AimX, connection.AimY, visible))
                 continue
+            pen := IsNumber(connection.Run) ? this.ConnectionRunPen(connection.Run) : this.tools["runLine"]
             for segment in connection.Segments
-                target.DrawLine(this.tools["runLine"], (segment.X - ox) * s, (segment.Y - oy) * s
+                target.DrawLine(pen, (segment.X - ox) * s, (segment.Y - oy) * s
                     , (segment.Right - ox) * s, (segment.Bottom - oy) * s)
         }
         for element in scene.Elements {
@@ -353,6 +349,58 @@ class Renderer {
         fit := this.ScaledIcon(path, size, size)
         if (fit is Array)
             canvas.DrawImage(fit[1], cx - fit[2] / 2, cy - fit[3] / 2, fit[2], fit[3])
+    }
+
+    ; The badges of the frame, drawn over the state overlays so that they stay readable on a running element: the
+    ; migration place of an element (top right, WI-0085), its warning count (bottom right) and the arming error of a
+    ; trigger (bottom left, WI-0089). All of them are drawn over the layer, so a new count costs no rebuild.
+    DrawBadges(scene, target, view) {
+        s := view.Scale
+        ox := view.OffsetX
+        oy := view.OffsetY
+        visible := view.VisibleArea()
+        r := EditorStyle.BadgeRadius * s
+        for element in scene.Elements {
+            failed := (element.Trigger is Map && element.Trigger["message"] != "")
+            if ((element.Migration.Length = 0 && element.WarningCount = 0 && !failed)
+                    || !FlowGeometry.ElementVisible(element.Bounds, visible))
+                continue
+            x := (element.X - ox) * s
+            y := (element.Y - oy) * s
+            w := FlowGeometry.ELEMENT_WIDTH * s
+            h := FlowGeometry.ELEMENT_HEIGHT * s
+            if (element.Migration.Length > 0)
+                target.FillEllipse(this.tools["migration"], x + w - 12 * s - r, y + 12 * s - r, 2 * r, 2 * r)
+            if (element.WarningCount > 0)
+                this.DrawCountBadge(target, element.WarningCount, x + w - 12 * s, y + h - 12 * s, r, s)
+            if (failed)
+                target.FillEllipse(this.tools["error"], x + 12 * s - r, y + h - 12 * s - r, 2 * r, 2 * r)
+        }
+    }
+
+    ; A warning badge with its count (99+ above that), centered at (cx, cy) with radius r.
+    DrawCountBadge(canvas, count, cx, cy, r, s) {
+        canvas.FillEllipse(this.tools["warning"], cx - r, cy - r, 2 * r, 2 * r)
+        size := EditorStyle.BadgeTextSize * s
+        if (size < EditorStyle.MinTextPx)
+            return
+        text := (count > 99) ? "99+" : String(count)
+        canvas.DrawText(this.tools["badgeText"], this.FontFor(size), this.tools["formatCenter"], text
+            , cx - r, cy - r, 2 * r, 2 * r)
+    }
+
+    ; The pen of a fading connection: the running line in one of 16 alpha steps (a fade is drawn in steps, so a pen is
+    ; made once per step and not per frame).
+    ConnectionRunPen(strength) {
+        level := Round(Min(Max(strength, 0), 1) * 16)
+        level := Max(level, 1)
+        key := "runLine." level
+        if (!this.tools.Has(key)) {
+            alpha := Round(level * 255 / 16)
+            argb := (alpha << 24) | (EditorStyle.RunningLineColor & 0xFFFFFF)
+            this.tools[key] := GdipPen(argb, EditorStyle.RunningLineWidth * this.toolsDpi / 96)
+        }
+        return this.tools[key]
     }
 
     ; The fill of the state overlay (ARGB), or "" when the element has no state.
@@ -513,6 +561,8 @@ class Renderer {
             t["labelText"] := GdipBrush(EditorStyle.LabelText)
             t["gridDot"] := GdipBrush(EditorStyle.GridDot)
             t["warning"] := GdipBrush(EditorStyle.WarningBadge)
+            t["badgeText"] := GdipBrush(EditorStyle.BadgeText)
+            t["error"] := GdipBrush(EditorStyle.ErrorBadge)
             t["migration"] := GdipBrush(EditorStyle.MigrationBadge)
             t["border"] := GdipPen(EditorStyle.Border, EditorStyle.BorderWidth * k)
             t["placeholderLine"] := GdipPen(EditorStyle.PlaceholderBorder, EditorStyle.BorderWidth * k)

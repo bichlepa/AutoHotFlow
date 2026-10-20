@@ -100,6 +100,7 @@ class EditorWindow {
             return
         }
         this.lastVersion := sc.Version
+        this.role.model.NoteFrame()
         this.frames += 1
         DllCall("user32\InvalidateRect", "ptr", this.hwnd, "ptr", 0, "int", 0)
     }

@@ -7,7 +7,8 @@
 ;
 ; Version: a number that the builder takes from the caller; a window compares it with the version it drew last to decide
 ; whether a new frame is needed.
-; Warnings: a list of Maps("id", element or connection ID, "text", message).
+; Warnings: a list of Maps("id", element or connection ID, "text", message, "kind"), kind "evaluation" for the warnings of the
+; evaluation (also the count of an element is in its WarningCount).
 ; Bounds: the box of everything in flow coordinates (empty at 0,0 for an empty flow).
 class Scene {
     __New(view, version, hovered, elements, connections, warnings) {
@@ -26,25 +27,31 @@ class Scene {
         this.Bounds := FlowRect.Union(rects)
     }
 
-    ; A scene with other run and trigger states (WI-0088, F-0150): the same flow, the same view or another one, and the
-    ; states given as SceneBuilder.Build takes them (run: ID -> "running", "recent" or ""; trigger: ID -> the engine's
-    ; trigger state). An element or connection whose state did not change is the same object as before (the scene is
-    ; immutable, so sharing is safe); only the changed ones are made new. Building the flow again costs about 18 ms for
-    ; 300 elements (MS-0046), a state change must not pay for it. The flow must be the one this scene was built from.
-    WithStates(view, run, trigger, version) {
+    ; A scene with other run, trigger and warning states (WI-0088, F-0150, WI-0089): the same flow, the same view or
+    ; another one, and the states given as SceneBuilder.Build takes them (run: ID -> "running", "exception", a fade or
+    ; ""; trigger: ID -> the engine's trigger state; warnings: element ID -> Map("count", n, "text", text), or "" to keep
+    ; the warnings of this scene). An element or connection whose state did not change is the same object as before (the
+    ; scene is immutable, so sharing is safe); only the changed ones are made new. Building the flow again costs about
+    ; 18 ms for 300 elements (MS-0046), a state change must not pay for it. The flow must be the one this scene was built
+    ; from. The list of Warnings is made again when the warnings are given: the evaluation warnings of the elements follow them.
+    WithStates(view, run, trigger, version, warnings := "") {
+        hasWarnings := (warnings is Map)
         elements := []
         for element in this.Elements {
             r := run.Get(element.Id, "")
             t := ""
             if (element.Kind = "trigger")
                 t := SceneBuilder.TriggerStateOf(trigger.Get(element.Id, ""), element.Trigger["default"])
-            if (r = element.Run && SceneBuilder.SameTrigger(t, element.Trigger)) {
+            w := hasWarnings ? SceneBuilder.WarningOf(warnings.Get(element.Id, "")) : Map("count", element.WarningCount
+                , "text", element.Warning)
+            if (r = element.Run && SceneBuilder.SameTrigger(t, element.Trigger) && w["count"] = element.WarningCount
+                    && w["text"] = element.Warning) {
                 elements.Push(element)
                 continue
             }
             elements.Push(SceneElement(element.Id, element.Kind, element.ClassName, element.Icon, element.X, element.Y,
-                element.HeightOfVerticalBar, r, t, element.Migration, element.Placeholder, element.Warning,
-                element.Package, element.Name))
+                element.HeightOfVerticalBar, r, t, element.Migration, element.Placeholder, w["text"],
+                element.Package, element.Name, w["count"]))
         }
         connections := []
         for connection in this.Connections {
@@ -57,6 +64,22 @@ class Scene {
                 connection.FromPart, connection.ToPart, connection.StartX, connection.StartY, connection.AimX,
                 connection.AimY, r))
         }
-        return Scene(view, version, this.Hovered, elements, connections, this.Warnings)
+        issues := this.Warnings
+        if (hasWarnings) {
+            issues := []
+            elementIds := Map()
+            for element in elements
+                elementIds[element.Id] := true
+            for issue in this.Warnings {
+                ; the evaluation warnings of elements are made again below; the others stay
+                if (issue.Get("kind", "") != "evaluation" || !elementIds.Has(issue["id"]))
+                    issues.Push(issue)
+            }
+            for element in elements {
+                if (element.Warning != "")
+                    issues.Push(Map("id", element.Id, "text", element.Warning, "kind", "evaluation"))
+            }
+        }
+        return Scene(view, version, this.Hovered, elements, connections, issues)
     }
 }
