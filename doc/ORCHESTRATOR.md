@@ -2,6 +2,8 @@
 
 How to start: `/orchestrate [wishes]` (command file `.claude/commands/orchestrate.md`) or paste: "Read `doc/ORCHESTRATOR.md` and follow it. My input: ...". Without wishes the orchestrator works through the work items of phase 3. The orchestrator itself runs on `haiku` (the project owner chooses the model of the session).
 
+Version 3 (2026-10-20): haiku for every implementer, unless the work item has a `Model:` line or the project owner's input names another model. Up to two implementers run in parallel, but no bug hunter runs alongside a second implementer. The reviewer keeps sonnet.
+
 Version 2 (2026-10-16): haiku by default with escalation, a sonnet reviewer after every implementation round, the verifier agent replaced by `tools/verify.py`, short reading lists and reports, a status book that holds only the current state. Reason: sessions 1 to 8 spent much of the budget on cold starts (every agent read about 60k tokens of documents), on verifier agents whose runs were almost always green, on bug-hunter rounds about test timing under load, and on a status log that grew to 59 KB.
 
 The text below is addressed to the orchestrator. It is written in English like the rest of the repository.
@@ -12,7 +14,7 @@ The text below is addressed to the orchestrator. It is written in English like t
 
 You do not implement, hunt bugs or review code yourself. You start sub-agents with the Agent tool, give them precise tasks, integrate their results into `v2-port`, run the verification script, and keep the book. Your own context must stay small: use the reports the agents hand back, never read an agent's transcript file, and do not read large documents you do not need.
 
-**Work independently.** The project owner starts you and wants progress without being asked. Starting agents, choosing models, escalating, integrating, continuing after a failed task, cleaning up: none of that needs confirmation. Stop and ask only when (a) a new, difficult decision comes up that the project owner must make soon and that cannot be postponed while other work goes on, or (b) an unforeseen difficulty blocks the work. Anything else you decide, and you report it (section 8). Speed of the implementation comes first; bug search runs on the side.
+**Work independently.** The project owner starts you and wants progress without being asked. Starting agents, choosing models within section 1, integrating, continuing after a failed task, cleaning up: none of that needs confirmation. Stop and ask only when (a) a new, difficult decision comes up that the project owner must make soon and that cannot be postponed while other work goes on, or (b) an unforeseen difficulty blocks the work. Anything else you decide, and you report it (section 8). Speed of the implementation comes first; bug search runs on the side.
 
 When sub-agents are running and nothing else can be done, end your turn with a short status (running agents, what comes next). Do not ask the project owner whether to wait or stop: the agent notifications wake you up again.
 
@@ -31,23 +33,25 @@ At most **4 sub-agents run at the same time**:
 
 | Slot | Role | Count | Runs |
 |---|---|---|---|
-| 1 | Implementer | 1 | one task after the other (a work item or a wish) |
-| 2 | Bug hunter | 0 or 1 | in parallel to slot 1, limited rounds (3c) |
+| 1 | Implementer | 0 to 2 | a task (a work item or a wish); two at the same time only under the rule below |
+| 2 | Bug hunter | 0 or 1 | in parallel to the implementers, limited rounds (3c) |
 | 3 | Reviewer | 0 or 1 | after every implementation round, before the integration (3d) |
 | 4 | Resumed agent | 0 or 1 | review feedback or a finding that goes back to its author (sections 3d, 7) |
 
 Start agents in the background and wait for their notifications. Do not poll and do not sleep. Verification is not an agent: it is `tools/verify.py` (section 4).
 
+**Parallel implementers.** Two implementers may run at the same time **only while no bug hunter is active**. Two running implementers must be independent: no dependency between their work items and no shared files (the "Files with conflict risk" lists and the "Order" lines of `work_items/phase3/README.md`). A bug hunter starts only while at most one implementer runs, and no second implementer starts while a hunter is active.
+
 **Workspaces.** Implementer and bug hunter each get their own workspace: `python tools/new_workspace.py <name>` before the agent starts (for example `wi-56`, `hunt-1`). The agent works only there. The reviewer works in the workspace of the branch it reviews, after the author has finished.
 
 **Models** (`model` parameter of the Agent tool).
 
-- `haiku` is the **default for every role except the reviewer**: implementer, bug hunter, small helpers (conflict resolution, running a command, collecting facts).
-- `sonnet` is the reviewer (3d), and the first escalation step.
-- `opus` is the last escalation step, for stubborn bugs and for design work that sonnet could not finish.
-- **A minimum model in the work item.** A work item may contain a line `Model: sonnet` or `Model: opus` (the project owner or whoever details the step sets it, for work that clearly needs it: protocol design, races, a new parser, many processes). Then start with that model. Without such a line start with `haiku`. Do not raise the model by your own estimate; a wrong start costs one escalation, not more.
+- `haiku` is the **default for implementers, bug hunters and small helpers** (conflict resolution, running a command, collecting facts). Nothing else changes this default.
+- `sonnet` is the reviewer (3d), and the first step of the review escalation.
+- `opus` is the last review escalation step, for stubborn bugs and for design work that sonnet could not finish.
+- **Another model only on request.** A work item may contain a line `Model: sonnet` or `Model: opus` (the project owner or whoever details the step sets it). The project owner's input may name a model too. Then start with that model. Otherwise every implementer and bug hunter runs on `haiku`. Do not raise the model by your own estimate.
 
-**Escalation.** Every agent prompt contains: "If you are stuck after a serious attempt (two different approaches without progress), stop, leave the workspace as it is, and end your report with a line `ESCALATE: <what you tried, what blocks you>`." When you read that line, or when a review asks for changes a second time (3d), start the next stronger model (haiku to sonnet, sonnet to opus) in the same workspace on the same branch, with the partial result, the escalation note or the review findings. If an opus agent escalates, put the task aside, record it, continue with other tasks, and report it. Never loop.
+**Escalation.** Review feedback escalates as in 3d. For implementers and bug hunters the orchestrator does not start a stronger model on its own. Every agent prompt contains: "If you are stuck after a serious attempt (two different approaches without progress), stop, leave the workspace as it is, and end your report with a line `ESCALATE: <what you tried, what blocks you>`." When you read that line, record the task as blocked with the escalation note, continue with other tasks, and report it to the project owner. A stronger model runs only in the cases named above. Never loop.
 
 **Reuse warm agents.** A follow-up to an agent that has just finished (review feedback, a finding on its own work, a next small task of the same kind) goes to that agent with SendMessage (deferred tool, load it with ToolSearch `select:SendMessage`), not to a new agent: its context is already loaded. Start a new agent when the earlier one cannot be resumed or when its context is no longer useful.
 
@@ -76,11 +80,11 @@ A wish for a new feature is first written as a requirement in `doc/REQUIREMENTS.
 
 1. Take the work items from `work_items/phase3/` (the step table in `README.md`, the `Depends on` line of each `WI-*.md`). Keep the book in `work_items/phase3/STATUS.md` (section 10). A work item is `done` when its acceptance criteria are met, the review approved it, the requirements it touches show their new status (`doc/REQUIREMENTS.md`), and `verify.py` is green on the integrated state.
 2. Next work item: the first one in plan order that is `open` and whose dependencies are `done`. **Skip** a work item that depends on an unanswered question in "Open questions for the project owner" of the README (record it as `blocked`, name the question, move on). Do not decide such questions yourself; the project owner answers them in separate sessions. If the input or the README already contains the answer, use it.
-3. Give the implementer the work item file as its task, and the files it names under "Read first". Model: section 1. Work items run strictly one after the other. When no work item with a file is `open` and unblocked, end the work-item part and report; do not invent work items (a step without work item files has to be detailed with the project owner first).
+3. Give the implementer the work item file as its task, and the files it names under "Read first". Model: section 1. Work items run one after the other, or two at the same time under section 1 (independent, no shared files). When no work item with a file is `open` and unblocked, end the work-item part and report; do not invent work items (a step without work item files has to be detailed with the project owner first).
 
 ### 3c. Bug hunter
 
-Runs in parallel to the implementer, one round after the other, **at most 3 rounds per session** unless the input says otherwise. A round is one OPEN-ITEMS entry. Successive rounds go to the same agent with SendMessage while its context is useful (section 1).
+Runs in parallel to the implementers (section 1: it starts only while at most one implementer runs), one round after the other, **at most 3 rounds per session** unless the input says otherwise. A round is one OPEN-ITEMS entry. Successive rounds go to the same agent with SendMessage while its context is useful (section 1).
 
 **Eligible entries:** not closed, not waiting for a decision of the project owner (`decision needed`, `accepted`), not analyzed by a hunter in this session, not in the area of the current implementer task, and **with a real risk**: wrong results, data loss, a hang or crash of the product, or a blocker of the plan. **A test that fails only under parallel load is not eligible** until it also fails alone: check with `python tools/recheck.py <run id>` (or `python tools/test_history.py --test <id>`) before you give it to a hunter. Timing tolerances of tests under load are not hunter work.
 
