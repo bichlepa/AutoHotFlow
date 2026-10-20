@@ -172,3 +172,114 @@ def test_many_big_flows_load_without_hung_and_with_a_responsive_engine(procs, da
     finally:
         result["probe"].close()
         chain.close()
+
+
+# --- WI-0093: patches of a running engine (cmd.flow.patch, PROTOCOL 4.2) ------------------------------------------------
+
+PATCH_BUDGET_S = 3.0        # F-0073: the answer to a patch of 30 operations on the biggest flow, the same budget as a snapshot
+PATCH_OPS_BIG = 30
+STEP_FLOW = "Steps 300"     # a generated flow: a trigger and STEP_COUNT sleeps of STEP_SLEEP_MS in a chain
+STEP_COUNT = 300
+STEP_SLEEP_MS = 20
+STEP_PATCHES = 100
+STEP_PATCH_BUDGET_MS = 50.0 # the stop criterion of WI-0093: a patch above 50 ms is a finding
+
+
+def _patch_ops(element_ids, rep):
+    return [{"op": "element.update", "id": eid, "fields": {"x": rep + k}} for k, eid in enumerate(element_ids)]
+
+
+def _rev_of(snap, name):
+    return [f["rev"] for f in snap["flows"] if f["flowId"] == name][0]
+
+
+def test_a_patch_of_30_operations_on_the_biggest_flow_is_answered_within_the_budget(procs, datadir, session_id):
+    result = load_chain_and_probe(procs, datadir, session_id, 1)
+    chain, probe = result["chain"], result["probe"]
+    try:
+        assert result["t_ready"] is not None, "evt.engine.ready did not come:\n" + chain.sup.text()
+        name = result["names"][0]
+        source = json.loads(BIGGEST_FLOW.read_text(encoding="utf-8"))
+        ids = sorted(eid for eid in source["allElements"] if eid != TIMER_TRIGGER)[:PATCH_OPS_BIG]
+        assert len(ids) == PATCH_OPS_BIG, "the biggest flow has too few elements"
+        rev = _rev_of(chain.snapshot_ok(timeout=10), name)
+        t0 = time.perf_counter()
+        answer = probe.request("engine", "cmd.flow.patch", {"flowId": name, "baseRev": rev,
+                                                            "ops": _patch_ops(ids, 100)}, timeout=10)
+        seconds = time.perf_counter() - t0
+        assert answer["payload"].get("ok") is True and answer["payload"]["rev"] == rev + 1, answer
+        metrics.record("patch of 30 operations on the biggest flow", seconds=round(seconds, 3),
+                       machine=metrics.machine())
+        print("\npatch of %d operations on the biggest flow: %.3f s" % (PATCH_OPS_BIG, seconds))
+        assert seconds < scaled(PATCH_BUDGET_S), "the patch was answered after %.3f s" % seconds
+    finally:
+        probe.close()
+        chain.close()
+
+
+def write_step_flow(datadir, name):
+    """A trigger and STEP_COUNT Action_Sleep elements (STEP_SLEEP_MS each) in a chain: a run of about 6 s."""
+    flow = {"name": name, "category": "", "ElementIDCounter": str(STEP_COUNT * 2 + 10), "flowSettings":
+            {"ExecutionPolicy": "default", "DefaultWorkingDir": 1, "WorkingDir": ""}, "allElements": {},
+            "allConnections": {}}
+    flow["allElements"]["element0000000001"] = {
+        "class": "Trigger_Manual", "DefaultTrigger": "1", "ID": "element0000000001", "name": "Manual",
+        "package": "Default", "packageVersion": "1.2.0", "pars": {"ID": name}, "StandardName": "1", "type": "trigger",
+        "x": "0", "y": "0"}
+    for i in range(2, STEP_COUNT + 2):
+        eid = "element%010d" % i
+        flow["allElements"][eid] = {
+            "class": "Action_Sleep", "ID": eid, "name": "Sleep", "package": "Default", "packageVersion": "1.2.0",
+            "pars": {"Duration": str(STEP_SLEEP_MS), "Unit": "Milliseconds"}, "StandardName": "1", "type": "action",
+            "x": "0", "y": str(i * 10)}
+        prev = "element%010d" % (i - 1)
+        cid = "connection%010d" % (STEP_COUNT * 2 + i)
+        flow["allConnections"][cid] = {"ID": cid, "from": prev, "to": eid, "ConnectionType": "normal",
+                                       "type": "Connection"}
+    (Path(datadir) / "Flows").mkdir(exist_ok=True)
+    (Path(datadir) / "Flows" / (name + ".json")).write_text(json.dumps(flow, indent=2), encoding="utf-8")
+
+
+def _run_steps(chain, name, patches):
+    """One run of the step flow. With patches, STEP_PATCHES patches go out one after another while it runs. Returns
+    (seconds from the start to evt.instance.ended, the round trips of the patches in seconds)."""
+    ended_before = len(chain.rec.find(event("evt.instance.ended", flowId=name)))
+    t0 = time.perf_counter()
+    chain.request_ok(chain.obs, "engine", "cmd.flow.start", {"flowId": name})
+    round_trips = []
+    rev = _rev_of(chain.snapshot_ok(timeout=10), name)
+    for i in range(patches):
+        ids = ["element%010d" % (STEP_COUNT + 1 - (i % 50))]     # elements near the end: they run last
+        a = time.perf_counter()
+        answer = chain.obs.request("engine", "cmd.flow.patch", {"flowId": name, "baseRev": rev,
+                                                                "ops": _patch_ops(ids, i)}, timeout=10)
+        round_trips.append(time.perf_counter() - a)
+        assert answer["payload"].get("ok") is True, answer
+        rev = answer["payload"]["rev"]
+    assert wait_until(lambda: len(chain.rec.find(event("evt.instance.ended", flowId=name))) > ended_before,
+                      timeout=scaled(120)), chain.sup.text()
+    ended = chain.rec.find(event("evt.instance.ended", flowId=name))[-1][0]
+    return ended - t0, round_trips
+
+
+@pytest.mark.stress
+def test_patches_during_a_run_add_no_more_than_their_own_time_to_the_steps(procs, datadir, session_id):
+    write_step_flow(datadir, STEP_FLOW)
+    chain = Chain(procs, datadir, session_id, FULL_CHAIN + ",triggerhost", HEADLESS_OPTS, run_timeout=900)
+    try:
+        assert chain.rec.wait(event("evt.engine.ready"), timeout=scaled(60)) is not None, chain.sup.text()
+        chain.request_ok(chain.obs, "supervisor", "cmd.topic.subscribe", {"topic": "flow:" + STEP_FLOW})
+        plain, _ = _run_steps(chain, STEP_FLOW, 0)
+        patched, round_trips = _run_steps(chain, STEP_FLOW, STEP_PATCHES)
+        extra_ms = (patched - plain) * 1000
+        per_step_ms = extra_ms / STEP_COUNT
+        trips = metrics.Dist([x * 1000 for x in round_trips])
+        metrics.record("steps of a running flow during 100 patches in a row", steps=STEP_COUNT,
+                       plain_s=round(plain, 3), patched_s=round(patched, 3), extra_ms_per_step=round(per_step_ms, 3),
+                       patch_round_trip_ms=trips.as_dict(), machine=metrics.machine())
+        print("\n%d steps: %.3f s plain, %.3f s with %d patches (%.3f ms more per step); patch round trips %s"
+              % (STEP_COUNT, plain, patched, STEP_PATCHES, per_step_ms, trips.as_dict()))
+        assert extra_ms < STEP_PATCHES * STEP_PATCH_BUDGET_MS + 1000, (plain, patched)
+        assert trips.max < STEP_PATCH_BUDGET_MS * 4, trips.as_dict()
+    finally:
+        chain.close()

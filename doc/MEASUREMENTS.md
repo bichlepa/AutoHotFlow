@@ -279,3 +279,31 @@ Setup: the plain flow of 300 elements and 350 connections (as MS-0048), the whol
 **Reading.** The budget of WI-0097 (the frame of a drag below 16 ms on average at 1920 × 1080): **met for 1 element** (10.6 ms; the frame of the flow that every frame pays is about 7 ms, see MS-0048), **not met for 30 elements** (25.0 ms). The drag costs about 13 ms more than the frame of a state change for 30 elements, plus about 3 to 5 ms for `Scene.WithDrag` in each frame (the scene is built again with its bounds). The rebuilds (90 to 107 ms) are of the order of the rebuild of MS-0048 (113 ms): the layer is built once per drag and once after the drop, as designed. Not checked: which part of the 13 ms belongs to the elements and which to their connections (the labels are text). The options are in `doc/OPEN-ITEMS.md` (decision needed).
 
 Not measured: with a real window (the owner's manual check), under a load on the machine, at 3840 × 2160.
+## Patches of the engine on a flow of 300 elements (WI-0093, MS-0053, MS-0054)
+
+### MS-0053: engine time of one patch on a flow of 300 elements (WI-0093, task 6)
+
+`tests/ahk/helpers/flow_patch_bench.ahk` (one run on 2026-10-20, not an idle machine): a generated flow of a manual trigger and 299 actions in a chain (299 connections). The engine's work for a patch is `FlowPatch.Apply` and the building of the new `FlowDefinition`, measured with `QueryPerformanceCounter`; the commit itself is a pointer change. Five warm-up runs, then 200 runs per case, each on the same base flow.
+
+| Case | Runs | Mean (ms) | p95 (ms) | Max (ms) |
+|---|---:|---:|---:|---:|
+| move one element | 200 | 4.5 | 7.8 | 14.6 |
+| move 30 elements (one patch) | 200 | 5.6 | 8.7 | 24.1 |
+| add 30 elements with their connections | 200 | 21.3 | 28.7 | 83.5 |
+
+**Reading.** All means are below the stop limit of 50 ms, so the work went on. The 30 additions cost about 20 ms more than the moves. The cause is assumed to be the rule check of each added connection (a scan of all connections for an identical one); not measured separately. **Budget proposal:** the engine time of a patch of up to 30 operations on a flow of 300 elements has a p95 below 40 ms; a single operation below 10 ms. Measured at the time of WI-0093 with the margin of about a factor of 1.4 to the proposal.
+
+### MS-0054: steps of a running flow during 100 patches in a row, and a patch of 30 operations on the biggest flow (WI-0093)
+
+`tests/stress/test_big_flows.py::test_patches_during_a_run_add_no_more_than_their_own_time_to_the_steps` (stress tier, run alone; the machine was shared with other agents' runs): a flow of a trigger and 300 `Action_Sleep` of 20 ms in a chain. One run without patches, then one run with 100 `cmd.flow.patch` sent one after another while it runs (each moves an element near the end, which runs last). Measured through the real chain (supervisor, engine, Python client).
+
+| Measure | Value |
+|---|---:|
+| Run without patches | 9.393 s |
+| Run with 100 patches during the run | 9.448 s |
+| Extra time per step (55 ms over 300 steps) | 0.18 ms |
+| Round trip of one patch from the client: median / p95 / p99 / max | 50.0 / 64.7 / 74.7 / 75.0 ms |
+
+**Reading.** The steps of the running flow are hardly affected: the patches add 0.18 ms per step; the cause is assumed to be that the engine is idle between the timers of the sleeps. The round trip of a patch is about 50 ms while the flow runs, which is far more than the engine time of MS-0053 (the time in the engine is not split from the round trip, F-9001* in `doc/OPEN-ITEMS.md`). An idle engine answers the same kind of patch in about 6 ms (`test_a_patch_of_30_operations_on_the_biggest_flow_is_answered_within_the_budget`: 30 operations on the biggest v1 flow, 93 KB, answered in 0.006 s against the budget of 3 s).
+
+Status: **verified** for the numbers of this run (one run each); **not checked** whether the round trip of 50 ms is the engine's message handling or the client.
