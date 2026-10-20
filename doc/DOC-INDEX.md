@@ -31,12 +31,12 @@ L407-418 9. Performance budgets (targets, measured in Phase 2)
 L420-430 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (153.0 KB, 683 lines)
+## doc/PROTOCOL.md (155.5 KB, 686 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-656 4. Message Catalog
+L95-659 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
@@ -46,14 +46,14 @@ L245-291   4.3 Engine events (`evt.*`, engine → topics)
 L293-325   4.4 Engine ↔ trigger host
 L327-392   4.5 Engine ↔ worker
 L394-466   4.6 Engine ↔ storage and log
-L468-486   4.7 Dialogs
-L488-523   4.8 Manager (WI-0073, `src/manager/`)
-L525-587   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
-L589-606   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L608-656   4.11 Role `editor` (WI-0088, `src/editor/`)
-L658-677 5. Connection setup, reconnection, resync
-L668-677   5a Events before subscription (design question, WI-0007)
-L679-683 6. Versioning and extension
+L468-487   4.7 Dialogs
+L489-524   4.8 Manager (WI-0073, `src/manager/`)
+L526-588   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
+L590-609   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
+L611-659   4.11 Role `editor` (WI-0088, `src/editor/`)
+L661-680 5. Connection setup, reconnection, resync
+L671-680   5a Events before subscription (design question, WI-0007)
+L682-686 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (55.3 KB, 338 lines)
