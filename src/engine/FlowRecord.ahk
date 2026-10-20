@@ -16,7 +16,7 @@ class FlowRecord {
     }
 
     ; Commits a new definition as the next revision. The Executor reads Def at every step (E0001), so the
-    ; next step of every running instance sees it. Phase 3 calls this when a patch is applied.
+    ; next step of every running instance sees it. Called by cmd.flow.patch and by a meta update (WI-0093).
     Commit(def) {
         this.Def := def
         this.Rev += 1

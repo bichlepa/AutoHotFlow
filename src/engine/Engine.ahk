@@ -5,6 +5,7 @@
 #Include ..\core\Log.ahk
 #Include ..\core\Role.ahk
 #Include ..\core\NoticeThrottle.ahk
+#Include ..\core\FlowPatch.ahk
 #Include FlowRecord.ahk
 #Include FlowTable.ahk
 #Include FlowStateFile.ahk
@@ -45,9 +46,6 @@
 ; process, +1 per event). A client that sees a new epoch or a gap in seq asks for cmd.engine.snapshot.
 class Engine extends Role {
     static STORAGE := "storage"
-    ; Operation names of cmd.flow.patch (PROTOCOL 4.2). Known, but not applied in Phase 2.
-    static PATCH_OPS := Map("element.add", true, "element.update", true, "element.remove", true
-        , "connection.add", true, "connection.remove", true, "flow.settings", true)
     static READ_TIMEOUT_MS := 30000
     static LOAD_RETRY_MS := 500
     static LOAD_RETRY_MAX_MS := 5000
@@ -812,9 +810,9 @@ class Engine extends Role {
         this.flowState.Touch(rec.FlowId)
     }
 
-    ; Patch schema (PROTOCOL 4.2). Phase 2 checks the revision and the shape of the operations, then
-    ; refuses them: applying operations is Phase 3. A stale baseRev is a conflict with the current state.
-    ; Operations are checked all before any is applied (atomic), and an empty list changes nothing.
+    ; cmd.flow.patch (PROTOCOL 4.2, WI-0093): FlowPatch applies the operations all or nothing, and the result is committed
+    ; as the next revision at once. A stale baseRev is a conflict with the current state; a refused list changes nothing.
+    ; The flow is busy while its deletion is pending (a commit would bring the deleted flow back in the table).
     _CmdFlowPatch(msg) {
         flowId := Engine.Text(msg, "flowId")
         rec := this.flows.Require(flowId)
@@ -824,18 +822,23 @@ class Engine extends Role {
         ops := msg.payload.Get("ops", "")
         if (!(ops is Array))
             throw AhfError("payload field 'ops' must be an array", ErrCode.BAD_PAYLOAD)
+        if (this.IsDeleting(flowId))
+            throw AhfError("flow '" flowId "' is being deleted", ErrCode.BUSY)
         if (Integer(base) != rec.Rev)
             return Map("ok", false, "error", Map("code", ErrCode.CONFLICT
                 , "message", "flow '" flowId "' is at rev " rec.Rev ", baseRev was " base)
                 , "rev", rec.Rev, "definition", rec.Def.WireDefinition())
-        for op in ops {
-            if (!(op is Map) || !op.Has("op") || IsObject(op["op"]))
-                throw AhfError("each operation needs an 'op' field", ErrCode.BAD_PAYLOAD)
-            name := String(op["op"])
-            if (!Engine.PATCH_OPS.Has(name))
-                throw AhfError("unknown patch operation '" name "'", ErrCode.BAD_PAYLOAD)
-            throw AhfError("patch operation '" name "' is not applied before phase 3", ErrCode.BAD_PAYLOAD)
+        if (ops.Length = 0)
+            return Map("rev", rec.Rev)
+        raw := FlowPatch.Apply(rec.Def.Raw, ops)
+        def := FlowDefinition(flowId, raw, rec.Rev + 1)
+        ; the elements that wait for their class keep waiting (FlowDefinition.Pending), those that are gone are dropped
+        for elementId in rec.Def.Pending {
+            if (def.HasElement(elementId))
+                def.Pending[elementId] := true
         }
+        rec.Commit(def)
+        this.Emit("topic:flow:" flowId, "evt.flow.committed", Map("flowId", flowId, "rev", rec.Rev, "byMeta", Json.False))
         return Map("rev", rec.Rev)
     }
 

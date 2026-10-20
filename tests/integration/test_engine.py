@@ -859,9 +859,9 @@ def test_patch_with_the_current_revision_and_no_operations_changes_nothing(pipe,
         assert ask(obs, "cmd.engine.snapshot")["flows"][0]["rev"] == 1
 
 
-def test_patch_operations_are_validated_and_refused_until_phase_3(pipe, flowdir, engine):
+def test_patch_operations_are_validated_and_a_refused_one_changes_nothing(pipe, flowdir, engine):
     cases = [
-        ({"flowId": "skeleton", "baseRev": 1, "ops": [{"op": "element.add"}]}, "not applied before phase 3"),
+        ({"flowId": "skeleton", "baseRev": 1, "ops": [{"op": "element.add"}]}, "'element' must be an object"),
         ({"flowId": "skeleton", "baseRev": 1, "ops": [{"op": "no.such.op"}]}, "unknown patch operation"),
         ({"flowId": "skeleton", "baseRev": 1, "ops": [{"x": 1}]}, "needs an 'op' field"),
         ({"flowId": "skeleton", "baseRev": 1, "ops": "nope"}, "must be an array"),

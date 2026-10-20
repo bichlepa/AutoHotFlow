@@ -259,7 +259,14 @@ class FlowLifecycle {
                 this._ReplyError(request, ErrCode.NOT_FOUND, "flow '" flowId "' is not loaded any more")
                 return
             }
-            rec.Commit(def)
+            ; The revision is built on the one that is current now, not on the one of the request (WI-0093, the meta race):
+            ; a patch committed while storage wrote the file is kept, and only the name and category of this request change.
+            raw := rec.Def.Raw.Clone()
+            raw["name"] := def.Name
+            raw["category"] := def.Category
+            next := FlowDefinition(flowId, raw, rec.Rev + 1)
+            next.Pending := rec.Def.Pending.Clone()
+            rec.Commit(next)
             this._engine.categories.Sync(true)
             this._engine.Emit("topic:flow:" flowId, "evt.flow.committed"
                 , Map("flowId", flowId, "rev", rec.Rev, "byMeta", Json.True))
