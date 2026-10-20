@@ -45,6 +45,7 @@ class ManagerDriver {
         this.ops["enable"] := (args, done) => this._OpSwitch(args, done, true)
         this.ops["disable"] := (args, done) => this._OpSwitch(args, done, false)
         this.ops["edit"] := (args, done) => this._OpEdit(args, done)
+        this.ops["openNotice"] := (args, done) => this._OpOpenNotice(args, done)
         this.ops["create"] := (args, done) => this.flowOps.NewFlow(args.Get("category", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
         this.ops["duplicate"] := (args, done) => this.flowOps.Duplicate(args.Get("flowId", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
         this.ops["delete"] := (args, done) => this.flowOps.Delete(ManagerDriver.Ids(args), (ans) => done(ManagerDriver.AnswerResult(ans)))
@@ -97,6 +98,15 @@ class ManagerDriver {
     ; WI-0087: the editor of a flow, as the Edit button and a double click do it: flowId (without it the selected flow), or
     ; flowIds, one request after the other, each sent when the answer of the one before has come (a test of a second Edit
     ; or of the editor limit needs the requests to follow each other at once). done({ok, results}) with one result per flow.
+    ; WI-0103: the button "Open editor" of the list of notices for notice n. Answers { ok, sent, answer? }: sent false when
+    ; the notice is not an editor notice (no request goes out).
+    _OpOpenNotice(args, done) {
+        n := args.Get("n", 0)
+        sent := this.model.OpenNoticeEditor(n, (ans) => done(Map("ok", true, "sent", true, "answer", ans)))
+        if (!sent)
+            done(Map("ok", true, "sent", false))
+    }
+
     _OpEdit(args, done) {
         ids := args.Get("flowIds", "")
         if (!(ids is Array))

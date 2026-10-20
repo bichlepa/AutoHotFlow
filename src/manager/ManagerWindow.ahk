@@ -129,7 +129,7 @@ class ManagerWindow {
     ; The list of notices (WI-0075): made at the first call, then shown. The model is changed by the role (OpenNotices).
     ShowNotices() {
         if (!IsObject(this.noticeView))
-            this.noticeView := NoticeWindow(this.model)
+            this.noticeView := NoticeWindow(this.model, (flowId) => this.model.OpenEditor(flowId))
         this.noticeView.Show()
     }
 

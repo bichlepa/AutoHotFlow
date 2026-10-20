@@ -17,8 +17,10 @@ class NoticeWindow {
     static WIDTH := 760
     static HEIGHT := 420
 
-    __New(model) {
+    __New(model, openEditor := "") {
         this.model := model
+        this.openEditor := openEditor      ; fn(flowId): the editor of a flow (WI-0103, the button "Open editor")
+        this.rowNotices := []              ; the entry of each row, as the rows are shown
         this.win := UiWindow("manager.notices", "Notices", NoticeWindow.WIDTH, NoticeWindow.HEIGHT)
         this.win.hideOnClose := true
         g := this.win.Gui
@@ -31,7 +33,27 @@ class NoticeWindow {
         this.lv.ModifyCol(3, GuiLayout.Scale(lay, 170))
         this.lv.ModifyCol(4, GuiLayout.Scale(lay, 380))
         this.status := g.AddText()
-        this.win.Place(this.status, 12, 390, 736, 20)
+        this.win.Place(this.status, 12, 390, 540, 20)
+        this.openBtn := g.AddButton(, Lang("Notice_open_editor"))
+        this.win.Place(this.openBtn, 580, 386, 168, 26)
+        this.openBtn.OnEvent("Click", (*) => this.OpenSelected())
+    }
+
+    ; The button "Open editor" (WI-0103): the editor of the selected notice, which must be an editor notice. Nothing else
+    ; is done here: the model asks the supervisor (ManagerModel.OpenEditor, the same as the button "Edit").
+    OpenSelected() {
+        row := this.lv.GetNext(0)
+        if (row = 0 || row > this.rowNotices.Length) {
+            this.win.Text(this.status, "Notice_pick_editor")
+            return
+        }
+        e := this.rowNotices[row]
+        if (e["kind"] != "editor" || e["flowId"] = "") {
+            this.win.Text(this.status, "Notice_not_editor")
+            return
+        }
+        if (IsObject(this.openEditor))
+            this.openEditor(e["flowId"])
     }
 
     Show() {
@@ -61,11 +83,13 @@ class NoticeWindow {
     ; Rebuilds the rows from the model's list, the newest first.
     Refresh() {
         this.lv.Delete()
+        this.rowNotices := []
         notices := this.model.notices
         i := notices.Length
         while (i >= 1) {
             e := notices[i]
             this.lv.Add("", e["clock"], Lang("Notice_level_" e["level"]), this._FlowName(e["flowId"]), this._Text(e))
+            this.rowNotices.Push(e)
             i -= 1
         }
         if (notices.Length = 0)

@@ -369,6 +369,20 @@ class ManagerModel {
         return out
     }
 
+    ; The button "Open editor" of the list of notices (WI-0103, PROTOCOL 4.8): the editor of the flow of notice n, when that
+    ; notice is an editor notice (kind editor). Returns true when the request went out; done gets the answer of OpenEditor.
+    OpenNoticeEditor(n, done := "") {
+        for e in this.notices {
+            if (e["n"] != n)
+                continue
+            if (e["kind"] != "editor" || e["flowId"] = "")
+                return false
+            this.OpenEditor(e["flowId"], done)
+            return true
+        }
+        return false
+    }
+
     ; The user selected a flow: its error mark goes.
     _Seen(flowId) {
         if (flowId = "" || !this.unseenIds.Has(flowId))
