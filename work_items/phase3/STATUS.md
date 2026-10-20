@@ -23,17 +23,17 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
-| WI-0093 | Engine: patch operations, shared `FlowPatch`, revisions that share, the meta race | open | | | | measures the patch time first (stop above 50 ms) |
+| WI-0093 | Engine: patch operations, shared `FlowPatch`, revisions that share, the meta race | done | haiku | 5743c3d0..b5acb473 | 2026-10-21 | patch 4.5 to 29 ms (MS-0053/54); F-0163, F-0164 decision needed |
 | WI-0094 | Engine: triggers of an edited flow | open | | | | E0092 |
 | WI-0095 | Engine and storage: automatic saving and backups (E0065) | open | | | | |
-| WI-0096 | Editor: draft, patch client, undo and redo, selection model, the view written | open | | | | E0086 |
-| WI-0097 | Scene and renderer for editing | open | | | | the owner accepts the screenshots |
+| WI-0096 | Editor: draft, patch client, undo and redo, selection model, the view written | running (haiku) | | | | E0086 |
+| WI-0097 | Scene and renderer for editing | done, screenshots await the owner | haiku | bb015aba..49f7edd4 | 2026-10-20 | F-0162 (30-element drag 25 ms) decision needed |
 | WI-0098 | Editor: select and move, loop height | open | | | | E0094 |
 | WI-0099 | Editor: add elements, class list | open | | | | |
 | WI-0100 | Editor: connect | open | | | | |
 | WI-0101 | Editor: delete, cut, copy, paste | open | | | | E0091 |
 | WI-0102 | Editor: menu bar, context menus, trigger buttons | open | | | | |
-| WI-0103 | Notice of a crashed editor | open | | | | E0093 |
+| WI-0103 | Notice of a crashed editor | running (haiku) | | | | E0093 |
 | WI-0104 | Acceptance S0006 | open | | | | manual check 10; refines S0007 |
 | WI-0105 | Form model and the `form` API | open | | | | may run beside S0006 |
 | WI-0106 | Element settings window | open | | | | |
@@ -53,9 +53,11 @@ None.
 
 ## Running agents
 
-None.
+WI-0096 (haiku, workspace wi-96), WI-0103 (haiku, workspace wi-103).
 
 ## Last verified state
+
+Commit `b5acb473` (WI-0097 and WI-0093 integrated; selection of the groups engine, tools, transport): VERDICT green (partial run). WI-0097 alone was not verified separately.
 
 Commit `60b41ad0` (gui test fixes, F-0158 and the requirements of S0005; the later commits change only documents): foundation 471 and slow 204 green, fast 1784 passed, 1 failed under load (`tests/e2e/test_editor_tray.py::test_a_state_that_cannot_be_read_asks_for_the_force_no_changes_nothing_yes_writes_it`, 99 % CPU, first failure in 7 runs, green alone in recheck 20261020-215042-recheck): a load flake (runs 20261020-213655-60b41ad0, -2, -3).
 
