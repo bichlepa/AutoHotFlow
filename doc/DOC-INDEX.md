@@ -385,11 +385,11 @@ L412-418 `loop files` takes a mode string, not a number (verified)
 L420-426 A closure over the variable of a `for` loop does not work in a test case (verified)
 L428-434 A window with real controls can be tested without showing it (verified) (verified)
 L436-442 A session with N workers needs `--workers=N` and `--warm-workers=N`, and `--windows-startup` drops the manager (verified) (verified)
-L444-450 SendMessage with a buffer of this process reads or writes the memory of the other process (gui tests, verified) (verified)
-L452-458 A Gui window of AutoHotkey has the class AutoHotkeyGUI, not AutoHotkey (verified) (verified)
-L460-466 A window title with the flow name depends on the language and the case of the name (verified) (verified)
-L468-474 `cmd.editor.open` is reserved for the manager: a gui test sends it as the manager (verified) (verified)
-L476-482 AHK's FileAppend fails in a missing folder, and SplitPath needs backslashes (verified) (verified)
+L444-450 SendMessage with a buffer of this process reads or writes the memory of the other process (gui tests, assumed) (assumed)
+L452-458 A Gui window of AutoHotkey has the class AutoHotkeyGUI, not AutoHotkey (assumed) (assumed)
+L460-466 A window title with the flow name depends on the language and the case of the name (assumed) (assumed)
+L468-474 `cmd.editor.open` is reserved for the manager: a gui test sends it as the manager (assumed) (verified)
+L476-482 AHK's FileAppend fails in a missing folder, and SplitPath needs backslashes (assumed) (assumed)
 ```
 
 ## doc/REQUIREMENTS.md
