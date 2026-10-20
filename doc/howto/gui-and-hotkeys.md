@@ -239,3 +239,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** This is the v1 text, which also gives "1.00" (v1 `ui_UpdateStatusbartext`). Keep it, and write the expectation with two decimals. A plain `zoom ""` gives "1".
 - **Status:** verified (`tests/e2e/test_editor.py::test_the_status_bar_text_shows_offset_zoom_and_the_number_of_elements`, AutoHotkey 2.0.30, 2026-10-20)
 - **Source:** `src/editor/FlowStatus.ahk`
+
+### A click on a TrayTip balloon comes as the icon's callback with NIN_BALLOONUSERCLICK (assumed)
+
+- **Problem:** The tray role must open the editor again when the user clicks the balloon of an editor notice (WI-0103). The TrayTip command gives no event for a click.
+- **Wrong:** Looking for a click handler of TrayTip, or treating a click on the balloon as a click on the icon (the menu entries would then run by mistake).
+- **Right:** `OnMessage 0x404` on the script (the callback message of the script's icon). The lParam is the notification: 1029 is NIN_BALLOONUSERCLICK, 1028 timeout or closed, 1026 shown, 1027 hidden (the codes of the AutoHotkey docs, `lib/TrayTip.htm`, example AHK_NOTIFYICON). Check `hwnd = A_ScriptHwnd`, because the message can come for another window. Code: `src/tray/Tray.ahk` (`_OnTrayMessage`).
+- **Status:** assumed (the codes and the message come from the AHK docs; the headless tests send the click as a test command; the real click is the gui test `tests/fault/test_editor_crash_notice_gui.py` (gui), which agents do not run; the owner's check is open). Not checked: the message on a real desktop.
+- **Source:** `src/tray/Tray.ahk`, `tests/e2e/test_editor_crash_notice.py`, `tests/fault/test_editor_crash_notice_gui.py`

@@ -176,7 +176,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (32.3 KB, 241 lines)
+## doc/howto/gui-and-hotkeys.md (33.5 KB, 249 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -208,6 +208,7 @@ L211-217 GdipLoadImageFromFile reports a missing file as OutOfMemory (verified) 
 L219-225 GdipSaveImageToFile returns Win32Error (7) for an invalid file name (verified) (verified)
 L227-233 The status bar of a window is laid out by the parent's WM_SIZE, and its height must be read after that (assumed) (assumed)
 L235-241 Round(x, n) returns text with n decimals, so Round(1, 2) shows "1.00" (verified) (verified)
+L243-249 A click on a TrayTip balloon comes as the icon's callback with NIN_BALLOONUSERCLICK (assumed) (assumed)
 ```
 
 ## doc/howto/objects-maps-arrays.md (13.2 KB, 150 lines)
