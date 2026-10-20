@@ -53,7 +53,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0157 | `tests/integration/test_pipe.py::test_abrupt_end_of_client_process_is_seen_within_500_ms[2]` is red under load: 1819 ms measured (budget 1500 ms) while the machine ran at 99 % CPU. A wall-clock latency assertion that is not covered by the admission of the test runs; not checked alone | open, verified (one red run under load); the owner decides whether it is a gui-tier or idle-tier test | WI-0090 |
 | F-0158 | The language files `assets/language/basic/de.ini`, `ko.ini` and `ru.ini` are UTF-16 LE with BOM and CRLF, but `LangTable` reads every language file as UTF-8, so these three languages are probably not loaded (`en.ini` and the `manager` folder are UTF-8 or ASCII) | open, verified by the file encodings and the `FileRead` calls; the effect at run time was not run | WI-0091 |
 | F-0160 | `tests/ahk/helpers/renderer_bench.ahk` under `#Warn All` warns about a local variable `type` (same name as a global) in `src/elements/Default/Triggers/Trigger_Start_up.ahk` line 47; the product does not run under `#Warn All`, so it is not checked whether the product shows it | open, low, verified by the bench output | WI-0092 |
-| F-9000* | Order inside a batch of element states: entries inside one 33 ms batch are in the order of the first change; a fast repeating failing element shows only its last state | postponed by the owner (2026-10-20), a note, no requirement | WI-0089 |
+| F-0161 | Order inside a batch of element states: entries inside one 33 ms batch are in the order of the first change; a fast repeating failing element shows only its last state | postponed by the owner (2026-10-20), a note, no requirement | WI-0089 |
 | F-0153 | The tint of a running element is drawn after all elements, so where a running element overlaps a later element of the scene, the tint lies over that element; v1 draws the tint with its element, so the later element covers it | open, low; the sample flows show no such overlap, not checked on a larger flow | WI-0085 |
 
 ## Findings
@@ -256,7 +256,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **What:** `assets/language/basic/de.ini`, `ko.ini` and `ru.ini` are UTF-16 LE with BOM and CRLF. `LangTable` reads every language file with `FileRead(path, "UTF-8")` (two places), so the keys of these files are probably not found and the program falls back to English. `basic/en.ini` and `assets/language/manager/*.ini` are ASCII or UTF-8. Seen while reviewing WI-0091, whose new key exists in `en.ini` only.
 **Status:** open; verified: the encodings and the read calls; not checked: what a run with the language German shows. Fix: convert the files to UTF-8 (or read them by their BOM) and add a test that every language file loads.
 
-### F-9000*: Order inside a batch of element states
+### F-0161: Order inside a batch of element states
 
 **What:** the engine sends the element states of a flow in batches of at most 33 ms (WI-0089). Inside one batch the entries are in the order of the first change of each element. A fast repeating failing element shows only its last state in the batch.
 **Status:** postponed by the owner on 2026-10-20. A note only; no requirement depends on it.
