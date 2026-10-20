@@ -14,19 +14,50 @@
 ;   cmd.test.close {}                   the planned end of the editor (after the answer)
 ;   cmd.test.view {zoomAt?, drag?, size?, dpi?}   the wheel, the drag, the size and the DPI of the window (WI-0090)
 ;   cmd.test.hover {x, y}               the tooltip text under a canvas pixel (WI-0090)
+;   cmd.test.command {item, answer?}    a menu entry of the tray as if it was clicked (WI-0091, PROTOCOL 4.11): item show,
+;                                       run, toggle or close; answer yes or no (default no) answers the questions of the entry
 ;
 ; Booleans on the wire are Json.True and Json.False (PROTOCOL 2): the state fields enabled and armed are written with Json.Bool.
 class EditorDriver {
     static MAX_SIDE := 8000
+    static TRAY_ITEMS := Map("show", 1, "run", 1, "toggle", 1, "close", 1)
 
     __New(role, model) {
         this.role := role
         this.model := model
+        this.answer := "no"           ; the answer to the questions of the flow commands (ask seam, Confirm)
+        this.asked := []              ; the kinds of the questions asked so far (EditorFlowOps)
         role.On("cmd.test.state", (msg) => Map("ok", true, "state", this.State()))
         role.On("cmd.test.render", (msg) => this._OnRender(msg))
         role.On("cmd.test.close", (msg) => this._OnClose())
         role.On("cmd.test.view", (msg) => this._OnView(msg))
         role.On("cmd.test.hover", (msg) => this._OnHover(msg))
+        role.On("cmd.test.command", (msg) => this._OnCommand(msg))
+    }
+
+    ; The question of a flow command (the ask seam of EditorFlowOps): answered at once with the answer of the test.
+    Confirm(kind, args, done) {
+        this.asked.Push(kind)
+        done(this.answer = "yes")
+    }
+
+    ; cmd.test.command {item, answer?}: runs the tray entry as the click does (EditorTray). The entry returns at once; the engine
+    ; answer to Run or Enable or disable comes later, so a test reads its result in tray.lastResult (cmd.test.state).
+    ; Close is the planned end: the answer goes out, then the role says bye.
+    _OnCommand(msg) {
+        p := msg.payload
+        item := p.Get("item", "")
+        answer := p.Get("answer", "no")
+        if (IsObject(item) || !EditorDriver.TRAY_ITEMS.Has(item) || (answer != "yes" && answer != "no"))
+            throw AhfError("cmd.test.command: item is show, run, toggle or close, answer yes or no", ErrCode.BAD_PAYLOAD)
+        this.answer := answer
+        switch item {
+            case "show": this.role.tray.Show()
+            case "run": this.role.tray.Run()
+            case "toggle": this.role.tray.Toggle()
+            case "close": this.role.tray.Close()
+        }
+        return Map("ok", true)
     }
 
     ; cmd.test.view {zoomAt?: {x, y, direction}, drag?: {dx, dy}, size?: {w, h}, dpi?}: the mouse and the window of the
@@ -107,6 +138,8 @@ class EditorDriver {
         r := IsObject(this.role.renderer) ? this.role.renderer.Snapshot() : Map("frames", 0, "meanFrameMs", 0
             , "lastFrameMs", 0, "slowestFrameMs", 0, "rebuilds", 0, "lastRebuildMs", 0)
         st["status"] := this._Status()
+        st["tray"] := this.role.tray.State()
+        st["asked"] := this.asked.Clone()
         st["frames"] := r["frames"]
         st["meanFrameMs"] := r["meanFrameMs"]
         st["lastFrameMs"] := r["lastFrameMs"]

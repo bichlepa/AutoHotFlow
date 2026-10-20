@@ -5,6 +5,8 @@
 #Include ..\core\Time.ahk
 #Include EditorModel.ahk
 #Include render\Renderer.ahk
+#Include EditorFlowOps.ahk
+#Include EditorTray.ahk
 #Include EditorWindow.ahk
 #Include EditorDriver.ahk
 
@@ -29,6 +31,8 @@ class Editor extends Role {
         this.renderer := ""           ; the Renderer, created when GDI+ is started (the first frame)
         this.canvas := ""             ; the offscreen bitmap of the headless driver (cmd.test.render)
         this.driver := ""
+        this.flowOps := ""            ; EditorFlowOps: Run and Enable or disable (the tray menu, the questions of the window)
+        this.tray := ""               ; EditorTray: the icon and the menu of this editor (REQ-EDT-230)
         this.started := false
         this.tornDown := false
         this.endReason := ""
@@ -45,8 +49,12 @@ class Editor extends Role {
         this.On("cmd.editor.show", (msg) => this._OnShow(msg))
         this.On("cmd.app.prepareExit", (msg) => Map("ok", true, "cancel", Json.False))
         this.FollowSettings()          ; the language (WI-0077): the title follows it
-        if (this.headless)
+        this.flowOps := EditorFlowOps(this.peer, this.flowId, this.model)
+        this.tray := EditorTray(this, this.headless)
+        if (this.headless) {
             this.driver := EditorDriver(this, this.model)
+            this.flowOps.ask := this.driver      ; the questions of the flow commands are answered by the test
+        }
     }
 
     OnReady() {
@@ -56,8 +64,10 @@ class Editor extends Role {
             this._Log("a1", "editor", this.name " ready" (this.headless ? " (headless)" : ""))
             if (!this.headless) {
                 this.window := EditorWindow(this)
+                this.flowOps.ask := this.window
                 this.window.Show()
             }
+            this.tray.Start()              ; the icon of this editor (hidden with --headless), its menu, the window icon
         }
         this.model.Start()             ; subscriptions and the first resync; every reconnect asks again
     }
@@ -70,10 +80,11 @@ class Editor extends Role {
     OnSettings(settings) {
         if (IsObject(this.window))
             this.window.Refresh()
+        this._Tray()
     }
 
-    ; The close box of the window: the planned end of the editor.
-    _OnWindowClose() {
+    ; The planned end of the editor by the user: the close box of the window and the tray menu (Close, as the close box).
+    CloseEditor() {
         this._EndPlanned("closed")
     }
 
@@ -94,6 +105,8 @@ class Editor extends Role {
         this.tornDown := true
         SetTimer(this.frameFn, 0)
         this.frameScheduled := false
+        if (IsObject(this.tray))
+            this.tray.Stop()
         if (IsObject(this.window)) {
             this.window.Close()
             this.window := ""
@@ -124,6 +137,7 @@ class Editor extends Role {
                 this._OnEnded(data)
             case "state":
                 this._Status()
+                this._Tray()
                 this._Repaint()
             case "view":
                 this._Status()
@@ -132,10 +146,23 @@ class Editor extends Role {
                 if (IsObject(this.window))
                     this.window.Refresh()
                 this._Status()
+                this._Tray()
                 this._Repaint()
             case "log":
                 this._Log("a1", "editor", this.name " " data)
         }
+    }
+
+    ; The icon, the tooltip and the menu follow the flow state and its name (REQ-EDT-230).
+    _Tray() {
+        if (IsObject(this.tray))
+            this.tray.Refresh()
+    }
+
+    ; cmd.editor.show and the tray entry Show: the window comes to the front (without a window nothing happens).
+    ShowWindow() {
+        if (IsObject(this.window))
+            this.window.Raise()
     }
 
     ; The status bar follows the view, the flow and the states (WI-0090); headless there is no bar.
@@ -199,8 +226,7 @@ class Editor extends Role {
 
     ; cmd.editor.show (PROTOCOL 4.11): the window comes to the front. Without a window only the call is recorded.
     _OnShow(msg) {
-        if (IsObject(this.window))
-            this.window.Raise()
+        this.ShowWindow()
         return Map("ok", true)
     }
 
@@ -218,6 +244,7 @@ class Editor extends Role {
         info["lastFrameMs"] := r["lastFrameMs"]
         info["slowestFrameMs"] := r["slowestFrameMs"]
         info["rebuilds"] := r["rebuilds"]
+        info["tray"] := IsObject(this.tray) ? this.tray.State() : Map()
         return info
     }
 }

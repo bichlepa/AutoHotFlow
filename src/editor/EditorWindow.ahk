@@ -3,10 +3,13 @@
 #Include ..\core\Lang.ahk
 #Include ..\core\Time.ahk
 #Include ..\ui_common\UiWindow.ahk
+#Include ..\ui_common\UiDialogs.ahk
 #Include render\Renderer.ahk
 #Include FlowHitTest.ahk
 #Include FlowStatus.ahk
 #Include FlowTooltip.ahk
+#Include EditorFlowOps.ahk
+#Include EditorTray.ahk
 
 ; The window of the editor (WI-0088, REQ-EDT-010, REQ-EDT-020, ARCHITECTURE 2.1): a UiWindow whose client area shows the
 ; back buffer of the renderer. The window copies the back buffer in WM_PAINT and answers WM_ERASEBKGND itself, so nothing
@@ -62,7 +65,9 @@ class EditorWindow {
         this.win := UiWindow("editor", "Editor", width, height)
         this.hwnd := this.win.Hwnd
         this.status := this.win.Gui.Add("StatusBar")
-        this.win.onClose := () => this.role._OnWindowClose()
+        this.win.onClose := () => this.role.CloseEditor()
+        this.iconState := ""          ; the state of the icon in use (SetIcon)
+        this.icons := []              ; the icon handles of the window (big, small), freed when replaced or closed
         this.paintFn := (wParam, lParam, msg, hwnd) => this._OnPaint(hwnd)
         this.eraseFn := (wParam, lParam, msg, hwnd) => this._OnErase(hwnd)
         this.sizeFn := (wParam, lParam, msg, hwnd) => this._OnSize(lParam, hwnd)
@@ -100,6 +105,53 @@ class EditorWindow {
     }
 
     Visible => this.win.Visible
+
+    ; The icon of the window is the icon of the flow state (REQ-EDT-230, the same as the tray icon): big and small, at the DPI of
+    ; the window. The handles are freed when the icon changes and at Close. A state that is already shown does nothing.
+    SetIcon(state) {
+        if (this.closed || state = this.iconState)
+            return
+        dpi := DllCall("user32\GetDpiForWindow", "ptr", this.hwnd, "uint")
+        if (dpi <= 0)
+            dpi := 96
+        file := EditorTray.IconFile(state)
+        big := EditorWindow._LoadIcon(file, Round(32 * dpi / 96))
+        small := EditorWindow._LoadIcon(file, Round(16 * dpi / 96))
+        if (big = 0 || small = 0) {
+            this.role._Log("a0", "editor", "window icon not loaded: " file)
+            EditorWindow._DestroyIcon(big)
+            EditorWindow._DestroyIcon(small)
+            return
+        }
+        this.iconState := state
+        WM_SETICON := 0x0080
+        DllCall("user32\SendMessageW", "ptr", this.hwnd, "uint", WM_SETICON, "ptr", 1, "ptr", big)     ; ICON_BIG
+        DllCall("user32\SendMessageW", "ptr", this.hwnd, "uint", WM_SETICON, "ptr", 0, "ptr", small)   ; ICON_SMALL
+        this._FreeIcons()
+        this.icons := [big, small]
+    }
+
+    static _LoadIcon(file, size) => LoadPicture(file, "w" size " h" size, &imageType)
+
+    static _DestroyIcon(handle) {
+        if (handle)
+            DllCall("user32\DestroyIcon", "ptr", handle)
+    }
+
+    _FreeIcons() {
+        for handle in this.icons
+            EditorWindow._DestroyIcon(handle)
+        this.icons := []
+    }
+
+    ; The question of a flow command (EditorFlowOps.ask): a dialog of the window, answered once by done(yes).
+    Confirm(kind, args, done) {
+        keys := EditorFlowOps.ASK[kind]
+        opened := UiDialogs.Confirm(this.hwnd, keys[1], keys[2], [["yes", "Yes"], ["no", "No"]]
+            , (answered, id) => done(answered && id = "yes"), args*)
+        if (!opened)
+            done(false)
+    }
 
     ; The title: "AutoHotFlow <Editor> - <flow name>" (the flow ID while the name is not known).
     Refresh() {
@@ -368,5 +420,6 @@ class EditorWindow {
             this.canvas := ""
         }
         this.win.Close()
+        this._FreeIcons()
     }
 }

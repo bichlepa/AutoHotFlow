@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; No tray icon yet (E0046): the editor's own icon comes with WI-0091 (REQ-EDT-230); until then this entry hides it.
+; The directive hides the icon the script would get by default (E0046, E0075); the editor's own icon is shown by its code,
+; EditorTray.Start (REQ-EDT-230, WI-0091).
 #NoTrayIcon
 
 ; Entry script of the role editor (doc/ARCHITECTURE.md D0012, E0041, WI-0088). The editor shows one flow (PROTOCOL 4.11).
