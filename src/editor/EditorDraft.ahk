@@ -149,7 +149,7 @@ class EditorDraft {
         eps := EditorDraft.VIEW_EPSILON
         if (Abs(saved.Zoom - view.Zoom) < eps && Abs(saved.OffsetX - view.OffsetX) < eps
                 && Abs(saved.OffsetY - view.OffsetY) < eps) {
-            EditorDraft._Call(done, true)
+            this._AfterQueue(done)
             return
         }
         settings := Map("zoomFactor", Format("{:f}", view.Zoom), "Offsetx", Format("{:f}", view.OffsetX)
@@ -158,6 +158,23 @@ class EditorDraft {
         res := this.Commit(ops, false, done)
         if (!res["ok"])
             EditorDraft._Call(done, false)
+    }
+
+    ; done(ok) is called when the patches that wait now are answered (at once when none is). The editor says bye only then
+    ; (a change shortly before closing must not get lost behind a view that needs no patch).
+    _AfterQueue(done) {
+        if (this.queue.Length = 0) {
+            EditorDraft._Call(done, true)
+            return
+        }
+        last := this.queue[this.queue.Length]
+        before := last["done"]
+        last["done"] := (ok) => EditorDraft._Both(before, done, ok)
+    }
+
+    static _Both(first, second, ok) {
+        EditorDraft._Call(first, ok)
+        EditorDraft._Call(second, ok)
     }
 
     ; --- selection -------------------------------------------------------------------------------------------------------

@@ -370,6 +370,38 @@ CommitBeforeTheDefinitionIsBusy() {
     Assert.Equal(peer.Count("cmd.flow.patch"), 0, "nothing sent")
 }
 
+; A view that needs no patch still waits for the patches that are on their way (the flush before the bye).
+UnchangedViewWaitsForTheQueue() {
+    t := Setup()
+    d := t["draft"]
+    box := Map("answered", "")
+    d.Commit([AddAction(NEW)])
+    d.SaveView(EditorView.FromFlowSettings(d.root["flowSettings"]), (ok) => box["answered"] := ok)
+    Assert.Equal(box["answered"], "", "not done while the edit is on its way")
+    t["peer"].Answer("cmd.flow.patch", Map("ok", 1, "rev", 2))
+    Assert.Equal(box["answered"], true, "done when the edit is answered")
+}
+
+; Undo of a change of the default trigger: the inverse sets the old default again and clears the new one (FlowPatch.Diff),
+; and the draft ends in the state before the change. FlowPatch does not promise exactly one default by itself.
+UndoOfADefaultTriggerChange() {
+    t := Setup()
+    d := t["draft"], peer := t["peer"]
+    second := "element0000000005"
+    d.Commit([Map("op", "element.add", "element", Map("ID", second, "type", "trigger", "class", "Trigger_Manual"
+        , "package", "Default", "packageVersion", "1", "x", 0, "y", 0, "name", "Manual 2", "StandardName", "Manual 2"
+        , "pars", Map(), "DefaultTrigger", Json.False))])
+    peer.Answer("cmd.flow.patch", Map("ok", 1, "rev", 2))
+    d.Commit([Map("op", "element.update", "id", second, "fields", Map("DefaultTrigger", Json.True))])
+    peer.Answer("cmd.flow.patch", Map("ok", 1, "rev", 3))
+    Assert.True(d.Undo()["done"], "undo goes")
+    ops := peer.Open("cmd.flow.patch")["payload"]["ops"]
+    Assert.Equal(ops.Length, 2, "the inverse sets the old default and clears the new one in one patch")
+    els := d.root["allElements"]
+    Assert.True(els[TRIGGER]["DefaultTrigger"] = "1" || els[TRIGGER]["DefaultTrigger"] = Json.True, "the old default is back")
+    Assert.True(els[second]["DefaultTrigger"] = Json.False, "the new one is no default any more")
+}
+
 TestRun.Case("Editor draft: a commit is sent as one patch and taken at its answer", CommitSendsOnePatch)
 TestRun.Case("Editor draft: patches wait in the queue, one in flight", PatchesWaitInTheQueue)
 TestRun.Case("Editor draft: undo sends the inverse, redo the operations again", UndoAndRedoSendTheInverseAndTheOperations)
@@ -390,4 +422,6 @@ TestRun.Case("Editor draft: a new epoch clears the queue and both stacks", NewEp
 TestRun.Case("Editor draft: new IDs come from the counter of the draft", NewIdsComeFromTheCounter)
 TestRun.Case("Editor draft: a commit before the definition is busy", CommitBeforeTheDefinitionIsBusy)
 
+TestRun.Case("Editor draft: undo of a change of the default trigger", UndoOfADefaultTriggerChange)
+TestRun.Case("Editor draft: an unchanged view waits for the queue", UnchangedViewWaitsForTheQueue)
 TestRun.Finish()
