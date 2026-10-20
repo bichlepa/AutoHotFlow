@@ -214,6 +214,8 @@ TEST_GROUPS = {
     "fault/test_editor_window.py": ["editor"],
     "fault/test_editor_tray_icon_gui.py": ["editor"],
     "fault/test_editor_mouse_gui.py": ["editor"],
+    "e2e/test_editor_crash_notice.py": ["editor", "tray"],
+    "fault/test_editor_crash_notice_gui.py": ["editor", "tray"],
 }
 
 # Element source file -> the tests that cover exactly that element: a test file (a unit or a whole file) or a single
