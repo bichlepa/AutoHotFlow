@@ -96,6 +96,9 @@ def expand_element_states(msg):
         single = dict(msg)
         single["type"] = "evt.element.state"
         single["payload"] = dict(entry, flowId=payload.get("flowId"))
+        for key in ("seq", "epoch"):               # the sequence fields of the batch are in its payload
+            if key in payload:
+                single["payload"][key] = payload[key]
         out.append(single)
     return out
 

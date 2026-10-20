@@ -96,9 +96,16 @@ def trace(obs, since=0):
 
 def trace_events(obs, s0):
     """(type, seq) of the engine events with seq above s0 that the manager has seen, in arrival order."""
-    return [(e["type"], e["payload"]["seq"]) for e in trace(obs)
-            if e["type"].startswith("evt.") and "seq" in e["payload"] and e["payload"]["seq"] > s0
-            and e["type"] != "evt.log.entry"]
+    out = [(e["type"].replace("evt.element.states", "evt.element.state"), e["payload"]["seq"]) for e in trace(obs)
+           if e["type"].startswith("evt.") and "seq" in e["payload"] and e["payload"]["seq"] > s0
+           and e["type"] != "evt.log.entry"]
+    return dedupe_batches(out)
+
+
+def dedupe_batches(events):
+    """WI-0089: an evt.element.states batch is one event with one seq; the observer sees it as one evt.element.state per
+    element (same seq). Equal neighbours are one event."""
+    return [ev for i, ev in enumerate(events) if i == 0 or ev != events[i - 1]]
 
 
 def connect_obs(pipe, timeout=20.0):
@@ -220,18 +227,19 @@ def test_headless_manager_records_every_skeleton_event_in_order(procs, datadir, 
                 if str(m.get("to", "")).startswith("topic:") and m.get("type", "").startswith("evt.") \
                         and "seq" in p and p["seq"] > s0 and m["type"] != "evt.log.entry":
                     out.append((m["type"], p["seq"]))
-            return out
+            return dedupe_batches(out)
 
-        # The skeleton run has 10 events from the engine (instance started, flow state, 3 x running and
-        # finished, instance ended, flow state). Wait for all of them at the observer ...
-        assert wait_until(lambda: len(relevant_observed()) >= 10, 10), relevant_observed()
+        # The skeleton run: instance started, flow state, the element state batches (WI-0089: how many depends on the
+        # timing, at least one), instance ended, flow state. Wait for the last flow state at the observer ...
+        assert wait_until(lambda: sum(1 for t, _ in relevant_observed() if t == "evt.flow.state") >= 2, 10),             relevant_observed()
         observed = relevant_observed()
         # ... and until the manager has recorded as many.
         assert wait_until(lambda: len(trace_events(obs, s0)) >= len(observed), 10),             "the manager recorded fewer events than the observer saw"
         types = [t for t, _ in observed]
         assert types[0] == "evt.instance.started", types
         assert types[-1] == "evt.flow.state", types
-        assert types.count("evt.element.state") == 6, types      # 3 elements, running and finished each
+        assert 1 <= types.count("evt.element.state") <= 6, types   # batches of the 3 elements (WI-0089)
+        assert types.index("evt.element.state") < types.index("evt.instance.ended"), types   # states before the end
 
         # The manager's record (in the order it received the events) is the proof.
         seen = trace_events(obs, s0)
