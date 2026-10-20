@@ -8,7 +8,7 @@ None open. Answered on 2026-10-20: the look of the editor is accepted (E0088), t
 
 ## Manual checks
 
-- **Manual check 9 (S0005, editor):** you did the steps by hand and the `gui` tests of part D pass. What is left: write the result into the section "Result" of `doc/MANUAL-CHECKS.md` (or tell the orchestrator), in particular the `WINDOW` line of the measurement with a window at 1920x1080 (mean below 16 ms for R0002 / REQ-PRF-060) and whether a 4K screen was available (step 25). With that, S0005 is accepted and the requirements that depend on the check can go from `partial` to `done` where the evidence exists.
+- **Manual check 9 (S0005):** done on 2026-10-20 (record in `doc/MANUAL-CHECKS.md`). Step 25 (4K window measurement) was not run: you have no 4K screen. Nothing waits.
 - The manual checks of S0004 passed on 2026-10-19. Not covered by that record: whether v1 or 7-Zip opens an `.ahf` file written by v2 (F-0129), and the German manager texts (`assets/language/manager/de.ini`).
 
 ## To know
