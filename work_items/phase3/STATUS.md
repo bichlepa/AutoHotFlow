@@ -10,14 +10,14 @@ Kept by the orchestrator as described in `doc/ORCHESTRATOR.md`. This file shows 
 | S0002 Element foundation and core set | WI-0044 to WI-0058 | done (acceptance WI-0058, 2026-10-16) |
 | S0003 Trigger host and triggers | WI-0060 to WI-0068 | done (acceptance WI-0067, 2026-10-17) |
 | S0004 UI foundation and manager | WI-0069 to WI-0082 | done (acceptance WI-0082 on 2026-10-19; the manual checks of the owner passed on 2026-10-19) |
-| S0005 Editor I: display | WI-0083 to WI-0092 | detailed on 2026-10-19 (E0085 to E0088), not started |
+| S0005 Editor I: display | WI-0083 to WI-0092 | all work items integrated; waiting for the manual check 9 and decisions of the owner |
 | S0006 to S0010 | | rough, see the plan |
 
 Step-independent: WI-0059 (test admission, load report, run history) is done. Step S0008 (remaining elements) is planned, not started.
 
 ## Work items of the next step
 
-WI-0092 is running (WI-0085 to WI-0090 and the look corrections are integrated). WI-0092 (acceptance) must list the `gui` test for real mouse input (task 7 of WI-0090: wheel and drag with SendInput, VS Code task) and the check of the status bar layout.
+WI-0092: agent part integrated, the owner closes S0005 (WI-0085 to WI-0090 and the look corrections are integrated). WI-0092 (acceptance) must list the `gui` test for real mouse input (task 7 of WI-0090: wheel and drag with SendInput, VS Code task) and the check of the status bar layout.
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
@@ -30,7 +30,7 @@ WI-0092 is running (WI-0085 to WI-0090 and the look corrections are integrated).
 | WI-0089 | Live states, marks and the event load | done | haiku | see git log (WI-0089), tip bfcdc7f9 | 2026-10-20 | review approved with fixes; batch per flow decided by the owner (evt.element.states); slow 204 and foundation 471 green; the restart test of the editor was a wrong test assumption (F-0155, fixed); F-0150 closed, F-0156 open; window latency measurement is for the owner |
 | WI-0090 | View: zoom, move, tooltip, status bar, DPI | done | haiku | see git log (WI-0090), tip 26de7a68 | 2026-10-20 | review approved with one fix (drag ends without a button); gui test of real mouse input and the status bar layout on screen are left to WI-0092; F-0157 |
 | WI-0091 | Tray icon and tray menu of the editor | done | haiku | see git log (WI-0091), tip 9b3267ca | 2026-10-20 | review approved with one fix (F-0158 recorded); gui test written, not run |
-| WI-0092 | Acceptance S0005 | running | haiku | | | workspace wi-92; manual check of the owner |
+| WI-0092 | Acceptance S0005 | agent part done, waiting for the owner | haiku | see git log (WI-0092), tip 477e762a | 2026-10-20 | review approved with fixes; REQ-PRF-060 unmet for 300 changing elements (F-0156); manual check 9 and the decisions in NEEDS-ATTENTION wait for the owner; result in WI-0092-result-s5.md |
 
 ## Pending integrations
 
@@ -41,6 +41,8 @@ None.
 WI-0089 implementer (haiku), workspace wi-89.
 
 ## Last verified state
+
+Commit `477e762a` (WI-0092 agent part integrated, all tiers): fast 1785 passed (1 skipped), foundation 471, slow 204, VERDICT green (runs 20261020-205058-477e762a, -2, -3). Stress: 33 passed (run 20261020-203757-cc86de86).
 
 Commit `9b3267ca` (WI-0090, WI-0091 and the look corrections integrated, all tiers): foundation 471 and slow 204 green, fast 1782 passed, 3 failed under load (`test_worker_lifecycle` cold start, `test_settings` log thresholds, `test_worker` not busy after a cancel; all green alone in recheck 20261020-195141-recheck): load flakes; VERDICT red only by those (runs 20261020-193737-9b3267ca, -2, -3).
 
