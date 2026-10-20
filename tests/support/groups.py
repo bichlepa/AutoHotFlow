@@ -173,10 +173,20 @@ def smoke_tests(areas):
     return sorted(key for key, values in SMOKE_FOR.items() if set(values) & set(areas))
 
 
-def _add_source(sel, path):
+def _unknown(sel, path, removed):
+    """A path without a rule. A path that the ref deleted has nothing left to classify: no test can read it through its
+    own rule, but a deletion can break any test, so it selects everything. Any other unknown path is an error."""
+    if path not in removed:
+        raise UnknownPathError(path)
+    sel.everything = True
+    sel.reasons.append((path, "deleted and no rule: everything"))
+
+
+def _add_source(sel, path, removed=()):
     area = area_of(path)
     if area is None:
-        raise UnknownPathError(path)
+        _unknown(sel, path, removed)
+        return
     if area == EVERYTHING_AREA:
         sel.everything = True
         sel.reasons.append((path, "base-hub: everything"))
@@ -204,7 +214,7 @@ def is_test_file(path):
     return key in TEST_GROUPS or key.endswith(".test.ahk") or Path(key).name.startswith("test_")
 
 
-def _add_test_path(sel, path):
+def _add_test_path(sel, path, removed=()):
     key = path[len("tests/"):]
     if path == "tests/test_ahk_runner.py":
         sel.everything = True
@@ -213,7 +223,7 @@ def _add_test_path(sel, path):
         sel.files.add(key)
         sel.reasons.append((path, "the test itself"))
     else:       # helpers, data, support and AHK libraries: OTHER_RULES says which tests read them
-        _add_other(sel, path)
+        _add_other(sel, path, removed)
 
 
 def other_rule(path):
@@ -227,10 +237,11 @@ def other_rule(path):
     return None
 
 
-def _add_other(sel, path):
+def _add_other(sel, path, removed=()):
     rule = other_rule(path)
     if rule is None:
-        raise UnknownPathError(path)
+        _unknown(sel, path, removed)
+        return
     pattern, rule_groups = rule
     if rule_groups is None:
         sel.everything = True
@@ -252,17 +263,19 @@ def classified(path):
     return other_rule(path) is not None
 
 
-def select(paths):
-    """The Selection for a list of changed paths (repo-relative, forward slashes)."""
+def select(paths, removed=()):
+    """The Selection for a list of changed paths (repo-relative, forward slashes). removed: the paths that the change
+    deletes (removed_paths); a deleted path needs no rule of its own (see _unknown)."""
     sel = Selection()
+    removed = set(removed)
     relevant = [p for p in paths if not p.startswith(IGNORED_PREFIXES)]
     for path in relevant:
         if path.startswith("src/"):
-            _add_source(sel, path)
+            _add_source(sel, path, removed)
         elif path.startswith("tests/"):
-            _add_test_path(sel, path)
+            _add_test_path(sel, path, removed)
         else:
-            _add_other(sel, path)
+            _add_other(sel, path, removed)
     if relevant:
         sel.groups.update(ALWAYS_GROUPS)
     return sel
@@ -285,6 +298,17 @@ def changed_paths(ref, repo=REPO):
     paths = run("diff", "--name-only", "--no-renames", ref)
     paths += run("ls-files", "--others", "--exclude-standard")
     return sorted({p for p in paths if p})
+
+
+def removed_paths(ref, repo=REPO, base=None):
+    """Files that the change deletes: deleted in the working tree against ref (base None), or between base and ref.
+    A rename shows as a deletion of the old path (changed_paths uses --no-renames)."""
+    args = ["diff", "--name-only", "--diff-filter=D", "--no-renames"]
+    args += [base + ".." + ref] if base else [ref]
+    proc = subprocess.run(["git", *args], cwd=str(repo), capture_output=True)
+    if proc.returncode != 0:
+        raise RuntimeError("git %s failed: %s" % (" ".join(args), proc.stderr.decode("utf-8", "replace").strip()))
+    return sorted({p for p in proc.stdout.decode("utf-8", "replace").splitlines() if p})
 
 
 def test_key(rel_path, ahk_file=None):

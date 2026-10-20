@@ -117,6 +117,12 @@ def changed_paths(repo, base, sha):
     return [line for line in out.splitlines() if line]
 
 
+def removed_paths(repo, base, sha):
+    """The paths that the change between base and sha deletes (a rename's old path included, --no-renames)."""
+    out = git(repo, "diff", "--name-only", "--diff-filter=D", "--no-renames", "%s..%s" % (base, sha))
+    return [line for line in out.splitlines() if line]
+
+
 def on_record_branch(repo, sha):
     """True when sha is RECORD_BRANCH or one of its ancestors. A run of a branch is never the base of --auto."""
     proc = subprocess.run(["git", "merge-base", "--is-ancestor", sha, RECORD_BRANCH], cwd=str(repo),
@@ -150,11 +156,11 @@ def write_state(path, data):
 
 # --- deciding what to run ---------------------------------------------------------------------------
 
-def select_tiers(changed):
-    """The tiers for a list of changed paths, or ([], reason) when nothing has to run."""
+def select_tiers(changed, removed=()):
+    """The tiers for a list of changed paths, or ([], reason) when nothing has to run. removed: the deleted paths."""
     if not changed:
         return [], "no change"
-    sel = groups.select(changed)
+    sel = groups.select(changed, removed)
     if sel.is_empty():
         return [], "not read by any test"
     if sel.everything:
@@ -162,16 +168,16 @@ def select_tiers(changed):
     return [SELECT], None
 
 
-def decide(changed):
+def decide(changed, removed=()):
     """(tiers to run, skip reason or None). changed None means: no base known, run everything."""
     if changed is None:
         return list(TIERS), None
-    return select_tiers(changed)
+    return select_tiers(changed, removed)
 
 
-def selection_note(changed, base):
+def selection_note(changed, base, removed=()):
     """One line for the output that says what the groups chose."""
-    sel = groups.select(changed)
+    sel = groups.select(changed, removed)
     names = sorted(sel.groups - set(groups.ALWAYS_GROUPS))
     text = "selection: groups %s" % (", ".join(names) or "-")
     if sel.files:
@@ -325,13 +331,15 @@ def main(argv=None, runner=None, repo=REPO):
         state = read_state(state_file)
         skip_reason = None
         base = None
+        removed = []
         if args.auto:
             base = args.base or (state or {}).get("sha")
             changed = changed_paths(repo, base, sha) if base else None
-            tiers, skip_reason = decide(changed)
+            removed = removed_paths(repo, base, sha) if base else []
+            tiers, skip_reason = decide(changed, removed)
         notes = []
         if tiers == [SELECT]:
-            notes.append(selection_note(changed, base))
+            notes.append(selection_note(changed, base, removed))
         provisional = provisional_ids(repo, sha)
         if provisional:
             notes.append("provisional finding IDs in doc/OPEN-ITEMS.md: %s (renumber before integration)"

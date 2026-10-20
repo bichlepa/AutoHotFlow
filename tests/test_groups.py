@@ -205,6 +205,41 @@ def test_an_unknown_helper_or_data_file_is_an_error_not_a_full_run():
             groups.select([path])
 
 
+def test_a_deleted_file_without_rule_runs_everything_and_an_unknown_file_still_fails():
+    """A path that the change deletes has no rule any more (WI-0088 removed src/core/PlaceholderRole.ahk): that is
+    not an error, the deletion selects everything. A path that still exists and has no rule stays an error."""
+    path = "src/core/PlaceholderRole.ahk"
+    assert groups.select([path], [path]).everything
+    with pytest.raises(groups.UnknownPathError):
+        groups.select([path])
+
+
+def test_a_deleted_file_with_a_rule_selects_by_its_rule():
+    path = "src/storage/Storage.ahk"
+    sel = groups.select([path], [path])
+    assert not sel.everything and sel.accepts("integration/test_storage.py", "test_x")
+
+
+def test_a_range_with_a_deletion_is_selected_from_git_not_refused(tmp_path):
+    """The real case: a range of commits that deletes a source file. removed_paths lists the deletion, and the
+    selection of the range runs (no UnknownPathError)."""
+    def git(*args):
+        return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *args], cwd=str(tmp_path),
+                              capture_output=True, text=True, check=True).stdout
+    git("init", "-q")
+    (tmp_path / "src" / "core").mkdir(parents=True)
+    (tmp_path / "src" / "core" / "Gone.ahk").write_text("x\n", encoding="utf-8", newline="")
+    git("add", "-A")
+    git("commit", "-q", "-m", "add")
+    base = git("rev-parse", "HEAD").strip()
+    git("rm", "-q", "src/core/Gone.ahk")
+    git("commit", "-q", "-m", "delete")
+    removed = groups.removed_paths("HEAD", tmp_path, base=base)
+    assert removed == ["src/core/Gone.ahk"]
+    sel = groups.select(["src/core/Gone.ahk"], removed)
+    assert sel.everything
+
+
 def test_the_editor_files_have_their_own_areas_render_and_editor_geometry():
     assert groups.area_of("src/editor/render/GdipFont.ahk") == "render"
     assert groups.area_of("src/editor/Scene.ahk") == "editor-geometry"

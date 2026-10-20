@@ -131,11 +131,12 @@ def main(argv=None):
     if bool(args.paths) == bool(args.ref):
         parser.error("give paths, --from REF or --simulate")
     paths = groups.changed_paths(args.ref) if args.ref else [p.replace("\\", "/") for p in args.paths]
+    removed = groups.removed_paths(args.ref) if args.ref else ()
     if not paths:
         print("no changed files")
         return 0
     try:
-        sel = groups.select(paths)
+        sel = groups.select(paths, removed)
     except groups.UnknownPathError as e:       # an error, not a full run: the message says what to add
         print("select_tests: %s" % e, file=sys.stderr)
         return 2

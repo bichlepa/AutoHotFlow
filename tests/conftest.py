@@ -235,7 +235,8 @@ def _selection(config):
         if listed:
             return groups.select([p.strip() for p in listed.split(",") if p.strip()])
         if ref:
-            return groups.select(groups.changed_paths(ref, TESTS_DIR.parent))
+            return groups.select(groups.changed_paths(ref, TESTS_DIR.parent),
+                                 groups.removed_paths(ref, TESTS_DIR.parent))
     except RuntimeError as e:
         raise pytest.UsageError("--changed-from: %s" % e)
     except groups.UnknownPathError as e:
