@@ -52,8 +52,8 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0156 | The element states of a flow go out in batches: at most one `evt.element.states` per flow and 33 ms (WI-0089, owner decision). The message count is bounded for any flow. The size of a batch grows with the number of elements that change in one interval; for a flow of 300 elements at once it is not measured (MS-0047 measures a loop of three elements at the guard's limit: hub queue 0, latency p95 46 ms) | open, measured (MS-0050, WI-0092): a flow of 300 elements that all change in one interval sends 2 or 3 batches per start, the largest about 35 KB and up to 235 to 300 entries; the editor's latency is median 43.8 ms and p95 68.8 ms, above the 50 ms of REQ-PRF-060; the owner decides the next step (decision needed) | WI-0089 |
 | F-0157 | `tests/integration/test_pipe.py::test_abrupt_end_of_client_process_is_seen_within_500_ms[2]` is red under load: 1819 ms measured (budget 1500 ms) while the machine ran at 99 % CPU. A wall-clock latency assertion that is not covered by the admission of the test runs; not checked alone | open, verified (one red run under load); the owner decides whether it is a gui-tier or idle-tier test | WI-0090 |
 | F-0158 | The language files `assets/language/basic/de.ini`, `ko.ini` and `ru.ini` are UTF-16 LE with BOM and CRLF, but `LangTable` reads every language file as UTF-8, so these three languages are probably not loaded (`en.ini` and the `manager` folder are UTF-8 or ASCII) | open, verified by the file encodings and the `FileRead` calls; the effect at run time was not run | WI-0091 |
-| F-9001* | REQ-EDT-230: the table of the editor's tray menu says that "Close" asks the question about unsaved changes, but REQ-EDT-100 says that closing the editor asks nothing (a flow has no unsaved state). Manual check 9, step 15 expects no question | open, doc contradiction, owner decision | WI-0092 |
-| F-9002* | `tests/ahk/helpers/renderer_bench.ahk` under `#Warn All` warns about a local variable `type` (same name as a global) in `src/elements/Default/Triggers/Trigger_Start_up.ahk` line 47; the product does not run under `#Warn All`, so it is not checked whether the product shows it | open, low, verified by the bench output | WI-0092 |
+| F-0159 | REQ-EDT-230: the table of the editor's tray menu says that "Close" asks the question about unsaved changes, but REQ-EDT-100 says that closing the editor asks nothing (a flow has no unsaved state). Manual check 9, step 15 expects no question | open, doc contradiction, owner decision | WI-0092 |
+| F-0160 | `tests/ahk/helpers/renderer_bench.ahk` under `#Warn All` warns about a local variable `type` (same name as a global) in `src/elements/Default/Triggers/Trigger_Start_up.ahk` line 47; the product does not run under `#Warn All`, so it is not checked whether the product shows it | open, low, verified by the bench output | WI-0092 |
 | F-0153 | The tint of a running element is drawn after all elements, so where a running element overlaps a later element of the scene, the tint lies over that element; v1 draws the tint with its element, so the later element covers it | open, low; the sample flows show no such overlap, not checked on a larger flow | WI-0085 |
 
 ## Findings
@@ -303,12 +303,12 @@ None here. The decisions waiting for the project owner are in `NEEDS-ATTENTION.m
 
 Decisions on entries are in the summary table (status `decision needed`, `accepted`, `closed`) and in the status book `work_items/phase3/STATUS.md`, section "Decisions of the project owner".
 
-### F-9001*: The tray menu's "Close" and REQ-EDT-100 disagree about the question
+### F-0159: The tray menu's "Close" and REQ-EDT-100 disagree about the question
 
 **What:** REQ-EDT-230 (table of the tray menu) says that "Close" closes the editor "with the question about unsaved changes (REQ-EDT-100)". REQ-EDT-100 says that a flow has no unsaved state, so "closing the editor or the application asks nothing". Manual check 9, step 15 expects no question.
 **Status:** open; a decision of the project owner: either the question goes (as REQ-EDT-100 says) or the requirement names it again.
 
-### F-9002*: A warning of the renderer bench in a product script
+### F-0160: A warning of the renderer bench in a product script
 
 **What:** the renderer bench (`tests/ahk/helpers/renderer_bench.ahk`, `#Warn All`) reports `Warning: This local variable has the same name as a global variable` for `type` in `Trigger_Start_up.ahk` line 47 (function `Enable`). The bench includes the product's element classes; the product itself does not use `#Warn All`.
 **Status:** open, low; verified by the bench output, not checked whether the product shows the warning at run time.

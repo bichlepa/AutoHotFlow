@@ -53,15 +53,15 @@ Gui tests were not run (no `gui` marker in any run). The memory measurement (MS-
 
 1. **Batches of element states (design question from WI-0089, open):** inside one 33 ms batch the entries are in the order of the first change, so an instant element can come after its neighbour; and a fast element that repeats and fails shows only its last state in the batch. Decision needed: keep, or change (order by time of change, or count the failures).
 2. **F-0156 (decision needed):** the editor's latency for a flow of 300 elements that all change in one interval is median 43.8 ms and p95 68.8 ms (MS-0050). Options: a smaller batch interval, a state path without a scene build, or the render process of ARCHITECTURE 2.1. The owner decides which.
-3. **F-9001 (decision needed):** "Close" in the tray menu table of REQ-EDT-230 asks about unsaved changes, REQ-EDT-100 says closing asks nothing. Manual check 9, step 15 expects no question.
+3. **F-0159 (decision needed):** "Close" in the tray menu table of REQ-EDT-230 asks about unsaved changes, REQ-EDT-100 says closing asks nothing. Manual check 9, step 15 expects no question.
 4. **Manual check 9 (owner):** the look (step 3, E0088, with the screenshots), zoom, move, tooltip, live states, tray menu, scaling and the screen move; the three gui tests (part D); the window measurement (part E, 1920 × 1080 and 3840 × 2160).
 5. **F-0158 (open finding, owner):** `basic/de.ini`, `ko.ini` and `ru.ini` are UTF-16 but read as UTF-8; the languages are probably not loaded. Not fixed here.
 
 ## 6. Findings
 
 - **F-0156** (open, measured): see criterion 2 and section 5.
-- **F-9001*** (open, owner decision): see section 5.
-- **F-9002*** (open, low): the renderer bench warns about a local variable `type` (`Trigger_Start_up.ahk` line 47) under `#Warn All`.
+- **F-0159*** (open, owner decision): see section 5.
+- **F-0160*** (open, low): the renderer bench warns about a local variable `type` (`Trigger_Start_up.ahk` line 47) under `#Warn All`.
 - **F-0158** (open, not fixed here): see section 5.
 - **Own mistakes, fixed in this item:** (a) `cmd.editor.open` is reserved for the manager, so the first batch test could not open its editor; the test starts the editor itself. (b) The batch test read the batches of the client's expanded events; it groups them again by their sequence number. (c) The renderer bench had `#` comments and a load error that did not change the exit code of the chain (HOW-TO, drawing category).
 

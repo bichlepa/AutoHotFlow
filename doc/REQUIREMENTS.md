@@ -1731,7 +1731,7 @@ The element settings offer typical settings and examples of the element, which t
 ### REQ-EDT-230 Tray icon of an editor
 
 - **v1:** yes (read: one icon per open editor)
-- **v2:** partial (the icon, its tooltip and menu are built and tested headless, WI-0091; the real icon and the open menu: the gui test `tests/fault/test_editor_tray_icon_gui.py` (not run by agents) and manual check 9, part B (owner); the menu entry "Close" asks a question in the table below, which REQ-EDT-100 contradicts, see OPEN-ITEMS F-9001*)
+- **v2:** partial (the icon, its tooltip and menu are built and tested headless, WI-0091; the real icon and the open menu: the gui test `tests/fault/test_editor_tray_icon_gui.py` (not run by agents) and manual check 9, part B (owner); the menu entry "Close" asks a question in the table below, which REQ-EDT-100 contradicts, see OPEN-ITEMS F-0159)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0005 (icon and menu, E0087, WI-0091)
