@@ -49,6 +49,7 @@ OTHER_RULES = [
     ("tests/ahk/helpers/render_samples.ahk", ["render", "tools"]),   # the editor screenshots (VS Code task, WI-0085)
     ("tests/ahk/helpers/element_rate_bench.ahk", ["element-units", "engine"]),   # benches: run by hand (VS Code tasks)
     ("tests/ahk/helpers/loop_bench.ahk", ["element-units", "engine"]),
+    ("tests/ahk/helpers/flow_patch_bench.ahk", ["engine"]),   # the patch cost (WI-0093, MS-0051), run by hand
     ("tests/ahk/helpers/evalparams_bench.ahk", ["element-units", "expr"]),
     ("tests/ahk/helpers/expr_bench.ahk", ["expr"]),
     ("tests/ahk/helpers/expr_eval_bench.ahk", ["expr"]),
