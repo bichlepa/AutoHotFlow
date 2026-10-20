@@ -205,11 +205,11 @@ Relative paths in file and folder parameters refer to the working directory. Eac
 ### REQ-EXE-140 Every element and flow shows its state
 
 - **v1:** yes
-- **v2:** partial (the states are reported, and the engine gives all element states of a flow at once, `cmd.flow.runstate`, WI-0086; the manager holds the state of every flow, the tree shows the flows without their state until WI-0074; the editor shows a running element when it opens and while it runs, WI-0088; the fading of the recently run elements, the exception mark and the warnings come with WI-0089)
+- **v2:** done (the engine gives all element states of a flow at once, `cmd.flow.runstate`, WI-0086; the manager shows the state of every flow and its tree, WI-0074; the editor shows the running elements with the connection a thread took, the fade of a finished element, the exception look and the warnings, WI-0088 and WI-0089)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (manager), S0005 (editor)
-- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/ahk/manager_model.test.ahk` (the model of the manager), `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`, `tests/e2e/test_editor.py::test_an_editor_opened_while_the_flow_runs_shows_the_running_element`
+- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/ahk/manager_model.test.ahk` (the model of the manager), `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`, `tests/e2e/test_editor.py::test_an_editor_opened_while_the_flow_runs_shows_the_running_element`, `tests/e2e/test_editor.py::test_a_running_element_and_its_connection_are_tinted_and_fade_out_after_the_end`, `tests/e2e/test_editor.py::test_an_exception_keeps_the_element_marked_and_its_message_is_kept`, `tests/ahk/editor_model.test.ahk` (the fades and the exception look)
 
 Each element has a state (idle, running, finished, exception) and counts its runs. Each flow shows whether it is enabled and whether it runs, and its running and queued instances. Manager and editor show these states live, also a window that was opened later or that reconnected after a fault.
 
@@ -366,7 +366,7 @@ Each parameter is evaluated by its content type: `String` (with `%var%`), `RawSt
 ### REQ-VAR-100 Type errors: compatible or strict per flow
 
 - **v1:** no (only the lenient behaviour)
-- **v2:** partial (both modes work; the engine counts the warnings per element, WI-0086; the editor does not show them yet)
+- **v2:** done (both modes work; the engine counts the warnings per element, WI-0086; the editor shows them at the element, WI-0089)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (display of the warnings, WI-0086, WI-0089)
@@ -1637,11 +1637,11 @@ Execution policy (REQ-EXE-050), working directory (REQ-EXE-130), the type mode (
 ### REQ-EDT-150 Warnings of the evaluation are visible in the editor
 
 - **v1:** no
-- **v2:** partial (the engine counts the warnings per element and sends them, WI-0086; the editor does not show them yet)
+- **v2:** done (the engine counts the warnings per element and sends them, WI-0086; the editor shows the count at the element and the migration places as badges, WI-0089)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (counted per element by the engine, WI-0086; shown at the element, WI-0089)
-- **Evidence:** `tests/integration/test_engine_runstate.py::test_warnings_of_a_loop_are_counted_exactly_and_sent_coalesced`
+- **Evidence:** `tests/integration/test_engine_runstate.py::test_warnings_of_a_loop_are_counted_exactly_and_sent_coalesced`, `tests/e2e/test_editor.py::test_warnings_show_a_count_badge_and_migration_places_a_badge`, `tests/ahk/editor_model.test.ahk` (the warnings of one evaluation, one scene per frame)
 
 The `f1` warnings of an element (for example a type error in compatibility mode) are shown at the element in the editor (E0034). Also the places of a migrated flow that carry a MIGRATION ID (REQ-MIG-040).
 
@@ -2409,11 +2409,11 @@ While 200 big flows load, AutoHotFlow stays responsive: the engine answers a sna
 ### REQ-PRF-060 Editor redraw
 
 - **v1:** n/a
-- **v2:** partial (the frame part is measured: a state change of a flow with 300 elements takes 6.3 ms at 1920×1080 with the renderer; a rebuild of the static layer takes 106 ms at 1920×1080 and 152 ms at 3840×2160, F-0151; the way from the engine to the screen is not measured)
+- **v2:** partial (measured headless under the event load of a loop at the guard's limit: the time from the change to the end of its frame has median 34 ms and p95 46 ms, the editor answers at once and draws about 21 frames per second, MS-0047; the window on a real screen is not measured, a `gui` run is the owner's; the frame part of a flow with 300 elements: 6.3 ms, MS-0046; a rebuild of the static layer takes 106 ms at 1920×1080 and 152 ms at 3840×2160, F-0151)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
-- **Evidence:** `doc/MEASUREMENTS.md` (MS-0046, the renderer of `src/editor/render/`, one machine, 2026-10-19; the frame part only)
+- **Evidence:** `tests/stress/test_editor_event_load.py::test_the_editor_answers_and_draws_at_a_steady_rate_while_the_guard_stops_a_loop` (the latency and the rate, printed), `doc/MEASUREMENTS.md` (MS-0047; MS-0046, the renderer of `src/editor/render/`, the frame part only)
 
 A state change of the engine is visible in a non-blocked editor within 50 ms. A frame of a flow with 300 elements takes below 16 ms on average; otherwise drawing moves to its own process (risk R0002, `ARCHITECTURE.md` 2.1).
 

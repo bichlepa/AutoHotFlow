@@ -31,12 +31,12 @@ L402-413 9. Performance budgets (targets, measured in Phase 2)
 L415-425 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (143.7 KB, 669 lines)
+## doc/PROTOCOL.md (145.6 KB, 672 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-642 4. Message Catalog
+L95-645 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
@@ -50,10 +50,10 @@ L465-483   4.7 Dialogs
 L485-520   4.8 Manager (WI-0073, `src/manager/`)
 L522-584   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
 L586-603   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L605-642   4.11 Role `editor` (WI-0088, `src/editor/`)
-L644-663 5. Connection setup, reconnection, resync
-L654-663   5a Events before subscription (design question, WI-0007)
-L665-669 6. Versioning and extension
+L605-645   4.11 Role `editor` (WI-0088, `src/editor/`)
+L647-666 5. Connection setup, reconnection, resync
+L657-666   5a Events before subscription (design question, WI-0007)
+L668-672 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (55.3 KB, 338 lines)
@@ -124,7 +124,7 @@ L503-520   19.1 The subset that is compared
 L522-539   19.2 Deliberate deviations from native AutoHotkey v2
 ```
 
-## doc/MEASUREMENTS.md (54.3 KB, 196 lines)
+## doc/MEASUREMENTS.md (56.9 KB, 215 lines)
 ```text
 L11-21 Important: one machine, not an idle machine
 L23-76 Overview
@@ -133,6 +133,7 @@ L104-123 Open menus in a running process (WI-0072, E0064)
 L125-156 Frame of the editor renderer (WI-0083, R0002, MS-0044)
 L158-174 Frame and layer rebuild of the real renderer (WI-0085, E0090, MS-0046)
 L176-196 Not measured
+L198-215 Editor under the event load and the state scene (WI-0089, REQ-PRF-060, MS-0047)
 ```
 
 ## doc/CONVENTIONS.md (8.5 KB, 63 lines)

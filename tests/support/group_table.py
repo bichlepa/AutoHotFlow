@@ -161,6 +161,7 @@ TEST_GROUPS = {
     "stress/test_background_memory.py": ["supervisor", "manager"],
     "stress/test_big_flows.py": ["storage"],
     "stress/test_clients_churn.py": ["transport"],
+    "stress/test_editor_event_load.py": ["editor"],
     "stress/test_log_backlog.py": ["storage"],
     "stress/test_manager_big_flows.py": ["manager"],
     "stress/test_measurements.py": ["supervisor"],

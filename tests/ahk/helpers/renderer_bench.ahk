@@ -154,6 +154,14 @@ Main(args) {
             SceneBuilder.Build(raw, vw, RunStates(ids, A_Index & 1 ? 3 : 4))
             buildTimes.Push(Renderer.Now() - t0)
         }
+        ; WI-0089 (F-0150): the scene of a state change, Scene.WithStates (what the editor pays per frame with a state change)
+        withTimes := []
+        loop frames {
+            t0 := Renderer.Now()
+            sceneA.WithStates(vw, RunStates(ids, A_Index & 1 ? 3 : 4), Map(), A_Index + 1000)
+            withTimes.Push(Renderer.Now() - t0)
+        }
+        wsT := Stats(withTimes)
         snap := r.Snapshot()
         st := Stats(statesTimes)
         sm := Stats(sameTimes)
@@ -170,6 +178,9 @@ Main(args) {
             350, frames, warm, st["mean"], st["median"], st["p95"], st["max"], sm["mean"], sm["median"], sm["p95"],
             rebuilds, rb["mean"], rb["median"], rb["max"], bd["mean"], bd["max"], snap["rebuilds"], A_AhkVersion,
             A_OSVersion, EnvGet("NUMBER_OF_PROCESSORS"), times), resultFile)
+        FileAppend(Format("WITHSTATES view={1} width={2} height={3} elements=300 changed=60 frames={4} "
+            . "mean={5:.3f} median={6:.3f} p95={7:.3f} max={8:.3f}`n", view, W, H, frames, wsT["mean"], wsT["median"],
+            wsT["p95"], wsT["max"]), resultFile)
     } finally {
         r.Destroy()
         c.Destroy()

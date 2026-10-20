@@ -194,3 +194,22 @@ These points are missing from the measurements. The first group is listed in the
 - Effect of `FlushFileBuffers` on a power failure. Not testable in this setup.
 - Whether `OpenProcess` returns "access denied" (error 5) in practice.
 - Idle CPU as "sum of the processes in percent of one core". Decision E0005 applies the target to the whole system, so this reading is not a target any more.
+
+## Editor under the event load and the state scene (WI-0089, REQ-PRF-060, MS-0047)
+
+**What and how.** Two measurements of the editor's live states. (a) `tests/stress/test_editor_event_load.py` (VS Code task "Test: stress, serial, measurement (-m stress)"): a loop of inline elements (three elements, about two starts per pass) runs with the default guard of 50,000 element executions per minute while the editor is open (headless, a canvas of 800 × 600). The editor is asked every half second. The numbers are the frames of the editor per second, the latency of the frames (`cmd.test.state` `latency`: from the change at the editor to the end of its frame, the engine's own time is not in the event; the hub latency comes on top), the worst ping, and the queue of the editor's link in the hub. (b) `tests/ahk/helpers/renderer_bench.ahk` (WITHSTATES line): `Scene.WithStates` for a flow of 300 elements with 60 changed states, against the build of the scene.
+
+**Machine and code state.** Windows 11 Pro, 8 logical CPUs, one machine, run alone. The stress run was the only load. Code state: the batch per flow (`evt.element.states`, Executor, PROTOCOL 4.3) and the editor of WI-0089 as committed on `wip/wi-89` at the time of this entry (commit given in the work item's report).
+
+| Measurement | Result |
+|---|---|
+| Event load, the guard stops the loop after 8.5 s (the flow stopped by the guard, not by the test) | 182 frames, 21.4 per second (limit about 30) |
+| Latency of the frames (change to end of frame), 184 changes | median 34.4 ms, p95 46.4 ms (budget of REQ-PRF-060: below 50 ms) |
+| Worst answer to a ping during the load | 106 ms (limit 1 s) |
+| Hub queue of the editor's link | 0 frames at every sample |
+| Before the batch (the same load, first run) | the hub dropped the editor: `peer_gone` (`queue_overflow`), the editor was not answering |
+| `Scene.WithStates`, 300 elements, 60 changed, 1920 × 1080, 300 frames | mean 4.0 ms, median 4.2 ms, p95 4.4 ms, max 5.2 ms |
+| `SceneBuilder.Build` of the same flow (the old path, same run) | mean 18.7 ms, max 19.0 ms (MS-0046: 18 ms) |
+| Frame of the state change (same run, 30 running elements) | mean 6.2 ms, p95 7.0 ms |
+
+**Reading.** The batch per flow bounds the message rate of a loop at the guard's limit (about 30 batches per second for the flow), and the editor keeps up: the latency median is one frame interval, the p95 is below 50 ms. Not measured: the window (a real screen, a `gui` run, owner); a flow with 300 elements running at once (the batch then carries up to 300 entries per 33 ms; the message count stays bounded, the size is not measured, F-9001).
