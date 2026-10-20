@@ -11,6 +11,8 @@ is answered as running whenever it comes. The "running" cases still send their r
 The test roles of the supervisor (--test-roles) lower the editor limit (--editor-limit), so the limit needs no 21 processes.
 """
 
+import time
+
 import psutil
 import pytest
 
@@ -159,19 +161,32 @@ def test_a_flow_id_that_a_command_line_cannot_carry_is_bad_payload(procs, datadi
         finish(sup, obs)
 
 
-def test_the_editor_of_a_flow_that_just_died_is_started_again_and_its_slot_is_free(procs, datadir, session_id):
-    """A killed editor is not restarted. A request for its flow, sent at once, is answered as started (the death was
-    judged) or as busy (the end is not judged yet); the next request then starts it. The slot of the dead editor counts
-    for nothing: with a limit of one, the other flow gets its editor once the first is judged."""
+@pytest.mark.parametrize("pause_s", [0, 1], ids=["at-once", "judged-first"])
+def test_the_editor_of_a_flow_that_just_died_is_started_again_and_its_slot_is_free(procs, datadir, session_id, pause_s):
+    """A killed editor is not restarted by the supervisor; the next request for its flow starts a new one. A request sent
+    at once is answered ok as running (the end is not judged yet, cmd.editor.show goes nowhere) or as started (the end
+    was judged first). Either way the editor runs again as a new process. The slot of the dead editor counts for
+    nothing: with a limit of one, the other flow gets its editor once the first is judged. "judged-first" pauses so that
+    the supervisor has judged the end before the first request. The old test expected a started answer on a later request;
+    after a started answer the new editor runs, so that request is answered as running and the test failed (F-9000)."""
     sup, obs = start_manager(procs, datadir, session_id, extra=("--test-roles", "--editor-limit=1"))
     try:
         assert edit_results(obs, flowId=FLOW)[0][3] is True
         assert wait_until(lambda: process_states(obs).get(EDITOR, {}).get("state") == "ready", scaled(15))
-        psutil.Process(process_states(obs)[EDITOR]["pid"]).kill()
+        dead = process_states(obs)[EDITOR]["pid"]
+        psutil.Process(dead).kill()
+        if pause_s:
+            time.sleep(scaled(pause_s))
         first = edit_results(obs, flowId=FLOW)[0]
         assert first[1] is True or first[2] == "busy", first
-        assert wait_until(lambda: edit_results(obs, flowId=FLOW)[0][3] is True, scaled(15)), state(obs)["lastAnswer"]
-        assert wait_until(lambda: process_states(obs)[EDITOR]["state"] == "ready", scaled(15)), process_states(obs)[EDITOR]
+
+        def running_again():            # a running answer starts nothing, so the requests go on until a new one runs
+            if edit_results(obs, flowId=FLOW)[0][1] is not True:
+                return False
+            new = process_states(obs).get(EDITOR, {})
+            return new.get("state") == "ready" and new.get("pid") != dead
+
+        assert wait_until(running_again, scaled(15)), process_states(obs).get(EDITOR)
         assert process_states(obs)[EDITOR]["restarts"] == 0
     finally:
         finish(sup, obs)
