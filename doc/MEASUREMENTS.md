@@ -212,4 +212,4 @@ These points are missing from the measurements. The first group is listed in the
 | `SceneBuilder.Build` of the same flow (the old path, same run) | mean 18.7 ms, max 19.0 ms (MS-0046: 18 ms) |
 | Frame of the state change (same run, 30 running elements) | mean 6.2 ms, p95 7.0 ms |
 
-**Reading.** The batch per flow bounds the message rate of a loop at the guard's limit (about 30 batches per second for the flow), and the editor keeps up: the latency median is one frame interval, the p95 is below 50 ms. Not measured: the window (a real screen, a `gui` run, owner); a flow with 300 elements running at once (the batch then carries up to 300 entries per 33 ms; the message count stays bounded, the size is not measured, F-9001).
+**Reading.** The batch per flow bounds the message rate of a loop at the guard's limit (about 30 batches per second for the flow), and the editor keeps up: the latency median is one frame interval, the p95 is below 50 ms. Not measured: the window (a real screen, a `gui` run, owner); a flow with 300 elements running at once (the batch then carries up to 300 entries per 33 ms; the message count stays bounded, the size is not measured, F-0156).

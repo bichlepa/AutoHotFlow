@@ -168,7 +168,7 @@ def test_the_editor_of_a_flow_that_just_died_is_started_again_and_its_slot_is_fr
     was judged first). Either way the editor runs again as a new process. The slot of the dead editor counts for
     nothing: with a limit of one, the other flow gets its editor once the first is judged. "judged-first" pauses so that
     the supervisor has judged the end before the first request. The old test expected a started answer on a later request;
-    after a started answer the new editor runs, so that request is answered as running and the test failed (F-9000)."""
+    after a started answer the new editor runs, so that request is answered as running and the test failed (F-0155)."""
     sup, obs = start_manager(procs, datadir, session_id, extra=("--test-roles", "--editor-limit=1"))
     try:
         assert edit_results(obs, flowId=FLOW)[0][3] is True
