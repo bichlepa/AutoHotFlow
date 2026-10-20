@@ -211,7 +211,7 @@ class Supervisor {
         this.children := Children(config, this.hub)
         this.report := DiagReport(this.hub, this.children, () => this.Snapshot(), this.session)
         this.report.storageWaitMs := this.reportWaitMs
-        this.children.onIncident := (kind, name) => this.report.Auto(kind, name)
+        this.children.onIncident := (kind, name) => this._OnIncident(kind, name)
         this.heartbeat := Heartbeat(this.children, this.hub)
         this.shutdown := Shutdown(this.children, this.hub)
         this.shutdown.prepareLimitMs := this.prepareLimitMs
@@ -424,13 +424,25 @@ class Supervisor {
         throw AhfError("unknown command " msg.type, ErrCode.UNKNOWN_TYPE)
     }
 
+    ; An incident of a child (Children.onIncident): the crash report as before, and for an editor that ended
+    ; unexpectedly a notice (WI-0103, PROTOCOL 4.7, E0093). The editor is not restarted; the user reopens it.
+    _OnIncident(kind, name) {
+        this.report.Auto(kind, name)
+        if (kind = "crashed" && SubStr(name, 1, 7) = "editor:" && !this.children.shuttingDown) {
+            flowId := SubStr(name, 8)
+            this.hub.Publish("notice", "evt.ui.notice", Map("kind", "editor", "level", "error", "flowId", flowId
+                , "key", "Notice_editor_crashed", "args", [flowId], "held", 0))
+        }
+    }
+
     ; cmd.editor.open {flowId} (WI-0087, PROTOCOL 4.1): the manager asks for the editor of a flow, one editor per flow (D0002).
-    ; The flow is not checked here (the editor does it, WI-0088). A running editor is shown, not started a second time.
+    ; The tray asks too, for a click on the balloon of an editor notice (WI-0103). The flow is not checked here (the editor
+    ; does it, WI-0088). A running editor is shown, not started a second time.
     _OnEditor(msg) {
         if (msg.type != "cmd.editor.open")
             throw AhfError("unknown command " msg.type, ErrCode.UNKNOWN_TYPE)
-        if (msg.from != "manager")
-            throw AhfError(msg.type " is reserved for the manager, not for '" msg.from "'", ErrCode.DENIED)
+        if (msg.from != "manager" && msg.from != "tray")
+            throw AhfError(msg.type " is reserved for the manager and the tray, not for '" msg.from "'", ErrCode.DENIED)
         flowId := msg.payload.Get("flowId", "")
         if (!Children.FlowIdOk(flowId))
             throw AhfError("payload field 'flowId' must be a flow ID that a command line can carry", ErrCode.BAD_PAYLOAD)
