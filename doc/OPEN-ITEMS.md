@@ -16,7 +16,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 | ID | Title | Status | Phase 3 |
 |---|---|---|---|
-| F-9000 | `verify.py --auto` (also `select_tests.py --from`, `pytest --changed-from`) refused every range that deletes a file with "not classified by any test rule": a deleted path has no rule once it is gone (WI-0088 removed `src/core/PlaceholderRole.ahk`) | closed, verified (`tests/test_groups.py`, a deleted path selects everything) | tooling |
+| F-0154 | `verify.py --auto` (also `select_tests.py --from`, `pytest --changed-from`) refused every range that deletes a file with "not classified by any test rule": a deleted path has no rule once it is gone (WI-0088 removed `src/core/PlaceholderRole.ahk`) | closed, verified (`tests/test_groups.py`, a deleted path selects everything) | tooling |
 | F-0129 | A `.ahf` written by tar.exe is not read by 7-Zip or by v1 in any test (v1 writes a flat ZIP with 7-Zip, tar writes the same layout). Reading a real v1 `.ahf` is tested (`tests/data/ahf/v1_export_two_flows.ahf`) | open, WI-0081; ask the owner for a v1 file of another kind (more flows, statics) | WI-0081 |
 | F-0130 | Drag and drop of an `.ahf` file onto the manager and the file dialogs of the import and export are not automated (the gui tier is not run by agents) | open, WI-0081; only MANUAL-CHECKS part D checks them by hand | WI-0081 |
 | F-0131 | A name outside the ANSI code page may make the listing of tar fail: the listing is read as text in the ANSI code page, and a failed listing reads as "not a ZIP archive" | open, not reproduced (WI-0081) | WI-0081 |
@@ -230,7 +230,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **What:** the tint of a running element is drawn after all elements, so where it overlaps a later element of the scene, the tint lies over that element; v1 draws the tint with its element.
 **Status:** open, low (WI-0085); the sample flows show no such overlap, not checked on a larger flow.
 
-### F-9000: a range that deletes a file is refused by the selection
+### F-0154: a range that deletes a file is refused by the selection
 
 **What:** `verify.py --auto`, `select_tests.py --from REF` and `pytest --changed-from` take the changed paths of a range (`--no-renames`), and every path had to match a rule. A deleted file has no rule once it is gone (WI-0088 deleted `src/core/PlaceholderRole.ahk` and its `SOURCE_AREAS` entry), so each such range ended with `not classified by any test rule` and the verdict `error`. A rename's old path behaves the same way.
 **Fix:** a deleted path (from `groups.removed_paths`, `--diff-filter=D`) keeps its own rule when it has one (the groups of its area). A deleted path without a rule selects everything, because a deletion can break any test. A path that still exists and has no rule is still an error. Test: `tests/test_groups.py` (three tests, one with a real git repository in a temporary folder). Doc: `doc/TEST-GROUPS.md`, section 1.
