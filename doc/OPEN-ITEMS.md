@@ -17,8 +17,8 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | ID | Title | Status | Phase 3 |
 |---|---|---|---|
 | F-0162 | The frame of a drag of 30 elements in a flow of 300 is 25 ms at 1920 × 1080 (budget 16 ms); one element meets it (WI-0097, MS-0051) | decision needed, measured; WI-0097 | WI-0097 |
-| F-9002* | The rename of a flow (`cmd.flow.meta.update`) writes the file at once, from the revision of the request; a patch committed while storage writes it is in memory only until the next `cmd.flow.save` (WI-0093, meta race) | decision needed | S0006 (WI-0093) |
-| F-9003* | A patch that changes the text of an element that still waits for its class (`v1Text` marker) keeps the marker: the new v2 text is converted when the class appears (WI-0093) | decision needed | S0006 (WI-0093) |
+| F-0163 | The rename of a flow (`cmd.flow.meta.update`) writes the file at once, from the revision of the request; a patch committed while storage writes it is in memory only until the next `cmd.flow.save` (WI-0093, meta race) | decision needed | S0006 (WI-0093) |
+| F-0164 | A patch that changes the text of an element that still waits for its class (`v1Text` marker) keeps the marker: the new v2 text is converted when the class appears (WI-0093) | decision needed | S0006 (WI-0093) |
 | F-0154 | `verify.py --auto` (also `select_tests.py --from`, `pytest --changed-from`) refused every range that deletes a file with "not classified by any test rule": a deleted path has no rule once it is gone (WI-0088 removed `src/core/PlaceholderRole.ahk`) | closed, verified (`tests/test_groups.py`, a deleted path selects everything) | tooling |
 | F-0129 | A `.ahf` written by tar.exe is not read by 7-Zip or by v1 in any test (v1 writes a flat ZIP with 7-Zip, tar writes the same layout). Reading a real v1 `.ahf` is tested (`tests/data/ahf/v1_export_two_flows.ahf`) | open, WI-0081; ask the owner for a v1 file of another kind (more flows, statics) | WI-0081 |
 | F-0130 | Drag and drop of an `.ahf` file onto the manager and the file dialogs of the import and export are not automated (the gui tier is not run by agents) | open, WI-0081; only MANUAL-CHECKS part D checks them by hand | WI-0081 |
@@ -60,13 +60,13 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 ## Findings
 
-### F-9002*: A rename writes the file from the revision of its request
+### F-0163: A rename writes the file from the revision of its request
 
 **What:** `cmd.flow.meta.update` writes the whole flow file at once (E0065: a flow has no unsaved state). Since WI-0093 a patch can be committed while storage writes the file. The revision is then built on the current one (the meta race is fixed, `tests/integration/test_flow_patch.py::test_a_patch_committed_while_storage_writes_a_rename_is_kept`), but the file written at the request does not contain the patch until the next `cmd.flow.save`. A crash in that moment loses the patch, the rename is kept.
 **Options:** (a) the engine writes the file again after such a commit (a second write per rename in that case); (b) a rename waits for the patch, or a patch is refused while a rename is pending (`busy`, as for a deletion); (c) the editor saves automatically a few seconds after every edit (WI-0095), which narrows the window to those seconds. The text of E0065 says that the file is always current, so (a) or (b) fits it best.
 **Status:** decision needed (project owner). Found while planning WI-0093; the test documents the current behaviour.
 
-### F-9003*: A pending element keeps its marker when a patch changes its text
+### F-0164: A pending element keeps its marker when a patch changes its text
 
 **What:** an element whose class is not known yet keeps its v1 texts and the marker `v1Text` (E0021). WI-0093 keeps the marker when a patch changes the element (as the plan says). When the class appears, the loader converts the element's texts, which are then v2 texts that a conversion would change again, so the text the user typed may be converted as if it were v1.
 **Status:** assumed; the conversion of a changed text was not run. Decision needed: a patch of such an element should drop the marker (then the new text is kept as typed, and the class of the element gets its texts from the editor), or the editor refuses to edit such an element.
