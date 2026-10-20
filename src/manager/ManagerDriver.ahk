@@ -102,9 +102,10 @@ class ManagerDriver {
     ; the notice is not an editor notice (no request goes out).
     _OpOpenNotice(args, done) {
         n := args.Get("n", 0)
-        sent := this.model.OpenNoticeEditor(n, (ans) => done(Map("ok", true, "sent", true, "answer", ans)))
+        sent := this.model.OpenNoticeEditor(n, (ans) => done(Map("ok", Json.True, "sent", Json.True
+            , "answerOk", Json.Bool(ans.Get("ok", false)), "code", ans.Get("code", ""))))
         if (!sent)
-            done(Map("ok", true, "sent", false))
+            done(Map("ok", Json.True, "sent", Json.False))
     }
 
     _OpEdit(args, done) {

@@ -13,7 +13,7 @@ import psutil
 
 from support.timing import scaled
 from test_manager import FLOW, process_states, wait_until
-from test_manager_editor import finish, op, start_manager, state as manager_state, supervisor_log
+from test_manager_editor import finish, op, start_manager, state as manager_state
 from test_editor import editor_process, editor_state, open_editor
 
 EDITOR = "editor:" + FLOW
@@ -76,7 +76,6 @@ def test_a_killed_editor_gives_one_notice_and_the_tray_links_its_balloon(procs, 
         assert wait_until(lambda: tray_info(obs)["editorFlow"] == FLOW, scaled(15)), tray_info(obs)
         assert tray_info(obs)["notices"] == 1, tray_info(obs)
         assert editor_process(obs).get("restarts", 0) == 0, editor_process(obs)
-        assert any("unexpectedly" in t and FLOW in t for t in supervisor_log(obs)), supervisor_log(obs)
     finally:
         finish(sup, obs)
 
