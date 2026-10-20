@@ -70,8 +70,14 @@ class Executor {
     ; nest on the AutoHotkey stack (see the header), so the limit only bounds the instances that wait for each other.
     static MAX_CALL_DEPTH := 100
 
+    ; The state events of one element are at least this far apart (WI-0089): the editor draws at about 30 frames per second.
+    static EMIT_MS := 33
+
     __New(owner) {
         this._owner := owner
+        this._stateFlows := Map() ; flowId -> Map("recs", element records waiting for the batch, "sentAt") (_EmitElement, WI-0089)
+        this._stateScheduled := false  ; the timer of _StateTimer is set
+        this._stateFn := ObjBindMethod(this, "_StateTimer")
         this._runs := Map()       ; instanceId -> run (Map, see _NewRun)
         this._elems := Map()      ; flowId -> Map elementId -> element record (_Elem): state, countRuns (v1), warnings (WI-0086)
         this._elems.CaseSense := "Off"
@@ -375,6 +381,7 @@ class Executor {
         trigger.Vars["A_TriggerTime"] := A_Now
         trigger.Vars["A_TriggerID"] := triggerId
         this._SetTriggerVars(run, def, trigger)
+        this._SendFlow(flowId)                 ; the states of an earlier instance come before this start (PROTOCOL 4.3)
         this._owner.Emit("topic:flow:" flowId, "evt.instance.started", Map("flowId", flowId, "instanceId", instId))
         this._owner.EmitFlowState(flowId)
         this._ElementStarted(run, triggerId)
@@ -839,6 +846,7 @@ class Executor {
         } finally {
             Critical(prev)
         }
+        this._SendFlow(run["flowId"])          ; the element states of the flow come before its instance ends (PROTOCOL 4.3)
         this._owner.Emit("topic:flow:" run["flowId"], "evt.instance.ended"
             , Map("flowId", run["flowId"], "instanceId", instId, "reason", reason))
         this._owner.EmitFlowState(run["flowId"])
@@ -889,7 +897,8 @@ class Executor {
         rec := flow.Get(elementId, "")
         if (!IsObject(rec)) {
             rec := Map("flowId", flowId, "elementId", elementId, "state", "idle", "countRuns", 0, "lastRun", ""
-                , "message", "", "warnings", 0, "lastWarning", "", "dirty", false, "sentAt", -2000)
+                , "message", "", "warnings", 0, "lastWarning", "", "dirty", false, "sentAt", -2000
+                , "esDirty", false, "esSentAt", -2000, "esConn", "")
             flow[elementId] := rec
         }
         return rec
@@ -968,9 +977,13 @@ class Executor {
         flow := this._elems.Get(flowId, "")
         if (!IsObject(flow))
             return
-        for elementId, rec in flow
+        for elementId, rec in flow {
             rec["dirty"] := false
+            rec["esDirty"] := false
+        }
         this._elems.Delete(flowId)
+        if (this._stateFlows.Has(flowId))
+            this._stateFlows.Delete(flowId)
     }
 
     ; The states of the elements of a flow that ran or have warnings, for cmd.flow.runstate (PROTOCOL 4.2). The counts of an
@@ -984,6 +997,7 @@ class Executor {
             rec := flow[elementId]
             if (!def.HasElement(elementId)) {
                 rec["dirty"] := false
+                rec["esDirty"] := false
                 flow.Delete(elementId)
                 continue
             }
@@ -998,14 +1012,87 @@ class Executor {
         return list
     }
 
+    ; The state of an element (PROTOCOL 4.3, WI-0089) goes out in one batch per flow: evt.element.states with every element
+    ; that changed since the flow's last batch, each with its latest state. A flow sends at most one batch per EMIT_MS:
+    ; the first change of a quiet flow goes out at once, later changes wait for the interval and share one batch. The
+    ; editor's queue therefore grows with the batches (about 30 per second per flow), not with the element starts (the
+    ; event load of a loop at the guard's limit). The connection a thread took is kept until its batch is sent.
     _EmitElement(rec, connectionId) {
-        payload := Map("flowId", rec["flowId"], "elementId", rec["elementId"], "state", rec["state"]
-            , "countRuns", rec["countRuns"], "lastRun", rec["lastRun"])
-        if (rec["message"] != "")
-            payload["message"] := rec["message"]
         if (connectionId != "")
-            payload["connectionId"] := connectionId      ; the connection taken, on running only (PROTOCOL 4.3)
-        this._owner.Emit("topic:flow:" rec["flowId"], "evt.element.state", payload)
+            rec["esConn"] := connectionId
+        if (rec["esDirty"])
+            return                                 ; already waiting in the batch of its flow (it carries the latest state)
+        rec["esDirty"] := true                     ; the flag first: a timer that runs now does not drop the record
+        flow := this._StateFlow(rec["flowId"])
+        flow["recs"].Push(rec)
+        if (A_TickCount - flow["sentAt"] >= Executor.EMIT_MS) {
+            this._SendFlow(rec["flowId"])
+            return
+        }
+        this._ScheduleState()
+    }
+
+    _StateFlow(flowId) {
+        if (!this._stateFlows.Has(flowId))
+            this._stateFlows[flowId] := Map("recs", [], "sentAt", -2000)
+        return this._stateFlows[flowId]
+    }
+
+    ; One evt.element.states of a flow: its elements that changed (latest states, the connection a thread took on running).
+    _SendFlow(flowId) {
+        flow := this._stateFlows.Get(flowId, "")
+        if (!IsObject(flow))
+            return
+        recs := flow["recs"]
+        flow["recs"] := []
+        flow["sentAt"] := A_TickCount
+        list := []
+        for rec in recs {
+            if (!rec["esDirty"])
+                continue                           ; dropped by ForgetFlow
+            rec["esDirty"] := false
+            entry := Map("elementId", rec["elementId"], "state", rec["state"], "countRuns", rec["countRuns"]
+                , "lastRun", rec["lastRun"])
+            if (rec["message"] != "")
+                entry["message"] := rec["message"]
+            if (rec["esConn"] != "")               ; the connection of the start, also when the start and the end share the batch
+                entry["connectionId"] := rec["esConn"]
+            rec["esConn"] := ""
+            list.Push(entry)
+        }
+        if (list.Length)
+            this._owner.Emit("topic:flow:" flowId, "evt.element.states", Map("flowId", flowId, "elements", list))
+    }
+
+    _ScheduleState() {
+        if (this._stateScheduled)
+            return
+        this._stateScheduled := true
+        SetTimer(this._stateFn, -Executor.EMIT_MS)
+    }
+
+    ; Sends the batches of the flows whose interval is over; the others wait for the next run of the timer.
+    _StateTimer() {
+        this._stateScheduled := false
+        now := A_TickCount
+        waiting := false
+        for flowId, flow in this._stateFlows.Clone() {
+            if (!flow["recs"].Length)
+                continue
+            if (now - flow["sentAt"] < Executor.EMIT_MS) {
+                waiting := true
+                continue
+            }
+            this._SendFlow(flowId)
+        }
+        if (waiting)
+            this._ScheduleState()
+    }
+
+    ; Sends the batch of a flow now (the tests and the end of a flow use it; not needed by the rules above).
+    FlushStates() {
+        for flowId, flow in this._stateFlows.Clone()
+            this._SendFlow(flowId)
     }
 
     _OnSlow(flowId, classId, ms) {

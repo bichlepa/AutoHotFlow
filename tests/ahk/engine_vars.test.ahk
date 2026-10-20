@@ -180,7 +180,9 @@ CheckNestedLoops() {
         , LoopConn("c6", "L1", "after", "tail")]))
     Start(owner)
     Assert.Equal(VarLog.Values("body"), "1,2,3,1,2,3", "inner A_Index")
-    Assert.Equal(owner.ElementStates("L1"), "running finished running finished running finished")
+    ; WI-0089: the states of an element that change within one batch interval are coalesced; the batch carries the latest
+    ; state, so the sequence of the loop's runs is not visible here (the end is checked below and by the runstate tests).
+    Assert.Equal(owner.ElementStates("L1"), "finished")
     Assert.Equal(VarLog.Values("after"), "<none>", "no loop variable after the loops")
     Assert.Equal(owner.LastEndReason(), "finished")
 }

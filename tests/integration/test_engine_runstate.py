@@ -88,8 +88,9 @@ def test_the_connection_taken_is_sent_with_the_running_event_on_yes_and_no(flows
     assert run.reason == "finished"
     messages = flows.messages(mark)
     assert [p.get("connectionId") for p in element_events(messages, trigger.id, "running")] == [None]
-    assert [p.get("connectionId") for p in element_events(messages, cond.id, "running")] == [c_trigger]
-    assert [p.get("connectionId") for p in element_events(messages, yes.id, "running")] == [c_yes]
+    # WI-0089: the elements of this flow are instant, so start and end share a batch; the connection is on that entry
+    assert [p.get("connectionId") for p in element_events(messages, cond.id) if p.get("connectionId")] == [c_trigger]
+    assert [p.get("connectionId") for p in element_events(messages, yes.id) if p.get("connectionId")] == [c_yes]
     assert element_events(messages, no.id) == [], "the no branch must not run"
     assert c_no not in [p.get("connectionId") for p in element_events(messages, yes.id)]
 
@@ -107,13 +108,14 @@ def test_the_connections_of_a_loop_are_sent_for_the_entry_and_the_body(flows):
     mark, run = run_marked(flows, fb)
     assert run.reason == "finished"
     messages = flows.messages(mark)
-    body_runs = element_events(messages, body.id, "running")
-    assert len(body_runs) == 2
-    assert {p["connectionId"] for p in body_runs} == {c_head}
-    loop_runs = element_events(messages, loop.id, "running")
-    assert loop_runs[0]["connectionId"] == c_entry
-    assert {p["connectionId"] for p in loop_runs[1:]} == {c_back}
-    assert element_events(messages, after.id, "running")[0]["connectionId"] != c_head
+    # WI-0089: the body and the loop are instant, so their starts and ends share batches and one entry can stand for
+    # several runs (the latest connection); the connections seen are the ones of this loop
+    body_conns = {p["connectionId"] for p in element_events(messages, body.id) if p.get("connectionId")}
+    assert body_conns and body_conns <= {c_head}, body_conns
+    loop_conns = {p["connectionId"] for p in element_events(messages, loop.id) if p.get("connectionId")}
+    assert loop_conns and loop_conns <= {c_entry, c_back}, loop_conns
+    after_conns = {p["connectionId"] for p in element_events(messages, after.id) if p.get("connectionId")}
+    assert after_conns and c_head not in after_conns
 
 
 def test_warnings_of_a_loop_are_counted_exactly_and_sent_coalesced(flows):

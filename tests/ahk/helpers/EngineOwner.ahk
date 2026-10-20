@@ -89,7 +89,17 @@ class EngineOwner {
         this.executor := Executor(this)
     }
 
+    ; An evt.element.states batch (WI-0089) is recorded as one evt.element.state per element, as the tests read them.
     Emit(to, msgType, payload) {
+        if (msgType = "evt.element.states") {
+            for entry in payload["elements"] {
+                single := Map("flowId", payload["flowId"])
+                for key, value in entry
+                    single[key] := value
+                this.events.Push(Map("to", to, "type", "evt.element.state", "payload", single))
+            }
+            return
+        }
         this.events.Push(Map("to", to, "type", msgType, "payload", payload))
     }
 
@@ -115,8 +125,12 @@ class EngineOwner {
     }
 
     ; Dispatches until nothing is ready (one Tick does that, up to Executor.TICK_BATCH).
+    ; One step of the engine, then the element batches that wait for their interval are sent now (WI-0089): the tests do
+    ; not wait for the 33 ms timer, so a test sees every state as it did before the batches. A test that checks the timer
+    ; itself must not call Drive.
     Drive() {
         this.executor.Tick()
+        this.executor.FlushStates()
     }
 
     ; "type:n" of the evt.instance.* events, in order, "n" is the index of the instance in ids.

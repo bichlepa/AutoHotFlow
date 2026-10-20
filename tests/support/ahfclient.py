@@ -84,6 +84,22 @@ def wake(peer_hwnd):
     return bool(ctypes.windll.user32.PostMessageW(peer_hwnd, WM_AHF_WAKE, 0, 0))
 
 
+def expand_element_states(msg):
+    """The messages of one event as the tests have always seen them (WI-0089): an evt.element.states batch of a flow
+    becomes one evt.element.state per element, with the same envelope (the seq and epoch of the batch). Every other
+    message is returned as it is."""
+    if msg.get("type") != "evt.element.states":
+        return [msg]
+    payload = msg.get("payload", {}) or {}
+    out = []
+    for entry in payload.get("elements", []):
+        single = dict(msg)
+        single["type"] = "evt.element.state"
+        single["payload"] = dict(entry, flowId=payload.get("flowId"))
+        out.append(single)
+    return out
+
+
 def topic_address(topic):
     """Accepts 'engine' or 'topic:engine' and returns the envelope address 'topic:engine'."""
     return topic if topic.startswith("topic:") else "topic:" + topic
@@ -223,5 +239,6 @@ class AhfClient:
             if msg.get("corr") is not None:
                 self._answers[msg["corr"]] = msg
             else:
-                self._events.append(msg)
+                for event in expand_element_states(msg):
+                    self._events.append(event)
             self._cond.notify_all()

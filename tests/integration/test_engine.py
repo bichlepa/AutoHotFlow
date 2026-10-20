@@ -594,7 +594,7 @@ def test_start_emits_the_documented_event_order(pipe, flowdir, engine):
     assert element_states(got) == [
         (TRIGGER, "running", 1, None), (TRIGGER, "finished", 0, None),
         (SLEEP, "running", 1, None), (SLEEP, "finished", 0, None),
-        (DONE, "running", 1, None), (DONE, "finished", 0, None),
+        (DONE, "finished", 0, None),          # WI-0089: start and end of DONE share one batch: its latest state only
     ]
     flow_states = [m["payload"]["executing"] for _, m in got if m["type"] == "evt.flow.state"]
     assert flow_states == [1, 0]
@@ -602,7 +602,8 @@ def test_start_emits_the_documented_event_order(pipe, flowdir, engine):
                          and m["payload"]["state"] == "running")
     sleep_done = next(t for t, m in got if m["type"] == "evt.element.state" and m["payload"]["elementId"] == SLEEP
                       and m["payload"]["state"] == "finished")
-    assert sleep_done - sleep_running >= 0.18, "Action_Sleep 200 ms finished after %.3f s" % (sleep_done - sleep_running)
+    # WI-0089: the running state goes out in a batch that may wait up to 33 ms, so the measured time is up to 33 ms short
+    assert sleep_done - sleep_running >= 0.15, "Action_Sleep 200 ms finished after %.3f s" % (sleep_done - sleep_running)
     check_seq(got)
 
 
@@ -634,7 +635,7 @@ def test_element_exception_is_reported_and_the_engine_keeps_running(pipe, flowdi
         ask(obs, "cmd.flow.start", {"flowId": "throw"})
         got = collect_until(obs, is_type("evt.instance.ended"), timeout=10)
         assert element_states(got) == [(TRIGGER, "running", 1, None), (TRIGGER, "finished", 0, None),
-                                       (SLEEP, "running", 1, None), (SLEEP, "exception", 0, "test")]
+                                       (SLEEP, "exception", 0, "test")]    # WI-0089: start and end share a batch
         assert got[-1][1]["payload"]["reason"] == "exception"
         logged = wait_for(lambda: [e for e in storage.logs if e.get("level") == "f0"
                                    and "unhandled exception in element" in e.get("text", "")])
