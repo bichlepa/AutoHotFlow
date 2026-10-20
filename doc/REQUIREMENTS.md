@@ -1597,10 +1597,11 @@ Every completed edit takes effect at once, also for running instances (REQ-EXE-0
 ### REQ-EDT-110 Run, stop and enable from the editor
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (run and enable or disable from the tray menu of the editor, E0087; the menu bar comes with S0006)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (run and enable from the tray menu of the editor, E0087, WI-0091), S0006 (the menu bar)
+- **Evidence:** `tests/e2e/test_editor_tray.py` (headless: run, enable and disable, the questions, a refused run)
 
 The menu bar of the editor has: save, run, stop, enable/disable, edit (undo, redo), flow settings, exit.
 
@@ -1726,10 +1727,11 @@ The element settings offer typical settings and examples of the element, which t
 ### REQ-EDT-230 Tray icon of an editor
 
 - **v1:** yes (read: one icon per open editor)
-- **v2:** open
+- **v2:** partial (the icon, its tooltip and menu are built; the real icon and the open menu are checked by hand in WI-0092)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0005 (icon and menu, E0087, WI-0091)
+- **Evidence:** `tests/e2e/test_editor_tray.py` (icon state, tooltip, menu entries, the questions; headless), `tests/fault/test_editor_tray_icon_gui.py` (gui, the real icon and a menu held 8 s; not run by the agent)
 
 Every open editor has a tray icon of its own besides the icon of the application (REQ-MGR-090). The icon shows the state of its flow (disabled, enabled, running; REQ-EXE-140), as does the icon of the editor window; the tooltip names the flow ("Flow: <name>").
 
