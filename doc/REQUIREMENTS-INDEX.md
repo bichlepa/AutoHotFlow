@@ -14,7 +14,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 6 | 16 | 0 | 0 |
 | [Triggers (TRG)](#triggers-trg) | 14 | 1 | 0 | 7 | 6 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 15 | 2 | 0 | 8 | 5 | 0 | 0 |
-| [Editor (EDT)](#editor-edt) | 23 | 1 | 0 | 7 | 15 | 0 | 0 |
+| [Editor (EDT)](#editor-edt) | 23 | 6 | 0 | 2 | 15 | 0 | 0 |
 | [Settings (SET)](#settings-set) | 8 | 4 | 0 | 3 | 1 | 0 | 0 |
 | [Import and migration (MIG)](#import-and-migration-mig) | 8 | 5 | 0 | 2 | 1 | 0 | 0 |
 | [Languages and help (LNG)](#languages-and-help-lng) | 5 | 1 | 0 | 2 | 2 | 0 | 0 |
@@ -27,8 +27,8 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Security (SEC)](#security-sec) | 7 | 2 | 1 | 1 | 2 | 1 | 1 |
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
-| [Usability (USE)](#usability-use) | 10 | 0 | 0 | 5 | 5 | 0 | 0 |
-| **All** | **221** | **68** | **1** | **62** | **89** | **1** | **6** |
+| [Usability (USE)](#usability-use) | 10 | 1 | 0 | 4 | 5 | 0 | 0 |
+| **All** | **221** | **74** | **1** | **56** | **89** | **1** | **6** |
 
 ## Flows and execution (EXE)
 
@@ -175,10 +175,10 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
-| [REQ-EDT-010](REQUIREMENTS.md#req-edt-010-one-editor-per-flow-several-at-the-same-time) | L1496-1505 | One editor per flow, several at the same time | partial | partial | must | port | S0005 |
-| [REQ-EDT-020](REQUIREMENTS.md#req-edt-020-draw-the-flow) | L1507-1516 | Draw the flow | yes | partial | must | port | S0005 |
-| [REQ-EDT-030](REQUIREMENTS.md#req-edt-030-zoom-and-move-the-view) | L1518-1527 | Zoom and move the view | yes | partial | must | port | S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086) |
-| [REQ-EDT-040](REQUIREMENTS.md#req-edt-040-live-execution-state-in-the-editor) | L1529-1538 | Live execution state in the editor | yes | partial | must | port | S0005 |
+| [REQ-EDT-010](REQUIREMENTS.md#req-edt-010-one-editor-per-flow-several-at-the-same-time) | L1496-1505 | One editor per flow, several at the same time | partial | done | must | port | S0005 |
+| [REQ-EDT-020](REQUIREMENTS.md#req-edt-020-draw-the-flow) | L1507-1516 | Draw the flow | yes | done | must | port | S0005 |
+| [REQ-EDT-030](REQUIREMENTS.md#req-edt-030-zoom-and-move-the-view) | L1518-1527 | Zoom and move the view | yes | done | must | port | S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086) |
+| [REQ-EDT-040](REQUIREMENTS.md#req-edt-040-live-execution-state-in-the-editor) | L1529-1538 | Live execution state in the editor | yes | done | must | port | S0005 |
 | [REQ-EDT-050](REQUIREMENTS.md#req-edt-050-add-elements) | L1540-1548 | Add elements | yes | open | must | port | S0006, S0007 |
 | [REQ-EDT-060](REQUIREMENTS.md#req-edt-060-select-and-move) | L1550-1558 | Select and move | yes | open | must | port | S0006 |
 | [REQ-EDT-070](REQUIREMENTS.md#req-edt-070-connect-elements) | L1560-1568 | Connect elements | yes | open | must | port | S0006 |
@@ -197,7 +197,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-EDT-200](REQUIREMENTS.md#req-edt-200-expressions-are-checked-while-editing) | L1701-1709 | Expressions are checked while editing | no | open | should | later | - (could fit into S0007) |
 | [REQ-EDT-210](REQUIREMENTS.md#req-edt-210-syntax-highlighting-and-auto-completion) | L1711-1719 | Syntax highlighting and auto-completion | no | open | could | later | - |
 | [REQ-EDT-220](REQUIREMENTS.md#req-edt-220-examples-and-templates-in-the-element-settings) | L1721-1729 | Examples and templates in the element settings | no | open | could | later | - |
-| [REQ-EDT-230](REQUIREMENTS.md#req-edt-230-tray-icon-of-an-editor) | L1731-1749 | Tray icon of an editor | yes | partial | should | port | S0005 (icon and menu, E0087, WI-0091) |
+| [REQ-EDT-230](REQUIREMENTS.md#req-edt-230-tray-icon-of-an-editor) | L1731-1749 | Tray icon of an editor | yes | done | should | port | S0005 (icon and menu, E0087, WI-0091) |
 
 ## Settings (SET)
 
@@ -354,4 +354,4 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-USE-060](REQUIREMENTS.md#req-use-060-amount-of-hints) | L2753-2761 | Amount of hints | no | open | should | later | - |
 | [REQ-USE-070](REQUIREMENTS.md#req-use-070-hints-can-be-switched-off-one-by-one) | L2763-2771 | Hints can be switched off one by one | no | open | should | later | - |
 | [REQ-USE-080](REQUIREMENTS.md#req-use-080-unhandled-errors-of-a-flow-are-noticed) | L2773-2782 | Unhandled errors of a flow are noticed | yes | partial | should | port | S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables), E0072 |
-| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2784-2793 | Sharp and correctly sized on high-resolution displays | no | partial | should | port | dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0005 |
+| [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2784-2793 | Sharp and correctly sized on high-resolution displays | no | done | should | port | dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0005 |

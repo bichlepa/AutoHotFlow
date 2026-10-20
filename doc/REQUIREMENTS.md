@@ -1496,44 +1496,44 @@ A deleted flow is not lost at once (E0066). Ideas of the owner (2026-10-17), to 
 ### REQ-EDT-010 One editor per flow, several at the same time
 
 - **v1:** partial (several editors, but drawing and input share one lock and one draw thread)
-- **v2:** partial (WI-0087: the supervisor starts one editor process per flow for the Edit button and a double click, and a second request shows the running one; WI-0088: the editor is a process of its own that shows its flow in a window, and an editor that crashes or is closed leaves the flow and the other editors running (`tests/e2e/test_editor.py`); the live states come with WI-0089, the tray icon with WI-0091)
+- **v2:** done (the supervisor starts one editor process per flow (WI-0087); an editor that crashes or is closed leaves the flow and the other editors running (`tests/e2e/test_editor.py`); live states (WI-0089) and tray icon (WI-0091) are in; the windows checked by the owner in manual check 9, steps 1 to 11)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
-- **Evidence:** `tests/e2e/test_editor.py::test_two_editors_of_two_flows_run_at_once`, `tests/e2e/test_editor.py::test_killed_editor_is_not_restarted_and_the_flow_and_the_other_editor_go_on`, `tests/fault/test_editor_window.py` (gui: the window closes like the X button; not run by agents, manual check 9)
+- **Evidence:** `tests/e2e/test_editor.py::test_two_editors_of_two_flows_run_at_once`, `tests/e2e/test_editor.py::test_killed_editor_is_not_restarted_and_the_flow_and_the_other_editor_go_on`, `tests/fault/test_editor_window.py` (gui: the window closes like the X button; not run by agents, manual check 9); `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
 Each open flow has its own editor window in its own process (D0002). An editor that hangs or crashes does not affect the other editors or the running flows. All open editors show live states, also those without focus.
 
 ### REQ-EDT-020 Draw the flow
 
 - **v1:** yes
-- **v2:** partial (the geometry, the scene and the hit test are unit-tested, WI-0084; the renderer draws the elements with icon and name, the connections with their type and label, the loops with their parts, the trigger marks and the state overlays, pixel-tested, WI-0085; WI-0088: the editor process draws its flow into the back buffer of its window and copies it in WM_PAINT, without a background erase, the window itself is checked by the owner (gui test `tests/fault/test_editor_window.py`); WI-0090: the tooltip text of an element (kind, class, name), of a connection (type) and of a MIGRATION place is tested headless (`tests/e2e/test_editor.py`); the lines for an exception, an arming error and a warning are not tested yet; the timing of the hover and the real pointer are not checked, owner check in WI-0092)
+- **v2:** done (geometry, scene and hit test unit-tested (WI-0084); the renderer draws elements, connections, loops, trigger marks and state overlays, pixel-tested (WI-0085); the editor draws its flow in its window (WI-0088); tooltips tested headless (WI-0090); the owner accepted the look (E0088) and checked the drawing and the tooltips in manual check 9, steps 3 and 7; the lines for an exception, an arming error and a warning are not tested yet)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
-- **Evidence:** `tests/e2e/test_editor.py::test_the_editor_draws_the_flow_and_the_probes_match_the_elements`, `tests/e2e/test_editor.py::test_the_tooltip_names_the_element_under_the_pointer_and_nothing_on_empty_space`, `tests/e2e/test_editor.py::test_the_tooltip_of_a_connection_gives_its_type`, `doc/MEASUREMENTS.md` (MS-0048: the frame of the real renderer with 300 elements). The look is the owner's (E0088): manual check 9, step 3
+- **Evidence:** `tests/e2e/test_editor.py::test_the_editor_draws_the_flow_and_the_probes_match_the_elements`, `tests/e2e/test_editor.py::test_the_tooltip_names_the_element_under_the_pointer_and_nothing_on_empty_space`, `tests/e2e/test_editor.py::test_the_tooltip_of_a_connection_gives_its_type`, `doc/MEASUREMENTS.md` (MS-0048: the frame of the real renderer with 300 elements). The look is the owner's (E0088): manual check 9, step 3; `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
 Elements with icon and name, connections with their type, loops with their adjustable height; texts are aligned vertically; drawing does not flicker. Hovering an element shows its kind, class and name.
 
 ### REQ-EDT-030 Zoom and move the view
 
 - **v1:** yes
-- **v2:** partial (zoom, move and the scale with the DPI are unit-tested, WI-0084; WI-0090: the wheel zoom at the pointer, the drag, the limits 0.1 to 3 and a new size or DPI are tested headless (`tests/e2e/test_editor.py`); the window reacts to the real mouse, not checked yet: the gui test for it is open, owner check in WI-0092)
+- **v2:** done (zoom, move and the DPI scale unit-tested (WI-0084); the wheel zoom at the pointer, the drag, the limits 0.1 to 3 and a new size or DPI tested headless (`tests/e2e/test_editor.py`); the real wheel and drag: gui test `tests/fault/test_editor_mouse_gui.py` (part D) and manual check 9, steps 4 and 5, owner)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086)
-- **Evidence:** `tests/e2e/test_editor.py::test_the_wheel_zooms_one_step_at_the_pointer_and_keeps_the_point_under_it`, `tests/e2e/test_editor.py::test_a_drag_moves_the_view_by_the_movement_of_the_pointer`, `tests/fault/test_editor_mouse_gui.py` (gui: real wheel and drag with SendInput; not run by agents, owner: manual check 9, part D)
+- **Evidence:** `tests/e2e/test_editor.py::test_the_wheel_zooms_one_step_at_the_pointer_and_keeps_the_point_under_it`, `tests/e2e/test_editor.py::test_a_drag_moves_the_view_by_the_movement_of_the_pointer`, `tests/fault/test_editor_mouse_gui.py` (gui: real wheel and drag with SendInput; not run by agents, owner: manual check 9, part D); `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
 Zoom, and move the view by dragging with the right (or left) mouse button. Zoom and offset are saved with the flow (`flowSettings`).
 
 ### REQ-EDT-040 Live execution state in the editor
 
 - **v1:** yes
-- **v2:** partial (the engine gives the states of all elements of a flow at once and the connection a thread took, WI-0086; the editor shows the running elements since WI-0088 (`tests/e2e/test_editor.py`); the connection taken, the fading and the exception mark come with WI-0089)
+- **v2:** done (the engine gives the states of all elements of a flow at once (WI-0086); the editor shows running elements, the connection a thread took, the fading and the exception mark (WI-0088, WI-0089; `tests/e2e/test_editor.py`); the look on the screen: manual check 9, step 8, owner)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
-- **Evidence:** `tests/e2e/test_editor.py::test_an_editor_opened_while_the_flow_runs_shows_the_running_element`, `tests/e2e/test_editor.py::test_a_running_element_and_its_connection_are_tinted_and_fade_out_after_the_end`, `tests/e2e/test_editor.py::test_an_exception_keeps_the_element_marked_and_its_message_is_kept`, `tests/stress/test_editor_event_load.py` (MS-0047, the states under load). The look on the screen: manual check 9, step 8
+- **Evidence:** `tests/e2e/test_editor.py::test_an_editor_opened_while_the_flow_runs_shows_the_running_element`, `tests/e2e/test_editor.py::test_a_running_element_and_its_connection_are_tinted_and_fade_out_after_the_end`, `tests/e2e/test_editor.py::test_an_exception_keeps_the_element_marked_and_its_message_is_kept`, `tests/stress/test_editor_event_load.py` (MS-0047, the states under load). The look on the screen: manual check 9, step 8; `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
 Running elements and connections are highlighted while the flow runs; the editor shows the current state again after an internal restart (REQ-ROB-040).
 
@@ -1601,11 +1601,11 @@ Every completed edit takes effect at once, also for running instances (REQ-EXE-0
 ### REQ-EDT-110 Run, stop and enable from the editor
 
 - **v1:** yes
-- **v2:** partial (run and enable or disable from the tray menu of the editor, E0087; the menu bar comes with S0006)
+- **v2:** partial (run, and enable or disable, from the tray menu of the editor, E0087; manual check 9, steps 12 and 13, owner; the menu bar (save, run, stop, enable, undo, redo, flow settings, exit) is missing and comes with S0006)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (run and enable from the tray menu of the editor, E0087, WI-0091), S0006 (the menu bar)
-- **Evidence:** `tests/e2e/test_editor_tray.py` (headless: run, enable and disable, the questions, a refused run)
+- **Evidence:** `tests/e2e/test_editor_tray.py` (headless: run, enable and disable, the questions, a refused run); `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
 The menu bar of the editor has: save, run, stop, enable/disable, edit (undo, redo), flow settings, exit.
 
@@ -1731,11 +1731,11 @@ The element settings offer typical settings and examples of the element, which t
 ### REQ-EDT-230 Tray icon of an editor
 
 - **v1:** yes (read: one icon per open editor)
-- **v2:** partial (the icon, its tooltip and menu are built and tested headless, WI-0091; the real icon and the open menu: the gui test `tests/fault/test_editor_tray_icon_gui.py` (not run by agents) and manual check 9, part B (owner))
+- **v2:** done (icon, tooltip and menu built and tested headless (WI-0091); the real icon and the open menu: gui test `tests/fault/test_editor_tray_icon_gui.py` (part D) and manual check 9, part B, steps 11 to 16, owner)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0005 (icon and menu, E0087, WI-0091)
-- **Evidence:** `tests/e2e/test_editor_tray.py` (icon state, tooltip, menu entries, the questions; headless), `tests/fault/test_editor_tray_icon_gui.py` (gui, the real icon and a menu held 8 s; not run by the agent)
+- **Evidence:** `tests/e2e/test_editor_tray.py` (icon state, tooltip, menu entries, the questions; headless), `tests/fault/test_editor_tray_icon_gui.py` (gui, the real icon and a menu held 8 s; not run by the agent); `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
 Every open editor has a tray icon of its own besides the icon of the application (REQ-MGR-090). The icon shows the state of its flow (disabled, enabled, running; REQ-EXE-140), as does the icon of the editor window; the tooltip names the flow ("Flow: <name>").
 
@@ -2415,7 +2415,7 @@ While 200 big flows load, AutoHotFlow stays responsive: the engine answers a sna
 ### REQ-PRF-060 Editor redraw
 
 - **v1:** n/a
-- **v2:** partial (measured headless under the event load of a loop at the guard's limit: the time from the change to the end of its frame has median 34 ms and p95 46 ms, the editor answers at once and draws about 21 frames per second, MS-0047; the window on a real screen is not measured, a `gui` run is the owner's; the frame part of a flow with 300 elements: 6.3 ms, MS-0046; a rebuild of the static layer takes 106 ms at 1920×1080 and 152 ms at 3840×2160, F-0151)
+- **v2:** partial (measured headless under the event load of a loop at the guard's limit: the time from the change to the end of its frame has median 34 ms and p95 46 ms, the editor answers at once and draws about 21 frames per second, MS-0047; the frame part of a flow with 300 elements: 6.7 ms at 1920 × 1080 (MS-0048); a rebuild of the static layer takes 113 ms at 1920 × 1080 and 182 ms at 3840 × 2160, F-0151; the latency with 300 changing elements in one interval is above 50 ms at p95 (MS-0050, F-0156; postponed by the owner, F-0156); the window measurement at 3840 × 2160 (manual check 9, step 25) was not run, the owner has no 4K screen)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
@@ -2784,10 +2784,10 @@ When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the us
 ### REQ-USE-090 Sharp and correctly sized on high-resolution displays
 
 - **v1:** no (not checked)
-- **v2:** partial (dialogs done; the window base for the UI roles is written, `ui_common/UiWindow.ahk` with the layout in `core/GuiLayout.ahk` (WI-0069), the manager window (WI-0073) uses it, opened in the gui test but not checked at another scaling; the view math scales the flow with the DPI, unit-tested (WI-0084); the renderer draws at the DPI of the view and rebuilds its layer at another DPI, unit-tested (WI-0085); the editor window: the canvas takes the size below the status bar and follows a DPI change with unchanged pixels, WI-0090; the real window at another scaling is not checked, owner check in WI-0092)
+- **v2:** done (dialogs checked at 100 % and 225 % in manual check 3; the editor window: the canvas takes the size below the status bar, the drawing stays sharp after a DPI change and after a move to a screen with another scaling, owner, manual check 9, part C, steps 17 to 20; the owner has a 2K screen only, so no 4K window was checked)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0005
-- **Evidence:** `doc/MANUAL-CHECKS.md` (manual check 3, steps 17 and 18, owner, 2026-10-16: dialog windows at 100 % and 225 %, DPI change with the window open, message box, debug dialog and tooltip), `src/elements/base/DialogWindow.ahk`, `src/core/GuiLayout.ahk` (the layout moved there in WI-0069; the manual check was made before the move, so the owner has to check again), `tests/e2e/test_editor.py::test_a_new_size_and_dpi_keep_the_flow_at_the_same_physical_size` (the editor headless; its window: manual check 9, part C)
+- **Evidence:** `doc/MANUAL-CHECKS.md` (manual check 3, steps 17 and 18, owner, 2026-10-16: dialog windows at 100 % and 225 %, DPI change with the window open, message box, debug dialog and tooltip), `src/elements/base/DialogWindow.ahk`, `src/core/GuiLayout.ahk` (the layout moved there in WI-0069; the manual check was made before the move, so the owner has to check again), `tests/e2e/test_editor.py::test_a_new_size_and_dpi_keep_the_flow_at_the_same_physical_size` (the editor headless; its window: manual check 9, part C); `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
 Manager, editor, dialogs and the tray icon are sharp and have the right size with a display scaling above 100 %, also when a window moves to a screen with another scaling. The editor draws the flow sharp at every zoom.
