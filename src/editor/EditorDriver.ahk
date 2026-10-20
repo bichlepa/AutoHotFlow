@@ -1,6 +1,9 @@
 #Requires AutoHotkey v2.0
 #Include ..\core\Errors.ahk
 #Include ..\core\Json.ahk
+#Include FlowStatus.ahk
+#Include FlowTooltip.ahk
+#Include FlowHitTest.ahk
 
 ; The headless driver of the editor (WI-0088, PROTOCOL 4.11), exists only with --headless: the test commands cmd.test.*
 ; of the editor role. There is no window: cmd.test.render draws the scene now into an offscreen bitmap of the given size,
@@ -9,6 +12,8 @@
 ;   cmd.test.state {}                   the state of the model, the view and the frame numbers (Driver.State)
 ;   cmd.test.render {w, h, dpi?, probes?}   draws now; probes are flow points [x, y]; answers ms and the colors (AARRGGBB)
 ;   cmd.test.close {}                   the planned end of the editor (after the answer)
+;   cmd.test.view {zoomAt?, drag?, size?, dpi?}   the wheel, the drag, the size and the DPI of the window (WI-0090)
+;   cmd.test.hover {x, y}               the tooltip text under a canvas pixel (WI-0090)
 ;
 ; Booleans on the wire are Json.True and Json.False (PROTOCOL 2): the state fields enabled and armed are written with Json.Bool.
 class EditorDriver {
@@ -20,7 +25,66 @@ class EditorDriver {
         role.On("cmd.test.state", (msg) => Map("ok", true, "state", this.State()))
         role.On("cmd.test.render", (msg) => this._OnRender(msg))
         role.On("cmd.test.close", (msg) => this._OnClose())
+        role.On("cmd.test.view", (msg) => this._OnView(msg))
+        role.On("cmd.test.hover", (msg) => this._OnHover(msg))
     }
+
+    ; cmd.test.view {zoomAt?: {x, y, direction}, drag?: {dx, dy}, size?: {w, h}, dpi?}: the mouse and the window of the
+    ; editor without a window. The steps run in this order: size and DPI, the wheel step (direction 1 in, -1 out, at the
+    ; canvas pixel x, y), the drag (pixels; the content follows the pointer). Answers the view and the status bar text.
+    _OnView(msg) {
+        p := msg.payload
+        size := p.Get("size", "")
+        dpi := p.Get("dpi", "")
+        view := this.model.view
+        if (size is Map) {
+            w := size.Get("w", 0), h := size.Get("h", 0)
+            if (!IsInteger(w) || !IsInteger(h) || w < 1 || h < 1 || w > EditorDriver.MAX_SIDE || h > EditorDriver.MAX_SIDE)
+                throw AhfError("cmd.test.view: size w and h are whole numbers from 1 to " EditorDriver.MAX_SIDE
+                    , ErrCode.BAD_PAYLOAD)
+            view := view.Resized(w, h, IsInteger(dpi) && dpi > 0 ? dpi : view.Dpi)
+        } else if (IsInteger(dpi) && dpi > 0) {
+            view := view.Resized(view.Width, view.Height, dpi)
+        }
+        zoomAt := p.Get("zoomAt", "")
+        if (zoomAt is Map) {
+            d := zoomAt.Get("direction", 0)
+            if ((d != 1 && d != -1) || !IsNumber(zoomAt.Get("x", "")) || !IsNumber(zoomAt.Get("y", "")))
+                throw AhfError("cmd.test.view: zoomAt is {x, y, direction} with direction 1 or -1", ErrCode.BAD_PAYLOAD)
+            view := view.ZoomStep(d, zoomAt["x"], zoomAt["y"])
+        }
+        drag := p.Get("drag", "")
+        if (drag is Map) {
+            if (!IsNumber(drag.Get("dx", "")) || !IsNumber(drag.Get("dy", "")))
+                throw AhfError("cmd.test.view: drag is {dx, dy} in pixels", ErrCode.BAD_PAYLOAD)
+            view := view.Moved(drag["dx"], drag["dy"])
+        }
+        this.model.ChangeView(view)
+        return Map("ok", true, "view", EditorDriver.ViewText(view), "status", this._Status())
+    }
+
+    ; cmd.test.hover {x, y}: what the tooltip shows at the canvas pixel x, y (the window waits about 0.5 s first). Answers
+    ; the tooltip text ("" for none) and the kind ("element", "connection" or "") and ID of the item under the pixel.
+    _OnHover(msg) {
+        p := msg.payload
+        x := p.Get("x", "")
+        y := p.Get("y", "")
+        if (!IsNumber(x) || !IsNumber(y))
+            throw AhfError("cmd.test.hover: x and y are canvas pixels", ErrCode.BAD_PAYLOAD)
+        sc := this.model.CurrentScene()
+        if (sc = "")
+            return Map("ok", false, "error", Map("code", ErrCode.BUSY, "message", "the flow is not loaded yet"))
+        pt := sc.View.ToFlow(x, y)
+        hit := FlowHitTest.At(sc, pt[1], pt[2])
+        return Map("ok", true, "tooltip", FlowTooltip.Text(sc, hit, this.model.messages)
+            , "kind", IsObject(hit) ? hit.Kind : "", "id", IsObject(hit) ? hit.Id : "")
+    }
+
+    ; The status bar text of the current view (FlowStatus).
+    _Status() => FlowStatus.Text(this.model.view, this.model.ElementCount())
+
+    static ViewText(view) => Map("zoom", view.Zoom, "offsetX", view.OffsetX, "offsetY", view.OffsetY, "dpi", view.Dpi
+        , "width", view.Width, "height", view.Height)
 
     ; The state for the tests: the model (flow, states, resync), the view, and the numbers of the renderer.
     State() {
@@ -42,6 +106,7 @@ class EditorDriver {
             , "width", v.Width, "height", v.Height)
         r := IsObject(this.role.renderer) ? this.role.renderer.Snapshot() : Map("frames", 0, "meanFrameMs", 0
             , "lastFrameMs", 0, "slowestFrameMs", 0, "rebuilds", 0, "lastRebuildMs", 0)
+        st["status"] := this._Status()
         st["frames"] := r["frames"]
         st["meanFrameMs"] := r["meanFrameMs"]
         st["lastFrameMs"] := r["lastFrameMs"]

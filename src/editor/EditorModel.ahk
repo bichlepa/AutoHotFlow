@@ -22,6 +22,7 @@
 ;   "engine"   the connection state of the engine changed; data is the new state
 ;   "ended"    the editor must end: data is the reason ("deleted", "not_found", "closed", "test")
 ;   "resync"   a resync was asked; data is the reason
+;   "view"     the view changed (ChangeView, WI-0090): the status bar and the frame follow it
 class EditorModel {
     static FADE_MS := 1000           ; a tint of a finished element or of a connection fades out this long (v1)
     static FADE_TICK_MS := 33        ; the fade is drawn about 30 times per second; its timer runs only while a tint fades
@@ -524,6 +525,18 @@ class EditorModel {
         }
     }
 
+    ; A new view (zoom, offset, size or DPI, from the mouse of the window or from cmd.test.view): the scene takes it at
+    ; once, and the role is told (the status bar shows the view, the window asks for a frame). WI-0090.
+    ChangeView(view) {
+        this.view := view
+        if (this.scene != "") {
+            this.sceneVersion += 1
+            this.restateDirty := false
+            this.scene := this.scene.WithStates(this.view, this.run, this.triggers, this.sceneVersion, this.warnings)
+        }
+        this._Changed("view")
+    }
+
     ; The scene to draw now (Scene, "" before the definition arrived). Events only mark the scene as changed: it is built
     ; here, once for all the events since the last frame (the event load, WI-0089).
     CurrentScene() {
@@ -575,12 +588,14 @@ class EditorModel {
     }
 
     ; The state for the test command and the snapshot (PROTOCOL 4.11). Without the view and the frames.
+    ; The number of elements of the flow (0 before the definition arrived). WI-0090: the status bar shows it.
+    ElementCount() => (this.definition is Map) ? this.definition.Get("allElements", Map()).Count : 0
+
     State() {
-        elements := 0, connections := 0
-        if (this.definition is Map) {
-            elements := this.definition.Get("allElements", Map()).Count
+        elements := this.ElementCount()
+        connections := 0
+        if (this.definition is Map)
             connections := this.definition.Get("allConnections", Map()).Count
-        }
         return Map("flowId", this.flowId, "name", this.name, "rev", this.rev, "elements", elements
             , "connections", connections, "run", this.run.Clone(), "triggers", this.triggers.Clone()
             , "warnings", this.warnings.Clone(), "messages", this.messages.Clone(), "fading", this.fading.Count

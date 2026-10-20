@@ -123,14 +123,25 @@ class Editor extends Role {
             case "ended":
                 this._OnEnded(data)
             case "state":
+                this._Status()
+                this._Repaint()
+            case "view":
+                this._Status()
                 this._Repaint()
             case "flow":
                 if (IsObject(this.window))
                     this.window.Refresh()
+                this._Status()
                 this._Repaint()
             case "log":
                 this._Log("a1", "editor", this.name " " data)
         }
+    }
+
+    ; The status bar follows the view, the flow and the states (WI-0090); headless there is no bar.
+    _Status() {
+        if (IsObject(this.window))
+            this.window.UpdateStatus()
     }
 
     ; A frame is wanted: the window asks for one, the headless editor draws one itself (the same renderer, the same rule of
