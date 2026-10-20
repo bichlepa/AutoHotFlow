@@ -8,8 +8,10 @@
 #Include GdipImage.ahk
 #Include GdipCanvas.ahk
 #Include EditorStyle.ahk
+#Include ..\..\core\Lang.ahk
 #Include ..\FlowRect.ahk
 #Include ..\FlowGeometry.ahk
+#Include ..\NewElementFields.ahk
 
 ; Draws a Scene into a GdipCanvas (WI-0085, REQ-EDT-020, ARCHITECTURE 2.1, E0090). The window copies the target to the
 ; screen; the renderer never draws to a window.
@@ -27,6 +29,11 @@
 ; Order (as v1): background, grid dots (zoom above 1), connections (in scene order), elements (in scene order: the
 ; last one is on top, as FlowHitTest assumes), then the overlays and marks. A selection on top (S0006) changes the
 ; scene order and the hit order together.
+;
+; Editing (WI-0097): the elements and connections of a drag (Scene.Dragged) are not in the cached layer; the layer is
+; built once at the start of the drag without them, and they are drawn live above it at their new positions (DrawDragged).
+; Then the selection (outline, line, rectangle, the connection being drawn), the buttons of the single selection and the
+; four fields for new elements (fixed to the canvas) are drawn last. Nothing of the editing state is in the layer.
 ;
 ; The renderer counts its frames and rebuilds (Snapshot) for the status of the editor role (WI-0088). Icons are read
 ; once from their files and kept until Destroy; scaled copies are kept per drawn size.
@@ -91,9 +98,13 @@ class Renderer {
         sx := Round((view.OffsetX - this.layerLeft) * s)
         sy := Round((view.OffsetY - this.layerTop) * s)
         this.layer.CopyRegionTo(target, 0, 0, W, H, sx, sy)
+        this.DrawDragged(scene, target, view)
         this.DrawStates(scene, target, view)
         this.DrawMarks(scene, target, view)
         this.DrawBadges(scene, target, view)
+        this.DrawSelection(scene, target, view)
+        this.DrawButtons(scene, target, view)
+        this.DrawFields(target, view)
         ms := Renderer.Now() - t0
         this.FramesDrawn += 1
         this.TotalFrameMs += ms
@@ -131,18 +142,29 @@ class Renderer {
 
     ; The text of everything that does not change with a run state or a trigger state. Two scenes with the same key
     ; have the same layer.
+    ; The dragged elements and their connections are left out (WI-0097): the key of a drag does not change while the
+    ; offset of the drag changes, so the layer is built once at its start.
     static StaticKey(scene) {
         key := ""
-        for element in scene.Elements
+        for element in scene.Elements {
+            if (scene.Dragged.Has(element.Id))
+                continue
             key .= element.Id "|" element.Kind "|" element.ClassName "|" element.Name "|" element.Icon "|"
                 . element.Package "|" element.X "|" element.Y "|" element.HeightOfVerticalBar "|"
                 . element.Placeholder "|" element.Migration.Length ";"
-        for connection in scene.Connections
+        }
+        for connection in scene.Connections {
+            if (Renderer.IsLive(scene, connection))
+                continue
             key .= "c" connection.Id "|" connection.From "|" connection.To "|" connection.Type "|"
                 . connection.FromPart "|" connection.ToPart "|" connection.StartX "|" connection.StartY "|"
                 . connection.AimX "|" connection.AimY ";"
+        }
         return key
     }
+
+    ; True for a connection with an end in the dragged set: it is drawn live, not in the layer (WI-0097).
+    static IsLive(scene, connection) => scene.Dragged.Has(connection.From) || scene.Dragged.Has(connection.To)
 
     ; Seconds of the performance counter in milliseconds.
     static Now() {
@@ -181,12 +203,12 @@ class Renderer {
             if (view.Zoom > 1)
                 this.DrawGrid(canvas, ox, oy, s, lw, lh)
             for connection in scene.Connections {
-                if (FlowGeometry.ConnectionVisible(connection.StartX, connection.StartY, connection.AimX,
-                        connection.AimY, visible))
+                if (!Renderer.IsLive(scene, connection) && FlowGeometry.ConnectionVisible(connection.StartX
+                        , connection.StartY, connection.AimX, connection.AimY, visible))
                     this.DrawConnection(canvas, connection, ox, oy, s)
             }
             for element in scene.Elements {
-                if (FlowGeometry.ElementVisible(element.Bounds, visible))
+                if (!scene.Dragged.Has(element.Id) && FlowGeometry.ElementVisible(element.Bounds, visible))
                     this.DrawElement(canvas, element, ox, oy, s)
             }
         } catch as failure {
@@ -388,6 +410,96 @@ class Renderer {
             , cx - r, cy - r, 2 * r, 2 * r)
     }
 
+    ; The dragged elements and the connections at their ends, drawn live above the layer at their new positions (WI-0097).
+    DrawDragged(scene, target, view) {
+        if (scene.Dragged.Count = 0)
+            return
+        s := view.Scale
+        ox := view.OffsetX
+        oy := view.OffsetY
+        visible := view.VisibleArea()
+        for connection in scene.Connections {
+            if (Renderer.IsLive(scene, connection) && FlowGeometry.ConnectionVisible(connection.StartX
+                    , connection.StartY, connection.AimX, connection.AimY, visible))
+                this.DrawConnection(target, connection, ox, oy, s)
+        }
+        for element in scene.Elements {
+            if (scene.Dragged.Has(element.Id) && FlowGeometry.ElementVisible(element.Bounds, visible))
+                this.DrawElement(target, element, ox, oy, s)
+        }
+    }
+
+    ; The selection (WI-0097): the outline of each selected element, the line of each selected connection, the
+    ; selection rectangle, and the connection being drawn from a part of an element to the pointer.
+    DrawSelection(scene, target, view) {
+        s := view.Scale
+        ox := view.OffsetX
+        oy := view.OffsetY
+        visible := view.VisibleArea()
+        pen := this.tools["selection"]
+        if (scene.Selected.Count > 0) {
+            for element in scene.Elements {
+                if (scene.Selected.Has(element.Id) && FlowGeometry.ElementVisible(element.Bounds, visible))
+                    this.OutlineShape(target, pen, element, ox, oy, s)
+            }
+            for connection in scene.Connections {
+                if (!scene.Selected.Has(connection.Id) || !FlowGeometry.ConnectionVisible(connection.StartX
+                        , connection.StartY, connection.AimX, connection.AimY, visible))
+                    continue
+                for segment in connection.Segments
+                    target.DrawLine(pen, (segment.X - ox) * s, (segment.Y - oy) * s, (segment.Right - ox) * s
+                        , (segment.Bottom - oy) * s)
+            }
+        }
+        rect := scene.Rect
+        if (rect is FlowRect) {
+            x := (rect.X - ox) * s
+            y := (rect.Y - oy) * s
+            target.FillRect(this.OverlayBrush(EditorStyle.SelectionFill), x, y, rect.W * s, rect.H * s)
+            target.DrawRect(pen, x, y, rect.W * s, rect.H * s)
+        }
+        connecting := scene.Connecting
+        if (connecting is Map) {
+            a := connecting["start"]
+            b := connecting["aim"]
+            target.DrawLine(this.tools["connecting"], (a[1] - ox) * s, (a[2] - oy) * s, (b[1] - ox) * s
+                , (b[2] - oy) * s)
+        }
+    }
+
+    ; The buttons of the single selected element or connection (WI-0097), the v1 icons at BUTTON_SIZE, centred on the
+    ; button's box.
+    DrawButtons(scene, target, view) {
+        s := view.Scale
+        ox := view.OffsetX
+        oy := view.OffsetY
+        size := FlowGeometry.BUTTON_SIZE * s
+        for button in scene.Buttons {
+            box := button["rect"]
+            file := EditorStyle.ButtonIcons.Get(button["name"], "e_plus.ico")
+            this.DrawMark(target, this.AssetPath(file), (box.X + box.W / 2 - ox) * s, (box.Y + box.H / 2 - oy) * s, size)
+        }
+    }
+
+    ; The four fields "Create new ..." at the top left of the canvas (WI-0097, NewElementFields): a white area, and a
+    ; field per kind filled with the kind's fill and named by its text. They are fixed to the canvas, not to the flow.
+    DrawFields(target, view) {
+        dpi := view.Dpi
+        k := dpi / 96
+        area := NewElementFields.AreaOf(dpi)
+        target.FillRect(this.tools["fieldArea"], area.X, area.Y, area.W, area.H)
+        size := EditorStyle.TextSize * k * EditorStyle.FieldTextFactor
+        for field in NewElementFields.Rects(dpi) {
+            box := field["rect"]
+            radius := EditorStyle.FieldRadius * k
+            target.FillRoundRect(this.BodyBrush(field["kind"]), box.X, box.Y, box.W, box.H, radius)
+            target.DrawRoundRect(this.tools["border"], box.X, box.Y, box.W, box.H, radius)
+            if (size >= EditorStyle.MinTextPx)
+                target.DrawText(this.tools["text"], this.FontFor(size), this.tools["formatCenter"]
+                    , Lang("Create new " field["kind"]), box.X + 4 * k, box.Y, box.W - 8 * k, box.H)
+        }
+    }
+
     ; The pen of a fading connection: the running line in one of 16 alpha steps (a fade is drawn in steps, so a pen is
     ; made once per step and not per frame).
     ConnectionRunPen(strength) {
@@ -586,6 +698,9 @@ class Renderer {
             t["formatLeft"] := GdipFormat(0, 1, false, false)
             t["formatRight"] := GdipFormat(2, 1, false, false)
             t["formatCenter"] := GdipFormat(1, 1, false, false)
+            t["fieldArea"] := GdipBrush(EditorStyle.FieldArea)
+            t["selection"] := GdipPen(EditorStyle.SelectionColor, EditorStyle.SelectionWidth * k)
+            t["connecting"] := GdipPen(EditorStyle.SelectionColor, EditorStyle.ConnectingWidth * k)
         } catch as failure {
             for key, obj in t
                 obj.Destroy()

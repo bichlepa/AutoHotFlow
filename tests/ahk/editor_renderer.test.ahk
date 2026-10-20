@@ -32,8 +32,10 @@ FlowText() {
         . '"allConnections": {"c1": {"ID": "c1", "from": "A", "to": "B", "ConnectionType": "normal"}}}'
 }
 
-; The view of the tests: zoom 1 and the flow point (-20, -20) at the top left corner, so flow (x, y) is canvas (x+20, y+20).
-ViewAt(zoom := 1.0, ox := -20, oy := -20, dpi := 96) => EditorView(zoom, ox, oy, dpi, CANVAS_W, CANVAS_H)
+; The view of the tests: zoom 1 and the flow point (-20, -110) at the top left corner, so flow (x, y) is canvas (x+20, y+110).
+; The top of the flow is below the fields for new elements (about 90 pixels, WI-0097), and the bottom of the loop L
+; (flow y 780) is still inside the canvas.
+ViewAt(zoom := 1.0, ox := -20, oy := -110, dpi := 96) => EditorView(zoom, ox, oy, dpi, CANVAS_W, CANVAS_H)
 
 ; The scene of the flow with run states, trigger states and warnings (Maps, as the window passes them).
 SceneOf(view := "", run := "", trigger := "", warnings := "") {
@@ -79,7 +81,8 @@ CheckBackground() {
     r := Renderer()
     try {
         r.Draw(sc, c)
-        Assert.Equal(c.Pixel(2, 2), EditorStyle.Background, "the background outside the flow")
+        ; the corner of the canvas is outside the flow and outside the fields (they are at the top left)
+        Assert.Equal(c.Pixel(CANVAS_W - 3, CANVAS_H - 3), EditorStyle.Background, "the background outside the flow")
     } finally {
         r.Destroy()
         c.Destroy()
@@ -464,7 +467,7 @@ CheckEmptyFlowAndElementsOutsideAreDrawn() {
     r := Renderer()
     try {
         r.Draw(SceneBuilder.Build(Map(), ViewAt()), c)
-        Assert.Equal(c.Pixel(2, 2), EditorStyle.Background, "an empty flow is the background")
+        Assert.Equal(c.Pixel(CANVAS_W - 3, CANVAS_H - 3), EditorStyle.Background, "an empty flow is the background")
         far := Json.Parse(FlowText())
         far["allElements"]["A"]["x"] := -90000
         r.Draw(SceneBuilder.Build(far, ViewAt(3)), c)
@@ -497,6 +500,170 @@ CheckStyleTableHasTheFillOfEachKind() {
     Assert.True(EditorStyle.TextSize > 0, "a text size")
 }
 
+; Editing (WI-0097): pixel probes of the selection, the buttons, the fields, the rectangle, the connection being drawn
+; and the drag. The selection colour is blue (blue minus red above 100); the other colours of the flow are not.
+IsBlue(argb) => ((argb & 0xFF) - ((argb >> 16) & 0xFF)) > 100
+
+; The number of blue pixels in the canvas box (x, y, w, h).
+CountBlue(c, x, y, w, h) {
+    n := 0
+    loop h {
+        py := y + A_Index - 1
+        loop w {
+            if (IsBlue(c.Pixel(x + A_Index - 1, py)))
+                n += 1
+        }
+    }
+    return n
+}
+
+; The box of a button centred at a flow point, 35 pixels at zoom 1 (the size of a button, FlowGeometry.BUTTON_SIZE).
+ButtonBox(view, fx, fy) {
+    p := PixelOf(view, fx, fy)
+    return [p[1] - 17, p[2] - 17, 35, 35]
+}
+
+; A selected element has its outline in the selection colour, an unselected one has none on the same pixel.
+CheckSelectedElementHasItsOutline() {
+    view := ViewAt()
+    c := NewCanvas()
+    c2 := NewCanvas()
+    r := Renderer()
+    try {
+        r.Draw(SceneOf(view).WithInteraction(Map("A", true)), c)
+        r.Draw(SceneOf(view), c2)
+        p := PixelOf(view, 0, 60)
+        Assert.True(IsBlue(c.Pixel(p[1], p[2])), "the left edge of the selected element is blue")
+        Assert.True(!IsBlue(c2.Pixel(p[1], p[2])), "the same pixel without the selection is not")
+    } finally {
+        r.Destroy()
+        c.Destroy()
+        c2.Destroy()
+    }
+}
+
+; A selected connection is drawn in the selection colour on its first segment.
+CheckSelectedConnectionIsBlue() {
+    view := ViewAt()
+    c := NewCanvas()
+    r := Renderer()
+    try {
+        r.Draw(SceneOf(view).WithInteraction(Map("c1", true)), c)
+        p := PixelOf(view, 70, 150)
+        Assert.True(IsBlue(c.Pixel(p[1], p[2])), "the first segment of the selected connection is blue")
+    } finally {
+        r.Destroy()
+        c.Destroy()
+    }
+}
+
+; The buttons of a selected element are drawn beside it (the trash button on the right, where no line runs), and
+; nothing is drawn there without the selection.
+CheckButtonsAreDrawnForTheSelection() {
+    view := ViewAt()
+    c := NewCanvas()
+    c2 := NewCanvas()
+    r := Renderer()
+    try {
+        r.Draw(SceneOf(view).WithInteraction(Map("A", true)), c)
+        r.Draw(SceneOf(view), c2)
+        b := ButtonBox(view, 164.5, 52.5)
+        Assert.True(CountNot(c, b[1], b[2], b[3], b[4], EditorStyle.Background) > 0, "the trash button is drawn")
+        Assert.Equal(CountNot(c2, b[1], b[2], b[3], b[4], EditorStyle.Background), 0, "nothing without the selection")
+    } finally {
+        r.Destroy()
+        c.Destroy()
+        c2.Destroy()
+    }
+}
+
+; The fields for new elements are at the top left of the canvas, whatever the view: the field of the action is white
+; and the area around the fields is the field area colour.
+CheckNewElementFieldsAreFixedToTheCanvas() {
+    c := NewCanvas()
+    c2 := NewCanvas()
+    r := Renderer()
+    try {
+        r.Draw(SceneOf(ViewAt()), c)
+        r.Draw(SceneOf(ViewAt(1.0, -700, -30)), c2)
+        Assert.Equal(c.Pixel(60, 12), EditorStyle.Fill["action"], "the action field is filled with the action fill")
+        Assert.Equal(c.Pixel(475, 12), EditorStyle.FieldArea, "the area beside the trigger field")
+        Assert.Equal(c2.Pixel(60, 12), c.Pixel(60, 12), "the fields do not move with the flow")
+    } finally {
+        r.Destroy()
+        c.Destroy()
+        c2.Destroy()
+    }
+}
+
+; The selection rectangle: a blue outline on its left edge and a tinted inside, over empty space.
+CheckSelectionRectangleIsDrawn() {
+    view := ViewAt()
+    c := NewCanvas()
+    r := Renderer()
+    try {
+        sc := SceneOf(view).WithInteraction(Map(), FlowRect(600, 0, 100, 50))
+        r.Draw(sc, c)
+        p := PixelOf(view, 600, 25)
+        Assert.True(IsBlue(c.Pixel(p[1], p[2])), "the left edge of the rectangle is blue")
+        p := PixelOf(view, 650, 25)
+        Assert.True(c.Pixel(p[1], p[2]) != EditorStyle.Background, "the inside of the rectangle is tinted")
+    } finally {
+        r.Destroy()
+        c.Destroy()
+    }
+}
+
+; The connection being drawn runs from the bottom of A to the point (600, 400) in flow units; without it nothing is
+; blue there.
+CheckConnectingLineIsDrawn() {
+    view := ViewAt()
+    c := NewCanvas()
+    c2 := NewCanvas()
+    r := Renderer()
+    try {
+        request := Map("fromId", "A", "fromPart", "", "type", "normal", "x", 600, "y", 400)
+        r.Draw(SceneOf(view).WithInteraction(Map(), "", request), c)
+        r.Draw(SceneOf(view), c2)
+        p := PixelOf(view, 335, 252.5)
+        Assert.True(CountBlue(c, p[1] - 10, p[2] - 10, 21, 21) > 0, "the line from the part of A reaches the point")
+        Assert.Equal(CountBlue(c2, p[1] - 10, p[2] - 10, 21, 21), 0, "no line without the connection being drawn")
+    } finally {
+        r.Destroy()
+        c.Destroy()
+        c2.Destroy()
+    }
+}
+
+; A drag: the element is drawn at its new place, its old place and the old route of its connection are background,
+; and the layer is built once for the whole drag (the offset of the drag changes, the layer does not).
+CheckDraggedElementIsDrawnLive() {
+    view := ViewAt()
+    c := NewCanvas()
+    r := Renderer()
+    try {
+        base := SceneOf(view).WithInteraction(Map("A", true))
+        r.Draw(base, c)
+        before := r.Rebuilds
+        drag := base.WithDrag(Map("A", true), 100, 0)
+        r.Draw(drag, c)
+        Assert.Equal(r.Rebuilds, before + 1, "the layer is built at the start of the drag")
+        p := PixelOf(view, 108, 30)
+        Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.Fill["action"], "the element at its new place")
+        p := PixelOf(view, 8, 30)
+        Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.Background, "its old place is background")
+        p := PixelOf(view, 70, 150)
+        Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.Background, "the old route of its connection is gone")
+        r.Draw(base.WithDrag(Map("A", true), 150, 40), c)
+        Assert.Equal(r.Rebuilds, before + 1, "a further frame of the same drag does not rebuild the layer")
+        r.Draw(base, c)
+        Assert.Equal(r.Rebuilds, before + 2, "after the drop the layer is built again")
+    } finally {
+        r.Destroy()
+        c.Destroy()
+    }
+}
+
 Gdip.Startup()
 TestRun.Init()
 
@@ -522,6 +689,13 @@ TestRun.Case("a zoom, a rename or a DPI change rebuilds the layer", CheckZoomAnd
 TestRun.Case("an empty flow and elements far outside the window are drawn", CheckEmptyFlowAndElementsOutsideAreDrawn)
 TestRun.Case("a renderer draws again after Destroy", CheckDestroyLeavesARendererThatDrawsAgain)
 TestRun.Case("the style has a fill for each kind and a text size", CheckStyleTableHasTheFillOfEachKind)
+TestRun.Case("a selected element has its outline in the selection colour", CheckSelectedElementHasItsOutline)
+TestRun.Case("a selected connection is blue on its first segment", CheckSelectedConnectionIsBlue)
+TestRun.Case("the buttons of a selection are drawn, and only then", CheckButtonsAreDrawnForTheSelection)
+TestRun.Case("the four fields for new elements are fixed to the canvas", CheckNewElementFieldsAreFixedToTheCanvas)
+TestRun.Case("the selection rectangle has a blue edge and a tinted inside", CheckSelectionRectangleIsDrawn)
+TestRun.Case("the connection being drawn runs from the part of the element to the pointer", CheckConnectingLineIsDrawn)
+TestRun.Case("a dragged element is drawn live at its new place, the layer is built once per drag", CheckDraggedElementIsDrawnLive)
 
 Gdip.Shutdown()
 TestRun.Finish()

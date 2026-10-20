@@ -67,6 +67,21 @@ class EditorStyle {
     static ExceptionFill := 0x66C62828
     static RecentFill := 0x2EE53935
 
-    ; reserved for the selection (S0006); not drawn yet
+    ; the selection (WI-0097): the outline of a selected element or the line of a selected connection, the selection
+    ; rectangle (fill and outline) and the connection being drawn (a line from a part of an element to the pointer)
     static SelectionColor := 0xFF2E7BD6
+    static SelectionWidth := 3.0         ; px at 96 DPI
+    static SelectionFill := 0x332E7BD6
+    static ConnectingWidth := 2.0        ; px at 96 DPI
+
+    ; the buttons of the selection: the icon of each button name (FlowGeometry.ElementButtons, ConnectionButtons), copies
+    ; of the v1 icons in assets/icons, drawn at FlowGeometry.BUTTON_SIZE flow units
+    static ButtonIcons := Map("edit", "e_edit.ico", "trash", "e_trash.ico", "plus", "e_plus.ico", "plus2", "e_plus.ico"
+        , "move1", "e_move.ico", "move2", "e_move.ico")
+
+    ; the fields for new elements (NewElementFields): the white area behind them, their text and the fill of the kind
+    ; (the fill of the element kind, as the field shows what is created)
+    static FieldArea := 0xFFFAFAFA
+    static FieldRadius := 14             ; corner radius in device pixels at 96 DPI (scaled by the DPI)
+    static FieldTextFactor := 0.8        ; the text of a field, relative to TextSize
 }
