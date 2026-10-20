@@ -27,6 +27,7 @@
 ; Notices (WI-0075, PROTOCOL 4.7, 4.10): the role subscribes to the topic notice and shows each evt.ui.notice as a tray
 ; notice (TrayTip). The tray shows it, not the supervisor: a tray notice belongs to the process that owns the icon. At most
 ; one tray notice per 5 s; the others are counted. A headless role only counts.
+; A click on the balloon of an editor notice asks the supervisor to open that editor again (WI-0103, E0093).
 ;
 ;   AutoHotkey64.exe src\entry\tray.ahk --role=tray --session=<id> --hub=<pipe> --data=<dir> [--headless]
 ;   --headless   the icon stays hidden (every test run; E0046). Adds cmd.test.command, a driver for the tests that
@@ -41,7 +42,10 @@ class Tray extends Role {
     static KEY_SHOW := "Show_Manager"
     static KEY_EXIT := "Exit_#verb"
     ; The entries of cmd.test.command, by their name.
-    static TEST_ITEMS := Map("show", 1, "exit", 1)
+    static TEST_ITEMS := Map("show", 1, "exit", 1, "notice", 1)
+    ; The callback of the tray icon (AutoHotkey's message of a tray icon, as the TrayTip docs show) and the balloon click.
+    static TRAY_MSG := 0x404
+    static NIN_BALLOONUSERCLICK := 1029
     ; Notices (WI-0075): at most one tray notice per NOTICE_MS; the title of the balloon.
     static NOTICE_MS := 5000
     static NOTICE_TITLE := "AutoHotFlow"
@@ -57,6 +61,7 @@ class Tray extends Role {
         this.notices := 0           ; notices received (WI-0075)
         this.noticesHeld := 0       ; of them, not shown as a tray notice (the throttle)
         this.lastNotice := ""
+        this.balloonFlow := ""      ; flow of the editor notice the last balloon shows, "" for none (WI-0103)
         this.noticeThrottle := NoticeThrottle(Tray.NOTICE_MS)
     }
 
@@ -67,6 +72,7 @@ class Tray extends Role {
         A_IconTip := Tray.TIP
         ; The entry script carries #NoTrayIcon, so the icon appears only here, with the menu already complete.
         A_IconHidden := this.headless
+        OnMessage(Tray.TRAY_MSG, (wParam, lParam, msg, hwnd) => this._OnTrayMessage(lParam, hwnd))
     }
 
     RegisterHandlers() {
@@ -79,7 +85,7 @@ class Tray extends Role {
     DiagInfo() {
         return Map("iconHidden", Json.Bool(A_IconHidden), "tip", A_IconTip, "items", [this.menuShow, this.menuExit]
             , "requests", this.requests, "lastResult", this.lastResult, "notices", this.notices
-            , "noticesHeld", this.noticesHeld, "lastNotice", this.lastNotice)
+            , "noticesHeld", this.noticesHeld, "lastNotice", this.lastNotice, "editorFlow", this.balloonFlow)
     }
 
     ; --- notices (WI-0075) -----------------------------------------------------------------------------
@@ -103,10 +109,31 @@ class Tray extends Role {
             this.noticesHeld += 1
             return
         }
+        ; The balloon now shows this notice: a click opens the editor only for an editor notice (WI-0103).
+        this.balloonFlow := p.Get("kind", "") = "editor" ? p.Get("flowId", "") : ""
         if (!this.headless) {
             icon := p.Get("level", "") = "warning" ? "Icon!" : "Iconx"
             TrayTip(Tray.NOTICE_TITLE, SubStr(text, 1, Tray.NOTICE_CHARS), icon)
         }
+    }
+
+    ; The callback of the tray icon (WI-0103). Only the messages of this script's own icon count.
+    _OnTrayMessage(lParam, hwnd) {
+        if (hwnd != A_ScriptHwnd)
+            return
+        if (lParam = Tray.NIN_BALLOONUSERCLICK)
+            this.OnBalloonClick()
+    }
+
+    ; A click on the balloon of an editor notice asks the supervisor to open that editor again (PROTOCOL 4.10). The link
+    ; goes with the click: a second click on the same balloon does nothing. Returns true when a request went out.
+    OnBalloonClick() {
+        flowId := this.balloonFlow
+        this.balloonFlow := ""
+        if (flowId = "")
+            return false
+        this._Send("cmd.editor.open", Map("flowId", flowId))
+        return true
     }
 
     ; The language may have changed (Role.ApplySettings loaded the texts already): the menu gets the new texts.
@@ -157,15 +184,18 @@ class Tray extends Role {
 
     ; --- test driver (--headless only) ---------------------------------------------------------------
 
-    ; cmd.test.command {item}: runs the menu entry as if it had been clicked. item is "show" or "exit".
+    ; cmd.test.command {item}: runs the menu entry as if it had been clicked, item "show" or "exit"; item "notice" is the
+    ; click on the balloon of the last editor notice (WI-0103, the answer tells whether a request went out).
     _OnTestCommand(msg) {
         item := msg.payload.Get("item", "")
         if (IsObject(item) || !Tray.TEST_ITEMS.Has(item))
-            throw AhfError("cmd.test.command: item must be 'show' or 'exit'", ErrCode.BAD_PAYLOAD)
+            throw AhfError("cmd.test.command: item must be 'show', 'exit' or 'notice'", ErrCode.BAD_PAYLOAD)
         if (item = "show")
             this.ShowManager()
-        else
+        else if (item = "exit")
             this.Exit()
+        else
+            return Map("ok", true, "sent", Json.Bool(this.OnBalloonClick()))
         return Map("ok", true)
     }
 }
