@@ -85,8 +85,11 @@ BackBufferFollowsTheClientSize() {
     t := Made()
     win := t["win"]
     win._OnSize(SizeParam(640, 480), win.hwnd)
+    ; the status bar takes the bottom of the client area (WI-0090): the canvas is the rest of it
+    WinGetPos(, , , &barH, "ahk_id " win.status.Hwnd)
+    Assert.True(barH > 0, "the status bar has a height")
     Assert.Equal(win.canvas.width, 640, "back buffer width")
-    Assert.Equal(win.canvas.height, 480, "back buffer height")
+    Assert.Equal(win.canvas.height, 480 - barH, "back buffer height: the client height less the status bar")
     Assert.Equal(t["model"].view.Width, 640, "the view takes the size")
     win._OnSize(SizeParam(640, 480), win.hwnd)
     Assert.Equal(win.canvas.width, 640, "the same size: the same back buffer is kept")

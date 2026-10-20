@@ -12,6 +12,7 @@ import time
 from pathlib import Path
 
 import psutil
+import pytest
 
 from support.timing import scaled
 from test_manager import FLOW, SKELETON_SRC, process_states, wait_until
@@ -354,5 +355,148 @@ def test_warnings_show_a_count_badge_and_migration_places_a_badge(procs, datadir
         assert st["warnings"][ACTION]["text"] != "", st
         out = render(obs, probes=[(ACTION_X + 123, ACTION_Y + 90), (ACTION_X + 128, ACTION_Y + 12)])
         assert out["colors"] == [WARNING_BADGE, MIGRATION_BADGE], out
+    finally:
+        finish(sup, obs)
+
+
+# --- WI-0090: the view (zoom, move, size, DPI), the status bar and the tooltip (REQ-EDT-020, REQ-EDT-030, REQ-USE-090) ---
+
+CONNECTION_1 = "connection0000000004"
+
+
+def view_command(obs, name=EDITOR, **args):
+    """cmd.test.view with the given steps; returns the payload (view, status)."""
+    ans = obs.request(name, "cmd.test.view", args, timeout=scaled(5))
+    assert ans["payload"]["ok"], ans
+    return ans["payload"]
+
+
+def hover(obs, x, y, name=EDITOR):
+    ans = obs.request(name, "cmd.test.hover", {"x": x, "y": y}, timeout=scaled(5))
+    assert ans["payload"]["ok"], ans
+    return ans["payload"]
+
+
+def test_the_wheel_zooms_one_step_at_the_pointer_and_keeps_the_point_under_it(procs, datadir, session_id):
+    """Task 1: a wheel step is the factor 1.1 (v1), and the flow point under the pointer stays under it."""
+    sup, obs = start_manager(procs, datadir, session_id)
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        before = editor_state(obs)["view"]
+        cx, cy = 400, 300
+        fx = before["offsetX"] + cx / before["zoom"]
+        fy = before["offsetY"] + cy / before["zoom"]
+        view = view_command(obs, zoomAt={"x": cx, "y": cy, "direction": 1}, size={"w": 800, "h": 600})["view"]
+        assert view["zoom"] == pytest.approx(before["zoom"] * 1.1, rel=1e-4), view
+        assert view["offsetX"] + cx / view["zoom"] == pytest.approx(fx, rel=1e-4), view
+        assert view["offsetY"] + cy / view["zoom"] == pytest.approx(fy, rel=1e-4), view
+        view = view_command(obs, zoomAt={"x": cx, "y": cy, "direction": -1})["view"]
+        assert view["zoom"] == pytest.approx(before["zoom"], rel=1e-4), view
+    finally:
+        finish(sup, obs)
+
+
+def test_the_zoom_stops_at_the_limits_0_1_and_3(procs, datadir, session_id):
+    sup, obs = start_manager(procs, datadir, session_id)
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        for _ in range(60):
+            view = view_command(obs, zoomAt={"x": 10, "y": 10, "direction": 1})["view"]
+        assert view["zoom"] == pytest.approx(3, rel=1e-6), view
+        for _ in range(80):
+            view = view_command(obs, zoomAt={"x": 10, "y": 10, "direction": -1})["view"]
+        assert view["zoom"] == pytest.approx(0.1, rel=1e-6), view
+    finally:
+        finish(sup, obs)
+
+
+def test_a_drag_moves_the_view_by_the_movement_of_the_pointer(procs, datadir, session_id):
+    """Task 2: the content follows the pointer: a movement of 50 px to the right moves the offset by 50 / zoom."""
+    sup, obs = start_manager(procs, datadir, session_id)
+    try:
+        op(obs, "select", flowId=FLOW)
+        before = open_editor(obs)["view"]
+        view = view_command(obs, drag={"dx": 50, "dy": -20})["view"]
+        assert view["offsetX"] == pytest.approx(before["offsetX"] - 50 / before["zoom"], rel=1e-4), view
+        assert view["offsetY"] == pytest.approx(before["offsetY"] + 20 / before["zoom"], rel=1e-4), view
+        assert view["zoom"] == pytest.approx(before["zoom"], rel=1e-6), view
+    finally:
+        finish(sup, obs)
+
+
+def test_a_new_size_and_dpi_keep_the_flow_at_the_same_physical_size(procs, datadir, session_id):
+    """Task 3 and 6 (REQ-USE-090): the canvas takes the size, and the scale is zoom x DPI / 96, so an element has the same
+    physical size on every screen. A window on a screen with 150 % scaling draws the flow 1.5 times as large in pixels."""
+    sup, obs = start_manager(procs, datadir, session_id)
+    try:
+        op(obs, "select", flowId=FLOW)
+        zoom = open_editor(obs)["view"]["zoom"]                # the flow's own zoom (flowSettings.zoomFactor)
+        view = view_command(obs, size={"w": 1000, "h": 700}, dpi=144)["view"]
+        assert (view["width"], view["height"], view["dpi"]) == (1000, 700, 144), view
+        assert view["zoom"] == pytest.approx(zoom, rel=1e-6), view
+        assert view["zoom"] * view["dpi"] / 96 == pytest.approx(zoom * 1.5, rel=1e-6), view
+        st = editor_state(obs)
+        assert st["view"]["dpi"] == 144, st
+    finally:
+        finish(sup, obs)
+
+
+def test_the_status_bar_text_shows_offset_zoom_and_the_number_of_elements(procs, datadir, session_id):
+    """Task 5 (v1 texts): offset, zoom and the number of elements, separated by |."""
+    sup, obs = start_manager(procs, datadir, session_id)
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        assert editor_state(obs)["status"] == "Offset: x 0 y 0   |   Zoom: 1.00   |   3 elements", editor_state(obs)
+        view_command(obs, drag={"dx": 10, "dy": 0})
+        assert editor_state(obs)["status"] == "Offset: x -10 y 0   |   Zoom: 1.00   |   3 elements", editor_state(obs)
+    finally:
+        finish(sup, obs)
+
+
+def test_the_tooltip_names_the_element_under_the_pointer_and_nothing_on_empty_space(procs, datadir, session_id):
+    """Task 4 (REQ-EDT-020): kind, class and name of an element. The skeleton flow has zoom 1 and offset 0, 0, so a
+    canvas pixel is a flow point: (70, 52) lies in the trigger (0..140, 0..105)."""
+    sup, obs = start_manager(procs, datadir, session_id)
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        out = hover(obs, 70, 52)
+        assert (out["kind"], out["id"]) == ("element", TRIGGER), out
+        lines = out["tooltip"].split("\n")
+        assert lines[0] == "Trigger", out
+        assert "Name: Manual - Skeleton" in lines, out
+        assert any(line.startswith("Class: ") for line in lines), out
+        empty = hover(obs, 700, 550)                   # right of the flow
+        assert (empty["kind"], empty["tooltip"]) == ("", ""), empty
+    finally:
+        finish(sup, obs)
+
+
+def test_the_tooltip_of_a_connection_gives_its_type(procs, datadir, session_id):
+    """Task 4: a connection shows its type. The connection runs from the trigger (bottom at flow y 105) to the action
+    (top at y 210), at x 70: the canvas pixel (70, 157) is on it (zoom 1, offset 0, 0)."""
+    sup, obs = start_manager(procs, datadir, session_id)
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        out = hover(obs, 70, 157)
+        assert (out["kind"], out["id"]) == ("connection", CONNECTION_1), out
+        assert out["tooltip"] == "Connection type: normal", out
+    finally:
+        finish(sup, obs)
+
+
+def test_the_tooltip_of_an_element_lists_its_migration_places(procs, datadir, session_id):
+    """Task 4: the MIGRATION IDs of an element are in its tooltip (the action has one place, M-0025)."""
+    sup, obs = start_manager(procs, datadir, session_id, prepare=lambda d: write_flow(d, FLOW, migration=True))
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        out = hover(obs, 70, 262)
+        assert out["id"] == ACTION, out
+        assert "MIGRATION M-0025" in out["tooltip"].split("\n"), out
     finally:
         finish(sup, obs)
