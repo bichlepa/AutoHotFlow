@@ -13,6 +13,8 @@
 ;           pan out of the layer.
 ; Also the cost of the scene itself (SceneBuilder.Build of a changed flow), which the window pays on a state change
 ; before the frame: that is not part of the frame and is reported apart.
+; WI-0097 (MS-0051): a DRAG line per count (1 and 30 elements): the frame of a drag (Scene.WithDrag and Draw), the rebuild
+; at its start and the rebuild after the drop.
 ;
 ; A_Args[1] = result file (one line RESULT ... is appended), [2] width, [3] height, [4] view: whole (the whole flow
 ; visible) or zoom1 (zoom 1), [5] frames (default 100), [6] warm-up frames (default 10), [7] rebuilds (default 10),
@@ -217,6 +219,48 @@ Main(args) {
         FileAppend(Format("WITHSTATES view={1} width={2} height={3} elements=300 changed=60 frames={4} "
             . "mean={5:.3f} median={6:.3f} p95={7:.3f} max={8:.3f}`n", view, W, H, frames, wsT["mean"], wsT["median"],
             wsT["p95"], wsT["max"]), resultFile)
+        ; WI-0097 (MS-0051): a drag of 1 and of 30 elements (the first ones of the flow) on the plain flow. Each frame
+        ; makes the scene of the drag (Scene.WithDrag, its own cost) and draws it. The first frame builds the static
+        ; layer without the dragged items (the rebuild at the start), the drop builds it again.
+        for count in [1, 30] {
+            dragIds := Map()
+            loop count
+                dragIds[ids[A_Index]] := true
+            plain := SceneBuilder.Build(raw, vw)
+            r.Invalidate()
+            r.Draw(plain, c)                       ; the layer of the flow at rest
+            startRebuild := 0
+            layersBefore := r.Rebuilds
+            moveTimes := []
+            drawTimes := []
+            frameTimes := []
+            loop frames {
+                offset := 2 * A_Index
+                t0 := Renderer.Now()
+                dragged := plain.WithDrag(dragIds, offset, offset)
+                t1 := Renderer.Now()
+                r.Draw(dragged, c)
+                t2 := Renderer.Now()
+                if (A_Index = 1) {
+                    startRebuild := r.LastRebuildMs     ; the first frame is the rebuild at the start: reported apart
+                    continue
+                }
+                moveTimes.Push(t1 - t0)
+                drawTimes.Push(t2 - t1)
+                frameTimes.Push(t2 - t0)
+            }
+            layersDuringDrag := r.Rebuilds - layersBefore
+            r.Draw(plain, c)                       ; the drop: the layer of the flow at rest again
+            dropRebuild := r.LastRebuildMs
+            fr := Stats(frameTimes)
+            dr := Stats(drawTimes)
+            mv := Stats(moveTimes)
+            FileAppend(Format("DRAG view={1} width={2} height={3} dragged={4} frames={5} frame_mean={6:.3f} "
+                . "frame_median={7:.3f} frame_p95={8:.3f} frame_max={9:.3f} draw_mean={10:.3f} move_mean={11:.3f} "
+                . "start_rebuild={12:.3f} drop_rebuild={13:.3f} layer_rebuilds_during_drag={14}`n", view, W, H, count,
+                frames, fr["mean"], fr["median"], fr["p95"], fr["max"], dr["mean"], mv["mean"], startRebuild,
+                dropRebuild, layersDuringDrag), resultFile)
+        }
     } finally {
         if IsObject(g)
             g.Destroy()

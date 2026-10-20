@@ -264,3 +264,18 @@ Background processes (sum of supervisor, storage, engine, triggerhost and manage
 Latency of the editor (change to end of frame, cumulative over the five starts, from `cmd.test.state`): 39 frames with a measured latency, **median 43.8 ms, p95 68.8 ms**. The editor ends with nothing running; the engine's run state agrees.
 
 **Reading (F-0156).** The batch size is bounded: one batch of up to about 235 to 300 entries per 33 ms interval, about 35 KB of JSON for the largest batch, and no element is lost. The latency is the open point: the median is above the 33 ms batch interval plus one frame, and the p95 of 68.8 ms is above the 50 ms of REQ-PRF-060. The batch wait adds to every change. So the number is **not fine**: F-0156 stays open. The owner decides the next step (decision needed, see the result of WI-0092). Not measured: the same run with a real window, and under a load on the machine.
+
+## Editing: frame of a drag and the layer rebuilds (WI-0097, MS-0051)
+
+**Machine and state.** The machine of MS-0048, one measurement at a time, but other agents worked on the same machine during the run (the load was not recorded). The renderer is the one of WI-0097 (the drag layer, commit "Renderer: selection, buttons, new-element fields and the live drag layer"). No pytest run ID: a hand measurement with `tests/ahk/helpers/renderer_bench.ahk` (DRAG lines, VS Code task "Tool: renderer measurement ..."). Output: `temp/bench/drag-1920-b.txt` in the workspace of WI-0097 (ignored).
+
+Setup: the plain flow of 300 elements and 350 connections (as MS-0048), the whole flow visible at 1920 × 1080 (zoom 0.47). The first elements of the flow are dragged (1 or 30) by an offset that grows by 2 units per frame. 100 frames; the first frame of the drag (the rebuild at its start) is reported apart and is not in the frame statistics. Times in milliseconds.
+
+| Dragged | Frame: mean (median, p95, max) | Draw: mean | Scene.WithDrag: mean | Rebuild at the start | Rebuild after the drop |
+|---|---|---:|---:|---:|---:|
+| 1 element | **10.57** (10.50, 10.96, 12.11) | 7.11 | 3.46 | 105.1 | 107.3 |
+| 30 elements | **25.03** (24.78, 26.21, 33.61) | 19.99 | 5.04 | 90.5 | 105.0 |
+
+**Reading.** The budget of WI-0097 (the frame of a drag below 16 ms on average at 1920 × 1080): **met for 1 element** (10.6 ms; the frame of the flow that every frame pays is about 7 ms, see MS-0048), **not met for 30 elements** (25.0 ms). The drag costs about 13 ms more than the frame of a state change for 30 elements, plus about 3 to 5 ms for `Scene.WithDrag` in each frame (the scene is built again with its bounds). The rebuilds (90 to 107 ms) are of the order of the rebuild of MS-0048 (113 ms): the layer is built once per drag and once after the drop, as designed. Not checked: which part of the 13 ms belongs to the elements and which to their connections (the labels are text). The options are in `doc/OPEN-ITEMS.md` (decision needed).
+
+Not measured: with a real window (the owner's manual check), under a load on the machine, at 3840 × 2160.

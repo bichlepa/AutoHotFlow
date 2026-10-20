@@ -16,6 +16,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 | ID | Title | Status | Phase 3 |
 |---|---|---|---|
+| F-9000 | The frame of a drag of 30 elements in a flow of 300 is 25 ms at 1920 × 1080 (budget 16 ms); one element meets it (WI-0097, MS-0051) | decision needed, measured; WI-0097 | WI-0097 |
 | F-0154 | `verify.py --auto` (also `select_tests.py --from`, `pytest --changed-from`) refused every range that deletes a file with "not classified by any test rule": a deleted path has no rule once it is gone (WI-0088 removed `src/core/PlaceholderRole.ahk`) | closed, verified (`tests/test_groups.py`, a deleted path selects everything) | tooling |
 | F-0129 | A `.ahf` written by tar.exe is not read by 7-Zip or by v1 in any test (v1 writes a flat ZIP with 7-Zip, tar writes the same layout). Reading a real v1 `.ahf` is tested (`tests/data/ahf/v1_export_two_flows.ahf`) | open, WI-0081; ask the owner for a v1 file of another kind (more flows, statics) | WI-0081 |
 | F-0130 | Drag and drop of an `.ahf` file onto the manager and the file dialogs of the import and export are not automated (the gui tier is not run by agents) | open, WI-0081; only MANUAL-CHECKS part D checks them by hand | WI-0081 |
@@ -306,4 +307,10 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 
 **What:** the renderer bench (`tests/ahk/helpers/renderer_bench.ahk`, `#Warn All`) reports `Warning: This local variable has the same name as a global variable` for `type` in `Trigger_Start_up.ahk` line 47 (function `Enable`). The bench includes the product's element classes; the product itself does not use `#Warn All`.
 **Status:** open, low; verified by the bench output, not checked whether the product shows the warning at run time.
+
+### F-9000: The drag of 30 elements is above the frame budget
+
+**What:** WI-0097 asks for a frame during a drag below 16 ms on average (1 and 30 elements, a flow of 300, 1920 × 1080). Measured with `tests/ahk/helpers/renderer_bench.ahk` (MS-0051, 100 frames, one run): 10.6 ms for 1 element (met), 25.0 ms for 30 elements (not met; the draw part is 20.0 ms, `Scene.WithDrag` 5.0 ms). The rebuilds at the start and after the drop are 90 to 107 ms, as for a flow change. The live drawing of the dragged items each frame is the cost; which part (elements or their connection labels) is not checked.
+**Options (for the owner):** (a) draw the dragged elements once into a group layer at the start of the drag and copy it per frame, the connections stay live (expected to help the elements part; not measured); (b) accept the 25 ms for large drags (a drag of many elements is rare, the one-element drag is inside the budget); (c) reduce the work of `Scene.WithDrag` (it builds the whole scene again per frame).
+**Status:** decision needed (the project owner), measured (MS-0051). Not checked: the real window and the feel of the drag on the owner's machine.
 
