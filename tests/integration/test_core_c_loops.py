@@ -530,7 +530,8 @@ def test_long_loops_do_not_scale_with_the_size_of_the_list_or_the_text(flows):
     runs = run_all(flows, builders, timeout=60)
     for run in runs:
         assert run.reason == "finished" and not run.exceptions
-        assert run.names.count("TP p") == n, run.names.count("TP p")
+        # WI-0089: the passes that run within one batch interval are one recorded step, so the count is at most n
+        assert 1 <= run.names.count("TP p") <= n, run.names.count("TP p")
 
 
 @pytest.mark.slow
@@ -561,7 +562,9 @@ def test_a_long_loop_does_not_block_the_engine_and_costs_little_per_pass(flows):
     flows.wait(run, timeout=300)
     total = time.monotonic() - t0
     assert run.reason == "finished" and run.names[-1] == "AFTER"
-    assert run.names.count("Loop_SimpleLoop") == passes_ + 1
+    # WI-0089: the passes of a loop that run within one batch interval are one entry of the batch (the latest state),
+    # so the count of the recorded steps is at most the passes (the passes are not observable one by one any more)
+    assert 1 <= run.names.count("Loop_SimpleLoop") <= passes_ + 1
     assert other.reason == "finished" and other.names[-1] == "QUICK"
     print("\nMEASURE long loop: %d passes in %.2f s = %.1f us per pass (includes the events to the test observer); "
           "snapshot while the loop ran: max %.0f ms; another flow: %.0f ms"
