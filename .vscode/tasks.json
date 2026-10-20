@@ -1045,7 +1045,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Tool: memory of five open editors (WI-0092, MS-0048; run alone, about 15 min; MEM5 lines in temp/s5/memory-editors.txt)",
+            "label": "Tool: memory of five open editors (WI-0092, MS-0049; run alone, about 15 min; MEM5 lines in temp/s5/memory-editors.txt)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -1064,7 +1064,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: stress, editor batch size of a flow of 300 elements (F-0156, MS-0049; run alone; prints the F-0156 lines)",
+            "label": "Test: stress, editor batch size of a flow of 300 elements (F-0156, MS-0050; run alone; prints the F-0156 lines)",
             "type": "shell",
             "command": "python",
             "args": [

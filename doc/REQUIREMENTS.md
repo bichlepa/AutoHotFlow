@@ -2262,7 +2262,7 @@ No blocking call on the message path. Every request has a timeout; a late answer
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (editor)
-- **Evidence:** `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/fault/test_worker_lifecycle.py::test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs`, `tests/integration/test_trigger_arming.py::test_the_engine_is_restarted_and_rearms_without_the_startup_context`, `tests/integration/test_trigger_arming.py::test_the_trigger_host_is_restarted_and_its_triggers_fire_again`, `tests/e2e/test_editor.py::test_killed_engine_restarts_and_the_editor_shows_the_state_again`, `tests/e2e/test_editor.py::test_killed_engine_restarts_and_the_editor_shows_the_state_again`
+- **Evidence:** `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/fault/test_worker_lifecycle.py::test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs`, `tests/integration/test_trigger_arming.py::test_the_engine_is_restarted_and_rearms_without_the_startup_context`, `tests/integration/test_trigger_arming.py::test_the_trigger_host_is_restarted_and_its_triggers_fire_again`, `tests/e2e/test_editor.py::test_killed_engine_restarts_and_the_editor_shows_the_state_again`
 
 When the part that runs the flows (the engine) crashes, it starts again by itself. Open windows stay open and show the current state again; the triggers of enabled flows are active again. Instances that were running are lost (MIGRATION M-0001).
 
