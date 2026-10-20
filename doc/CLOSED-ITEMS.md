@@ -85,6 +85,7 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0128 | The text of the question dialogs was clipped to its first line | closed (fixed: `GuiLayout.TextHeight`) | WI-0076 |
 | F-0140 | The checkboxes of the settings dialog were 600 px wide and painted over the note column on hover | closed (fixed, unit test `ControlsOfATabDoNotOverlap`; the owner saw the fix on 2026-10-19) | WI-0078 |
 | F-0142 | PROTOCOL documents message types that no source string uses | closed 2026-10-19: `evt.connection.state` and `cmd.ui.confirmDeleteFlowFile` removed from PROTOCOL (dead; M-0008, WI-0086), the status table brought to the code | WI-0082 |
+| F-0159 | REQ-EDT-230: the table of the editor's tray menu says that "Close" asks the question about unsaved changes, but REQ-EDT-100 says that closing the editor asks nothing | closed (decided by the owner on 2026-10-20: REQ-EDT-100 holds, REQ-EDT-230 corrected) | WI-0092 |
 | F-0143 | A `-m stress` run opens a real manager window | closed 2026-10-19: fixed in `tests/conftest.py` (a run that names stress, soak or idle but not gui leaves gui tests out, also with `--all`), test `tests/test_tier_selection.py` | WI-0082 |
 | F-0144 | The fast tier takes 4 to 13 minutes, not the 1 to 2 minutes of the owner decision F-0108 | closed (owner decision E0089: no fixed budget, the test groups decide) | |
 | F-0151 | The static layer rebuild is slow at 4K | accepted | WI-0085 |
@@ -836,6 +837,12 @@ This document lists findings that are closed or accepted. Entries are moved here
 **What:** 10 tests of `tests/integration/test_hotkey_input.py` (`@input`) failed in run 20261017-105241-27428 (commit 237441d plus uncommitted test changes): "the probe key vk88 did not arrive although the input desktop is usable and no modifier is held: hotkey path, not the desktop". A serial rerun at 11:01 skipped all of them ("no input desktop": the desktop was locked or secure).
 **Status (before closing):** observed once; not reproduced; not checked against a base commit; cause not known. The change of WI-0070 touches the engine trigger path only in a guard (`IsDeleting`). Watch the next fast runs. A locked PC explains the skips (LogonUI was running during the session, verified).
 **Closed (2026-10-19):** the cause was found and fixed (see the table row: the input desktop was locked, LogonUI was running, the `tasklist` output could not be decoded). The skip on a real lock screen has not been seen since.
+
+### F-0159: The tray menu's "Close" and REQ-EDT-100 disagree about the question
+
+**What:** REQ-EDT-230 (table of the tray menu) says that "Close" closes the editor "with the question about unsaved changes (REQ-EDT-100)". REQ-EDT-100 says that a flow has no unsaved state, so "closing the editor or the application asks nothing". Manual check 9, step 15 expects no question.
+**Status (before closing):** open; a decision of the project owner: either the question goes (as REQ-EDT-100 says) or the requirement names it again.
+**Closed (2026-10-20, decided by the owner):** REQ-EDT-100 holds, REQ-EDT-230 is corrected: "Close" closes the editor without a question, as the close box does (a flow has no unsaved state). The code (`EditorTray.Close`) and the planned-end test (`tests/e2e/test_editor_tray.py`) already did so.
 
 ## Sources
 

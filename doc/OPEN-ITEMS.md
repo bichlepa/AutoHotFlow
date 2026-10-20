@@ -1,6 +1,6 @@
 # Open Points
 
-Status: 2026-10-19, branch `v2-port`. Findings are carried in the summary table below; closed ones are in `doc/CLOSED-ITEMS.md`.
+Status: 2026-10-20, branch `v2-port`. Findings are carried in the summary table below; closed ones are in `doc/CLOSED-ITEMS.md`.
 
 This document lists everything that is still open, observed, or deferred. History of the early findings (F-0001 to F-0043): tag `v2-phase2-final`, table "Funde" in `v2-phase2-final:work_items/STATUS.md`. The work-item files that this document cites were removed from the working tree; they can be read with `git show v2-phase2-final:<path>`.
 
@@ -49,11 +49,11 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0150 | `SceneBuilder.Build` takes about 18 ms for 300 elements (MS-0046), more than the frame of a state change (6 ms): the window builds a new scene at every state change, so a state change costs about 25 ms before it is on the screen. A build that changes only the run states would save it | closed in WI-0089: `Scene.WithStates` takes a mean of 4.0 ms for 300 elements with 60 changed states, against 18.7 ms for a build (MS-0047) | WI-0085 |
 | F-0152 | The word "break" in the break field of a loop is a literal in the renderer, not a language text | open, low | WI-0085 |
 | F-0155 | The restart test after an editor death (`test_the_editor_of_a_flow_that_just_died_is_started_again_and_its_slot_is_free`) expected a started answer on a later request; since WI-0088 the first request is often the one that starts the editor, so the test failed under load in every full fast run | closed (test parametrized and robust; the old assertion fails in the judged-first case) | WI-0088, WI-0089 |
-| F-0156 | The element states of a flow go out in batches: at most one `evt.element.states` per flow and 33 ms (WI-0089, owner decision). The message count is bounded for any flow. The size of a batch grows with the number of elements that change in one interval; for a flow of 300 elements at once it is not measured (MS-0047 measures a loop of three elements at the guard's limit: hub queue 0, latency p95 46 ms) | open, measured (MS-0050, WI-0092): a flow of 300 elements that all change in one interval sends 2 or 3 batches per start, the largest about 35 KB and up to 235 to 300 entries; the editor's latency is median 43.8 ms and p95 68.8 ms, above the 50 ms of REQ-PRF-060; the owner decides the next step (decision needed) | WI-0089 |
+| F-0156 | The element states of a flow go out in batches: at most one `evt.element.states` per flow and 33 ms (WI-0089, owner decision). The message count is bounded for any flow. The size of a batch grows with the number of elements that change in one interval; for a flow of 300 elements at once it is not measured (MS-0047 measures a loop of three elements at the guard's limit: hub queue 0, latency p95 46 ms) | postponed by the owner on 2026-10-20; measured (MS-0050, WI-0092): a flow of 300 elements that all change in one interval sends 2 or 3 batches per start, the largest about 35 KB and up to 235 to 300 entries; the editor's latency is median 43.8 ms and p95 68.8 ms, above the 50 ms of REQ-PRF-060; the next step is postponed by the owner | WI-0089 |
 | F-0157 | `tests/integration/test_pipe.py::test_abrupt_end_of_client_process_is_seen_within_500_ms[2]` is red under load: 1819 ms measured (budget 1500 ms) while the machine ran at 99 % CPU. A wall-clock latency assertion that is not covered by the admission of the test runs; not checked alone | open, verified (one red run under load); the owner decides whether it is a gui-tier or idle-tier test | WI-0090 |
 | F-0158 | The language files `assets/language/basic/de.ini`, `ko.ini` and `ru.ini` are UTF-16 LE with BOM and CRLF, but `LangTable` reads every language file as UTF-8, so these three languages are probably not loaded (`en.ini` and the `manager` folder are UTF-8 or ASCII) | open, verified by the file encodings and the `FileRead` calls; the effect at run time was not run | WI-0091 |
-| F-0159 | REQ-EDT-230: the table of the editor's tray menu says that "Close" asks the question about unsaved changes, but REQ-EDT-100 says that closing the editor asks nothing (a flow has no unsaved state). Manual check 9, step 15 expects no question | open, doc contradiction, owner decision | WI-0092 |
 | F-0160 | `tests/ahk/helpers/renderer_bench.ahk` under `#Warn All` warns about a local variable `type` (same name as a global) in `src/elements/Default/Triggers/Trigger_Start_up.ahk` line 47; the product does not run under `#Warn All`, so it is not checked whether the product shows it | open, low, verified by the bench output | WI-0092 |
+| F-9000* | Order inside a batch of element states: entries inside one 33 ms batch are in the order of the first change; a fast repeating failing element shows only its last state | postponed by the owner (2026-10-20), a note, no requirement | WI-0089 |
 | F-0153 | The tint of a running element is drawn after all elements, so where a running element overlaps a later element of the scene, the tint lies over that element; v1 draws the tint with its element, so the later element covers it | open, low; the sample flows show no such overlap, not checked on a larger flow | WI-0085 |
 
 ## Findings
@@ -244,7 +244,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 ### F-0156: The size of an element-state batch is not measured for large flows
 
 **What:** the engine sends the element states of a flow in batches: at most one `evt.element.states` per flow and 33 ms (WI-0089, owner decision). The message count is bounded for any flow. The size of a batch grows with the number of elements that change in one interval. Measured in WI-0092 (MS-0050): a flow of 300 elements that all change in one interval gives 2 or 3 batches per start, the largest about 35 KB; the editor's frame latency (change to end of frame) has median 43.8 ms and p95 68.8 ms. The median is above the batch interval plus one frame, and the p95 is above the 50 ms of REQ-PRF-060 (MS-0047 measures a loop of three elements at the guard's limit: hub queue 0, latency p95 46 ms).
-**Status:** open, measured: the number is not fine, so the finding stays open. The owner decides the next step (the batch interval, a faster path for the state change, or the render process of ARCHITECTURE 2.1); the message count is verified by `tests/stress/test_editor_event_load.py`.
+**Status:** postponed by the owner on 2026-10-20. Measured: the number is not fine, so the finding stays open; the owner postponed the next step (the batch interval, a faster path for the state change, or the render process of ARCHITECTURE 2.1); the message count is verified by `tests/stress/test_editor_event_load.py`.
 
 ### F-0157: The pipe latency test is red under load
 
@@ -255,6 +255,11 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 **What:** `assets/language/basic/de.ini`, `ko.ini` and `ru.ini` are UTF-16 LE with BOM and CRLF. `LangTable` reads every language file with `FileRead(path, "UTF-8")` (two places), so the keys of these files are probably not found and the program falls back to English. `basic/en.ini` and `assets/language/manager/*.ini` are ASCII or UTF-8. Seen while reviewing WI-0091, whose new key exists in `en.ini` only.
 **Status:** open; verified: the encodings and the read calls; not checked: what a run with the language German shows. Fix: convert the files to UTF-8 (or read them by their BOM) and add a test that every language file loads.
+
+### F-9000*: Order inside a batch of element states
+
+**What:** the engine sends the element states of a flow in batches of at most 33 ms (WI-0089). Inside one batch the entries are in the order of the first change of each element. A fast repeating failing element shows only its last state in the batch.
+**Status:** postponed by the owner on 2026-10-20. A note only; no requirement depends on it.
 
 ## Observed only (not for the bug hunter)
 
@@ -302,11 +307,6 @@ Work that is open but is not a finding with an entry. Rule: a finished action is
 None here. The decisions waiting for the project owner are in `NEEDS-ATTENTION.md` (repository root).
 
 Decisions on entries are in the summary table (status `decision needed`, `accepted`, `closed`) and in the status book `work_items/phase3/STATUS.md`, section "Decisions of the project owner".
-
-### F-0159: The tray menu's "Close" and REQ-EDT-100 disagree about the question
-
-**What:** REQ-EDT-230 (table of the tray menu) says that "Close" closes the editor "with the question about unsaved changes (REQ-EDT-100)". REQ-EDT-100 says that a flow has no unsaved state, so "closing the editor or the application asks nothing". Manual check 9, step 15 expects no question.
-**Status:** open; a decision of the project owner: either the question goes (as REQ-EDT-100 says) or the requirement names it again.
 
 ### F-0160: A warning of the renderer bench in a product script
 
