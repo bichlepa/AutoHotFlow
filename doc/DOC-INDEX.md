@@ -330,7 +330,7 @@ L423-429 An Array has no Sort method, and a function returns one value (verified
 L431-437 Names are case-insensitive: a global `W` makes every local `w` of the included files a warning (verified) (verified)
 ```
 
-## doc/howto/tests-and-tools.md (45.2 KB, 442 lines)
+## doc/howto/tests-and-tools.md (49.2 KB, 482 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -385,6 +385,11 @@ L412-418 `loop files` takes a mode string, not a number (verified)
 L420-426 A closure over the variable of a `for` loop does not work in a test case (verified)
 L428-434 A window with real controls can be tested without showing it (verified) (verified)
 L436-442 A session with N workers needs `--workers=N` and `--warm-workers=N`, and `--windows-startup` drops the manager (verified) (verified)
+L444-450 SendMessage with a buffer of this process reads or writes the memory of the other process (gui tests, verified) (verified)
+L452-458 A Gui window of AutoHotkey has the class AutoHotkeyGUI, not AutoHotkey (verified) (verified)
+L460-466 A window title with the flow name depends on the language and the case of the name (verified) (verified)
+L468-474 `cmd.editor.open` is reserved for the manager: a gui test sends it as the manager (verified) (verified)
+L476-482 AHK's FileAppend fails in a missing folder, and SplitPath needs backslashes (verified) (verified)
 ```
 
 ## doc/REQUIREMENTS.md
