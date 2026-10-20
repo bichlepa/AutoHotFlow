@@ -223,3 +223,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** a valid file name (no separators, no `:` apart from the drive). `GdipCanvas.SavePng` writes through `GdipCreateBitmapFromHBITMAP` and `GdipSaveImageToFile` with the PNG encoder CLSID from `Gdip.EncoderClsid("image/png")` (`tests/ahk/gdip.test.ahk`, `CheckSavePngWritesAPngFile`).
 - **Status:** verified (the unit test with a valid name; the failing name by the helper run, AutoHotkey 2.0.30, 2026-10-19; a folder with forward slashes was not tested on its own)
 - **Source:** `src/editor/render/GdipCanvas.ahk` (`SavePng`), `src/editor/render/Gdip.ahk` (`EncoderClsid`)
+
+### The status bar of a window is laid out by the parent's WM_SIZE, and its height must be read after that (assumed)
+
+- **Problem:** The editor window puts a native StatusBar at the bottom and gives the canvas the rest of the client area. The status bar does not resize itself when a Gui is resized by Windows only through the size message the window gets.
+- **Wrong:** Sizing the canvas from the `lParam` of WM_SIZE alone: the canvas then covers the status bar.
+- **Right:** In the WM_SIZE handler, send WM_SIZE to the status bar (`DllCall("user32\SendMessageW", ...)`), read its height with `WinGetPos` by `ahk_id`, and subtract it from the client height. `src/editor/EditorWindow.ahk` (`_OnSize`).
+- **Status:** assumed (the same code runs in the headless unit test with the window created but not shown; the layout of a shown window is for the owner's gui check, WI-0092)
+- **Source:** `src/editor/EditorWindow.ahk` (`_OnSize`), `tests/ahk/editor_window.test.ahk`
+
+### Round(x, n) returns text with n decimals, so Round(1, 2) shows "1.00" (verified)
+
+- **Problem:** The status text of the editor showed "Zoom: 1.00" where the test expected "Zoom: 1".
+- **Wrong:** Taking `Round(zoom, 2)` for a number that prints without decimals.
+- **Right:** This is the v1 text, which also gives "1.00" (v1 `ui_UpdateStatusbartext`). Keep it, and write the expectation with two decimals. A plain `zoom ""` gives "1".
+- **Status:** verified (`tests/e2e/test_editor.py::test_the_status_bar_text_shows_offset_zoom_and_the_number_of_elements`, AutoHotkey 2.0.30, 2026-10-20)
+- **Source:** `src/editor/FlowStatus.ahk`

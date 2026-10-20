@@ -1506,7 +1506,7 @@ Each open flow has its own editor window in its own process (D0002). An editor t
 ### REQ-EDT-020 Draw the flow
 
 - **v1:** yes
-- **v2:** partial (the geometry, the scene and the hit test are unit-tested, WI-0084; the renderer draws the elements with icon and name, the connections with their type and label, the loops with their parts, the trigger marks and the state overlays, pixel-tested, WI-0085; WI-0088: the editor process draws its flow into the back buffer of its window and copies it in WM_PAINT, without a background erase, the window itself is checked by the owner (gui test `tests/fault/test_editor_window.py`); the hover is missing: WI-0090)
+- **v2:** partial (the geometry, the scene and the hit test are unit-tested, WI-0084; the renderer draws the elements with icon and name, the connections with their type and label, the loops with their parts, the trigger marks and the state overlays, pixel-tested, WI-0085; WI-0088: the editor process draws its flow into the back buffer of its window and copies it in WM_PAINT, without a background erase, the window itself is checked by the owner (gui test `tests/fault/test_editor_window.py`); WI-0090: the tooltip text of an element (kind, class, name), of a connection (type) and of a MIGRATION place is tested headless (`tests/e2e/test_editor.py`); the lines for an exception, an arming error and a warning are not tested yet; the timing of the hover and the real pointer are not checked, owner check in WI-0092)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
@@ -1516,7 +1516,7 @@ Elements with icon and name, connections with their type, loops with their adjus
 ### REQ-EDT-030 Zoom and move the view
 
 - **v1:** yes
-- **v2:** partial (zoom, move and the scale with the DPI are unit-tested, WI-0084; the window does not react to the mouse yet, WI-0090)
+- **v2:** partial (zoom, move and the scale with the DPI are unit-tested, WI-0084; WI-0090: the wheel zoom at the pointer, the drag, the limits 0.1 to 3 and a new size or DPI are tested headless (`tests/e2e/test_editor.py`); the window reacts to the real mouse, not checked yet: the gui test for it is open, owner check in WI-0092)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086)
@@ -2778,7 +2778,7 @@ When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the us
 ### REQ-USE-090 Sharp and correctly sized on high-resolution displays
 
 - **v1:** no (not checked)
-- **v2:** partial (dialogs done; the window base for the UI roles is written, `ui_common/UiWindow.ahk` with the layout in `core/GuiLayout.ahk` (WI-0069), the manager window (WI-0073) uses it, opened in the gui test but not checked at another scaling; the view math scales the flow with the DPI, unit-tested (WI-0084); the renderer draws at the DPI of the view and rebuilds its layer at another DPI, unit-tested (WI-0085); the editor window is missing)
+- **v2:** partial (dialogs done; the window base for the UI roles is written, `ui_common/UiWindow.ahk` with the layout in `core/GuiLayout.ahk` (WI-0069), the manager window (WI-0073) uses it, opened in the gui test but not checked at another scaling; the view math scales the flow with the DPI, unit-tested (WI-0084); the renderer draws at the DPI of the view and rebuilds its layer at another DPI, unit-tested (WI-0085); the editor window: the canvas takes the size below the status bar and follows a DPI change with unchanged pixels, WI-0090; the real window at another scaling is not checked, owner check in WI-0092)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0005
