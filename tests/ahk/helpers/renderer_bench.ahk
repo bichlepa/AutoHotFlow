@@ -15,7 +15,10 @@
 ; before the frame: that is not part of the frame and is reported apart.
 ;
 ; A_Args[1] = result file (one line RESULT ... is appended), [2] width, [3] height, [4] view: whole (the whole flow
-; visible) or zoom1 (zoom 1), [5] frames (default 100), [6] warm-up frames (default 10), [7] rebuilds (default 10).
+; visible) or zoom1 (zoom 1), [5] frames (default 100), [6] warm-up frames (default 10), [7] rebuilds (default 10),
+; [8] window (optional): also a series WINDOW of frames that are copied into a real window of width x height (the
+; BitBlt of CopyToWindow, the path of the editor's WM_PAINT). The window opens on the screen: it is run by the owner only
+; (manual check 9, step 3). The script is DPI aware in this mode, so the window has the size in physical pixels.
 ;
 ; Usage: python tools/ahkrun.py --timeout 900 tests/ahk/helpers/renderer_bench.ahk <result file> 1920 1080 whole
 #Include ..\..\..\src\core\AhfError.ahk
@@ -117,6 +120,7 @@ Main(args) {
     frames := args.Length >= 5 ? Integer(args[5]) : 100
     warm := args.Length >= 6 ? Integer(args[6]) : 10
     rebuilds := args.Length >= 7 ? Integer(args[7]) : 10
+    winMode := args.Length >= 8 && args[8] = "window"
     built := BuildFlow()
     raw := built[1]
     ids := built[2]
@@ -125,6 +129,12 @@ Main(args) {
     sceneB := SceneBuilder.Build(raw, vw, RunStates(ids, 4))
     c := GdipCanvas(W, H)
     r := Renderer()
+    g := ""
+    if (winMode) {
+        DllCall("user32\SetProcessDPIAware")      ; physical pixels: the window has the size W x H on the screen
+        g := Gui("-Caption +AlwaysOnTop", "AutoHotFlow renderer bench")
+        g.Show("x0 y0 w" W " h" H " NoActivate")
+    }
     statesTimes := []
     sameTimes := []
     rebuildTimes := []
@@ -162,6 +172,20 @@ Main(args) {
             withTimes.Push(Renderer.Now() - t0)
         }
         wsT := Stats(withTimes)
+        if (winMode) {
+            ; the frame and the copy into the window (CopyToWindow, BitBlt), as the editor's paint does it
+            winTimes := []
+            loop frames {
+                t0 := Renderer.Now()
+                r.Draw(A_Index & 1 ? sceneA : sceneB, c)
+                c.CopyToWindow(g.Hwnd, 0, 0)
+                winTimes.Push(Renderer.Now() - t0)
+            }
+            wn := Stats(winTimes)
+            FileAppend(Format("WINDOW view={1} width={2} height={3} frames={4} mean={5:.3f} median={6:.3f} "
+                . "p95={7:.3f} max={8:.3f}`n", view, W, H, frames, wn["mean"], wn["median"], wn["p95"], wn["max"]),
+                resultFile)
+        }
         snap := r.Snapshot()
         st := Stats(statesTimes)
         sm := Stats(sameTimes)
@@ -182,6 +206,8 @@ Main(args) {
             . "mean={5:.3f} median={6:.3f} p95={7:.3f} max={8:.3f}`n", view, W, H, frames, wsT["mean"], wsT["median"],
             wsT["p95"], wsT["max"]), resultFile)
     } finally {
+        if IsObject(g)
+            g.Destroy()
         r.Destroy()
         c.Destroy()
     }

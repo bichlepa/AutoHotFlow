@@ -162,6 +162,7 @@ TEST_GROUPS = {
     "stress/test_big_flows.py": ["storage"],
     "stress/test_clients_churn.py": ["transport"],
     "stress/test_editor_event_load.py": ["editor"],
+    "stress/test_editor_batch_size.py": ["editor"],
     "stress/test_log_backlog.py": ["storage"],
     "stress/test_manager_big_flows.py": ["manager"],
     "stress/test_measurements.py": ["supervisor"],
@@ -210,6 +211,7 @@ TEST_GROUPS = {
     "ahk/editor_window.test.ahk": ["editor"],
     "fault/test_editor_window.py": ["editor"],
     "fault/test_editor_tray_icon_gui.py": ["editor"],
+    "fault/test_editor_mouse_gui.py": ["editor"],
 }
 
 # Element source file -> the tests that cover exactly that element: a test file (a unit or a whole file) or a single

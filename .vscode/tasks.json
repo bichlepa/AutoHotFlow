@@ -961,6 +961,130 @@
             "problemMatcher": []
         },
         {
+            "label": "Start: manual check 9, editor with the imported v1 flows (manual_check.py)",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/manual_check.py",
+                "start",
+                "--",
+                "--start=storage,engine,triggerhost,manager"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: editor mouse input and status bar (gui, a real editor window; wheel and drag are sent; do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/fault/test_editor_mouse_gui.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: renderer measurement with a window (WI-0092, owner; opens a window of the size; run alone; result in temp/s5/renderer-window.txt)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/ahkrun.py",
+                "--timeout",
+                "900",
+                "tests/ahk/helpers/renderer_bench.ahk",
+                "${workspaceFolder}/temp/s5/renderer-window.txt",
+                "1920",
+                "1080",
+                "whole",
+                "300",
+                "20",
+                "20",
+                "window"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: renderer measurement with a window, 3840 x 2160 (WI-0092, owner; needs a 4K screen or the window is cut; run alone; result in temp/s5/renderer-window.txt)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/ahkrun.py",
+                "--timeout",
+                "900",
+                "tests/ahk/helpers/renderer_bench.ahk",
+                "${workspaceFolder}/temp/s5/renderer-window.txt",
+                "3840",
+                "2160",
+                "whole",
+                "100",
+                "10",
+                "10",
+                "window"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: memory of five open editors (WI-0092, MS-0048; run alone, about 15 min; MEM5 lines in temp/s5/memory-editors.txt)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/measure_editors.py",
+                "--runs",
+                "3",
+                "--gap",
+                "20",
+                "--out",
+                "${workspaceFolder}/temp/s5/memory-editors.txt"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: stress, editor batch size of a flow of 300 elements (F-0156, MS-0049; run alone; prints the F-0156 lines)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/stress/test_editor_batch_size.py",
+                "-m",
+                "stress",
+                "-q",
+                "-s",
+                "-n",
+                "0"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Test: editor window (gui, a real editor window opens and is closed like the X button; do not use the PC)",
             "type": "shell",
             "command": "python",
