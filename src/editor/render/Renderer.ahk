@@ -261,29 +261,28 @@ class Renderer {
         this.DrawName(canvas, element, x, y, w, h, s, placeholder ? this.tools["placeholderText"] : this.tools["text"])
     }
 
-    ; The icon of the element's class, fitted into its box at the top of the element.
+    ; The icon of the element's class, fitted into the whole box of the element (aspect kept, centered), as v1 does.
+    ; It is drawn faded before the name, so the name stays readable on top of it.
     DrawIcon(canvas, element, x, y, w, h, s) {
-        box := EditorStyle.IconBox * s
-        fit := this.ScaledIcon(this.IconPath(element.Package, element.Icon), box, box)
+        fit := this.ScaledIcon(this.IconPath(element.Package, element.Icon), w, h)
         if (!(fit is Array))
             return
         ix := x + (w - fit[2]) / 2
-        iy := y + EditorStyle.IconTop * s + (box - fit[3]) / 2
+        iy := y + (h - fit[3]) / 2
         canvas.DrawImage(fit[1], ix, iy, fit[2], fit[3], EditorStyle.IconAlpha)
     }
 
-    ; The name, centered and clipped to the element; no text when it is too small to read.
+    ; The name, centered in the element (no icon strip above it) and clipped to the element; no text when it is too
+    ; small to read.
     DrawName(canvas, element, x, y, w, h, s, brush) {
         size := EditorStyle.TextSize * s
         if (size < EditorStyle.MinTextPx || element.Name = "")
             return
         inset := EditorStyle.NameInset * s
-        top := EditorStyle.NameTop * s
-        bottom := 4 * s
         canvas.SetClip(x, y, w, h)
         try
-            canvas.DrawText(brush, this.FontFor(size), this.NameFormat(), element.Name, x + inset, y + top
-                , w - 2 * inset, h - top - bottom)
+            canvas.DrawText(brush, this.FontFor(size), this.NameFormat(), element.Name, x + inset, y + inset
+                , w - 2 * inset, h - 2 * inset)
         finally
             canvas.ResetClip()
     }

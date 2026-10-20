@@ -188,9 +188,52 @@ CheckIconIsDrawn() {
     r := Renderer()
     try {
         r.Draw(sc, c)
-        p := ProbeOf(view, sc, "A", 48, 10)
-        n := CountNot(c, p[1], p[2], 44, 44, EditorStyle.Fill["action"])
-        Assert.True(n > 50, "the icon of Sleep is drawn into its box, pixels: " n)
+        p := ProbeOf(view, sc, "A", 48, 4)           ; inside the border (rows 0 and 1 are the outline)
+        n := CountNot(c, p[1], p[2], 44, 36, EditorStyle.Fill["action"])
+        Assert.True(n > 20, "the icon of Sleep is drawn into the upper part of its box (faded: few pixels), pixels: " n)
+    } finally {
+        r.Destroy()
+        c.Destroy()
+    }
+}
+
+; The icon fills the whole element box (v1 fits it into the element, not into a strip above the name): the bottom
+; band of the element, which the old icon strip (y 10 to 54) and the old name (from y 58) never reached, holds icon ink.
+CheckIconFillsTheElementBox() {
+    view := ViewAt()
+    sc := SceneOf(view)
+    c := NewCanvas()
+    r := Renderer()
+    try {
+        r.Draw(sc, c)
+        p := ProbeOf(view, sc, "A", 0, 0)
+        n := CountNot(c, p[1] + 30, p[2] + 92, 80, 12, EditorStyle.Fill["action"])
+        Assert.True(n > 0, "the icon reaches the bottom band of the element, pixels: " n)
+    } finally {
+        r.Destroy()
+        c.Destroy()
+    }
+}
+
+; The name is centered in the whole element, not below an icon strip: the single letter "a" of A has strong ink in the
+; upper half, above the old name top (flow y 58). Faded icon ink stays below the strong threshold (300 of 1020).
+CheckNameUsesTheWholeElement() {
+    view := ViewAt()
+    sc := SceneOf(view)
+    c := NewCanvas()
+    r := Renderer()
+    try {
+        r.Draw(sc, c)
+        p := ProbeOf(view, sc, "A", 4, 4)            ; inside the outline, down to the old name top (flow y 58)
+        n := 0
+        loop 132 {
+            x := p[1] + A_Index - 1
+            loop 54 {
+                if (ColorDistance(c.Pixel(x, p[2] + A_Index - 1), EditorStyle.Fill["action"]) > 300)
+                    n += 1
+            }
+        }
+        Assert.True(n > 10, "the name is drawn in the upper half of the element, strong pixels: " n)
     } finally {
         r.Destroy()
         c.Destroy()
@@ -227,7 +270,7 @@ IconDistanceAt(alpha, sc, p) {
     r := Renderer()
     try {
         r.Draw(sc, c)
-        return MaxDistance(c, p[1], p[2], 44, 44, EditorStyle.Fill["action"])
+        return MaxDistance(c, p[1], p[2], 44, 36, EditorStyle.Fill["action"])
     } finally {
         EditorStyle.IconAlpha := saved
         r.Destroy()
@@ -238,7 +281,7 @@ IconDistanceAt(alpha, sc, p) {
 CheckIconIsFaded() {
     view := ViewAt()
     sc := SceneOf(view)
-    p := ProbeOf(view, sc, "A", 48, 10)
+    p := ProbeOf(view, sc, "A", 48, 4)
     faded := IconDistanceAt(EditorStyle.IconAlpha, sc, p)
     full := IconDistanceAt(1.0, sc, p)
     Assert.True(EditorStyle.IconAlpha <= 0.3, "the icon alpha of the style is faded (<= 0.3)")
@@ -464,6 +507,8 @@ TestRun.Case("a connection segment is a dark line on its path", CheckConnectionI
 TestRun.Case("the label of a yes connection is drawn left of its target", CheckLabelOfAYesConnectionIsDrawn)
 TestRun.Case("the name of an element puts ink into its name area", CheckNameIsDrawn)
 TestRun.Case("the icon of an element is drawn into its box", CheckIconIsDrawn)
+TestRun.Case("the icon fills the whole element box, not a strip above the name", CheckIconFillsTheElementBox)
+TestRun.Case("the name is centered in the whole element", CheckNameUsesTheWholeElement)
 TestRun.Case("the icon is faded (style alpha) against full alpha", CheckIconIsFaded)
 TestRun.Case("the corners of an action and a loop are square", CheckCornersAreSquare)
 TestRun.Case("a loop is one object: no outline at its seams", CheckLoopIsOneObject)

@@ -32,14 +32,12 @@ class EditorStyle {
     static LabelTextFactor := 0.8        ; the label of a connection type, relative to TextSize
     static BreakTextFactor := 0.7        ; the word "break" in the break field (v1 TextOptionsSmall)
     static MinTextPx := 4                ; below this text size (device px) no text is drawn, only the shapes
-    static NameInset := 6                ; flow units, left and right of the name
-    static NameTop := 58                 ; flow units from the top of the element to the name
+    static NameInset := 6                ; flow units, inside the element on every side; the name is centered in it
 
     ; shapes: corner radius by kind (flow units); a condition is a diamond
     static Radius := Map("trigger", 30, "action", 0, "loop", 0)   ; 0: square corners (owner feedback, E0088)
-    static IconBox := 44                 ; flow units, the box an element icon is fitted into (aspect kept)
-    static IconTop := 10                 ; flow units from the top of the element to the icon
-    static IconAlpha := 0.2              ; faded, drawn behind the name (v1 Gdip_DrawImage opacity 0.2)
+    ; the icon fills the element's box: aspect kept, centered (v1 drawElementIcon), faded and drawn behind the name
+    static IconAlpha := 0.2              ; v1 Gdip_DrawImage opacity 0.2
 
     ; marks of a trigger: the switch (enabled or not) at 80 % x and 25 % y, the star (default manual trigger) at 15 %
     ; x and 20 % y, both MarkSize flow units (v1 SizeOfButtons 35, v1 positions)
