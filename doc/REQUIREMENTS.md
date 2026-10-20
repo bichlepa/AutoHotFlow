@@ -1508,11 +1508,11 @@ Each open flow has its own editor window in its own process (D0002). An editor t
 ### REQ-EDT-020 Draw the flow
 
 - **v1:** yes
-- **v2:** done (geometry, scene and hit test unit-tested (WI-0084); the renderer draws elements, connections, loops, trigger marks and state overlays, pixel-tested (WI-0085); the editor draws its flow in its window (WI-0088); tooltips tested headless (WI-0090); the owner accepted the look (E0088) and checked the drawing and the tooltips in manual check 9, steps 3 and 7; the lines for an exception, an arming error and a warning are not tested yet)
+- **v2:** partial (the flow: geometry, scene and hit test unit-tested (WI-0084); the renderer draws elements, connections, loops, trigger marks and state overlays, pixel-tested (WI-0085); the editor draws its flow in its window (WI-0088); tooltips tested headless (WI-0090); the owner accepted the look of the flow (E0088) and checked it in manual check 9, steps 3 and 7; the lines for an exception, an arming error and a warning are not tested yet. The look while editing (WI-0097): the selection, its buttons, the four fields for new elements, the selection rectangle, the connection being drawn and a drag are drawn and pixel-tested; the owner has not yet accepted these screenshots; a drag of 30 elements is above the frame budget (F-9000, MS-0051))
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0005
-- **Evidence:** `tests/e2e/test_editor.py::test_the_editor_draws_the_flow_and_the_probes_match_the_elements`, `tests/e2e/test_editor.py::test_the_tooltip_names_the_element_under_the_pointer_and_nothing_on_empty_space`, `tests/e2e/test_editor.py::test_the_tooltip_of_a_connection_gives_its_type`, `doc/MEASUREMENTS.md` (MS-0048: the frame of the real renderer with 300 elements). The look is the owner's (E0088): manual check 9, step 3; `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
+- **Plan:** S0005, S0006 (WI-0097)
+- **Evidence:** `tests/e2e/test_editor.py::test_the_editor_draws_the_flow_and_the_probes_match_the_elements`, `tests/e2e/test_editor.py::test_the_tooltip_names_the_element_under_the_pointer_and_nothing_on_empty_space`, `tests/e2e/test_editor.py::test_the_tooltip_of_a_connection_gives_its_type`, `tests/ahk/editor_renderer.test.ahk` (pixel probes of the selection, buttons, fields, rectangle, connection being drawn and drag), `tests/ahk/editor_scene.test.ahk` (buttons, drag and fields data), `doc/MEASUREMENTS.md` (MS-0048: the frame of the real renderer with 300 elements; MS-0051: the drag). The look is the owner's (E0088): manual check 9, step 3; `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
 Elements with icon and name, connections with their type, loops with their adjustable height; texts are aligned vertically; drawing does not flicker. Hovering an element shows its kind, class and name.
 

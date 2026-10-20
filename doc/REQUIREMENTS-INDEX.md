@@ -14,7 +14,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 6 | 16 | 0 | 0 |
 | [Triggers (TRG)](#triggers-trg) | 14 | 1 | 0 | 7 | 6 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 15 | 2 | 0 | 8 | 5 | 0 | 0 |
-| [Editor (EDT)](#editor-edt) | 23 | 6 | 0 | 2 | 15 | 0 | 0 |
+| [Editor (EDT)](#editor-edt) | 23 | 5 | 0 | 3 | 15 | 0 | 0 |
 | [Settings (SET)](#settings-set) | 8 | 4 | 0 | 3 | 1 | 0 | 0 |
 | [Import and migration (MIG)](#import-and-migration-mig) | 8 | 5 | 0 | 2 | 1 | 0 | 0 |
 | [Languages and help (LNG)](#languages-and-help-lng) | 5 | 1 | 0 | 2 | 2 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 1 | 0 | 4 | 5 | 0 | 0 |
-| **All** | **221** | **74** | **1** | **56** | **89** | **1** | **5** |
+| **All** | **221** | **73** | **1** | **57** | **89** | **1** | **5** |
 
 ## Flows and execution (EXE)
 
@@ -176,7 +176,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
 | [REQ-EDT-010](REQUIREMENTS.md#req-edt-010-one-editor-per-flow-several-at-the-same-time) | L1497-1506 | One editor per flow, several at the same time | partial | done | must | port | S0005 |
-| [REQ-EDT-020](REQUIREMENTS.md#req-edt-020-draw-the-flow) | L1508-1517 | Draw the flow | yes | done | must | port | S0005 |
+| [REQ-EDT-020](REQUIREMENTS.md#req-edt-020-draw-the-flow) | L1508-1517 | Draw the flow | yes | partial | must | port | S0005, S0006 (WI-0097) |
 | [REQ-EDT-030](REQUIREMENTS.md#req-edt-030-zoom-and-move-the-view) | L1519-1528 | Zoom and move the view | yes | done | must | port | S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086, WI-0096; the left button goes to the rectangle selection, E0094, WI-0098) |
 | [REQ-EDT-040](REQUIREMENTS.md#req-edt-040-live-execution-state-in-the-editor) | L1530-1539 | Live execution state in the editor | yes | done | must | port | S0005 |
 | [REQ-EDT-050](REQUIREMENTS.md#req-edt-050-add-elements) | L1541-1549 | Add elements | yes | open | must | port | S0006 (the fields for new elements and the class list, WI-0099), S0007 (the settings open after the choice, WI-0106) |

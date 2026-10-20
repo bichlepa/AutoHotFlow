@@ -124,7 +124,7 @@ L503-520   19.1 The subset that is compared
 L522-539   19.2 Deliberate deviations from native AutoHotkey v2
 ```
 
-## doc/MEASUREMENTS.md (63.8 KB, 266 lines)
+## doc/MEASUREMENTS.md (65.9 KB, 281 lines)
 ```text
 L11-21 Important: one machine, not an idle machine
 L23-76 Overview
@@ -138,6 +138,7 @@ L216-266 Editor with the real renderer, five editors, batch of 300 (WI-0092, MS-
 L220-233   MS-0048: frame of the real renderer, 300 elements, headless (task 2 of WI-0092, R0002, REQ-PRF-060)
 L235-250   MS-0049: memory of five open editors (task 3 of WI-0092, E0040, MS-0006)
 L252-266   MS-0050: element states of a flow of 300 elements that all change in one interval; latency of the editor (F-0156, REQ-PRF-060)
+L268-281 Editing: frame of a drag and the layer rebuilds (WI-0097, MS-0051)
 ```
 
 ## doc/CONVENTIONS.md (8.5 KB, 63 lines)
@@ -150,12 +151,16 @@ L46-55 5. AHK v2 pitfalls (short)
 L57-63 6. Tests and docs
 ```
 
-## doc/howto/drawing-gdip.md (3.0 KB, 31 lines)
+## doc/howto/drawing-gdip.md (5.9 KB, 59 lines)
 ```text
 L5-10 A big icon file is scaled down on every draw (verified)
 L12-17 Every draw of a changing flow rebuilds the static layer only when needed (verified)
 L19-24 Text per call is the second largest cost (partly verified)
 L26-31 A load error in an AHK comment looks like a clean run (verified)
+L33-38 Text in a fixed box is cut off when the format does not wrap (verified)
+L40-45 Pixel probes of the flow break when an overlay covers the top left of the canvas (verified)
+L47-52 A drag keeps the static layer when the key leaves the dragged items out (verified)
+L54-59 A drag of 30 elements draws live at 25 ms per frame (partly verified)
 ```
 
 ## doc/howto/error-handling.md (3.8 KB, 49 lines)
