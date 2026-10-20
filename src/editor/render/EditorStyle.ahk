@@ -83,5 +83,5 @@ class EditorStyle {
     ; (the fill of the element kind, as the field shows what is created)
     static FieldArea := 0xFFFAFAFA
     static FieldRadius := 14             ; corner radius in device pixels at 96 DPI (scaled by the DPI)
-    static FieldTextFactor := 0.8        ; the text of a field, relative to TextSize
+    static FieldTextSize := 11           ; px at 96 DPI (the text wraps inside the field)
 }

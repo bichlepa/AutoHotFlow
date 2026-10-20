@@ -476,8 +476,9 @@ class Renderer {
         size := FlowGeometry.BUTTON_SIZE * s
         for button in scene.Buttons {
             box := button["rect"]
-            file := EditorStyle.ButtonIcons.Get(button["name"], "e_plus.ico")
-            this.DrawMark(target, this.AssetPath(file), (box.X + box.W / 2 - ox) * s, (box.Y + box.H / 2 - oy) * s, size)
+            iconFile := EditorStyle.ButtonIcons.Get(button["name"], "e_plus.ico")
+            this.DrawMark(target, this.AssetPath(iconFile), (box.X + box.W / 2 - ox) * s, (box.Y + box.H / 2 - oy) * s
+                , size)
         }
     }
 
@@ -488,14 +489,14 @@ class Renderer {
         k := dpi / 96
         area := NewElementFields.AreaOf(dpi)
         target.FillRect(this.tools["fieldArea"], area.X, area.Y, area.W, area.H)
-        size := EditorStyle.TextSize * k * EditorStyle.FieldTextFactor
+        size := EditorStyle.FieldTextSize * k
         for field in NewElementFields.Rects(dpi) {
             box := field["rect"]
             radius := EditorStyle.FieldRadius * k
             target.FillRoundRect(this.BodyBrush(field["kind"]), box.X, box.Y, box.W, box.H, radius)
             target.DrawRoundRect(this.tools["border"], box.X, box.Y, box.W, box.H, radius)
             if (size >= EditorStyle.MinTextPx)
-                target.DrawText(this.tools["text"], this.FontFor(size), this.tools["formatCenter"]
+                target.DrawText(this.tools["text"], this.FontFor(size), this.tools["formatFieldText"]
                     , Lang("Create new " field["kind"]), box.X + 4 * k, box.Y, box.W - 8 * k, box.H)
         }
     }
@@ -698,6 +699,7 @@ class Renderer {
             t["formatLeft"] := GdipFormat(0, 1, false, false)
             t["formatRight"] := GdipFormat(2, 1, false, false)
             t["formatCenter"] := GdipFormat(1, 1, false, false)
+            t["formatFieldText"] := GdipFormat(1, 1, false, true)   ; the text of a field wraps inside it
             t["fieldArea"] := GdipBrush(EditorStyle.FieldArea)
             t["selection"] := GdipPen(EditorStyle.SelectionColor, EditorStyle.SelectionWidth * k)
             t["connecting"] := GdipPen(EditorStyle.SelectionColor, EditorStyle.ConnectingWidth * k)
