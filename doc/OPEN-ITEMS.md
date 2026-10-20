@@ -49,9 +49,11 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0150 | `SceneBuilder.Build` takes about 18 ms for 300 elements (MS-0046), more than the frame of a state change (6 ms): the window builds a new scene at every state change, so a state change costs about 25 ms before it is on the screen. A build that changes only the run states would save it | closed in WI-0089: `Scene.WithStates` takes a mean of 4.0 ms for 300 elements with 60 changed states, against 18.7 ms for a build (MS-0047) | WI-0085 |
 | F-0152 | The word "break" in the break field of a loop is a literal in the renderer, not a language text | open, low | WI-0085 |
 | F-0155 | The restart test after an editor death (`test_the_editor_of_a_flow_that_just_died_is_started_again_and_its_slot_is_free`) expected a started answer on a later request; since WI-0088 the first request is often the one that starts the editor, so the test failed under load in every full fast run | closed (test parametrized and robust; the old assertion fails in the judged-first case) | WI-0088, WI-0089 |
-| F-0156 | The element states of a flow go out in batches: at most one `evt.element.states` per flow and 33 ms (WI-0089, owner decision). The message count is bounded for any flow. The size of a batch grows with the number of elements that change in one interval; for a flow of 300 elements at once it is not measured (MS-0047 measures a loop of three elements at the guard's limit: hub queue 0, latency p95 46 ms) | open, batch size for large flows not measured; the message count is verified by `tests/stress/test_editor_event_load.py` | WI-0089 |
+| F-0156 | The element states of a flow go out in batches: at most one `evt.element.states` per flow and 33 ms (WI-0089, owner decision). The message count is bounded for any flow. The size of a batch grows with the number of elements that change in one interval; for a flow of 300 elements at once it is not measured (MS-0047 measures a loop of three elements at the guard's limit: hub queue 0, latency p95 46 ms) | open, measured (MS-0050, WI-0092): a flow of 300 elements that all change in one interval sends 2 or 3 batches per start, the largest about 35 KB and up to 235 to 300 entries; the editor's latency is median 43.8 ms and p95 68.8 ms, above the 50 ms of REQ-PRF-060; the owner decides the next step (decision needed) | WI-0089 |
 | F-0157 | `tests/integration/test_pipe.py::test_abrupt_end_of_client_process_is_seen_within_500_ms[2]` is red under load: 1819 ms measured (budget 1500 ms) while the machine ran at 99 % CPU. A wall-clock latency assertion that is not covered by the admission of the test runs; not checked alone | open, verified (one red run under load); the owner decides whether it is a gui-tier or idle-tier test | WI-0090 |
 | F-0158 | The language files `assets/language/basic/de.ini`, `ko.ini` and `ru.ini` are UTF-16 LE with BOM and CRLF, but `LangTable` reads every language file as UTF-8, so these three languages are probably not loaded (`en.ini` and the `manager` folder are UTF-8 or ASCII) | open, verified by the file encodings and the `FileRead` calls; the effect at run time was not run | WI-0091 |
+| F-9001* | REQ-EDT-230: the table of the editor's tray menu says that "Close" asks the question about unsaved changes, but REQ-EDT-100 says that closing the editor asks nothing (a flow has no unsaved state). Manual check 9, step 15 expects no question | open, doc contradiction, owner decision | WI-0092 |
+| F-9002* | `tests/ahk/helpers/renderer_bench.ahk` under `#Warn All` warns about a local variable `type` (same name as a global) in `src/elements/Default/Triggers/Trigger_Start_up.ahk` line 47; the product does not run under `#Warn All`, so it is not checked whether the product shows it | open, low, verified by the bench output | WI-0092 |
 | F-0153 | The tint of a running element is drawn after all elements, so where a running element overlaps a later element of the scene, the tint lies over that element; v1 draws the tint with its element, so the later element covers it | open, low; the sample flows show no such overlap, not checked on a larger flow | WI-0085 |
 
 ## Findings
@@ -241,8 +243,8 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 ### F-0156: The size of an element-state batch is not measured for large flows
 
-**What:** the engine sends the element states of a flow in batches: at most one `evt.element.states` per flow and 33 ms (WI-0089, owner decision). The message count is bounded for any flow. The size of a batch grows with the number of elements that change in one interval; for a flow of 300 elements at once it is not measured (MS-0047 measures a loop of three elements at the guard's limit: hub queue 0, latency p95 46 ms).
-**Status:** open; the message count is verified by `tests/stress/test_editor_event_load.py`.
+**What:** the engine sends the element states of a flow in batches: at most one `evt.element.states` per flow and 33 ms (WI-0089, owner decision). The message count is bounded for any flow. The size of a batch grows with the number of elements that change in one interval. Measured in WI-0092 (MS-0050): a flow of 300 elements that all change in one interval gives 2 or 3 batches per start, the largest about 35 KB; the editor's frame latency (change to end of frame) has median 43.8 ms and p95 68.8 ms. The median is above the batch interval plus one frame, and the p95 is above the 50 ms of REQ-PRF-060 (MS-0047 measures a loop of three elements at the guard's limit: hub queue 0, latency p95 46 ms).
+**Status:** open, measured: the number is not fine, so the finding stays open. The owner decides the next step (the batch interval, a faster path for the state change, or the render process of ARCHITECTURE 2.1); the message count is verified by `tests/stress/test_editor_event_load.py`.
 
 ### F-0157: The pipe latency test is red under load
 
@@ -300,3 +302,14 @@ Work that is open but is not a finding with an entry. Rule: a finished action is
 None here. The decisions waiting for the project owner are in `NEEDS-ATTENTION.md` (repository root).
 
 Decisions on entries are in the summary table (status `decision needed`, `accepted`, `closed`) and in the status book `work_items/phase3/STATUS.md`, section "Decisions of the project owner".
+
+### F-9001*: The tray menu's "Close" and REQ-EDT-100 disagree about the question
+
+**What:** REQ-EDT-230 (table of the tray menu) says that "Close" closes the editor "with the question about unsaved changes (REQ-EDT-100)". REQ-EDT-100 says that a flow has no unsaved state, so "closing the editor or the application asks nothing". Manual check 9, step 15 expects no question.
+**Status:** open; a decision of the project owner: either the question goes (as REQ-EDT-100 says) or the requirement names it again.
+
+### F-9002*: A warning of the renderer bench in a product script
+
+**What:** the renderer bench (`tests/ahk/helpers/renderer_bench.ahk`, `#Warn All`) reports `Warning: This local variable has the same name as a global variable` for `type` in `Trigger_Start_up.ahk` line 47 (function `Enable`). The bench includes the product's element classes; the product itself does not use `#Warn All`.
+**Status:** open, low; verified by the bench output, not checked whether the product shows the warning at run time.
+

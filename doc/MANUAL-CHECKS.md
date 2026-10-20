@@ -2,7 +2,7 @@
 
 The automated tests do not cover the checks in this document. The project owner runs them by hand. Each step states the expected result. A step passes only if the expected result is seen. A dialog box (window class `#32770`) at any point is a failure.
 
-The checks cover the manager (section 1), the debug window (section 2), the dialog windows at other scaling (section 3), triggers (sections 4 and 5), start with Windows and run as administrator (section 7) and the settings dialog (section 8). The numbers are kept as they were: section 6 ("Checks that wait for a decision of the project owner", empty) was removed, and other documents refer to sections 7 and 8. Use the "Result" template at the end to record a run.
+The checks cover the manager (section 1), the debug window (section 2), the dialog windows at other scaling (section 3), triggers (sections 4 and 5), start with Windows and run as administrator (section 7), the settings dialog (section 8) and the editor window (section 9). The numbers are kept as they were: section 6 ("Checks that wait for a decision of the project owner", empty) was removed, and other documents refer to sections 7 and 8. Use the "Result" template at the end to record a run.
 
 Where a step starts the application, the VS Code task is named by its label in `.vscode/tasks.json`, followed by the same call for a terminal.
 
@@ -270,6 +270,64 @@ Start with the VS Code task of part A (or its terminal command), in the fresh fo
 | 58 | Switch "Run as admin" on in the dialog, click OK. | Exactly one question asks whether to restart now (Yes on the left, No on the right). Answer No: nothing changes, the dialog is closed. | |
 | 59 | Repeat step 58 and answer Yes. | AutoHotFlow closes, the Windows question (UAC) appears, and the manager comes back elevated (section 7, part C). The question does not appear a second time. | |
 
+## 9. Editor window, look, view and live states (WI-0092, REQ-EDT-010 to REQ-EDT-040, REQ-EDT-110, REQ-EDT-150, REQ-EDT-230, REQ-USE-090, REQ-ROB-040)
+
+Test on the real editor windows and their tray icons. Not automated: the e2e tests run the editor headless, and the window is checked by the gui tests of part D and by this section. The owner accepts the look of the editor (E0088). The look is judged on the screen; the screenshots of the tool "Tool: editor screenshots of two example flows" (PNG files in `temp/editor-screenshots`, drawn by the same renderer at zoom 0.7 and 1.5, no window) are the reference for part A, step 3, not a test.
+
+**Start, parts A to C.** VS Code task "Start: manual check 9, editor with the imported v1 flows (manual_check.py)", or `python tools/manual_check.py start -- --start=storage,engine,triggerhost,manager`. The folder is the manual-check folder of section 1: run part B of section 1 first, so the v1 flows are imported there (they are disabled). The editor opens from the manager with the button "Edit" or a double click on the flow. Do not run an imported v1 flow: it may act on the system; the live states of part A, step 8 use the flow `skeleton`.
+
+### Steps, part A (look, view, tooltip, live states, engine restart)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 1 | Start the application (see above). | The manager window opens with the imported flows. No dialog. | |
+| 2 | Select the imported v1 flow `Flow 1384439262` (129 elements) and click "Edit". Then open `Flow 2052424815` (6 elements) the same way. | One editor window per flow, titled "AutoHotFlow Editor - <name>", with the flow drawn at once. Each editor has its own tray icon. No dialog. | |
+| 3 | Look at the drawing of `Flow 1384439262` at zoom 1 and with the whole flow visible. Compare with the screenshots in `temp/editor-screenshots`. | Loops are one object without seams. Actions and conditions have square corners. Icons are faded and fill the element background. Names are readable and vertically centred. Moving the pointer does not make the drawing flicker. **Owner: write here accepted or the change wanted (E0088).** | |
+| 4 | Turn the wheel up and down with the pointer over an element. | Each notch changes the zoom by about 10 %. The point under the pointer stays under it. The zoom in the status bar follows. It stops at 0.10 and at 3.00. | |
+| 5 | Drag the flow with the left button, then with the right button. | The content follows the pointer. The offset in the status bar changes, the zoom does not. | |
+| 6 | Look at the status bar at the bottom of the window. | It reads "Offset: x <n> y <n>   \|   Zoom: <n.nn>   \|   <n> elements". It lies below the drawing and does not cover it. The text is complete. | |
+| 7 | Hover an element for about one second, then a connection, then empty space. For an element with a MIGRATION place (an imported flow shows the badge) hover the badge. | The element tooltip gives kind, class and name. The connection tooltip gives its type. Empty space gives no tooltip. The badge tooltip lists the places. | |
+| 8 | Live states: in the manager select `skeleton` and start it with the editor's tray menu, entry "Run" (part B, step 13), or with the button of the manager. Watch the editor. | While the elements run they are tinted, and the connection a thread took is tinted; the tint fades after the end. No dialog. | |
+| 9 | Stop the engine by hand: debug window (section 2), Processes tab, stop the engine process. Watch the editor. | The engine starts again. Within a few seconds the editor shows the current state again (running elements, enabled state of the flow). The editor window stays open and its tray icon stays. | |
+| 10 | Watch for dialogs during part A. | No dialog (window class `#32770`) appears. | |
+
+### Steps, part B (tray icon and menu of an editor)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 11 | Hover the tray icon of the editor of `Flow 1384439262`. | The tooltip reads "Flow: Flow 1384439262". The icon of the window and the tray icon show the state of the flow (disabled, enabled, running). | |
+| 12 | Open the context menu of the editor's tray icon. | Entries "Show", "Run", "Enable" or "Disable", "Close". | |
+| 13 | On the editor of `skeleton`: menu "Run". Then menu "Enable", then "Disable". | Run starts the flow (live states as in part A, step 8). Enable and disable switch the flow; the manager shows the new state. No dialog. | |
+| 14 | Hide the editor window behind other windows, then double-click its tray icon. | The window comes to the front. | |
+| 15 | On the editor of `Flow 2052424815`: menu "Close". | The editor window and its tray icon disappear. Expected: no question (REQ-EDT-100: a flow has no unsaved state). The application, the manager and the tray icon of the application keep running. | |
+| 16 | Close the editor of `skeleton` with the X button of its window. | As in step 15. | |
+
+### Steps, part C (scaling, screens and size)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 17 | Set the display scaling to 100 %. Open an editor and look at text, lines and icons at zoom 1. | Sharp text, lines and icons. | |
+| 18 | Set the display scaling to 225 % (restart the editor after the change). Look again at zoom 1 and at zoom 0.5. | Sharp at every zoom, the status bar text is complete. | |
+| 19 | If a second screen with another scaling is there: move an open editor window to it, then back. | The drawing is sharp at the new scale after the move, without a restart (REQ-USE-090). The status bar stays at the bottom of the window. | |
+| 20 | Resize the editor window: wider, narrower, taller, smaller. | The canvas takes the size, the status bar stays at the bottom, nothing is cut off, nothing overlaps. | |
+
+### Steps, part D (gui tests of the editor; the PC is not used during them)
+
+The gui tests open real editor windows and send real mouse and keyboard input. Run them alone, and do not move the mouse or press keys while they run. Expected result: all pass.
+
+| # | VS Code task (label) | Test file | Tests |
+|---|---|---|---|
+| 21 | "Test: editor window (gui, ...)" | `tests/fault/test_editor_window.py` | the window opens with the flow and closes like the X button (a planned end) |
+| 22 | "Test: editor tray icon and menu (gui, ...)" | `tests/fault/test_editor_tray_icon_gui.py` | the real icon of an editor opens its menu, and a menu open for 8 s does not make the editor hung |
+| 23 | "Test: editor mouse input and status bar (gui, ...)" | `tests/fault/test_editor_mouse_gui.py` | the status bar lies below the canvas and does not overlap it; a real wheel zooms at the pointer and a real left drag moves the view |
+
+### Steps, part E (renderer with a window, WI-0092 task 2; owner only)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 24 | VS Code task "Tool: renderer measurement with a window (WI-0092, owner; ...)" with the size 1920 x 1080 (whole flow). Close the other programs first. | The task opens a window of 1920 x 1080 for about two minutes and writes the line `WINDOW ...` into `temp/s5/renderer-window.txt`. Mean below 16 ms (R0002, REQ-PRF-060). Write the line in the result. | |
+| 25 | The same task with 3840 x 2160 (a 4K screen is needed, otherwise the window is cut; write that down). | The `WINDOW` line for 4K is recorded (a measurement; see MEASUREMENTS.md MS-0048). | |
+
 ## Result
 
 Record one result per run. Copy the template.
@@ -283,6 +341,7 @@ Dialog windows (section 3): steps pass / fail (list failed steps)
 Triggers (sections 4 and 5): steps 1 to 7 and 1 to 6 pass / fail (list failed steps)
 Start with Windows and administrator (section 7): parts A to D pass / fail (list failed steps)
 Settings dialog (section 8): steps 44 to 59 pass / fail (list failed steps)
+Editor (section 9): steps 1 to 25 pass / fail (list failed steps); look accepted yes / no (step 3)
 Notes:
 ```
 

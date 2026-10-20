@@ -25,6 +25,7 @@ Entries live in the category files under `doc/howto/` (listed below). Append a n
 - [Error handling](howto/error-handling.md)
 - [Processes, pipes, messages](howto/processes-pipes-messages.md)
 - [GUI and hotkeys](howto/gui-and-hotkeys.md)
+- [Drawing with GDI+ (editor)](howto/drawing-gdip.md)
 - [Tests and tools](howto/tests-and-tools.md)
 
 The entries of all files, with their line ranges and status, are in `doc/DOC-INDEX.md` (generated; grep it for a keyword).

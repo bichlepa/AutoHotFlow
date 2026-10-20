@@ -31,7 +31,7 @@ Targets are the performance budgets in `doc/ARCHITECTURE.md`, section 9.
 | MS-0003 | Latency of a Python client that does not wake the hub | 2026-10-11 | 10 runs of 100 requests. Median 226 ms, p99 264 ms, max 274 ms. The client is served only by the hub's 250 ms fallback timer | PROTOCOL section 1 (wake-up calls); HOW-TO | verified; a client without a window cannot meet the 5 ms target |
 | MS-0004 | Idle CPU of the chain (supervisor, storage, engine, manager stub, `--headless`), 30 s per run | 2026-10-11 | 5 runs. 0.23 % of the whole system (8 CPUs; max 0.25 %), i.e. 1.82 % of one core (median of the sum of the four roles; max 2.03 %) | Target: idle CPU < 1 %, applies to the whole system (decision E0005, 2026-10-11) | verified; target met under E0005 |
 | MS-0005 | Memory of the chain without an editor | 2026-10-11 | Sum of RSS 68.3 MB (max 68.5 MB) over the idle runs | Memory target (see MS-0006) | verified, for the chain without editor only |
-| MS-0006 | Memory with 5 open editors | not stated | **Not measured**: there is no editor role yet | Target: < 100 MB | not checked |
+| MS-0006 | Memory with 5 open editors | 2026-10-20 | Measured as MS-0049 (editors are outside the budget, E0040) | Target: < 100 MB (background processes) | verified, see MS-0049 |
 | MS-0007 | Engine state change until editor redraw | not stated | **Not measured**: no editor, no redraw | Target: < 50 ms | not checked |
 | MS-0008 | Start until `ready` (supervisor start until all roles ready and flows loaded), 100 starts (10 runs of 10) | 2026-10-11 | Median 0.30 s (max 0.34 s). All roles ready after 0.21 s (max 0.24 s) | Target: < 3 s | verified; target met. The flow used is not named in the source; see MS-0009 |
 | MS-0009 | Start of the chain with one flow (`test_start_to_ready_time`), after WI-0024 | 2026-10-11 | 10 runs. Median 0.56 s (max 1.19 s). Before WI-0024: median 0.30 s | Target: < 3 s | verified; cause of the increase not investigated |
@@ -177,7 +177,6 @@ Notes on the table:
 
 These points are missing from the measurements. The first group is listed in the source as "not measured" or "not checked".
 
-- Memory with 5 open editors (MS-0006). There is no editor role.
 - Engine state change until editor redraw (MS-0007). There is no editor.
 - Latency with an AutoHotkey client as the other end. Only the Python client was used.
 - Triggerhost (WI-0014) was not built and is not part of the runs.
@@ -213,3 +212,55 @@ These points are missing from the measurements. The first group is listed in the
 | Frame of the state change (same run, 30 running elements) | mean 6.2 ms, p95 7.0 ms |
 
 **Reading.** The batch per flow bounds the message rate of a loop at the guard's limit (about 30 batches per second for the flow), and the editor keeps up: the latency median is one frame interval, the p95 is below 50 ms. Not measured: the window (a real screen, a `gui` run, owner); a flow with 300 elements running at once (the batch then carries up to 300 entries per 33 ms; the message count stays bounded, the size is not measured, F-0156).
+
+## Editor with the real renderer, five editors, batch of 300 (WI-0092, MS-0048 to MS-0050)
+
+**Machine and state.** Windows 11 Pro, 8 logical CPUs, AutoHotkey 2.0.30, one machine, one measurement at a time. The code state is WI-0092 (the renderer and the editor as committed in WI-0085 to WI-0091; the renderer bench gets an optional window series in this work item). No pytest run ID: these are tools and stress measurements, run by hand; their console output is the record. The machine load was not recorded during these runs.
+
+### MS-0048: frame of the real renderer, 300 elements, headless (task 2 of WI-0092, R0002, REQ-PRF-060)
+
+`tests/ahk/helpers/renderer_bench.ahk` (VS Code task "Tool: renderer measurement of the editor frame (WI-0085 ...)"), one start per case, 300 frames (1920 × 1080) or 100 frames (3840 × 2160), 20 or 10 warm-up frames and rebuilds. Frame of a state change ("states": the scene alternates between two sets of 30 running elements, the static layer is not rebuilt), "same" (unchanged scene), "rebuild" (layer built again), and `Scene.WithStates` (the state-change path with 60 changed elements). Times in milliseconds: mean (median, p95, max) for the states.
+
+| Case | States: mean (median, p95, max) | Same: mean | Rebuild: mean (max), n | SceneBuilder.Build: mean | WithStates: mean (p95) |
+|---|---|---:|---|---:|---|
+| 1920 × 1080, whole flow, zoom 0.47 | **6.70** (6.70, 7.26, 7.87) | 6.82 | 112.7 (115.6), 20 | 21.1 | 4.58 (5.08) |
+| 1920 × 1080, zoom 1 (part of the flow) | **4.62** (4.59, 5.19, 7.56) | 4.31 | 82.1 (83.0), 20 | 20.4 | 4.64 (5.25) |
+| 3840 × 2160, whole flow, zoom 0.96 | **14.51** (13.94, 17.89, 29.02) | 13.61 | 181.6 (183.8), 10 | 20.5 | 4.61 (5.16) |
+| 3840 × 2160, zoom 1 (part of the flow) | 10.89 (10.51, 13.02, 20.92) | 10.01 | 159.5 (181.9), 10 | 20.4 | 4.35 (4.83) |
+
+**Reading.** R0002 (the frame below 16 ms on average with the whole flow visible at 1920 × 1080; 3840 × 2160 and zoom 1 measured too): met at 1920 × 1080 (6.7 ms for a state frame, 4.6 ms at zoom 1). At 3840 × 2160 the whole flow averages 14.5 ms, below 16 ms, but its p95 is 17.9 ms and its maximum 29 ms: the average criterion holds with a small margin. The 4K values are higher than in MS-0046 (11.8 ms for the same case); the cause is not known (assumed: the load of the machine; the code is the same). A state change costs the frame (6.7 ms) plus `Scene.WithStates` (4.6 ms), not `SceneBuilder.Build` (21 ms). A rebuild of the static layer (a change of the flow, the zoom or the pan out of the layer) costs 113 ms at 1920 × 1080 and 182 ms at 3840 × 2160 (F-0151, accepted by the owner).
+
+**Not measured here (owner).** The same cases with a real window, BitBlt included. The bench has a window series now (`window` as the eighth argument), run by the owner only (VS Code tasks "Tool: renderer measurement with a window (WI-0092 ...)", manual check 9, part E). The values are added here from the owner's run. The bench prints a load-time warning about a local variable `type` in `src/elements/Default/Triggers/Trigger_Start_up.ahk` (line 47, under `#Warn All`); it does not change the numbers (finding F-9002*).
+
+### MS-0049: memory of five open editors (task 3 of WI-0092, E0040, MS-0006)
+
+`tools/measure_editors.py` (VS Code task "Tool: memory of five open editors (WI-0092 ...)"): supervisor with storage, engine, triggerhost and manager (headless); five editors started with the editor command line and `--headless` on five flows: `skeleton` (3 elements), `Flow 464187831` (3), `Flow 2052424815` (6), `Flow 1384439262` (129) and a generated flow of 300 elements. Two variants: `default` (the product editor entry, the classes of the Default package) and `synthetic` (the same entry with the 150 synthetic element classes of MS-0033, mixed modes). Three runs per variant; samples 3 s after all five editors answered, and 20 s later. Private bytes, median of 3 runs:
+
+| Editor (flow, elements) | default | synthetic (150 classes) |
+|---|---:|---:|
+| skeleton (3) | 9.15 MB | 21.57 MB |
+| Flow 464187831 (3) | 9.38 MB | 21.58 MB |
+| Flow 2052424815 (6) | 9.40 MB | 21.65 MB |
+| Flow 1384439262 (129) | 11.12 MB | 23.32 MB |
+| generated (300) | 13.79 MB | 25.59 MB |
+| **Five editors, sum** (min to max of 3 runs) | **52.8 MB** (52.7 to 52.95) | **113.8 MB** (113.6 to 113.8) |
+
+Background processes (sum of supervisor, storage, engine, triggerhost and manager; median of 3 runs): **58.6 MB** before the editors start, **58.9 MB** with the five editors open (default); 58.1 MB before and 58.7 MB with the editors (synthetic). The processes are the same in all 6 runs (no restart). Between the two samples 20 s apart the background sums agree within 0.3 MB, so nothing grows over time. The supervisor is 0.5 MB larger with the editors (19.8 to 20.3 MB; assumed: the hub links of the editors); the other processes are unchanged within 0.1 MB.
+
+**Reading.** The editors are outside the budget (E0040). A headless editor costs about 9 MB with a flow of a few elements and 14 MB with 300 elements; with the 150 extra classes every editor costs about 12 MB more (about 75 KB per class, as MS-0028 and MS-0033). Five editors with the Default package stay below 60 MB in total; the background processes do not grow with editors open, within the noise of the measurement. The window of an editor costs more than the headless editor: not measured (owner).
+
+### MS-0050: element states of a flow of 300 elements that all change in one interval; latency of the editor (F-0156, REQ-PRF-060)
+
+`tests/stress/test_editor_batch_size.py` (stress tier, run alone, headless): a flow of a trigger and 299 actions in a row (`Action_Do_nothing`), so one start changes all 300 elements within a few milliseconds. The observer records every `evt.element.states` of the flow (the client splits batches into single events, `tests/support/ahfclient.py`; they are grouped again by their sequence number). Five starts with one headless editor open, which is given a canvas of 1920 × 1080.
+
+| Start | Batches | Entries per batch | Bytes per batch (JSON) | Distinct elements |
+|---|---:|---|---|---:|
+| 1 | 3 | 1, 235, 65 | 120, 34,519, 9,569 | 300 |
+| 2 | 2 | 234, 67 | 34,371, 9,823 | 300 |
+| 3 | 2 | 192, 108 | 28,198, 15,890 | 300 |
+| 4 | 2 | 215, 86 | 31,578, 12,616 | 300 |
+| 5 | 2 | 234, 67 | 34,371, 9,823 | 300 |
+
+Latency of the editor (change to end of frame, cumulative over the five starts, from `cmd.test.state`): 39 frames with a measured latency, **median 43.8 ms, p95 68.8 ms**. The editor ends with nothing running; the engine's run state agrees.
+
+**Reading (F-0156).** The batch size is bounded: one batch of up to about 235 to 300 entries per 33 ms interval, about 35 KB of JSON for the largest batch, and no element is lost. The latency is the open point: the median is above the 33 ms batch interval plus one frame, and the p95 of 68.8 ms is above the 50 ms of REQ-PRF-060. The batch wait adds to every change. So the number is **not fine**: F-0156 stays open. The owner decides the next step (decision needed, see the result of WI-0092). Not measured: the same run with a real window, and under a load on the machine.

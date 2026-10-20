@@ -1500,6 +1500,7 @@ A deleted flow is not lost at once (E0066). Ideas of the owner (2026-10-17), to 
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
+- **Evidence:** `tests/e2e/test_editor.py::test_two_editors_of_two_flows_run_at_once`, `tests/e2e/test_editor.py::test_killed_editor_is_not_restarted_and_the_flow_and_the_other_editor_go_on`, `tests/fault/test_editor_window.py` (gui: the window closes like the X button; not run by agents, manual check 9)
 
 Each open flow has its own editor window in its own process (D0002). An editor that hangs or crashes does not affect the other editors or the running flows. All open editors show live states, also those without focus.
 
@@ -1510,6 +1511,7 @@ Each open flow has its own editor window in its own process (D0002). An editor t
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
+- **Evidence:** `tests/e2e/test_editor.py::test_the_editor_draws_the_flow_and_the_probes_match_the_elements`, `tests/e2e/test_editor.py::test_the_tooltip_names_the_element_under_the_pointer_and_nothing_on_empty_space`, `tests/e2e/test_editor.py::test_the_tooltip_of_a_connection_gives_its_type`, `doc/MEASUREMENTS.md` (MS-0048: the frame of the real renderer with 300 elements). The look is the owner's (E0088): manual check 9, step 3
 
 Elements with icon and name, connections with their type, loops with their adjustable height; texts are aligned vertically; drawing does not flicker. Hovering an element shows its kind, class and name.
 
@@ -1520,6 +1522,7 @@ Elements with icon and name, connections with their type, loops with their adjus
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086)
+- **Evidence:** `tests/e2e/test_editor.py::test_the_wheel_zooms_one_step_at_the_pointer_and_keeps_the_point_under_it`, `tests/e2e/test_editor.py::test_a_drag_moves_the_view_by_the_movement_of_the_pointer`, `tests/fault/test_editor_mouse_gui.py` (gui: real wheel and drag with SendInput; not run by agents, owner: manual check 9, part D)
 
 Zoom, and move the view by dragging with the right (or left) mouse button. Zoom and offset are saved with the flow (`flowSettings`).
 
@@ -1530,6 +1533,7 @@ Zoom, and move the view by dragging with the right (or left) mouse button. Zoom 
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
+- **Evidence:** `tests/e2e/test_editor.py::test_an_editor_opened_while_the_flow_runs_shows_the_running_element`, `tests/e2e/test_editor.py::test_a_running_element_and_its_connection_are_tinted_and_fade_out_after_the_end`, `tests/e2e/test_editor.py::test_an_exception_keeps_the_element_marked_and_its_message_is_kept`, `tests/stress/test_editor_event_load.py` (MS-0047, the states under load). The look on the screen: manual check 9, step 8
 
 Running elements and connections are highlighted while the flow runs; the editor shows the current state again after an internal restart (REQ-ROB-040).
 
@@ -1727,7 +1731,7 @@ The element settings offer typical settings and examples of the element, which t
 ### REQ-EDT-230 Tray icon of an editor
 
 - **v1:** yes (read: one icon per open editor)
-- **v2:** partial (the icon, its tooltip and menu are built; the real icon and the open menu are checked by hand in WI-0092)
+- **v2:** partial (the icon, its tooltip and menu are built and tested headless, WI-0091; the real icon and the open menu: the gui test `tests/fault/test_editor_tray_icon_gui.py` (not run by agents) and manual check 9, part B (owner); the menu entry "Close" asks a question in the table below, which REQ-EDT-100 contradicts, see OPEN-ITEMS F-9001*)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0005 (icon and menu, E0087, WI-0091)
@@ -2254,11 +2258,11 @@ No blocking call on the message path. Every request has a timeout; a late answer
 ### REQ-ROB-040 Recovery after a crash of the flow execution
 
 - **v1:** no
-- **v2:** partial (restart and resync work; the triggers are armed again after a restart of the engine or of the trigger host, WI-0062; the engine gives the states of all elements of a flow at once for the resync of the editor, WI-0086; the editor shows the current state again after an engine restart, WI-0088; the states of the editor after a crash of the editor itself are the business of the supervisor (the editor is not restarted, WI-0087))
+- **v2:** done (restart and resync work; the triggers are armed again after a restart of the engine or of the trigger host, WI-0062; the engine gives the states of all elements of a flow at once for the resync of the editor, WI-0086; the editor shows the current state again after an engine restart, WI-0088, `tests/e2e/test_editor.py::test_killed_engine_restarts_and_the_editor_shows_the_state_again`; an editor that is killed is not restarted, WI-0087, by design)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (editor)
-- **Evidence:** `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/fault/test_worker_lifecycle.py::test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs`, `tests/integration/test_trigger_arming.py::test_the_engine_is_restarted_and_rearms_without_the_startup_context`, `tests/integration/test_trigger_arming.py::test_the_trigger_host_is_restarted_and_its_triggers_fire_again`, `tests/e2e/test_editor.py::test_killed_engine_restarts_and_the_editor_shows_the_state_again`
+- **Evidence:** `tests/e2e/test_manager.py::test_engine_restart_is_seen_and_resynced_without_restarting_the_manager`, `tests/fault/test_worker_lifecycle.py::test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs`, `tests/integration/test_trigger_arming.py::test_the_engine_is_restarted_and_rearms_without_the_startup_context`, `tests/integration/test_trigger_arming.py::test_the_trigger_host_is_restarted_and_its_triggers_fire_again`, `tests/e2e/test_editor.py::test_killed_engine_restarts_and_the_editor_shows_the_state_again`, `tests/e2e/test_editor.py::test_killed_engine_restarts_and_the_editor_shows_the_state_again`
 
 When the part that runs the flows (the engine) crashes, it starts again by itself. Open windows stay open and show the current state again; the triggers of enabled flows are active again. Instances that were running are lost (MIGRATION M-0001).
 
@@ -2415,7 +2419,7 @@ While 200 big flows load, AutoHotFlow stays responsive: the engine answers a sna
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005
-- **Evidence:** `tests/stress/test_editor_event_load.py::test_the_editor_answers_and_draws_at_a_steady_rate_while_the_guard_stops_a_loop` (the latency and the rate, printed), `doc/MEASUREMENTS.md` (MS-0047; MS-0046, the renderer of `src/editor/render/`, the frame part only)
+- **Evidence:** `tests/stress/test_editor_event_load.py::test_the_editor_answers_and_draws_at_a_steady_rate_while_the_guard_stops_a_loop` (the latency and the rate, printed), `doc/MEASUREMENTS.md` (MS-0047; MS-0046, the renderer of `src/editor/render/`, the frame part only), MS-0048 (the frame of the real renderer, 6.7 ms at 1920 × 1080), MS-0050 (the latency with a flow of 300 elements in one interval: p95 68.8 ms, above the 50 ms; F-0156 open)
 
 A state change of the engine is visible in a non-blocked editor within 50 ms. A frame of a flow with 300 elements takes below 16 ms on average; otherwise drawing moves to its own process (risk R0002, `ARCHITECTURE.md` 2.1).
 
@@ -2784,6 +2788,6 @@ When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the us
 - **Prio:** should
 - **Scope:** port
 - **Plan:** dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0005
-- **Evidence:** `doc/MANUAL-CHECKS.md` (manual check 3, steps 17 and 18, owner, 2026-10-16: dialog windows at 100 % and 225 %, DPI change with the window open, message box, debug dialog and tooltip), `src/elements/base/DialogWindow.ahk`, `src/core/GuiLayout.ahk` (the layout moved there in WI-0069; the manual check was made before the move, so the owner has to check again)
+- **Evidence:** `doc/MANUAL-CHECKS.md` (manual check 3, steps 17 and 18, owner, 2026-10-16: dialog windows at 100 % and 225 %, DPI change with the window open, message box, debug dialog and tooltip), `src/elements/base/DialogWindow.ahk`, `src/core/GuiLayout.ahk` (the layout moved there in WI-0069; the manual check was made before the move, so the owner has to check again), `tests/e2e/test_editor.py::test_a_new_size_and_dpi_keep_the_flow_at_the_same_physical_size` (the editor headless; its window: manual check 9, part C)
 
 Manager, editor, dialogs and the tray icon are sharp and have the right size with a display scaling above 100 %, also when a window moves to a screen with another scaling. The editor draws the flow sharp at every zoom.
