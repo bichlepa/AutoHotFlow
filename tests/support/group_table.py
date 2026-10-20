@@ -206,8 +206,10 @@ TEST_GROUPS = {
     "ahk/editor_scene.test.ahk": ["editor-geometry"],
     "ahk/editor_model.test.ahk": ["editor"],
     "e2e/test_editor.py": ["editor"],
+    "e2e/test_editor_tray.py": ["editor"],
     "ahk/editor_window.test.ahk": ["editor"],
     "fault/test_editor_window.py": ["editor"],
+    "fault/test_editor_tray_icon_gui.py": ["editor"],
 }
 
 # Element source file -> the tests that cover exactly that element: a test file (a unit or a whole file) or a single
@@ -453,7 +455,7 @@ SOURCE_AREAS = [
     ("tray", ["src/tray/*", "src/entry/tray.ahk"]),
     ("editor", ["src/editor/Editor.ahk", "src/editor/EditorModel.ahk", "src/editor/EditorDriver.ahk",
                 "src/editor/EditorWindow.ahk", "src/editor/FlowStatus.ahk", "src/editor/FlowTooltip.ahk",
-                "src/entry/editor.ahk"]),
+                "src/editor/EditorTray.ahk", "src/editor/EditorFlowOps.ahk", "src/entry/editor.ahk"]),
     ("editor-geometry", ["src/editor/FlowRect.ahk", "src/editor/FlowGeometry.ahk", "src/editor/EditorView.ahk",
                          "src/editor/FlowHit.ahk", "src/editor/FlowHitTest.ahk", "src/editor/Scene.ahk",
                          "src/editor/SceneElement.ahk", "src/editor/SceneConnection.ahk",
