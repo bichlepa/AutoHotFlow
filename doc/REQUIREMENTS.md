@@ -1508,7 +1508,7 @@ Each open flow has its own editor window in its own process (D0002). An editor t
 ### REQ-EDT-020 Draw the flow
 
 - **v1:** yes
-- **v2:** partial (the flow: geometry, scene and hit test unit-tested (WI-0084); the renderer draws elements, connections, loops, trigger marks and state overlays, pixel-tested (WI-0085); the editor draws its flow in its window (WI-0088); tooltips tested headless (WI-0090); the owner accepted the look of the flow (E0088) and checked it in manual check 9, steps 3 and 7; the lines for an exception, an arming error and a warning are not tested yet. The look while editing (WI-0097): the selection, its buttons, the four fields for new elements, the selection rectangle, the connection being drawn and a drag are drawn and pixel-tested; the owner has not yet accepted these screenshots; a drag of 30 elements is above the frame budget (F-9000, MS-0051))
+- **v2:** partial (the flow: geometry, scene and hit test unit-tested (WI-0084); the renderer draws elements, connections, loops, trigger marks and state overlays, pixel-tested (WI-0085); the editor draws its flow in its window (WI-0088); tooltips tested headless (WI-0090); the owner accepted the look of the flow (E0088) and checked it in manual check 9, steps 3 and 7; the lines for an exception, an arming error and a warning are not tested yet. The look while editing (WI-0097): the selection, its buttons, the four fields for new elements, the selection rectangle, the connection being drawn and a drag are drawn and pixel-tested; the owner has not yet accepted these screenshots; a drag of 30 elements is above the frame budget (F-9000*, MS-0051))
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005, S0006 (WI-0097)
