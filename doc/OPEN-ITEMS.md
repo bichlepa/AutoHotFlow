@@ -335,3 +335,9 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 **Options:** (a) find the cause with timestamps along the path (the client's read loop, the hub, the send queue of a connection); (b) accept it and measure the editor's frames only (REQ-PRF-060 counts the editor's own latency).
 **Status:** open, not checked. Measured by MS-0055 (one run each, the machine shared with other agents' runs). The owner's machine is not checked.
 
+### F-9005*: A refused view patch clears the undo stacks, and the live zoom jumps back on a foreign definition
+
+**What:** the review of WI-0096 found two behaviours of the editor draft. (1) A refused or lost patch that only carries the view (zoom, offset) goes through the same path as a content patch and clears the undo stacks, so the user loses the undo because of a zoom. (2) `EditorModel._OnDefinition` sets the view from the flow settings of every definition, also from an `evt.flow.committed` of someone else, so an unsaved zoom jumps back.
+**Options:** (a) let view patches skip the clearing of the stacks, and keep the live view once the first definition has arrived; (b) accept it until the automatic saving (WI-0095) makes view patches rare.
+**Status:** open, found by reading, not reproduced. Best handled in WI-0098 (the first user of the view in the editor).
+
