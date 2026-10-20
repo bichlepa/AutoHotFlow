@@ -52,7 +52,7 @@ The first matching pattern wins; `*` also matches `/`. Test groups that run in f
 | `supervisor` | `supervisor/` (hub, children, launcher, commands) | `supervisor` |
 | `recovery` | `Heartbeat`, `Shutdown`, `Stall` | `recovery` (crash, hang, shutdown, orphans, stall) |
 | `diagnosis` | `DiagLog`, `DiagReport`, `ReportText`, `Snapshot`, `ProcInfo`, `Debug`, `debugview/` | `diagnosis` |
-| `engine` | `engine/` (executor, flows, scheduler, runaway guard, ...), `entry/engine` | `engine` (includes the loop logic) |
+| `engine` | `engine/` (executor, flows, scheduler, runaway guard, ...), `entry/engine`, `core/FlowPatch.ahk` (WI-0093) | `engine` (includes the loop logic) |
 | `variables` | `engine/vars/`, `VarRequests`, `ImportV1Vars` | `variables` |
 | `workers` | `worker/`, `WorkerBridge`, `entry/worker` | `workers` |
 | `expr` | `expr/`, `FlowExprConvert` | `expr` |
