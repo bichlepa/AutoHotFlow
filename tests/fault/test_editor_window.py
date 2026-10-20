@@ -19,8 +19,11 @@ from support.timing import scaled
 pytestmark = [pytest.mark.fault, pytest.mark.gui]
 
 ROOT_ENTRY_EDITOR = Path(__file__).resolve().parents[2] / "src" / "entry" / "editor.ahk"   # the product entry
-TITLE = "AutoHotFlow Editor - Skeleton"
+# The title is "AutoHotFlow <Editor> - <flow name>" (EditorWindow.Refresh); the flow name is the flow ID "skeleton" (the
+# language of the test folder decides the word in the middle, so only the start and the end are matched).
 FLOW = "skeleton"
+TITLE_START = "AutoHotFlow "
+TITLE_END = " - " + FLOW
 WM_CLOSE = 0x0010
 
 user32 = ctypes.WinDLL("user32")
@@ -35,13 +38,14 @@ def _text(hwnd):
     return buf.value
 
 
-def windows_titled(title):
-    """The visible top-level windows with this title (any process)."""
+def windows_titled():
+    """The visible top-level windows of the editor title (any process)."""
     found = []
     proc_type = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
 
     def visit(hwnd, _):
-        if _text(hwnd) == title and user32.IsWindowVisible(hwnd):
+        text = _text(hwnd)
+        if text.startswith(TITLE_START) and text.endswith(TITLE_END) and user32.IsWindowVisible(hwnd):
             found.append(hwnd)
         return True
 
@@ -65,13 +69,14 @@ def test_the_editor_window_opens_with_the_flow_and_closes_as_a_planned_end(procs
         editor = procs.start([sys.executable, str(AHKRUN), "--timeout", "120", str(ROOT_ENTRY_EDITOR),
                               "--role=editor", "--flow=" + FLOW, "--session=" + session_id, "--hub=" + sup.pipe,
                               "--data=" + str(datadir)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        assert wait_until(lambda: len(windows_titled(TITLE)) == 1, scaled(30)), "no window titled %r" % TITLE
-        hwnd = windows_titled(TITLE)[0]
+        expected = "%s... %s" % (TITLE_START, TITLE_END)
+        assert wait_until(lambda: len(windows_titled()) == 1, scaled(30)), "no editor window titled %r" % expected
+        hwnd = windows_titled()[0]
         assert user32.IsWindowVisible(hwnd)
         user32.PostMessageW(hwnd, WM_CLOSE, 0, 0)               # the X button
         code = editor.wait(timeout=scaled(30))
         assert code == 0, "the closed editor ends with exit %s" % code
-        assert not windows_titled(TITLE)
+        assert not windows_titled()
     finally:
         obs.request("supervisor", "cmd.app.exit", {}, timeout=5)
         assert sup.wait_exit(20) == 0, sup.text()
