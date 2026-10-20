@@ -961,6 +961,26 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: editor window (gui, a real editor window opens and is closed like the X button; do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/fault/test_editor_window.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Test: settings dialog and about window (gui, real windows open, the language changes; do not use the PC)",
             "type": "shell",
             "command": "python",
