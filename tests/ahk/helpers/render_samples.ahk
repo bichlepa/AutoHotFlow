@@ -17,7 +17,18 @@
 
 SAMPLE_W := 1100
 SAMPLE_H := 800
-ZOOMS := [0.7, 1.5]
+; the zooms of the pictures; AHF_SAMPLE_ZOOMS="1.0,1.5" (comma separated) overrides them for one run
+ZOOMS := EnvZooms()
+
+EnvZooms() {
+    list := EnvGet("AHF_SAMPLE_ZOOMS")
+    if (list = "")
+        return [0.7, 1.5]
+    zooms := []
+    for part in StrSplit(list, ",")
+        zooms.Push(Number(Trim(part)))
+    return zooms
+}
 
 ; The base name of a path without the folder and the extension.
 BaseName(path) {
