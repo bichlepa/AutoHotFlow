@@ -17,7 +17,7 @@ Step-independent: WI-0059 (test admission, load report, run history) is done. St
 
 ## Work items of the next step
 
-WI-0089 is running (WI-0085 to WI-0088 are integrated).
+WI-0090 may start (WI-0085 to WI-0089 are integrated).
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
@@ -27,7 +27,7 @@ WI-0089 is running (WI-0085 to WI-0088 are integrated).
 | WI-0086 | Engine: run states, connection taken, warnings per element | done | haiku | f2846ee2..19c91fdf | 2026-10-19 | review approved with one fix; verified green; F-0148 |
 | WI-0087 | Open and close an editor: supervisor and manager | done | haiku | 1646a787..e147d1f4 (see git log) | 2026-10-19 | review approved with one text fix; verified (one load flake); F-0149 carried to WI-0088 |
 | WI-0088 | Editor role: model, resync, window, headless driver | done | haiku | see git log (WI-0088), tip 663c5adf | 2026-10-20 | review approved; verified green; gui window test left to the owner; F-0149 closed |
-| WI-0089 | Live states, marks and the event load | running | haiku | | | workspace wi-89 |
+| WI-0089 | Live states, marks and the event load | done, one test red | haiku | see git log (WI-0089), tip bfcdc7f9 | 2026-10-20 | review approved with fixes; batch per flow decided by the owner (evt.element.states); slow 204 and foundation 471 green; fast: test_manager_editor restart test fails under load every time since this integration, passes alone (hunter running); F-0150 closed, F-9001 open; window latency measurement is for the owner |
 | WI-0090 | View: zoom, move, tooltip, status bar, DPI | open | | | | |
 | WI-0091 | Tray icon and tray menu of the editor | open | | | | |
 | WI-0092 | Acceptance S0005 | open | | | | manual check of the owner |
@@ -41,6 +41,8 @@ None.
 WI-0089 implementer (haiku), workspace wi-89.
 
 ## Last verified state
+
+Commit `bfcdc7f9` (WI-0089 integrated): foundation 471, slow 204 green; fast 1760 passed, 1 failed (`tests/e2e/test_manager_editor.py::test_the_editor_of_a_flow_that_just_died_is_started_again_and_its_slot_is_free`, red in 4 of 4 full runs since WI-0089, green alone: recheck 20261020-185530-recheck); VERDICT red (runs 20261020-184414-bfcdc7f9, -2, -3).
 
 Commit `33f4e961` (F-0154 fix integrated: `--auto` handles deleted files; all tiers): fast 1742 passed (11 skipped), foundation 471, slow 204, VERDICT green (runs 20261020-163838-33f4e961, -2, -3).
 
