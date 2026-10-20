@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from support.ahfclient import AhfClient
+from support.ahfclient import AhfClient, per_event
 from support.elements import split as split_class
 from support.timing import scaled
 from test_role import (FLOOD_PINGS, STALL_S, RoleHub, RoleRun, StallingHub, ahk_process, first_pong_of,
@@ -566,7 +566,8 @@ def stop_flow(obs, flow_id):
 
 
 def check_seq(got):
-    seqs = [m["payload"]["seq"] for _, m in got if "seq" in m.get("payload", {})]
+    # one number per engine event: the entries of one evt.element.states batch share its seq (WI-0089)
+    seqs = [m["payload"]["seq"] for m in per_event([m for _, m in got]) if "seq" in m.get("payload", {})]
     assert seqs == sorted(seqs) and len(set(seqs)) == len(seqs), seqs
     epochs = {m["payload"]["epoch"] for _, m in got if "epoch" in m.get("payload", {})}
     assert len(epochs) == 1, epochs

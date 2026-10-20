@@ -99,7 +99,23 @@ def expand_element_states(msg):
         for key in ("seq", "epoch"):               # the sequence fields of the batch are in its payload
             if key in payload:
                 single["payload"][key] = payload[key]
+        single["event"] = payload.get("seq")       # all entries of one batch name the same engine event (see per_event)
         out.append(single)
+    return out
+
+
+def per_event(messages):
+    """One message per engine event: the entries of one evt.element.states batch (they share its seq) count as one event,
+    the first entry stands for it. Sequence checks (order, no duplicates, rise by one) use this list; a message that is
+    not from a batch is always kept. The checks on the single states of a batch stay on the list itself."""
+    out = []
+    last = None
+    for msg in messages:
+        event = msg.get("event")
+        if event is not None and event == last:
+            continue
+        out.append(msg)
+        last = event
     return out
 
 

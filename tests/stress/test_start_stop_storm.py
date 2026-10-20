@@ -15,6 +15,7 @@ import time
 import pytest
 
 from support import metrics
+from support.ahfclient import per_event
 from stresskit import stress_chain  # noqa: F401  (fixture)
 
 FLOW = "slow"
@@ -88,7 +89,7 @@ def test_start_stop_storm_leaves_a_consistent_engine(stress_chain, cycles):
     assert flow_states and flow_states[-1] == 0, flow_states[-5:]
 
     # seq: strictly +1, one epoch, nothing lost between the first and the last event we saw
-    engine_events = [m for m in events if m.get("from") == "engine" and "seq" in m.get("payload", {})]
+    engine_events = per_event([m for m in events if m.get("from") == "engine" and "seq" in m.get("payload", {})])
     seqs = [m["payload"]["seq"] for m in engine_events]
     assert seqs == list(range(seqs[0], seqs[0] + len(seqs))), "seq gap or reordering: %s" % _gaps(seqs)
     assert len({m["payload"]["epoch"] for m in engine_events}) == 1

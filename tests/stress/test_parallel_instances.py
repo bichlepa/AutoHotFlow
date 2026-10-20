@@ -15,6 +15,7 @@ import time
 import pytest
 
 from support import metrics
+from support.ahfclient import per_event
 from stresskit import stress_chain  # noqa: F401  (fixture)
 
 FLOW = "par"
@@ -76,8 +77,10 @@ def test_parallel_instances_all_end_and_the_counters_return_to_zero(stress_chain
     assert alive == 0
     assert peak >= count * 0.8, "peak concurrency %d of %d: the starts did not overlap" % (peak, count)
 
+    # WI-0089: the states of one batch interval are one batch: at least one element event per instance, at most the six
+    # per instance of the single-event engine (the batches of parallel instances may merge their states)
     element_events = [m for m in events if m["type"] == "evt.element.state"]
-    assert len(element_events) == 6 * count, (len(element_events), 6 * count)
+    assert count <= len(element_events) <= 6 * count, (len(element_events), 6 * count)
     assert not [m for m in element_events if m["payload"]["state"] == "exception"]
     last = {}
     for m in element_events:
@@ -88,7 +91,7 @@ def test_parallel_instances_all_end_and_the_counters_return_to_zero(stress_chain
 
     flow_states = [m["payload"]["executing"] for m in events if m["type"] == "evt.flow.state"]
     assert flow_states[-1] == 0, flow_states[-5:]
-    engine_events = [m for m in events if m.get("from") == "engine" and "seq" in m.get("payload", {})]
+    engine_events = per_event([m for m in events if m.get("from") == "engine" and "seq" in m.get("payload", {})])
     seqs = [m["payload"]["seq"] for m in engine_events]
     assert seqs == list(range(seqs[0], seqs[0] + len(seqs))), "seq gap or reordering: %s" % _gaps(engine_events)
 
