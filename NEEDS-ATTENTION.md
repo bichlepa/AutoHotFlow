@@ -4,7 +4,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 
 ## Decisions
 
-- **Look of the editor (E0088, WI-0085):** your feedback of 2026-10-20 is being worked in (loop drawn as one object without seams, icons faded in the background like in v1, square corners for loops and actions). New screenshots will be in `temp/look1-screenshots/` of the main checkout; accept the look or say what to change.
+- **Look of the editor (E0088, WI-0085):** your feedback of 2026-10-20 is being worked in (loop drawn as one object without seams, icons faded in the background like in v1, square corners for loops and actions). The icons now fill the whole element in the background (faded, aspect kept, centered like v1) and the name is centered over them. Screenshots (not committed): `temp/look2-screenshots/` of the main checkout; accept the look or say what to change.
 
 (R0002: decided on 2026-10-19, E0090. Time of the fast tier: E0089. 4K rebuild F-0151: accepted by you on 2026-10-20.)
 
