@@ -450,8 +450,13 @@ class FlowRunner:
                 step = Step(eid, names.get(eid, eid))
                 steps.append(step)
                 open_steps.setdefault(eid, []).append(step)
-            elif state in ("finished", "exception") and open_steps.get(eid):
-                step = open_steps[eid].pop(0)
+            elif state in ("finished", "exception"):
+                if open_steps.get(eid):
+                    step = open_steps[eid].pop(0)
+                else:
+                    # WI-0089: an element that starts and ends in one batch arrives as its end only (the latest state)
+                    step = Step(eid, names.get(eid, eid))
+                    steps.append(step)
                 step.state = state
                 step.message = payload.get("message", "")
         return steps

@@ -441,7 +441,9 @@ def test_a_loop_left_through_exception_restores_the_variables_of_the_outer_loop(
     assert handled.reason == "finished" and handled.names[-1] == "AFTER", handled.names
     assert seq_of(handled) == [
         "I 1", "E 1 1 x", "I 1", "E 2 2 y"]
-    assert len(handled.exceptions) == 2 and all("An error occured while parsing expression" in m for m in handled.exceptions)
+    # WI-0089: two exceptions of one element in one batch interval arrive as one (the latest state), so 1 or 2 here
+    assert len(handled.exceptions) in (1, 2) and all("An error occured while parsing expression" in m
+                                                     for m in handled.exceptions)
     gone(handled, *LOOP_VARS)
 
     assert at_head.reason == "finished" and at_head.names[-1] == "AFTER"
