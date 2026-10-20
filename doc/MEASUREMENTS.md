@@ -319,6 +319,6 @@ Status: **verified** for the numbers of this run (one run each); **not checked**
 | Plain `cmd.test.state` to the editor, median of 30 (earlier run, same setup, log not kept) | 117 ms |
 | Plain `cmd.flow.get` to the engine, median of 30 (same earlier run) | 126 ms |
 
-**Reading.** A patch costs about one plain request round trip through the hub; the running flow makes no difference. The cost sits in the path of every request, not in the patch code (finding F-9004*). MS-0054 measured 50 ms for a patch under stress; the difference is not explained (machine load and the client are the suspects, not checked).
+**Reading.** A patch costs about one plain request round trip through the hub; the running flow makes no difference. The cost sits in the path of every request, not in the patch code (finding F-0165). MS-0054 measured 50 ms for a patch under stress; the difference is not explained (machine load and the client are the suspects, not checked).
 
 Status: **verified** for the numbers of the runs (one run each, two patch series); **not checked** where the 120 ms come from and what the owner's machine shows.
