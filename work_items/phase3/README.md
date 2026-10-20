@@ -28,9 +28,9 @@ Each step is worked through individually: **detail** (package files WI-xx with t
 | **S0002** | Element foundation and core set | oracle of the expression language (native AHK v2, E0035), migration markers, R0003 measurement, element layout per package (E0037), L0001 smoke test, flow builder for tests, R0004 (`ctx.Request`), dialog test seam (E0038), core set of 29 elements, test corpus from the "Automatic tests" flows | see below, packages WI-0044 to WI-0058 | **done** (acceptance WI-0058, 2026-10-16; F-0107 and F-0108 closed by the owner) |
 | **S0003** | Trigger host and a few triggers | enabled state per trigger, kept across starts (E0056, E0057), role `triggerhost` (WI-0014), `cmd.trigger.arm/disarm`, `evt.trigger.fired/error`, re-arming after a restart of engine or trigger host, activate/deactivate flow. Triggers: Manual, Hotkey (with window conditions, E0060), Periodic_Timer, Start_up; elements `Set_Flow_Status`, `Condition_Flow_Enabled`; guard against runaway flows (REQ-EXE-170, E0062) | see below, packages WI-0060 to WI-0067 | **done** (2026-10-17) |
 | **S0004** | UI foundation and manager | `ui_common/`, manager (category tree with free order, start/stop/enable, new/rename/delete/duplicate, settings, log display), **import from v1** (flows, variables, settings), `.ahf` export/import, engine commands `cmd.flow.create/delete/meta.update`, `cmd.category.*`, `cmd.settings.*`, global setting for the number of workers (E0048). Closing the window only hides it (E0014). Tray icon and tray menu in the supervisor (E0064, REQ-MGR-090, REQ-MGR-140), start with Windows, run as administrator, user level setting, about window. Notice and mark on unhandled flow errors (REQ-USE-080 part 1, E0072), imported flows disabled with a warning (REQ-SEC-060), the manager can be reopened after a crash (REQ-ROB-120), sharp on high-resolution displays (REQ-USE-090). From S0003: the display of active independent triggers and the dialog that disables a flow completely (E0056), the question before `force` (E0063), the notice when a flow was stopped by a limit and the global defaults of the limits (E0062, E0071), the autostart entry passes `--windows-startup` | see below, packages WI-0069 to WI-0082 | **done** (acceptance WI-0082, result in `WI-0082-result-s4.md`; the manual checks of the owner passed on 2026-10-19) |
-| **S0005** | Editor I: display | own GDI+ wrapper (E0085), geometry and `Scene` as v1, `Renderer` with a modernized look (E0088), opening an editor from the manager, live states (running, recently run, connection taken, trigger switches, exceptions, warnings and MIGRATION places per element), resync, zoom, panning the view, tooltip, status bar, DPI, tray icon of the editor with the state of the flow and its full menu (REQ-EDT-230, E0087). The view is read only; it is written in S0006 (E0086) | see below, packages WI-0083 to WI-0092 | **detailed** |
-| S0006 | Editor II: editing | selection, moving, connecting, copy/paste, undo/redo, patch operations, `baseRev` conflict, automatic saving and the backup rhythm (E0065: no unsaved state, no prompt when quitting), a crashed editor loses nothing (REQ-ROB-120), the view (zoom, offset) written with the automatic saving (E0086), menu bar and context menus of the editor. From S0003: a changed, added or removed trigger of an enabled flow is re-armed or disarmed; the enabled state of a new trigger | e2e: editing during execution (E0001) | rough |
-| S0007 | Editor III: settings dialogs | parameter schema to GUI, `form` API for `CheckSettings`, flow settings, wizards (window info, color, mouse), help, element list filtered by user level (REQ-USE-010). From S0003: the checkbox "Switch with the flow" (`followsFlow`, E0056) in every trigger dialog, the limits of a flow in the flow settings (REQ-EXE-170). From S0004: the window of an unhandled error with the variables of the branch (REQ-USE-080 part 2, E0072) | every element of the core set editable | rough |
+| **S0005** | Editor I: display | own GDI+ wrapper (E0085), geometry and `Scene` as v1, `Renderer` with a modernized look (E0088), opening an editor from the manager, live states (running, recently run, connection taken, trigger switches, exceptions, warnings and MIGRATION places per element), resync, zoom, panning the view, tooltip, status bar, DPI, tray icon of the editor with the state of the flow and its full menu (REQ-EDT-230, E0087). The view is read only; it is written in S0006 (E0086) | see below, packages WI-0083 to WI-0092 | **done** (acceptance WI-0092, result in `WI-0092-result-s5.md`; manual check 9 passed on 2026-10-20) |
+| **S0006** | Editor II: editing | selection (click, Ctrl, Ctrl+A, rectangle, E0094), moving, loop height, adding elements with the class list by user level (REQ-USE-010, moved here from S0007), connecting, delete/cut/copy/paste (Windows clipboard, E0091), undo/redo, patch operations, `baseRev` conflict, automatic saving and the backup rhythm (E0065: no unsaved state, no prompt when quitting), a crashed editor loses nothing and is announced (REQ-ROB-120, E0093), the view (zoom, offset) written with the automatic saving (E0086), menu bar and context menus of the editor. From S0003: a changed, added or removed trigger of an enabled flow is re-armed or disarmed; the enabled state of a new trigger (E0092) | see below, packages WI-0093 to WI-0104 | **detailed** |
+| **S0007** | Editor III: settings dialogs | parameter schema to GUI, `form` API for `CheckSettings`, flow settings, assistants (window info, color, mouse), help in its own window with three viewers to choose from (WebView2, the browser control of Windows, the default browser; E0098, E0099), written in Markdown (E0100), expressions checked while typing (REQ-EDT-200, E0096). From S0003: the checkbox "Switch with the flow" (`followsFlow`, E0056) in every trigger dialog, the limits of a flow in the flow settings (REQ-EXE-170). From S0004: the window of an unhandled error with the variables of the branch (REQ-USE-080 part 2, E0072) | see below, packages WI-0105 to WI-0115 | **detailed** together with S0006 (E0095) |
 | S0008 | Remaining elements | first the converter `tools/convert_element.py` (E0036, tested with the core set of S0002 as before/after cases), then the elements in groups: dialogs/worker, file/drive/process/internet/power/sound, window/user simulation/image, unsafe elements (AHK script with v2 code only, E0039; DllCall, TTS, Eject, Monitor, screen, input block), remaining triggers, demonstration flows (REQ-MGR-060) | the "Automatic tests" flows of the test corpus (WI-0057, adapted to v2 where needed) run green | rough |
 | S0009 | Distribution and release | compiled program (one program or one per role, R0007), installer with start menu entry and uninstaller, release checklist, translations brought up to date, translation tools for contributors, newer file formats are not destroyed (REQ-DST-010, REQ-DST-020, REQ-DST-050, REQ-LNG-050, REQ-MIG-080) | install, start, use and uninstall on a Windows without AutoHotkey | rough |
 | S0010 | Phase 3 completion | overall acceptance, equality list with v1, performance budgets, documents, check that nothing is sent from the computer (REQ-SEC-050), scope of Phase 4 | serial, parallel, stress green | rough |
@@ -116,9 +116,24 @@ Decisions of the project owner while S0005 was detailed (2026-10-19; details in 
 | E0087 | **The tray menu of the editor is complete in S0005:** Show, Run, Enable or disable, Close. | WI-0091 |
 | E0088 | **Geometry as v1, look modernized:** positions, sizes and shapes of v1 stay; font and colors are reworked, from one style table, accepted by the owner. | WI-0085 |
 
+Decisions of the project owner while S0006 and S0007 were detailed (2026-10-20; details in `doc/DECISIONS.md`):
+
+| # | Decision | Affects |
+|---|---|---|
+| E0091 | **Clipboard:** cut, copy and paste use the Windows clipboard, in a registered format of AutoHotFlow only (no text), so that they work between all editors, also after one of them closed. v1 used an internal variable. | WI-0101 |
+| E0092 | **A new trigger follows the flow:** a trigger that is added, pasted or brought back by undo is enabled when it switches with the flow and the flow is active; an independent one starts disabled (v1: always disabled). | WI-0094 |
+| E0093 | **A crashed editor is not reopened by itself:** a notice says that the editor of the flow ended unexpectedly, and a click on it opens the editor again. Closes the doubt of REQ-ROB-120. | WI-0103 |
+| E0094 | **Rectangle selection with the left button:** a left drag on an empty place draws a selection rectangle (Ctrl adds to the selection); the view moves with the right button only. A deviation from v1 (MIGRATION). | WI-0098 |
+| E0095 | **S0007 is detailed together with S0006,** against the rule "only the next step is detailed". The retrospective of the S0006 acceptance (WI-0104) refines the S0007 packages before they start; S0007 packages without an S0006 dependency may run beside S0006. | Plan |
+| E0096 | **REQ-EDT-200 comes in S0007** (scope `later` to `port`): expression fields are checked while the user types, with the position of the error. | WI-0108 |
+| E0097 | **Help content:** S0007 takes over every help page; the pages of the 29 core elements and the general page on variables and expressions are corrected for v2 (English); the other element pages are corrected in S0008 with their element; translations come in S0009. | WI-0112, S0008, S0009 |
+| E0098 | **The help has its own window** (as in v1). Format and viewer: E0099, E0100. | WI-0111 |
+| E0099 | **Three help viewers behind one interface, chosen by a setting** (`helpViewer`): `auto` (the default) shows WebView2 when its loader DLL and the runtime are available, else the browser control of Windows (`Shell.Explorer`); the user can also choose WebView2, the classic control, or opening the page in the default browser. | WI-0111, WI-0115 |
+| E0100 | **The help is written in Markdown;** a tool generates the HTML that the viewers show (committed, checked by a test like the include blocks). The v1 pages are converted once. | WI-0112 |
+
 ## Open questions for the project owner
 
-None at the moment (E0085 to E0088 answered on 2026-10-19).
+None at the moment (E0091 to E0100 answered on 2026-10-20).
 
 ## Required reading for every package
 
@@ -464,4 +479,151 @@ No owner decision needed; a package may refine it and says so in its result.
 ### Progress S0005
 
 - [x] WI-0083  - [x] WI-0084  - [x] WI-0085  - [x] WI-0086  - [x] WI-0087
-- [x] WI-0088  - [x] WI-0089  - [x] WI-0090  - [x] WI-0091  - [x] WI-0092 (agent part; the owner closes manual check 9)
+- [x] WI-0088  - [x] WI-0089  - [x] WI-0090  - [x] WI-0091  - [x] WI-0092 (step S0005 complete, 2026-10-20; manual check 9 passed)
+
+## S0006: Editor II: editing
+
+**Goal:** The owner edits a flow in its editor as in v1: selects elements (click, Ctrl+click, Ctrl+A, a rectangle, E0094), moves them, and changes the height of a loop; adds elements of the four kinds from a class list filtered by the user level, connects them and changes the type of a connection; deletes, cuts, copies and pastes them, also into another flow, and undoes and redoes every step. Every completed action takes effect at once, also in running instances (E0001), and is saved automatically a few seconds later (E0065): nothing is ever unsaved, and a crash of the editor loses nothing and is announced (E0093). The view (zoom, offset) is saved too (E0086). The editor has the menu bar of v1, keyboard shortcuts and context menus. A changed, added or removed trigger of an enabled flow is armed again, armed or disarmed at once (E0092).
+
+**Not part of S0006:**
+
+- The element settings and the flow settings dialogs (S0007). Until then a new element gets the default values of its parameters and its default name, a double click on an element does nothing, and the menu entry of the flow settings is disabled.
+- The checkbox "Switch with the flow" (S0007).
+- The flow check with warnings and refused edits (REQ-EDT-160, REQ-EDT-170, later).
+- Restoring backups (REQ-MGR-110).
+- The order inside a batch of element states (F-0161) and F-0156 (postponed).
+- The elements beyond the core set (S0008).
+
+### Findings for S0006 (2026-10-20)
+
+- **Verified (read):** `cmd.flow.patch` checks `baseRev` and the names of the operations, then refuses every operation (`Engine._CmdFlowPatch`). The schema has `element.add/update/remove`, `connection.add/remove` and `flow.settings`, and no operation that changes a connection (PROTOCOL 4.2). The conflict answer carries `rev` and `definition` (`tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`).
+- **Verified (read):** `cmd.flow.meta.update` builds the new definition before storage writes it, and commits that definition afterwards (`FlowLifecycle._OnMetaWritten`, `rec.Commit(def)`). A patch committed while the write is pending would be lost. Nothing patches yet, so the race cannot happen today; WI-0093 removes it.
+- **Verified (read):** every flow write of the engine asks storage for a backup (`backup: true` in `Engine._CmdFlowSave` and in `FlowLifecycle`); storage keeps 10 (`FlowFiles.MAX_BACKUPS`). With automatic saving every 3 to 10 s, ten backups would cover less than two minutes; E0065 wants a backup at the first write of an editing session and then at most every 10 minutes.
+- **Verified (read):** the editor registers all element classes (`src/entry/editor.ahk`, `Elements_editor.ahk`), so it can compute default parameters (`Parameters`) and default names (`GenerateName`) itself.
+- **Verified (measured, MS-0048, WI-0092):** the static layer of the renderer (E0090) costs 113 ms at 1920 × 1080 and 182 ms at 3840 × 2160 for 300 elements, and it is rebuilt when the definition changes. A drag that changed the definition at every mouse move would stutter: the moved elements must be drawn above a layer that is built once at the start of the drag.
+- **Verified (read, v1):** undo keeps full copies of the flow, at most 100 (`v1/Source_Common/Flows/States.ahk`, `MAX_COUNT_OF_STATES`); a cancelled action restores the last copy. A new element, a trigger included, starts disabled (`Element_generateDefaultInfoObject`, `Manage Elements.ahk`). Removing the default manual trigger makes another one the default (`Element_checkAndFixDefaultTrigger`). Changed triggers of an enabled flow are disabled and enabled again at every new copy (`states_Update`).
+- **Verified (read, v1):** the canvas has four fields at the top left that create an action, a condition, a loop or a trigger. The selected element has buttons near it: plus (a new connection; a loop has a second one for its tail), edit and trash; a selected connection has move buttons for its two ends; a trigger has a switch and the manual trigger a star (`Editor GUI User Input.ahk`, `ui_findElementUnderMouse`). A new element follows the mouse until a click; then the class selector (a tree by category, filtered by the user level, `ElementSettingsElementClassSelector`) and the settings open, and cancelling any step undoes the element. Moving snaps to the grid of 35 at the drop; Esc or the right button cancels; the tail of a loop changes the height of its bar (at least two grid steps).
+- **Verified (read, v1):** Del removes the selection without a question, the trash button asks first (REQ-EDT-080 wants the question for both). The clipboard is a shared variable, not the Windows clipboard (`Clipboard.ahk`); paste puts the elements under the mouse, or in the middle when the mouse is outside. The menu bar has Save, Run, Stop, Enable, Edit (Undo, Redo), Settings and Exit (`Editor GUI Menu bar.ahk`). v1 has no context menu in the canvas (a right click moves the view or cancels) and no rectangle selection.
+- **Verified (read):** the S0005 editor moves the view with the right button and with the left button on an empty place (PROTOCOL 4.11, WI-0090); E0094 gives the left button to the rectangle selection.
+- **Not measured:** how long the engine needs to apply a patch to a flow of 300 elements and commit it as a new immutable revision. WI-0093 measures it first.
+
+### Design fixed while detailing
+
+No owner decision needed; a package may refine it and says so in its result.
+
+- **One implementation of the operations.** `FlowPatch` (`src/core/`, shared by engine and editor) applies a list of operations to a definition and checks them. The engine commits a patch with it (authoritative); the editor keeps its draft with it and computes the inverse of a step for undo. Operations: `element.add`, `element.update` (named keys; `pars` merged), `element.remove` (its connections go with it), `connection.add`, `connection.update` (new: type, ends, parts), `connection.remove`, `flow.settings` (keys merged). Rules (REQ-EDT-070): no connection into a trigger, none from an element to itself, no second identical connection, both ends exist, IDs unique. A list is applied all or nothing.
+- **IDs come from the editor**, in the format of v1 (`element0000000042`, `connection0000000043`), from `ElementIDCounter`. There is one editor per flow (D0002), so they do not clash. The engine refuses a used ID and keeps the counter above every number used.
+- **Revisions share what did not change.** Every patch is a new immutable revision (E0001). The maps of unchanged elements and connections are shared between revisions (copy on write), so a patch costs the changed parts, not the whole flow. Nothing changes a committed map.
+- **The editor sends a patch after each completed action** (mouse released, dialog OK), never during a drag. It applies the operations to its draft at once (optimistic), keeps one patch in flight and queues the next. On `conflict` (only a rename or a move by the manager can cause one, since there is one editor per flow) it applies its operations again on the definition of the answer and sends them once more; if they do not apply, it takes the engine's state, clears its undo stack and tells the user. `cmd.flow.meta.update` commits on top of the current revision.
+- **Undo and redo in the editor** (ARCHITECTURE 4): a step is the operations and their inverse, and undo sends the inverse as a new patch (the engine has no undo). At most 100 steps (v1). A cancelled action (Esc, a cancelled dialog) leaves no step (REQ-EDT-090). The stacks are cleared when the engine restarts (new `epoch`). Changes of the view and of the selection are no steps.
+- **Automatic saving in the engine** (E0065): per flow, 3 s after the last commit and at the latest 10 s after the first unsaved one; at `sys.shutdown` before the bye; `cmd.flow.save` (Ctrl+S) at once. The engine asks storage for a backup at the first write of an editing session (the editor sends its session ID with each patch) and then at most every 10 minutes; ten backups are kept. So a crashed editor loses nothing, and a crashed engine loses at most the last 10 s (E0065).
+- **The view** (E0086) is a `flow.settings` patch marked as a view change: no undo step, no backup; it is sent 2 s after the last change of zoom or offset and when the editor closes.
+- **Drawing while editing:** the selection, the buttons near the selected element, the four fields for new elements, a connection that follows the mouse and the selection rectangle are an overlay above the cached layers. During a drag the moved elements and their connections are drawn live above a static layer that is built once without them (E0090). Hit order as in v1: buttons, new-element fields, elements (with v1's click-through priority for overlapping ones), connections.
+- **Input:** keys come through `WM_KEYDOWN` of the editor window only, never through hotkeys (the trigger host owns the hotkeys, and an editor must not catch the keys of another window). The dialogs of the editor (class list, connection type, questions) are `ui_common/` windows that do not block the message path; menus run in the editor process (E0077). Every action has a headless driver command that goes through the same handlers as the window, so the operations are tested in the normal tiers.
+- **Triggers** (left from S0003): the engine arms again a changed trigger of an enabled flow, disarms a removed one, and enables a new trigger by E0092. A flow with manual triggers always has exactly one default trigger (as v1).
+- **The class list moves from S0007 to S0006** (REQ-USE-010, REQ-USE-020 for the list): adding an element needs it, and v1 filters the classes by the user level in the selector itself.
+
+### Packages
+
+| ID | Title | Size | Depends on |
+|---|---|---|---|
+| [WI-0093](WI-0093-patch-operations.md) | Engine: patch operations, shared `FlowPatch`, revisions that share, the meta race | L | – |
+| [WI-0094](WI-0094-edited-triggers.md) | Engine: triggers of an edited flow | M | WI-0093 |
+| [WI-0095](WI-0095-automatic-saving.md) | Engine and storage: automatic saving and backups (E0065) | M | WI-0093 |
+| [WI-0096](WI-0096-editor-draft-undo.md) | Editor: draft, patch client, undo and redo, selection model, the view written | L | WI-0093 |
+| [WI-0097](WI-0097-edit-scene-renderer.md) | Scene and renderer for editing: selection, buttons, new-element fields, drag layer | M | – |
+| [WI-0098](WI-0098-select-move.md) | Editor: select (click, Ctrl, rectangle) and move, loop height | M | WI-0096, WI-0097 |
+| [WI-0099](WI-0099-add-elements.md) | Editor: add elements, class list by category and user level | M | WI-0098 |
+| [WI-0100](WI-0100-connect.md) | Editor: connect, connection type, move the ends of a connection | M | WI-0098, WI-0099 |
+| [WI-0101](WI-0101-delete-clipboard.md) | Editor: delete, cut, copy, paste (Windows clipboard, E0091) | M | WI-0098 |
+| [WI-0102](WI-0102-menus.md) | Editor: menu bar, context menus, the trigger buttons | M | WI-0099, WI-0100, WI-0101 |
+| [WI-0103](WI-0103-editor-crash-notice.md) | Notice of a crashed editor that reopens it (E0093) | S | – |
+| [WI-0104](WI-0104-acceptance-s6.md) | Acceptance S0006 | M | all |
+
+**Order.** WI-0093 first (engine), with WI-0097 (renderer) and WI-0103 (supervisor, tray, manager) beside it. Then WI-0094 and WI-0095 (engine, one after the other) beside WI-0096 (editor). Then WI-0098 to WI-0102 one after the other (the same files in `src/editor/`), then WI-0104. As before, the column "Depends on" is binding, the order is not. The S0007 packages without an S0006 dependency may run beside S0006 (E0095).
+
+**Load path (F-0073).** WI-0093 changes how a revision is built; it runs `tests/stress/test_big_flows.py` at its end and records the time to ready and the largest snapshot answer (budget 3 s, E0042).
+
+**Files with conflict risk in S0006:** `doc/PROTOCOL.md` (WI-0093 to WI-0096, WI-0098, WI-0103), `src/engine/Engine.ahk` and `src/engine/FlowLifecycle.ahk` (WI-0093, WI-0095), `src/engine/TriggerArms.ahk` and `src/engine/FlowStateFile.ahk` (WI-0094), `src/storage/` (WI-0095), `src/editor/` (WI-0096 to WI-0102), `src/editor/render/` (WI-0097), `doc/MIGRATION.md`, `tests/support/group_table.py`, `.vscode/tasks.json`.
+
+### Acceptance S0006
+
+- Editing during execution (E0001, ARCHITECTURE 4.2): e2e tests show that a running instance follows a connection added or changed during the run, that a removed next element ends its thread as M-0017 says, and that a changed trigger of an enabled flow fires with its new parameters.
+- Every editing action has headless e2e tests through the driver; the windows are checked by `gui` tests of the owner and by the manual check.
+- A killed editor loses no completed edit: the file has it within 10 s, the reopened editor shows it, and the user got the notice (REQ-ROB-120, E0093). A killed engine loses at most the edits of the last 10 s. Nothing asks at close or exit (REQ-EDT-100); the backups follow E0065.
+- Copy in one editor and paste in another works (E0091).
+- Measured: the answer of a patch on a flow of 300 elements (WI-0093 proposes the budget), the frame during a drag of 30 elements in a flow of 300 elements (below 16 ms, headless) and the rebuild after the drop.
+- The owner edits the imported v1 flows at 100 % and 225 % (manual check 10): select, rectangle, move, add, connect, delete, copy and paste between two flows, undo and redo, menu bar, keys, context menus.
+- Serial, parallel, `-m stress`, foundation and slow runs are green.
+
+### Progress S0006
+
+- [ ] WI-0093  - [ ] WI-0094  - [ ] WI-0095  - [ ] WI-0096  - [ ] WI-0097  - [ ] WI-0098
+- [ ] WI-0099  - [ ] WI-0100  - [ ] WI-0101  - [ ] WI-0102  - [ ] WI-0103  - [ ] WI-0104
+
+## S0007: Editor III: settings dialogs
+
+**Goal:** Every element of the core set is configured in its settings dialog. The dialog is built from the parameter schema of its class, with the checks of the element while the user edits (`CheckSettings`), the content type of each field, a check of every expression while typing (REQ-EDT-200, E0096), the MIGRATION places of a migrated flow, and the help of the element in its own window (E0098). The help is written in Markdown and shown in one of three viewers (E0099, E0100). A new element opens its settings after the choice of its class. The flow settings set the execution policy, the working directory, the type mode, the limits of the runaway guard and the notices of the flow. Every trigger dialog has "Switch with the flow". The assistants help to fill in window information, colors and mouse positions. An unhandled error of a flow opens, from its notice, a window with the message, the element and the variables of the branch at that moment.
+
+**Not part of S0007:** the help pages of the elements of S0008 (corrected with their element, E0097), translations of the help (S0009), the flow check (REQ-EDT-160), syntax highlighting and completion (REQ-EDT-210), examples (REQ-EDT-220), help with variables (REQ-EDT-190), the debug dialog that halts a flow (REQ-DBG-060, phase 4).
+
+**Refinement (E0095).** S0007 is detailed together with S0006. The retrospective of WI-0104 refines these packages before they start, as a proposal for the owner.
+
+### Findings for S0007 (2026-10-20)
+
+- **Verified (read):** the core set has its parameter schema in the v1 form (`static Parameters(ctx)`), and 13 classes have `CheckSettings(form, params, staticValues)` that calls `form.Enable` (for example `Action_Add_To_List`). Nothing implements `form` yet (`AhfElement.CheckSettings` is a stub). The field types of the core set are `Label`, `Edit`, `multilineEdit`, `Checkbox`, `Radio`, `DropDown`, `ListBox`, `Hotkey` and `Button` (counted in `src/elements/`; the case of the type name varies: `edit`, `multiLineEdit`).
+- **Verified (read, v1):** the settings window knows 15 field types plus the name field (`Element settings.ahk`: label, checkbox, radio, edit, multilineEdit, slider, DropDown, ComboBox, Hotkey, Button, file, folder, weekdays, DateAndTime, listbox). The edit fields show their content type by an icon (`v1/Icons/expression.ico`, `string.ico`, `VariableName.ico`). The form API of the element (`v1/Source_Editor/API/API for Elements.ahk`): `x_Par_Enable`, `x_Par_Disable`, `x_Par_SetValue`, `x_Par_GetValue`, `x_Par_SetChoices`, `x_Par_SetLabel`, `x_FirstCallOfCheckSettings`. The editor side also gives flow and element lists of other flows (`x_getFlowName`, `x_GetListOfFlowNames`, `x_getAllElementIDsOfClass`, ...) and the assistants (`x_assistant_windowParameter`, `x_assistant_MouseTracker`, `x_assistant_ChooseColor`).
+- **Verified (read):** `Trigger_Hotkey` needs the window-information assistant (`src/elements/Default/lib/WindowIdent.ahk`, a `Button` field). The color and mouse assistants are used only by elements of S0008 (9 element files of v1).
+- **Verified (read):** M-0064: the names of `Action_Execute_Flow`, `Action_Stop_Flow` and `Condition_Flow_Running` show IDs, because the editor side has no access to other flows yet.
+- **Verified (counted, v1):** 149 help pages, English only (`v1/Source_Elements/Default/help/en/`, one per element), plus general pages. v1 showed them with `Shell.Explorer` (the engine of Internet Explorer) in a window next to the settings (`Help.ahk`). The general pages on variables and expressions describe the v1 syntax.
+- **Verified (read):** the flow settings of v1 are the policy, the working directory and a button for the log (`Flow settings.ahk`). v2 adds the type mode (`strictTypes`, E0034), the three limits (REQ-EXE-170, E0062) and the switch of the error notices per flow (PROTOCOL 4.7).
+- **Verified (read):** the notice of an unhandled error carries no variables (E0072, PROTOCOL 4.7), and the engine keeps none after the end of the branch.
+- **Not checked:** how the help looks in each viewer at 225 % (WI-0111, WI-0115); whether WebView2 can be driven from AutoHotkey v2 with a small COM wrapper of our own (the spike of WI-0115); whether the loader DLL may be shipped (assumed: the WebView2 SDK license allows it; WI-0115 checks).
+
+### Design fixed while detailing
+
+No owner decision needed; a package may refine it and says so in its result.
+
+- **Form model and window apart** (as the manager and the editor): `ElementForm` builds the fields from the schema; holds values, enabled state, labels, choices and warnings; runs `CheckSettings` after each change under `try/catch` (an error of the element is a warning in the dialog, never a crash of the editor); and gives back the parameters and the name (`StandardName` with `GenerateName`). The window draws the model. Headless driver commands fill and submit a form, so every core element is tested in the normal tiers.
+- **The `form` API** is documented in ELEMENT-API-V2 3 with the v1 names mapped: `Enable`, `Disable`, `SetValue`, `GetValue`, `SetChoices`, `SetLabel`, `FirstCall`.
+- **The dialog writes once:** OK sends one `element.update` (one undo step). A new element: class choice, dialog, and OK sends one `element.add`. Cancel writes nothing. A changed parameter that carries a MIGRATION place loses its place (WI-0093); the dialog shows the IDs and the v1 text of each place next to its field.
+- **An element of an unknown class or a missing package** opens a read-only list of its parameters (REQ-MIG-070).
+- **The editor's `ctx`:** flow names, trigger lists and element names of other flows come from the engine (asked when a dialog opens, dropped on `evt.flow.list.changed`), so M-0064 can go back.
+- **The help has its own window** (E0098) with a viewer interface: the classic viewer and the browser option in WI-0111, WebView2 in WI-0115 (E0099). The pages are Markdown sources with generated, committed HTML (E0100). The loader DLL of WebView2 is fetched by a setup tool into an ignored folder; without it `auto` shows the classic viewer. Shipping it is S0009.
+- **The error window** lives in the manager, which holds the notices. The engine keeps a bounded copy of the variables of the branch at an unhandled exception (a few errors per flow, a size cap), and the manager asks for it when the user opens the notice.
+
+### Packages
+
+| ID | Title | Size | Depends on |
+|---|---|---|---|
+| [WI-0105](WI-0105-form-model.md) | Form model and the `form` API (headless) | L | – |
+| [WI-0106](WI-0106-settings-window.md) | Element settings window: every field type, content types, MIGRATION places, new element | L | WI-0105, WI-0099 |
+| [WI-0107](WI-0107-editor-ctx-follows-flow.md) | Editor `ctx` (other flows), trigger option "Switch with the flow", M-0064 back | M | WI-0105 |
+| [WI-0108](WI-0108-expression-check.md) | Expressions checked while typing (REQ-EDT-200, E0096) | S | WI-0106 |
+| [WI-0109](WI-0109-flow-settings.md) | Flow settings dialog and the switch of the error notices per flow | M | WI-0096, WI-0102 |
+| [WI-0110](WI-0110-assistants.md) | Assistants: window information, color, mouse position | M | WI-0106 |
+| [WI-0111](WI-0111-help-window.md) | Help window: viewer interface, `Shell.Explorer`, browser, the setting | M | WI-0106 (help button), WI-0112 (pages) |
+| [WI-0112](WI-0112-help-content.md) | Help content: Markdown sources, the HTML generator, core set and expression page for v2 | L | – |
+| [WI-0113](WI-0113-error-window.md) | Window of an unhandled error with the variables of the branch (REQ-USE-080 part 2) | M | – |
+| [WI-0115](WI-0115-webview2-viewer.md) | Help viewer with WebView2 (spike first) | L | WI-0111 |
+| [WI-0114](WI-0114-acceptance-s7.md) | Acceptance S0007 | M | all |
+
+**Order.** WI-0105 (form model, new files in `src/editor/`), WI-0112 (help content and generator, new files) and WI-0113 (engine and manager) do not depend on S0006 and may run beside it, when the orchestrator has a free slot and the files do not clash (WI-0113 touches `src/engine/Executor.ahk`: not at the same time as WI-0093 or WI-0094). WI-0106 starts after WI-0099; then WI-0107, WI-0108 and WI-0110 one after the other (the same files); WI-0109 after WI-0102; WI-0111 after WI-0106 and WI-0112, then WI-0115 (its spike may stop it: then the classic viewer stays the only embedded one); then WI-0114. The column "Depends on" is binding, the order is not.
+
+**Files with conflict risk in S0007:** `doc/ELEMENT-API-V2.md` (WI-0105, WI-0107, WI-0110, WI-0112), `doc/PROTOCOL.md` (WI-0106, WI-0107, WI-0109, WI-0111, WI-0113, WI-0115), `src/editor/` (WI-0105 to WI-0110), `src/engine/` (WI-0107, WI-0109, WI-0113), `src/manager/` (WI-0109, WI-0111, WI-0113), `src/core/SettingsModel.ahk` (WI-0111), `src/elements/Default/` (WI-0107, WI-0112), `doc/MIGRATION.md`, `tests/support/group_table.py`, `.vscode/tasks.json`.
+
+### Acceptance S0007
+
+- Every element of the core set is opened, changed and saved through its dialog in a headless test, and its new parameters run (the acceptance of the plan). Every field type of v1 is covered by a test element.
+- `CheckSettings` of every core element runs without an error for its defaults; an element that throws in `CheckSettings` gives a warning, and the editor keeps running.
+- An expression with a syntax error shows a warning with its position while the user types (REQ-EDT-200).
+- The flow settings change the policy, the working directory, the type mode, the limits and the notices of the flow, and the engine uses them as their requirements say.
+- Every core element has a help page that opens from its dialog (REQ-ELM-020); the help opens from the manager too (REQ-LNG-040); the setting chooses the viewer, and `auto` falls back to the classic viewer without the loader DLL (E0099); the generated HTML is current (E0100).
+- An unhandled error opens, from its notice, the window with the variables of the branch (REQ-USE-080).
+- The owner configures elements of the imported v1 flows at 100 % and 225 % (manual check 11), with the assistants and the help.
+- Serial, parallel, `-m stress`, foundation and slow runs are green.
+
+### Progress S0007
+
+- [ ] WI-0105  - [ ] WI-0106  - [ ] WI-0107  - [ ] WI-0108  - [ ] WI-0109
+- [ ] WI-0110  - [ ] WI-0111  - [ ] WI-0112  - [ ] WI-0113  - [ ] WI-0115  - [ ] WI-0114

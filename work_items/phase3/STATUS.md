@@ -11,26 +11,41 @@ Kept by the orchestrator as described in `doc/ORCHESTRATOR.md`. This file shows 
 | S0003 Trigger host and triggers | WI-0060 to WI-0068 | done (acceptance WI-0067, 2026-10-17) |
 | S0004 UI foundation and manager | WI-0069 to WI-0082 | done (acceptance WI-0082 on 2026-10-19; the manual checks of the owner passed on 2026-10-19) |
 | S0005 Editor I: display | WI-0083 to WI-0092 | done (acceptance WI-0092 on 2026-10-20; manual check 9 passed, look accepted, E0088; step 25 (4K) not run, REQ-PRF-060 partial, F-0156 postponed) |
-| S0006 to S0010 | | rough, see the plan |
+| S0006 Editor II: editing | WI-0093 to WI-0104 | detailed on 2026-10-20 (E0091 to E0094), not started |
+| S0007 Editor III: settings dialogs | WI-0105 to WI-0115 | detailed on 2026-10-20 together with S0006 (E0095 to E0100); refined by the retrospective of WI-0104 before its packages start |
+| S0008 to S0010 | | rough, see the plan |
 
-Step-independent: WI-0059 (test admission, load report, run history) is done. Step S0008 (remaining elements) is planned, not started.
+Step-independent: WI-0059 (test admission, load report, run history) is done.
 
-## Work items of the next step
+## Work items of the next steps
 
-S0005 is done; next is S0006, to be detailed with the owner (WI-0085 to WI-0090 and the look corrections are integrated). WI-0092 (acceptance) must list the `gui` test for real mouse input (task 7 of WI-0090: wheel and drag with SendInput, VS Code task) and the check of the status bar layout.
+S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-0093 first, with WI-0097 and WI-0103 beside it; then WI-0094, WI-0095 and WI-0096; then WI-0098 to WI-0102 one after the other; then WI-0104. S0007 packages without an S0006 dependency (WI-0105, WI-0112, WI-0113) may run beside S0006 when the files do not clash (E0095). The history of S0005 is in the git history of this file (commit `830ddffc`).
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
-| WI-0083 | GDI+ wrapper and the R0002 measurement | done | haiku | e0febbf1..92b9cac5 | 2026-10-19 | R0002 failed: 300 ms vs 16 ms (MS-0044); owner decided E0090 (caches), added to WI-0085 |
-| WI-0084 | Geometry and scene (headless) | done | haiku | 98f467b0..e065b5d1 | 2026-10-19 | review approved; verified green |
-| WI-0085 | Renderer: draw the scene, style, icons | done, look not yet accepted | haiku | see git log (WI-0085) | 2026-10-19 | review approved with one fix; frame 6.3 ms, rebuild 106 ms (152 ms at 4K, F-0151); owner accepts the look (E0088); verified green |
-| WI-0086 | Engine: run states, connection taken, warnings per element | done | haiku | f2846ee2..19c91fdf | 2026-10-19 | review approved with one fix; verified green; F-0148 |
-| WI-0087 | Open and close an editor: supervisor and manager | done | haiku | 1646a787..e147d1f4 (see git log) | 2026-10-19 | review approved with one text fix; verified (one load flake); F-0149 carried to WI-0088 |
-| WI-0088 | Editor role: model, resync, window, headless driver | done | haiku | see git log (WI-0088), tip 663c5adf | 2026-10-20 | review approved; verified green; gui window test left to the owner; F-0149 closed |
-| WI-0089 | Live states, marks and the event load | done | haiku | see git log (WI-0089), tip bfcdc7f9 | 2026-10-20 | review approved with fixes; batch per flow decided by the owner (evt.element.states); slow 204 and foundation 471 green; the restart test of the editor was a wrong test assumption (F-0155, fixed); F-0150 closed, F-0156 open; window latency measurement is for the owner |
-| WI-0090 | View: zoom, move, tooltip, status bar, DPI | done | haiku | see git log (WI-0090), tip 26de7a68 | 2026-10-20 | review approved with one fix (drag ends without a button); gui test of real mouse input and the status bar layout on screen are left to WI-0092; F-0157 |
-| WI-0091 | Tray icon and tray menu of the editor | done | haiku | see git log (WI-0091), tip 9b3267ca | 2026-10-20 | review approved with one fix (F-0158 recorded); gui test written, not run |
-| WI-0092 | Acceptance S0005 | done | haiku | see git log (WI-0092), tip 477e762a | 2026-10-20 | review approved with fixes; REQ-PRF-060 unmet for 300 changing elements (F-0156); manual check 9 and the decisions in NEEDS-ATTENTION wait for the owner; result in WI-0092-result-s5.md |
+| WI-0093 | Engine: patch operations, shared `FlowPatch`, revisions that share, the meta race | open | | | | measures the patch time first (stop above 50 ms) |
+| WI-0094 | Engine: triggers of an edited flow | open | | | | E0092 |
+| WI-0095 | Engine and storage: automatic saving and backups (E0065) | open | | | | |
+| WI-0096 | Editor: draft, patch client, undo and redo, selection model, the view written | open | | | | E0086 |
+| WI-0097 | Scene and renderer for editing | open | | | | the owner accepts the screenshots |
+| WI-0098 | Editor: select and move, loop height | open | | | | E0094 |
+| WI-0099 | Editor: add elements, class list | open | | | | |
+| WI-0100 | Editor: connect | open | | | | |
+| WI-0101 | Editor: delete, cut, copy, paste | open | | | | E0091 |
+| WI-0102 | Editor: menu bar, context menus, trigger buttons | open | | | | |
+| WI-0103 | Notice of a crashed editor | open | | | | E0093 |
+| WI-0104 | Acceptance S0006 | open | | | | manual check 10; refines S0007 |
+| WI-0105 | Form model and the `form` API | open | | | | may run beside S0006 |
+| WI-0106 | Element settings window | open | | | | |
+| WI-0107 | Editor `ctx`, "Switch with the flow" | open | | | | |
+| WI-0108 | Expressions checked while typing | open | | | | E0096 |
+| WI-0109 | Flow settings dialog | open | | | | |
+| WI-0110 | Assistants | open | | | | |
+| WI-0111 | Help window: viewer interface, classic viewer, browser, setting | open | | | | E0099 |
+| WI-0112 | Help content: Markdown, generator, core pages | open | | | | E0097, E0100; may run beside S0006 |
+| WI-0113 | Window of an unhandled error | open | | | | may run beside S0006 (not with WI-0093/WI-0094: `Executor.ahk`) |
+| WI-0115 | Help viewer with WebView2 | open | | | | spike first; if it fails, the classic viewer stays (E0099) |
+| WI-0114 | Acceptance S0007 | open | | | | manual check 11 |
 
 ## Pending integrations
 
@@ -38,7 +53,7 @@ None.
 
 ## Running agents
 
-WI-0089 implementer (haiku), workspace wi-89.
+None.
 
 ## Last verified state
 

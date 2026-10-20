@@ -119,7 +119,7 @@ The global setting is `executionPolicy` (default `parallel`, never `default`); i
 - **v2:** partial (the commands work; the buttons in manager and editor are missing)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (manager), S0006 (editor)
+- **Plan:** S0004 (manager), S0006 (editor, WI-0102)
 - **Evidence:** `tests/integration/test_engine.py` (`test_start_*`, `test_stop_*`, `test_toggle_starts_and_stops_a_flow`), `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`
 
 The user starts a flow from the manager or the editor, through its default manual trigger or a chosen one, and stops it there. Stopping ends all running and waiting instances of the flow. Starting and stopping from inside a flow is REQ-EXE-120 and REQ-ELM-250; starting by an event is TRG.
@@ -197,7 +197,7 @@ The action `Execute_Flow` starts a flow (this one or another) through its defaul
 - **v2:** partial (`A_WorkingDir` and the file parameters use the global setting `workingDir` at once; the own folder of a flow is kept from the flow file, its editing comes with S0007)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (global, WI-0077, done), S0007 (flow settings)
+- **Plan:** S0004 (global, WI-0077, done), S0007 (flow settings, WI-0109)
 - **Evidence:** `tests/ahk/vars_model.test.ahk`, `tests/integration/test_settings.py::test_the_global_working_directory_is_a_working_directory_of_flows_at_once`
 
 Relative paths in file and folder parameters refer to the working directory. Each flow uses the global working directory (default `A_MyDocuments "\AutoHotFlow"`, the same as in v1, so imported flows find their files) or its own (flow setting). Decision E0028.
@@ -241,7 +241,7 @@ Every element that can wait (REQ-EXE-100) has a setting "maximum run time". The 
 - **v2:** partial (the three limits work per flow with the defaults from MS-0036, set in the flow file; the notice (tray and manager list, WI-0075) is there; the global defaults and the global switch of the notice are settings and take effect at once (WI-0077); their dialog is there (WI-0078); the editing per flow (S0007) is missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0003 (WI-0066, done), S0004 (global defaults, WI-0077, done; the notice, WI-0075, done), S0007 (per flow, editing)
+- **Plan:** S0003 (WI-0066, done), S0004 (global defaults, WI-0077, done; the notice, WI-0075, done), S0007 (per flow, editing, WI-0109)
 - **Evidence:** `tests/ahk/engine_runaway.test.ahk`, `tests/integration/test_settings.py::test_the_global_runaway_limit_stops_a_flow_without_its_own_limit`, `tests/integration/test_settings.py::test_a_limit_of_the_flow_wins_over_the_global_one`, `tests/integration/test_settings.py::test_the_global_limit_of_running_instances_refuses_a_start`, `tests/integration/test_settings.py::test_the_switch_for_notices_of_unhandled_errors`, `tests/integration/test_notices.py::test_a_stop_by_the_runaway_guard_gives_a_notice_with_the_limit`, `tests/integration/test_runaway.py::test_an_endless_loop_is_stopped_and_its_triggers_stay_disabled_after_a_restart`, `tests/integration/test_runaway.py::test_a_flood_of_refused_starts_is_answered_and_logged_a_few_times`
 
 A flow that runs away does not disturb the others (decision E0062, after the model of the Android app AutoMagic). A flow that executes more elements per minute than its limit (the trigger of each new instance counts) is stopped and all its triggers are disabled, also those that do not switch with the flow; the user is told. A start that would exceed the limit of waiting instances (policy `wait`) or of running instances of a flow is refused like the policy `skip`; a flow that calls it learns this (`exception`). The limits have global defaults and can be changed per flow; 0 means no limit. The defaults are chosen so that a loop over a long list passes.
@@ -711,7 +711,7 @@ An element is a class with: name, category, user level, stability (stable or exp
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0007
+- **Plan:** S0007 (the core set, WI-0112, E0097), S0008 (the other elements, with their element)
 - **Evidence:** -
 
 Every element has a help page that says what it does and what its parameters mean. The help is reachable from the element settings.
@@ -1162,7 +1162,7 @@ When two enabled flows, or two triggers of one flow, use the same hotkey or hots
 - **v2:** partial (each trigger has its own enabled state and can be switched on its own; no trigger is armed yet, and the editor cannot add or switch one yet)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003 (WI-0060 done), S0006
+- **Plan:** S0003 (WI-0060 done), S0006 (WI-0094, WI-0102)
 - **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`
 
 A flow can have several triggers. Each trigger can be enabled and disabled on its own, and can be set to switch with the flow or on its own (REQ-TRG-050). One manual trigger is the default trigger, used when the flow is started without naming a trigger.
@@ -1173,13 +1173,14 @@ A flow can have several triggers. Each trigger can be enabled and disabled on it
 - **v2:** partial (the engine has the option "switch with the flow" and the independent triggers, and the flow is active by the following ones only; the elements Set flow status and Flow enabled switch and ask by it (WI-0065); the manager and the editor are missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0003 (WI-0060 done, WI-0065 done), S0004 (manager), S0007 (editor)
+- **Plan:** S0003 (WI-0060 done, WI-0065 done), S0004 (manager), S0006 (new triggers, WI-0094, E0092), S0007 (the checkbox, WI-0107)
 - **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_engine.py::test_a_flow_without_a_following_trigger_answers_with_a_message`, `tests/integration/test_flow_status_elements.py::test_set_flow_status_every_choice_for_another_flow`, `tests/integration/test_flow_status_elements.py::test_condition_flow_enabled_every_choice`, `tests/e2e/test_manager_flows.py::test_disable_of_an_inactive_flow_with_independent_triggers_yes_disables_them`
 
 Each trigger has the option "Switch with the flow", on by default, so that a flow behaves as in v1 (decision E0056).
 
 - A trigger that switches with the flow is enabled and disabled together with the flow. The flow counts as active when at least one of these triggers is enabled; enabling one of them by itself makes the flow active.
 - A trigger that switches on its own is enabled and disabled only by itself: in the editor or by an element of a flow. It does not make the flow active, and it stays enabled when the flow is disabled. Use: a trigger that other elements switch on and off, while the rest of the flow is enabled or disabled as a whole.
+- A new trigger (added, pasted, or brought back by undo) is enabled when it switches with the flow and the flow is active; one that switches on its own starts disabled (E0092).
 - The state of every trigger survives a restart of AutoHotFlow (REQ-EXE-070).
 - The manager shows when a flow is inactive but has active triggers of its own. When the user disables such a flow by hand, the manager asks whether to disable these triggers too; the question says that they can then be enabled again by hand only in the editor.
 - Elements can switch and query the flow, all its triggers, its triggers of their own, its default trigger and a given trigger (REQ-ELM-250).
@@ -1521,10 +1522,10 @@ Elements with icon and name, connections with their type, loops with their adjus
 - **v2:** done (zoom, move and the DPI scale unit-tested (WI-0084); the wheel zoom at the pointer, the drag, the limits 0.1 to 3 and a new size or DPI tested headless (`tests/e2e/test_editor.py`); the real wheel and drag: gui test `tests/fault/test_editor_mouse_gui.py` (part D) and manual check 9, steps 4 and 5, owner)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086)
+- **Plan:** S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086, WI-0096; the left button goes to the rectangle selection, E0094, WI-0098)
 - **Evidence:** `tests/e2e/test_editor.py::test_the_wheel_zooms_one_step_at_the_pointer_and_keeps_the_point_under_it`, `tests/e2e/test_editor.py::test_a_drag_moves_the_view_by_the_movement_of_the_pointer`, `tests/fault/test_editor_mouse_gui.py` (gui: real wheel and drag with SendInput; not run by agents, owner: manual check 9, part D); `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
-Zoom, and move the view by dragging with the right (or left) mouse button. Zoom and offset are saved with the flow (`flowSettings`).
+Zoom, and move the view by dragging with the right mouse button (E0094; until WI-0098 the left button on an empty place moves it too, as in v1). Zoom and offset are saved with the flow (`flowSettings`, E0086).
 
 ### REQ-EDT-040 Live execution state in the editor
 
@@ -1543,7 +1544,7 @@ Running elements and connections are highlighted while the flow runs; the editor
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0006, S0007
+- **Plan:** S0006 (the fields for new elements and the class list, WI-0099), S0007 (the settings open after the choice, WI-0106)
 
 The user chooses the kind (trigger, action, condition, loop) and then the class from a list grouped by category. The list shows only the elements of the user's level (REQ-USE-010) and marks experimental ones (REQ-USE-020). The new element gets a default name.
 
@@ -1553,9 +1554,9 @@ The user chooses the kind (trigger, action, condition, loop) and then the class 
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0006
+- **Plan:** S0006 (WI-0098, E0094)
 
-Select one or several elements (also all with Ctrl+A) and move them with the mouse. Esc or the right mouse button cancels a move.
+Select one or several elements (also all with Ctrl+A, or with a rectangle drawn with the left mouse button on an empty place, E0094) and move them with the mouse. Esc or the right mouse button cancels a move.
 
 ### REQ-EDT-070 Connect elements
 
@@ -1563,7 +1564,7 @@ Select one or several elements (also all with Ctrl+A) and move them with the mou
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0006
+- **Plan:** S0006 (WI-0100)
 
 Draw a connection between two elements and choose its type; change the type later. Not allowed: a connection into a trigger, from an element to itself, a second identical connection.
 
@@ -1573,9 +1574,9 @@ Draw a connection between two elements and choose its type; change the type late
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0006
+- **Plan:** S0006 (WI-0101, E0091)
 
-Delete with confirmation (Del). Cut, copy and paste with Ctrl+X, Ctrl+C, Ctrl+V, also between two flows.
+Delete with confirmation (Del). Cut, copy and paste with Ctrl+X, Ctrl+C, Ctrl+V, also between two flows. The elements go through the Windows clipboard, in a format of AutoHotFlow only (E0091).
 
 ### REQ-EDT-090 Undo and redo
 
@@ -1583,7 +1584,7 @@ Delete with confirmation (Del). Cut, copy and paste with Ctrl+X, Ctrl+C, Ctrl+V,
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0006
+- **Plan:** S0006 (WI-0096)
 
 Ctrl+Z and Ctrl+Y and menu entries. A cancelled action (a move cancelled with Esc, a dialog cancelled) leaves no undo step.
 
@@ -1593,7 +1594,7 @@ Ctrl+Z and Ctrl+Y and menu entries. A cancelled action (a move cancelled with Es
 - **v2:** partial (revisions, conflict detection and saving work internally; edit operations are refused until the editor exists)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0006
+- **Plan:** S0006 (commit WI-0093, automatic saving WI-0095, editor WI-0096)
 - **Evidence:** `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`
 
 Every completed edit takes effect at once, also for running instances (REQ-EXE-080), and is saved automatically a few seconds later (E0065): about 3 s after the last change, at the latest every 10 s while the user keeps editing. A flow has no unsaved state, so closing the editor or the application asks nothing. Saving by hand (Ctrl+S, menu) only writes at once. Mistakes are undone with undo (REQ-EDT-090) or by a backup: a backup is made at the first write of an editing session and then at most every 10 minutes (REQ-ROB-060, REQ-MGR-110). A rename by the manager while the editor is open is merged.
@@ -1604,7 +1605,7 @@ Every completed edit takes effect at once, also for running instances (REQ-EXE-0
 - **v2:** partial (run, and enable or disable, from the tray menu of the editor, E0087; manual check 9, steps 12 and 13, owner; the menu bar (save, run, stop, enable, undo, redo, flow settings, exit) is missing and comes with S0006)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0005 (run and enable from the tray menu of the editor, E0087, WI-0091), S0006 (the menu bar)
+- **Plan:** S0005 (run and enable from the tray menu of the editor, E0087, WI-0091), S0006 (the menu bar, WI-0102)
 - **Evidence:** `tests/e2e/test_editor_tray.py` (headless: run, enable and disable, the questions, a refused run); `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
 The menu bar of the editor has: save, run, stop, enable/disable, edit (undo, redo), flow settings, exit.
@@ -1615,7 +1616,7 @@ The menu bar of the editor has: save, run, stop, enable/disable, edit (undo, red
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0007
+- **Plan:** S0007 (model WI-0105, window WI-0106)
 
 The dialog is built from the parameter schema of the class. Field types used in v1: label, edit, multi-line edit, checkbox, radio, drop-down, combo box, list box, slider, file, folder, hotkey, week days, date and time, button. An icon next to each edit field shows its content type (expression, string, variable name). The element checks its settings while the user edits them (enable or disable fields, warnings such as "the variable name is not valid"). The important buttons stay visible in long dialogs. A help button opens the help of the element.
 
@@ -1625,7 +1626,7 @@ The dialog is built from the parameter schema of the class. Field types used in 
 - **v2:** open
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0007
+- **Plan:** S0007 (WI-0110)
 
 Get window and control information by pointing at a window; choose a color or pick it from the screen; take a position with the mouse.
 
@@ -1635,7 +1636,7 @@ Get window and control information by pointing at a window; choose a color or pi
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0007
+- **Plan:** S0007 (WI-0109)
 
 Execution policy (REQ-EXE-050), working directory (REQ-EXE-130), the type mode (REQ-VAR-100), and a button that shows the log of the flow.
 
@@ -1703,8 +1704,8 @@ The analysis of the flow (REQ-EDT-160) knows which variables can exist at an ele
 - **v1:** no
 - **v2:** open (the parser reports errors with their position, `EXPRESSION-LANGUAGE.md` section 10)
 - **Prio:** should
-- **Scope:** later
-- **Plan:** - (could fit into S0007)
+- **Scope:** port
+- **Plan:** S0007 (WI-0108, E0096)
 
 The element settings check every expression field and every script field (REQ-VAR-010, REQ-VAR-020) while the user types, and show a warning with the position of the error.
 
@@ -1973,9 +1974,9 @@ Names, categories and parameter labels of the elements are translated by the lan
 - **v2:** open
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0007
+- **Plan:** S0007 (the window WI-0111, WebView2 WI-0115, E0098, E0099; the content WI-0112, E0097, E0100), S0009 (translations, shipping the WebView2 loader)
 
-A help window with general pages (welcome, variables, key list, color chart) and one page per element (REQ-ELM-020), opened from the manager and from the element settings.
+A help window of its own (E0098) with general pages (welcome, variables, key list, color chart) and one page per element (REQ-ELM-020), opened from the manager and from the element settings. The pages are written in Markdown and shown as HTML (E0100). A setting chooses the viewer: automatic (WebView2 when it is available, otherwise the browser control of Windows), one of the two, or the default browser (E0099).
 
 ### REQ-LNG-050 Translation tools for contributors
 
@@ -2347,11 +2348,10 @@ The broken file is reported; all other flows load.
 - **v2:** partial (the manager part: a killed manager is not restarted by itself, the tray icon stays and opens a new one, which holds the 200 flows again; the owner's check of the real crash is MANUAL-CHECKS section 1 step 25; that the rest keeps running and a flow can still be started after a crash of the real manager is the gui test `test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted` (gui tier: the gui tests of WI-0073 are reported as passed in `work_items/phase3/STATUS.md`; not repeated by agents); the editor is S0006)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (manager), S0006 (editor)
+- **Plan:** S0004 (manager), S0006 (editor: WI-0095, the notice WI-0103, E0093)
 - **Evidence:** `tests/fault/test_tray_role.py::test_a_crashed_manager_is_opened_again_by_the_show_manager_entry`, `tests/fault/test_manager_window.py::test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted (gui)`, `tests/stress/test_manager_big_flows.py::test_the_manager_holds_200_big_flows_quickly_and_in_little_memory`
-- **Doubt:** Still open: whether AutoHotFlow opens a crashed editor again by itself. (The question of unsaved changes is gone with E0065.)
 
-When an editor crashes, no completed edit is lost: every edit is in effect at once and is saved automatically (REQ-EDT-100, E0065). The user learns that the editor has ended; the editor opened again shows the flow with all edits. Only an edit in progress at that moment (an open dialog, a move with the mouse) may be lost. A crashed manager is opened again from the tray icon, which belongs to the application and stays (REQ-MGR-090, E0064). Flows and triggers keep running in both cases (REQ-ROB-010).
+When an editor crashes, no completed edit is lost: every edit is in effect at once and is saved automatically (REQ-EDT-100, E0065). The user learns from a notice that the editor has ended, and a click on the notice opens the editor again; AutoHotFlow does not reopen it by itself (E0093). The editor opened again shows the flow with all edits. Only an edit in progress at that moment (an open dialog, a move with the mouse) may be lost. A crashed manager is opened again from the tray icon, which belongs to the application and stays (REQ-MGR-090, E0064). Flows and triggers keep running in both cases (REQ-ROB-010).
 
 ## Performance and resources (PRF)
 
@@ -2678,7 +2678,7 @@ Every deliberate behaviour change compared to v1 has a MIGRATION ID; no silent c
 - **v2:** partial (the setting `userLevel` exists and is taken over from v1; the element list that uses it comes with S0007)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0004 (setting, WI-0077, done), S0007 (element list)
+- **Plan:** S0004 (setting, WI-0077, done), S0006 (the class list of a new element, WI-0099)
 - **Evidence:** `tests/ahk/core_settings.test.ahk`
 
 Each element has a level; the setting "Shown elements" hides the elements above the user's level, so beginners are not overwhelmed. The first start proposes a level (REQ-USE-050).
@@ -2689,7 +2689,7 @@ Each element has a level; the setting "Shown elements" hides the elements above 
 - **v2:** open
 - **Prio:** could
 - **Scope:** port
-- **Plan:** S0007
+- **Plan:** S0006 (the class list, WI-0099), S0007 (the settings, WI-0106)
 
 An experimental element is marked in the list and in its settings ("This element is experimental!").
 
@@ -2776,7 +2776,7 @@ Every hint that is not critical (for example "take care with global variables", 
 - **v2:** partial (part 1 done in WI-0075: the notice (tray and list) and the mark of the flow until it is selected or the list is opened; the window with the variables of the branch is missing; the switch per flow is missing)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables), E0072
+- **Plan:** S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables, WI-0113), E0072
 - **Evidence:** `tests/integration/test_notices.py::test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray`, `tests/integration/test_notices.py::test_opening_the_list_of_notices_removes_the_marks_and_keeps_the_entries`, `tests/fault/test_manager_window.py::test_an_error_notice_shows_in_the_list_of_notices_opened_by_its_button`, `tests/ahk/manager_model.test.ahk`
 
 When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the user learns it without reading the log: a window like the debug dialog (REQ-DBG-060) shows the error message, the element and the variables of the branch at the moment of the error. Unlike the debug dialog it does not halt anything, because the branch has already ended; the variables can be looked at, not changed. The flow also gets a mark in the manager until the user has looked at the error. Many errors in a short time give one notice. The notice can be switched off per flow and globally (REQ-USE-070).

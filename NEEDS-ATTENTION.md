@@ -1,10 +1,10 @@
 # Needs attention (project owner)
 
-Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits for the project owner: a decision, a manual check, or a fact the owner must know. Last update: 2026-10-20 (after the owner's answers).
+Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits for the project owner: a decision, a manual check, or a fact the owner must know. Last update: 2026-10-20 (S0006 and S0007 detailed).
 
 ## Decisions
 
-None open. Answered on 2026-10-20: the look of the editor is accepted (E0088), the batch order and F-0156 are postponed (F-0161, F-0156), REQ-EDT-230 follows REQ-EDT-100 (F-0159), the language files are re-saved as UTF-8 (F-0158). 4K rebuild F-0151 accepted. (R0002: E0090. Time of the fast tier: E0089.)
+None open. Decided on 2026-10-20 while S0006 and S0007 were detailed: E0091 to E0100 (clipboard, new triggers, crashed editor, rectangle selection, S0007 detailed with S0006, expression check, help content, help window, three help viewers, help in Markdown). Answered on 2026-10-20 before: the look of the editor is accepted (E0088), the batch order and F-0156 are postponed (F-0161, F-0156), REQ-EDT-230 follows REQ-EDT-100 (F-0159), the language files are re-saved as UTF-8 (F-0158). 4K rebuild F-0151 accepted. (R0002: E0090. Time of the fast tier: E0089.)
 
 ## Manual checks
 
