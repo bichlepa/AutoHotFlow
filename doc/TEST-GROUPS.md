@@ -16,6 +16,8 @@ Every source file belongs to one **area** (`SOURCE_AREAS`), every test belongs t
 
 A changed path that **no rule knows is an error**, not a full run: `select_tests.py` exits 2, `verify.py --auto` gives the verdict `error`, and `pytest --changed-from` is a usage error. The message names the file and says what to add (section 6). The guard test `tests/test_groups.py` checks that every tracked file of the repository is known, so the gap shows on the commit that adds the file.
 
+**A deleted file is not an unknown path.** A path that the change deletes (also the old path of a rename) has no rule to find once it is gone. Its own rule still applies when it has one (the groups of its area); a deleted path without a rule selects **everything**, because a deletion can break any test. The deletions come from `groups.removed_paths` (`git diff --diff-filter=D`) and are passed to `groups.select(paths, removed)` by `verify.py --auto`, `select_tests.py --from` and `pytest --changed-from`. Found with WI-0088, which removed `src/core/PlaceholderRole.ahk`.
+
 Two cheap groups always run with any change that tests may read: `docs` and `architecture` (together about 2 s). A test that is **not** in the table always runs: a forgotten entry costs time, never a missed test.
 
 Not selected by the groups, whatever the change: `gui`, `stress`, `soak` and `idle` tests (they depend on the machine, not on the change; unchanged rules in `doc/TEST-STRATEGY.md` section 6) and the group `perf` (scaling measurements, only in full runs).
