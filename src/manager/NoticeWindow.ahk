@@ -100,7 +100,11 @@ class NoticeWindow {
 
     ; The text of an entry: its Lang key with the arguments, and the count of the notices that were held back.
     _Text(e) {
-        text := Lang(e["key"], e["args"]*)
+        args := e["args"]
+        ; An editor notice carries the flow ID (the supervisor does not know names); the list shows the name (WI-0103).
+        if (e["kind"] = "editor" && e["flowId"] != "")
+            args := [this._FlowName(e["flowId"])]
+        text := Lang(e["key"], args*)
         if (e["held"] > 0)
             text .= " " Lang("Notice_more", e["held"])
         return text
