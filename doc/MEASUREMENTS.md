@@ -307,3 +307,18 @@ Not measured: with a real window (the owner's manual check), under a load on the
 **Reading.** The steps of the running flow are hardly affected: the patches add 0.18 ms per step; the cause is assumed to be that the engine is idle between the timers of the sleeps. The round trip of a patch is about 50 ms while the flow runs, which is far more than the engine time of MS-0053 (the time in the engine is not split from the round trip). An idle engine answers the same kind of patch in about 6 ms (`test_a_patch_of_30_operations_on_the_biggest_flow_is_answered_within_the_budget`: 30 operations on the biggest v1 flow, 93 KB, answered in 0.006 s against the budget of 3 s).
 
 Status: **verified** for the numbers of this run (one run each); **not checked** whether the round trip of 50 ms is the engine's message handling or the client.
+
+### MS-0055: patch round trip of the editor, running and idle, against a plain request (WI-0096)
+
+`tests/e2e/test_editor_draft.py::test_a_round_trip_of_an_edit_is_measured` (parametrized: while a flow runs, and idle): 30 `cmd.test.edit` one after another, each timed until the editor shows `pending` 0 (the client polls with no pause). Run log `20261021-000907-24644` (commit 1fc90266 plus the docs of this commit). The machine was shared with other agents' runs.
+
+| Measure | Value |
+|---|---:|
+| Patch round trip seen by the client, flow running: median / max | 139.1 / 259.0 ms |
+| Patch round trip seen by the client, idle: median / max | 137.6 / 255.8 ms |
+| Plain `cmd.test.state` to the editor, median of 30 (earlier run, same setup, log not kept) | 117 ms |
+| Plain `cmd.flow.get` to the engine, median of 30 (same earlier run) | 126 ms |
+
+**Reading.** A patch costs about one plain request round trip through the hub; the running flow makes no difference. The cost sits in the path of every request, not in the patch code (finding F-9004*). MS-0054 measured 50 ms for a patch under stress; the difference is not explained (machine load and the client are the suspects, not checked).
+
+Status: **verified** for the numbers of the runs (one run each, two patch series); **not checked** where the 120 ms come from and what the owner's machine shows.

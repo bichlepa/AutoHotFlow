@@ -1519,11 +1519,11 @@ Elements with icon and name, connections with their type, loops with their adjus
 ### REQ-EDT-030 Zoom and move the view
 
 - **v1:** yes
-- **v2:** done (zoom, move and the DPI scale unit-tested (WI-0084); the wheel zoom at the pointer, the drag, the limits 0.1 to 3 and a new size or DPI tested headless (`tests/e2e/test_editor.py`); the real wheel and drag: gui test `tests/fault/test_editor_mouse_gui.py` (part D) and manual check 9, steps 4 and 5, owner)
+- **v2:** done (zoom, move and the DPI scale unit-tested (WI-0084); the wheel zoom at the pointer, the drag, the limits 0.1 to 3 and a new size or DPI tested headless (`tests/e2e/test_editor.py`); the real wheel and drag: gui test `tests/fault/test_editor_mouse_gui.py` (part D) and manual check 9, steps 4 and 5, owner; the view is saved with the flow two seconds after a change and when the editor closes, and a new editor shows it: `tests/e2e/test_editor_draft.py`)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086, WI-0096; the left button goes to the rectangle selection, E0094, WI-0098)
-- **Evidence:** `tests/e2e/test_editor.py::test_the_wheel_zooms_one_step_at_the_pointer_and_keeps_the_point_under_it`, `tests/e2e/test_editor.py::test_a_drag_moves_the_view_by_the_movement_of_the_pointer`, `tests/fault/test_editor_mouse_gui.py` (gui: real wheel and drag with SendInput; not run by agents, owner: manual check 9, part D); `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
+- **Evidence:** `tests/e2e/test_editor.py::test_the_wheel_zooms_one_step_at_the_pointer_and_keeps_the_point_under_it`, `tests/e2e/test_editor.py::test_a_drag_moves_the_view_by_the_movement_of_the_pointer`, `tests/e2e/test_editor_draft.py::test_the_view_is_saved_two_seconds_after_the_change_and_a_new_editor_uses_it`, `tests/e2e/test_editor_draft.py::test_a_view_change_closes_with_the_view_written`, `tests/fault/test_editor_mouse_gui.py` (gui: real wheel and drag with SendInput; not run by agents, owner: manual check 9, part D); `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
 Zoom, and move the view by dragging with the right mouse button (E0094; until WI-0098 the left button on an empty place moves it too, as in v1). Zoom and offset are saved with the flow (`flowSettings`, E0086).
 
@@ -1581,21 +1581,22 @@ Delete with confirmation (Del). Cut, copy and paste with Ctrl+X, Ctrl+C, Ctrl+V,
 ### REQ-EDT-090 Undo and redo
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the undo and redo steps of the editor work headless: a change is one step, undo and redo are committed, at most 100 steps, a new change clears redo, a step that no longer applies is refused with a text; the keys Ctrl+Z and Ctrl+Y and the menu entries come with WI-0098 to WI-0102)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0006 (WI-0096)
+- **Plan:** S0006 (WI-0096; keys and menu WI-0098 to WI-0102)
+- **Evidence:** `tests/ahk/editor_draft.test.ahk` (undo, redo, the limit of 100 steps, the refused step), `tests/e2e/test_editor_draft.py::test_undo_and_redo_send_the_inverse_and_the_operations`, `tests/e2e/test_editor_draft.py::test_101_steps_keep_the_last_100`
 
 Ctrl+Z and Ctrl+Y and menu entries. A cancelled action (a move cancelled with Esc, a dialog cancelled) leaves no undo step.
 
 ### REQ-EDT-100 Save, and changes during execution
 
 - **v1:** yes (unsaved flows are saved automatically at exit)
-- **v2:** partial (the commit of a change works: revisions, conflicts, the rules and the rename race; the automatic saving and the editor are still missing)
+- **v2:** partial (the commit of a change works: revisions, conflicts, the rules and the rename race; the editor makes its changes as patches, merges a rename of the manager and clears its undo steps on a restart of the engine; the automatic saving (WI-0095) is still missing)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0006 (automatic saving WI-0095, editor WI-0096)
-- **Evidence:** `tests/integration/test_flow_patch.py` (commit, conflict, refused list, busy deletion, rename race), `tests/ahk/core_flow_patch.test.ahk` (rules, inverse, shared revisions), `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`
+- **Plan:** S0006 (automatic saving WI-0095; the editor part is done with WI-0096)
+- **Evidence:** `tests/integration/test_flow_patch.py` (commit, conflict, refused list, busy deletion, rename race), `tests/ahk/core_flow_patch.test.ahk` (rules, inverse, shared revisions), `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`, `tests/ahk/editor_draft.test.ahk` (queue, conflict, refusal, lost answer), `tests/e2e/test_editor_draft.py::test_a_rename_by_the_manager_while_a_patch_is_on_its_way_is_merged`, `tests/e2e/test_editor_draft.py::test_a_restart_of_the_engine_clears_the_stacks_and_shows_the_saved_state`
 
 Every completed edit takes effect at once, also for running instances (REQ-EXE-080), and is saved automatically a few seconds later (E0065): about 3 s after the last change, at the latest every 10 s while the user keeps editing. A flow has no unsaved state, so closing the editor or the application asks nothing. Saving by hand (Ctrl+S, menu) only writes at once. Mistakes are undone with undo (REQ-EDT-090) or by a backup: a backup is made at the first write of an editing session and then at most every 10 minutes (REQ-ROB-060, REQ-MGR-110). A rename by the manager while the editor is open is merged.
 

@@ -148,3 +148,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Keep one flag per map that the operation list owns (`w["owned"]`). The first write goes through a helper that clones the map (or the one element) and stores the clone in the new root; later writes reuse it. Clone the nested value you change (the `pars` of an element), not only the element. Nothing reachable from the input is written. Removing a key from the owned flags checks `Has` first (`Map.Delete` throws on a missing key).
 - **Status:** verified (`tests/ahk/core_flow_patch.test.ahk`, cases "revisions share the maps that do not change" and "a refused operation refuses the whole list"; the `Delete` error was seen in the first run)
 - **Source:** `src/core/FlowPatch.ahk` (`_ElsW`, `_ElW`, `_Forget`)
+
+### A field and a method with the same name clash (case-insensitive names)
+
+- **Problem:** The draft of the editor had the fields `undo` and `redo` (the stacks) and the methods `Undo()` and `Redo()`. The constructor `this.undo := []` failed with "Property is read-only", at the first use, in a class that otherwise worked. AHK v2 names are case-insensitive, so the field and the method are the same member.
+- **Wrong:** A field and a method whose names differ only in case (`this.undo` and `Undo()`, `this.rev` and `Rev()`, `this.later` and `Later()`).
+- **Right:** Give the field its own name (`undoSteps`, `redoSteps`). The same applies to a property and a method of a class that is written in another file. A quick check: grep the class for the name in any case before adding a member.
+- **Status:** verified (`tests/ahk/editor_model.test.ahk` and `tests/ahk/editor_draft.test.ahk` failed with this error until the fields were renamed; the editor draft tests pass)
+- **Source:** `src/editor/EditorDraft.ahk` (`undoSteps`, `redoSteps`, `Undo`, `Redo`)

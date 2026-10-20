@@ -329,3 +329,9 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 **Options (for the owner):** (a) draw the dragged elements once into a group layer at the start of the drag and copy it per frame, the connections stay live (expected to help the elements part; not measured); (b) accept the 25 ms for large drags (a drag of many elements is rare, the one-element drag is inside the budget); (c) reduce the work of `Scene.WithDrag` (it builds the whole scene again per frame).
 **Status:** decision needed (the project owner), measured (MS-0051). Not checked: the real window and the feel of the drag on the owner's machine.
 
+### F-9004*: A plain request through the hub takes about 120 ms in the test client
+
+**What:** while the patch round trip of the editor was measured (MS-0055), a plain `cmd.test.state` request from the test client to the editor took a median of about 120 ms, a patch about 130 ms, and a `cmd.flow.get` to the engine about 125 ms. MS-0054 measured 50 ms for a patch under stress. So the time sits in the path that every request takes (the client, the supervisor's hub or the send path), not in the patch code. Not checked where it goes.
+**Options:** (a) find the cause with timestamps along the path (the client's read loop, the hub, the send queue of a connection); (b) accept it and measure the editor's frames only (REQ-PRF-060 counts the editor's own latency).
+**Status:** open, not checked. Measured by MS-0055 (one run each, the machine shared with other agents' runs). The owner's machine is not checked.
+

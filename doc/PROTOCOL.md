@@ -98,7 +98,7 @@ All payloads are objects. `flowId`, `elementId`, `connectionId` are the identifi
 
 **Implementation status (comparison with `src/` on 2026-10-19, WI-0082; verified by a script that compares the `cmd.*`, `evt.*` and `sys.*` strings of this catalog with `src/`):** every message type that `src/` sends or registers is in this catalog, and every type of the catalog exists in `src/`, with these exceptions: the test commands `cmd.test.*` (only the test entries and test roles have them), the names that are built from a prefix in the code (`cmd.storage.var.*`, `res.flow.start`) and the types of later steps, which this catalog marks where they are described. The types `evt.connection.state` (the connection taken is a field of `evt.element.state` from WI-0086 on, S0005) and `cmd.ui.confirmDeleteFlowFile` (a flow with missing packages is not deleted and nobody is asked, M-0008) were removed from the catalog on 2026-10-19 (F-0142).
 
-`cmd.flow.patch` applies its operations since WI-0093 (the rules are in 4.2; the editor sends them from S0006 on). The role `editor` is the real editor since WI-0088 (4.11), `manager` is the real manager of WI-0073 (4.8).
+`cmd.flow.patch` applies its operations since WI-0093 (the rules are in 4.2; the editor sends them since WI-0096, 4.11). The role `editor` is the real editor since WI-0088 (4.11), `manager` is the real manager of WI-0073 (4.8).
 
 ### 4.1 Lifecycle (`sys.*`)
 
@@ -612,7 +612,7 @@ An answer other than `ok`, or none, is logged (`a0`, source `tray`) and kept in 
 
 ### 4.11 Role `editor` (WI-0088, `src/editor/`)
 
-One editor per flow (D0002), started by the supervisor with `--flow=<flowId>` (4.1, `cmd.editor.open`). It shows the flow and follows its run states. It holds no truth: the definition comes from the engine, the states are the engine's events, and the view (zoom, offset) is read from `flowSettings`. Since S0005 it changes nothing in the flow (E0086): the commands that write come in S0006.
+One editor per flow (D0002), started by the supervisor with `--flow=<flowId>` (4.1, `cmd.editor.open`). It shows the flow and follows its run states. It holds no truth: the definition comes from the engine, the states are the engine's events, and the view (zoom, offset) is read from `flowSettings`. It changes the flow only through its draft and `cmd.flow.patch` (WI-0096, the paragraph "Draft and patches" below); its view is written as `flowSettings` (E0086).
 
 **Subscriptions** (after `sys.welcome`, before the first resync): `engine` (`evt.engine.ready`, `evt.engine.restarted`, `evt.flow.list.changed`), `settings` (`evt.settings.changed`, the language), `process` (the `evt.process.*` of `engine`), `flow:<flowId>` (`evt.flow.state`, `evt.trigger.state`, `evt.element.states`, `evt.element.warning`, `evt.flow.committed`).
 
@@ -653,6 +653,25 @@ One editor per flow (D0002), started by the supervisor with `--flow=<flowId>` (4
 - `cmd.test.hover` {x, y} (WI-0090): what the tooltip would show at the canvas pixel x, y, at once (the window waits about 0.5 s after the mouse rests). Answers `{ ok, tooltip, kind, id }`: `tooltip` the text ("" for none, lines separated by a newline), `kind` `element`, `connection` or "", `id` the element or connection ID.
 - `cmd.test.command` {item, answer?} (WI-0091): runs a menu entry of the tray as if it had been clicked: `item` `show`, `run`, `toggle` (Enable or disable) or `close`. `answer` `yes` or `no` (default `no`) answers every question the entry asks (the questions of the flow commands go to the driver, not to a dialog). Answers `{ ok: true }` at once; the result of Run or Enable or disable is in `tray.lastResult` of `cmd.test.state` (`run: ok`, `toggle: cancelled`, `run: <code>`), a refusal also as a notice. `close` is the planned end after the answer. Other values: `bad_payload`.
 - `cmd.test.state` also answers `tray` (WI-0091: `icon` the state of the icon, `tip`, `items` (the texts of the four entries), `iconHidden`, `lastResult`, `notices`, `lastNotice`) and `asked` (the kinds of the questions asked so far, `independent` or `force`).
+
+**Draft and patches (WI-0096, `src/editor/EditorDraft.ahk`).** The editor changes its flow only with `cmd.flow.patch {flowId, baseRev, ops, session}` (4.2): `baseRev` is the rev of the committed definition the editor holds, `session` the session of the editor. The draft is that definition (the answer of `cmd.flow.get`) plus the operations that are not answered yet; the scene is built from the draft. One patch is in flight; the others wait in a queue and go out in order, each with the rev of the answer before. The answers:
+- `ok {rev}`: the new rev is taken; the committed definition gets the same operations.
+- `conflict {rev, definition}`: the operations are applied again on that definition and sent once more. A second conflict, or an operation that no longer applies on it, refuses the queue.
+- `bad_payload` (a refused operation): the queue and the undo steps are dropped, the status bar says so, and the definition is asked again.
+- `busy`: the same patch is sent again after 1 s.
+- `timeout` or `peer_gone`: the outcome is unknown; the queue and the undo steps are dropped, and the engine's state is asked for (a resync).
+
+A definition answer that comes while a patch is in flight waits until that patch is answered. `evt.flow.committed` with the rev that the patch in flight will get is the echo of the own patch and asks nothing. A new `epoch` clears the queue and the undo steps.
+
+**Undo, redo and selection (REQ-EDT-090, WI-0096):** a step holds its operations and their inverse (`FlowPatch.Inverse`). Undo sends the inverse, redo the operations again; both are patches that are no undo step. At most 100 steps; a new step clears the redo steps. A step whose inverse no longer applies stays on its stack and the status bar says so. The selection is a set of element and connection IDs; an ID that the flow no longer has leaves it.
+
+**The view (WI-0096, E0086):** the view goes out as `flow.settings` with `view: true` (`zoomFactor`, `Offsetx`, `Offsety` as `%f` texts, as v1 writes them) 2 s after the last change of the view, and before the editor says bye when it closes (at most 1 s). It is no undo step, and nothing is sent when the flow settings already have the view.
+
+**Test commands of the draft (WI-0096, headless):**
+- `cmd.test.edit {ops}`: the operations as one undo step. `{ok}`; `error.code` `bad_payload` for a refused list, `busy` before the definition arrived. The answer comes at once; `pending` of `cmd.test.state` counts the patches on their way.
+- `cmd.test.undo {}`, `cmd.test.redo {}`: `{ok, done, status}`; `done` is false when there is no step. A refused step is `ok` false with `error` and the status text.
+- `cmd.test.select {mode, ids?}`: `mode` `one` (the IDs are the selection), `toggle`, `all` or `none`; answers `{ok, selection}`.
+- `cmd.test.state` adds `selection` (the IDs), `undo` and `redo` (the numbers of steps) and `pending` (patches not answered yet); `rev` is the rev of the committed definition.
 
 **Mouse and status of the window (WI-0090, not part of the test commands):** the wheel zooms one step at the pointer, when the pointer is over the canvas. A drag with the right button, or with the left one on an empty place (a left click on an element is left to the selection, S0006), moves the view; the drag holds the mouse with capture. The tooltip shows after the pointer rested 0.5 s on the flow; it hides on the next move and when the pointer leaves the window. The status bar text (`basic` language keys `Status offset`, `Status zoom`, `%1% elements`): `Offset: x <x> y <y>   |   Zoom: <zoom>   |   <n> elements`. The tooltip texts (`Tooltip class`, `Tooltip name`, `Tooltip arming`, `Tooltip exception`, `Tooltip warning`, `Tooltip migration`, `Tooltip connection`): an element shows its kind (Trigger, Action or Loop), its class and its name, a trigger its arming error, an element its exception, up to three warning texts and its MIGRATION IDs; a connection its type.
 
