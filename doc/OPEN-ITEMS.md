@@ -237,6 +237,11 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **What:** `test_the_editor_of_a_flow_that_just_died_is_started_again_and_its_slot_is_free` expected a started answer on a later request. Since WI-0088 the supervisor judges an ended editor before it answers a request (`OpenEditor` settles first). If the first request comes after the judgement, it starts the new editor (answer started); every later request is then answered as running (`cmd.editor.show`), so the wait ran into its timeout. Under load the first request came after the judgement in the full fast runs since the WI-0089 integration. Alone it passed, because the request came before the judgement.
 **Status:** closed (test only; the supervisor behaves as designed): the test is parametrized ("at-once", "judged-first" with a 1 s pause) and keeps sending requests until a new editor runs. The old assertion fails in the judged-first case every time (checked). Verified: `tests/e2e/test_manager_editor.py` green serially (5 runs of the two new cases), and the e2e directory green under load (98 passed). Not checked: a full fast-tier run with this change.
 
+### F-9001: The size of an element-state batch is not measured for large flows
+
+**What:** the engine sends the element states of a flow in batches: at most one `evt.element.states` per flow and 33 ms (WI-0089, owner decision). The message count is bounded for any flow. The size of a batch grows with the number of elements that change in one interval; for a flow of 300 elements at once it is not measured (MS-0047 measures a loop of three elements at the guard's limit: hub queue 0, latency p95 46 ms).
+**Status:** open; the message count is verified by `tests/stress/test_editor_event_load.py`.
+
 ## Observed only (not for the bug hunter)
 
 Entries that the bug hunter does not take (`doc/ORCHESTRATOR.md` 3c): they were observed once or only under parallel load, were not reproduced when run alone, or are assumed and not checked. Each one has its sign (what to look for in a run) and its action. Hunter-eligible entries stay in the summary table and the findings above.
