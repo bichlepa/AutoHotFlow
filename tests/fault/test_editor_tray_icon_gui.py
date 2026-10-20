@@ -1,10 +1,11 @@
 """WI-0091, REQ-EDT-230, PROTOCOL 4.11: the tray icon of an editor, shown for real (not headless). Only the gui test is here;
 the entries, the states and the questions are tested headless in tests/e2e/test_editor_tray.py.
 
-The editor is started by the supervisor (cmd.editor.open) without --headless, so it has its own icon. The menu of the icon is
-opened with the tray message to the script window of the editor process, held longer than the pong timeout and closed with
-Esc: a menu that is open pauses only this editor, so the editor must not be judged hung (E0077). The test needs the input
-desktop and skips on a locked PC. An agent runs it only when the project owner allows it (doc/TEST-STRATEGY.md section 6).
+The editor is started by the supervisor (cmd.editor.open, sent as the manager) without --headless, so it has its own
+icon. The menu of the icon is opened with the tray message to the script window of the editor process, held longer than
+the pong timeout and closed with Esc: a menu that is open pauses only this editor, so the editor must not be judged hung
+(E0077). The test needs the input desktop and skips on a locked PC. An agent runs it only when the project owner allows
+it (doc/TEST-STRATEGY.md section 6).
 """
 
 import ctypes
@@ -13,7 +14,7 @@ from ctypes import wintypes
 
 import pytest
 
-from faultkit import SKELETON_FLOW, event, request_ok, wait_until
+from faultkit import SKELETON_FLOW, event, open_editor_as_manager, request_ok, wait_until
 from support import inputlock
 from support.timing import scaled
 from faultfixtures import chains  # noqa: F401  (fixture)
@@ -42,7 +43,7 @@ def test_the_real_icon_of_an_editor_opens_its_menu_and_a_menu_open_for_8_seconds
 
     chain = chains("storage,engine", [])          # not headless: the editor shows its icon and its window
     chain.wait_ready(["storage", "engine"], timeout=READY_S)
-    request_ok(chain.obs, "supervisor", "cmd.editor.open", {"flowId": SKELETON_FLOW})
+    open_editor_as_manager(chain, SKELETON_FLOW)
     name = "editor:" + SKELETON_FLOW
     pid = chain.wait_ready([name], timeout=READY_S)[name]
     snap = request_ok(chain.obs, name, "cmd.diag.snapshot", {})["snapshot"]

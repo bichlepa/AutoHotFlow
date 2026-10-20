@@ -286,6 +286,16 @@ def request_ok(client, to, type_, payload=None, timeout=5.0):
     return answer["payload"]
 
 
+def open_editor_as_manager(chain, flow_id):
+    """cmd.editor.open is reserved for the manager (Supervisor._OnEditor): the test takes the manager's name for one
+    request."""
+    manager = connect(chain.sup.pipe, "manager")
+    try:
+        return request_ok(manager, "supervisor", "cmd.editor.open", {"flowId": flow_id})
+    finally:
+        manager.close()
+
+
 class Chain:
     """A supervisor with its children, plus an observer. Use close() (the fixture does) to end everything."""
 

@@ -17,7 +17,7 @@ from ctypes import wintypes
 
 import pytest
 
-from faultkit import SKELETON_FLOW, request_ok, wait_until
+from faultkit import SKELETON_FLOW, open_editor_as_manager, request_ok, wait_until
 from support import inputlock
 from support.timing import scaled
 from faultfixtures import chains  # noqa: F401  (fixture)
@@ -37,6 +37,24 @@ ZOOM_RE = re.compile(r"Zoom: ([0-9.]+)")
 OFFSET_RE = re.compile(r"Offset: x (-?\d+) y (-?\d+)")
 
 user32 = ctypes.WinDLL("user32", use_last_error=True)
+kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+PROCESS_VM_OPERATION = 0x0008
+PROCESS_VM_READ = 0x0010
+PROCESS_VM_WRITE = 0x0020
+PROCESS_QUERY_INFORMATION = 0x0400
+MEM_COMMIT = 0x1000
+MEM_RESERVE = 0x2000
+MEM_RELEASE = 0x8000
+PAGE_READWRITE = 0x04
+TEXT_BYTES = 512 * 2            # the buffer of the status text: 512 UTF-16 characters
+kernel32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+kernel32.OpenProcess.restype = ctypes.c_void_p
+kernel32.VirtualAllocEx.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, wintypes.DWORD, wintypes.DWORD]
+kernel32.VirtualAllocEx.restype = ctypes.c_void_p
+kernel32.VirtualFreeEx.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, wintypes.DWORD]
+kernel32.ReadProcessMemory.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t,
+                                       ctypes.POINTER(ctypes.c_size_t)]
+kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
 user32.SendInput.argtypes = [wintypes.UINT, ctypes.c_void_p, ctypes.c_int]
 user32.SetCursorPos.argtypes = [ctypes.c_int, ctypes.c_int]
 user32.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
@@ -44,8 +62,9 @@ user32.GetClassNameW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
 user32.GetWindowRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT)]
 user32.GetClientRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT)]
 user32.ClientToScreen.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.POINT)]
-user32.SendMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
+user32.SendMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, ctypes.c_void_p]
 user32.SendMessageW.restype = wintypes.LPARAM
+user32.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
 
 
 class _MOUSEINPUT(ctypes.Structure):
@@ -73,7 +92,8 @@ def _enable_dpi_awareness():
 
 
 def _window_of_pid(pid):
-    """The visible top-level window of the editor process (its class is AutoHotkey, the main window of the script)."""
+    """The visible top-level window of the editor process: a Gui window of AutoHotkey, class AutoHotkeyGUI (the script's own
+    main window, class AutoHotkey, is hidden and is not the editor window)."""
     found = []
     proc = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
 
@@ -82,7 +102,7 @@ def _window_of_pid(pid):
         user32.GetWindowThreadProcessId(hwnd, ctypes.byref(owner))
         cls = ctypes.create_unicode_buffer(64)
         user32.GetClassNameW(hwnd, cls, 64)
-        if owner.value == pid and cls.value == "AutoHotkey" and user32.IsWindowVisible(hwnd):
+        if owner.value == pid and cls.value == "AutoHotkeyGUI" and user32.IsWindowVisible(hwnd):
             found.append(hwnd)
         return True
 
@@ -132,9 +152,27 @@ class EditorWindowGeometry:
 
 
 def status_text(status):
-    buf = ctypes.create_unicode_buffer(512)
-    user32.SendMessageW(status, SB_GETTEXTW, 0, ctypes.addressof(buf))
-    return buf.value
+    """The text of part 0. SB_GETTEXTW writes into the buffer whose address it gets, in the process of the status bar:
+    the buffer is allocated there (VirtualAllocEx) and read back (ReadProcessMemory). A pointer of this process would be
+    written into the editor's memory and crash or hang the editor."""
+    pid = wintypes.DWORD()
+    user32.GetWindowThreadProcessId(status, ctypes.byref(pid))
+    proc = kernel32.OpenProcess(PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION,
+                                False, pid.value)
+    assert proc, "OpenProcess of the editor failed: %d" % ctypes.get_last_error()
+    try:
+        remote = kernel32.VirtualAllocEx(proc, None, TEXT_BYTES, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE)
+        assert remote, "VirtualAllocEx in the editor failed: %d" % ctypes.get_last_error()
+        try:
+            user32.SendMessageW(status, SB_GETTEXTW, 0, remote)
+            buf = ctypes.create_string_buffer(TEXT_BYTES)
+            read = ctypes.c_size_t()
+            assert kernel32.ReadProcessMemory(proc, remote, buf, TEXT_BYTES, ctypes.byref(read)), "ReadProcessMemory failed"
+            return buf.raw[:read.value].decode("utf-16-le", errors="replace").split("\x00")[0]
+        finally:
+            kernel32.VirtualFreeEx(proc, remote, 0, MEM_RELEASE)
+    finally:
+        kernel32.CloseHandle(proc)
 
 
 def view_of(status):
@@ -148,7 +186,7 @@ def view_of(status):
 
 def _open_editor(chain):
     chain.wait_ready(["storage", "engine"], timeout=READY_S)
-    request_ok(chain.obs, "supervisor", "cmd.editor.open", {"flowId": SKELETON_FLOW})
+    open_editor_as_manager(chain, SKELETON_FLOW)
     name = "editor:" + SKELETON_FLOW
     pid = chain.wait_ready([name], timeout=READY_S)[name]
     hwnd = wait_until(lambda: _window_of_pid(pid), scaled(20))
