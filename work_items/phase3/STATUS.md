@@ -17,7 +17,7 @@ Step-independent: WI-0059 (test admission, load report, run history) is done. St
 
 ## Work items of the next step
 
-WI-0091 is running (WI-0085 to WI-0090 and the look corrections are integrated). WI-0092 (acceptance) must list the `gui` test for real mouse input (task 7 of WI-0090: wheel and drag with SendInput, VS Code task) and the check of the status bar layout.
+WI-0092 is running (WI-0085 to WI-0090 and the look corrections are integrated). WI-0092 (acceptance) must list the `gui` test for real mouse input (task 7 of WI-0090: wheel and drag with SendInput, VS Code task) and the check of the status bar layout.
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
@@ -29,8 +29,8 @@ WI-0091 is running (WI-0085 to WI-0090 and the look corrections are integrated).
 | WI-0088 | Editor role: model, resync, window, headless driver | done | haiku | see git log (WI-0088), tip 663c5adf | 2026-10-20 | review approved; verified green; gui window test left to the owner; F-0149 closed |
 | WI-0089 | Live states, marks and the event load | done | haiku | see git log (WI-0089), tip bfcdc7f9 | 2026-10-20 | review approved with fixes; batch per flow decided by the owner (evt.element.states); slow 204 and foundation 471 green; the restart test of the editor was a wrong test assumption (F-0155, fixed); F-0150 closed, F-0156 open; window latency measurement is for the owner |
 | WI-0090 | View: zoom, move, tooltip, status bar, DPI | done | haiku | see git log (WI-0090), tip 26de7a68 | 2026-10-20 | review approved with one fix (drag ends without a button); gui test of real mouse input and the status bar layout on screen are left to WI-0092; F-0157 |
-| WI-0091 | Tray icon and tray menu of the editor | running | haiku | | | workspace wi-91 |
-| WI-0092 | Acceptance S0005 | open | | | | manual check of the owner |
+| WI-0091 | Tray icon and tray menu of the editor | done | haiku | see git log (WI-0091), tip 9b3267ca | 2026-10-20 | review approved with one fix (F-0158 recorded); gui test written, not run |
+| WI-0092 | Acceptance S0005 | running | haiku | | | workspace wi-92; manual check of the owner |
 
 ## Pending integrations
 
@@ -41,6 +41,8 @@ None.
 WI-0089 implementer (haiku), workspace wi-89.
 
 ## Last verified state
+
+Commit `9b3267ca` (WI-0090, WI-0091 and the look corrections integrated, all tiers): foundation 471 and slow 204 green, fast 1782 passed, 3 failed under load (`test_worker_lifecycle` cold start, `test_settings` log thresholds, `test_worker` not busy after a cancel; all green alone in recheck 20261020-195141-recheck): load flakes; VERDICT red only by those (runs 20261020-193737-9b3267ca, -2, -3).
 
 Commit `b8ffb990` (F-0155 fix, F-0156 heading; selection of the groups): slow 204 and foundation 471 green, fast 1761 passed, 1 failed under load (`tests/fault/test_tray_role.py::test_a_killed_tray_role_is_started_again_so_the_icon_comes_back`, green alone in recheck 20261020-193207-recheck; the fast run took 24 minutes on a loaded machine): a load flake (runs 20261020-190757-b8ffb990, -2, and 20261020-190801-b8ffb990). WI-0090 and the look corrections (tip 38c9b502) are not yet verified.
 
