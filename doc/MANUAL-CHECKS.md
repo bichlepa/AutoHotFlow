@@ -326,7 +326,7 @@ The gui tests open real editor windows and send real mouse and keyboard input. R
 | # | Step | Expected result | Result |
 |---|---|---|---|
 | 24 | VS Code task "Tool: renderer measurement with a window (WI-0092, owner; ...)" with the size 1920 x 1080 (whole flow). Close the other programs first. | The task opens a window of 1920 x 1080 for about two minutes and writes the line `WINDOW ...` into `temp/s5/renderer-window.txt`. Mean below 16 ms (R0002, REQ-PRF-060). Write the line in the result. | |
-| 25 | The same task with 3840 x 2160 (a 4K screen is needed, otherwise the window is cut; write that down). | The `WINDOW` line for 4K is recorded (a measurement; see MEASUREMENTS.md MS-0048). | |
+| 25 | The same task with 3840 x 2160 (a 4K screen is needed, otherwise the window is cut; write that down). | The `WINDOW` line for 4K is recorded (a measurement; see MEASUREMENTS.md MS-0048). Without a screen of at least 3840 x 2160 (the primary screen) the file gets the line `WINDOW skipped ...` instead of a cut window; the `RESULT` line of 3840 x 2160 is written in both cases. Write down which of the two you got. | |
 
 ## Result
 

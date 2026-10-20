@@ -440,3 +440,43 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Pass both options for N living workers at once, and count the `--role=worker` processes before sampling (`tests/stress/test_background_memory.py` waits for them and asserts the count). For "no manager" use `--windows-startup` with the normal start list: the test then also checks the real start-with-Windows path. The roles `tray` and `manager` with `--headless` have no visible icon or window, so a stress run opens nothing; the window itself is measured only by a gui test.
 - **Status:** verified (tests/stress/test_background_memory.py, 12 sessions).
 - **Source:** WI-0082, `Supervisor.ahk` (`startList`), `Engine.ahk` (`--workers`, `--warm-workers`).
+
+### SendMessage with a buffer of this process reads or writes the memory of the other process (gui tests, verified)
+
+- **Problem:** The gui test read the text of the editor's status bar with `SB_GETTEXTW` and a `create_unicode_buffer` of the test process. The editor then hung (no pong for 6 s) and ended as crashed: the status bar wrote the text into the address of the test's buffer, which is an arbitrary address in the editor's memory.
+- **Wrong:** `user32.SendMessageW(status, SB_GETTEXTW, 0, ctypes.addressof(buf))` with a pointer of the caller's process, when `status` belongs to another process.
+- **Right:** Allocate the buffer in the owner's process and read it back: `OpenProcess` (VM_OPERATION, VM_READ, VM_WRITE), `VirtualAllocEx`, `SendMessageW`, `ReadProcessMemory`, `VirtualFreeEx`, `CloseHandle`. Same rule for every message that takes a pointer (`WM_GETTEXT`, `SB_GETTEXT`, `LVM_GETITEMTEXT`, ...).
+- **Status:** verified (tests/fault/test_editor_mouse_gui.py, 2026-10-20: passes; the version before the fix made the editor hang)
+- **Source:** `tests/fault/test_editor_mouse_gui.py` (`status_text`).
+
+### A Gui window of AutoHotkey has the class AutoHotkeyGUI, not AutoHotkey (verified)
+
+- **Problem:** A gui test looked for the editor's window by its process and class `AutoHotkey` and found none, although the window was visible.
+- **Wrong:** `cls == "AutoHotkey"`: that is the hidden main window of the script (used for the tray messages, `FindWindowW`).
+- **Right:** The windows made by `Gui()` have the class `AutoHotkeyGUI`; filter by the process ID and this class, and check `IsWindowVisible`.
+- **Status:** verified (tests/fault/test_editor_mouse_gui.py, 2026-10-20; tests/fault/test_editor_tray_icon_gui.py uses the class `AutoHotkey` on purpose, for the tray message).
+- **Source:** `tests/fault/test_editor_mouse_gui.py` (`_window_of_pid`).
+
+### A window title with the flow name depends on the language and the case of the name (verified)
+
+- **Problem:** The editor window test searched the title "AutoHotFlow Editor - Skeleton" and never found it: the title is "AutoHotFlow <Editor> - <flow name>", with the flow ID `skeleton` in lower case and the word in the language of the test folder.
+- **Wrong:** Comparing the whole title with a constant (the match is also case sensitive).
+- **Right:** Match the start ("AutoHotFlow ") and the end (" - skeleton") of the title, and check the visible state.
+- **Status:** verified (tests/fault/test_editor_window.py, 2026-10-20: passes).
+- **Source:** `src/editor/EditorWindow.ahk` (`Refresh`), `tests/fault/test_editor_window.py`.
+
+### `cmd.editor.open` is reserved for the manager: a gui test sends it as the manager (verified)
+
+- **Problem:** The editor gui tests sent `cmd.editor.open` through the observer connection and got `denied`, so no editor started.
+- **Wrong:** `chain.obs.request("supervisor", "cmd.editor.open", ...)`.
+- **Right:** `open_editor_as_manager(chain, flowId)` in `tests/fault/faultkit.py`: a short connection named `manager` sends the request once and closes. The e2e tests use the real manager (`tests/e2e/test_manager_editor.py`).
+- **Status:** verified (tests/fault/test_editor_tray_icon_gui.py, 2026-10-20: passes).
+- **Source:** `src/supervisor/Supervisor.ahk` (`_OnEditor`).
+
+### AHK's FileAppend fails in a missing folder, and SplitPath needs backslashes (verified)
+
+- **Problem:** The renderer bench tool wrote its result to `temp/s5/renderer-window.txt` (given with slashes by the VS Code task). The folder did not exist in a fresh checkout, so the script ended with "Das System kann den angegebenen Pfad nicht finden" in a blocking dialog (caught by `ahkrun.py`, exit 97).
+- **Wrong:** `SplitPath(args[1], , &dir)` with `C:/...` gives an empty folder, so no `DirCreate` happens; and `FileAppend` into a missing folder.
+- **Right:** `resultFile := StrReplace(args[1], "/", "\")` before `SplitPath`, then `DirCreate(dir)`.
+- **Status:** verified (`tests/ahk/helpers/renderer_bench.ahk`, the task of part E at 1920 x 1080, 2026-10-20)
+- **Source:** `tests/ahk/helpers/renderer_bench.ahk` (`Main`).
