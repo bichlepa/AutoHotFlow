@@ -87,6 +87,7 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0142 | PROTOCOL documents message types that no source string uses | closed 2026-10-19: `evt.connection.state` and `cmd.ui.confirmDeleteFlowFile` removed from PROTOCOL (dead; M-0008, WI-0086), the status table brought to the code | WI-0082 |
 | F-0143 | A `-m stress` run opens a real manager window | closed 2026-10-19: fixed in `tests/conftest.py` (a run that names stress, soak or idle but not gui leaves gui tests out, also with `--all`), test `tests/test_tier_selection.py` | WI-0082 |
 | F-0144 | The fast tier takes 4 to 13 minutes, not the 1 to 2 minutes of the owner decision F-0108 | closed (owner decision E0089: no fixed budget, the test groups decide) | |
+| F-0151 | The static layer rebuild is slow at 4K | accepted | WI-0085 |
 
 ## Findings
 
@@ -849,3 +850,8 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 **What:** The owner decision of 2026-10-16 (F-0108, `doc/CLOSED-ITEMS.md`) set the fast tier to about 1 minute, up to 2 minutes at the end of the port. The fast tier now has about 1600 tests (`python -m pytest tests --collect-only -q`: 1609 of 2292 collected); the run history shows 255 s (run `20261019-195119-a94365a0`, 1605 passed) to 793 s (run `20261019-200110-a94365a0`, 1605 passed, external CPU 16 %) for it with `run_suite.py` (4 workers).
 **Status:** closed by the owner's decision of 2026-10-19 (E0089): no fixed time budget; the tests are sorted into groups so that a change runs only what it needs. (Options were: Options: accept the size and change the rule in `AGENTS.md` and `doc/TEST-STRATEGY.md`; or mark more tests `slow`/`foundation` (the largest cost per `python tools/test_history.py --durations`). The test groups (`doc/TEST-GROUPS.md`) already keep most changes below the fast tier: `verify.py --auto` runs only the selection.)
 **Evidence:** `python tools/test_history.py --last 12` (2026-10-19).
+
+### F-0151: The static layer rebuild is slow at 4K
+
+**What:** the layer is rebuilt in 152 ms at 3840×2160 (106 ms at 1920×1080) on a change of the flow, the zoom, the DPI or a pan out of the layer, and takes about 52 MB at 4K. That is above the 150 ms the owner was to hear about (E0090).
+**Status:** accepted by the owner on 2026-10-20: a rebuild that exceeds the budget a little is fine, the numbers were chosen arbitrarily (MS-0046). Options that were open: a smaller margin, a rebuild in parts over several frames, or a separate process.
