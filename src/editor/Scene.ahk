@@ -10,14 +10,34 @@
 ; Warnings: a list of Maps("id", element or connection ID, "text", message, "kind"), kind "evaluation" for the warnings of the
 ; evaluation (also the count of an element is in its WarningCount).
 ; Bounds: the box of everything in flow coordinates (empty at 0,0 for an empty flow).
+;
+; Interaction (WI-0097, the editing state the renderer draws over the flow; a Map, every key optional):
+;   selected    Map: element or connection ID -> true (the selection)
+;   rect        FlowRect of the selection rectangle being drawn (flow units), or ""
+;   connecting  Map("fromId", element ID, "fromPart", part, "type", connection type, "x", x, "y", y) for a connection
+;               being drawn from a part of an element to the point (x, y), or ""
+;   dragged     Map: ID -> true of the elements being dragged; dx, dy the offset of the drag (see WithDrag)
+; Properties from it: Selected, Rect, Connecting (Map("start", [x, y], "aim", [x, y]) or ""), Dragged, DragX, DragY,
+; and Buttons: the buttons of the single selected element or connection (Array of Maps("name", "id", "rect" FlowRect);
+; none while a drag runs). FlowHitTest asks Buttons first.
 class Scene {
-    __New(view, version, hovered, elements, connections, warnings) {
+    __New(view, version, hovered, elements, connections, warnings, interaction := "") {
         this.View := view
         this.Version := version
         this.Hovered := hovered
         this.Elements := elements
         this.Connections := connections
         this.Warnings := warnings
+        if (!(interaction is Map))
+            interaction := Map()
+        this.Selected := interaction.Get("selected", Map())
+        this.Rect := interaction.Get("rect", "")
+        this.ConnectingRequest := interaction.Get("connecting", "")
+        this.Dragged := interaction.Get("dragged", Map())
+        this.DragX := interaction.Get("dx", 0)
+        this.DragY := interaction.Get("dy", 0)
+        this.Connecting := Scene.ConnectingOf(elements, this.ConnectingRequest)
+        this.Buttons := (this.Dragged.Count = 0) ? Scene.ButtonsOf(elements, connections, this.Selected) : []
         rects := []
         for element in elements
             rects.Push(element.Bounds)
@@ -25,6 +45,100 @@ class Scene {
             for segment in connection.Segments
                 rects.Push(segment)
         this.Bounds := FlowRect.Union(rects)
+    }
+
+    ; The interaction of this scene as the constructor takes it (the state that WithStates keeps).
+    Interaction() {
+        return Map("selected", this.Selected, "rect", this.Rect, "connecting", this.ConnectingRequest
+            , "dragged", this.Dragged, "dx", this.DragX, "dy", this.DragY)
+    }
+
+    ; The same flow and states with another selection, selection rectangle and connection being drawn (the drag of the
+    ; scene stays as it is). The elements and connections are shared, nothing is built again.
+    WithInteraction(selected, rect := "", connecting := "") {
+        interaction := this.Interaction()
+        interaction["selected"] := (selected is Map) ? selected : Map()
+        interaction["rect"] := rect
+        interaction["connecting"] := connecting
+        return Scene(this.View, this.Version, this.Hovered, this.Elements, this.Connections, this.Warnings, interaction)
+    }
+
+    ; The scene with the elements in dragged (Map: ID -> true) moved by (dx, dy) flow units, and their connections
+    ; routed again from the new ends (WI-0097). The base is the scene without a drag: its moved elements are computed
+    ; from their positions in this scene. Only the moved objects are new; the others are shared with this scene.
+    WithDrag(dragged, dx, dy) {
+        elements := []
+        byId := Map()
+        for element in this.Elements {
+            moved := dragged.Has(element.Id) ? element.Moved(dx, dy) : element
+            elements.Push(moved)
+            byId[moved.Id] := moved
+        }
+        connections := []
+        for connection in this.Connections {
+            from := byId.Get(connection.From, "")
+            to := byId.Get(connection.To, "")
+            if ((!dragged.Has(connection.From) && !dragged.Has(connection.To)) || !(from is SceneElement)
+                    || !(to is SceneElement)) {
+                connections.Push(connection)
+                continue
+            }
+            start := FlowGeometry.StartOf(from.Kind, from.X, from.Y, from.HeightOfVerticalBar, connection.Type
+                , connection.FromPart)
+            aim := FlowGeometry.AimOf(to.Kind, to.X, to.Y, to.HeightOfVerticalBar, connection.ToPart)
+            connections.Push(connection.Moved(start[1], start[2], aim[1], aim[2]))
+        }
+        interaction := this.Interaction()
+        interaction["dragged"] := dragged
+        interaction["dx"] := dx
+        interaction["dy"] := dy
+        return Scene(this.View, this.Version, this.Hovered, elements, connections, this.Warnings, interaction)
+    }
+
+    ; The start and the aim of a connection being drawn, or "" when its source element is not in the scene.
+    static ConnectingOf(elements, request) {
+        if (!(request is Map))
+            return ""
+        source := ""
+        for element in elements {
+            if (element.Id = request.Get("fromId", "")) {
+                source := element
+                break
+            }
+        }
+        if (!(source is SceneElement))
+            return ""
+        start := FlowGeometry.StartOf(source.Kind, source.X, source.Y, source.HeightOfVerticalBar
+            , request.Get("type", "normal"), request.Get("fromPart", ""))
+        return Map("start", start, "aim", [request.Get("x", 0), request.Get("y", 0)])
+    }
+
+    ; The buttons of the single selected element or connection, as the boxes of their centres (B x B flow units).
+    static ButtonsOf(elements, connections, selected) {
+        if (selected.Count != 1)
+            return []
+        id := ""
+        for key, value in selected
+            id := key
+        for element in elements {
+            if (element.Id = id)
+                return Scene.BoxesOf(FlowGeometry.ElementButtons(element.Kind, element.X, element.Y
+                    , element.HeightOfVerticalBar), id)
+        }
+        for connection in connections {
+            if (connection.Id = id)
+                return Scene.BoxesOf(FlowGeometry.ConnectionButtons(connection.Segments), id)
+        }
+        return []
+    }
+
+    static BoxesOf(centres, id) {
+        size := FlowGeometry.BUTTON_SIZE
+        out := []
+        for centre in centres
+            out.Push(Map("name", centre["name"], "id", id, "rect"
+                , FlowRect(centre["x"] - size / 2, centre["y"] - size / 2, size, size)))
+        return out
     }
 
     ; A scene with other run, trigger and warning states (WI-0088, F-0150, WI-0089): the same flow, the same view or
@@ -80,6 +194,6 @@ class Scene {
                     issues.Push(Map("id", element.Id, "text", element.Warning, "kind", "evaluation"))
             }
         }
-        return Scene(view, version, this.Hovered, elements, connections, issues)
+        return Scene(view, version, this.Hovered, elements, connections, issues, this.Interaction())
     }
 }

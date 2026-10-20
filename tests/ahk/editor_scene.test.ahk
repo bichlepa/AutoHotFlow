@@ -8,6 +8,7 @@
 #Include ..\..\src\core\Json.ahk
 #Include ..\..\src\editor\SceneBuilder.ahk
 #Include ..\..\src\editor\FlowHitTest.ahk
+#Include ..\..\src\editor\NewElementFields.ahk
 #Include ..\..\src\elements\Default\_includes_engine.ahk
 
 ; Numbers are compared with a tolerance: the arithmetic of the drawing is in floats.
@@ -57,6 +58,12 @@ TestRun.Case("Hit test: an element wins over a connection, nothing far away", Hi
 TestRun.Case("Scene: the default manual trigger comes from the definition (DefaultTrigger), not from a state key", DefaultTriggerFromDefinition)
 TestRun.Case("Scene: WithStates gives the states of Build and shares the objects whose state did not change", WithStatesSharesUnchanged)
 TestRun.Case("Scene: WithStates changes the view and keeps the flow", WithStatesChangesView)
+TestRun.Case("Buttons: a selected action has edit, trash and plus at the v1 positions; the button wins the hit", ButtonsOfAnElement)
+TestRun.Case("Buttons: a loop has a second plus below its foot", ButtonsOfALoop)
+TestRun.Case("Buttons: a selected connection has five buttons, the move buttons only when they do not overlap", ButtonsOfAConnection)
+TestRun.Case("Drag: the element and its connection move, the base scene and the buttons stay as they are", DragMovesElementAndConnection)
+TestRun.Case("Interaction: the connection being drawn and the selection rectangle are kept", ConnectingAndRectangle)
+TestRun.Case("Fields: the four fields for new elements at the v1 positions, scaled by the DPI", NewElementFieldsAt)
 
 ; Two triggers: T1 is the default manual trigger (class Trigger_Manual, DefaultTrigger "1"), T2 is a manual trigger
 ; without the key. A state key "default" in the engine's state does not make a trigger the default one.
@@ -268,6 +275,95 @@ HitOrderAndMiss() {
     h := FlowHitTest.At(sc, 70, 105)
     Assert.Equal(h.Kind, "element", "the bottom edge of A is A, not the connection that starts there")
     Assert.Equal(FlowHitTest.At(sc, 1000, 1000), "", "nothing far away")
+}
+
+; The buttons of a selected action: edit left, trash right, plus below (v1 positions, size 35); a click on the plus
+; button is the button, not the element; the element alone is not a button.
+ButtonsOfAnElement() {
+    sc := SceneBuilder.Build(SmallFlow()).WithInteraction(Map("A", true))
+    Assert.Equal(sc.Buttons.Length, 3, "edit, trash and plus")
+    Assert.Equal(sc.Buttons[1]["name"], "edit", "first button")
+    Near(sc.Buttons[1]["rect"].X, -24.5 - 17.5, "edit box left: centre minus half the size")
+    Near(sc.Buttons[3]["rect"].Y, 122.5 + 7 - 17.5, "plus box top")
+    h := FlowHitTest.At(sc, 70, 129.5)
+    Assert.Equal(h.Kind, "button", "the plus button wins")
+    Assert.Equal(h.Index, "plus", "its name")
+    Assert.Equal(h.Id, "A", "its element")
+    Assert.Equal(FlowHitTest.At(sc, 70, 105).Kind, "element", "the bottom edge of the element is the element")
+    Assert.Equal(SceneBuilder.Build(SmallFlow()).Buttons.Length, 0, "no selection, no buttons")
+}
+
+; A loop has a second plus below its foot (v1: width / 8 + 4/3 of the height + bar + 0.2 of the size).
+ButtonsOfALoop() {
+    sc := SceneBuilder.Build(SmallFlow()).WithInteraction(Map("L", true))
+    Assert.Equal(sc.Buttons.Length, 4, "edit, trash, plus and the plus of the foot")
+    Near(sc.Buttons[4]["rect"].Y + 17.5, 17.5 + 140 + 40 + 7, "the second plus is below the foot")
+}
+
+; A selected connection A to B: edit, trash and plus on the middle of its third segment, and two move buttons at the
+; ends (the first and the last segment); with a short connection the move buttons are left out (v1 rule).
+ButtonsOfAConnection() {
+    sc := SceneBuilder.Build(SmallFlow()).WithInteraction(Map("c1", true))
+    Assert.Equal(sc.Buttons.Length, 5, "five buttons for a long connection")
+    names := ""
+    for button in sc.Buttons
+        names .= button["name"] " "
+    Assert.Equal(names, "edit trash plus move1 move2 ", "the names in order")
+    h := FlowHitTest.At(sc, 170, 202.5)
+    Assert.Equal(h.Kind, "button", "the plus button is on the middle of the third segment (x 70 + (270 - 70) / 2)")
+    Assert.Equal(h.Index, "plus", "plus")
+    Assert.Equal(h.Id, "c1", "of the connection")
+    raw := FlowOf('{"allElements": {'
+        . '"A": {"ID": "A", "type": "action", "class": "action_Sleep", "package": "Default", "x": 0, "y": 0},'
+        . '"B": {"ID": "B", "type": "action", "class": "action_Sleep", "package": "Default", "x": 0, "y": 130}},'
+        . '"allConnections": {"c1": {"ID": "c1", "from": "A", "to": "B", "ConnectionType": "normal"}}}')
+    short := SceneBuilder.Build(raw).WithInteraction(Map("c1", true))
+    Assert.Equal(short.Buttons.Length, 3, "no move buttons for a short connection")
+}
+
+; A drag: the dragged element and its connection are moved, the base scene is not changed, and no buttons are shown
+; while the drag runs.
+DragMovesElementAndConnection() {
+    plain := SceneBuilder.Build(SmallFlow()).WithInteraction(Map("B", true))
+    sc := plain.WithDrag(Map("B", true), 10, 20)
+    Assert.True(sc.Dragged.Has("B"), "B is dragged")
+    Near(ElementById(sc, "B").X, 210, "x moved")
+    Near(ElementById(sc, "B").Y, 320, "y moved")
+    Near(ElementById(plain, "B").X, 200, "the base scene keeps the position")
+    Near(sc.Connections[1].AimX, 280, "the connection ends at the moved element")
+    Near(sc.Connections[1].AimY, 320, "its aim y")
+    Near(sc.Connections[1].StartX, 70, "the other end stays")
+    Assert.Equal(sc.Buttons.Length, 0, "no buttons during a drag")
+    Assert.Equal(plain.Buttons.Length, 3, "the base scene keeps its buttons")
+    Assert.True(sc.Connections[1] != plain.Connections[1], "the connection is a new object")
+    Assert.True(ElementById(sc, "A") == ElementById(plain, "A"), "an element not dragged is the same object")
+    states := sc.WithStates(sc.View, Map("A", "running"), Map(), 7)
+    Assert.True(states.Dragged.Has("B") && ElementById(states, "B").X = 210, "a state change keeps the drag")
+}
+
+; The interaction that is not the selection: the connection being drawn starts at the part of the element and the
+; rectangle is kept; both are copies of the request.
+ConnectingAndRectangle() {
+    sc := SceneBuilder.Build(SmallFlow()).WithInteraction(Map(), FlowRect(1, 2, 3, 4)
+        , Map("fromId", "A", "fromPart", "", "type", "normal", "x", 100, "y", 200))
+    Near(sc.Connecting["start"][1], 70, "start x: bottom centre of A")
+    Near(sc.Connecting["start"][2], 105, "start y")
+    Near(sc.Connecting["aim"][1], 100, "aim x")
+    Assert.Equal(sc.Rect.W, 3, "the rectangle width")
+    Assert.Equal(sc.WithInteraction(Map()).Connecting, "", "a new interaction without a connection")
+    Assert.Equal(SceneBuilder.Build(SmallFlow()).Connecting, "", "none by default")
+}
+
+; The fields for new elements: fixed in device pixels (not in the flow), scaled by the DPI, in the order action,
+; condition, loop, trigger (v1 positions).
+NewElementFieldsAt() {
+    Assert.Equal(NewElementFields.At(96, 50, 40), "action", "the action field")
+    Assert.Equal(NewElementFields.At(96, 140, 40), "condition", "the condition field")
+    Assert.Equal(NewElementFields.At(96, 260, 40), "loop", "the loop field")
+    Assert.Equal(NewElementFields.At(96, 380, 40), "trigger", "the trigger field")
+    Assert.Equal(NewElementFields.At(96, 200, 300), "", "an empty place")
+    Assert.Equal(NewElementFields.At(192, 50, 40), "action", "scaled by 2 at 192 DPI")
+    Assert.Equal(NewElementFields.At(192, 15, 40), "", "the field at 192 DPI starts at 20 pixels")
 }
 
 TestRun.Finish()

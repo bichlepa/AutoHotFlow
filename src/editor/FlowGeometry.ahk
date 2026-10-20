@@ -17,6 +17,8 @@ class FlowGeometry {
     static CONNECTION_MARGIN := 20
     ; v1 GDIp.ahk line 597: height of the label of a connection type (texth)
     static LABEL_HEIGHT := 17
+    ; v1 Design.ahk default_SizeOfButtons: the size of a button of the selection (flow units, the box of its centre)
+    static BUTTON_SIZE := 35
 
     ; The parts of an element as FlowRects, in the numbering of v1 (part 1 first). A trigger, an action and a condition
     ; have one part, the whole box. A loop has four (GDIp.ahk lines 800 to 816): the head, the bar on its left side
@@ -143,6 +145,43 @@ class FlowGeometry {
         if (t = "yes")
             return Map("rect", FlowRect(ax - W / 2, ay - H, W / 2 - 3, H), "align", "right")
         return Map("rect", FlowRect(ax + 5, ay - H, W / 2, H), "align", "left")
+    }
+
+    ; The buttons of a selected element as an Array of Maps("name", "x", "y"), the centre in flow units (v1 GDIp.ahk lines
+    ; 828 to 960): edit and trash beside the head, plus below it; a loop has a second plus below its foot. A trigger's
+    ; switch and star are marks (EditorStyle), not buttons.
+    static ElementButtons(kind, x, y, heightOfVerticalBar) {
+        W := FlowGeometry.ELEMENT_WIDTH, H := FlowGeometry.ELEMENT_HEIGHT, B := FlowGeometry.BUTTON_SIZE
+        out := [
+            Map("name", "edit", "x", x - W * 0.125 - B * 0.2, "y", y + W * 0.375),
+            Map("name", "trash", "x", x + W * 9 / 8 + B * 0.2, "y", y + W * 0.375),
+            Map("name", "plus", "x", x + W * 0.5, "y", y + W * 7 / 8 + B * 0.2)
+        ]
+        if (kind = "loop")
+            out.Push(Map("name", "plus2", "x", x + W * 0.5
+                , "y", y + W / 8 + H * 4 / 3 + heightOfVerticalBar + B * 0.2))
+        return out
+    }
+
+    ; The buttons of a selected connection (v1 GDIp.ahk lines 861 to 900) from its five segments: edit, trash and plus
+    ; on the middle of the third segment, and two move buttons at the ends (near the first and the last segment). The
+    ; move buttons are left out when they would lie on top of each other (v1 rule with GRID).
+    static ConnectionButtons(segments) {
+        B := FlowGeometry.BUTTON_SIZE, G := FlowGeometry.GRID
+        s3 := segments[3]
+        mx := s3.X, my := s3.Y + s3.H / 2
+        out := [
+            Map("name", "edit", "x", mx - B * 1.3, "y", my),
+            Map("name", "trash", "x", mx + B * 1.3, "y", my),
+            Map("name", "plus", "x", mx, "y", my)
+        ]
+        m1x := segments[1].X, m1y := segments[1].Y + 20
+        m2x := segments[5].X, m2y := segments[5].Bottom - 20
+        if !(Abs(m2y - m1y) < G * 2 && Abs(m2x - m1x) < G * 5) {
+            out.Push(Map("name", "move1", "x", m1x, "y", m1y))
+            out.Push(Map("name", "move2", "x", m2x, "y", m2y))
+        }
+        return out
     }
 
     ; True if an element with this box is at least partly visible in the flow rectangle visible (GDIp.ahk line 593).

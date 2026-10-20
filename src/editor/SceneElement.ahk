@@ -28,4 +28,12 @@ class SceneElement {
         this.Warning := warning          ; the text of the last warning of the evaluation ("" for none)
         this.WarningCount := warningCount
     }
+
+    ; A copy of this element moved by (dx, dy) in flow units (the drag of WI-0097, Scene.WithDrag). Everything else is
+    ; the same; the Name is passed as it is (a name equal to the class name gives the same text).
+    Moved(dx, dy) {
+        return SceneElement(this.Id, this.Kind, this.ClassName, this.Icon, this.X + dx, this.Y + dy
+            , this.HeightOfVerticalBar, this.Run, this.Trigger, this.Migration, this.Placeholder, this.Warning
+            , this.Package, this.Name, this.WarningCount)
+    }
 }

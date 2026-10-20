@@ -20,4 +20,11 @@ class SceneConnection {
         this.Label := FlowGeometry.LabelOf(connectionType, aimX, aimY)
         this.Run := run
     }
+
+    ; A copy of this connection with new anchor points (the ends of a dragged element moved, Scene.WithDrag); the
+    ; segments and the label are computed again from them.
+    Moved(startX, startY, aimX, aimY) {
+        return SceneConnection(this.Id, this.From, this.To, this.Type, this.FromPart, this.ToPart, startX, startY
+            , aimX, aimY, this.Run)
+    }
 }

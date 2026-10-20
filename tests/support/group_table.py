@@ -461,7 +461,7 @@ SOURCE_AREAS = [
     ("editor-geometry", ["src/editor/FlowRect.ahk", "src/editor/FlowGeometry.ahk", "src/editor/EditorView.ahk",
                          "src/editor/FlowHit.ahk", "src/editor/FlowHitTest.ahk", "src/editor/Scene.ahk",
                          "src/editor/SceneElement.ahk", "src/editor/SceneConnection.ahk",
-                         "src/editor/SceneBuilder.ahk"]),
+                         "src/editor/SceneBuilder.ahk", "src/editor/NewElementFields.ahk"]),
 ]
 
 # Test groups that run in full when a file of the source area changes. An area that is not listed runs the test group
