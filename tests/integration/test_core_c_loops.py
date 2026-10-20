@@ -515,7 +515,8 @@ def test_a_stop_ends_an_endless_loop_that_runs_at_full_speed(flows):
     flows.wait(run, timeout=10)
     assert run.reason == "flow.stop"
     assert time.monotonic() - started < scaled(5.0)
-    assert run.names.count("Loop_SimpleLoop") > 50                      # it did run, and fast enough to count
+    # it did run; WI-0089: the passes are batched, so the recorded steps are fewer than the passes (at least some)
+    assert run.names.count("Loop_SimpleLoop") > 5
 
 
 @pytest.mark.slow
