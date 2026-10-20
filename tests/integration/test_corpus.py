@@ -406,7 +406,9 @@ def test_10_a_confirmation_in_a_loop_ends_the_loop_with_no(flows):
     fb.connect(loop, fb.action("Action_Do_nothing", name="AFTER"), "tail")
     run = run_all(flows, [fb])[0]
     assert finished(run) and "AFTER" in run.names, (run.reason, run.exceptions, run.names[-4:])
-    assert run.names.count("Condition_Confirmation_Dialog") == 3 and len(dialogs.requests()) == 3
+    # WI-0089: the recorded steps of a fast element are batched (one step can stand for several runs); the dialogs
+    # themselves are counted exactly below
+    assert 1 <= run.names.count("Condition_Confirmation_Dialog") <= 3 and len(dialogs.requests()) == 3
     assert [r["args"]["title"] for r in dialogs.requests()] == ["Again?"] * 3
 
 
@@ -449,7 +451,8 @@ def test_12_a_loop_is_left_through_the_exception_connection(flows):
     fb.connect(loop, fb.action("Action_Do_nothing", name="AFTER"), "tail")
     run = run_all(flows, [fb])[0]
     assert run.reason == "finished", (run.reason, run.steps)
-    assert run.names.count("Condition_Expression") == 3, run.names
+    # WI-0089: the recorded steps of a fast element are batched (one step can stand for several runs), so at most 3
+    assert 1 <= run.names.count("Condition_Expression") <= 3, run.names
     assert run.names[-1] == "CAUGHT" and "AFTER" not in run.names
     assert [s.message for s in run.steps if s.state == "exception"] == ["String 'VarValue' is empty"]
 
