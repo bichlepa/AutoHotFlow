@@ -3,6 +3,7 @@
 #Include FlowGeometry.ahk
 #Include FlowHit.ahk
 #Include FlowHitTest.ahk
+#Include NewElementFields.ahk
 
 ; The mouse of the editor (WI-0098, REQ-EDT-060, REQ-EDT-030, PROTOCOL 4.11, E0094): what the buttons and the pointer do to
 ; the flow. The window (EditorWindow) and the headless driver (cmd.test.mouse) call the same three methods Down, Move and
@@ -22,9 +23,13 @@
 ; Esc, or the right button during a drag of the left one, cancels: no patch, no undo step, and the selection of a rectangle
 ; goes back to the one at the press. A drag runs while the button is held (the window holds the mouse with SetCapture while
 ; Holding is true); a lost button ends it as a cancel.
+; Placing a new element (WI-0099, REQ-EDT-050): a left press on one of the four fields (NewElementFields) starts the mode
+; "place": the box of the new element (Model.SetGhost) follows the pointer. A drag places it where the button goes up, a
+; click leaves it following until the next left click places it. Esc or the right button cancels. A placed element goes to
+; onPlace(kind, x, y) (the flow position of its top left corner); the class is asked there, not here.
 ;
-; Modes: "" (nothing), "press" (left button down, no drag yet, or a drag from a connection), "move", "tail", "rect" and
-; "view". The mode is the state of the pointer; the model gets the drag (SetDrag) or the rectangle (SetRect) while it runs.
+; Modes: "" (nothing), "press" (left button down, no drag yet, or a drag from a connection), "move", "tail", "rect", "view"
+; and "place". The mode is the state of the pointer; the model gets the drag (SetDrag) or the rectangle (SetRect) while it runs.
 class EditorPointer {
     static MOVE_PX := 3              ; the movement in canvas pixels that makes a drag (v1 detects 2 and more)
 
@@ -47,6 +52,10 @@ class EditorPointer {
         this.tailNew := 0            ; the height of the last step of the tail drag (snapped)
         this.dx := 0                 ; the offset of the last step of a move, in flow units
         this.dy := 0
+        this.placeKind := ""         ; the kind of the new element being placed ("action", ...; mode "place")
+        this.placeHeld := false      ; the press on the field is still held (no click or release yet)
+        this.placeMoved := false     ; the pointer moved while the field's button was held: a drag places at the release
+        this.onPlace := ""           ; function (kind, x, y): a new element was placed at the flow position x, y
     }
 
     ; "" or the mode ("press", "move", "tail", "rect", "view"). The getter has another name than the field: AHK names are
@@ -61,6 +70,13 @@ class EditorPointer {
     Down(button, cx, cy, ctrl := false) {
         if (this.mode = "view")
             return
+        if (this.mode = "place") {
+            if (button = "left")
+                this._Place(cx, cy)
+            else if (button = "right")
+                this.Cancel()
+            return
+        }
         if (this.mode != "") {
             if (button = "right")
                 this.Cancel()
@@ -74,6 +90,11 @@ class EditorPointer {
         }
         if (button != "left")
             return
+        kind := NewElementFields.At(this.model.view.Dpi, cx, cy)
+        if (kind != "") {
+            this._StartPlace(kind, cx, cy)
+            return
+        }
         this.ctrl := ctrl
         this.moved := false
         this.cx := cx
@@ -102,6 +123,12 @@ class EditorPointer {
 
     ; The pointer moved to the canvas pixel (cx, cy). held: the button that is down ("left", "right" or "" for none).
     Move(cx, cy, held := "") {
+        if (this.mode = "place") {
+            if (held = "left")
+                this.placeMoved := true
+            this.model.SetGhost(this._GhostAt(cx, cy))
+            return
+        }
         if (this.mode = "view") {
             if (held != "right") {
                 this.mode := ""
@@ -141,6 +168,14 @@ class EditorPointer {
                 this.mode := ""
             return
         }
+        if (this.mode = "place") {
+            if (button = "left" && this.placeHeld) {
+                this.placeHeld := false
+                if (this.placeMoved)
+                    this._Place(cx, cy)
+            }
+            return
+        }
         if (button != "left" || this.mode = "")
             return
         if (this.mode = "press") {
@@ -158,6 +193,10 @@ class EditorPointer {
 
     ; Cancels the drag or the view drag that runs (Esc, the right button, a lost button). Nothing is sent, no undo step.
     Cancel() {
+        if (this.mode = "place") {
+            this._EndPlace()
+            return
+        }
         if (this.mode = "move" || this.mode = "tail")
             this.model.SetDrag("")
         else if (this.mode = "rect") {
@@ -183,6 +222,45 @@ class EditorPointer {
 
     ; The loop height of a tail drag: the nearest grid step, at least two steps (v1 ui_FitGridx and the minimum of v1).
     static LoopHeight(h) => Max(FlowGeometry.GRID * 2, FlowGeometry.Snap(h))
+
+    ; --- placing a new element (WI-0099) ---------------------------------------------------------------------------------
+
+    _StartPlace(kind, cx, cy) {
+        this.mode := "place"
+        this.placeKind := kind
+        this.placeHeld := true
+        this.placeMoved := false
+        this.model.SetGhost(this._GhostAt(cx, cy))
+    }
+
+    ; The element is placed with its centre at the pointer. The placing ends first, so the box is gone when onPlace asks for
+    ; the class.
+    _Place(cx, cy) {
+        kind := this.placeKind
+        pt := this.model.view.ToFlow(cx, cy)
+        origin := FlowGeometry.CentredOrigin(pt[1], pt[2])
+        this._EndPlace()
+        if (IsObject(this.onPlace)) {
+            onPlace := this.onPlace              ; not this.onPlace(...): that would pass this as the first argument (HOW-TO)
+            onPlace(kind, origin[1], origin[2])
+        }
+    }
+
+    _EndPlace() {
+        this.mode := ""
+        this.placeKind := ""
+        this.placeHeld := false
+        this.placeMoved := false
+        this.model.SetGhost("")
+    }
+
+    ; The box (FlowRect, flow units) of the new element at the pointer.
+    _GhostAt(cx, cy) {
+        pt := this.model.view.ToFlow(cx, cy)
+        origin := FlowGeometry.CentredOrigin(pt[1], pt[2])
+        bar := (this.placeKind = "loop") ? FlowGeometry.NEW_LOOP_BAR : 0
+        return FlowGeometry.Bounds(this.placeKind, origin[1], origin[2], bar)
+    }
 
     ; --- the drag ---------------------------------------------------------------------------------------------------------
 

@@ -59,6 +59,7 @@ class EditorWindow {
         this.hoverX := 0
         this.hoverY := 0
         this.tipShown := false
+        this.captured := false        ; the window holds the mouse (SetCapture) for the pointer (_Sync)
         this.statusText := ""
         MonitorGetWorkArea(MonitorGetPrimary(), &left, &top, &right, &bottom)
         dpi := A_ScreenDPI > 0 ? A_ScreenDPI : 96
@@ -155,6 +156,15 @@ class EditorWindow {
             , (answered, id) => done(answered && id = "yes"), args*)
         if (!opened)
             done(false)
+    }
+
+    ; The class list of a new element (EditorAdd, WI-0099): the tree dialog of the kind; done(classId) once, "" for a cancel.
+    ; A dialog that cannot open answers "" at once.
+    Choose(kind, groups, done) {
+        opened := UiDialogs.Tree(this.hwnd, "Create new " kind, "Choose the class of the new element", groups
+            , (ok, id) => done(ok ? id : ""))
+        if (!opened)
+            done("")
     }
 
     ; The title: "AutoHotFlow <Editor> - <flow name>" (the flow ID while the name is not known).
@@ -278,8 +288,7 @@ class EditorWindow {
         if (pointer.Holding) {
             held := (wParam & 0x1) ? "left" : ((wParam & 0x2) ? "right" : "")
             pointer.Move(pt[1], pt[2], held)
-            if (!pointer.Holding)
-                DllCall("user32\ReleaseCapture")       ; the drag ended (a lost button, or a cancel)
+            this._Sync()                               ; the drag may have ended (a lost button, or a cancel)
             return 0
         }
         this._HideTip()
@@ -297,8 +306,7 @@ class EditorWindow {
         this._HideTip()
         pointer := this.role.pointer
         pointer.Down(button, pt[1], pt[2], GetKeyState("Ctrl", "P"))
-        if (pointer.Holding)
-            DllCall("user32\SetCapture", "ptr", this.hwnd)
+        this._Sync()
         return 0
     }
 
@@ -308,10 +316,8 @@ class EditorWindow {
             return
         pt := EditorWindow._Point(lParam)
         pointer := this.role.pointer
-        was := pointer.Holding
         pointer.Up(button, pt[1], pt[2])
-        if (was && !pointer.Holding)
-            DllCall("user32\ReleaseCapture")
+        this._Sync()
         return 0
     }
 
@@ -323,8 +329,24 @@ class EditorWindow {
         if (key = "")
             return
         name := EditorKeys.Name(key, GetKeyState("Ctrl", "P"), GetKeyState("Shift", "P"))
-        if (EditorKeys.Handle(this.role.pointer, name))
+        if (EditorKeys.Handle(this.role.pointer, name)) {
+            this._Sync()                               ; Esc may have ended a drag or a placing: it takes no mouse message
             return 0
+        }
+    }
+
+    ; The mouse is captured while the pointer holds it (EditorPointer.Holding): the capture is taken when the pointer starts to
+    ; hold it and released when it lets go, by whatever way (a release, a key, a lost button). Called after every call of
+    ; the pointer.
+    _Sync() {
+        want := this.role.pointer.Holding
+        if (want && !this.captured) {
+            DllCall("user32\SetCapture", "ptr", this.hwnd)
+            this.captured := true
+        } else if (!want && this.captured) {
+            DllCall("user32\ReleaseCapture")
+            this.captured := false
+        }
     }
 
     ; WM_MOUSEWHEEL goes to the focused window, so it is taken when the pointer is over the canvas, whichever window got it.
@@ -423,6 +445,10 @@ class EditorWindow {
         SetTimer(this.frameFn, 0)
         SetTimer(this.hoverFn, 0)
         this._HideTip()
+        if (this.captured) {
+            DllCall("user32\ReleaseCapture")
+            this.captured := false
+        }
         OnMessage(EditorWindow.WM_PAINT, this.paintFn, 0)
         OnMessage(EditorWindow.WM_ERASEBKGND, this.eraseFn, 0)
         OnMessage(EditorWindow.WM_SIZE, this.sizeFn, 0)
