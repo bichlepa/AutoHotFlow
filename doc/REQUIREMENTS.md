@@ -2781,11 +2781,11 @@ Every hint that is not critical (for example "take care with global variables", 
 ### REQ-USE-080 Unhandled errors of a flow are noticed
 
 - **v1:** yes (read: a window with the message that does not block; a new error replaces the window shown)
-- **v2:** partial (part 1 done in WI-0075: the notice (tray and list) and the mark of the flow until it is selected or the list is opened; the window with the variables of the branch is missing; the switch per flow is missing)
+- **v2:** partial (part 1 done in WI-0075: the notice (tray and list) and the mark of the flow until it is selected or the list is opened; part 2 done in WI-0113: the window with the variables of the branch, from the list of notices, follows a new error; the switch per flow is missing, WI-0109)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables, WI-0113), E0072
-- **Evidence:** `tests/integration/test_notices.py::test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray`, `tests/integration/test_notices.py::test_opening_the_list_of_notices_removes_the_marks_and_keeps_the_entries`, `tests/fault/test_manager_window.py::test_an_error_notice_shows_in_the_list_of_notices_opened_by_its_button`, `tests/ahk/manager_model.test.ahk`
+- **Plan:** S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables, WI-0113, done; the switch per flow, WI-0109), E0072
+- **Evidence:** `tests/integration/test_notices.py::test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray`, `tests/integration/test_notices.py::test_opening_the_list_of_notices_removes_the_marks_and_keeps_the_entries`, `tests/fault/test_manager_window.py::test_an_error_notice_shows_in_the_list_of_notices_opened_by_its_button`, `tests/ahk/manager_model.test.ahk`, `tests/integration/test_error_window.py::test_an_unhandled_error_keeps_the_variables_of_its_branch`, `tests/integration/test_error_window.py::test_the_copy_is_bounded_to_200_variables_and_the_long_values_are_cut`, `tests/integration/test_error_window.py::test_a_deleted_flow_keeps_no_error_and_an_unknown_error_is_not_found`, `tests/integration/test_error_window.py::test_the_manager_asks_for_the_variables_of_a_notice_and_follows_a_new_error`, `tests/ahk/engine_error_snapshot.test.ahk`
 
 When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the user learns it without reading the log: a window like the debug dialog (REQ-DBG-060) shows the error message, the element and the variables of the branch at the moment of the error. Unlike the debug dialog it does not halt anything, because the branch has already ended; the variables can be looked at, not changed. The flow also gets a mark in the manager until the user has looked at the error. Many errors in a short time give one notice. The notice can be switched off per flow and globally (REQ-USE-070).
 
