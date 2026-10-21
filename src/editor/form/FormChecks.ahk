@@ -5,7 +5,7 @@
 
 ; The checks of one value of a settings field (WI-0105, doc/ELEMENT-API-V2.md section 2.1). They give warnings, not
 ; refusals (v1 warned too). Headless: no variables are known, so a name with %...% is checked with a placeholder, and a
-; number content type checks a plain number only; an expression is checked when it runs and while typing (WI-0108).
+; number content type checks a plain number only; the syntax of an expression is checked by FormExpressions (WI-0108).
 class FormChecks {
     static NUMBER_TYPES := Map("number", 1, "positivenumber", 1, "integer", 1, "positiveinteger", 1
         , "positiveintegerorzero", 1)

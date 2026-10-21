@@ -6,11 +6,14 @@
 #Include ..\..\elements\base\ParamEvaluator.ahk
 #Include FormField.ahk
 #Include FormChecks.ahk
+#Include FormExpressions.ahk
 
 ; The settings form of one element, without a window (WI-0105, doc/ELEMENT-API-V2.md sections 2.1 and 3). The form is
 ; built from Parameters() of the class and filled with the parameters of the element; CheckSettings of the class runs
 ; at the start (FirstCall is true then) and after every change of a value; the checks of the fields run after that.
 ; The window (WI-0106) shows the fields and calls SetValue for every change; a test calls the same functions.
+; The syntax of the expressions is not checked by SetValue: CheckExpressions does it, and EditorSettings calls it when
+; the user stops typing (WI-0108, FormExpressions).
 ;
 ; Every datum has one owner (AGENTS.md rule 2): the form owns the values, the fields own what they show. The values are
 ; a Map with case-insensitive keys (the parameter ids, the content IDs and every parameter of the element, also those
@@ -30,6 +33,8 @@ class ElementForm {
         this.values := Map()
         this.values.CaseSense := "Off"
         this.staticValues := Map()
+        this.exprChecks := Map()          ; id -> Map("text", the text parsed, "warn", its warning or "") (WI-0108)
+        this.exprChecks.CaseSense := "Off"
         this.formWarnings := []
         this.parametersWarning := ""
         this.checking := false
@@ -138,10 +143,72 @@ class ElementForm {
         for warning in this.formWarnings
             out.Push(warning)
         for field in this.fields {
-            for text in field.warnings
+            for text in this.FieldWarnings(field)
                 out.Push(Map("id", field.ids.Length ? field.ids[1] : "", "text", text))
         }
         return out
+    }
+
+    ; The warnings of one field now: its checks of the values, and the syntax warnings of its expressions (WI-0108).
+    FieldWarnings(field) {
+        out := []
+        for text in field.warnings
+            out.Push(text)
+        for id in field.ids {
+            warn := this._ExprWarning(field, id)
+            if (warn != "")
+                out.Push(warn)
+        }
+        return out
+    }
+
+    ; Checks the syntax of every expression and script value that changed since its last check (WI-0108). Called when the
+    ; user stops typing, not at every key: the parse of a long text takes time. Returns true when the warnings changed.
+    CheckExpressions() {
+        changed := false
+        wanted := Map()
+        wanted.CaseSense := "Off"
+        for field in this.fields {
+            for id in field.ids {
+                kind := FormExpressions.Kind(this.cls, field, id, this.values)
+                if (kind = "")
+                    continue
+                wanted[id] := true
+                text := this._TextOf(id)
+                old := this.exprChecks.Get(id, "")
+                if (old is Map && old["text"] == text)
+                    continue
+                this.exprChecks[id] := Map("text", text, "warn", FormExpressions.Warning(text, kind))
+                changed := true
+            }
+        }
+        drop := []
+        for id, _ in this.exprChecks {
+            if (!wanted.Has(id))
+                drop.Push(id)
+        }
+        for id in drop {
+            this.exprChecks.Delete(id)
+            changed := true
+        }
+        return changed
+    }
+
+    ; The syntax warning of the id of a field for its value now, or "". A warning counts only while its text is the value:
+    ; a text that was typed on since the check is not warned about (the check comes when the typing stops).
+    _ExprWarning(field, id) {
+        if (FormExpressions.Kind(this.cls, field, id, this.values) = "")
+            return ""
+        old := this.exprChecks.Get(id, "")
+        if (!(old is Map) || !(old["text"] == this._TextOf(id)))
+            return ""
+        return old["warn"]
+    }
+
+    ; The text of a value for the checks ("" for a list or a map, which have no text).
+    _TextOf(id) {
+        v := this.values.Get(id, "")
+        return IsObject(v) ? "" : String(v)
     }
 
     ; The result: "pars" (a Map of every parameter, the types as they came in or as the user set them), "name" and
