@@ -34,6 +34,10 @@
 ;                                       open {id} (the settings of an element), set {id, value} (a field), name {text},
 ;                                       standardName {flag}, class {id} (another class of the kind), ok, cancel. The form is in
 ;                                       cmd.test.state (form)
+;   cmd.test.flowsettings {action, field?, value?}   the flow settings dialog as the window works it (WI-0109, EditorFlowSettings):
+;                                       open (the menu entry Settings), set {field, value} (policy, useGlobalDir, workingDir,
+;                                       strict, notify, limit:<key>), ok, cancel, log (Show log). The dialog is in cmd.test.state
+;                                       (flowSettings)
 ;
 ; Booleans on the wire are Json.True and Json.False (PROTOCOL 2): the state fields enabled and armed are written with Json.Bool.
 class EditorDriver {
@@ -62,6 +66,51 @@ class EditorDriver {
         role.On("cmd.test.class", (msg) => this._OnClass(msg))
         role.On("cmd.test.pick", (msg) => this._OnPick(msg))
         role.On("cmd.test.form", (msg) => this._OnForm(msg))
+        role.On("cmd.test.flowsettings", (msg) => this._OnFlowSettings(msg))
+    }
+
+    ; cmd.test.flowsettings {action, field?, value?}: the calls of the flow settings window on the controller (EditorFlowSettings,
+    ; WI-0109). A value that is a JSON true or false is 1 or 0. ok answers changed, and ok false with the refusal (the dialog
+    ; stays open then).
+    _OnFlowSettings(msg) {
+        p := msg.payload
+        fs := this.role.flowSettings
+        action := p.Get("action", "")
+        if (IsObject(action))
+            throw AhfError("cmd.test.flowsettings: action is open, set, ok, cancel or log", ErrCode.BAD_PAYLOAD)
+        switch action {
+            case "open":
+                if (!fs.Open(this.role.globals))
+                    return Map("ok", false, "error", Map("code", fs.Busy ? ErrCode.BUSY : ErrCode.BAD_PAYLOAD
+                        , "message", "no flow settings opened"))
+                return Map("ok", true)
+            case "set":
+                field := p.Get("field", "")
+                value := p.Get("value", "")
+                if (IsObject(field) || field = "")
+                    throw AhfError("cmd.test.flowsettings set: field is a key of the form", ErrCode.BAD_PAYLOAD)
+                if (IsObject(value)) {
+                    if (!(value == Json.True || value == Json.False))
+                        throw AhfError("cmd.test.flowsettings set: value is a text, a number or true or false", ErrCode.BAD_PAYLOAD)
+                    value := (value == Json.True) ? 1 : 0
+                }
+                if (!fs.Set(field, value))
+                    return Map("ok", false, "error", Map("code", ErrCode.BUSY
+                        , "message", "no flow settings are open, or the field is unknown"))
+                return Map("ok", true)
+            case "ok":
+                res := fs.Ok()
+                if (!res["ok"])
+                    return Map("ok", false, "changed", Json.False, "error", Map("code", res["code"], "message", res["message"]))
+                return Map("ok", true, "changed", Json.Bool(res["changed"]))
+            case "cancel":
+                fs.Cancel()
+                return Map("ok", true)
+            case "log":
+                fs.ShowLog()
+                return Map("ok", true)
+        }
+        throw AhfError("cmd.test.flowsettings: action is open, set, ok, cancel or log", ErrCode.BAD_PAYLOAD)
     }
 
     ; cmd.test.form {action, id?, value?, text?, flag?}: the settings window's calls on the controller (EditorSettings). A value
@@ -420,6 +469,7 @@ class EditorDriver {
         st["buttons"] := EditorDriver._ButtonsText(sc)        ; the buttons of the selection, at their flow centres (WI-0100)
         st["tray"] := this.role.tray.State()
         st["form"] := this.role.settings.State()              ; the open settings window (WI-0106)
+        st["flowSettings"] := this.role.flowSettings.State()  ; the open flow settings dialog (WI-0109)
         st["menus"] := this.role.menus.State()                ; the menu bar and the open context menu (WI-0102)
         st["asked"] := this.asked.Clone()
         st["frames"] := r["frames"]

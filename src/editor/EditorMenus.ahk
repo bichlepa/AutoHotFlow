@@ -55,7 +55,7 @@ class EditorMenus {
             EditorMenus._Entry("stop", Lang("Stop #verb"), st["executing"]),
             EditorMenus._Entry("toggle", toggleLabel, true),
             EditorMenus._Entry("edit", Lang("Edit #verb"), true, edit),
-            EditorMenus._Entry("settings", Lang("Settings"), false),      ; the flow settings dialog comes with WI-0109
+            EditorMenus._Entry("settings", Lang("Settings"), true),       ; the flow settings dialog (WI-0109)
             EditorMenus._Entry("exit", Lang("Exit #verb"), true)
         ]
     }
@@ -289,7 +289,8 @@ class EditorMenus {
                 role.add.Placed(EditorMenus._KindOfNew(id), origin[1], origin[2])
             case "edit":
                 role.settings.Open(this.target)         ; the settings of the element under the last context menu (WI-0106)
-            ; "settings" has no action yet (WI-0109)
+            case "settings":
+                role.flowSettings.Open(role.globals)    ; the flow settings of the flow (WI-0109)
         }
     }
 

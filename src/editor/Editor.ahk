@@ -13,6 +13,8 @@
 #Include EditorMenus.ahk
 #Include EditorSettings.ahk
 #Include ElementSettingsWindow.ahk
+#Include EditorFlowSettings.ahk
+#Include form\FlowSettingsWindow.ahk
 #Include EditorTray.ahk
 #Include EditorPointer.ahk
 #Include EditorKeys.ahk
@@ -49,6 +51,9 @@ class Editor extends Role {
         this.menus := ""              ; EditorMenus: the menu bar, the context menus and the menu commands (WI-0102)
         this.settings := ""           ; EditorSettings: the settings of an element or of a new one (WI-0106)
         this.settingsWindow := ""     ; ElementSettingsWindow (not with --headless)
+        this.flowSettings := ""       ; EditorFlowSettings: the flow settings dialog (WI-0109)
+        this.flowSettingsWindow := "" ; FlowSettingsWindow (not with --headless)
+        this.globals := Map()         ; the global settings as the engine has them (evt.settings.changed), for the dialogs
         this.tray := ""               ; EditorTray: the icon and the menu of this editor (REQ-EDT-230)
         this.started := false
         this.tornDown := false
@@ -75,6 +80,7 @@ class Editor extends Role {
         this.settings := EditorSettings(this.model)          ; the settings of an element (WI-0106)
         this.settings.adder := this.add
         this.add.settings := this.settings                    ; a new element gets its settings before it is added
+        this.flowSettings := EditorFlowSettings(this.model, this.peer, this.flowId)   ; the flow settings (WI-0109)
         this.pointer.onSettings := (id) => this.settings.Open(id)     ; the edit button and a double click (WI-0106)
         this.pointer.commands := this.menus                 ; Ctrl+Z, Ctrl+Y and Ctrl+S (EditorKeys)
         this.pointer.onContext := (cx, cy, fx, fy) => this.menus.Open(cx, cy, fx, fy)     ; the right click (WI-0102)
@@ -109,6 +115,8 @@ class Editor extends Role {
                 this.window.Show()
                 this.settingsWindow := ElementSettingsWindow(this.window.hwnd)
                 this.settings.window := this.settingsWindow
+                this.flowSettingsWindow := FlowSettingsWindow(this.window.hwnd)
+                this.flowSettings.window := this.flowSettingsWindow
             }
             this.tray.Start()              ; the icon of this editor (hidden with --headless), its menu, the window icon
         }
@@ -121,6 +129,7 @@ class Editor extends Role {
 
     ; The settings changed (WI-0077): the language is applied already; the title gets the new text.
     OnSettings(settings) {
+        this.globals := settings                           ; the labels "Global setting" of the flow settings (WI-0109)
         if (IsObject(this.window)) {
             this.window.Refresh()
             this.window.SetMenuBar(this.menus.Bar())      ; the menu texts follow the language (WI-0102)
@@ -167,6 +176,8 @@ class Editor extends Role {
             this.tray.Stop()
         if (IsObject(this.settings))
             this.settings.Discard()                       ; an open settings window goes first (WI-0106)
+        if (IsObject(this.flowSettings))
+            this.flowSettings.Discard()                   ; and the flow settings (WI-0109)
         if (IsObject(this.window)) {
             this.window.Close()
             this.window := ""

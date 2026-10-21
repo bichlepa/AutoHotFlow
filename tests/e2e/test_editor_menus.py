@@ -170,7 +170,7 @@ def test_the_menu_bar_has_the_v1_entries_and_their_states(procs, datadir, sessio
         open_editor(obs)
         assert [e["id"] for e in menus(obs)["bar"]] == ["save", "run", "stop", "toggle", "edit", "settings", "exit"]
         bar = bar_items(obs)
-        assert bar["settings"]["enabled"] is False, "the flow settings come with WI-0109"
+        assert bar["settings"]["enabled"] is True, "the flow settings dialog opens from this entry (WI-0109)"
         assert bar["stop"]["enabled"] is False, "nothing runs"
         assert bar["toggle"]["label"] == "Enable", bar           # the skeleton flow starts disabled
         items = edit_items(obs)
@@ -187,7 +187,8 @@ def test_the_menu_items_run_the_actions_and_a_disabled_one_runs_nothing(procs, d
         op(obs, "select", flowId=FLOW)
         open_editor(obs)
         assert command(obs, "undo")["ran"] == 0, "undo is disabled without a step"
-        assert command(obs, "settings")["ran"] == 0, "settings are disabled until WI-0109"
+        assert command(obs, "settings")["ran"] == 1, "settings open the flow settings (WI-0109)"
+        obs.request("editor:" + FLOW, "cmd.test.flowsettings", {"action": "cancel"}, timeout=scaled(5))
         edit(obs, [{"op": "element.update", "id": ACTION, "fields": {"x": 100}}])
         assert wait_until(lambda: settled(obs) and edit_items(obs)["undo"]["enabled"] is True, scaled(10)), menus(obs)
         assert command(obs, "undo")["ran"] == 1
