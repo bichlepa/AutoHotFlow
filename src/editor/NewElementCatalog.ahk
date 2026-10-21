@@ -101,8 +101,16 @@ class NewElementCatalog {
         pars := Map()
         try {
             for entry in cls.Parameters("") {
-                if (entry is Object && entry.HasProp("id") && entry.HasProp("default"))
+                if (!(entry is Object && entry.HasProp("id") && entry.HasProp("default")))
+                    continue
+                ; an id that is an Array stands for several parameters with one description (ParamEvaluator.List): one
+                ; default per id, an Array default gives its n-th item (ParamEvaluator.RawValue). Found by WI-0108.
+                if (entry.id is Array) {
+                    for n, id in entry.id
+                        pars[id] := NewElementCatalog._DefaultOf(entry.default, n)
+                } else {
                     pars[entry.id] := entry.default
+                }
             }
         } catch {
             pars := Map()
@@ -155,6 +163,13 @@ class NewElementCatalog {
         for name, value in pars
             o.%name% := value
         return o
+    }
+
+    ; The default of the n-th parameter that shares a description: an Array default gives its n-th item, else the default.
+    static _DefaultOf(d, n) {
+        if (!(d is Array))
+            return d
+        return (n >= 1 && n <= d.Length) ? d[n] : ""
     }
 
     static _Has(arr, value) {

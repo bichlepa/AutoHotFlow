@@ -33,6 +33,8 @@ TestRun.Case("Settings: a change of the choices builds the window again", Window
 TestRun.Case("Settings: a long form gets a scroll area and a slider", WindowScrollArea)
 TestRun.Case("Settings: an unknown class is shown read only", WindowUnknownClass)
 TestRun.Case("Settings: a class of the same kind is taken and the window follows, another kind is refused", ClassChange)
+TestRun.Case("Settings: a syntax error of an expression is shown in the field after the typing check (WI-0108)", WindowShowsSyntaxWarning)
+TestRun.Case("Settings: a new element with a parameter that stands for several ids gets one default per id", MultiIdDefaults)
 
 ; Opens the settings of the test element for a new element (no window): the controller with a session.
 OpenTestElement(pars := "") {
@@ -190,6 +192,34 @@ ClassChange() {
     Assert.True(settings.ChangeClass("Default.Action_Do_nothing"), "a class of the same kind is taken")
     Assert.Equal(settings.session["classId"], "Default.Action_Do_nothing")
     window.Hide()
+    settings.Discard()
+}
+
+WindowShowsSyntaxWarning() {
+    ; the window's warning line takes the warnings of the form, the syntax check runs 300 ms after a change (a timer)
+    settings := EditorSettings(SettingsTestModel())
+    Assert.True(settings.OpenNew("action", "Test.Action_TestExprParams", 0, 0, "", ""), "the settings open")
+    window := ElementSettingsWindow(0)
+    settings.window := window
+    window.Build(settings, "", false)
+    expr := EntryOf(window, "Expr")
+    settings.SetValue("Expr", "1 + * 2")
+    Sleep(600)                        ; the check of the typing: CHECK_DELAY (300 ms) after the last change
+    Assert.True(InStr(expr["warn"].Text, "column 5"), "the warning line shows the syntax error: " expr["warn"].Text)
+    settings.SetValue("Expr", "1 + 2")
+    Sleep(600)
+    Assert.Equal(expr["warn"].Text, "", "a fixed text has no warning line")
+    window.Hide()
+    settings.Discard()
+}
+
+MultiIdDefaults() {
+    ; Action_TestExprParams has id ["Tag", "Skip", "More"] (one description for three parameters): the defaults are per id
+    settings := EditorSettings(SettingsTestModel())
+    Assert.True(settings.OpenNew("action", "Test.Action_TestExprParams", 0, 0, "", ""), "the settings open")
+    pars := settings.Form.Result()["pars"]
+    for id in ["Tag", "Skip", "More"]
+        Assert.True(pars.Has(id), "the parameter " id " has a default")
     settings.Discard()
 }
 
