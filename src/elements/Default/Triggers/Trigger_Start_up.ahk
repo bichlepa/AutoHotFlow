@@ -44,10 +44,10 @@ class Trigger_Start_up extends AhfElement {
     ; TYPES, does not fire (an invalid type is refused, as v1 refuses an invalid unit: ElementError).
     static Enable(ctx, params) {
         value := params.HasProp("startupType") ? params.startupType : ""
-        type := this.TypeOf(value)
-        if (type = "")
+        startType := this.TypeOf(value)
+        if (startType = "")
             throw ElementError(Lang("Parameter '%1%' has invalid value: %2%", "startupType", IsObject(value) ? "" : value))
-        if (InStr(ctx.context, this.TOKENS[type]))
+        if (InStr(ctx.context, this.TOKENS[startType]))
             ctx.Fire()
         return ""
     }
