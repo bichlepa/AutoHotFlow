@@ -16,6 +16,7 @@
 #Include Executor.ahk
 #Include core\ErrorSnapshot.ahk
 #Include core\FlowErrors.ahk
+#Include core\FlowNotify.ahk
 #Include TriggerArms.ahk
 #Include TriggerChanges.ahk
 #Include WorkerBridge.ahk
@@ -520,10 +521,13 @@ class Engine extends Role {
     ; An unhandled exception ended a branch of a flow (Executor._Advance, REQ-EXE-090). The engine keeps the copy of the
     ; variables of the branch (WI-0113, PROTOCOL 4.7a) and sends the notice with its errorId; the notice text names the
     ; flow, the element and the message, never the variables (E0072). The copy is kept also when the notice is switched off.
-    ; The global switch is the setting notifyUnhandledErrors (WI-0077, REQ-USE-070); the per-flow switch comes with S0007.
+    ; The switch: flowSettings.notifyUnhandledErrors of the flow, else the global setting notifyUnhandledErrors (WI-0077,
+    ; WI-0109, FlowNotify, PROTOCOL 4.7).
     FlowException(flowId, elementId, message, inst, thread) {
         errorId := this._KeepError(flowId, elementId, message, inst, thread)
-        if (!this.settings.Value("notifyUnhandledErrors"))
+        rec := this.flows.Get(flowId)
+        globalOn := this.settings.Value("notifyUnhandledErrors") ? true : false
+        if (!FlowNotify.On(IsObject(rec) ? rec.Def : {Raw: Map()}, globalOn))
             return
         this._Notice("exception", flowId, "Notice_exception", [this._FlowName(flowId), elementId, message], errorId)
     }

@@ -42,6 +42,7 @@ TEST_GROUPS = {
     "ahk/core_flow_patch.test.ahk": ["engine"],
     "ahk/engine_revision.test.ahk": ["engine"],
     "ahk/engine_runaway.test.ahk": ["engine"],
+    "ahk/engine_flow_notify.test.ahk": ["engine"],
     "ahk/engine_error_snapshot.test.ahk": ["engine"],
     "ahk/engine_scheduler.test.ahk": ["engine"],
     "ahk/engine_states.test.ahk": ["engine"],
