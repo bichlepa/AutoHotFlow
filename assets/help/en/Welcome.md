@@ -25,7 +25,3 @@ If you want to give me some feedback and thereby motivate me, then write an emai
  My name is Paul and my email is [autohotflow@arcor.de](mailto:autohotflow@arcor.de)
 
 You can support me by reporting bugs, make feature requests, make and improve translations, make this help more comprehensive, and code some new features. I appreciate any kind of help!
-
-## Note!
-
-##

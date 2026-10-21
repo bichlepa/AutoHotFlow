@@ -1,75 +1,121 @@
-# Variables
+# Variables and expressions
 
-## Variable formats
+Many elements take a value from a **variable** or from an **expression**: a number, a text or a list that is worked out when the element runs. This page explains the names of variables, the built-in variables and the expression language of AutoHotFlow. Since version 2 the expression language follows AutoHotkey v2; flows made with AutoHotkey v1 are converted when they are loaded (see the end of this page).
 
-There are some defined variable formats:
+## Variables
 
-Normal
+### Names
 
-The value can be a number or some text. If a mathematical operation is applied to a string containing a number, it will be automatically interpreted as a number
+A variable name starts with a letter or an underscore and continues with letters, digits and underscores. Names are not case sensitive: `Count`, `count` and `COUNT` are the same variable.
 
-Date
+A variable that has never been given a value is **empty**: reading it gives an empty text.
 
-The value contains a date. If the date is shown, e.g. in a message box, it will be converted to a readable form. For example: 4:55 PM Saturday, November 27, 2004
+### Kinds of variables
 
-List
+The first letters of a name decide where the variable lives:
 
-The value contains a list with some elements. Each element has keys. Those keys can either be numerical (comparable to an array) or they can be an arbitrary name.
+| Name | Example | Lives |
+|---|---|---|
+| no prefix | `count`, `customer` | as long as one run of the flow (instance). All threads of the run see it. |
+| `global_` | `global_total` | always. It is kept when the flow stops and when AutoHotFlow restarts. |
+| `static_` | `static_last` | always, but only for this flow. |
+| `A_` | `A_Index`, `A_Now` | built-in variables (see below) and the variables that the elements of a loop or a trigger set for the run. |
 
-You can add or access elements by using some specific actions. If the date is shown, e.g. in a message box, it will be converted to a readable form.
+Built-in variables cannot be set. A few `A_` variables are set during a run by the elements that need them (see below). The element **New variable** refuses a name that starts with `A_` and ends with an exception.
 
-## Variable names
+### Built-in variables
 
-Variable names are not case sensitive (for example, *CurrentDate* is the same as *currentdate*). Variable names may be up to 253 characters long and may consist of letters, numbers and the following punctuation: # _ @ $
+Some examples. The names are those of AutoHotkey v2.
 
-A variable name mustn’t start with the letters "A_", since those are built in variables.
+| Variable | Contains |
+|---|---|
+| `A_Index` | the index of the current repetition of a loop (starts with 1) |
+| `A_LoopField`, `A_LoopKey` | the current field or element and its key, in the loops that go through a text or a list |
+| `A_Now` | the current date and time, as `YYYYMMDDHH24MISS` text |
+| `A_TickCount` | milliseconds since the start of Windows |
+| `A_UserName`, `A_ComputerName` | the name of the user and of the computer |
+| `A_Desktop`, `A_MyDocuments` | the folders of the desktop and of the documents |
+| `A_WorkingDir` | the working directory of the flow |
+| `A_LF`, `A_CR`, `A_Tab`, `A_Space` | line feed, carriage return, tab and space, as text (useful in expressions and in text fields) |
+| `A_AhfVersion` | the version of AutoHotFlow |
 
-## Global and local variables
+Variables that elements set during a run: `A_UserAction` (the message box and the confirmation dialog), `A_FoundKey` (the condition **List contains element**), `A_ManualTriggerID` (a manual trigger), `A_TriggerTime` and `A_TriggerID` (a trigger that starts the run). The help page of each element says which variables it sets.
 
-**Local variables**
+### Values
 
-As local variable can have almost any name. As soon it is set, it is available in the current instance. An instance is one execution. As soon the instance ends, all local variables will be deleted.
+A variable holds a **text**, a **number** or a **list**. A number is a whole number (for example `42`) or a number with a decimal point (for example `0.75`). A number keeps its type when it is stored and read again.
 
-**Static variables**
+A **list** is a variable with keys: the elements of a list have the keys `1`, `2`, `3` and so on, and may also have text keys. Use the elements **New list**, **Add to list** and **Get list info** to work with lists, and the loop **Work through a list** to go through them.
 
-Static variables must begin with "Static_". For example: Static_MyVar. Those variables are available in the current flow in all instances. They are kept when the flow has ended, even after a reboot.
+## Expressions
 
-**Global variables**
+An expression computes a value from numbers, texts, variables and functions. Examples:
 
-Global variables must begin with "Global_". For example: Global_MyVar. Those variables are available in all flows and they are kept when the flow has ended, even after a reboot.
+- `count + 1`
+- `price * count`
+- `round(price * count, 2)`
+- `name = "Paul"`
+- `count >= 10 and name = "Paul"`
 
-## Using variables
+### Numbers
 
-Variables can be used in almost every edit field in the settings. If a string is needed, a variable's content can be inserted by enclosing them into percent signs.
+- Whole numbers: `42`, `0`, `-5` (the minus is an operator, not part of the number).
+- Numbers with a decimal point: `3.14`, `.5`.
+- Hexadecimal numbers: `0x1F`.
+- The result of a division keeps the exact form: `/` gives a whole number when the division is exact (`4 / 2` is `2`), otherwise a number with a decimal point (`7 / 2` is `3.5`). `//` always gives the whole part (`7 // 2` is `3`).
+- A number is written in its short form: `0.75`, not `0.750000`.
 
- ***Example:***
+### Texts
 
-**Expression**
+A text is written in double quotes: `"Hello"`. Single quotes also work: `'Hello'`.
 
-Expressions are used to perform one or more operations upon a series of variables, literal strings, and/or literal numbers. In other words, they may be used in order to do some calculations or to make some comparisons.
+Some characters need an escape with the backtick (the key above the Tab key): `` `n `` is a line break, `` `t `` a tab, and `` `" `` a double quote inside a text. The percent sign is an ordinary character in a text: `"50%"` is the text `50%`.
 
-Variable names in an expression are not enclosed in percent signs. Numbers are allowed.
+To join texts, write ` . ` with a space on both sides: `"Total: " . sum`. Two operands that stand side by side are joined too (`"Total: " sum`), but the dot makes the intention clear.
 
-It is possible to make a double reference. If a variable is enclosed in percent signs within an expression (e.g. %Var%), whatever that variable contains is assumed to be the name or partial name of another variable.
+### Operators
 
-***Examples:***
+From the strongest to the weakest binding:
 
-Following operands are supported:
+| Operators | Meaning |
+|---|---|
+| `( )`, `f(x)`, `list[1]`, `list.1` | brackets, function call, element of a list |
+| `-x`, `!x` | negation |
+| `*`, `/`, `//` | multiplication, division, whole-number division |
+| `+`, `-` | addition, subtraction |
+| concatenation: ` . ` or two operands side by side | joins texts; binds weaker than `+` |
+| `<`, `>`, `<=`, `>=` | comparison of numbers |
+| `=`, `!=` | equal, not equal (texts are compared without case) |
+| `==`, `!==` | equal, not equal (texts are compared with case) |
+| `not x` | negation, weaker than the comparisons: `not a = b` is `not (a = b)` |
+| `and`, `&&` | true if both sides are true |
+| `or` (also written with two vertical bars) | true if one side is true |
 
-## Built in variables
+`and` and `or` give one of their operands as the result, as in AutoHotkey v2. Parentheses change the order: `(a + b) * c`.
 
-The following variables are built in and are read only.
+Two texts that look like numbers are compared as texts: `"1.0" = "1"` is false. A number compared with a text that looks like a number is compared as a number: `count = "5"` is true when `count` is 5.
 
-**Special characters**
+### Functions
 
-**Flow variables**
+| Function | Result |
+|---|---|
+| `round(number)`, `round(number, digits)` | the number rounded; `round(2.567, 2)` is `2.57` |
+| `mod(a, b)` | the remainder of `a` divided by `b`, with the sign of `a` |
+| `object()` | a new empty list; `object("name", "Paul")` is a list with one text key |
+| `print(value)` | writes the value to the log and returns an empty text |
 
-Some elements, especially loops and triggers may provide other read only variables. See in the description of each element.
+Function names are not case sensitive.
 
- In contrast to other variables, the variables that are set by the actions are thread variables. So, if you separate the flow into two threads, the thread 1 will not access the variables of thread 2.
+### Lists
 
-**Date and time**
+A list element is read as `list[1]` or `list.1`, and set in an expression as `list[1] := "x"`. The keys `"1"` and `1` are the same element. A missing element is empty.
 
-**Operating system and user info**
+## Text fields
 
-**Directories**
+A field that takes plain text (for example the message of the action **Message box**) replaces `%name%` by the value of the variable: `Hello %name%` shows the name.
+
+In an expression, `%` does not replace text. It builds a variable name: `item%i%` is the variable whose name is `item` followed by the value of `i`. With `i` = 2 that is `item2`. A plain name in an expression is written without percent signs: `count + 1`.
+
+## Flows from AutoHotkey v1
+
+Expressions of flows that were made with AutoHotFlow 1 are converted when the flow is loaded. The conversion puts spaces around the dot that joins texts and rewrites the escapes of texts that the new language knows. Syntax that the new language does not have, for example `%` as the remainder (use `mod(a, b)`), stays as it was written. Such an element is marked and the log names the expression. Check it before you rely on its result.

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Generated from assets/help/en/Variables.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Variables</title>
+<title>Variables and expressions</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,44 +98,212 @@ img {
 </head>
 <body>
 <main>
-<h1>Variables</h1>
-<h2>Variable formats</h2>
-<p>There are some defined variable formats:</p>
-<p>Normal</p>
-<p>The value can be a number or some text. If a mathematical operation is applied to a string containing a number, it will be automatically interpreted as a number</p>
-<p>Date</p>
-<p>The value contains a date. If the date is shown, e.g. in a message box, it will be converted to a readable form. For example: 4:55 PM Saturday, November 27, 2004</p>
-<p>List</p>
-<p>The value contains a list with some elements. Each element has keys. Those keys can either be numerical (comparable to an array) or they can be an arbitrary name.</p>
-<p>You can add or access elements by using some specific actions. If the date is shown, e.g. in a message box, it will be converted to a readable form.</p>
-<h2>Variable names</h2>
-<p>Variable names are not case sensitive (for example, <em>CurrentDate</em> is the same as <em>currentdate</em>). Variable names may be up to 253 characters long and may consist of letters, numbers and the following punctuation: # _ @ $</p>
-<p>A variable name mustn’t start with the letters "A_", since those are built in variables.</p>
-<h2>Global and local variables</h2>
-<p><strong>Local variables</strong></p>
-<p>As local variable can have almost any name. As soon it is set, it is available in the current instance. An instance is one execution. As soon the instance ends, all local variables will be deleted.</p>
-<p><strong>Static variables</strong></p>
-<p>Static variables must begin with "Static_". For example: Static_MyVar. Those variables are available in the current flow in all instances. They are kept when the flow has ended, even after a reboot.</p>
-<p><strong>Global variables</strong></p>
-<p>Global variables must begin with "Global_". For example: Global_MyVar. Those variables are available in all flows and they are kept when the flow has ended, even after a reboot.</p>
-<h2>Using variables</h2>
-<p>Variables can be used in almost every edit field in the settings. If a string is needed, a variable's content can be inserted by enclosing them into percent signs.</p>
-<p><strong><em>Example:</em></strong></p>
-<p><strong>Expression</strong></p>
-<p>Expressions are used to perform one or more operations upon a series of variables, literal strings, and/or literal numbers. In other words, they may be used in order to do some calculations or to make some comparisons.</p>
-<p>Variable names in an expression are not enclosed in percent signs. Numbers are allowed.</p>
-<p>It is possible to make a double reference. If a variable is enclosed in percent signs within an expression (e.g. %Var%), whatever that variable contains is assumed to be the name or partial name of another variable.</p>
-<p><strong><em>Examples:</em></strong></p>
-<p>Following operands are supported:</p>
-<h2>Built in variables</h2>
-<p>The following variables are built in and are read only.</p>
-<p><strong>Special characters</strong></p>
-<p><strong>Flow variables</strong></p>
-<p>Some elements, especially loops and triggers may provide other read only variables. See in the description of each element.</p>
-<p>In contrast to other variables, the variables that are set by the actions are thread variables. So, if you separate the flow into two threads, the thread 1 will not access the variables of thread 2.</p>
-<p><strong>Date and time</strong></p>
-<p><strong>Operating system and user info</strong></p>
-<p><strong>Directories</strong></p>
+<h1>Variables and expressions</h1>
+<p>Many elements take a value from a <strong>variable</strong> or from an <strong>expression</strong>: a number, a text or a list that is worked out when the element runs. This page explains the names of variables, the built-in variables and the expression language of AutoHotFlow. Since version 2 the expression language follows AutoHotkey v2; flows made with AutoHotkey v1 are converted when they are loaded (see the end of this page).</p>
+<h2>Variables</h2>
+<h3>Names</h3>
+<p>A variable name starts with a letter or an underscore and continues with letters, digits and underscores. Names are not case sensitive: <code>Count</code>, <code>count</code> and <code>COUNT</code> are the same variable.</p>
+<p>A variable that has never been given a value is <strong>empty</strong>: reading it gives an empty text.</p>
+<h3>Kinds of variables</h3>
+<p>The first letters of a name decide where the variable lives:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Example</th>
+<th>Lives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>no prefix</td>
+<td><code>count</code>, <code>customer</code></td>
+<td>as long as one run of the flow (instance). All threads of the run see it.</td>
+</tr>
+<tr>
+<td><code>global_</code></td>
+<td><code>global_total</code></td>
+<td>always. It is kept when the flow stops and when AutoHotFlow restarts.</td>
+</tr>
+<tr>
+<td><code>static_</code></td>
+<td><code>static_last</code></td>
+<td>always, but only for this flow.</td>
+</tr>
+<tr>
+<td><code>A_</code></td>
+<td><code>A_Index</code>, <code>A_Now</code></td>
+<td>built-in variables (see below) and the variables that the elements of a loop or a trigger set for the run.</td>
+</tr>
+</tbody>
+</table>
+<p>Built-in variables cannot be set. A few <code>A_</code> variables are set during a run by the elements that need them (see below). The element <strong>New variable</strong> refuses a name that starts with <code>A_</code> and ends with an exception.</p>
+<h3>Built-in variables</h3>
+<p>Some examples. The names are those of AutoHotkey v2.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Contains</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>A_Index</code></td>
+<td>the index of the current repetition of a loop (starts with 1)</td>
+</tr>
+<tr>
+<td><code>A_LoopField</code>, <code>A_LoopKey</code></td>
+<td>the current field or element and its key, in the loops that go through a text or a list</td>
+</tr>
+<tr>
+<td><code>A_Now</code></td>
+<td>the current date and time, as <code>YYYYMMDDHH24MISS</code> text</td>
+</tr>
+<tr>
+<td><code>A_TickCount</code></td>
+<td>milliseconds since the start of Windows</td>
+</tr>
+<tr>
+<td><code>A_UserName</code>, <code>A_ComputerName</code></td>
+<td>the name of the user and of the computer</td>
+</tr>
+<tr>
+<td><code>A_Desktop</code>, <code>A_MyDocuments</code></td>
+<td>the folders of the desktop and of the documents</td>
+</tr>
+<tr>
+<td><code>A_WorkingDir</code></td>
+<td>the working directory of the flow</td>
+</tr>
+<tr>
+<td><code>A_LF</code>, <code>A_CR</code>, <code>A_Tab</code>, <code>A_Space</code></td>
+<td>line feed, carriage return, tab and space, as text (useful in expressions and in text fields)</td>
+</tr>
+<tr>
+<td><code>A_AhfVersion</code></td>
+<td>the version of AutoHotFlow</td>
+</tr>
+</tbody>
+</table>
+<p>Variables that elements set during a run: <code>A_UserAction</code> (the message box and the confirmation dialog), <code>A_FoundKey</code> (the condition <strong>List contains element</strong>), <code>A_ManualTriggerID</code> (a manual trigger), <code>A_TriggerTime</code> and <code>A_TriggerID</code> (a trigger that starts the run). The help page of each element says which variables it sets.</p>
+<h3>Values</h3>
+<p>A variable holds a <strong>text</strong>, a <strong>number</strong> or a <strong>list</strong>. A number is a whole number (for example <code>42</code>) or a number with a decimal point (for example <code>0.75</code>). A number keeps its type when it is stored and read again.</p>
+<p>A <strong>list</strong> is a variable with keys: the elements of a list have the keys <code>1</code>, <code>2</code>, <code>3</code> and so on, and may also have text keys. Use the elements <strong>New list</strong>, <strong>Add to list</strong> and <strong>Get list info</strong> to work with lists, and the loop <strong>Work through a list</strong> to go through them.</p>
+<h2>Expressions</h2>
+<p>An expression computes a value from numbers, texts, variables and functions. Examples:</p>
+<ul>
+<li><code>count + 1</code></li>
+<li><code>price * count</code></li>
+<li><code>round(price * count, 2)</code></li>
+<li><code>name = "Paul"</code></li>
+<li><code>count &gt;= 10 and name = "Paul"</code></li>
+</ul>
+<h3>Numbers</h3>
+<ul>
+<li>Whole numbers: <code>42</code>, <code>0</code>, <code>-5</code> (the minus is an operator, not part of the number).</li>
+<li>Numbers with a decimal point: <code>3.14</code>, <code>.5</code>.</li>
+<li>Hexadecimal numbers: <code>0x1F</code>.</li>
+<li>The result of a division keeps the exact form: <code>/</code> gives a whole number when the division is exact (<code>4 / 2</code> is <code>2</code>), otherwise a number with a decimal point (<code>7 / 2</code> is <code>3.5</code>). <code>//</code> always gives the whole part (<code>7 // 2</code> is <code>3</code>).</li>
+<li>A number is written in its short form: <code>0.75</code>, not <code>0.750000</code>.</li>
+</ul>
+<h3>Texts</h3>
+<p>A text is written in double quotes: <code>"Hello"</code>. Single quotes also work: <code>'Hello'</code>.</p>
+<p>Some characters need an escape with the backtick (the key above the Tab key): <code>`n</code> is a line break, <code>`t</code> a tab, and <code>`"</code> a double quote inside a text. The percent sign is an ordinary character in a text: <code>"50%"</code> is the text <code>50%</code>.</p>
+<p>To join texts, write <code>.</code> with a space on both sides: <code>"Total: " . sum</code>. Two operands that stand side by side are joined too (<code>"Total: " sum</code>), but the dot makes the intention clear.</p>
+<h3>Operators</h3>
+<p>From the strongest to the weakest binding:</p>
+<table>
+<thead>
+<tr>
+<th>Operators</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>( )</code>, <code>f(x)</code>, <code>list[1]</code>, <code>list.1</code></td>
+<td>brackets, function call, element of a list</td>
+</tr>
+<tr>
+<td><code>-x</code>, <code>!x</code></td>
+<td>negation</td>
+</tr>
+<tr>
+<td><code>*</code>, <code>/</code>, <code>//</code></td>
+<td>multiplication, division, whole-number division</td>
+</tr>
+<tr>
+<td><code>+</code>, <code>-</code></td>
+<td>addition, subtraction</td>
+</tr>
+<tr>
+<td>concatenation: <code>.</code> or two operands side by side</td>
+<td>joins texts; binds weaker than <code>+</code></td>
+</tr>
+<tr>
+<td><code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code></td>
+<td>comparison of numbers</td>
+</tr>
+<tr>
+<td><code>=</code>, <code>!=</code></td>
+<td>equal, not equal (texts are compared without case)</td>
+</tr>
+<tr>
+<td><code>==</code>, <code>!==</code></td>
+<td>equal, not equal (texts are compared with case)</td>
+</tr>
+<tr>
+<td><code>not x</code></td>
+<td>negation, weaker than the comparisons: <code>not a = b</code> is <code>not (a = b)</code></td>
+</tr>
+<tr>
+<td><code>and</code>, <code>&amp;&amp;</code></td>
+<td>true if both sides are true</td>
+</tr>
+<tr>
+<td><code>or</code> (also written with two vertical bars)</td>
+<td>true if one side is true</td>
+</tr>
+</tbody>
+</table>
+<p><code>and</code> and <code>or</code> give one of their operands as the result, as in AutoHotkey v2. Parentheses change the order: <code>(a + b) * c</code>.</p>
+<p>Two texts that look like numbers are compared as texts: <code>"1.0" = "1"</code> is false. A number compared with a text that looks like a number is compared as a number: <code>count = "5"</code> is true when <code>count</code> is 5.</p>
+<h3>Functions</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>round(number)</code>, <code>round(number, digits)</code></td>
+<td>the number rounded; <code>round(2.567, 2)</code> is <code>2.57</code></td>
+</tr>
+<tr>
+<td><code>mod(a, b)</code></td>
+<td>the remainder of <code>a</code> divided by <code>b</code>, with the sign of <code>a</code></td>
+</tr>
+<tr>
+<td><code>object()</code></td>
+<td>a new empty list; <code>object("name", "Paul")</code> is a list with one text key</td>
+</tr>
+<tr>
+<td><code>print(value)</code></td>
+<td>writes the value to the log and returns an empty text</td>
+</tr>
+</tbody>
+</table>
+<p>Function names are not case sensitive.</p>
+<h3>Lists</h3>
+<p>A list element is read as <code>list[1]</code> or <code>list.1</code>, and set in an expression as <code>list[1] := "x"</code>. The keys <code>"1"</code> and <code>1</code> are the same element. A missing element is empty.</p>
+<h2>Text fields</h2>
+<p>A field that takes plain text (for example the message of the action <strong>Message box</strong>) replaces <code>%name%</code> by the value of the variable: <code>Hello %name%</code> shows the name.</p>
+<p>In an expression, <code>%</code> does not replace text. It builds a variable name: <code>item%i%</code> is the variable whose name is <code>item</code> followed by the value of <code>i</code>. With <code>i</code> = 2 that is <code>item2</code>. A plain name in an expression is written without percent signs: <code>count + 1</code>.</p>
+<h2>Flows from AutoHotkey v1</h2>
+<p>Expressions of flows that were made with AutoHotFlow 1 are converted when the flow is loaded. The conversion puts spaces around the dot that joins texts and rewrites the escapes of texts that the new language knows. Syntax that the new language does not have, for example <code>%</code> as the remainder (use <code>mod(a, b)</code>), stays as it was written. Such an element is marked and the log names the expression. Check it before you rely on its result.</p>
 </main>
 </body>
 </html>
