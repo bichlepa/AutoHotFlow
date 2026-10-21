@@ -116,11 +116,11 @@ The global setting is `executionPolicy` (default `parallel`, never `default`); i
 ### REQ-EXE-060 Start and stop a flow by hand
 
 - **v1:** yes
-- **v2:** partial (the commands work; the buttons in manager and editor are missing)
+- **v2:** partial (the commands work; the editor has Run and Stop in its menu bar and the switch and the star of a trigger (WI-0102, headless); the real mouse and the real menus: gui test, owner; the manager buttons: S0004)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (manager), S0006 (editor, WI-0102)
-- **Evidence:** `tests/integration/test_engine.py` (`test_start_*`, `test_stop_*`, `test_toggle_starts_and_stops_a_flow`), `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`
+- **Evidence:** `tests/integration/test_engine.py` (`test_start_*`, `test_stop_*`, `test_toggle_starts_and_stops_a_flow`), `tests/e2e/test_manager_flows.py::test_a_running_flow_is_shown_as_running_while_it_runs`, `tests/e2e/test_editor_menus.py::test_the_menu_items_run_the_actions_and_a_disabled_one_runs_nothing`
 
 The user starts a flow from the manager or the editor, through its default manual trigger or a chosen one, and stops it there. Stopping ends all running and waiting instances of the flow. Starting and stopping from inside a flow is REQ-EXE-120 and REQ-ELM-250; starting by an event is TRG.
 
@@ -1159,11 +1159,11 @@ When two enabled flows, or two triggers of one flow, use the same hotkey or hots
 ### REQ-TRG-030 Several triggers per flow
 
 - **v1:** yes
-- **v2:** partial (each trigger has its own enabled state and can be switched on its own; no trigger is armed yet, and the editor cannot add or switch one yet)
+- **v2:** partial (each trigger has its own enabled state and can be switched on its own; the editor switches a trigger with its switch and makes a manual trigger the default with its star (WI-0102, headless; the real mouse: gui, owner); no trigger is armed yet)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003 (WI-0060 done), S0006 (WI-0094 done, WI-0102)
-- **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_flow_patch_triggers.py::test_a_changed_interval_of_an_enabled_trigger_fires_at_the_new_interval`, `tests/integration/test_flow_patch_triggers.py::test_a_removed_trigger_fires_no_more_and_leaves_the_state_file`
+- **Evidence:** `tests/e2e/test_editor_menus.py::test_a_click_on_the_switch_of_a_trigger_switches_it_and_selects_nothing`, `tests/e2e/test_editor_menus.py::test_a_click_on_the_star_of_another_manual_trigger_makes_it_the_default_as_one_undo_step`, `tests/ahk/editor_scene.test.ahk` (the marks), `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_flow_patch_triggers.py::test_a_changed_interval_of_an_enabled_trigger_fires_at_the_new_interval`, `tests/integration/test_flow_patch_triggers.py::test_a_removed_trigger_fires_no_more_and_leaves_the_state_file`
 
 A flow can have several triggers. Each trigger can be enabled and disabled on its own, and can be set to switch with the flow or on its own (REQ-TRG-050). One manual trigger is the default trigger, used when the flow is started without naming a trigger.
 
@@ -1585,11 +1585,11 @@ Delete with confirmation (Del, and the trash button of the selection): one quest
 ### REQ-EDT-090 Undo and redo
 
 - **v1:** yes
-- **v2:** partial (the undo and redo steps of the editor work headless: a change is one step, undo and redo are committed, at most 100 steps, a new change clears redo, a step that no longer applies is refused with a text; the keys Ctrl+Z and Ctrl+Y and the menu entries come with WI-0098 to WI-0102)
+- **v2:** partial (the undo and redo steps of the editor work headless: a change is one step, undo and redo are committed, at most 100 steps, a new change clears redo, a step that no longer applies is refused with a text; the keys Ctrl+Z and Ctrl+Y and the menu entries work headless (WI-0102); the real keys and menus: gui test, owner)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0006 (WI-0096; keys and menu WI-0098 to WI-0102)
-- **Evidence:** `tests/ahk/editor_draft.test.ahk` (undo, redo, the limit of 100 steps, the refused step), `tests/e2e/test_editor_draft.py::test_undo_and_redo_send_the_inverse_and_the_operations`, `tests/e2e/test_editor_draft.py::test_101_steps_keep_the_last_100`
+- **Evidence:** `tests/e2e/test_editor_menus.py::test_ctrl_z_ctrl_y_and_ctrl_s_are_the_undo_redo_and_save_of_the_keys`, `tests/ahk/editor_draft.test.ahk` (undo, redo, the limit of 100 steps, the refused step), `tests/e2e/test_editor_draft.py::test_undo_and_redo_send_the_inverse_and_the_operations`, `tests/e2e/test_editor_draft.py::test_101_steps_keep_the_last_100`
 
 Ctrl+Z and Ctrl+Y and menu entries. A cancelled action (a move cancelled with Esc, a dialog cancelled) leaves no undo step.
 
@@ -1600,18 +1600,18 @@ Ctrl+Z and Ctrl+Y and menu entries. A cancelled action (a move cancelled with Es
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0006 (automatic saving WI-0095; the editor part is done with WI-0096)
-- **Evidence:** `tests/integration/test_flow_patch.py` (commit, conflict, refused list, busy deletion, rename race), `tests/ahk/core_flow_patch.test.ahk` (rules, inverse, shared revisions), `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`, `tests/ahk/editor_draft.test.ahk` (queue, conflict, refusal, lost answer), `tests/e2e/test_editor_draft.py::test_a_rename_by_the_manager_while_a_patch_is_on_its_way_is_merged`, `tests/e2e/test_editor_draft.py::test_a_restart_of_the_engine_clears_the_stacks_and_shows_the_saved_state`, `tests/integration/test_flow_autosave.py` (write-behind, save, shutdown, killed engine, delete, retries, backups)
+- **Evidence:** `tests/e2e/test_editor_menus.py::test_ctrl_z_ctrl_y_and_ctrl_s_are_the_undo_redo_and_save_of_the_keys` (Ctrl+S), `tests/integration/test_flow_patch.py` (commit, conflict, refused list, busy deletion, rename race), `tests/ahk/core_flow_patch.test.ahk` (rules, inverse, shared revisions), `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`, `tests/ahk/editor_draft.test.ahk` (queue, conflict, refusal, lost answer), `tests/e2e/test_editor_draft.py::test_a_rename_by_the_manager_while_a_patch_is_on_its_way_is_merged`, `tests/e2e/test_editor_draft.py::test_a_restart_of_the_engine_clears_the_stacks_and_shows_the_saved_state`, `tests/integration/test_flow_autosave.py` (write-behind, save, shutdown, killed engine, delete, retries, backups)
 
 Every completed edit takes effect at once, also for running instances (REQ-EXE-080), and is saved automatically a few seconds later (E0065): about 3 s after the last change, at the latest every 10 s while the user keeps editing. A flow has no unsaved state, so closing the editor or the application asks nothing. Saving by hand (Ctrl+S, menu) only writes at once. Mistakes are undone with undo (REQ-EDT-090) or by a backup: a backup is made at the first write of an editing session and then at most every 10 minutes (REQ-ROB-060, REQ-MGR-110). A rename by the manager while the editor is open is merged.
 
 ### REQ-EDT-110 Run, stop and enable from the editor
 
 - **v1:** yes
-- **v2:** partial (run, and enable or disable, from the tray menu of the editor, E0087; manual check 9, steps 12 and 13, owner; the menu bar (save, run, stop, enable, undo, redo, flow settings, exit) is missing and comes with S0006)
+- **v2:** partial (run, and enable or disable, from the tray menu of the editor, E0087; manual check 9, steps 12 and 13, owner; the menu bar (save, run, stop, enable or disable, edit with undo, redo, cut, copy, paste, delete and select all, settings, exit) is built and tested headless (WI-0102); the settings entry waits for WI-0109; the real menu bar is the gui test `tests/fault/test_editor_menus_gui.py`, owner, not run yet)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (run and enable from the tray menu of the editor, E0087, WI-0091), S0006 (the menu bar, WI-0102)
-- **Evidence:** `tests/e2e/test_editor_tray.py` (headless: run, enable and disable, the questions, a refused run); `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
+- **Evidence:** `tests/e2e/test_editor_tray.py` (headless: run, enable and disable, the questions, a refused run); `tests/e2e/test_editor_menus.py::test_the_menu_bar_has_the_v1_entries_and_their_states`, `tests/e2e/test_editor_menus.py::test_the_menu_items_run_the_actions_and_a_disabled_one_runs_nothing`; `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
 The menu bar of the editor has: save, run, stop, enable/disable, edit (undo, redo), flow settings, exit.
 

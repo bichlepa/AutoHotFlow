@@ -270,3 +270,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Wrong:** `DllCall("user32\OpenClipboard", "ptr", 0, "int")`: with no window the lock is not kept against another process (the second `OpenClipboard(0)` in a child process succeeded while the first one held it).
 - **Right:** Open with a window of the own process as owner: a hidden `Static` control made once (`CreateWindowExW`, `WinClipboard.Owner`). A second process then gets 0 from its `OpenClipboard`. The test holds the clipboard with its own hidden window the same way.
 - **Status:** verified (probe in Python with `ctypes` and two processes; `tests/e2e/test_editor_clipboard.py::test_a_busy_clipboard_is_said_in_the_status_bar_and_nothing_is_lost`)
+
+### A menu bar entry without a submenu takes a callback (assumed)
+
+- **Problem:** The v1 menu bar had "Save", "Run", "Stop", "Enable" and "Exit" as top-level entries that run a command at once (no submenu). It is not known whether a top-level `MenuBar` item with a callback fires that callback in AutoHotkey v2.
+- **Right:** Built that way in `src/editor/EditorMenus.ahk` (`Bar`): `bar.Add(label, callback)` for each entry without items, and `Menu.Enable`, `Menu.Disable` and `Menu.Rename` by label for the state (`Refresh`). The headless tests read the same spec; the real bar is checked by `tests/fault/test_editor_menus_gui.py` (seven entries, a context menu).
+- **Status:** assumed (not run: the gui test is for the owner). Check the owner's run first if a top-level entry does nothing when clicked.
+- **Source:** `src/editor/EditorMenus.ahk`, `tests/fault/test_editor_menus_gui.py`
+

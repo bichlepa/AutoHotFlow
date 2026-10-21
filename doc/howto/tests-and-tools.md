@@ -480,3 +480,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `resultFile := StrReplace(args[1], "/", "\")` before `SplitPath`, then `DirCreate(dir)`.
 - **Status:** assumed (the dialog was reported by the owner; the fixed bench is not run by agents)
 - **Source:** `tests/ahk/helpers/renderer_bench.ahk` (`Main`).
+
+### The wire-bool rule also flags internal Maps with `"enabled", 1` (verified)
+
+- **Problem:** `tools/arch_check.py` (rule `wire-bool`) matches the text `"enabled", 1` in any Map literal, also in an internal menu spec that never goes on the wire. The first version of `EditorMenus.ahk` failed the check for that.
+- **Right:** Name an internal flag differently (here `allowed`), and write the wire key (`enabled`) only with `Json.Bool(...)`, which the rule accepts.
+- **Status:** verified (`python tools/arch_check.py` before and after the rename, WI-0102)
+- **Source:** `tools/arch_check.py`, `src/editor/EditorMenus.ahk`
+
