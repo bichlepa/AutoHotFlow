@@ -336,6 +336,21 @@ ViewIsSavedAsFlowSettings() {
     Assert.Equal(d.undoSteps.Length, 0, "still no undo step")
 }
 
+; A refused view patch (zoom, offset) alone keeps the undo steps; a refused element patch clears them (F-0166).
+RefusedViewPatchKeepsTheUndoSteps() {
+    t := Setup()
+    d := t["draft"], peer := t["peer"]
+    d.Commit([AddAction(NEW)])
+    peer.Answer("cmd.flow.patch", Map("ok", 1, "rev", 2))
+    Assert.Equal(d.undoSteps.Length, 1, "one step")
+    d.SaveView(EditorView(1.5, 10, 20, 96, 800, 600))
+    peer.Answer("cmd.flow.patch", Map("ok", 0, "error", Map("code", "bad_payload", "message", "view")))
+    Assert.Equal(d.undoSteps.Length, 1, "the refused view patch keeps the step")
+    d.Commit([Rename(ACTION, "Other")])
+    peer.Answer("cmd.flow.patch", Map("ok", 0, "error", Map("code", "bad_payload", "message", "rename")))
+    Assert.Equal(d.undoSteps.Length, 0, "a refused element patch clears the steps")
+}
+
 ; A new epoch (the engine restarted): the queue and both stacks go.
 NewEpochClearsTheDraftState() {
     t := Setup()
@@ -418,6 +433,8 @@ TestRun.Case("Editor draft: a definition during a patch waits for the answer", D
 TestRun.Case("Editor draft: the selection modes and the IDs the flow does not have", SelectionModes)
 TestRun.Case("Editor draft: a removed element leaves the selection", SelectionLosesRemovedIds)
 TestRun.Case("Editor draft: the view is written as flow settings and is no undo step", ViewIsSavedAsFlowSettings)
+TestRun.Case("Editor draft: a refused view patch keeps the undo steps, a refused element patch clears them",
+    RefusedViewPatchKeepsTheUndoSteps)
 TestRun.Case("Editor draft: a new epoch clears the queue and both stacks", NewEpochClearsTheDraftState)
 TestRun.Case("Editor draft: new IDs come from the counter of the draft", NewIdsComeFromTheCounter)
 TestRun.Case("Editor draft: a commit before the definition is busy", CommitBeforeTheDefinitionIsBusy)
