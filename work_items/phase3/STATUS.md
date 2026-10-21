@@ -31,7 +31,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0098 | Editor: select and move, loop height | done | haiku | see git log | 2026-10-21 | E0094; REQ-EDT-060 partial (real-mouse gui test unwritten); F-0166 part 1 tested; de/ko/ru texts of the status bar missing |
 | WI-0099 | Editor: add elements, class list | done | haiku | see git log | 2026-10-21 | M-0091; open: dialog title "Create new <kind>" not a language key; Advanced level no e2e; tree dialog and real mouse are gui-only |
 | WI-0100 | Editor: connect | done | haiku | see git log | 2026-10-21 | M-0092; REQ-EDT-070 partial (gui unwritten); author used --no-verify once (CRLF index sizes, see report); FlowPatch.Diff fix; moved connection not previewed |
-| WI-0101 | Editor: delete, cut, copy, paste | open | | | | E0091 |
+| WI-0101 | Editor: delete, cut, copy, paste | done | haiku | see git log | 2026-10-21 | E0091; M-0093; REQ-EDT-080 partial; F-0168 (cold-start flake); clipboard limit 16 MB parsed on message path (consider 1-2 MB); ko/ru keys missing |
 | WI-0102 | Editor: menu bar, context menus, trigger buttons | open | | | | |
 | WI-0103 | Notice of a crashed editor | done | haiku | 5fe3f431..f7a7dad1 | 2026-10-21 | balloon shows the flow ID; real click not checked |
 | WI-0104 | Acceptance S0006 | open | | | | manual check 10; refines S0007 |
