@@ -18,6 +18,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 |---|---|---|---|
 | F-0175 | REQ-USE-080 names REQ-USE-070 for the switch of the notices, but REQ-USE-070 is the requirement of hints (WI-0109; PROTOCOL 4.7 follows the same wrong reference) | decision needed (correct the reference, or give the switch its own requirement); the owner decides | WI-0109 |
 | F-0178 | The help request of the supervisor for a role that is still starting (the page sent at its hello) and the requests of the manager and the editors are not tested end to end: the tests can only send as an observer, which the supervisor refuses (WI-0111) | open, not checked | WI-0111 |
+| F-0179 | The WebView2 help viewer does not handle a new-window request (`target=_blank`): the runtime would open its own unfiltered window; the handlers of the viewer are kept for the process (WI-0115) | open, low: no help page has such a link | WI-0115 |
 | F-0176 | Show log with no running manager starts the manager, and the log window is not filtered to the flow (WI-0109, PROTOCOL 4.11) | open, low; the manager is normally running | WI-0109 |
 | F-0162 | The frame of a drag of 30 elements in a flow of 300 is 25 ms at 1920 × 1080 (budget 16 ms); one element meets it (WI-0097, MS-0051) | decision needed, measured; WI-0097 | WI-0097 |
 | F-0170 | The trigger switch of the editor does not ask the force question that the flow commands ask when a state cannot be read (WI-0104, REQ-TRG-030) | decided (a), E0101; built in WI-0107 | S0006 |
@@ -350,6 +351,12 @@ Work that is open but is not a finding with an entry. Rule: a finished action is
 None here. The decisions waiting for the project owner are in `NEEDS-ATTENTION.md` (repository root).
 
 Decisions on entries are in the summary table (status `decision needed`, `accepted`, `closed`) and in the status book `work_items/phase3/STATUS.md`, section "Decisions of the project owner".
+
+### F-0179: the WebView2 help viewer has a hole in its navigation filter (new-window requests) and keeps its handlers
+
+**What:** the viewer cancels every navigation that is not `file:` and hands http and https links to the default browser (WI-0115). A link with `target=_blank` makes the runtime ask for a new window (`NewWindowRequested`), which the viewer does not handle: the runtime would open its own window, and the filter does not apply to it. No help page has such a link today. Besides, `ComHandler` keeps every handler (about four per mount of the viewer, `CallbackCreate` and buffers) for the whole process; a mount happens on a viewer change or on a failure only.
+**Options:** (a) handle `NewWindowRequested`: cancel it and route its URI through the same filter; (b) let a test or the generator refuse `target=_blank` in the help pages; the handler leak is acceptable for a help role that does not run long.
+**Status:** open, low priority. Verified by reading (the author of WI-0115 and the reviewer); not tested.
 
 ### F-0160: A warning of the renderer bench in a product script
 
