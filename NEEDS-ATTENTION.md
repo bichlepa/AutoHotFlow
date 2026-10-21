@@ -18,3 +18,9 @@ Open (full text in `doc/OPEN-ITEMS.md`): **F-0162** (drag of 30 elements 25 ms v
 - **Decisions taken for you (WI-0081):** `Action_Execute_Flow` and `Action_Set_Flow_Status` count as acting on the system (the import warning lists them); `Action_Message_Box` and `Action_Tooltip` do not. The unpacked size of an `.ahf` is limited to 4 MB, UNC paths are refused (F-0132). Say so if you want it differently.
 - **Stress tests:** run when a work item requires them (your permission of 2026-10-17). A stress run no longer opens the manager window (F-0143 fixed); the window variant needs `-m "stress or gui"`.
 - **Slow tier:** relevant again (your decision of 2026-10-17); the verification of a state includes it.
+
+## Waiting for you (2026-10-22)
+
+- **Manual checks:** 10 (S0006, editing at 100 % and 225 %) and 11 (S0007, settings, assistants, help in the three viewers, flow settings, error window). The gui tests are written and not run (VS Code tasks `Test: ... (gui ...)` and `Start: manual check ...`). Until then REQ-EDT-050/060/070/080/090, 120, 130, 140, 200 and REQ-LNG-040 stay `partial`.
+- **Decisions:** F-0162 (drag of 30 elements 26.9 ms vs 16 ms), F-0184 (the error window shows variable values, passwords included, in clear text), F-0185 (text fields are not checked as expressions, confirm), F-0175 (wrong requirement reference), F-0163/F-0164/WI-0094 (see above), F-0167 (original v1 help text), F-0182/F-0183 (tracker mode, extend E0076 to the colour dialog?), F-0181 (field types no core element uses, for S0008), the S0007 proposals in `work_items/phase3/WI-0114-result-s7.md` sections 6 and 7.
+- **Facts:** the WebView2 loader hashes (F-0186) come from one nuget.org download, cross-check if you like. `tools/hooks` pre-commit hook regenerated indexes on a CRLF tree once with other sizes than LF (an agent worked around it with --no-verify once, WI-0100). `recheck.py` cannot take test IDs with `@input`.

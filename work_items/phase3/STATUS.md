@@ -12,7 +12,7 @@ Kept by the orchestrator as described in `doc/ORCHESTRATOR.md`. This file shows 
 | S0004 UI foundation and manager | WI-0069 to WI-0082 | done (acceptance WI-0082 on 2026-10-19; the manual checks of the owner passed on 2026-10-19) |
 | S0005 Editor I: display | WI-0083 to WI-0092 | done (acceptance WI-0092 on 2026-10-20; manual check 9 passed, look accepted, E0088; step 25 (4K) not run, REQ-PRF-060 partial, F-0156 postponed) |
 | S0006 Editor II: editing | WI-0093 to WI-0104 | accepted by WI-0104 (agent part, 2026-10-21, E0091 to E0094); manual check 10 open for the owner |
-| S0007 Editor III: settings dialogs | WI-0105 to WI-0115 | detailed on 2026-10-20 together with S0006 (E0095 to E0100); refined by the retrospective of WI-0104 before its packages start |
+| S0007 Editor III: settings dialogs | WI-0105 to WI-0115 | all work items done 2026-10-22 (agent part); waits for the owner: manual check 11, the gui tests, the proposals in the result |
 | S0008 Remaining elements | WI-0116 to WI-0135 | detailed on 2026-10-21 (E0102 to E0105); refined by the retrospective of WI-0114 before its element packages start |
 | S0009 to S0010 | | rough, see the plan |
 
@@ -46,7 +46,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0112 | Help content: Markdown, generator, core pages | done | haiku | see git log | 2026-10-21 | F-0167 owner decision; 17 pages with v1 markers for S0008; markdown pinned (generated HTML compared byte for byte); `Variables.md` still says threads |
 | WI-0113 | Window of an unhandled error | done | haiku | see git log | 2026-10-21 | PROTOCOL 4.7a; owner: variable values (also passwords) kept in engine memory and shown in clear text; cyclic object cannot be stringified (not reachable via normal assignment); tray click does not open it; slow/foundation tiers via verify | | | | may run beside S0006 (not with WI-0093/WI-0094: `Executor.ahk`) |
 | WI-0115 | Help viewer with WebView2 | done | haiku | f1e44ea5, 779b9531 | 2026-10-21 | E0099; spike ok (runtime 155, real window); loader DLL by the setup task (not committed, S0009 ships it); gui check at 100/225 % for the owner (tests/fault/test_help_webview2_gui.py); links to the web and the new-window request not checked; HOW-TO com-and-native-calls.md |
-| WI-0114 | Acceptance S0007 | open | | | | manual check 11 |
+| WI-0114 | Acceptance S0007 | agent part done | haiku | see git log | 2026-10-22 | result: `WI-0114-result-s7.md`; S0007 NOT accepted: manual check 11 and the gui tests are the owner's; F-0180 to F-0187; REQ-EDT-120/130/140/200 and REQ-LNG-040 partial |
 | WI-0116 | Check of the parameter schema against v1 | open | | | |  |
 | WI-0117 | Seam `SystemOps` (E0103) | open | | | |  |
 | WI-0118 | Calculations, script, date and time | open | | | |  |
