@@ -42,7 +42,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0109 | Flow settings dialog | open | | | | |
 | WI-0110 | Assistants | open | | | | |
 | WI-0111 | Help window: viewer interface, classic viewer, browser, setting | open | | | | E0099 |
-| WI-0112 | Help content: Markdown, generator, core pages | open | | | | E0097, E0100; may run beside S0006 |
+| WI-0112 | Help content: Markdown, generator, core pages | done | haiku | see git log | 2026-10-21 | F-0167 owner decision; 17 pages with v1 markers for S0008; markdown pinned (generated HTML compared byte for byte); `Variables.md` still says threads |
 | WI-0113 | Window of an unhandled error | open | | | | may run beside S0006 (not with WI-0093/WI-0094: `Executor.ahk`) |
 | WI-0115 | Help viewer with WebView2 | open | | | | spike first; if it fails, the classic viewer stays (E0099) |
 | WI-0114 | Acceptance S0007 | open | | | | manual check 11 |
