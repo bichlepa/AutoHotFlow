@@ -306,7 +306,7 @@ L398-404 One timer for many jobs: SetTimer with the same function moves the run 
 L407-413 The sender of a message is its link name, which carries the flow of an editor (verified) (verified)
 ```
 
-## doc/howto/syntax-and-language.md (50.4 KB, 498 lines)
+## doc/howto/syntax-and-language.md (51.2 KB, 506 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -370,6 +370,7 @@ L468-474 A parameter named like a built-in class hides the class in its function
 L476-482 A callback held in a property is called with its object as first argument (verified) (verified)
 L484-490 A property name equal to a method name of the class ("Property is read-only") (verified)
 L492-498 A new element helper in a package lib folder needs the generated include blocks (verified)
+L500-506 Array has no Sort method in AutoHotkey v2 (the error is a runtime one) (verified)
 ```
 
 ## doc/howto/tests-and-tools.md (52.1 KB, 513 lines)

@@ -496,3 +496,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Run `python tools/gen_element_includes.py` after an include of a package file changes, and check with `--check` (the test `tests/test_element_includes.py` fails otherwise).
 - **Status:** verified (the editor and engine entry scripts load without the dialog after the regeneration; `python tools/gen_element_includes.py --check` passes)
 - **Source:** `src/elements/Default/_includes_editor.ahk`, `tools/gen_element_includes.py`
+
+### Array has no Sort method in AutoHotkey v2 (the error is a runtime one)
+
+- **Problem:** The engine answer of a new command failed with `MethodError: This value of type "Array" has no method named "Sort"`. The code loaded fine, because the call only fails when it runs.
+- **Wrong:** `list.Sort((a, b) => ...)` on an Array, as in other languages.
+- **Right:** Insert in order (`loop list.Length { if (StrCompare(list[A_Index]["id"], id) > 0) { at := A_Index; break } }`, then `list.InsertAt(at, entry)`), or sort a plain list of keys by hand. Compare texts with `StrCompare`, not with a relational operator.
+- **Status:** verified (the command `cmd.flow.triggers` answers after the change; `src/engine/Engine.ahk`, `src/editor/EditorElementCtx.ahk`)
+- **Source:** `src/engine/Engine.ahk` (`_CmdFlowTriggers`)
