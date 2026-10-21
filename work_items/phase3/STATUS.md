@@ -53,7 +53,7 @@ None.
 
 ## Running agents
 
-None.
+WI-0107 (haiku, wi-107).
 
 ## Last verified state
 
