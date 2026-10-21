@@ -459,9 +459,12 @@ class ElementSettingsWindow {
 
     _DaysPicked(id, days) {
         text := ""
-        for index, ctl in days {
-            if (ctl.Value)
-                text .= (text = "" ? "" : ",") index
+        mask := ""
+        for index, ctl in days
+            mask .= ctl.Value ? ElementSettingsWindow._DayDigit(index) : ""
+        loop 7 {
+            if (InStr(mask, A_Index))
+                text .= A_Index          ; v1 format: the digits in ascending order, Sunday is 1 (A_WDay)
         }
         this._Set(id, text)
     }
@@ -558,13 +561,12 @@ class ElementSettingsWindow {
                 if (e["ed"].Value != text)
                     e["ed"].Value := text
             case "weekdays":
-                chosen := ElementSettingsWindow._Split(text)
                 for index, ctl in e["days"]
-                    ctl.Value := ElementSettingsWindow._Has(chosen, index) ? 1 : 0
+                    ctl.Value := InStr(text, ElementSettingsWindow._DayDigit(index)) ? 1 : 0
             case "dateandtime":
                 digits := RegExReplace(text, "\D", "")
                 fmt := field.format
-                e["len"] := (fmt = "time") ? 6 : (fmt = "date") ? 8 : (StrLen(digits) = 8 ? 8 : 14)
+                e["len"] := (fmt = "time") ? (StrLen(digits) >= 14 ? 14 : 6) : (fmt = "date") ? 8 : (StrLen(digits) = 8 ? 8 : 14)
                 e["ed"].Value := ElementSettingsWindow._DateIn(text, e["len"])
             case "listbox":
                 ElementSettingsWindow._SyncList(field, e["ed"], text)
@@ -742,6 +744,9 @@ class ElementSettingsWindow {
             out.Push(Trim(part))
         return out
     }
+
+    ; The digit of a week day in the stored value (v1, A_WDay): Sunday 1, Monday 2, ... Saturday 7. index: 1 Monday ... 7 Sunday.
+    static _DayDigit(index) => index = 7 ? 1 : index + 1
 
     static _Has(list, index) {
         for item in list {
