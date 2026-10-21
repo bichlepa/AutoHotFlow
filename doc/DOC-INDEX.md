@@ -369,7 +369,7 @@ L468-474 A parameter named like a built-in class hides the class in its function
 L476-482 A callback held in a property is called with its object as first argument (verified) (verified)
 ```
 
-## doc/howto/tests-and-tools.md (51.1 KB, 505 lines)
+## doc/howto/tests-and-tools.md (52.1 KB, 513 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -432,6 +432,7 @@ L476-482 AHK's FileAppend fails in a missing folder, and SplitPath needs backsla
 L484-489 The wire-bool rule also flags internal Maps with `"enabled", 1` (verified) (verified)
 L491-497 A pytest run started as `(... ) &` in a bash subshell stops with the tool call (verified) (verified)
 L499-505 tests/ahk/lib/Assert.ahk has no False check (verified) (verified)
+L507-513 A role started by the supervisor is no peer until its `sys.hello`: wait for it (verified) (verified)
 ```
 
 ## doc/REQUIREMENTS.md

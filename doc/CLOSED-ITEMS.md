@@ -1,6 +1,6 @@
 # Closed Items
 
-Status: 2026-10-19.
+Status: 2026-10-21.
 
 This document lists findings that are closed or accepted. Entries are moved here from `doc/OPEN-ITEMS.md` unchanged, with a closing note at the end. Open findings are in `doc/OPEN-ITEMS.md`.
 
@@ -91,6 +91,7 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0151 | The static layer rebuild is slow at 4K | accepted | WI-0085 |
 | F-0158 | Three basic language files are UTF-16 but are read as UTF-8 | closed (files re-saved as UTF-8) | WI-0091 |
 | F-0174 | The engine of a slow autosave test is killed by the 60 s safety net of the test harness | closed (test fix) | WI-0095 |
+| F-0177 | The settings test `test_the_log_thresholds_change_in_every_role_at_once` fails now and then with `no peer 'tray'` (the test asked the tray before it was connected) | closed (test fix: the test waits until the roles are ready) | WI-0111 |
 
 ## Findings
 
@@ -877,3 +878,8 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 **Options:** (a) a hunter reads the engine log of the failed run (`pytest-log/.../data/...`) and finds out why the engine ended; (b) if it is the stand-in heartbeat, fix the test.
 **Status:** closed. Cause (verified): the test harness, not the product. `RoleRun` (`tests/integration/test_role.py`) starts every role through `ahkrun.py --timeout 60`, which kills the process tree after 60 s; the slow test runs `scaled(22 s)` of patches, 66 s at the parallel factor 3, so the engine was killed at about the 60th patch (stderr of the failed runs: `TIMEOUT after 60 s, process tree killed`). The earlier failures of the same test (`ok: false`) probably had the same cause (their logs are no longer available). Fix: `RoleRun` takes an optional timeout, the test passes `scaled(120)`. Reproduced without load with `AHF_TIMING_FACTOR=3` (run 20261021-195826-3120); green after the fix: runs 20261021-200005-2816, 20261021-200123-17868 and the engine and transport groups (553 passed, run 20261021-200332-19176).
 
+### F-0177: The settings test of the log thresholds is flaky (the tray role is not yet connected)
+
+**What:** `tests/integration/test_settings.py::test_the_log_thresholds_change_in_every_role_at_once` fails now and then with `no peer 'tray'` at its first snapshot of the tray (the `shown` fixture starts the roles storage, engine and tray with `--headless`). It failed in 3 of 5 runs on WI-0111 and passed on the reruns. Once it failed with the working tree stashed (the state before the settings change of WI-0111), so the change is not the cause.
+**Options:** (a) the fixture waits for the hello of every role before the first snapshot; (b) find out why the tray role starts late in the test entry (its start is not in the log of the run).
+**Status:** closed (test fix, option (a)). Cause (verified by the log of run 20261021-204324-b55810dc-3, `pytest-log/20261021-204717-2516/data/.../Log/`): a test race, not a product bug. `Children.ahk` started storage, engine and tray at 20:59:28. The hub had the links of storage and engine at 20:59:29, the tray only at 20:59:30. `FlowRunner.start()` waits for the ready engine, not for the other roles, so the test asked the tray at 20:59:29 and got `not_found` "no peer 'tray'" (the hub answers so for a name without a link, `src/supervisor/Hub.ahk`, `_Route`). The tray starts last and is the slowest under load (about 2 s from spawn to connection in that run; the spawn-to-connection time on an idle machine is `not checked`). The run history (`python tools/test_history.py --since 2026-10-21 --test ...`) shows 14 red records out of 48 for this test since 06:00 on 2026-10-21, all with `no peer 'tray'` after 0.9 to 1.8 s (the failure point, the green runs take 2 to 5 s). Fix: `wait_roles_ready` in `tests/integration/test_settings.py` waits (bounded, `WAIT_S`) until `cmd.process.list` shows storage, engine and tray as `ready`, before the first snapshot; `doc/howto/tests-and-tools.md` has the entry. Verification: the unchanged state in run 20261021-210349-c3c963f7 (`tests/integration -n 4`) had 325 passed and 1 failed in another test (`test_window_active_conditions_against_the_active_window@input`, not this one); with the fix, runs 20261021-210801-c3c963f7-wc and 20261021-211111-c3c963f7-wc (`tests/integration -n 4`, uncommitted fix) each passed 326 of 326. The flake rate before the fix was 8 red of about 37 runs of this test (history), so two green runs under load are supporting evidence, not proof of the absence of the race.

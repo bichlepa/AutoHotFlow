@@ -503,3 +503,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `Assert.True(!value, "message")` (the library has `Equal`, `True` and `Throws` only).
 - **Status:** verified (tests/ahk/engine_flow_notify.test.ahk, tests/ahk/editor_flow_settings.test.ahk)
 - **Source:** tests/ahk/lib/Assert.ahk (WI-0109)
+
+### A role started by the supervisor is no peer until its `sys.hello`: wait for it (verified)
+
+- **Problem:** `test_the_log_thresholds_change_in_every_role_at_once` asked the tray role for its snapshot right after `start()`, which returns when the engine has loaded. Under load the tray connected about 2 s after its start, so the hub answered `not_found` "no peer 'tray'" (F-0177; 8 red runs in the history of this test).
+- **Wrong:** Asking a role after `start()` because the engine is ready, or waiting only for the storage and the engine.
+- **Right:** Wait until the roles the test uses are `ready` in `cmd.process.list` (bounded, as `wait_roles_ready` in `tests/integration/test_settings.py`), or until they subscribe to a topic, as `start_shown` in `tests/integration/test_notices.py` does.
+- **Status:** verified (the failing run's log: tray started 20:59:28, hub link 20:59:30, the test asked at 20:59:29; the fixed test passed under `-n 4` with the integration suite, see F-0177 for the runs)
+- **Source:** tests/integration/test_settings.py (F-0177)
