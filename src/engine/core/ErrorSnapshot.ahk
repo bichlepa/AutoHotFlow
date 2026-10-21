@@ -26,10 +26,14 @@ class ErrorSnapshot {
         for source in sources {
             scope := source[1]
             for name, value in source[2] {
+                if (out.Length >= ErrorSnapshot.MAX_VARS) {   ; full: count only, do not convert the value (bounds the time)
+                    omitted += 1
+                    continue
+                }
                 nameText := String(name)
                 text := ErrorSnapshot.Text(value)
                 size := StrLen(nameText) + StrLen(text)
-                if (out.Length >= ErrorSnapshot.MAX_VARS || bytes + size > ErrorSnapshot.MAX_BYTES) {
+                if (bytes + size > ErrorSnapshot.MAX_BYTES) {
                     omitted += 1
                     continue
                 }
