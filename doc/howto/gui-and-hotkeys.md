@@ -294,3 +294,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `ctl.OnEvent("Change", ...)` fires on every change of the selection, a multi-select list box included. Read the selection with `SendMessage(0x0187, index - 1, 0, ctl)` (LB_GETSEL) and set it with `SendMessage(0x0185, select, index - 1, ctl)` (LB_SETSEL, index -1 clears).
 - **Status:** verified (the unit test builds every field type; the error came from it)
 - **Source:** `src/editor/ElementSettingsWindow.ahk` (`_ListRow`, `_ListPicked`, `_SyncList`)
+### A menu state that depends on another program is read only when the menu is refreshed (verified)
+
+- **Problem:** The paste entry of the editor's Edit menu depends on the Windows clipboard, which another program fills. The bar was refreshed only when the editor's model changed, so after a copy in another program Paste stayed disabled until the next edit in the editor.
+- **Wrong:** Refreshing the bar only from the model's change events (`Editor.ahk`, `this.menus.Refresh()`).
+- **Right:** Also refresh when the window is activated: `OnMessage(0x0006, fn)` (WM_ACTIVATE) and in the handler `if ((wParam & 0xFFFF) = 0) return` (the low word is 0 when the window is deactivated). Unregister the handler in `Close()` with `OnMessage(msg, fn, 0)` like the other handlers.
+- **Status:** verified (read of the code and the message values); the fix itself is not run in a window (the gui check of the menus is the owner's, `tests/fault/test_editor_menus_gui.py`).
+- **Source:** `src/editor/EditorWindow.ahk` (`_OnActivate`), `src/editor/EditorMenus.ahk` (`Refresh`)

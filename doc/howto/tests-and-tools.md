@@ -488,3 +488,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (`python tools/arch_check.py` before and after the rename, WI-0102)
 - **Source:** `tools/arch_check.py`, `src/editor/EditorMenus.ahk`
 
+### A pytest run started as `(... ) &` in a bash subshell stops with the tool call (verified)
+
+- **Problem:** A long pytest run was started as `(timeout 1500 python -m pytest ... > out.txt; echo EXIT >> out.txt) &` in the Bash tool. The tool reported the job as completed after a few seconds, and `out.txt` held only the first lines of the run: the process had ended with the call.
+- **Wrong:** Backgrounding inside the shell command with `&`.
+- **Right:** Start the run with the tool's own `run_in_background` (the notification comes when it ends), and write its output to a file in the scratchpad (not `/tmp`). Read the file only after the notification.
+- **Status:** verified (the output file of the first run held 66 bytes; the second run with `run_in_background` wrote the whole output).
+- **Source:** WI-0104 (agent work in the workspace `wi-104`)
