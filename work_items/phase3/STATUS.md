@@ -25,7 +25,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 |---|---|---|---|---|---|---|
 | WI-0093 | Engine: patch operations, shared `FlowPatch`, revisions that share, the meta race | done | haiku | 5743c3d0..b5acb473 | 2026-10-21 | patch 4.5 to 29 ms (MS-0053/54); F-0163, F-0164 decision needed |
 | WI-0094 | Engine: triggers of an edited flow | done | haiku | e813da0d..15600ccd | 2026-10-21 | E0092; owner to confirm: activity of a flow after removals in a patch (undo of a sole trigger returns it disabled) |
-| WI-0095 | Engine and storage: automatic saving and backups (E0065) | running (haiku) | | | | |
+| WI-0095 | Engine and storage: automatic saving and backups (E0065) | done | haiku | 9164afdc..59ba17bf | 2026-10-21 | F-0163 closed; editor sends no session until WI-0096 wiring; tests weaker than spec (no killed-editor test) |
 | WI-0096 | Editor: draft, patch client, undo and redo, selection model, the view written | done | haiku | 1fc90266..c0f3f0ff | 2026-10-21 | F-0165, F-0166 |
 | WI-0097 | Scene and renderer for editing | done, screenshots await the owner | haiku | bb015aba..49f7edd4 | 2026-10-20 | F-0162 (30-element drag 25 ms) decision needed |
 | WI-0098 | Editor: select and move, loop height | running (haiku) | | | | E0094; also F-0166 |
@@ -53,7 +53,7 @@ None.
 
 ## Running agents
 
-WI-0095 (haiku, workspace wi-95), WI-0098 (haiku, workspace wi-98).
+WI-0098 (haiku, workspace wi-98).
 
 ## Last verified state
 
