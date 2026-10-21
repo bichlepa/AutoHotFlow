@@ -230,7 +230,7 @@ def test_a_right_click_on_an_element_selects_it_and_offers_its_actions(procs, da
         right_click(obs, px, py)
         assert editor_state(obs)["selection"] == [ACTION], "the element under the right click is selected"
         items = context_items(obs)
-        assert items["edit"]["enabled"] is False, "the element settings come with WI-0106"
+        assert items["edit"]["enabled"] is True, "the element settings open from this entry (WI-0106)"
         assert items["cut"]["enabled"] and items["copy"]["enabled"] and items["delete"]["enabled"], items
         assert "toggleTrigger" not in items, "an action has no switch"
         assert command(obs, "ctx:copy")["ran"] == 1
