@@ -93,8 +93,13 @@ class HelpRole extends Role {
         if (!this.headless) {
             if (choice["viewer"] = "browser")
                 BrowserViewer().Navigate(resolved["path"])
-            else
-                this._Window().Show(resolved["path"])
+            else {
+                try {
+                    this._Window().Show(resolved["path"])
+                } catch as e {
+                    Log.Write("a0", "help", "the classic viewer could not show the page: " e.Message)
+                }
+            }
         }
         return Map("ok", true, "viewer", this.viewerName)
     }

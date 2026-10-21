@@ -168,7 +168,7 @@ def test_the_menu_bar_has_the_v1_entries_and_their_states(procs, datadir, sessio
     try:
         op(obs, "select", flowId=FLOW)
         open_editor(obs)
-        assert [e["id"] for e in menus(obs)["bar"]] == ["save", "run", "stop", "toggle", "edit", "settings", "exit"]
+        assert [e["id"] for e in menus(obs)["bar"]] == ["save", "run", "stop", "toggle", "edit", "settings", "help", "exit"]
         bar = bar_items(obs)
         assert bar["settings"]["enabled"] is True, "the flow settings dialog opens from this entry (WI-0109)"
         assert bar["stop"]["enabled"] is False, "nothing runs"
