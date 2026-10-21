@@ -1128,6 +1128,21 @@
             "problemMatcher": []
         },
         {
+            "label": "Start: manual check 11, settings, help and the error window (manual_check.py)",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/manual_check.py",
+                "start",
+                "--",
+                "--start=storage,engine,triggerhost,manager"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Test: editor mouse input and status bar (gui, a real editor window; wheel and drag are sent; do not use the PC)",
             "type": "shell",
             "command": "python",

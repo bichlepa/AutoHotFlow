@@ -391,11 +391,17 @@ The gui tests open real editor windows and send real mouse and keyboard input. R
 
 Not in the gui tests yet: a real mouse selection, move, connection and placing of elements (REQ-EDT-060, REQ-EDT-070, REQ-EDT-080 stay `partial` until steps 1 to 16 are checked by hand; a gui test for them is open work).
 
-## 11. Expressions checked while typing, and the keys in a settings field (WI-0108, REQ-EDT-200; WI-0104 refinement)
+## 11. Acceptance S0007: settings of the elements, assistants, help, flow settings and the error window (WI-0114; WI-0105 to WI-0113, WI-0115)
 
-Test by hand on the real settings window, at 100 % display scaling. Not automated: the e2e test drives the settings headless (`tests/e2e/test_editor_settings.py`), and the window itself is the owner's. This section checks what the headless test cannot: the window's own edit field, and that its keys do not reach the editor behind it.
+Test by hand on the real windows, at 100 % and at 225 % display scaling. The project owner closes this section; the agent does not run it and does not claim it closed. Until the owner writes the result, the requirements REQ-EDT-120, REQ-EDT-130, REQ-EDT-140, REQ-EDT-200, REQ-ELM-020, REQ-LNG-040 and REQ-USE-080 stay `partial`. The headless part is automated: `tests/e2e/test_core_settings.py` (every element of the core set is changed in its settings form, saved and run), `tests/e2e/test_editor_settings.py`, `tests/e2e/test_editor_flow_settings.py`, `tests/test_help.py`, `tests/fault/test_help_role.py`, `tests/integration/test_error_window.py`. The gui tests of part G are the owner's and are run alone.
 
-**Start.** Run section 9, part B first (the folder with the flows of the manual checks). VS Code task "Start: manual check 10, editing the imported v1 flows (manual_check.py)". Open the flow `skeleton` with "Edit" in the manager. Double-click an action with an expression field (for example Sleep, its field Duration). If the flow has none, add one: click the field "action" on the canvas and choose Sleep.
+**Start.** Run section 9, part B first, or use the same folder: the checks need the imported v1 flows, which are disabled. VS Code task "Start: manual check 11, settings, help and the error window (manual_check.py)", or `python tools/manual_check.py start -- --start=storage,engine,triggerhost,manager`. Do not run an imported v1 flow: a running flow may act on the system. Run only the flow `skeleton` (a copy of the test skeleton) when a step says so. A change is written to the file a few seconds after it is made, so give it about 10 s before you close the application.
+
+**Scaling.** Parts A and B are run at 100 %. Part C repeats key steps of parts B, D and E at 225 % (set the scaling in the Windows settings and start the application again).
+
+### Steps, part A (100 %: expression check while typing, WI-0108, REQ-EDT-200)
+
+Steps 1 to 8 are the steps of the first version of this section (WI-0108); their numbers stay. Open `skeleton` with "Edit" in the manager. Double-click an action with an expression field (for example Sleep, its field Duration). If the flow has none, add one: click the field "action" on the canvas and choose Sleep.
 
 | # | Step | Expected result | Result |
 |---|---|---|---|
@@ -408,7 +414,77 @@ Test by hand on the real settings window, at 100 % display scaling. Not automate
 | 7 | Open the settings again, type `1 + * 2`, and press Cancel before the warning shows. | The window closes, nothing is changed. | |
 | 8 | Watch for dialogs during the section. | No dialog (window class `#32770`) appears, except the answer of step 5 if it asks for one. | |
 
-Record the result of each step in the table. A failed step is a finding: write it into `doc/OPEN-ITEMS.md` with the steps that show it.
+### Steps, part B (100 %: field types, content types, checks and migration places, WI-0105, WI-0106, REQ-EDT-120)
+
+Open the settings of an element by a double click on it, or by its button "edit". Use the imported flow `Flow 1384439262` (129 elements) or `skeleton`, as the step names. The core set has these field types: edit, multi-line edit, check box, radio, drop-down and list box, and the content icons (expression, string, variable name).
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 9 | Open the settings of a Sleep action: the field Duration (an expression field) and the radio Unit. Choose Seconds and press OK. Then Ctrl+Z in the editor. | The field shows the value, its icon shows the expression content. OK changes the element and its name (for example "Sleep: 1 s"); Ctrl+Z takes the change back in one step. | |
+| 10 | Open the settings of a New variable. Change the check box "Write only if variable does not exist", change the multi-line text of the value, press OK. | The check box and the multi-line text show what was typed, and the value is kept after OK. | |
+| 11 | Open a "Variable content is" condition. Look at the radio of the content types (List, Time, Number, Integer, ...). Choose Integer and press OK. | The radio shows the chosen type, and the element has it after OK. | |
+| 12 | Open a Message box whose timeout is off. Choose "Define timeout" in the radio of the timeout, then "No timeout" again. Press Cancel. | The timeout fields are enabled only for "Define timeout" (the check of the element). Cancel changes nothing. | |
+| 13 | Open a Trace point check. Look at the list box of the trace points that must have been passed: the trace points of the flow are in it. Select one and press OK. | The list shows every trace point of the flow, and the selection is kept after OK. | |
+| 14 | Open an Execute flow. Look at the drop-down of the flow: the names of the other flows are shown (not their IDs). Choose one, uncheck "This flow", press OK. | The drop-down lists the flows by name. The element names the chosen flow after OK. | |
+| 15 | Open a Loop (Simple loop). Check "Endless loop": the field of the count is disabled. Uncheck it. | The count field is disabled exactly while the check box is on. | |
+| 16 | Find an element of the imported flow with a migration badge (a small badge at its top right corner). Open its settings. | The settings show the migration place with its v2 field and the v1 text. Change the value and press OK: the badge is gone. | |
+| 17 | Open the settings of an element with an expression warning (a wrong expression, typed in the field). Press OK. | The window closes and the change is kept; the warning does not refuse OK. | |
+| 18 | Add a Sleep action with the field "action" on the canvas. Choose it in the class list, look at the settings window, then press OK. Add another one and press Cancel. | The settings appear before the element is added. OK adds it with its values (one undo step). Cancel adds nothing. | |
+| 19 | Watch for dialogs during part B. | No dialog (window class `#32770`) appears, except the questions of the editing steps of section 10. | |
+
+### Steps, part C (225 %: the look of the windows, repeated key steps)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 20 | Repeat the steps 9, 12 and 16 at 225 %. | The windows fit the screen, all buttons and fields are reachable, and the texts are not cut. | |
+| 21 | Repeat the help steps 23 and 25 at 225 %. | The help window fills a sensible part of the screen, and the text is sharp. | |
+
+### Steps, part D (assistant and help: WI-0110, WI-0111, WI-0115, E0098 to E0100; REQ-EDT-130, REQ-ELM-020, REQ-LNG-040)
+
+Only the window assistant has an element in the product: the trigger "Hotkey". The mouse and colour assistants have no element of the core set yet; they are checked in S0008 with their elements.
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 22 | Open the settings of a Hotkey trigger of an imported flow. Press the button "Import window identification". Move the pointer over another window, pick it in the window assistant, then press OK. | The window assistant takes a window from a list (its title, class and process). The fields of the window identification show them after OK. Cancel changes nothing. | |
+| 23 | Open the settings of Sleep (step 9). Press "Help". | The help window opens with the page of Sleep: its title, the parameters and the v2 text. The window is a window of its own. | |
+| 24 | In the manager, open the menu "Help". Then open the link "Variables" in the index. | The index and the general page open in the help window. | |
+| 25 | In the manager: Settings, the general tab, the entry "Help viewer". Set it to `classic`, then open the help of step 23 again. Then set `webview2`, open it again, then `browser`, then `auto`. | Each choice opens the page with the viewer it names (classic: the control of Windows, webview2: the WebView2 view, browser: the default browser). `auto` shows the WebView2 view on this PC. The chosen viewer is kept after a restart of the application. | |
+| 26 | In the WebView2 view, follow a link to another page and use the back button (or Alt+Left). | The page changes. A link to a web address opens the default browser, not the help window. | |
+| 27 | Open the help of an element of the core set from the editor's settings for each of: Action_Trace_Point, Loop_Parse_A_String, Condition_Confirmation_Dialog. | Each page is the page of its element, with the parameters of the element. The English text is shown (the translations come in S0009). | |
+
+### Steps, part E (flow settings: REQ-EDT-140, REQ-EXE-050, REQ-EXE-130, REQ-EXE-170, REQ-VAR-100)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 28 | In the editor of `skeleton`, open the menu "Settings" (the flow settings). Set the execution policy to "wait", press OK. Then Ctrl+Z. | The dialog closes on OK, the change is one undo step, and Ctrl+Z restores the policy. | |
+| 29 | Open the flow settings. Choose the working directory with the folder dialog, then Cancel. Open them again and type an invalid limit (a text in the field of a limit). Press OK. | Cancel changes nothing. The invalid limit keeps the dialog open with a message, and nothing is sent. | |
+| 30 | Open the flow settings of the imported flow `Flow 2052424815` (a migrated flow). Set the type mode to strict. | A warning says that the flow is migrated and may fail in strict mode. Cancel keeps the mode as it was. | |
+| 31 | In the flow settings press "Show log". | The log window of the manager opens. It should show the entries of this flow only; if it shows all entries, that is finding F-0176 (`doc/OPEN-ITEMS.md`). | |
+| 32 | At 100 %: check the dialog of steps 28 and 29 once more. | The dialog fits the screen, and all fields are reachable. | |
+
+### Steps, part F (the window of an unhandled error: WI-0113, REQ-USE-080 part 2)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 33 | In the settings of the action Do nothing of `skeleton` set "Result" to Exception and press OK. Run `skeleton` (the manager, Start). | A notice appears in the tray (balloon) and in the manager's list of notices. The flow is marked in the manager. | |
+| 34 | Open the notice of step 33 (the list of notices, the button of the variables). | A window shows the variables of the branch at the failing element, with names and values, and the copy button. The values are shown in clear text; the owner's decision on that is pending (`NEEDS-ATTENTION.md`). | |
+| 35 | Switch the notices of `skeleton` off in its flow settings, run it again. | No new notice is shown; the flow is still marked as failed in the list. | |
+| 36 | Set the element back to Normal, switch the notices on again. | The flow runs without an exception and without a notice. | |
+
+### Steps, part G (gui tests of S0007; the PC is not used during them)
+
+The gui tests open real windows and send real mouse and keyboard input. Run them alone, one after the other, and do not move the mouse or press keys while they run. Expected result: all pass. The agent does not run them (`doc/TEST-STRATEGY.md` section 6).
+
+| # | VS Code task (label) | Test file | Tests |
+|---|---|---|---|
+| 37 | "Test: editor settings window (gui, a real editor window; a double click and Esc are sent; do not use the PC)" | `tests/fault/test_editor_settings_gui.py` | the settings window of an element opens by a double click and closes with Esc |
+| 38 | "Test: window assistant (gui, the mouse moves onto a target window; do not use the PC)" | `tests/fault/test_editor_assist_gui.py` | the window assistant takes the window under the mouse |
+| 39 | "Test: help window (gui, the classic viewer shows a page in a window, then the default browser opens the index; both hold for about 12 s, do not use the PC)" | `tests/fault/test_help_window_gui.py` | the classic viewer shows a page; the browser opens the index |
+| 40 | "Test: help window with WebView2 (gui, three pages in the WebView2 view, about 18 s; set the scaling first, 100 % and 225 %; do not use the PC)" | `tests/fault/test_help_webview2_gui.py` | three pages in the WebView2 view; run it at 100 % and at 225 % |
+| 41 | "Test: flow settings window (gui, a real editor window opens the dialog from the menu entry Settings; do not use the PC)" | `tests/fault/test_editor_flow_settings_gui.py` | the dialog opens from the menu entry Settings |
+| 42 | "Test: error window (gui, a real manager window opens, the list of notices and the window of the variables; do not use the PC)" | `tests/fault/test_error_window_gui.py` | the list of notices and the window of the variables |
+
+Not in the gui tests: the look of the windows (steps 20, 21, 32) and the real window assistant with a window of the owner's choice (step 22). They are checked by hand.
 
 ## Result
 
@@ -425,6 +501,7 @@ Start with Windows and administrator (section 7): parts A to D pass / fail (list
 Settings dialog (section 8): steps 44 to 59 pass / fail (list failed steps)
 Editor (section 9): steps 1 to 25 pass / fail (list failed steps); look accepted yes / no (step 3)
 Editing (section 10): steps 1 to 29 pass / fail (list failed steps) at 100 % and 225 %; gui tests 30 to 32 pass / fail; closed by the owner yes / no
+Settings, help, flow settings and error window (section 11): steps 1 to 19 at 100 %, 20 to 21 at 225 %, 22 to 36 pass / fail (list failed steps); gui tests 37 to 42 pass / fail; closed by the owner yes / no
 Notes:
 ```
 
