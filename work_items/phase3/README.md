@@ -558,8 +558,8 @@ No owner decision needed; a package may refine it and says so in its result.
 
 ### Progress S0006
 
-- [ ] WI-0093  - [ ] WI-0094  - [ ] WI-0095  - [ ] WI-0096  - [ ] WI-0097  - [ ] WI-0098
-- [ ] WI-0099  - [ ] WI-0100  - [ ] WI-0101  - [ ] WI-0102  - [ ] WI-0103  - [ ] WI-0104
+- [x] WI-0093  - [x] WI-0094  - [x] WI-0095  - [x] WI-0096  - [x] WI-0097  - [x] WI-0098
+- [x] WI-0099  - [x] WI-0100  - [x] WI-0101  - [x] WI-0102  - [x] WI-0103  - [x] WI-0104 (acceptance written 2026-10-21; manual check 10 open for the owner; see `WI-0104-result-s6.md`)
 
 ## S0007: Editor III: settings dialogs
 
@@ -622,6 +622,17 @@ No owner decision needed; a package may refine it and says so in its result.
 - An unhandled error opens, from its notice, the window with the variables of the branch (REQ-USE-080).
 - The owner configures elements of the imported v1 flows at 100 % and 225 % (manual check 11), with the assistants and the help.
 - Serial, parallel, `-m stress`, foundation and slow runs are green.
+
+### Refinement of S0007 (proposal of WI-0104, not decided)
+
+The retrospective of WI-0104 (E0095) refines the S0007 packages before they start. Every point below is a **proposal for the project owner**; it is written into the files of the packages (section "Refinement from WI-0104" at the end of each `WI-010x` file) and is not yet a decision.
+
+- **Patch client:** a form writes with `EditorDraft.Commit(ops, true)`, as the trigger star does (one undo step per OK, nothing on Cancel). No form talks to the engine itself.
+- **New element:** the form goes between the class choice and the add (choice, form, OK = one `element.add`). This changes the answer of WI-0099 that adds at once with the defaults (M-0091 says so; the e2e test of that answer changes in WI-0106).
+- **Menus and keys:** the entries `edit` (element) and `settings` (flow) are disabled in `EditorMenus` until WI-0106 and WI-0109; the double click of an element opens the form. `Run` already catches the failure of an action (WI-0104), keep it around the new actions.
+- **Decision needed before WI-0106 and WI-0107:** the force question of the trigger switch (OPEN-ITEMS F-9000). The "Switch with the flow" checkbox sits in the same dialogs.
+- **Lists of other flows** (WI-0107) use the request pattern of `EditorTriggers.Switch`.
+- **Keys in dialogs:** the keys of a dialog field do not reach the editor's keys (WI-0108 tests that Ctrl+Z in a field does not undo the flow).
 
 ### Progress S0007
 

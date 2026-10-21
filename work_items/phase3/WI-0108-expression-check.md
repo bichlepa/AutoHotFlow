@@ -24,3 +24,9 @@ An expression field of the element settings shows a syntax error, with its posit
 ## Not part of this
 
 Syntax highlighting and completion (REQ-EDT-210, later); the variables known at the element (REQ-EDT-190, later).
+
+## Refinement from WI-0104 (proposal, not decided)
+
+Written by the acceptance of S0006 (WI-0104, E0095). The project owner decides whether this stands; the package may refine it again and says so in its result.
+
+- The check while typing runs in the dialog's edit field. Keys typed there go to the dialog window, not to the editor's `WM_KEYDOWN` (EditorKeys is the editor window only), so Ctrl+Z in a field must not reach the draft: test it headless and by hand.

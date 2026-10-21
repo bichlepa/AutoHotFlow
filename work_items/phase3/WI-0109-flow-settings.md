@@ -31,3 +31,10 @@ The user sets, per flow: the execution policy, the working directory, the type m
 ## Not part of this
 
 The global settings (S0004, done).
+
+## Refinement from WI-0104 (proposal, not decided)
+
+Written by the acceptance of S0006 (WI-0104, E0095). The project owner decides whether this stands; the package may refine it again and says so in its result.
+
+- The flow settings are a `flow.settings` patch, which is an undo step (unlike the view, which is marked `view: true`). Check that a settings change is one step and that a view change still is none.
+- The menu entry `settings` is disabled in `EditorMenus.BarSpec` (allowed false) until this package; enable it there and in `_Act`, as WI-0106 does for `edit`.

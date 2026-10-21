@@ -26,3 +26,9 @@ The element settings help to fill in window information by pointing at a window,
 ## Not part of this
 
 Assistants of the elements of S0008 that v1 does not have.
+
+## Refinement from WI-0104 (proposal, not decided)
+
+Written by the acceptance of S0006 (WI-0104, E0095). The project owner decides whether this stands; the package may refine it again and says so in its result.
+
+- The window-information and mouse assistants are the first dialog code that is not a plain form: they hide the dialog, watch the mouse and read a window. Keep their waiting on timers (no loop with Sleep on the message path, AGENTS rule 3).

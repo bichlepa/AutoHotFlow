@@ -25,3 +25,10 @@ In the editor, the elements see what v1 gave them: the other flows, their trigge
 ## Not part of this
 
 Lists of variables (REQ-EDT-190, later).
+
+## Refinement from WI-0104 (proposal, not decided)
+
+Written by the acceptance of S0006 (WI-0104, E0095). The project owner decides whether this stands; the package may refine it again and says so in its result.
+
+- The request pattern for other flows is `EditorTriggers.Switch` (a peer request with `COMMAND_MS`, the answer through a callback, a refusal as status text). Copy that pattern for the flow and trigger lists instead of a new one.
+- The trigger switch of the context menu gets the force question only if the owner decides F-9000 for it (WI-0104); decide before this package adds the 'Switch with the flow' checkbox to the same dialog.

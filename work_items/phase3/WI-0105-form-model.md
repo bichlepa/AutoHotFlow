@@ -31,3 +31,10 @@ The settings of an element exist as a model without a window. The model is built
 ## Not part of this
 
 The window (WI-0106); the editor `ctx` for other flows (WI-0107); the expression check while typing (WI-0108); the assistants (WI-0110).
+
+## Refinement from WI-0104 (proposal, not decided)
+
+Written by the acceptance of S0006 (WI-0104, E0095). The project owner decides whether this stands; the package may refine it again and says so in its result.
+
+- The patch client is the one of S0006: a form that writes sends its operations to `EditorDraft.Commit(ops, true)` (undoable), as `EditorTriggers.SetDefault` does. A form does not talk to the engine itself.
+- Keep the form free of the window: `ElementForm` must be usable headless, as the driver needs it (`cmd.test.form`-like commands, see the plan).

@@ -35,3 +35,11 @@ The user opens the settings of an element and changes them in a window drawn fro
 ## Not part of this
 
 The help window itself (WI-0111); the assistants (WI-0110); the expression check (WI-0108).
+
+## Refinement from WI-0104 (proposal, not decided)
+
+Written by the acceptance of S0006 (WI-0104, E0095). The project owner decides whether this stands; the package may refine it again and says so in its result.
+
+- Today `EditorAdd._Chosen` adds the element at once with its defaults. The form goes between the class choice and the add: choice, form, OK = one `element.add`; Cancel = nothing. The e2e test `test_the_answer_adds_the_element_at_the_placed_place_with_its_defaults_and_selects_it` changes with it (say so in the result).
+- The entries `edit` (context menu of an element and the Edit menu) are disabled in `EditorMenus.ContextSpec` and `BarSpec` until this package; enable them in the same place, and the double click of `EditorPointer` opens the form (the plan says so; it is not wired yet).
+- `EditorMenus._Act` has the placeholder for `edit`: it must not fall through to nothing silently. Keep the try/catch of `Run` (WI-0104) around it.

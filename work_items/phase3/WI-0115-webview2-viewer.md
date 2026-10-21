@@ -26,3 +26,9 @@ The help window shows its pages with WebView2 (the engine of Edge) when the load
 ## Not part of this
 
 Shipping the DLL (S0009); other uses of WebView2 in AutoHotFlow.
+
+## Refinement from WI-0104 (proposal, not decided)
+
+Written by the acceptance of S0006 (WI-0104, E0095). The project owner decides whether this stands; the package may refine it again and says so in its result.
+
+- The spike decides on a COM wrapper of our own; if it stops, the classic viewer and the browser stay (the plan says so). Do not let the spike touch the editor's files.
