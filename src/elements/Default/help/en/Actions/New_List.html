@@ -99,20 +99,24 @@ img {
 <body>
 <main>
 <h1>New list</h1>
-<p>The action <strong>New list</strong> creates a new list, and initialize it with some data.</p>
+<p>The action <strong>New list</strong> creates a list in a variable. The list can be empty, or it can start with one or more elements.</p>
 <h2>Settings</h2>
 <h3>Variable name</h3>
-<p>Name of the variable which will contain the list.</p>
+<p>The name of the variable that receives the list. An existing variable with this name is replaced.</p>
 <h3>Number of elements</h3>
-<p>The new list can be empty.</p>
-<p>Optionally one or multiple elements can be initially added to the list.</p>
-<h3>Content to add</h3>
-<p>If <strong>Initialize with one element</strong> is selected, this field can contain either a value or an expression.</p>
-<p>If <strong>Initialize with multiple elements</strong> is selected, this multiline field can contain one or multiple values that will be added. Specify which delimiter will be used. The default setting is a new element in each line.</p>
+<ul>
+<li><strong>Empty list</strong>: the list has no elements.</li>
+<li><strong>Initialize with one element</strong>: one element is added. Its value is the text or the expression of <strong>Initial content</strong>.</li>
+<li><strong>Initialize with multiple elements</strong>: the elements are the lines (or the parts) of the multiline field, see <strong>Initial content</strong>.</li>
+</ul>
+<h3>Initial content</h3>
+<p>For one element, a text or an expression (choose next to the field, see <a href="../../../../../../assets/help/en/Variables.html">Variables and expressions</a>).</p>
+<p>For several elements, the text is split at the delimiters that are checked below the field: <strong>Use linefeed as delimiter</strong> (one element per line, the default), <strong>Use comma as delimiter</strong>, <strong>Use semicolon as delimiter</strong> and <strong>Use space as delimiter</strong>. With no delimiter checked, the whole text is one element.</p>
 <h3>Key</h3>
-<p>Specify the position or key of insertion.</p>
-<p>If <strong>Numerically as first element</strong> is selected, the value(s) will be added numerically as the first item(s) with the index 1 (, 2, …).</p>
-<p>If <strong>Following key</strong> is selected, the value(s) will be added into a specified numerically position. If only one element will be added, any key name can be specified.</p>
+<ul>
+<li><strong>Numerically as first element</strong>: the elements get the keys 1, 2, ... in the order given.</li>
+<li><strong>Following key</strong>: the elements get the given key, and the following keys if there are several elements. A single element can get any key name.</li>
+</ul>
 </main>
 </body>
 </html>

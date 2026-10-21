@@ -99,22 +99,22 @@ img {
 <body>
 <main>
 <h1>List contains element</h1>
-<p>The condition <strong>List contains element</strong> checks whether a list contains an item.</p>
+<p>The condition <strong>List contains element</strong> checks whether a list has an element. It decides between <strong>Yes</strong> and <strong>No</strong>.</p>
 <h2>Settings</h2>
 <h3>Input list</h3>
-<p>The input list.</p>
+<p>The list to check: the name of a variable that holds the list, or an expression that gives a list.</p>
 <h3>Search for what</h3>
-<p>It's possible either to search for an index or key or to search for an element with a specific content.</p>
-<h3>Key or index</h3>
-<p>Only accessible if <strong>Search for an index or key</strong> is selected.</p>
-<p>Specify the position or key of the value to retrieve.</p>
+<ul>
+<li><strong>Search for a position or key</strong>: the condition checks whether the list has an element with the key given below.</li>
+<li><strong>Search for an element with a specified content</strong>: the condition checks whether an element has the value given below. If several elements have it, the first one counts.</li>
+</ul>
+<h3>Key or position</h3>
+<p>Only used with <strong>Search for a position or key</strong>: the key (or the integer position) to look for.</p>
 <h3>Seeked content</h3>
-<p>Only accessible if <strong>Search for an element with a specific content</strong> is selected.</p>
-<p>Enter the value to search for.</p>
+<p>Only used with <strong>Search for an element with a specified content</strong>: the value to look for.</p>
 <h2>Supplied Variables</h2>
 <h3><code>A_FoundKey</code></h3>
-<p>This variable is only set if <strong>Search for an element with a specific content</strong> is selected.</p>
-<p>It contains the found key name which contains the searched content.</p>
+<p>Only set with <strong>Search for an element with a specified content</strong>, when the condition is <strong>Yes</strong>: the key of the element that has the content (the first one, if there are several).</p>
 </main>
 </body>
 </html>

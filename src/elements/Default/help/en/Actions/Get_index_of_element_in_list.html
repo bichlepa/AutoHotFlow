@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Generated from src/elements/Default/help/en/Actions/Get_index_of_element_in_list.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Get index from element in list</title>
+<title>Get index of element in list</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,15 +98,16 @@ img {
 </head>
 <body>
 <main>
-<h1>Get index from element in list</h1>
-<p>The action <strong>Get index from element in list</strong> searches for an item in the list with the specified value.</p>
+<h1>Get index of element in list</h1>
+<p>The action <strong>Get index of element in list</strong> searches a list for a value and writes the key of the element that has it into a variable.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
-<p>Name of the variable which will contain the value.</p>
+<p>The name of the variable that receives the key of the found element. If several elements have the value, the first one counts.</p>
 <h3>Input list</h3>
-<p>Name of the variable which contains the list.</p>
+<p>The name of the variable that holds the list (or an expression that gives a list).</p>
 <h3>Seeked content</h3>
-<p>Specify a string or a number that should be searched.</p>
+<p>The text or number to search for.</p>
+<p>If the list does not contain the value, the action ends with the result <strong>exception</strong>; the message names the value that was searched for.</p>
 </main>
 </body>
 </html>

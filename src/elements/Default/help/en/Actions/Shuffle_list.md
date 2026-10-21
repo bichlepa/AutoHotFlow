@@ -1,17 +1,17 @@
 # Shuffle list
 
-The action **Shuffle list** shuffles all entries that have a numeric key in a list.
+The action **Shuffle list** puts the elements of a list into a random order and writes the result into a variable.
 
 ## Settings
 
 ### Output list name
 
-Name of the variable which will contain the shuffled list. It can be the same as the input list.
+The name of the variable that receives the shuffled list. It can be the same variable as the input list.
 
 ### Input list
 
-Input list.
+The list to shuffle (a list, or an expression that gives a list).
 
 ## Remarks
 
-Only numeric keys will be shuffled. If the list contains keys that are not a number, they will remain unchanged.
+Only the elements with an integer key are shuffled. Elements with other keys keep their keys and places.

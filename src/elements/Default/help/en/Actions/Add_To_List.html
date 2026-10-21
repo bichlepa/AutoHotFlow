@@ -99,20 +99,24 @@ img {
 <body>
 <main>
 <h1>Add to list</h1>
-<p>The action <strong>Add to list</strong> adds a value to a list. If the list does not exist, it will be created.</p>
+<p>The action <strong>Add to list</strong> adds one or more values to a list. If the variable does not exist yet, it is created as a list.</p>
 <h2>Settings</h2>
 <h3>Variable name</h3>
-<p>Name of the variable which contains a list. If the list doesn't exist, it will be created.</p>
+<p>The name of the variable that holds the list.</p>
 <h3>Number of elements</h3>
-<p>Either one or multiple elements can be added to the list.</p>
+<ul>
+<li><strong>Add one element</strong>: one value is added. Its value is the text or the expression of <strong>Content to add</strong>.</li>
+<li><strong>Add multiple elements</strong>: the values are the lines (or the parts) of the multiline field, see <strong>Content to add</strong>.</li>
+</ul>
 <h3>Content to add</h3>
-<p>If <strong>Add one element</strong> is selected, this field can contain either a value or an expression.</p>
-<p>If <strong>Add multiple elements</strong> is selected, this multiline field can contain one or multiple values that will be added. Specify which delimiter will be used. The default setting is a new element in each line.</p>
+<p>For one element, a text or an expression (choose next to the field, see <a href="../../../../../../assets/help/en/Variables.html">Variables and expressions</a>).</p>
+<p>For several elements, the text is split at the delimiters that are checked below the field: <strong>Use linefeed as delimiter</strong> (one value per line, the default), <strong>Use comma as delimiter</strong>, <strong>Use semicolon as delimiter</strong> and <strong>Use space as delimiter</strong>. With no delimiter checked, the whole text is one value.</p>
 <h3>Key</h3>
-<p>Specify the position or key of insertion.</p>
-<p>If <strong>First position</strong> is selected, the value(s) will be added numerically as the first item(s) with the index 1 (, 2, …). The indexes of other items will be incremented.</p>
-<p>If <strong>Last position</strong> is selected, the value(s) will be added as the last item(s). For example if a list has three elements, the other element(s) will be added as the fourth element (, fifth element, …)</p>
-<p>If <strong>Following position or key</strong> is selected, the value(s) will be added into a specified position. You can specify the insertion method if position is an integer.</p>
+<ul>
+<li><strong>First integer position</strong>: the values are added at the start, with the keys 1, 2, ... in the order given. The keys of the other elements move up by the number of values.</li>
+<li><strong>Last integer position</strong>: the values are added at the end, after the highest integer key.</li>
+<li><strong>Following position or key</strong>: the values are added at the given key. For an integer key, <strong>Insert and increment all other positions</strong> moves the elements at this and the higher positions up; <strong>Overwrite value</strong> replaces the element at the key. With several values, the second value goes to the next key, and so on.</li>
+</ul>
 </main>
 </body>
 </html>

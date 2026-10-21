@@ -1,17 +1,19 @@
-# Get index from element in list
+# Get index of element in list
 
-The action **Get index from element in list** searches for an item in the list with the specified value.
+The action **Get index of element in list** searches a list for a value and writes the key of the element that has it into a variable.
 
 ## Settings
 
 ### Output variable name
 
-Name of the variable which will contain the value.
+The name of the variable that receives the key of the found element. If several elements have the value, the first one counts.
 
 ### Input list
 
-Name of the variable which contains the list.
+The name of the variable that holds the list (or an expression that gives a list).
 
 ### Seeked content
 
-Specify a string or a number that should be searched.
+The text or number to search for.
+
+If the list does not contain the value, the action ends with the result **exception**; the message names the value that was searched for.

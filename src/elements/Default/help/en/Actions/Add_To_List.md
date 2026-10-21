@@ -1,29 +1,26 @@
 # Add to list
 
-The action **Add to list** adds a value to a list. If the list does not exist, it will be created.
+The action **Add to list** adds one or more values to a list. If the variable does not exist yet, it is created as a list.
 
 ## Settings
 
 ### Variable name
 
-Name of the variable which contains a list. If the list doesn't exist, it will be created.
+The name of the variable that holds the list.
 
 ### Number of elements
 
-Either one or multiple elements can be added to the list.
+- **Add one element**: one value is added. Its value is the text or the expression of **Content to add**.
+- **Add multiple elements**: the values are the lines (or the parts) of the multiline field, see **Content to add**.
 
 ### Content to add
 
-If **Add one element** is selected, this field can contain either a value or an expression.
+For one element, a text or an expression (choose next to the field, see [Variables and expressions](../../../../../../assets/help/en/Variables.md)).
 
-If **Add multiple elements** is selected, this multiline field can contain one or multiple values that will be added. Specify which delimiter will be used. The default setting is a new element in each line.
+For several elements, the text is split at the delimiters that are checked below the field: **Use linefeed as delimiter** (one value per line, the default), **Use comma as delimiter**, **Use semicolon as delimiter** and **Use space as delimiter**. With no delimiter checked, the whole text is one value.
 
 ### Key
 
-Specify the position or key of insertion.
-
-If **First position** is selected, the value(s) will be added numerically as the first item(s) with the index 1 (, 2, …). The indexes of other items will be incremented.
-
-If **Last position** is selected, the value(s) will be added as the last item(s). For example if a list has three elements, the other element(s) will be added as the fourth element (, fifth element, …)
-
-If **Following position or key** is selected, the value(s) will be added into a specified position. You can specify the insertion method if position is an integer.
+- **First integer position**: the values are added at the start, with the keys 1, 2, ... in the order given. The keys of the other elements move up by the number of values.
+- **Last integer position**: the values are added at the end, after the highest integer key.
+- **Following position or key**: the values are added at the given key. For an integer key, **Insert and increment all other positions** moves the elements at this and the higher positions up; **Overwrite value** replaces the element at the key. With several values, the second value goes to the next key, and so on.

@@ -99,17 +99,24 @@ img {
 <body>
 <main>
 <h1>Delete from list</h1>
-<p>The action <strong>Delete from list</strong> deletes a value from an existing list.</p>
+<p>The action <strong>Delete from list</strong> deletes one element from a list.</p>
 <h2>Settings</h2>
 <h3>Variable name</h3>
-<p>Name of the variable which contains the list.</p>
+<p>The name of the variable that holds the list.</p>
 <h3>Which element</h3>
-<p>Either one or multiple elements can be added to the list.</p>
-<p>If <strong>First position</strong> is selected, the first value (usually with the key 1) will be deleted.</p>
-<p>If <strong>Last position</strong> is selected, the first value with the highest key will be deleted.</p>
-<p>If <strong>Following position or key</strong> is selected, the specified key will be deleted. If you specify an integer position, you can decide whether higher positions should be decremented after the deletion (to maintain a gapless array).</p>
-<h3>Deleted value</h3>
-<p>You may write the deleted value to a new variable.</p>
+<ul>
+<li><strong>First integer position</strong>: the element with the lowest integer key is deleted.</li>
+<li><strong>Last integer position</strong>: the element with the highest integer key is deleted.</li>
+<li><strong>Following position or key</strong>: the element with the given key is deleted. A key that is not an integer is simply removed; nothing else moves.</li>
+</ul>
+<h3>Delete method</h3>
+<p>Only for an integer position:</p>
+<ul>
+<li><strong>Delete and decrement all higher positions</strong>: the elements at higher positions move down, so that the keys stay without a gap.</li>
+<li><strong>Delete and keep the gap</strong>: the other keys stay as they are.</li>
+</ul>
+<h3>Write deleted value to variable</h3>
+<p>If checked, the value that was deleted is written into the variable named below.</p>
 </main>
 </body>
 </html>

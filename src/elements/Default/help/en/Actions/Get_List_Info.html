@@ -99,14 +99,19 @@ img {
 <body>
 <main>
 <h1>Get list info</h1>
-<p>The action <strong>Get list info</strong> gets an information about a list.</p>
+<p>The action <strong>Get list info</strong> writes one piece of information about a list into a variable.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
-<p>Name of the variable which will contain the value.</p>
+<p>The name of the variable that receives the information.</p>
 <h3>Input list</h3>
-<p>Name of the variable which contains the list.</p>
+<p>The name of the variable that holds the list (or an expression that gives a list).</p>
 <h3>Which info</h3>
-<p>Information that will be retrieved.</p>
+<ul>
+<li><strong>Minimum index</strong>: the lowest integer key. Empty if the list has no integer key.</li>
+<li><strong>Maximum index</strong>: the highest integer key. Empty if the list has no integer key.</li>
+<li><strong>Array length</strong>: the highest integer key, or 0 if the list has none. For a list whose keys are 1, 2, 3, this is 3.</li>
+<li><strong>Element count</strong>: the number of elements, whatever their keys.</li>
+</ul>
 </main>
 </body>
 </html>
