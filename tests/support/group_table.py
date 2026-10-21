@@ -218,6 +218,7 @@ TEST_GROUPS = {
     "e2e/test_editor_select.py": ["editor"],
     "e2e/test_editor_add.py": ["editor"],
     "e2e/test_editor_tray.py": ["editor"],
+    "ahk/editor_form.test.ahk": ["editor-form"],
     "ahk/editor_window.test.ahk": ["editor"],
     "fault/test_editor_window.py": ["editor"],
     "fault/test_editor_tray_icon_gui.py": ["editor"],
@@ -473,6 +474,7 @@ SOURCE_AREAS = [
                 "src/editor/EditorTray.ahk", "src/editor/EditorFlowOps.ahk", "src/editor/EditorPointer.ahk",
                 "src/editor/EditorKeys.ahk", "src/editor/NewElementCatalog.ahk", "src/editor/EditorAdd.ahk",
                 "src/entry/editor.ahk"]),
+    ("editor-form", ["src/editor/form/*"]),
     ("editor-geometry", ["src/editor/FlowRect.ahk", "src/editor/FlowGeometry.ahk", "src/editor/EditorView.ahk",
                          "src/editor/FlowHit.ahk", "src/editor/FlowHitTest.ahk", "src/editor/Scene.ahk",
                          "src/editor/SceneElement.ahk", "src/editor/SceneConnection.ahk",
@@ -493,6 +495,8 @@ OWN_TEST_GROUPS = {
 SMOKE_FOR = {
     # the patch operations: the editor draft applies them to its copy of the flow (WI-0096)
     "ahk/editor_draft.test.ahk": ["engine"],
+    # the settings form of an element (WI-0105): it reads Parameters() and the defaults of the element base
+    "ahk/editor_form.test.ahk": ["elements-base"],
     # the settings: the engine start reads them before the flows, the manager import writes them
     "integration/test_engine.py::test_start_emits_the_documented_event_order": ["settings"],
     "e2e/test_manager_import.py::test_every_flow_of_the_folder_is_imported_with_its_id_and_disabled": ["settings"],
