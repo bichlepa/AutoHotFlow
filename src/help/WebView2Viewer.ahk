@@ -163,7 +163,9 @@ class WebView2Viewer extends HelpViewer {
     }
 
     _OnNavigationStarting(args) {
-        uri := WebView2Viewer._Text(args, WebView2Viewer.IX_ARGS_GET_URI)
+        uri := ""
+        try uri := WebView2Viewer._Text(args, WebView2Viewer.IX_ARGS_GET_URI)
+        ; fail closed: when the address cannot be read, the navigation is cancelled
         if (SubStr(StrLower(uri), 1, 5) = "file:")
             return
         ComCall(WebView2Viewer.IX_ARGS_PUT_CANCEL, args, "Int", 1)
