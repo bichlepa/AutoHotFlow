@@ -31,7 +31,7 @@ L410-421 9. Performance budgets (targets, measured in Phase 2)
 L423-433 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (180.4 KB, 762 lines)
+## doc/PROTOCOL.md (180.6 KB, 762 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
@@ -73,7 +73,7 @@ L296-316 9a. Dialog tests (E0038, WI-0051)
 L318-338 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (56.6 KB, 494 lines)
+## doc/ELEMENT-API-V2.md (56.8 KB, 494 lines)
 ```text
 L8-18 1. Guidelines
 L20-110 2. Class contract
@@ -185,7 +185,7 @@ L51-57 A copy of the variables of an error must be taken where the error is caug
 L59-65 A repeated error of the same flow within 10 s sends no notice at once (verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (40.5 KB, 311 lines)
+## doc/howto/gui-and-hotkeys.md (41.7 KB, 318 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -225,7 +225,8 @@ L274-279 A menu bar entry without a submenu takes a callback (assumed) (assumed)
 L282-288 The format of a DateTime control is set by message, the option takes no spaces (verified) (partly verified)
 L290-296 A ListBox has no Click event in AHK v2 (verified) (verified)
 L297-303 A menu state that depends on another program is read only when the menu is refreshed (verified) (verified)
-L305-311 A drop-down list of a Gui is AddDDL, not AddDropDown (verified) (verified)
+L305-311 A one-shot timer that is set again restarts its delay: one `SetTimer` call per change is a debounce (verified) (verified)
+L312-318 A drop-down list of a Gui is AddDDL, not AddDropDown (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)
