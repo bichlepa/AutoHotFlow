@@ -15,7 +15,7 @@ import pytest
 from support.timing import scaled
 from test_manager import FLOW, wait_until
 from test_manager_editor import finish, op, start_manager
-from test_editor import editor_state, open_editor, render
+from test_editor import editor_state, open_editor, render, view_command
 from test_editor_draft import edit, engine_definition, settled, step
 
 EDITOR = "editor:" + FLOW
@@ -40,7 +40,18 @@ def start(procs, datadir, session_id):
     op(obs, "select", flowId=FLOW)
     open_editor(obs)
     render(obs)                        # the canvas takes its size; the view is the one of the flow
+    move_out_of_the_fields(obs)
     return sup, obs
+
+
+def move_out_of_the_fields(obs):
+    """The four fields for new elements lie over the top left corner of the canvas (WI-0099, NewElementFields: up to 480 by
+    90 pixels at 96 DPI), so at the start view the top left flow elements are under them. The view moves 200 by 100 pixels
+    (the content follows the drag) and the test waits for the view to be saved (a patch of the flow settings), so that no
+    save comes during a test that checks the revision."""
+    rev = editor_state(obs)["rev"]
+    view_command(obs, drag={"dx": 200, "dy": 100})
+    assert wait_until(lambda: editor_state(obs)["rev"] > rev, scaled(10)), "the view was not saved"
 
 
 def mouse(obs, action, x, y, button="left", ctrl=False):
