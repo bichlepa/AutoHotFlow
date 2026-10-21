@@ -38,7 +38,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0105 | Form model and the `form` API | done | haiku | a7e46ddd..6e5558d2 (rebased) | 2026-10-21 | WI-0106 must re-render after SetChoices/SetLabel and include ElementForm in the editor entry; v1 percent-sign note for WI-0108 |
 | WI-0106 | Element settings window | done | haiku | see git log | 2026-10-21 | M-0095 (renumber WI-0104's if clashing); F-0169 fixed; window never shown, gui test written for owner; slider fixed to 0-100 (v1 passes options); help and assistant buttons disabled |
 | WI-0107 | Editor `ctx`, "Switch with the flow" | open | | | | |
-| WI-0108 | Expressions checked while typing | open | | | | E0096 |
+| WI-0108 | Expressions checked while typing | done | haiku | see git log | 2026-10-21 | REQ-EDT-200 done; manual check 11 open (owner); String texts not checked (docs: no %var% in strings; owner to confirm); parser messages English |
 | WI-0109 | Flow settings dialog | open | | | | |
 | WI-0110 | Assistants | open | | | | |
 | WI-0111 | Help window: viewer interface, classic viewer, browser, setting | open | | | | E0099 |
@@ -53,7 +53,7 @@ None.
 
 ## Running agents
 
-None.
+WI-0109 (haiku, workspace wi-109).
 
 ## Last verified state
 
