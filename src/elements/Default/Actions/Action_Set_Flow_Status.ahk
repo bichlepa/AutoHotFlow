@@ -68,7 +68,7 @@ class Action_Set_Flow_Status extends AhfElement {
     }
 
     ; v1: the flow list is off for "This flow", the trigger list is off unless "Specified" is chosen. The lists are the
-    ; flows and every trigger of the flow (v1 x_getAllElementIDsOfType "trigger", WI-0107).
+    ; flows and every trigger of the flow (v1 getAllElementIDsOfType "trigger", WI-0107).
     static CheckSettings(form, params, staticValues) {
         thisFlow := FlowSwitchOps.IsOn(FlowSwitchOps.Par(params, "ThisFlow", 1))
         form.Enable("flowID", !thisFlow)

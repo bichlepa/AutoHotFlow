@@ -32,7 +32,7 @@ class Action_Stop_Flow extends AhfElement {
         return Lang("Stop_Flow") " - " FlowChoices.FlowName(ctx, flowId)
     }
 
-    ; The list of the flows (v1 x_GetListOfFlowIDs, WI-0107)
+    ; The list of the flows (v1 GetListOfFlowIDs, WI-0107)
     static CheckSettings(form, params, staticValues) {
         FlowChoices.Flows(form, "flowID")
     }

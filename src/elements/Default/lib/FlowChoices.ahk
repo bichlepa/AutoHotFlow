@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 
-; The lists and the names of the flow elements in the settings (WI-0107, v1 x_GetListOfFlowIDs, x_getAllElementIDsOfType,
-; x_getFlowName, x_getElementName). Editor only: the form has the editor context (form.ctx, EditorElementCtx, section 3 of
+; The lists and the names of the flow elements in the settings (WI-0107, v1 GetListOfFlowIDs, getAllElementIDsOfType,
+; getFlowName, getElementName). Editor only: the form has the editor context (form.ctx, EditorElementCtx, section 3 of
 ; ELEMENT-API-V2) with the flows and their triggers. Without a context (a new element of the class list, a test) the lists
 ; stay empty and the names are the IDs. A list of another flow that is not known yet is empty too; its answer comes later
 ; and the form runs CheckSettings again (EditorSettings.CatalogChanged).
