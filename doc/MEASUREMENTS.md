@@ -322,3 +322,35 @@ Status: **verified** for the numbers of this run (one run each); **not checked**
 **Reading.** A patch costs about one plain request round trip through the hub; the running flow makes no difference. The cost sits in the path of every request, not in the patch code (finding F-0165). MS-0054 measured 50 ms for a patch under stress; the difference is not explained (machine load and the client are the suspects, not checked).
 
 Status: **verified** for the numbers of the runs (one run each, two patch series); **not checked** where the 120 ms come from and what the owner's machine shows.
+
+## Editing, measured again at the end of S0006 (WI-0104, task 4)
+
+**Machine and state.** The machine of this document, one run of each measurement at commit `0e7a7c3f` (2026-10-21, about 18:19). No pytest run was in progress at that time; another agent's workspace existed on the same machine, its load was not recorded. The values are for one run each.
+
+### MS-0056: frame of a drag and the rebuilds of the editor renderer, 300 elements (WI-0104, MS-0051 again)
+
+`tests/ahk/helpers/renderer_bench.ahk` with the arguments `1920 1080 whole` (the plain flow of 300 elements and 350 connections, the whole flow visible, zoom 0.47; result file in the scratchpad). Times in milliseconds, 100 frames per series after 10 warm-up frames.
+
+| Series | Mean (median, p95, max) |
+|---|---:|
+| a frame of a state change (`states`) | 10.15 (9.88, 11.13, 25.79) |
+| a frame of an unchanged scene (`same`) | 10.12 (9.70, 10.65) |
+| a rebuild of the static layer (`rebuild`, 10 runs) | 108.0 (107.2, 112.9) |
+| a frame of a drag, 1 element (`DRAG dragged=1`) | **12.64** (12.57, 14.21, 14.85); draw 9.06, `Scene.WithDrag` 3.58 |
+| rebuild at the start of the drag / after the drop, 1 element | 106.9 / 97.9 |
+| a frame of a drag, 30 elements (`DRAG dragged=30`) | **26.93** (26.22, 29.99, 61.27); draw 21.91, `Scene.WithDrag` 5.02 |
+| rebuild at the start of the drag / after the drop, 30 elements | 85.0 / 104.4 |
+
+**Reading.** The budget of WI-0097 (the frame of a drag below 16 ms on average at 1920 × 1080) is **met for one element** (12.6 ms) and **not met for 30 elements** (26.9 ms; F-0162, decision of the owner). The unchanged frame is 10.1 ms, so this run is about 20 % slower than MS-0051 (one element then 10.6 ms, 30 elements 25.0 ms); the load of the machine explains it as far as known (assumed, not recorded). The rebuild after the drop is 98 to 104 ms, as in MS-0051 and MS-0048: the static layer is built once per drag and once after the drop. Status: **verified** for the numbers of this run; **not checked** with a real window (manual check 9, part E) and at 3840 x 2160.
+
+### MS-0057: engine time of a patch on a flow of 300 elements (WI-0104, MS-0053 again)
+
+`tests/ahk/helpers/flow_patch_bench.ahk` with 200 runs per case (a flow of a trigger and 299 actions in a chain, as MS-0053; five warm-up runs are in the script).
+
+| Case | Runs | Mean (ms) | p95 (ms) | Max (ms) |
+|---|---:|---:|---:|---:|
+| move one element | 200 | 2.69 | 2.82 | 12.24 |
+| move 30 elements (one patch) | 200 | 3.10 | 3.32 | 6.03 |
+| add 30 elements with their connections | 200 | 12.47 | 13.63 | 31.56 |
+
+**Reading.** All cases are far below the budget proposed in MS-0053 (p95 below 40 ms for up to 30 operations, below 10 ms for one operation). The numbers are lower than in MS-0053 (4.5, 5.6 and 21.3 ms mean) for the same code path; the cause is not known (assumed: load). The answer that the user waits for is not the engine time but the round trip of a patch through the hub and the editor: about 140 ms median in MS-0055 (F-0165, not explained). The answer of the biggest flow through the chain is measured by the stress test `test_a_patch_of_30_operations_on_the_biggest_flow_is_answered_within_the_budget` (its MEASURE line is in the run log of the stress run of WI-0104, see WI-0104-result-s6.md). Status: **verified** for the numbers of this run.
