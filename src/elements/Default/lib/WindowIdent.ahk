@@ -43,7 +43,11 @@ class WindowIdent {
         p.Push({type: "Label", label: Lang("Hidden window"), size: "small"})
         p.Push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: Lang("Detect hidden window")})
         p.Push({type: "Label", label: Lang("Assistant"), size: "small"})
-        p.Push({type: "Button", id: "GetWindowInformation", label: Lang("Import window identification")})
+        ; the assistant "window" takes the window under the mouse (WI-0110); its keys go to these parameters (the excludes
+        ; are skipped when the element has none)
+        p.Push({type: "Button", id: "GetWindowInformation", label: Lang("Import window identification"), assistant: "window"
+            , map: {Wintitle: "Wintitle", ahk_class: "ahk_class", ahk_exe: "ahk_exe", excludeTitle: "excludeTitle"
+                , ExcludeText: "ExcludeText", ahk_id: "ahk_id", ahk_pid: "ahk_pid"}})
         return p
     }
 

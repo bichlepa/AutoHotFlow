@@ -32,6 +32,10 @@ class FormField {
         this.result := StrLower(FormField.Text(ParamEvaluator.Field(spec, "result")))
         this.multi := ParamEvaluator.Truthy(ParamEvaluator.Field(spec, "multi"))
         this.format := StrLower(FormField.Text(ParamEvaluator.Field(spec, "format")))   ; DateAndTime: Time, Date or DateTime
+        ; Button (WI-0110): the assistant it starts ("window", "mouse" or "color"; "" for none) and the map from the keys
+        ; the assistant returns to the ids of the parameters (v1 x_assistant_* keys); an id that the form lacks is skipped.
+        this.assistant := StrLower(FormField.Text(ParamEvaluator.Field(spec, "assistant")))
+        this.assistMap := FormField.MapOf(ParamEvaluator.Field(spec, "map"))
         this.isEnabled := true
         this.warnings := []
     }
@@ -41,6 +45,19 @@ class FormField {
 
     ; The first entry of a list, or the value itself (a content default may be an Array).
     static First(v) => (v is Array) ? (v.Length ? v[1] : "") : v
+
+    ; A map of texts (a Map or an object literal, as the descriptions give it) as a Map; anything else is an empty Map.
+    static MapOf(v) {
+        out := Map()
+        if (v is Map) {
+            for key, value in v
+                out[key] := FormField.Text(value)
+        } else if (IsObject(v) && !(v is Array)) {
+            for key, value in v.OwnProps()
+                out[key] := FormField.Text(value)
+        }
+        return out
+    }
 
     ; The entries of a list as an Array of texts: an Array is copied, "" gives an empty Array, a text one entry.
     static Names(v) {

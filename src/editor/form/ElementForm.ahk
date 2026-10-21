@@ -81,6 +81,9 @@ class ElementForm {
         this.Check()
     }
 
+    ; True when the form has a field for the id (a parameter or a content ID). An assistant fills only such ids (WI-0110).
+    Has(id) => this.owners.Has(id)
+
     ; The value of a parameter or of a content ID ("" when the form has none).
     GetValue(id) {
         if (!IsObject(this.FieldOf(id, "GetValue")))
