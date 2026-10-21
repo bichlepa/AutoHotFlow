@@ -71,6 +71,7 @@ class EditorPointer {
         this.transfer := ""          ; EditorTransfer: delete, cut, copy and paste (WI-0101; the role gives it)
         this.commands := ""          ; EditorMenus: the menu commands of the keys (Ctrl+Z, Ctrl+Y, Ctrl+S; WI-0102)
         this.onContext := ""         ; function (cx, cy, fx, fy): the right button went up without a movement (WI-0102)
+        this.onSettings := ""        ; function (elementId): the settings of an element (its edit button, a double click; WI-0106)
         this.viewPress := [0, 0]     ; the canvas pixel of the right press: a movement of MOVE_PX makes it a view drag
         this.viewMoved := false
         this.triggers := ""          ; EditorTriggers: the switch and the star of a trigger (WI-0102; the role gives it)
@@ -387,6 +388,9 @@ class EditorPointer {
         } else if (kind = "connection" && name = "edit") {
             this.connect.ChangeType(hit.Id)
             return true
+        } else if (kind = "element" && name = "edit") {
+            this._OpenSettings(hit.Id)          ; the edit button of an element: its settings (WI-0106)
+            return true
         } else if (kind = "connection" && name = "plus") {
             if (!this.connect.BeginSplit(hit.Id))
                 return false
@@ -521,20 +525,32 @@ class EditorPointer {
         } else if (this.rule = "toggle") {
             this._Select([this.itemId], "toggle")
         }
-        if (this.itemKind = "connection" && !this.ctrl)
-            this._ConnectionClicked()
+        if ((this.itemKind = "connection" || this.itemKind = "element") && !this.ctrl)
+            this._ItemClicked()
     }
 
-    ; A second click on the same connection within DOUBLE_MS asks its type (WI-0100, v1 double click on a connection).
-    _ConnectionClicked() {
+    ; A second click on the same connection within DOUBLE_MS asks its type (WI-0100, v1 double click on a connection); a
+    ; second click on the same element opens its settings (WI-0106, v1).
+    _ItemClicked() {
         now := A_TickCount
         if (this.lastClickId = this.itemId && now - this.lastClickTick < EditorPointer.DOUBLE_MS) {
             this.lastClickId := ""
-            this.connect.ChangeType(this.itemId)
+            if (this.itemKind = "connection")
+                this.connect.ChangeType(this.itemId)
+            else
+                this._OpenSettings(this.itemId)
         } else {
             this.lastClickId := this.itemId
             this.lastClickTick := now
         }
+    }
+
+    ; The settings of an element (the role opens them; EditorSettings).
+    _OpenSettings(id) {
+        if (!IsObject(this.onSettings))
+            return
+        onSettings := this.onSettings         ; not this.onSettings(...): that would pass this as the first argument (HOW-TO)
+        onSettings(id)
     }
 
     _End() {

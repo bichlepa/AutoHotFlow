@@ -8,14 +8,16 @@
 ; as one patch (element.add, one undo step) and selects it. Cancel at any point adds nothing: the element exists only
 ; after the choice.
 ;
-; The class list shows the classes of the user's level (userLevel, set by the role from the settings). The settings dialog
-; of the class (S0007, WI-0106) opens between the choice and the patch; until then the element is added at once.
+; The class list shows the classes of the user's level (userLevel, set by the role from the settings). The settings of the
+; class (EditorSettings, WI-0106) open between the choice and the patch: OK adds the element with the values of the settings,
+; Cancel adds nothing. Without settings (settings is "") the element is added at once with the defaults.
 class EditorAdd {
     __New(model) {
         this.model := model
         this.userLevel := "Beginner"   ; the setting userLevel (REQ-USE-010), set by the role
         this.chooser := ""             ; the seam: chooser.Choose(kind, groups, done); done(classId) once, "" for a cancel
         this.busy := false             ; a class list is open: another placement waits
+        this.settings := ""            ; EditorSettings: the settings of the chosen class (WI-0106)
     }
 
     ; An element of kind is placed with its top left corner at the flow position (x, y): the class list opens. Returns false
@@ -34,7 +36,8 @@ class EditorAdd {
         return true
     }
 
-    ; The answer of the list: classId is the qualified ID of the class, or "" for a cancel (nothing is added).
+    ; The answer of the list: classId is the qualified ID of the class, or "" for a cancel (nothing is added). Then the
+    ; settings of the class open (done(ok) follows their OK or Cancel) or, without settings, the element is added.
     _Chosen(kind, x, y, classId, connect, done) {
         this.busy := false
         draft := this.model.draft
@@ -43,8 +46,27 @@ class EditorAdd {
                 done(false)
             return false
         }
+        if (IsObject(this.settings))
+            return this.settings.OpenNew(kind, classId, x, y, connect, done)
+        return this.Create(kind, classId, x, y, connect, done)
+    }
+
+    ; Adds the element of the class to the flow as one patch (one undo step) and selects it. form: "" for the defaults of the
+    ; class, or the values of the settings (a Map "pars", "name", "standardName"). done(ok) is called once, as in Add.
+    Create(kind, classId, x, y, connect, done, form := "") {
+        draft := this.model.draft
+        if (!(draft.root is Map)) {
+            if (IsObject(done))
+                done(false)
+            return false
+        }
         id := draft.NextId("element")
         el := NewElementCatalog.NewElement(kind, classId, x, y, id, NewElementCatalog.HasManualTrigger(draft.root))
+        if (IsObject(form)) {
+            el["pars"] := form["pars"]
+            el["name"] := form["name"]
+            el["StandardName"] := form["standardName"] ? 1 : 0
+        }
         ops := [Map("op", "element.add", "element", el)]
         if (IsObject(connect)) {
             for op in connect(id)

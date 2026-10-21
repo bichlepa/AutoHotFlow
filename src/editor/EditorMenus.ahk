@@ -28,6 +28,7 @@ class EditorMenus {
         this.context := []          ; the entries of the last context menu (Open); the headless driver reads and runs them
         this.at := ""               ; the canvas pixel of the last context menu (a paste goes there) or ""
         this.flow := [0, 0]         ; the flow point of the last context menu (a new element goes there)
+        this.target := ""           ; the element of the last context menu (its settings, WI-0106), "" for none
     }
 
     ; --- the spec -------------------------------------------------------------------------------------------------------------
@@ -60,13 +61,13 @@ class EditorMenus {
     }
 
     ; The entries of a context menu. kind: "element", "connection" or "empty". trigger: the Trigger state Map of a trigger
-    ; (SceneElement.Trigger) or "" for another element. An element: edit (disabled until WI-0106), cut, copy, delete; a trigger
+    ; (SceneElement.Trigger) or "" for another element. An element: edit (its settings, WI-0106), cut, copy, delete; a trigger
     ; adds its switch and the default. A connection: change type, delete. An empty place: paste, select all, and a new action,
     ; condition, loop or trigger at the place.
     static ContextSpec(kind, trigger := "", pasteOk := false) {
         if (kind = "element") {
             items := [
-                EditorMenus._Entry("edit", Lang("Edit #verb"), false),
+                EditorMenus._Entry("edit", Lang("Edit #verb"), true),
                 EditorMenus._Entry("cut", Lang("Menu_cut"), true),
                 EditorMenus._Entry("copy", Lang("copy #verb"), true),
                 EditorMenus._Entry("delete", Lang("Delete"), true)
@@ -200,6 +201,7 @@ class EditorMenus {
         }
         this.at := [cx, cy]
         this.flow := [fx, fy]
+        this.target := (kind = "element") ? hit.Id : ""
         pasteOk := WinClipboard.Available()
         this.context := EditorMenus.ContextSpec(kind, trigger, pasteOk)
         if (!this.role.headless && IsObject(this.role.window))
@@ -279,7 +281,9 @@ class EditorMenus {
             case "newAction", "newCondition", "newLoop", "newTrigger":
                 origin := FlowGeometry.CentredOrigin(this.flow[1], this.flow[2])
                 role.add.Placed(EditorMenus._KindOfNew(id), origin[1], origin[2])
-            ; "edit" and "settings" have no action yet (WI-0106, WI-0109)
+            case "edit":
+                role.settings.Open(this.target)         ; the settings of the element under the last context menu (WI-0106)
+            ; "settings" has no action yet (WI-0109)
         }
     }
 

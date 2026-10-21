@@ -30,6 +30,9 @@
 ;                                       offers, or "" for Cancel. The list is in cmd.test.state (choice)
 ;   cmd.test.pick {id}                  the answer of the open question of a connection (WI-0100): a kind, a type, or "" for
 ;                                       Cancel. The question is in cmd.test.state (pick)
+;   cmd.test.form {action, id?, value?, text?, flag?}   the settings of an element as the window works them (WI-0106, EditorSettings):
+;                                       open {id} (the settings of an element), set {id, value} (a field), name {text},
+;                                       standardName {flag}, ok, cancel. The form is in cmd.test.state (form)
 ;
 ; Booleans on the wire are Json.True and Json.False (PROTOCOL 2): the state fields enabled and armed are written with Json.Bool.
 class EditorDriver {
@@ -57,6 +60,58 @@ class EditorDriver {
         role.On("cmd.test.select", (msg) => this._OnSelect(msg))
         role.On("cmd.test.class", (msg) => this._OnClass(msg))
         role.On("cmd.test.pick", (msg) => this._OnPick(msg))
+        role.On("cmd.test.form", (msg) => this._OnForm(msg))
+    }
+
+    ; cmd.test.form {action, id?, value?, text?, flag?}: the settings window's calls on the controller (EditorSettings). A value
+    ; that is a JSON true or false is 1 or 0. ok answers changed (a patch was sent) and ok false with the refusal.
+    _OnForm(msg) {
+        p := msg.payload
+        settings := this.role.settings
+        action := p.Get("action", "")
+        if (IsObject(action))
+            throw AhfError("cmd.test.form: action is open, set, name, standardName, ok or cancel", ErrCode.BAD_PAYLOAD)
+        switch action {
+            case "open":
+                id := p.Get("id", "")
+                if (IsObject(id) || id = "")
+                    throw AhfError("cmd.test.form open: id is the element", ErrCode.BAD_PAYLOAD)
+                if (!settings.Open(id))
+                    return Map("ok", false, "error", Map("code", settings.Busy ? ErrCode.BUSY : ErrCode.BAD_PAYLOAD
+                        , "message", "no settings opened for '" id "'"))
+                return Map("ok", true)
+            case "set":
+                id := p.Get("id", "")
+                value := p.Get("value", "")
+                if (IsObject(id) || id = "")
+                    throw AhfError("cmd.test.form set: id is a parameter", ErrCode.BAD_PAYLOAD)
+                if (IsObject(value)) {
+                    if (!(value == Json.True || value == Json.False))
+                        throw AhfError("cmd.test.form set: value is a text, a number or true or false", ErrCode.BAD_PAYLOAD)
+                    value := (value == Json.True) ? 1 : 0
+                }
+                if (!settings.SetValue(id, value))
+                    return Map("ok", false, "error", Map("code", ErrCode.BUSY, "message", "no settings form is open"))
+                return Map("ok", true)
+            case "name":
+                text := p.Get("text", "")
+                if (IsObject(text) || !settings.SetName(text))
+                    return Map("ok", false, "error", Map("code", ErrCode.BUSY, "message", "no settings form is open"))
+                return Map("ok", true)
+            case "standardName":
+                if (!settings.SetStandardName(EditorDriver._Flag(p.Get("flag", 0))))
+                    return Map("ok", false, "error", Map("code", ErrCode.BUSY, "message", "no settings form is open"))
+                return Map("ok", true)
+            case "ok":
+                res := settings.Ok()
+                if (!res["ok"])
+                    return Map("ok", false, "changed", Json.False, "error", Map("code", res["code"], "message", res["message"]))
+                return Map("ok", true, "changed", Json.Bool(res["changed"]))
+            case "cancel":
+                settings.Cancel()
+                return Map("ok", true)
+        }
+        throw AhfError("cmd.test.form: action is open, set, name, standardName, ok or cancel", ErrCode.BAD_PAYLOAD)
     }
 
     ; The question of a connection (the picker seam of EditorConnect): it stays open until cmd.test.pick answers it.
@@ -357,6 +412,7 @@ class EditorDriver {
         st["ghost"] := (g is FlowRect) ? Map("x", g.X, "y", g.Y, "w", g.W, "h", g.H) : ""
         st["buttons"] := EditorDriver._ButtonsText(sc)        ; the buttons of the selection, at their flow centres (WI-0100)
         st["tray"] := this.role.tray.State()
+        st["form"] := this.role.settings.State()              ; the open settings window (WI-0106)
         st["menus"] := this.role.menus.State()                ; the menu bar and the open context menu (WI-0102)
         st["asked"] := this.asked.Clone()
         st["frames"] := r["frames"]

@@ -86,6 +86,9 @@ def answer_pick(obs, button_id):
 def answer_class(obs, class_id):
     ans = obs.request(EDITOR, "cmd.test.class", {"id": class_id}, timeout=scaled(5))
     assert ans["payload"]["ok"], ans
+    if class_id:                       # the settings of the class open (WI-0106): OK with the defaults
+        form = obs.request(EDITOR, "cmd.test.form", {"action": "ok"}, timeout=scaled(5))
+        assert form["payload"]["ok"], form
 
 
 def after_patch(obs, before):

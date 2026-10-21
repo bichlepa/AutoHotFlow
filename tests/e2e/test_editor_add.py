@@ -52,7 +52,11 @@ def canvas(obs, fx, fy):
 
 
 def answer(obs, class_id):
+    """Answers the class list. A class opens its settings (WI-0106): they are answered with OK, the defaults."""
     ans = obs.request(EDITOR, "cmd.test.class", {"id": class_id}, timeout=scaled(5))
+    if class_id and ans["payload"].get("ok"):
+        form = obs.request(EDITOR, "cmd.test.form", {"action": "ok"}, timeout=scaled(5))
+        assert form["payload"]["ok"], form
     return ans["payload"]
 
 
