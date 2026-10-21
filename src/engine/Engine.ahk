@@ -670,9 +670,16 @@ class Engine extends Role {
         list := []
         for id in rec.Def.Triggers() {
             name := rec.Def.Element(id).Get("name", "")
-            list.Push(Map("elementId", id, "name", IsObject(name) ? "" : String(name), "manual", Json.Bool(manual.Has(id))))
+            entry := Map("elementId", id, "name", IsObject(name) ? "" : String(name), "manual", Json.Bool(manual.Has(id)))
+            at := list.Length + 1                   ; insert in ID order (Array has no Sort in AHK v2)
+            loop list.Length {
+                if (StrCompare(list[A_Index]["elementId"], id) > 0) {
+                    at := A_Index
+                    break
+                }
+            }
+            list.InsertAt(at, entry)
         }
-        list.Sort((a, b) => (a["elementId"] < b["elementId"]) ? -1 : (a["elementId"] > b["elementId"]) ? 1 : 0)
         return Map("flowId", rec.FlowId, "triggers", list)
     }
 

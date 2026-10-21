@@ -38,6 +38,7 @@ class EditorSettings {
         this.checkFn := () => this._CheckTyped()   ; the one-shot timer of the syntax check (CHECK_DELAY)
         this.assist := ""             ; the running assistant (WindowAssistant or MouseAssistant), "" when none (WI-0110)
         this.assistSource := AssistantSource()   ; the window, mouse and pixel source; the tests replace it
+        this.catalog := ""            ; EditorFlowCatalog: the other flows for the lists of the form (WI-0107); the role gives it
     }
 
     ; The syntax check of the expressions runs this many ms after the last change of a value (WI-0108): a check at every
@@ -73,8 +74,10 @@ class EditorSettings {
             session["form"] := ""
             session["initial"] := Map()
         } else {
+            if (IsObject(this.catalog))
+                this.catalog.Refresh()          ; the flow list is asked as the window opens (WI-0107); the answer comes later
             form := ElementForm(cls, pars, EditorSettings._Text(el.Get("name", "")),
-                ParamEvaluator.Truthy(el.Get("StandardName", 0)))
+                ParamEvaluator.Truthy(el.Get("StandardName", 0)), this._Ctx(elementId), EditorSettings._FollowsFor(cls, el))
             session["form"] := form
             session["initial"] := form.Result()
         }
@@ -98,7 +101,9 @@ class EditorSettings {
             return false
         }
         d := NewElementCatalog.Defaults(classId)
-        form := ElementForm(cls, d["pars"], d["name"], true)
+        if (IsObject(this.catalog))
+            this.catalog.Refresh()
+        form := ElementForm(cls, d["pars"], d["name"], true, this._Ctx(""), EditorSettings._FollowsFor(cls, ""))
         session := Map("mode", "new", "id", "", "kind", kind, "classId", classId, "cls", cls, "migration", []
             , "x", x, "y", y, "connect", connect, "done", done, "placeholder", "", "unknown", false
             , "form", form, "initial", form.Result())
@@ -237,7 +242,7 @@ class EditorSettings {
         if (classId = s["classId"])
             return true
         d := NewElementCatalog.Defaults(classId)
-        s["form"] := ElementForm(cls, d["pars"], d["name"], true)
+        s["form"] := ElementForm(cls, d["pars"], d["name"], true, this._Ctx(s["id"]), EditorSettings._FollowsFor(cls, ""))
         s["form"].CheckExpressions()
         s["classId"] := classId
         s["cls"] := cls
@@ -328,10 +333,42 @@ class EditorSettings {
             }
         }
         fields["pars"] := pars
+        if (final.Has("followsFlow"))
+            fields["followsFlow"] := Json.Bool(final["followsFlow"])
         return fields
     }
 
     _Editable() => this.Busy && IsObject(this.session["form"])
+
+    ; The context of the form (EditorElementCtx, WI-0107) for an element ID ("" for a new element), or "" without a catalog.
+    _Ctx(elementId) => IsObject(this.catalog) ? EditorElementCtx(this.model, this.catalog, elementId) : ""
+
+    ; The answer of the flow list or of a trigger list of another flow arrived (EditorFlowCatalog.onChange): an open form
+    ; runs its CheckSettings again, so the lists show the names.
+    CatalogChanged() {
+        if (this.Busy && IsObject(this.session["form"])) {
+            this.session["form"].Check()
+            this._Sync()
+        }
+    }
+
+    ; "Switch with the flow" of a trigger (E0056): 1 or 0 for the element el as the engine reads it (a missing key is on,
+    ; false, 0, "0" and "false" are off, as FlowDefinition.FollowsFlow), "" for a class that is not a trigger. el "" is a new
+    ; element (on).
+    static _FollowsFor(cls, el) {
+        if (!IsObject(cls) || !cls.HasProp("Mode") || cls.Mode != "trigger")
+            return ""
+        if (!(el is Map))
+            return 1
+        if (!el.Has("followsFlow"))
+            return 1
+        v := el["followsFlow"]
+        if (v == Json.False)
+            return 0
+        if (v == Json.Null || v == Json.True || IsObject(v))
+            return 1
+        return (v = 0 || v = "0" || v = "false") ? 0 : 1
+    }
 
     _Sync() {
         if (IsObject(this.window))
@@ -356,6 +393,8 @@ class EditorSettings {
             fields["name"] := final["name"]
         if (initial["standardName"] != final["standardName"])
             fields["StandardName"] := final["standardName"] ? 1 : 0
+        if (final.Has("followsFlow") && (!initial.Has("followsFlow") || !EditorSettings.Same(initial["followsFlow"], final["followsFlow"])))
+            fields["followsFlow"] := Json.Bool(final["followsFlow"])
         return fields
     }
 

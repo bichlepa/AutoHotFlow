@@ -11,6 +11,8 @@
 #Include EditorTransfer.ahk
 #Include EditorTriggers.ahk
 #Include EditorMenus.ahk
+#Include EditorFlowCatalog.ahk
+#Include EditorElementCtx.ahk
 #Include EditorSettings.ahk
 #Include ElementSettingsWindow.ahk
 #Include EditorFlowSettings.ahk
@@ -50,6 +52,7 @@ class Editor extends Role {
         this.triggers := ""           ; EditorTriggers: the switch and the star of a trigger (WI-0102)
         this.menus := ""              ; EditorMenus: the menu bar, the context menus and the menu commands (WI-0102)
         this.settings := ""           ; EditorSettings: the settings of an element or of a new one (WI-0106)
+        this.catalog := ""            ; EditorFlowCatalog: the other flows for the lists of the settings (WI-0107)
         this.settingsWindow := ""     ; ElementSettingsWindow (not with --headless)
         this.flowSettings := ""       ; EditorFlowSettings: the flow settings dialog (WI-0109)
         this.flowSettingsWindow := "" ; FlowSettingsWindow (not with --headless)
@@ -78,6 +81,9 @@ class Editor extends Role {
         this.pointer.triggers := this.triggers
         this.menus := EditorMenus(this)
         this.settings := EditorSettings(this.model)          ; the settings of an element (WI-0106)
+        this.catalog := EditorFlowCatalog(this.peer)         ; the other flows for the lists of the settings (WI-0107)
+        this.catalog.onChange := () => this.settings.CatalogChanged()
+        this.settings.catalog := this.catalog
         this.settings.adder := this.add
         this.add.settings := this.settings                    ; a new element gets its settings before it is added
         this.flowSettings := EditorFlowSettings(this.model, this.peer, this.flowId)   ; the flow settings (WI-0109)
@@ -85,7 +91,7 @@ class Editor extends Role {
         this.pointer.commands := this.menus                 ; Ctrl+Z, Ctrl+Y and Ctrl+S (EditorKeys)
         this.pointer.onContext := (cx, cy, fx, fy) => this.menus.Open(cx, cy, fx, fy)     ; the right click (WI-0102)
         this.pointer.onPlace := (kind, x, y) => this.add.Placed(kind, x, y)
-        this.On("evt.", (msg) => this.model.OnEvent(msg.type, msg.payload))
+        this.On("evt.", (msg) => this._OnEvent(msg))
         this.On("cmd.editor.show", (msg) => this._OnShow(msg))
         this.On("cmd.app.prepareExit", (msg) => Map("ok", true, "cancel", Json.False))
         this.FollowSettings()          ; the language (WI-0077): the title follows it
@@ -94,10 +100,18 @@ class Editor extends Role {
         if (this.headless) {
             this.driver := EditorDriver(this, this.model)
             this.flowOps.ask := this.driver      ; the questions of the flow commands are answered by the test
+            this.triggers.ask := this.driver     ; the force question of a trigger switch too (E0101)
             this.add.chooser := this.driver      ; the class list of a new element is answered by the test (cmd.test.class)
             this.connect.picker := this.driver   ; the questions of a connection are answered by the test (cmd.test.pick)
             this.transfer.ask := this.driver     ; the question of Del is answered by the test (cmd.test.key answer)
         }
+    }
+
+    ; An event of the engine: the model follows it; a changed flow list drops the kept lists of the other flows (WI-0107).
+    _OnEvent(msg) {
+        this.model.OnEvent(msg.type, msg.payload)
+        if (msg.type = "evt.flow.list.changed" && IsObject(this.catalog))
+            this.catalog.Drop()
     }
 
     OnReady() {
@@ -108,6 +122,7 @@ class Editor extends Role {
             if (!this.headless) {
                 this.window := EditorWindow(this)
                 this.flowOps.ask := this.window
+                this.triggers.ask := this.window
                 this.add.chooser := this.window
                 this.connect.picker := this.window
                 this.transfer.ask := this.window

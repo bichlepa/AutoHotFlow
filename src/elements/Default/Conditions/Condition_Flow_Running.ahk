@@ -1,5 +1,6 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\base\AhfElement.ahk
+#Include ..\lib\FlowChoices.ahk
 
 ; Condition Flow executing of the package Default (WI-0055): "yes" if the flow is executing, else "no". Specification:
 ; the help text of v1 (help/en/Conditions/Flow_Running.html). Class ID, parameter ID and language keys are those of v1
@@ -24,9 +25,15 @@ class Condition_Flow_Running extends AhfElement {
         {type: "DropDown", id: "flowID", default: "", result: "enum", choices: [], enum: []}
     ]
 
-    ; "Flow executing - <flow>" (v1 showed the name of the flow; the editor has no access to other flows yet, S0007)
+    ; "Flow executing - <flow>" (v1 showed the name of the flow; the ID while the name is not known, WI-0107)
     static GenerateName(ctx, params) {
-        return Lang("Flow_Executing") " - " ((IsObject(params) && params.HasProp("flowID")) ? params.flowID : "")
+        flowId := (IsObject(params) && params.HasProp("flowID")) ? params.flowID : ""
+        return Lang("Flow_Executing") " - " FlowChoices.FlowName(ctx, flowId)
+    }
+
+    ; The list of the flows (v1 x_GetListOfFlowIDs, WI-0107)
+    static CheckSettings(form, params, staticValues) {
+        FlowChoices.Flows(form, "flowID")
     }
 
     static Run(ctx, params) {

@@ -1,5 +1,6 @@
 #Requires AutoHotkey v2.0
 #Include ..\core\Errors.ahk
+#Include ..\core\Json.ahk
 #Include NewElementCatalog.ahk
 
 ; Adding a new element in the editor (WI-0099, REQ-EDT-050, PROTOCOL 4.11): the pointer places the box of a new element of a
@@ -66,6 +67,8 @@ class EditorAdd {
             el["pars"] := form["pars"]
             el["name"] := form["name"]
             el["StandardName"] := form["standardName"] ? 1 : 0
+            if (form.Has("followsFlow"))
+                el["followsFlow"] := Json.Bool(form["followsFlow"])     ; a trigger: "Switch with the flow" (WI-0107)
         }
         ops := [Map("op", "element.add", "element", el)]
         if (IsObject(connect)) {

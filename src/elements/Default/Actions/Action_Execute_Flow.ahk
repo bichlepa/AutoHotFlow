@@ -1,5 +1,6 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\base\AhfElement.ahk
+#Include ..\lib\FlowChoices.ahk
 
 ; Action Execute flow of the package Default (WI-0055): starts a flow, this one or another, at its default manual trigger
 ; or at a chosen trigger. Specification: the help text of v1 (help/en/Actions/Execute_Flow.html). Class ID, parameter
@@ -44,23 +45,29 @@ class Action_Execute_Flow extends AhfElement {
         {type: "Checkbox", id: "SkipDisabled", default: 0, label: Lang("Skip disabled flows without error")}
     ]
 
-    ; "Execute flow: <flow> - <trigger>" (v1 Element_GenerateName). v1 showed the names of the flow and the trigger; the
-    ; editor has no access to other flows yet (S0007), so the IDs stand for them.
+    ; "Execute flow: <flow> - <trigger>" (v1 Element_GenerateName): the names of the flow and the trigger, the IDs while
+    ; they are not known (WI-0107).
     static GenerateName(ctx, params) {
-        flowLabel := this.IsOn(this.Par(params, "ThisFlow", 1)) ? Lang("This flow") : this.Par(params, "flowID", "")
+        thisFlow := this.IsOn(this.Par(params, "ThisFlow", 1))
+        flowId := FlowChoices.Target(ctx, thisFlow, this.Par(params, "flowID", ""))
+        flowLabel := thisFlow ? Lang("This flow") : FlowChoices.FlowName(ctx, flowId)
         if (this.WhichOf(this.Par(params, "WhichTrigger", "Default")) = "specified")
-            triggerLabel := this.Par(params, "triggerID", "")
+            triggerLabel := FlowChoices.TriggerName(ctx, flowId, this.Par(params, "triggerID", ""))
         else
             triggerLabel := Lang("Default trigger")
         return Lang("Execute_Flow") ": " flowLabel " - " triggerLabel
     }
 
     ; v1: the flow list is off for "This flow", the trigger list is off for the default trigger, and the returned
-    ; variables need the wait. Filling the lists of flows and triggers needs the editor (S0007).
+    ; variables need the wait. The lists are the flows and the manual triggers of the flow (WI-0107, v1 Execute_Flow).
     static CheckSettings(form, params, staticValues) {
         form.Enable("flowID", !this.IsOn(this.Par(params, "ThisFlow", 1)))
         form.Enable("triggerID", this.WhichOf(this.Par(params, "WhichTrigger", "Default")) = "specified")
         form.Enable("ReturnVariables", this.IsOn(this.Par(params, "WaitToFinish", 0)))
+        FlowChoices.Flows(form, "flowID")
+        ctx := FlowChoices.CtxOf(form)
+        flowId := FlowChoices.Target(ctx, this.IsOn(this.Par(params, "ThisFlow", 1)), this.Par(params, "flowID", ""))
+        FlowChoices.Triggers(form, flowId, "triggerID", true)
     }
 
     static Run(ctx, params) {

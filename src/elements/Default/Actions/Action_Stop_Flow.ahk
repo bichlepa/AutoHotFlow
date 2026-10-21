@@ -1,5 +1,6 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\base\AhfElement.ahk
+#Include ..\lib\FlowChoices.ahk
 
 ; Action Stop flow of the package Default (WI-0055): stops all instances of a flow. Specification: the help text of v1
 ; (help/en/Actions/Stop_Flow.html). Class ID, parameter ID and language keys are those of v1
@@ -25,9 +26,15 @@ class Action_Stop_Flow extends AhfElement {
         {type: "DropDown", id: "flowID", default: "", result: "enum", choices: [], enum: []}
     ]
 
-    ; "Stop flow - <flow>" (v1 showed the name of the flow; the editor has no access to other flows yet, S0007)
+    ; "Stop flow - <flow>" (v1 showed the name of the flow; the ID while the name is not known, WI-0107)
     static GenerateName(ctx, params) {
-        return Lang("Stop_Flow") " - " ((IsObject(params) && params.HasProp("flowID")) ? params.flowID : "")
+        flowId := (IsObject(params) && params.HasProp("flowID")) ? params.flowID : ""
+        return Lang("Stop_Flow") " - " FlowChoices.FlowName(ctx, flowId)
+    }
+
+    ; The list of the flows (v1 x_GetListOfFlowIDs, WI-0107)
+    static CheckSettings(form, params, staticValues) {
+        FlowChoices.Flows(form, "flowID")
     }
 
     static Run(ctx, params) {

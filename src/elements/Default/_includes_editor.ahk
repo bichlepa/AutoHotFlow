@@ -6,6 +6,7 @@
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
 #Include lib\ListOps.ahk
+#Include lib\FlowChoices.ahk
 #Include lib\DialogOps.ahk
 #Include lib\FlowSwitchOps.ahk
 #Include lib\DebugOps.ahk

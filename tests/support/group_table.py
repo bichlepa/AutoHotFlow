@@ -233,6 +233,7 @@ TEST_GROUPS = {
     "e2e/test_editor_add.py": ["editor"],
     "e2e/test_editor_connect.py": ["editor"],
     "e2e/test_editor_tray.py": ["editor"],
+    "e2e/test_editor_flow_ctx.py": ["editor"],
     "e2e/test_editor_clipboard.py": ["editor"],
     "e2e/test_editor_menus.py": ["editor"],
     "e2e/test_editor_settings.py": ["editor"],
@@ -279,6 +280,7 @@ COVERS = {
         "integration/test_core_a_elements.py::test_action_do_nothing_finishes_with_normal_or_exception",
     ],
     "src/elements/Default/Actions/Action_Execute_Flow.ahk": [
+        "e2e/test_editor_flow_ctx.py",
         "integration/test_core_d_flows.py",
         "ahk/engine_call_flow.test.ahk",
     ],
@@ -307,6 +309,7 @@ COVERS = {
         "integration/test_core_a_elements.py::test_the_v1_flow_variable_test_runs_up_to_the_first_result_list",
     ],
     "src/elements/Default/Actions/Action_Set_Flow_Status.ahk": [
+        "e2e/test_editor_flow_ctx.py",
         "integration/test_flow_status_elements.py::test_a_switch_of_a_flow_whose_state_cannot_be_read_ends_the_element_with_exception",
         "integration/test_flow_status_elements.py::test_set_flow_status_choice_that_matches_no_trigger_ends_normal_with_a_log_entry",
         "integration/test_flow_status_elements.py::test_set_flow_status_default_trigger_of_a_flow_without_one_is_an_exception",
@@ -325,6 +328,7 @@ COVERS = {
         "ahk/element_sleep.test.ahk",
     ],
     "src/elements/Default/Actions/Action_Stop_Flow.ahk": [
+        "e2e/test_editor_flow_ctx.py",
         "ahk/engine_call_flow.test.ahk",
         "integration/test_core_d_flows.py::test_stop_flow_stops_running_and_queued_instances_and_its_own_flow",
     ],
@@ -354,12 +358,14 @@ COVERS = {
         "integration/test_core_a_elements.py::test_condition_expression_decides_yes_or_no",
     ],
     "src/elements/Default/Conditions/Condition_Flow_Enabled.ahk": [
+        "e2e/test_editor_flow_ctx.py",
         "integration/test_flow_status_elements.py::test_condition_flow_enabled_a_choice_without_triggers_is_no_with_a_log_entry",
         "integration/test_flow_status_elements.py::test_condition_flow_enabled_asks_the_target_state_not_the_arming",
         "integration/test_flow_status_elements.py::test_condition_flow_enabled_every_choice",
         "integration/test_flow_status_elements.py::test_condition_flow_enabled_missing_flow_and_trigger_are_exceptions",
     ],
     "src/elements/Default/Conditions/Condition_Flow_Running.ahk": [
+        "e2e/test_editor_flow_ctx.py",
         "integration/test_core_d_flows.py::test_flow_running_sees_running_and_queued_instances",
     ],
     "src/elements/Default/Conditions/Condition_List_Contains_Element.ahk": [
@@ -421,6 +427,9 @@ COVERS = {
     ],
     "src/elements/Default/lib/DialogOps.ahk": [
         "integration/test_core_e_dialogs.py",
+    ],
+    "src/elements/Default/lib/FlowChoices.ahk": [
+        "e2e/test_editor_flow_ctx.py",
     ],
     "src/elements/Default/lib/FlowSwitchOps.ahk": [
         "integration/test_flow_status_elements.py",
@@ -507,6 +516,7 @@ SOURCE_AREAS = [
                 "src/editor/ConnectionRules.ahk", "src/editor/EditorConnect.ahk",
                 "src/editor/ElementClipboard.ahk", "src/editor/EditorTransfer.ahk", "src/editor/WinClipboard.ahk",
                 "src/editor/EditorTriggers.ahk", "src/editor/EditorMenus.ahk",
+                "src/editor/EditorFlowCatalog.ahk", "src/editor/EditorElementCtx.ahk",
                 "src/editor/EditorSettings.ahk", "src/editor/ElementSettingsWindow.ahk",
                 "src/editor/EditorFlowSettings.ahk",
                 "src/entry/editor.ahk"]),

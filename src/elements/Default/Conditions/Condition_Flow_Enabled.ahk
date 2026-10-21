@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\base\AhfElement.ahk
 #Include ..\lib\FlowSwitchOps.ahk
+#Include ..\lib\FlowChoices.ahk
 
 ; Condition Flow enabled of the package Default (WI-0065, decision E0056): "yes" if the chosen triggers of a flow are
 ; enabled, else "no". Specification: the help text of v1 (help/en/Conditions/Flow_Enabled.html). Class ID, parameter IDs
@@ -40,11 +41,12 @@ class Condition_Flow_Enabled extends AhfElement {
 
     static Choices := ["Any", "AnyTrigger", "AllTriggers", "AnyIndependent", "Default", "Specified"]
 
-    ; "Flow enabled: <flow> - <triggers>" (v1 name). The editor has no access to the other flows (S0007), so the ID of the
-    ; flow stands for its name.
+    ; "Flow enabled: <flow> - <triggers>" (v1 name): the names of the flow and the trigger, the IDs while they are not known
+    ; (WI-0107).
     static GenerateName(ctx, params) {
-        flowLabel := FlowSwitchOps.IsOn(FlowSwitchOps.Par(params, "ThisFlow", 1)) ? Lang("This flow")
-            : String(FlowSwitchOps.Par(params, "flowID", ""))
+        thisFlow := FlowSwitchOps.IsOn(FlowSwitchOps.Par(params, "ThisFlow", 1))
+        flowId := FlowChoices.Target(ctx, thisFlow, FlowSwitchOps.Par(params, "flowID", ""))
+        flowLabel := thisFlow ? Lang("This flow") : FlowChoices.FlowName(ctx, flowId)
         which := FlowSwitchOps.Choice(FlowSwitchOps.Par(params, "WhichTrigger", "Any"), this.Choices)
         switch which {
             case "Any": triggerLabel := Lang("The flow is active")
@@ -52,17 +54,21 @@ class Condition_Flow_Enabled extends AhfElement {
             case "AllTriggers": triggerLabel := Lang("All triggers")
             case "AnyIndependent": triggerLabel := Lang("Triggers of their own")
             case "Default": triggerLabel := Lang("Default trigger")
-            case "Specified": triggerLabel := String(FlowSwitchOps.Par(params, "triggerID", ""))
+            case "Specified": triggerLabel := FlowChoices.TriggerName(ctx, flowId, FlowSwitchOps.Par(params, "triggerID", ""))
             default: triggerLabel := ""
         }
         return Lang("Flow_Enabled") ": " flowLabel " - " triggerLabel
     }
 
-    ; v1: the flow list is off for "This flow", the trigger list is off unless "Specified" is chosen. Filling the lists of
-    ; flows and triggers needs the editor (S0007).
+    ; v1: the flow list is off for "This flow", the trigger list is off unless "Specified" is chosen. The lists are the flows
+    ; and every trigger of the flow (WI-0107, v1 Flow_Enabled).
     static CheckSettings(form, params, staticValues) {
-        form.Enable("flowID", !FlowSwitchOps.IsOn(FlowSwitchOps.Par(params, "ThisFlow", 1)))
+        thisFlow := FlowSwitchOps.IsOn(FlowSwitchOps.Par(params, "ThisFlow", 1))
+        form.Enable("flowID", !thisFlow)
         form.Enable("triggerID", FlowSwitchOps.Par(params, "WhichTrigger", "Any") = "Specified")
+        FlowChoices.Flows(form, "flowID")
+        flowId := FlowChoices.Target(FlowChoices.CtxOf(form), thisFlow, FlowSwitchOps.Par(params, "flowID", ""))
+        FlowChoices.Triggers(form, flowId, "triggerID")
     }
 
     static Run(ctx, params) {

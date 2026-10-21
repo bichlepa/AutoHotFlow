@@ -21,10 +21,13 @@
 ; is a warning of the form and a log line; the form goes on (element code never ends the editor, rule 8).
 class ElementForm {
     ; cls: the element class; pars: the parameters of the element (a Map or an object); name, standardName: the name of
-    ; the element and whether it is the standard name (GenerateName); ctx: "" for now (the context of the flow, WI-0107).
-    __New(cls, pars, name := "", standardName := false, ctx := "") {
+    ; the element and whether it is the standard name (GenerateName); ctx: the editor context (EditorElementCtx, WI-0107,
+    ; "" when there is none). follows: for a trigger the value of "Switch with the flow" (1 or 0, WI-0107, E0056), else "".
+    ; A trigger form has the checkbox followsFlow, which is not a parameter: Result gives it as its own key.
+    __New(cls, pars, name := "", standardName := false, ctx := "", follows := "") {
         this.cls := cls
         this.ctx := ctx
+        this.follows := (follows = "") ? "" : (follows ? 1 : 0)
         this.name := FormField.Text(name)
         this.standardName := standardName ? true : false
         this.fields := []
@@ -215,12 +218,19 @@ class ElementForm {
     }
 
     ; The result: "pars" (a Map of every parameter, the types as they came in or as the user set them), "name" and
-    ; "standardName". Parameters that the form does not show are in it too.
+    ; "standardName". Parameters that the form does not show are in it too. A trigger form gives "followsFlow" (1 or 0)
+    ; as its own key: it is a key of the element, not one of its parameters (E0056).
     Result() {
         pars := Map()
-        for key, value in this.values
+        for key, value in this.values {
+            if (this.follows != "" && key = "followsFlow")
+                continue
             pars[key] := value
-        return Map("pars", pars, "name", this.name, "standardName", this.standardName)
+        }
+        out := Map("pars", pars, "name", this.name, "standardName", this.standardName)
+        if (this.follows != "")
+            out["followsFlow"] := ParamEvaluator.Truthy(this.values.Get("followsFlow", 1)) ? 1 : 0
+        return out
     }
 
     ; ---- internal -----------------------------------------------------------------------------------------------
@@ -238,6 +248,14 @@ class ElementForm {
         if (!(specs is Array)) {
             Log.Write("a0", "editor", this.ClassId() ": Parameters() gives no list of fields")
             return
+        }
+        if (this.follows != "") {
+            ; the switch with the flow is in every trigger dialog (WI-0107): added by the editor, not by the class
+            all := []
+            for spec in specs
+                all.Push(spec)
+            all.Push({type: "Checkbox", id: "followsFlow", default: 1, label: Lang("Switch with the flow")})
+            specs := all
         }
         for spec in specs {
             field := FormField(spec, A_Index)
@@ -269,6 +287,8 @@ class ElementForm {
             for key, value in pars.OwnProps()
                 this.values[key] := value
         }
+        if (this.follows != "")
+            this.values["followsFlow"] := this.follows
         for field in this.fields {
             if (!field.isValue)
                 continue
