@@ -14,7 +14,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 7 | 15 | 0 | 0 |
 | [Triggers (TRG)](#triggers-trg) | 14 | 1 | 0 | 7 | 6 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 15 | 2 | 0 | 8 | 5 | 0 | 0 |
-| [Editor (EDT)](#editor-edt) | 23 | 6 | 0 | 11 | 6 | 0 | 0 |
+| [Editor (EDT)](#editor-edt) | 23 | 5 | 0 | 12 | 6 | 0 | 0 |
 | [Settings (SET)](#settings-set) | 8 | 4 | 0 | 3 | 1 | 0 | 0 |
 | [Import and migration (MIG)](#import-and-migration-mig) | 8 | 5 | 0 | 2 | 1 | 0 | 0 |
 | [Languages and help (LNG)](#languages-and-help-lng) | 5 | 1 | 0 | 3 | 1 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 4 | 4 | 0 | 0 | 0 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 2 | 0 | 4 | 4 | 0 | 0 |
-| **All** | **220** | **75** | **1** | **67** | **76** | **1** | **5** |
+| **All** | **220** | **74** | **1** | **68** | **76** | **1** | **5** |
 
 ## Flows and execution (EXE)
 
@@ -108,7 +108,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
 | [REQ-ELM-010](REQUIREMENTS.md#req-elm-010-element-contract-and-registry) | L697-706 | Element contract and registry | yes | partial | must | port | S0002 (WI-0047), S0007 (editor) |
-| [REQ-ELM-020](REQUIREMENTS.md#req-elm-020-every-element-is-documented-by-its-help-text) | L708-717 | Every element is documented by its help text | yes | partial | must | port | S0007 (the core set, WI-0112, E0097), S0008 (the other elements, with their element) |
+| [REQ-ELM-020](REQUIREMENTS.md#req-elm-020-every-element-is-documented-by-its-help-text) | L708-717 | Every element is documented by its help text | yes | partial | must | port | S0007 (the core set, WI-0112, E0097; manual check 11, part D, steps 23 and 27), S0008 (the other elements, with their element) |
 | [REQ-ELM-110](REQUIREMENTS.md#req-elm-110-autohotkey-scripts-in-flows) | L719-734 | AutoHotkey scripts in flows | yes | open | must | port | S0008 |
 | [REQ-ELM-200](REQUIREMENTS.md#req-elm-200-variables-and-calculations) | L736-754 | Variables and calculations | yes | partial | must | port | S0002 (WI-0052), S0008 |
 | [REQ-ELM-210](REQUIREMENTS.md#req-elm-210-conditions-on-values) | L756-770 | Conditions on values | yes | done | must | port | S0002 (WI-0052) |
@@ -186,15 +186,15 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-EDT-090](REQUIREMENTS.md#req-edt-090-undo-and-redo) | L1587-1596 | Undo and redo | yes | partial | must | port | S0006 (WI-0096; keys and menu WI-0098 to WI-0102) |
 | [REQ-EDT-100](REQUIREMENTS.md#req-edt-100-save-and-changes-during-execution) | L1598-1607 | Save, and changes during execution | yes | partial | must | port | S0006 (automatic saving WI-0095; the editor part is done with WI-0096) |
 | [REQ-EDT-110](REQUIREMENTS.md#req-edt-110-run-stop-and-enable-from-the-editor) | L1609-1618 | Run, stop and enable from the editor | yes | partial | must | port | S0005 (run and enable from the tray menu of the editor, E0087, WI-0091), S0006 (the menu bar, WI-0102) |
-| [REQ-EDT-120](REQUIREMENTS.md#req-edt-120-element-settings-dialog) | L1620-1629 | Element settings dialog | yes | partial | must | port | S0007 (model WI-0105, window and settings WI-0106; the gui check of the window is the owner's; the class change and the help button follow) |
-| [REQ-EDT-130](REQUIREMENTS.md#req-edt-130-assistants-in-the-element-settings) | L1631-1642 | Assistants in the element settings | yes | partial | should | port | S0007 (WI-0110) |
-| [REQ-EDT-140](REQUIREMENTS.md#req-edt-140-flow-settings-dialog) | L1644-1653 | Flow settings dialog | yes | partial | must | port | S0007 (WI-0109) |
+| [REQ-EDT-120](REQUIREMENTS.md#req-edt-120-element-settings-dialog) | L1620-1629 | Element settings dialog | yes | partial | must | port | S0007 (model WI-0105, window and settings WI-0106, help button WI-0111, core set WI-0114; the gui check of the window and manual check 11 are the owner's) |
+| [REQ-EDT-130](REQUIREMENTS.md#req-edt-130-assistants-in-the-element-settings) | L1631-1642 | Assistants in the element settings | yes | partial | should | port | S0007 (WI-0110; manual check 11, part D, steps 22 and 27 of the window assistant) |
+| [REQ-EDT-140](REQUIREMENTS.md#req-edt-140-flow-settings-dialog) | L1644-1653 | Flow settings dialog | yes | partial | must | port | S0007 (WI-0109; manual check 11, part E; gui test by the owner) |
 | [REQ-EDT-150](REQUIREMENTS.md#req-edt-150-warnings-of-the-evaluation-are-visible-in-the-editor) | L1655-1664 | Warnings of the evaluation are visible in the editor | no | done | must | port | S0005 (counted per element by the engine, WI-0086; shown at the element, WI-0089) |
 | [REQ-EDT-160](REQUIREMENTS.md#req-edt-160-flow-check-with-warnings) | L1666-1682 | Flow check with warnings | no | open | should | later | - |
 | [REQ-EDT-170](REQUIREMENTS.md#req-edt-170-refuse-invalid-edits) | L1684-1692 | Refuse invalid edits | partial | open | could | later | - |
 | [REQ-EDT-180](REQUIREMENTS.md#req-edt-180-quick-fixes-for-warnings) | L1694-1702 | Quick fixes for warnings | no | open | could | later | - |
 | [REQ-EDT-190](REQUIREMENTS.md#req-edt-190-help-with-variables-from-the-flow-analysis) | L1704-1712 | Help with variables from the flow analysis | no | open | could | later | - |
-| [REQ-EDT-200](REQUIREMENTS.md#req-edt-200-expressions-are-checked-while-editing) | L1714-1723 | Expressions are checked while editing | no | done | should | port | S0007 (WI-0108, E0096) |
+| [REQ-EDT-200](REQUIREMENTS.md#req-edt-200-expressions-are-checked-while-editing) | L1714-1723 | Expressions are checked while editing | no | partial | should | port | S0007 (WI-0108, E0096; manual check 11, part A; status `partial` until the owner's check, WI-0114) |
 | [REQ-EDT-210](REQUIREMENTS.md#req-edt-210-syntax-highlighting-and-auto-completion) | L1725-1733 | Syntax highlighting and auto-completion | no | open | could | later | - |
 | [REQ-EDT-220](REQUIREMENTS.md#req-edt-220-examples-and-templates-in-the-element-settings) | L1735-1743 | Examples and templates in the element settings | no | open | could | later | - |
 | [REQ-EDT-230](REQUIREMENTS.md#req-edt-230-tray-icon-of-an-editor) | L1745-1763 | Tray icon of an editor | yes | done | should | port | S0005 (icon and menu, E0087, WI-0091) |
@@ -232,7 +232,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-LNG-010](REQUIREMENTS.md#req-lng-010-user-interface-in-several-languages) | L1951-1960 | User interface in several languages | yes | partial | must | port | S0004 (WI-0077 setting, done) |
 | [REQ-LNG-020](REQUIREMENTS.md#req-lng-020-choice-of-the-language) | L1962-1971 | Choice of the language | yes | done | must | port | S0004 (WI-0077 setting, done; WI-0078 dialog, done) |
 | [REQ-LNG-030](REQUIREMENTS.md#req-lng-030-translated-element-texts) | L1973-1982 | Translated element texts | yes | partial | must | port | S0002 (WI-0047), S0008 |
-| [REQ-LNG-040](REQUIREMENTS.md#req-lng-040-help-pages) | L1984-1993 | Help pages | yes | partial | must | port | S0007 (the window WI-0111, WebView2 WI-0115, E0098, E0099; the content WI-0112, E0097, E0100), S0009 (translations, shipping the WebView2 loader) |
+| [REQ-LNG-040](REQUIREMENTS.md#req-lng-040-help-pages) | L1984-1993 | Help pages | yes | partial | must | port | S0007 (the window WI-0111, WebView2 WI-0115, E0098, E0099; the content WI-0112, E0097, E0100; manual check 11, parts D and G), S0009 (translations, shipping the WebView2 loader) |
 | [REQ-LNG-050](REQUIREMENTS.md#req-lng-050-translation-tools-for-contributors) | L1995-2003 | Translation tools for contributors | yes | open | could | port | S0009 |
 
 ## Logging and diagnostics (DIA)
@@ -352,5 +352,5 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-USE-050](REQUIREMENTS.md#req-use-050-the-setup-assistant-asks-for-the-users-experience) | L2740-2756 | The setup assistant asks for the user's experience | no | open | should | later | - |
 | [REQ-USE-060](REQUIREMENTS.md#req-use-060-amount-of-hints) | L2758-2766 | Amount of hints | no | open | should | later | - |
 | [REQ-USE-070](REQUIREMENTS.md#req-use-070-hints-can-be-switched-off-one-by-one) | L2768-2776 | Hints can be switched off one by one | no | open | should | later | - |
-| [REQ-USE-080](REQUIREMENTS.md#req-use-080-unhandled-errors-of-a-flow-are-noticed) | L2778-2787 | Unhandled errors of a flow are noticed | yes | partial | should | port | S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables, WI-0113, done; the switch per flow, WI-0109), E0072 |
+| [REQ-USE-080](REQUIREMENTS.md#req-use-080-unhandled-errors-of-a-flow-are-noticed) | L2778-2787 | Unhandled errors of a flow are noticed | yes | partial | should | port | S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables, WI-0113, done; the switch per flow, WI-0109; manual check 11, part F, owner), E0072 |
 | [REQ-USE-090](REQUIREMENTS.md#req-use-090-sharp-and-correctly-sized-on-high-resolution-displays) | L2789-2798 | Sharp and correctly sized on high-resolution displays | no | done | should | port | dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0005 |

@@ -711,7 +711,7 @@ An element is a class with: name, category, user level, stability (stable or exp
 - **v2:** partial (the 29 core elements have their page, checked by reading against the v2 elements; the other 120 pages are converted from v1 and not yet checked, S0008; the Help button of the element settings opens the page, WI-0111, the gui check is the owner's)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0007 (the core set, WI-0112, E0097), S0008 (the other elements, with their element)
+- **Plan:** S0007 (the core set, WI-0112, E0097; manual check 11, part D, steps 23 and 27), S0008 (the other elements, with their element)
 - **Evidence:** `tests/test_help.py` (every core element has its page; the pages are current)
 
 Every element has a help page that says what it does and what its parameters mean. The help is reachable from the element settings.
@@ -1620,11 +1620,11 @@ The menu bar of the editor has: save, run, stop, enable/disable, edit (undo, red
 ### REQ-EDT-120 Element settings dialog
 
 - **v1:** yes
-- **v2:** partial (the settings window of an element, WI-0106: opened by the edit button, a double click, the context menu and for a new element after the class list; every field type, the checks, one patch with the changed fields and one undo step, Cancel sends nothing, the migration places and an unknown class, headless; the help button (WI-0111) is not done, and the change of the class (v1's type button) is built, headless; the owner's gui check is open)
+- **v2:** partial (the settings window of an element, WI-0106: opened by the edit button, a double click, the context menu and for a new element after the class list; every field type, the checks, one patch with the changed fields and one undo step, Cancel sends nothing, the migration places and an unknown class, headless; the help button opens the page (WI-0111); every core element is changed, saved and run through its form in `tests/e2e/test_core_settings.py` (WI-0114); the change of the class (v1's type button) is built, headless; the owner's gui check and manual check 11 are open)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0007 (model WI-0105, window and settings WI-0106; the gui check of the window is the owner's; the class change and the help button follow)
-- **Evidence:** `tests/ahk/editor_form.test.ahk`, `tests/ahk/editor_settings_window.test.ahk`, `tests/e2e/test_editor_settings.py`
+- **Plan:** S0007 (model WI-0105, window and settings WI-0106, help button WI-0111, core set WI-0114; the gui check of the window and manual check 11 are the owner's)
+- **Evidence:** `tests/ahk/editor_form.test.ahk`, `tests/ahk/editor_settings_window.test.ahk`, `tests/e2e/test_editor_settings.py`, `tests/e2e/test_core_settings.py`, `tests/fault/test_editor_settings_gui.py` (written; the owner runs it)
 
 The dialog is built from the parameter schema of the class. Field types used in v1: label, edit, multi-line edit, checkbox, radio, drop-down, combo box, list box, slider, file, folder, hotkey, week days, date and time, button. An icon next to each edit field shows its content type (expression, string, variable name). The element checks its settings while the user edits them (enable or disable fields, warnings such as "the variable name is not valid"). The important buttons stay visible in long dialogs. A help button opens the help of the element.
 
@@ -1634,7 +1634,7 @@ The dialog is built from the parameter schema of the class. Field types used in 
 - **v2:** partial (the three assistants work in tests with a fake window and pixel source; the pointing with the real mouse is the owner's gui test, not run yet; the control pick and the check box of hidden windows of v1 are not there)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0007 (WI-0110)
+- **Plan:** S0007 (WI-0110; manual check 11, part D, steps 22 and 27 of the window assistant)
 - **Evidence:** `tests/ahk/editor_assist.test.ahk`, `tests/fault/test_editor_assist_gui.py` (written, not run)
 
 Get window and control information by pointing at a window; choose a color or pick it from the screen; take a position with the mouse.
@@ -1647,8 +1647,8 @@ A button of an element starts its assistant: the window under the mouse (its tit
 - **v2:** partial (the entry Settings of the menu opens the dialog (WI-0109): the execution policy, the working directory with a folder dialog, the type mode with the warning for a migrated flow, the three limits, the notice switch; OK sends one patch (one undo step), Cancel sends nothing, an invalid value keeps the dialog open; the button Show log opens the log window of the manager filtered to the flow; headless, the owner's gui check and manual check are open)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0007 (WI-0109)
-- **Evidence:** `tests/e2e/test_editor_flow_settings.py`, `tests/ahk/editor_flow_settings.test.ahk`, `tests/ahk/editor_flow_settings_window.test.ahk`, `tests/integration/test_flow_settings.py`, `tests/e2e/test_editor_menus.py`
+- **Plan:** S0007 (WI-0109; manual check 11, part E; gui test by the owner)
+- **Evidence:** `tests/e2e/test_editor_flow_settings.py`, `tests/ahk/editor_flow_settings.test.ahk`, `tests/ahk/editor_flow_settings_window.test.ahk`, `tests/integration/test_flow_settings.py`, `tests/e2e/test_editor_menus.py`, `tests/fault/test_editor_flow_settings_gui.py` (written; the owner runs it)
 
 Execution policy (REQ-EXE-050), working directory (REQ-EXE-130), the type mode (REQ-VAR-100), and a button that shows the log of the flow.
 
@@ -1714,10 +1714,10 @@ The analysis of the flow (REQ-EDT-160) knows which variables can exist at an ele
 ### REQ-EDT-200 Expressions are checked while editing
 
 - **v1:** no
-- **v2:** done (expression fields and the parameters that the element evaluates itself; a script element comes with S0008; the place is not marked, the warning gives the line and the column)
+- **v2:** partial (expression fields and the parameters that the element evaluates itself are checked while the user types, headless, with the line and the column of the error; a script element comes with S0008; the look of the warning in the real window is the owner's check, manual check 11, part A)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0007 (WI-0108, E0096)
+- **Plan:** S0007 (WI-0108, E0096; manual check 11, part A; status `partial` until the owner's check, WI-0114)
 - **Evidence:** `tests/ahk/editor_form_expr.test.ahk`, `tests/e2e/test_editor_settings.py::test_a_syntax_error_of_an_expression_is_shown_after_typing_stops_and_goes_when_fixed`
 
 The element settings check every expression field and every script field (REQ-VAR-010, REQ-VAR-020) while the user types, and show a warning with the position of the error. The check runs when the typing stops (300 ms after the last change). A text longer than 4000 characters is not checked while typing, and the warning says so. A warning does not stop OK. The messages of the parser are English.
@@ -1987,7 +1987,7 @@ Names, categories and parameter labels of the elements are translated by the lan
 - **v2:** partial (the pages are Markdown sources with generated HTML, checked by `tests/test_help.py`; the help window with the classic viewer, the browser and the setting `helpViewer` are built and tested headless (`tests/fault/test_help_role.py`); the WebView2 viewer (WI-0115) is built and was run once in a real window (environment, controller, navigation, location, the fallback to the classic viewer), its COM handler and loader check are tested headless (`tests/ahk/help_webview2.test.ahk`, `tests/test_webview2_loader.py`); the requests of the manager, the editor menu and the settings button are tested headless; not checked: the look of the WebView2 view, the classic viewer and the browser option at 100 % and 225 % (gui, owner, `tests/fault/test_help_webview2_gui.py`, `tests/fault/test_help_window_gui.py`); the translations (S0009) and shipping the loader DLL (S0009) are missing)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0007 (the window WI-0111, WebView2 WI-0115, E0098, E0099; the content WI-0112, E0097, E0100), S0009 (translations, shipping the WebView2 loader)
+- **Plan:** S0007 (the window WI-0111, WebView2 WI-0115, E0098, E0099; the content WI-0112, E0097, E0100; manual check 11, parts D and G), S0009 (translations, shipping the WebView2 loader)
 - **Evidence:** `tests/test_help.py`, `tests/fault/test_help_role.py`, `tests/ahk/help_pages.test.ahk`, `tests/ahk/help_webview2.test.ahk`, `tests/test_webview2_loader.py`
 
 A help window of its own (E0098) with general pages (welcome, variables, key list, color chart) and one page per element (REQ-ELM-020), opened from the manager and from the element settings. The pages are written in Markdown and shown as HTML (E0100). A setting chooses the viewer: automatic (WebView2 when it is available, otherwise the browser control of Windows), one of the two, or the default browser (E0099).
@@ -2622,7 +2622,7 @@ Generated expressions run as native AutoHotkey v2 code and in the evaluator; the
 ### REQ-TST-060 Manual checks of the user interfaces
 
 - **v1:** n/a
-- **v2:** partial (guides for the stub and the debug window (passed 2026-10-14), the dialog windows (DPI, passed 2026-10-17), the triggers (sections 4 and 5; passed 2026-10-17), the manager (section 1, parts A to E), start with Windows and administrator (section 7) and the settings dialog (section 8); the checks of section 1, 7 and 8 and the gui tests of S0004 are open for the owner (WI-0082); the editor guides come with S0005 to S0007)
+- **v2:** partial (guides for the stub and the debug window (passed 2026-10-14), the dialog windows (DPI, passed 2026-10-17), the triggers (sections 4 and 5; passed 2026-10-17), the manager (section 1, parts A to E), start with Windows and administrator (section 7) and the settings dialog (section 8); the checks of section 1, 7 and 8 and the gui tests of S0004 are open for the owner (WI-0082); the editor guides come with S0005 to S0007; section 11 (acceptance S0007, WI-0114) is written and open for the owner)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 to S0007
@@ -2781,7 +2781,7 @@ Every hint that is not critical (for example "take care with global variables", 
 - **v2:** partial (part 1 done in WI-0075: the notice (tray and list) and the mark of the flow until it is selected or the list is opened; part 2 done in WI-0113: the window with the variables of the branch, from the list of notices, follows a new error; the switch per flow and the global switch decide whether the notice goes out, WI-0109, the switch in the flow settings dialog)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables, WI-0113, done; the switch per flow, WI-0109), E0072
+- **Plan:** S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables, WI-0113, done; the switch per flow, WI-0109; manual check 11, part F, owner), E0072
 - **Evidence:** `tests/integration/test_flow_settings.py`, `tests/ahk/engine_flow_notify.test.ahk`, `tests/integration/test_notices.py::test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray`, `tests/integration/test_notices.py::test_opening_the_list_of_notices_removes_the_marks_and_keeps_the_entries`, `tests/fault/test_manager_window.py::test_an_error_notice_shows_in_the_list_of_notices_opened_by_its_button`, `tests/ahk/manager_model.test.ahk`, `tests/integration/test_error_window.py::test_an_unhandled_error_keeps_the_variables_of_its_branch`, `tests/integration/test_error_window.py::test_the_copy_is_bounded_to_200_variables_and_the_long_values_are_cut`, `tests/integration/test_error_window.py::test_a_deleted_flow_keeps_no_error_and_an_unknown_error_is_not_found`, `tests/integration/test_error_window.py::test_the_manager_asks_for_the_variables_of_a_notice_and_follows_a_new_error`, `tests/ahk/engine_error_snapshot.test.ahk`
 
 When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the user learns it without reading the log: a window like the debug dialog (REQ-DBG-060) shows the error message, the element and the variables of the branch at the moment of the error. Unlike the debug dialog it does not halt anything, because the branch has already ended; the variables can be looked at, not changed. The flow also gets a mark in the manager until the user has looked at the error. Many errors in a short time give one notice. The notice can be switched off per flow and globally (REQ-USE-070).
