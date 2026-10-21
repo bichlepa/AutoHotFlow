@@ -57,6 +57,8 @@ WI-0105 (haiku, workspace wi-105).
 
 ## Last verified state
 
+Commit `be95b747` (WI-0098 and WI-0099 integrated; selection of 19 groups): 2179 passed, 2 failed under load, both green alone (`test_worker_lifecycle` cold start: recheck 20261021-075807-recheck; `test_flow_autosave` every-10-s timing: serial green; another autosave test failed alone once by a torn read of the flow file, fixed in the test helper); VERDICT red only by those (run 20261021-074758-be95b747). Earlier, `740897e1` (WI-0095): 13 red in the select run, all load or input tests (`test_hotkey_input` @input ids cannot be rechecked by `recheck.py`, skipped alone); not classified further.
+
 Commit `c0f3f0ff` (WI-0103, WI-0094, WI-0096 integrated; selection of 10 groups): 1170 passed, 11 skipped, VERDICT green (partial run; runs 20261020-235009-f7a7dad1 and 20261021-001254-c0f3f0ff). A full tier run is still due.
 
 Commit `b5acb473` (WI-0097 and WI-0093 integrated; selection of the groups engine, tools, transport): VERDICT green (partial run). WI-0097 alone was not verified separately.
