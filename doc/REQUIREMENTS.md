@@ -1541,11 +1541,11 @@ Running elements and connections are highlighted while the flow runs; the editor
 ### REQ-EDT-050 Add elements
 
 - **v1:** yes
-- **v2:** partial (the fields, the class list at the user's level and the default name, WI-0099; the settings dialog after the choice, WI-0106)
+- **v2:** partial (the fields, the class list at the user's level and the default name, WI-0099; the settings of the class open after the choice, OK adds the element, Cancel adds nothing, WI-0106, headless; the window itself is a gui check of the owner)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0006 (the fields for new elements and the class list, WI-0099), S0007 (the settings open after the choice, WI-0106)
-- **Evidence:** `tests/e2e/test_editor_add.py`, `tests/ahk/editor_new_element.test.ahk`
+- **Evidence:** `tests/e2e/test_editor_add.py`, `tests/e2e/test_editor_settings.py::test_a_new_element_gets_its_settings_before_it_is_added_and_ok_adds_it_with_them`, `tests/e2e/test_editor_settings.py::test_cancel_of_a_new_element_adds_nothing`, `tests/ahk/editor_new_element.test.ahk`
 
 The user chooses the kind (trigger, action, condition, loop) and then the class from a list grouped by category. The list shows only the elements of the user's level (REQ-USE-010) and marks experimental ones (REQ-USE-020). The new element gets a default name.
 
@@ -1618,11 +1618,11 @@ The menu bar of the editor has: save, run, stop, enable/disable, edit (undo, red
 ### REQ-EDT-120 Element settings dialog
 
 - **v1:** yes
-- **v2:** partial (the model of the dialog without a window: fields, values, checks and the element's settings check, WI-0105; the window is WI-0106)
+- **v2:** partial (the settings window of an element, WI-0106: opened by the edit button, a double click, the context menu and for a new element after the class list; every field type, the checks, one patch with the changed fields and one undo step, Cancel sends nothing, the migration places and an unknown class, headless; the window itself and the help button (WI-0111) are not done, and the change of the class (v1's type button) is not built yet)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0007 (model WI-0105, window WI-0106)
-- **Evidence:** `tests/ahk/editor_form.test.ahk`
+- **Plan:** S0007 (model WI-0105, window and settings WI-0106; the gui check of the window is the owner's; the class change and the help button follow)
+- **Evidence:** `tests/ahk/editor_form.test.ahk`, `tests/ahk/editor_settings_window.test.ahk`, `tests/e2e/test_editor_settings.py`
 
 The dialog is built from the parameter schema of the class. Field types used in v1: label, edit, multi-line edit, checkbox, radio, drop-down, combo box, list box, slider, file, folder, hotkey, week days, date and time, button. An icon next to each edit field shows its content type (expression, string, variable name). The element checks its settings while the user edits them (enable or disable fields, warnings such as "the variable name is not valid"). The important buttons stay visible in long dialogs. A help button opens the help of the element.
 
@@ -1921,11 +1921,11 @@ The user imports the flows and variables of v1 into the v2 data folder through t
 ### REQ-MIG-070 Flows with missing element packages
 
 - **v1:** yes (the flow is not loaded; a dialog under the global lock asks, on "Yes" the file is deleted)
-- **v2:** partial (the flow loads, the element is kept and fails with `exception` when run, WI-0047; the manager marks the flow with its missing packages for every element type, E0080; the editor draws such an element as a placeholder with its name and the reason (scene and renderer unit tests, WI-0084 and WI-0085; the window of the editor is a gui test of the owner)
+- **v2:** partial (the flow loads, the element is kept and fails with `exception` when run, WI-0047; the manager marks the flow with its missing packages for every element type, E0080; the editor draws such an element as a placeholder with its name and the reason (scene and renderer unit tests, WI-0084 and WI-0085; the window of the editor is a gui test of the owner); the settings of such an element show its stored parameters read only, WI-0106)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0004 (manager and the notice), S0005 to S0007 (editor)
-- **Evidence:** `tests/integration/test_trigger_arming.py::test_an_unknown_class_and_a_missing_package_are_not_armed_with_their_message` (WI-0062: the trigger carries the message of the missing package in its state), `tests/e2e/test_manager_flows.py::test_enabling_a_flow_with_a_missing_package_reports_the_trigger`, `tests/e2e/test_manager_flows.py::test_a_flow_with_a_missing_package_of_an_action_is_marked_with_the_package`
+- **Evidence:** `tests/integration/test_trigger_arming.py::test_an_unknown_class_and_a_missing_package_are_not_armed_with_their_message` (WI-0062: the trigger carries the message of the missing package in its state), `tests/e2e/test_manager_flows.py::test_enabling_a_flow_with_a_missing_package_reports_the_trigger`, `tests/e2e/test_manager_flows.py::test_a_flow_with_a_missing_package_of_an_action_is_marked_with_the_package`, `tests/e2e/test_editor_settings.py::test_an_unknown_class_shows_its_parameters_read_only_and_ok_changes_nothing`
 
 When a flow uses a package that is not installed, the flow still loads and nothing is deleted, because the package may be installed later (a flow synced from another computer). Nobody is asked whether to delete anything. The manager shows at the flow which packages are missing, without a dialog. The editor shows such an element as a placeholder with its parameters; the user can delete it like any other element. Running the element ends with `exception` and names the missing package. A trigger of a missing package does not stay off silently: enabling the flow tells the user that this trigger is not available. Saving keeps the element unchanged. (Decision of the owner 2026-10-15, MIGRATION M-0008.)
 
@@ -2693,11 +2693,11 @@ Each element has a level; the setting "Shown elements" hides the elements above 
 ### REQ-USE-020 Experimental elements are marked
 
 - **v1:** yes
-- **v2:** partial (marked in the class list, WI-0099, unit-tested with test classes; the Default package has no experimental class yet; the settings mark comes with WI-0106)
+- **v2:** partial (marked in the class list, WI-0099, unit-tested with test classes; the Default package has no experimental class yet; the settings window shows the note "This element is experimental!" for a class with Stability Experimental (WI-0106), read in the code, not tested with a real experimental class)
 - **Prio:** could
 - **Scope:** port
 - **Plan:** S0006 (the class list, WI-0099), S0007 (the settings, WI-0106)
-- **Evidence:** `tests/ahk/editor_new_element.test.ahk`
+- **Evidence:** `tests/ahk/editor_new_element.test.ahk`, `tests/ahk/editor_settings_window.test.ahk`
 
 An experimental element is marked in the list and in its settings ("This element is experimental!").
 
@@ -2792,7 +2792,7 @@ When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the us
 ### REQ-USE-090 Sharp and correctly sized on high-resolution displays
 
 - **v1:** no (not checked)
-- **v2:** done (dialogs checked at 100 % and 225 % in manual check 3; the editor window: the canvas takes the size below the status bar, the drawing stays sharp after a DPI change and after a move to a screen with another scaling, owner, manual check 9, part C, steps 17 to 20; the owner has a 2K screen only, so no 4K window was checked)
+- **v2:** done (dialogs checked at 100 % and 225 % in manual check 3; the editor window: the canvas takes the size below the status bar, the drawing stays sharp after a DPI change and after a move to a screen with another scaling, owner, manual check 9, part C, steps 17 to 20; the owner has a 2K screen only, so no 4K window was checked; the settings window of an element (WI-0106) is not checked at 100 % and 225 % yet, the owner's gui check is open)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** dialogs done (manual check 3, 2026-10-16); manager S0004, editor S0005 to S0007, tray icon S0004 and S0005

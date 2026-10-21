@@ -278,3 +278,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** assumed (not run: the gui test is for the owner). Check the owner's run first if a top-level entry does nothing when clicked.
 - **Source:** `src/editor/EditorMenus.ahk`, `tests/fault/test_editor_menus_gui.py`
 
+
+### The format of a DateTime control is set by message, the option takes no spaces (verified)
+
+- **Problem:** The date and time field of the settings window needs a format with spaces (`yyyy-MM-dd HH:mm:ss`). Passed as an option (`AddDateTime("Format yyyy-MM-dd HH:mm:ss")`), AHK v2 rejects the option with "Invalid option".
+- **Wrong:** `g.AddDateTime("Format " fmt, "")`: the option parser does not take a format with spaces.
+- **Right:** Create the control without the format and set it by message: `SendMessage(0x1032, 0, StrPtr(fmt), ctl)` (DTM_SETFORMATW). The string variable must live until the call returns.
+- **Status:** verified (the settings window is built headless for the test element, `tests/ahk/editor_settings_window.test.ahk`; the text the control shows is not checked, the owner's gui check)
+- **Source:** `src/editor/ElementSettingsWindow.ahk` (`_DateRow`)
+
+### A ListBox has no Click event in AHK v2 (verified)
+
+- **Problem:** The list box of an element's settings reacted to a click, so `OnEvent("Click")` was the first try.
+- **Wrong:** `ctl.OnEvent("Click", ...)` on a `Gui.ListBox`: "Parameter #1 of Gui.Control.Prototype.OnEvent is invalid".
+- **Right:** `ctl.OnEvent("Change", ...)` fires on every change of the selection, a multi-select list box included. Read the selection with `SendMessage(0x0187, index - 1, 0, ctl)` (LB_GETSEL) and set it with `SendMessage(0x0185, select, index - 1, ctl)` (LB_SETSEL, index -1 clears).
+- **Status:** verified (the unit test builds every field type; the error came from it)
+- **Source:** `src/editor/ElementSettingsWindow.ahk` (`_ListRow`, `_ListPicked`, `_SyncList`)

@@ -31,12 +31,12 @@ L408-419 9. Performance budgets (targets, measured in Phase 2)
 L421-431 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (172.9 KB, 738 lines)
+## doc/PROTOCOL.md (176.0 KB, 744 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-711 4. Message Catalog
+L95-717 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
@@ -51,10 +51,10 @@ L494-500   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2
 L502-538   4.8 Manager (WI-0073, `src/manager/`)
 L540-602   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
 L604-623   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L625-711   4.11 Role `editor` (WI-0088, `src/editor/`)
-L713-732 5. Connection setup, reconnection, resync
-L723-732   5a Events before subscription (design question, WI-0007)
-L734-738 6. Versioning and extension
+L625-717   4.11 Role `editor` (WI-0088, `src/editor/`)
+L719-738 5. Connection setup, reconnection, resync
+L729-738   5a Events before subscription (design question, WI-0007)
+L740-744 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (55.3 KB, 338 lines)
@@ -181,7 +181,7 @@ L51-57 A copy of the variables of an error must be taken where the error is caug
 L59-65 A repeated error of the same flow within 10 s sends no notice at once (verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (37.3 KB, 280 lines)
+## doc/howto/gui-and-hotkeys.md (38.9 KB, 296 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -218,6 +218,8 @@ L251-257 The second click of a double click can arrive as WM_LBUTTONDBLCLK, not 
 L259-265 The mouse capture follows the state of the pointer, not the mouse message that ends a drag (assumed) (assumed)
 L267-272 OpenClipboard with no window does not keep another process out (verified) (verified)
 L274-279 A menu bar entry without a submenu takes a callback (assumed) (assumed)
+L282-288 The format of a DateTime control is set by message, the option takes no spaces (verified) (partly verified)
+L290-296 A ListBox has no Click event in AHK v2 (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)
