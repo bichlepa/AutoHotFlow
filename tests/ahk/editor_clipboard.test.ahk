@@ -78,6 +78,8 @@ ParseRefusesWhatIsNotOurs() {
         "an element without ID and position")
     Assert.True(ElementClipboard.Parse('{"formatVersion":1,"elements":[],"connections":[{"ID":"c"}]}') == "",
         "a connection without its ends")
+    Assert.True(ElementClipboard.Parse('{"formatVersion":1,"elements":[],"connections":[{"ID":"c","from":{"q":1},"to":"a"}]}')
+        == "", "an end of a connection that is no ID")
     Assert.True(ElementClipboard.Parse('{"formatVersion":1,"elements":[],"connections":[]}') is Map,
         "an empty copy of the right format is ours")
 }

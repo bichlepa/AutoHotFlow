@@ -65,7 +65,8 @@ class ElementClipboard {
                 return ""
         }
         for c in data["connections"] {
-            if (!(c is Map) || !c.Has("ID") || IsObject(c["ID"]) || !c.Has("from") || !c.Has("to"))
+            if (!(c is Map) || !c.Has("ID") || IsObject(c["ID"]) || !c.Has("from") || !c.Has("to")
+                    || IsObject(c["from"]) || IsObject(c["to"]))
                 return ""
         }
         return Map("elements", data["elements"], "connections", data["connections"])
