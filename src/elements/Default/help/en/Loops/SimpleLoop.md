@@ -1,21 +1,17 @@
-# Loop through files
+# Simple loop
 
-The loop **Loop through files** allows to repeat some actions several times.
+The loop **Simple loop** repeats the elements that follow it in the flow a given number of times. The elements connected to the loop's **head** are repeated; the connection to **tail** continues after the loop.
 
 ## Settings
 
 ### Repeats
 
-If **Endless loop** is checked, the loop will never end. The loop can still be left if a connection leads to "break" part.
+The number of repetitions, as an expression (see [Variables and expressions](../../../../../../assets/help/en/Variables.md)). A number that is 0 or less means no repetition.
 
-If **Endless loop** is not checked, the loop will end after the specified repeats.
+If **Endless loop** is checked, the loop never ends by itself. It can still be left through a connection that leads to **break** (the loop's second exit).
 
 ## Supplied Variables
 
 ### `A_Index`
 
-Index of the current iteration. It starts with the value 1 and increases on every loop.
-
-## Remarks
-
-The supplied variable will be removed after last iteration.
+The index of the current repetition. It starts with 1 and increases with every repetition. It is removed after the last repetition.

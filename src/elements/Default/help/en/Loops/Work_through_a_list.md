@@ -1,27 +1,25 @@
 # Work through a list
 
-The loop **Work through a list** allows to loop over all elements in a list, one at a time.
+The loop **Work through a list** runs over all elements of a list, one after the other, in the order of their keys.
 
 ## Settings
 
 ### Input list
 
-The input list. The loop will iterathe through all elements of the list.
+The name of the variable that holds the list. The elements are taken in turn; the loop ends after the last one.
 
 ## Supplied Variables
 
 ### `A_Index`
 
-Index of the current iteration. It starts with the value 1 and increases on every loop.
+The index of the current repetition. It starts with 1 and increases with every repetition.
 
 ### `A_LoopKey`
 
-Position or key of the current element.
+The key (position) of the current element.
 
 ### `A_LoopField`
 
-Value of the current element.
+The value of the current element.
 
-## Remarks
-
-All supplied variables will be removed after last iteration.
+All supplied variables are removed after the last repetition.

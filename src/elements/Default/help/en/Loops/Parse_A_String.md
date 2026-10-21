@@ -1,49 +1,37 @@
 # Parse a string
 
-The loop **Parse a string** retrieves substrings (fields) from a string, one at a time.
+The loop **Parse a string** runs over the fields of a text, one field after the other. The text is split at the delimiter characters.
 
 ## Settings
 
 ### Input string
 
-A string whose contents will be read from.
+The text to split: a text, or an expression, as chosen next to the field (see [Variables and expressions](../../../../../../assets/help/en/Variables.md)). An empty text is an error.
 
 ### Delimiter characters
 
-This field contains the separator characters (case sensitive). On every appearance of one of those characters the input text will be split into substrings.
+Each character in this field is a delimiter; the comparison is case sensitive. Do not separate the delimiters with commas or spaces, unless these are delimiters too.
 
-If this field is blank, each character of the input string will be treated as a separate substring.
+If the field is empty, each character of the text is a field of its own: `abc` gives the fields `a`, `b` and `c`.
 
-Each letter is a delimiter. Don't separate the delimiters by a comma or space, unless you want the comma or space to be a delimiter.
+Examples:
 
-*Examples:*
-
-- `,` *(Use comma as delimiter)*
-- `%a_space%%a_tab%%a_lf%%a_cr%` *(separate by whitespaces)*
-- `%delimiters%` *(variable that contains the delimiters)*
-- `ab c` *(use the letters **a**, **b**, **c** and a **space** as delimiter)*
+- `,`: fields separated by commas
+- `%a_space%%a_tab%%a_lf%%a_cr%`: fields separated by spaces, tabs and line breaks (a variable written as `%name%` is replaced by its value in this field)
+- `ab c`: the letters `a` and `b`, and the space, are delimiters
 
 ### Omit characters
 
-This field contains the characters (case sensitive) to exclude from the beginning and end of each substring.
-
-This field can be blank.
-
-*Examples:*
-
-- `,.:;-!?` *(Omit punctuation characters)*
-- `%a_space%%a_tab%%a_lf%%a_cr%` *(omit whitespaces)*
+Characters that are removed from the beginning and the end of every field, for example `,.:;-!?` to remove punctuation, or `%a_space%%a_tab%%a_lf%%a_cr%` to remove whitespace. The field may be empty.
 
 ## Supplied Variables
 
 ### `A_Index`
 
-Index of the current iteration. It starts with the value 1 and increases on every loop.
+The index of the current repetition. It starts with 1 and increases with every repetition.
 
 ### `A_LoopField`
 
-Current substring.
+The current field.
 
-## Remarks
-
-All supplied variables will be removed after last iteration.
+All supplied variables are removed after the last repetition.

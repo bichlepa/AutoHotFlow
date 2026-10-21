@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Generated from src/elements/Default/help/en/Loops/SimpleLoop.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Loop through files</title>
+<title>Simple loop</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,17 +98,15 @@ img {
 </head>
 <body>
 <main>
-<h1>Loop through files</h1>
-<p>The loop <strong>Loop through files</strong> allows to repeat some actions several times.</p>
+<h1>Simple loop</h1>
+<p>The loop <strong>Simple loop</strong> repeats the elements that follow it in the flow a given number of times. The elements connected to the loop's <strong>head</strong> are repeated; the connection to <strong>tail</strong> continues after the loop.</p>
 <h2>Settings</h2>
 <h3>Repeats</h3>
-<p>If <strong>Endless loop</strong> is checked, the loop will never end. The loop can still be left if a connection leads to "break" part.</p>
-<p>If <strong>Endless loop</strong> is not checked, the loop will end after the specified repeats.</p>
+<p>The number of repetitions, as an expression (see <a href="../../../../../../assets/help/en/Variables.html">Variables and expressions</a>). A number that is 0 or less means no repetition.</p>
+<p>If <strong>Endless loop</strong> is checked, the loop never ends by itself. It can still be left through a connection that leads to <strong>break</strong> (the loop's second exit).</p>
 <h2>Supplied Variables</h2>
 <h3><code>A_Index</code></h3>
-<p>Index of the current iteration. It starts with the value 1 and increases on every loop.</p>
-<h2>Remarks</h2>
-<p>The supplied variable will be removed after last iteration.</p>
+<p>The index of the current repetition. It starts with 1 and increases with every repetition. It is removed after the last repetition.</p>
 </main>
 </body>
 </html>

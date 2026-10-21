@@ -99,36 +99,27 @@ img {
 <body>
 <main>
 <h1>Parse a string</h1>
-<p>The loop <strong>Parse a string</strong> retrieves substrings (fields) from a string, one at a time.</p>
+<p>The loop <strong>Parse a string</strong> runs over the fields of a text, one field after the other. The text is split at the delimiter characters.</p>
 <h2>Settings</h2>
 <h3>Input string</h3>
-<p>A string whose contents will be read from.</p>
+<p>The text to split: a text, or an expression, as chosen next to the field (see <a href="../../../../../../assets/help/en/Variables.html">Variables and expressions</a>). An empty text is an error.</p>
 <h3>Delimiter characters</h3>
-<p>This field contains the separator characters (case sensitive). On every appearance of one of those characters the input text will be split into substrings.</p>
-<p>If this field is blank, each character of the input string will be treated as a separate substring.</p>
-<p>Each letter is a delimiter. Don't separate the delimiters by a comma or space, unless you want the comma or space to be a delimiter.</p>
-<p><em>Examples:</em></p>
+<p>Each character in this field is a delimiter; the comparison is case sensitive. Do not separate the delimiters with commas or spaces, unless these are delimiters too.</p>
+<p>If the field is empty, each character of the text is a field of its own: <code>abc</code> gives the fields <code>a</code>, <code>b</code> and <code>c</code>.</p>
+<p>Examples:</p>
 <ul>
-<li><code>,</code> <em>(Use comma as delimiter)</em></li>
-<li><code>%a_space%%a_tab%%a_lf%%a_cr%</code> <em>(separate by whitespaces)</em></li>
-<li><code>%delimiters%</code> <em>(variable that contains the delimiters)</em></li>
-<li><code>ab c</code> <em>(use the letters <strong>a</strong>, <strong>b</strong>, <strong>c</strong> and a <strong>space</strong> as delimiter)</em></li>
+<li><code>,</code>: fields separated by commas</li>
+<li><code>%a_space%%a_tab%%a_lf%%a_cr%</code>: fields separated by spaces, tabs and line breaks (a variable written as <code>%name%</code> is replaced by its value in this field)</li>
+<li><code>ab c</code>: the letters <code>a</code> and <code>b</code>, and the space, are delimiters</li>
 </ul>
 <h3>Omit characters</h3>
-<p>This field contains the characters (case sensitive) to exclude from the beginning and end of each substring.</p>
-<p>This field can be blank.</p>
-<p><em>Examples:</em></p>
-<ul>
-<li><code>,.:;-!?</code> <em>(Omit punctuation characters)</em></li>
-<li><code>%a_space%%a_tab%%a_lf%%a_cr%</code> <em>(omit whitespaces)</em></li>
-</ul>
+<p>Characters that are removed from the beginning and the end of every field, for example <code>,.:;-!?</code> to remove punctuation, or <code>%a_space%%a_tab%%a_lf%%a_cr%</code> to remove whitespace. The field may be empty.</p>
 <h2>Supplied Variables</h2>
 <h3><code>A_Index</code></h3>
-<p>Index of the current iteration. It starts with the value 1 and increases on every loop.</p>
+<p>The index of the current repetition. It starts with 1 and increases with every repetition.</p>
 <h3><code>A_LoopField</code></h3>
-<p>Current substring.</p>
-<h2>Remarks</h2>
-<p>All supplied variables will be removed after last iteration.</p>
+<p>The current field.</p>
+<p>All supplied variables are removed after the last repetition.</p>
 </main>
 </body>
 </html>
