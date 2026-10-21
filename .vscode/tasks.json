@@ -1008,6 +1008,26 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: error window (gui, a real manager window opens, the list of notices and the window of the variables; do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/fault/test_error_window_gui.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Start: manual check 9, editor with the imported v1 flows (manual_check.py)",
             "type": "process",
             "command": "python",
