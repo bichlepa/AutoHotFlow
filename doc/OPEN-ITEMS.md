@@ -22,7 +22,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0154 | `verify.py --auto` (also `select_tests.py --from`, `pytest --changed-from`) refused every range that deletes a file with "not classified by any test rule": a deleted path has no rule once it is gone (WI-0088 removed `src/core/PlaceholderRole.ahk`) | closed, verified (`tests/test_groups.py`, a deleted path selects everything) | tooling |
 | F-0129 | A `.ahf` written by tar.exe is not read by 7-Zip or by v1 in any test (v1 writes a flat ZIP with 7-Zip, tar writes the same layout). Reading a real v1 `.ahf` is tested (`tests/data/ahf/v1_export_two_flows.ahf`) | open, WI-0081; ask the owner for a v1 file of another kind (more flows, statics) | WI-0081 |
 | F-0130 | Drag and drop of an `.ahf` file onto the manager and the file dialogs of the import and export are not automated (the gui tier is not run by agents) | open, WI-0081; only MANUAL-CHECKS part D checks them by hand | WI-0081 |
-| F-9000* | The general pages of the v1 help (Welcome, Variables, Key list, Color chart) are not in the repository: `v1/Help/en/` is ignored by git. They were converted from the owner's working copy (WI-0112); the Markdown is the only copy in the repository now, and the converter needs that copy again | open, WI-0112; the owner decides whether the v1 text is kept anywhere besides the repository | WI-0112 |
+| F-0167 | The general pages of the v1 help (Welcome, Variables, Key list, Color chart) are not in the repository: `v1/Help/en/` is ignored by git. They were converted from the owner's working copy (WI-0112); the Markdown is the only copy in the repository now, and the converter needs that copy again | open, WI-0112; the owner decides whether the v1 text is kept anywhere besides the repository | WI-0112 |
 | F-0131 | A name outside the ANSI code page may make the listing of tar fail: the listing is read as text in the ANSI code page, and a failed listing reads as "not a ZIP archive" | open, not reproduced (WI-0081) | WI-0081 |
 | F-0132 | UNC paths (`\\server\share\x.ahf`) are refused: the path must start with a drive letter | open decision for the owner | WI-0081 |
 | F-0139 | The windows of the log and of the notices are relabelled on a language change (`LogWindow.Relabel`, `NoticeWindow.Relabel`), no test reads their texts; checked by hand only (MANUAL-CHECKS section 8, step 50) | open, verified in code, not checked on screen | WI-0078 |
@@ -270,7 +270,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **What:** the engine sends the element states of a flow in batches of at most 33 ms (WI-0089). Inside one batch the entries are in the order of the first change of each element. A fast repeating failing element shows only its last state in the batch.
 **Status:** postponed by the owner on 2026-10-20. A note only; no requirement depends on it.
 
-### F-9000*: the v1 general help pages are not in the repository
+### F-0167: the v1 general help pages are not in the repository
 
 **What:** `v1/Help/en/` (`Welcome.html`, `Variables.html`, `Key list.html`, `Color chart.html`) is ignored by git (`v1/Help/en/.gitignore`), so the repository never had these four pages. WI-0112 converted them from the owner's working copy into `assets/help/en/` (Markdown). The converter `tools/convert_v1_help.py --general <folder>` needs that folder again. The page on variables was rewritten for v2 and is no longer the v1 text.
 

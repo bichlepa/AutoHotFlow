@@ -6,7 +6,7 @@ Branch `wip/wi-112`. Acceptance: the tests of task 6 are green (`tests/test_help
 
 - **Layout:** element pages in `src/elements/Default/help/en/<Kind>/<Name>.md` (`<Name>` = class name without the kind prefix); general pages in `assets/help/en/`; one stylesheet `assets/help/help.css`, copied into every generated page, so each page is self-contained.
 - **Generator:** `tools/gen_help.py` (Markdown to HTML, `--check` fails on a missing, stale or superfluous page, a broken link or a missing title). VS Code tasks: generate, check, and the one-time converter.
-- **Conversion:** `tools/convert_v1_help.py` converted 149 element pages and 4 general pages (Welcome, Variables, Key list, Color chart; the last three from the owner's working copy, see F-9000*).
+- **Conversion:** `tools/convert_v1_help.py` converted 149 element pages and 4 general pages (Welcome, Variables, Key list, Color chart; the last three from the owner's working copy, see F-0167).
 - **Core set:** the 29 pages of the core set (README, S0002) are corrected for v2 by reading against each element (parameters, results, MIGRATION places). `Variables.md` is rewritten for the v2 expression language.
 
 ## List for S0008 (task 7)
