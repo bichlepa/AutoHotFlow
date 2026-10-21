@@ -16,6 +16,14 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 | ID | Title | Status | Phase 3 |
 |---|---|---|---|
+| F-9001* | The slider of the settings form is fixed to the range 0 to 100; v1 passes the options of the field (WI-0105 form model, WI-0106 window) | open, not checked for a real v1 slider; the owner decides whether the options of a field are needed for the elements of S0008 | S0007 |
+| F-9002* | The mouse and colour assistants have no element of the product yet, and the window assistant is used by the Hotkey trigger only (WI-0110); the field types Slider, ComboBox, Hotkey (apart from the trigger), File, Folder, weekdays, DateAndTime and Button of the form are shown in the product by no element of the core set | open for S0008: the elements that use them come with S0008; until then they are checked by the test element `Action_TestForm` (headless, `tests/ahk/editor_form.test.ahk`) only | S0008 |
+| F-9003* | The window mode of the tracker of the mouse assistant is relative to the tracker window itself, not to the target window (WI-0110, from the handover of WI-0114) | open, assumed from the handover; not checked on screen | S0007 |
+| F-9004* | The colour dialog behaves differently when the pipe is busy; it is not measured (WI-0110); proposed as a extension of E0076 | open, not measured; the owner decides on the extension | S0007 |
+| F-9005* | The window of an unhandled error shows the values of the variables in clear text (WI-0113); a secret in a variable is shown on screen | decision needed: the owner, see NEEDS-ATTENTION.md | S0007 |
+| F-9006* | Text fields with the content type String are not checked as expressions (WI-0108): a `%name%` or a `{` in a text is not a warning | decision needed: the owner confirms that the content String is no expression | S0007 |
+| F-9007* | The WebView2 loader DLL hashes (WI-0115) come from one download; a second download was not compared | open, not checked; the hashes are checked again when the loader is updated (S0009) | S0007 |
+| F-9008* | A flow with its own working directory (flow settings, DefaultWorkingDir off) is not run end to end: `BuiltInVars.WorkingDirOf` is tested as a function (`tests/ahk/vars_model.test.ahk`) and the global working directory is tested in a run (`tests/integration/test_settings.py`) | open, not checked end to end (WI-0114) | S0007 |
 | F-0175 | REQ-USE-080 names REQ-USE-070 for the switch of the notices, but REQ-USE-070 is the requirement of hints (WI-0109; PROTOCOL 4.7 follows the same wrong reference) | decision needed (correct the reference, or give the switch its own requirement); the owner decides | WI-0109 |
 | F-0178 | The help request of the supervisor for a role that is still starting (the page sent at its hello) and the requests of the manager and the editors are not tested end to end: the tests can only send as an observer, which the supervisor refuses (WI-0111) | open, not checked | WI-0111 |
 | F-0179 | The WebView2 help viewer does not handle a new-window request (`target=_blank`): the runtime would open its own unfiltered window; the handlers of the viewer are kept for the process (WI-0115) | open, low: no help page has such a link | WI-0115 |
@@ -284,6 +292,46 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Options:** (a) keep the Markdown as the only copy (now); (b) store the v1 text as a file in `v1/` next to the other reference material, which is removed after the port; (c) nothing: the Markdown is the source from now on.
 
 **Status:** open, found by WI-0112. Decision for the project owner.
+
+### F-9001*: The slider of the settings form is fixed to the range 0 to 100
+
+**What:** v1 passes the options of a slider field; the v2 form model (WI-0105) and the window (WI-0106) use the fixed range 0 to 100. No element of the core set has a slider, so no run shows it.
+**Status:** open, found by WI-0114 (read in code, not reproduced).
+
+### F-9002*: Field types and assistants that no element of the core set uses
+
+**What:** The mouse and colour assistants have no element yet; the window assistant is used by the Hotkey trigger, which is not in the core set (it is in the Default package). The field types Slider, ComboBox, Hotkey, File, Folder, weekdays, DateAndTime and Button are shown by no core element. The test `tests/ahk/editor_form.test.ahk` covers them with the test element `Action_TestForm`.
+**Status:** open, for S0008 (the list of the next package). Verified by reading the element files.
+
+### F-9003*: The tracker of the mouse assistant is relative to the tracker window
+
+**What:** The window mode of the tracker is relative to the tracker window itself, not to the window the mouse points at (WI-0110). Taken over from the handover of WI-0114.
+**Status:** open, assumed; not checked on screen (the owner's gui check of the assistants).
+
+### F-9004*: The colour dialog and the pipe are not measured
+
+**What:** How the colour dialog behaves while the pipe is busy (WI-0110) is not measured. Proposal: extend the measurement of E0076.
+**Status:** open, not measured; the owner decides on the extension.
+
+### F-9005*: The error window shows variable values in clear text
+
+**What:** The window of an unhandled error (WI-0113) shows the variables of the branch with their values in clear text, also a value that a flow stores as a secret.
+**Status:** decision needed: the project owner, see NEEDS-ATTENTION.md.
+
+### F-9006*: Text fields are not checked as expressions
+
+**What:** A field with the content type String is not expression-checked (WI-0108): a text such as `%name%` or `{` gives no warning, although the element may evaluate it.
+**Status:** decision needed: the project owner confirms that a String is no expression.
+
+### F-9007*: The WebView2 loader hashes come from one download
+
+**What:** The SHA hashes of the WebView2 loader DLL that the project pins (WI-0115) were taken from one download. A second download from the same source was not compared.
+**Status:** open, not checked; to be repeated when the loader is shipped (S0009).
+
+### F-9008*: A flow with its own working directory is not run end to end
+
+**What:** `BuiltInVars.WorkingDirOf` is tested as a function (`tests/ahk/vars_model.test.ahk`), the global working directory in a run (`tests/integration/test_settings.py`). A flow whose own folder is set (flow settings, WI-0109) is not run and its `A_WorkingDir` read.
+**Status:** open, not checked end to end (WI-0114).
 
 ### F-0175: REQ-USE-080 names the wrong requirement for the switch of the notices
 
