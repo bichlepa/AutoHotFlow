@@ -21,7 +21,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0178 | The help request of the supervisor for a role that is still starting (the page sent at its hello) and the requests of the manager and the editors are not tested end to end: the tests can only send as an observer, which the supervisor refuses (WI-0111) | open, not checked | WI-0111 |
 | F-0176 | Show log with no running manager starts the manager, and the log window is not filtered to the flow (WI-0109, PROTOCOL 4.11) | open, low; the manager is normally running | WI-0109 |
 | F-0162 | The frame of a drag of 30 elements in a flow of 300 is 25 ms at 1920 × 1080 (budget 16 ms); one element meets it (WI-0097, MS-0051) | decision needed, measured; WI-0097 | WI-0097 |
-| F-0170 | The trigger switch of the editor does not ask the force question that the flow commands ask when a state cannot be read (WI-0104, REQ-TRG-030) | decision needed (add the question, or keep the status text as documented) | S0006 |
+| F-0170 | The trigger switch of the editor does not ask the force question that the flow commands ask when a state cannot be read (WI-0104, REQ-TRG-030) | decided (a), E0101; built in WI-0107 | S0006 |
 | F-0171 | Real mouse and real keys of the editing actions (select, move, add, connect, delete, the menus) are not in any gui test; only the wheel, the drag of the view and the menus have one (WI-0104, REQ-EDT-050 to REQ-EDT-080) | open; owner's manual check 10 covers it | S0006 |
 | F-0172 | The editor texts of the Korean and Russian language files are missing; these languages show the English text (fallback of LangTable) (WI-0104) | open, low; translation not done | later |
 | F-0173 | Finding F-0158 (language files UTF-16) is not reproduced: `assets/language/basic/*.ini` and the manager files have no NUL bytes and are read as UTF-8 (WI-0104, checked by bytes) | open, to be closed or confirmed by the owner | S0006 |
@@ -373,7 +373,7 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 
 **What:** the flow commands of the editor (run, stop, enable, disable) ask a question with the choice "force" when the engine cannot read the state of a flow (the tray and the menu do this, E0087). The switch of a trigger (`EditorTriggers.Switch`, `cmd.trigger.enable` or `cmd.trigger.disable`) does not: a refused switch is the status text "The trigger could not be switched: nothing changed" (WI-0102).
 **Options (for the owner):** (a) add the same question for the trigger switch (one more dialog path in `EditorFlowOps`, about one day); (b) keep the status text and write it into REQ-TRG-030 as the chosen behavior (the trigger keeps its state; the user retries).
-**Status:** decision needed. Measured: no (read of `src/editor/EditorTriggers.ahk`). Not checked: what the engine answers for a trigger whose state cannot be read.
+**Status:** decided by the owner on 2026-10-21: option (a), E0101; built in WI-0107. Measured: no (read of `src/editor/EditorTriggers.ahk`). Not checked: what the engine answers for a trigger whose state cannot be read.
 
 ### F-0171: Real mouse and real keys of the editing actions have no gui test
 
