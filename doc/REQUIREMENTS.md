@@ -1159,7 +1159,7 @@ When two enabled flows, or two triggers of one flow, use the same hotkey or hots
 ### REQ-TRG-030 Several triggers per flow
 
 - **v1:** yes
-- **v2:** partial (each trigger has its own enabled state and can be switched on its own; the editor switches a trigger with its switch and makes a manual trigger the default with its star (WI-0102, headless; the real mouse: gui, owner); no trigger is armed yet; WI-0104: the switch of the editor asks no force question when the state of a trigger cannot be read, unlike the flow commands (open decision, OPEN-ITEMS F-9000); manual check 10, steps 21 and 22 (owner))
+- **v2:** partial (each trigger has its own enabled state and can be switched on its own; the editor switches a trigger with its switch and makes a manual trigger the default with its star (WI-0102, headless; the real mouse: gui, owner); no trigger is armed yet; WI-0104: the switch of the editor asks no force question when the state of a trigger cannot be read, unlike the flow commands (open decision, OPEN-ITEMS F-9000*); manual check 10, steps 21 and 22 (owner))
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003 (WI-0060 done), S0006 (WI-0094 done, WI-0102)
