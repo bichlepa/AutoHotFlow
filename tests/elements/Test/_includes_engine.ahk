@@ -19,6 +19,7 @@ class Test {
     #Include Actions\Action_TestEchoWorker.ahk
     #Include Actions\Action_TestExprParams.ahk
     #Include Actions\Action_TestExprParamsWorker.ahk
+    #Include Actions\Action_TestForm.ahk
     #Include Actions\Action_TestFreezeTimeoutWorker.ahk
     #Include Actions\Action_TestFreezeWorker.ahk
     #Include Actions\Action_TestHangWorker.ahk
@@ -46,6 +47,7 @@ ElementRegistry.Register(Test.Action_TestDialogWorker)
 ElementRegistry.Register(Test.Action_TestEchoWorker)
 ElementRegistry.Register(Test.Action_TestExprParams)
 ElementRegistry.Register(Test.Action_TestExprParamsWorker)
+ElementRegistry.Register(Test.Action_TestForm)
 ElementRegistry.Register(Test.Action_TestFreezeTimeoutWorker)
 ElementRegistry.Register(Test.Action_TestFreezeWorker)
 ElementRegistry.Register(Test.Action_TestHangWorker)
