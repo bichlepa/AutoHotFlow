@@ -232,6 +232,7 @@ TEST_GROUPS = {
     "e2e/test_editor_settings.py": ["editor"],
     "e2e/test_editor_flow_settings.py": ["editor"],
     "fault/test_editor_settings_gui.py": ["editor"],
+    "fault/test_editor_flow_settings_gui.py": ["editor"],
     "ahk/editor_settings_window.test.ahk": ["editor", "editor-form"],
     "ahk/editor_flow_settings.test.ahk": ["editor"],
     "ahk/editor_flow_settings_window.test.ahk": ["editor", "editor-form"],
