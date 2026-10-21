@@ -30,7 +30,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0097 | Scene and renderer for editing | done, screenshots await the owner | haiku | bb015aba..49f7edd4 | 2026-10-20 | F-0162 (30-element drag 25 ms) decision needed |
 | WI-0098 | Editor: select and move, loop height | done | haiku | see git log | 2026-10-21 | E0094; REQ-EDT-060 partial (real-mouse gui test unwritten); F-0166 part 1 tested; de/ko/ru texts of the status bar missing |
 | WI-0099 | Editor: add elements, class list | done | haiku | see git log | 2026-10-21 | M-0091; open: dialog title "Create new <kind>" not a language key; Advanced level no e2e; tree dialog and real mouse are gui-only |
-| WI-0100 | Editor: connect | open | | | | |
+| WI-0100 | Editor: connect | done | haiku | see git log | 2026-10-21 | M-0092; REQ-EDT-070 partial (gui unwritten); author used --no-verify once (CRLF index sizes, see report); FlowPatch.Diff fix; moved connection not previewed |
 | WI-0101 | Editor: delete, cut, copy, paste | open | | | | E0091 |
 | WI-0102 | Editor: menu bar, context menus, trigger buttons | open | | | | |
 | WI-0103 | Notice of a crashed editor | done | haiku | 5fe3f431..f7a7dad1 | 2026-10-21 | balloon shows the flow ID; real click not checked |
@@ -43,7 +43,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0110 | Assistants | open | | | | |
 | WI-0111 | Help window: viewer interface, classic viewer, browser, setting | open | | | | E0099 |
 | WI-0112 | Help content: Markdown, generator, core pages | done | haiku | see git log | 2026-10-21 | F-0167 owner decision; 17 pages with v1 markers for S0008; markdown pinned (generated HTML compared byte for byte); `Variables.md` still says threads |
-| WI-0113 | Window of an unhandled error | open | | | | may run beside S0006 (not with WI-0093/WI-0094: `Executor.ahk`) |
+| WI-0113 | Window of an unhandled error | running (haiku, wi-113) | | | | may run beside S0006 (not with WI-0093/WI-0094: `Executor.ahk`) |
 | WI-0115 | Help viewer with WebView2 | open | | | | spike first; if it fails, the classic viewer stays (E0099) |
 | WI-0114 | Acceptance S0007 | open | | | | manual check 11 |
 
@@ -53,7 +53,7 @@ None.
 
 ## Running agents
 
-WI-0105 (haiku, workspace wi-105).
+WI-0113 (haiku, workspace wi-113).
 
 ## Last verified state
 
