@@ -1592,11 +1592,11 @@ Ctrl+Z and Ctrl+Y and menu entries. A cancelled action (a move cancelled with Es
 ### REQ-EDT-100 Save, and changes during execution
 
 - **v1:** yes (unsaved flows are saved automatically at exit)
-- **v2:** partial (the commit of a change works: revisions, conflicts, the rules and the rename race; the editor makes its changes as patches, merges a rename of the manager and clears its undo steps on a restart of the engine; the automatic saving (WI-0095) is still missing)
+- **v2:** partial (the commit of a change works: revisions, conflicts, the rules and the rename race; the editor makes its changes as patches, merges a rename of the manager and clears its undo steps on a restart of the engine; the automatic saving in the engine works (WI-0095: written about 3 s after a change, Ctrl+S writes at once, shutdown writes the rest, backups by session))
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0006 (automatic saving WI-0095; the editor part is done with WI-0096)
-- **Evidence:** `tests/integration/test_flow_patch.py` (commit, conflict, refused list, busy deletion, rename race), `tests/ahk/core_flow_patch.test.ahk` (rules, inverse, shared revisions), `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`, `tests/ahk/editor_draft.test.ahk` (queue, conflict, refusal, lost answer), `tests/e2e/test_editor_draft.py::test_a_rename_by_the_manager_while_a_patch_is_on_its_way_is_merged`, `tests/e2e/test_editor_draft.py::test_a_restart_of_the_engine_clears_the_stacks_and_shows_the_saved_state`
+- **Evidence:** `tests/integration/test_flow_patch.py` (commit, conflict, refused list, busy deletion, rename race), `tests/ahk/core_flow_patch.test.ahk` (rules, inverse, shared revisions), `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`, `tests/ahk/editor_draft.test.ahk` (queue, conflict, refusal, lost answer), `tests/e2e/test_editor_draft.py::test_a_rename_by_the_manager_while_a_patch_is_on_its_way_is_merged`, `tests/e2e/test_editor_draft.py::test_a_restart_of_the_engine_clears_the_stacks_and_shows_the_saved_state`, `tests/integration/test_flow_autosave.py` (write-behind, save, shutdown, killed engine, delete, retries, backups)
 
 Every completed edit takes effect at once, also for running instances (REQ-EXE-080), and is saved automatically a few seconds later (E0065): about 3 s after the last change, at the latest every 10 s while the user keeps editing. A flow has no unsaved state, so closing the editor or the application asks nothing. Saving by hand (Ctrl+S, menu) only writes at once. Mistakes are undone with undo (REQ-EDT-090) or by a backup: a backup is made at the first write of an editing session and then at most every 10 minutes (REQ-ROB-060, REQ-MGR-110). A rename by the manager while the editor is open is merged.
 
@@ -2286,7 +2286,7 @@ A process that keeps crashing is not restarted for ever (engine and storage: thr
 - **Prio:** must
 - **Scope:** port
 - **Plan:** -
-- **Evidence:** `tests/fault/test_storage_abort.py`, `tests/integration/test_storage.py::test_backups_keep_exactly_ten_after_twelve_writes`
+- **Evidence:** `tests/fault/test_storage_abort.py`, `tests/integration/test_storage.py::test_backups_keep_exactly_ten_after_twelve_writes`, `tests/integration/test_flow_autosave.py` (backups per editing session, the interval, a view patch asks for none, WI-0095)
 
 Flows and variables are written to a temporary file and renamed; a crash leaves the old or the new file. Up to ten backups of a flow are kept. A file that cannot be written is reported and the engine keeps its copy.
 
@@ -2346,7 +2346,7 @@ The broken file is reported; all other flows load.
 ### REQ-ROB-120 A crashed editor or manager loses nothing
 
 - **v1:** no (one process; a crash ends everything)
-- **v2:** partial (the manager part: a killed manager is not restarted by itself, the tray icon stays and opens a new one, which holds the 200 flows again; the owner's check of the real crash is MANUAL-CHECKS section 1 step 25; that the rest keeps running and a flow can still be started after a crash of the real manager is the gui test `test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted` (gui tier: the gui tests of WI-0073 are reported as passed in `work_items/phase3/STATUS.md`; not repeated by agents); the editor part (WI-0103): an ended editor gives a notice, and a click on its balloon or the button "Open editor" of the list of notices opens it again; nothing reopens it by itself (headless e2e tests; the real balloon click is the gui test `test_a_click_on_the_balloon_of_an_editor_notice_opens_the_editor_again` (gui), not run by agents; the owner's check is open; the edit part is S0006)
+- **v2:** partial (the manager part: a killed manager is not restarted by itself, the tray icon stays and opens a new one, which holds the 200 flows again; the owner's check of the real crash is MANUAL-CHECKS section 1 step 25; that the rest keeps running and a flow can still be started after a crash of the real manager is the gui test `test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted` (gui tier: the gui tests of WI-0073 are reported as passed in `work_items/phase3/STATUS.md`; not repeated by agents); the editor part (WI-0103): an ended editor gives a notice, and a click on its balloon or the button "Open editor" of the list of notices opens it again; nothing reopens it by itself (headless e2e tests; the real balloon click is the gui test `test_a_click_on_the_balloon_of_an_editor_notice_opens_the_editor_again` (gui), not run by agents; the owner's check is open); the edit part: the engine writes every commit about 3 s after it (WI-0095; tested with a killed engine, `tests/integration/test_flow_autosave.py`, not with a killed editor; the editor side follows in WI-0096)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (manager), S0006 (editor: WI-0095, the notice WI-0103, E0093)

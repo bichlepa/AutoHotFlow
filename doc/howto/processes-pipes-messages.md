@@ -395,3 +395,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (`tests/integration/test_supervisor.py::test_a_flow_id_with_a_space_reaches_the_role_whole`, run 20261019-222444-2d3caef3, `-m foundation`, 1 passed; the refusals are checked by `tests/e2e/test_manager_editor.py::test_edit_without_a_flow_is_refused_as_bad_payload_and_becomes_a_notice` for the empty ID only).
 - **Source:** `src/supervisor/Children.ahk` (`_Launch`, `FlowIdOk`)
 
+### One timer for many jobs: SetTimer with the same function moves the run
+
+- **Problem:** The write-behind of the flows (FlowSaver, WI-0095) has one timer for all flows, due at the earliest entry. A save that asks for an earlier run must not wait for a timer that is set for later.
+- **Wrong:** A flag `_scheduled` that skips the call while a timer is set. The urgent run then fires at the old, later time.
+- **Right:** Call `SetTimer(fn, -wait)` every time the earliest due time is recomputed. A new `SetTimer` on the same function replaces the pending one, so the earlier time wins. `SetTimer(fn, 0)` cancels it when nothing is due.
+- **Status:** verified (WI-0095, `tests/integration/test_flow_autosave.py::test_cmd_flow_save_writes_at_once_and_answers_with_the_saved_revision`)
+- **Source:** `src/engine/FlowSaver.ahk` (`_Schedule`)
+
