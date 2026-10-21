@@ -57,6 +57,8 @@ None.
 
 ## Last verified state
 
+Commit `b55810dc` (WI-0109 and WI-0110 integrated, F-0174 fix; all tiers): fast 2174 passed, 1 failed (`test_settings::test_the_log_thresholds_change_in_every_role_at_once`, F-0177: no peer tray, frequent under load), foundation 471 passed, slow 206 passed (runs 20261021-204324-b55810dc, -2, -3). VERDICT red only by F-0177 (hunter round).
+
 Commit `e597935a` (WI-0104, WI-0106 and the S0006 acceptance integrated; all tiers): fast 2109 passed, foundation 471 passed, slow 205 passed, 1 failed (`test_flow_autosave` every-10-s: `no peer engine` after about 60 patches under load, F-0174, a hunter entry; green alone) (runs 20261021-193520-e597935a, -2, -3). VERDICT red only by that.
 
 Commit `cf085e1f` (WI-0101 and WI-0113 integrated, all tiers): fast 2066 passed, foundation 471 passed, slow 204 passed, 2 failed under load, both green alone (recheck): `test_log_burst` stand-still, and `test_flow_autosave` every-10-s (fourth load failure; the WI-0095 author investigates the cause: ok:false of a patch) (runs 20261021-091309-cf085e1f, -2, -3).
