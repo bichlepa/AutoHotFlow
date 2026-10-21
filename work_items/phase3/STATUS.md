@@ -28,7 +28,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0095 | Engine and storage: automatic saving and backups (E0065) | done | haiku | 9164afdc..59ba17bf | 2026-10-21 | F-0163 closed; editor sends no session until WI-0096 wiring; tests weaker than spec (no killed-editor test) |
 | WI-0096 | Editor: draft, patch client, undo and redo, selection model, the view written | done | haiku | 1fc90266..c0f3f0ff | 2026-10-21 | F-0165, F-0166 |
 | WI-0097 | Scene and renderer for editing | done, screenshots await the owner | haiku | bb015aba..49f7edd4 | 2026-10-20 | F-0162 (30-element drag 25 ms) decision needed |
-| WI-0098 | Editor: select and move, loop height | running (haiku) | | | | E0094; also F-0166 |
+| WI-0098 | Editor: select and move, loop height | done | haiku | see git log | 2026-10-21 | E0094; REQ-EDT-060 partial (real-mouse gui test unwritten); F-0166 part 1 tested; de/ko/ru texts of the status bar missing |
 | WI-0099 | Editor: add elements, class list | open | | | | |
 | WI-0100 | Editor: connect | open | | | | |
 | WI-0101 | Editor: delete, cut, copy, paste | open | | | | E0091 |
@@ -53,7 +53,7 @@ None.
 
 ## Running agents
 
-WI-0098 (haiku, workspace wi-98).
+None.
 
 ## Last verified state
 
