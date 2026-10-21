@@ -339,10 +339,25 @@ class EditorWindow {
         if (key = "")
             return
         name := EditorKeys.Name(key, GetKeyState("Ctrl", "P"), GetKeyState("Shift", "P"))
-        if (EditorKeys.Handle(this.role.pointer, name)) {
+        if (EditorKeys.Handle(this.role.pointer, name, this._MouseAt())) {
             this._Sync()                               ; Esc may have ended a drag or a placing: it takes no mouse message
             return 0
         }
+    }
+
+    ; The canvas pixel under the mouse, or "" when the mouse is not over the canvas (a paste goes under the mouse, WI-0101).
+    _MouseAt() {
+        if (!IsObject(this.canvas))
+            return ""
+        pt := Buffer(8, 0)
+        DllCall("user32\GetCursorPos", "ptr", pt)
+        DllCall("user32\ScreenToClient", "ptr", this.hwnd, "ptr", pt)
+        x := NumGet(pt, 0, "int")
+        y := NumGet(pt, 4, "int")
+        view := this.role.model.view
+        if (x < 0 || y < 0 || x >= view.Width || y >= view.Height)
+            return ""
+        return [x, y]
     }
 
     ; The mouse is captured while the pointer holds it (EditorPointer.Holding): the capture is taken when the pointer starts to

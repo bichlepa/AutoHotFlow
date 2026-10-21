@@ -278,8 +278,8 @@ class EditorModel {
 
     ; A change of the editor that the engine was not asked for and that was refused here (WI-0100): the text (a language key)
     ; is shown in the status bar until the next change.
-    Notice(textKey) {
-        this.draft.message := Lang(textKey)
+    Notice(textKey, args*) {
+        this.draft.message := Lang(textKey, args*)
         this._Changed("view")
     }
 

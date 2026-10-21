@@ -19,11 +19,13 @@
 ;   cmd.test.edit {ops}                 the operations as one undo step (WI-0096, EditorDraft.Commit)
 ;   cmd.test.undo {}, cmd.test.redo {}  one step of the undo or the redo stack
 ;   cmd.test.select {mode, ids?}        the selection: one, toggle, all or none (WI-0096)
-;   cmd.test.mouse {button, action, x, y, ctrl?}   the mouse as the window gets it (WI-0098): button left, right (none for a
-;                                       move without a button); action down, move, up or double (two clicks). The same
-;                                       pointer methods as the window (EditorPointer)
-;   cmd.test.key {key, ctrl?, shift?}   a key of the editor window as WM_KEYDOWN gives it (WI-0098, EditorKeys): key "Esc" or
-;                                       one letter; answers handled (the table has it)
+;   cmd.test.mouse {button, action, x, y, ctrl?, answer?}   the mouse as the window gets it (WI-0098): button left, right (none
+;                                       for a move without a button); action down, move, up or double (two clicks). The same
+;                                       pointer methods as the window (EditorPointer). answer: as cmd.test.key (the trash button)
+;   cmd.test.key {key, ctrl?, shift?, x?, y?, answer?}   a key of the editor window as WM_KEYDOWN gives it (WI-0098, EditorKeys):
+;                                       key "Esc", "Del" or one letter; answers handled (the table has it). x, y: the canvas pixel
+;                                       of the mouse for a paste (WI-0101; without them the middle of the view). answer yes or no
+;                                       answers the question that Del opens (default: the last answer, at first no)
 ;   cmd.test.class {id}                 the answer of the open class list of a new element (WI-0099): the qualified ID the list
 ;                                       offers, or "" for Cancel. The list is in cmd.test.state (choice)
 ;   cmd.test.pick {id}                  the answer of the open question of a connection (WI-0100): a kind, a type, or "" for
@@ -151,6 +153,7 @@ class EditorDriver {
             throw AhfError("cmd.test.mouse: button left or right (none for a move), action down, move, up or double",
                 ErrCode.BAD_PAYLOAD)
         ctrl := EditorDriver._Flag(p.Get("ctrl", 0))
+        this._SetAnswer(p)                       ; the trash button opens a question (WI-0101)
         pointer := this.role.pointer
         switch action {
             case "down":
@@ -168,17 +171,31 @@ class EditorDriver {
         return Map("ok", true, "pointer", pointer.CurrentMode, "selection", this.model.SelectionIds(), "status", this._Status())
     }
 
-    ; cmd.test.key {key, ctrl?, shift?}: the key as the window gets it (WM_KEYDOWN, EditorKeys). handled: the table has it.
+    ; cmd.test.key {key, ctrl?, shift?, x?, y?, answer?}: the key as the window gets it (WM_KEYDOWN, EditorKeys). handled: the
+    ; table has it. x, y: the canvas pixel of the mouse for a paste (without them: the middle of the view). answer: the answer
+    ; to a question that the key opens (Del), as cmd.test.command.
     _OnKey(msg) {
         p := msg.payload
         key := p.Get("key", "")
         isLetter := (Type(key) = "String" && StrLen(key) = 1 && RegExMatch(key, "^[A-Za-z]$"))
-        if (!(Type(key) = "String" && key = "Esc") && !isLetter)
-            throw AhfError("cmd.test.key: key is Esc or one letter", ErrCode.BAD_PAYLOAD)
+        if (!(Type(key) = "String" && (key = "Esc" || key = "Del")) && !isLetter)
+            throw AhfError("cmd.test.key: key is Esc, Del or one letter", ErrCode.BAD_PAYLOAD)
         name := EditorKeys.Name(key, EditorDriver._Flag(p.Get("ctrl", 0)), EditorDriver._Flag(p.Get("shift", 0)))
-        handled := EditorKeys.Handle(this.role.pointer, name)
+        this._SetAnswer(p)
+        at := (IsNumber(p.Get("x", "")) && IsNumber(p.Get("y", ""))) ? [p["x"], p["y"]] : ""
+        handled := EditorKeys.Handle(this.role.pointer, name, at)
         return Map("ok", true, "handled", Json.Bool(handled), "selection", this.model.SelectionIds()
             , "status", this._Status())
+    }
+
+    ; The answer to the questions that the command opens, when the payload gives one (yes or no); otherwise it stays.
+    _SetAnswer(p) {
+        if (!p.Has("answer"))
+            return
+        answer := p["answer"]
+        if (IsObject(answer) || (answer != "yes" && answer != "no"))
+            throw AhfError("answer is yes or no", ErrCode.BAD_PAYLOAD)
+        this.answer := answer
     }
 
     ; True for a JSON true (1, or the Json.True object) in a payload; false, 0 and missing values are false.

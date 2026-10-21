@@ -68,6 +68,7 @@ class EditorPointer {
         this.connectMoved := false   ; the pointer moved while the button was held: a drag drops at the release
         this.lastClickId := ""       ; the connection of the last click (a double click asks its type)
         this.lastClickTick := 0
+        this.transfer := ""          ; EditorTransfer: delete, cut, copy and paste (WI-0101; the role gives it)
     }
 
     ; "" or the mode ("press", "move", "tail", "rect", "view"). The getter has another name than the field: AHK names are
@@ -261,6 +262,28 @@ class EditorPointer {
             this._Select([], "all")
     }
 
+    ; Ctrl+C, Ctrl+X, Ctrl+V and Del (WI-0101, EditorKeys): the transfer of the selection (EditorTransfer). Nothing happens
+    ; during a drag or a placing. at: the canvas pixel of the mouse for a paste ("" for the middle of the view).
+    Copy() {
+        if (this.mode = "" && IsObject(this.transfer))
+            this.transfer.Copy()
+    }
+
+    Cut() {
+        if (this.mode = "" && IsObject(this.transfer))
+            this.transfer.Cut()
+    }
+
+    Paste(at := "") {
+        if (this.mode = "" && IsObject(this.transfer))
+            this.transfer.Paste(at)
+    }
+
+    Delete() {
+        if (this.mode = "" && IsObject(this.transfer))
+            this.transfer.Delete()
+    }
+
     ; The loop height of a tail drag: the nearest grid step, at least two steps (v1 ui_FitGridx and the minimum of v1).
     static LoopHeight(h) => Max(FlowGeometry.GRID * 2, FlowGeometry.Snap(h))
 
@@ -307,7 +330,8 @@ class EditorPointer {
 
     ; A press on a button of the selection starts its gesture: true when the button is handled (the press selects nothing).
     ; plus of an element and plus2 (the foot of a loop), plus, move1 and move2 of a connection, and edit of a connection
-    ; (the type is asked at once). Other buttons (edit and trash of an element) are not handled here.
+    ; (the type is asked at once). The trash button asks for the selection (WI-0101). The edit button of an element is not
+    ; handled here (its settings dialog comes with S0007).
     _ButtonPress(hit, cx, cy) {
         sc := this.model.CurrentScene()
         kind := EditorPointer._KindOf(sc, hit.Id)
@@ -327,6 +351,9 @@ class EditorPointer {
         } else if (kind = "connection" && name = "move2") {
             if (!this.connect.BeginMoveTo(hit.Id))
                 return false
+        } else if (name = "trash" && (kind = "element" || kind = "connection") && IsObject(this.transfer)) {
+            this.transfer.Delete()          ; the trash button asks for the selection, as Del does (WI-0101)
+            return true
         } else {
             return false
         }

@@ -17,7 +17,8 @@ class EditorFlowOps {
     static COMMAND_MS := 5000
     ; The keys of the texts of each question (the same texts as the manager, assets/language/manager).
     static ASK := Map("independent", ["Ask_independent_title", "Ask_independent_text"]
-        , "force", ["Ask_force_title", "Ask_force_text"])
+        , "force", ["Ask_force_title", "Ask_force_text"]
+        , "selection", ["Ask_selection_delete_title", "Ask_selection_delete_text"])     ; WI-0101: Del and the trash button
 
     __New(peer, flowId, model) {
         this.peer := peer
