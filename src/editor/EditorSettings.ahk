@@ -7,15 +7,12 @@
 #Include ..\elements\base\ParamEvaluator.ahk
 #Include form\ElementForm.ahk
 #Include NewElementCatalog.ahk
-<<<<<<< HEAD
 #Include assist\AssistantValues.ahk
 #Include assist\AssistantSource.ahk
 #Include assist\WindowAssistant.ahk
 #Include assist\MouseAssistant.ahk
 #Include assist\ColorAssistant.ahk
-=======
 #Include ..\ui_common\HelpRequest.ahk
->>>>>>> 356d6d97... Help: the manager, the editor menu and the element settings open the help (WI-0111)
 
 ; The settings of one element in the editor (WI-0106, REQ-EDT-120, PROTOCOL 4.11): the form of the element (ElementForm,
 ; the headless model of WI-0105) is opened for an element of the flow (mode "edit") or for a class chosen for a new element

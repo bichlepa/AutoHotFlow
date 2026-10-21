@@ -17,13 +17,9 @@
 ;
 ; The window is not modal and does not block: it opens and returns at once, and the events call the controller. Layout at
 ; 100 % (96 dpi) through GuiLayout (DPI and the font). Content longer than the screen scrolls with the slider at the right
-<<<<<<< HEAD
-; edge and the mouse wheel. Help is disabled until the help window (WI-0111). A button of an element is enabled when its
-; assistant is one of AssistantValues.KINDS (WI-0110), else it stays disabled; while an assistant runs the window is disabled.
-=======
-; edge and the mouse wheel. Help opens the help page of the element (WI-0111, EditorSettings.Help). A button of an element (for example the
-; import of a window, WI-0110) is shown disabled until its assistant exists.
->>>>>>> 356d6d97... Help: the manager, the editor menu and the element settings open the help (WI-0111)
+; edge and the mouse wheel. Help opens the help page of the element (WI-0111, EditorSettings.Help). A button of an element is
+; enabled when its assistant is one of AssistantValues.KINDS (WI-0110), else it stays disabled; while an assistant runs the
+; window is disabled.
 class ElementSettingsWindow {
     static WIDTH := 480
     static MARGIN := 12
