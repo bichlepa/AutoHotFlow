@@ -1,25 +1,27 @@
 # Execute flow
 
-The action **Execute flow** executes a flow. The target trigger must be enabled.
+The action **Execute flow** starts a manual trigger of a flow, and so runs the flow (or another flow) once more.
 
 ## Settings
 
 ### Which flow
 
-Choose which flow should be executed.
+**This flow** runs the flow that contains the action. Uncheck it to choose another flow in the list.
 
 ### Which trigger
 
-Choose which trigger should be executed. You can choose any of the manual triggers.
+- **Default trigger**: the flow's first manual trigger.
+- **Specified trigger**: the manual trigger that you choose in the list.
 
-The trigger must be enabled, otherwise the action will throw an exception by default.
+The trigger must be enabled. If it is not, the action ends with an exception, unless **Skip disabled flows without error** is checked.
 
 ### Options
 
-If **Send local variables** is checked, all local variables from the current instance will be sent to the executed flow.
+- **Send local variables**: the local variables of the calling instance are passed to the called flow (checked by default).
+- **Wait for called flow to finish**: the action waits until the called instance has ended. It then ends with the result **normal** if the called flow ended normally, and with **exception** if the called flow ended with an exception or was stopped.
+- **Return local variables to the calling flow**: after the called flow has finished, its variables are passed back to the calling flow.
+- **Skip disabled flows without error**: a disabled trigger does not end the action with an exception; the action ends with **normal** and does nothing.
 
-If **Skip disabled flow** is checked, the action will not throw an error if the target flow is not enabled.
+Without **Wait for called flow to finish** the action ends with **normal** as soon as the call is started.
 
-If **Wait for called flow to finish** is checked, the action will wait until the target flow has finished.
-
-If **Return variables to the calling flow** is checked, all generated variables in the target flow will be sent back after it finishes.
+The action ends with an exception if the flow does not exist or has no manual trigger.

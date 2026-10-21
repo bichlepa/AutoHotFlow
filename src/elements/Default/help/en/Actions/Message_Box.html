@@ -99,26 +99,32 @@ img {
 <body>
 <main>
 <h1>Message box</h1>
-<p>The action <strong>Message box</strong> displays a window with a message.</p>
+<p>The action <strong>Message box</strong> shows a window with a message and a button. The action ends when the user has closed the window, or when the timeout has run out.</p>
 <h2>Settings</h2>
-<h3>Title <em>and</em> Message</h3>
-<p>Message shown to the user.</p>
-<h3>Button Text</h3>
-<p>Enter the text which will be shown as the <strong>OK</strong> button.</p>
+<h3>Title and message</h3>
+<p>The title and the text of the window. The text may be an object, which is shown as JSON.</p>
+<h3>Button text</h3>
+<p>The text of the <strong>OK</strong> button.</p>
 <h3>Timeout</h3>
-<p>If <strong>Define timeout</strong> is selected, the dialog will automatically close after the specified amount of time.</p>
-<p><strong>Result on timeout</strong>: If timeout reaches zero, the action will end with the specified result.</p>
+<ul>
+<li><strong>No timeout</strong>: the window stays open until the user closes it.</li>
+<li><strong>Define timeout</strong>: the window closes after the given time (in seconds, minutes or hours). The result for a timeout is set under <strong>Result on timeout</strong>: <strong>Normal</strong> or <strong>Throw exception</strong> (exception: "Timeout reached").</li>
+</ul>
 <h3>Width and height</h3>
-<p>Specify the size of the window that will be shown. Make sure, that the window is not too small.</p>
+<p>The size of the window, in pixels (default 300 by 200). Make sure that the window is not too small for its text.</p>
 <h3>Cancelling</h3>
-<p>If <strong>Show cancel button</strong> is selected, a second button near to the OK button will be shown. The text can be specified.</p>
-<p><strong>Result if cancelled</strong>: If uses either closes the window or clicks on the cancel button, the action will end with the specified result.</p>
+<p>If <strong>Show cancel button</strong> is checked, a second button is shown; its text is set under <strong>Button text</strong>. <strong>Result if cancelled</strong> sets what happens when it is pressed: <strong>Normal</strong>, or <strong>Throw exception</strong> (exception: "User cancelled the dialog").</p>
+<p>Closing the window with its close button or with Esc is set by <strong>Result if closed</strong>: <strong>Normal</strong> or <strong>Throw exception</strong> (exception: "User closed the dialog").</p>
 <h2>Supplied Variables</h2>
 <h3><code>A_UserAction</code></h3>
-<p>The operation used to close the dialog. Can be one of:</p>
-<p><strong>ok</strong>: when the user pressed the OK-button</p>
-<p><strong>timeout</strong>: when the dialog was closed by a timeout</p>
-<p><strong>cancel</strong>: when the user pressed the back key and the appropriate option is set</p>
+<p>The way the window was closed, as a text in lower case:</p>
+<ul>
+<li><strong>ok</strong>: the user pressed the OK button</li>
+<li><strong>timeout</strong>: the timeout has run out</li>
+<li><strong>cancel</strong>: the user pressed the cancel button</li>
+<li><strong>close</strong>: the user closed the window or pressed Esc</li>
+</ul>
+<p>Compare it with <code>=</code>, which ignores the case. The comparison with <code>==</code> is case sensitive: <code>A_UserAction == "OK"</code> is never true.</p>
 </main>
 </body>
 </html>

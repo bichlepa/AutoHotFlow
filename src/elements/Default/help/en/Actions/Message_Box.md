@@ -1,41 +1,41 @@
 # Message box
 
-The action **Message box** displays a window with a message.
+The action **Message box** shows a window with a message and a button. The action ends when the user has closed the window, or when the timeout has run out.
 
 ## Settings
 
-### Title *and* Message
+### Title and message
 
-Message shown to the user.
+The title and the text of the window. The text may be an object, which is shown as JSON.
 
-### Button Text
+### Button text
 
-Enter the text which will be shown as the **OK** button.
+The text of the **OK** button.
 
 ### Timeout
 
-If **Define timeout** is selected, the dialog will automatically close after the specified amount of time.
-
-**Result on timeout**: If timeout reaches zero, the action will end with the specified result.
+- **No timeout**: the window stays open until the user closes it.
+- **Define timeout**: the window closes after the given time (in seconds, minutes or hours). The result for a timeout is set under **Result on timeout**: **Normal** or **Throw exception** (exception: "Timeout reached").
 
 ### Width and height
 
-Specify the size of the window that will be shown. Make sure, that the window is not too small.
+The size of the window, in pixels (default 300 by 200). Make sure that the window is not too small for its text.
 
 ### Cancelling
 
-If **Show cancel button** is selected, a second button near to the OK button will be shown. The text can be specified.
+If **Show cancel button** is checked, a second button is shown; its text is set under **Button text**. **Result if cancelled** sets what happens when it is pressed: **Normal**, or **Throw exception** (exception: "User cancelled the dialog").
 
-**Result if cancelled**: If uses either closes the window or clicks on the cancel button, the action will end with the specified result.
+Closing the window with its close button or with Esc is set by **Result if closed**: **Normal** or **Throw exception** (exception: "User closed the dialog").
 
 ## Supplied Variables
 
 ### `A_UserAction`
 
-The operation used to close the dialog. Can be one of:
+The way the window was closed, as a text in lower case:
 
-**ok**: when the user pressed the OK-button
+- **ok**: the user pressed the OK button
+- **timeout**: the timeout has run out
+- **cancel**: the user pressed the cancel button
+- **close**: the user closed the window or pressed Esc
 
-**timeout**: when the dialog was closed by a timeout
-
-**cancel**: when the user pressed the back key and the appropriate option is set
+Compare it with `=`, which ignores the case. The comparison with `==` is case sensitive: `A_UserAction == "OK"` is never true.

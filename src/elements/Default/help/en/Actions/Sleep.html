@@ -99,12 +99,12 @@ img {
 <body>
 <main>
 <h1>Sleep</h1>
-<p>The action <strong>Sleep</strong> pauses the current thread for a specified amount of time.</p>
+<p>The action <strong>Sleep</strong> waits for a given time, then ends with the result <strong>normal</strong>. While it waits, other instances of the flow keep running.</p>
 <h2>Settings</h2>
 <h3>Duration</h3>
-<p>Duration of the sleep.</p>
-<h2>Remarks</h2>
-<p>If there are other execution instances or threads, other actions will be executed while this sleep action is running.</p>
+<p>The time to wait, as an expression (see <a href="../../../../../../assets/help/en/Variables.html">Variables and expressions</a>). It must be a number of 0 or more; otherwise the action ends with an exception.</p>
+<h3>Unit</h3>
+<p>The unit of the duration: <strong>Milliseconds</strong>, <strong>Seconds</strong> (the default) or <strong>Minutes</strong>.</p>
 </main>
 </body>
 </html>

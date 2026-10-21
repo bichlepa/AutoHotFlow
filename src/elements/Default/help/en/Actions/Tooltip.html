@@ -99,16 +99,16 @@ img {
 <body>
 <main>
 <h1>Tooltip</h1>
-<p>The action <strong>Tooltip</strong> displays a tooltip with a message.</p>
+<p>The action <strong>Tooltip</strong> shows a tooltip with a message for a given time.</p>
 <h2>Settings</h2>
 <h3>Text to show</h3>
-<p>Message shown to the user.</p>
+<p>The message. The text may be an object, which is shown as JSON.</p>
 <h3>Duration</h3>
-<p>Specify how long the tooltip will be shown.</p>
-<h3>Options</h3>
-<p>If Follow mouse is selected, the tooltip will follow the mouse. If not, the tooltip will remain at its position.</p>
+<p>How long the tooltip is shown: a number in milliseconds, seconds or minutes (choose the unit next to the field; the default is 2 seconds).</p>
+<h3>Follow mouse</h3>
+<p>If checked, the tooltip moves with the mouse. If not, it stays at its position.</p>
 <h2>Remarks</h2>
-<p>If another action is executed while the a tooltip is shown, the tooltip will be replaced by the new one.</p>
+<p>The action ends at once; the tooltip is removed when its duration has run out. A tooltip that is shown when another tooltip is shown replaces it. Stopping the flow does not remove a tooltip that is already shown.</p>
 </main>
 </body>
 </html>

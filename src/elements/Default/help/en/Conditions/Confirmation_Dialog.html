@@ -99,30 +99,20 @@ img {
 <body>
 <main>
 <h1>Confirmation dialog</h1>
-<p>The condition <strong>Confirmation dialog</strong> displays a dialog window with a message and the buttons "Yes" and "No".</p>
+<p>The condition <strong>Confirmation dialog</strong> shows a window with a question and the buttons <strong>Yes</strong> and <strong>No</strong>. The result of the button decides the branch.</p>
 <h2>Settings</h2>
-<h3><strong>Title and <strong>Message</strong>&gt;</strong></h3>
-<p>Message shown to the user.</p>
+<h3>Title and message</h3>
+<p>The title and the question. The text may be an object, which is shown as JSON.</p>
 <h3>Button text</h3>
-<p>You may change the text in the <strong>Yes</strong> and <strong>No</strong> buttons.</p>
+<p>The texts of the <strong>Yes</strong> and <strong>No</strong> buttons.</p>
 <h3>Timeout</h3>
-<p>If <strong>Define timeout</strong> is selected, the dialog will automatically close after the specified amount of time.</p>
-<p>You can select the result if the timer runs out.</p>
+<p>If <strong>Define timeout</strong> is checked, the window closes after the given time. <strong>Result on timeout</strong> then sets the result: <strong>Yes</strong>, <strong>No</strong> or <strong>Throw exception</strong> (exception: "Timeout reached").</p>
 <h3>Width and height</h3>
-<p>Specify the size of the window that will be shown. Make sure, that the window is not too small.</p>
+<p>The size of the window, in pixels.</p>
 <h3>Cancelling</h3>
-<p>If <strong>Show cancel button</strong> is selected, a third button will be shown. The text can be modified.</p>
-<p>You can select the result if the cancels or closes the dialog.</p>
+<p>If <strong>Show cancel button</strong> is checked, a third button is shown; its text can be changed. <strong>Result if cancelled</strong> sets the result when it is pressed, or when the window is closed: <strong>Yes</strong>, <strong>No</strong> or <strong>Throw exception</strong> (exception: "User cancelled the dialog", or "User closed the dialog" for the close button and Esc).</p>
 <h3>Default button</h3>
-<p>You can specify which button should be the default one.</p>
-<p>The default button will be highlighted and focused when the dialog opens.</p>
-<h2>Supplied Variables</h2>
-<h3><code>A_UserAction</code></h3>
-<p>The operation used to close the dialog. Can be one of:</p>
-<p><strong>yes</strong>: when the user pressed the Yes-button</p>
-<p><strong>no</strong>: when the user pressed the No-button</p>
-<p><strong>timeout</strong>: when the dialog was closed by a timeout</p>
-<p><strong>cancel</strong>: when the user pressed the back key and the appropriate option is set</p>
+<p>The button that is highlighted and focused when the window opens.</p>
 </main>
 </body>
 </html>

@@ -1,49 +1,29 @@
 # Confirmation dialog
 
-The condition **Confirmation dialog** displays a dialog window with a message and the buttons "Yes" and "No".
+The condition **Confirmation dialog** shows a window with a question and the buttons **Yes** and **No**. The result of the button decides the branch.
 
 ## Settings
 
-### **Title and **Message**>**
+### Title and message
 
-Message shown to the user.
+The title and the question. The text may be an object, which is shown as JSON.
 
 ### Button text
 
-You may change the text in the **Yes** and **No** buttons.
+The texts of the **Yes** and **No** buttons.
 
 ### Timeout
 
-If **Define timeout** is selected, the dialog will automatically close after the specified amount of time.
-
-You can select the result if the timer runs out.
+If **Define timeout** is checked, the window closes after the given time. **Result on timeout** then sets the result: **Yes**, **No** or **Throw exception** (exception: "Timeout reached").
 
 ### Width and height
 
-Specify the size of the window that will be shown. Make sure, that the window is not too small.
+The size of the window, in pixels.
 
 ### Cancelling
 
-If **Show cancel button** is selected, a third button will be shown. The text can be modified.
-
-You can select the result if the cancels or closes the dialog.
+If **Show cancel button** is checked, a third button is shown; its text can be changed. **Result if cancelled** sets the result when it is pressed, or when the window is closed: **Yes**, **No** or **Throw exception** (exception: "User cancelled the dialog", or "User closed the dialog" for the close button and Esc).
 
 ### Default button
 
-You can specify which button should be the default one.
-
-The default button will be highlighted and focused when the dialog opens.
-
-## Supplied Variables
-
-### `A_UserAction`
-
-The operation used to close the dialog. Can be one of:
-
-**yes**: when the user pressed the Yes-button
-
-**no**: when the user pressed the No-button
-
-**timeout**: when the dialog was closed by a timeout
-
-**cancel**: when the user pressed the back key and the appropriate option is set
+The button that is highlighted and focused when the window opens.

@@ -99,18 +99,25 @@ img {
 <body>
 <main>
 <h1>Execute flow</h1>
-<p>The action <strong>Execute flow</strong> executes a flow. The target trigger must be enabled.</p>
+<p>The action <strong>Execute flow</strong> starts a manual trigger of a flow, and so runs the flow (or another flow) once more.</p>
 <h2>Settings</h2>
 <h3>Which flow</h3>
-<p>Choose which flow should be executed.</p>
+<p><strong>This flow</strong> runs the flow that contains the action. Uncheck it to choose another flow in the list.</p>
 <h3>Which trigger</h3>
-<p>Choose which trigger should be executed. You can choose any of the manual triggers.</p>
-<p>The trigger must be enabled, otherwise the action will throw an exception by default.</p>
+<ul>
+<li><strong>Default trigger</strong>: the flow's first manual trigger.</li>
+<li><strong>Specified trigger</strong>: the manual trigger that you choose in the list.</li>
+</ul>
+<p>The trigger must be enabled. If it is not, the action ends with an exception, unless <strong>Skip disabled flows without error</strong> is checked.</p>
 <h3>Options</h3>
-<p>If <strong>Send local variables</strong> is checked, all local variables from the current instance will be sent to the executed flow.</p>
-<p>If <strong>Skip disabled flow</strong> is checked, the action will not throw an error if the target flow is not enabled.</p>
-<p>If <strong>Wait for called flow to finish</strong> is checked, the action will wait until the target flow has finished.</p>
-<p>If <strong>Return variables to the calling flow</strong> is checked, all generated variables in the target flow will be sent back after it finishes.</p>
+<ul>
+<li><strong>Send local variables</strong>: the local variables of the calling instance are passed to the called flow (checked by default).</li>
+<li><strong>Wait for called flow to finish</strong>: the action waits until the called instance has ended. It then ends with the result <strong>normal</strong> if the called flow ended normally, and with <strong>exception</strong> if the called flow ended with an exception or was stopped.</li>
+<li><strong>Return local variables to the calling flow</strong>: after the called flow has finished, its variables are passed back to the calling flow.</li>
+<li><strong>Skip disabled flows without error</strong>: a disabled trigger does not end the action with an exception; the action ends with <strong>normal</strong> and does nothing.</li>
+</ul>
+<p>Without <strong>Wait for called flow to finish</strong> the action ends with <strong>normal</strong> as soon as the call is started.</p>
+<p>The action ends with an exception if the flow does not exist or has no manual trigger.</p>
 </main>
 </body>
 </html>

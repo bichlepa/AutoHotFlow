@@ -1,15 +1,15 @@
 # Manual
 
-The trigger **Manual** can be triggered manually or via action **Execute flow**.
+The trigger **Manual** starts an instance of the flow when the user triggers it, or when the action **Execute flow** of a flow calls it.
 
 ## Settings
 
 ### ID
 
-Name of the trigger. It will help you to identify the correct trigger in dialogs where you have to select a trigger.
+The name of the trigger. Choose a name that tells the manual triggers of a flow apart, for example `Start` and `Cleanup`. The action **Execute flow** lists the triggers by this ID.
 
 ## Supplied Variables
 
 ### `A_ManualTriggerID`
 
-The **ID** of the manual trigger.
+The ID of the trigger that started the instance.
