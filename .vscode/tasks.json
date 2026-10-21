@@ -1120,6 +1120,27 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: window assistant (gui, the mouse moves onto a target window; do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/fault/test_editor_assist_gui.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Test: editor settings window (gui, a real editor window; a double click and Esc are sent; do not use the PC)",
             "type": "shell",
             "command": "python",

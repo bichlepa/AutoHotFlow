@@ -67,6 +67,7 @@ The first matching pattern wins; `*` also matches `/`. Test groups that run in f
 | `manager` | `manager/`, `NoticeThrottle` | `manager` |
 | `tray` | `tray/` | `tray` |
 | `editor-form` | `editor/form/` (the settings form model of an element, WI-0105) | `editor-form` |
+| `editor-assist` | `editor/assist/` (the assistants of the element settings: window, mouse, colour, WI-0110) | `editor-assist` |
 | `editor-geometry` | `editor/` (the geometry, the view, the scene and the hit test, WI-0084) | `editor-geometry` |
 
 Outside `src/` the rules are `OTHER_RULES` in `tests/support/groups.py` (first match wins): `doc/` runs `docs` and `architecture` only (`doc/PROTOCOL.md` also `transport`); `tools/<tool>.py` runs the group `tools` (exceptions listed first); a helper or a data file of `tests/` names the groups of the tests that read it, or `None` (everything) for shared infrastructure, or `[]` when no test reads it (`tests/stress/stresskit.py`: only the stress tests read it, and the selection never runs them); benchmarks and probes that no test calls name the groups of the code they exercise; `v1/` is the reference code and names no group except the golden data (`v1/AutoHotKey/`, `v1/Source_Elements/`); a changed test file selects itself; `work_items/`, `.claude/` and `NEEDS-ATTENTION.md` select nothing. A file of `src/` that no area pattern matches is an error as well: a new folder needs an area in `SOURCE_AREAS`.
@@ -92,6 +93,7 @@ A test file may verify several things; its groups are listed in `tests/support/g
 | `ui` | dialogs, windows, `GuiLayout`, the UI texts |
 | `manager`, `tray` | the manager headless (flows, import, log, notices), the tray |
 | `editor-form` | the settings form of an element without a window: fields, values, checks, CheckSettings (headless) |
+| `editor-assist` | the assistants of the element settings with a fake window and pixel source (headless); the gui probe of the window assistant is `fault/test_editor_assist_gui.py` (owner) |
 | `editor-geometry` | the flow geometry, the view math (zoom, move, DPI), the scene and the hit test (headless) |
 | `element-units` | the `ahk/element_*.test.ahk` units and the generated include lists |
 | `help` | the help pages: every core element has its source, the generated HTML is current, the links resolve (`tests/test_help.py`, `tools/gen_help.py --check`) |
