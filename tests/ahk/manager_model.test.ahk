@@ -423,6 +423,60 @@ CheckNoticeBeforeSnapshot() {
     Assert.Equal(m.Flow("B")["unseen"], false)
 }
 
+TestRun.Case("An exception notice keeps its errorId, and the error window asks the engine for the variables", () => CheckErrorAsk())
+CheckErrorAsk() {
+    pm := ReadyModel()
+    m := pm[2]
+    peer := pm[1]
+    seen := []
+    m.AddListener((kind, data) => (kind = "error" ? seen.Push(data) : 0))
+    m.OnEvent("evt.ui.notice", Evt(100, 11, Map("kind", "exception", "level", "error", "flowId", "A", "key", "Notice_exception"
+        , "args", ["Name A", "t1", "boom"], "held", 0, "errorId", "err-7")))
+    n := m.notices[m.notices.Length]["n"]
+    Assert.Equal(m.notices[m.notices.Length]["errorId"], "err-7")
+    Assert.Equal(m.OpenError(n), true, "an exception notice with an errorId is asked for")
+    Assert.Equal(peer.Count("cmd.flow.error.get"), 1)
+    req := peer.requests[peer.requests.Length]
+    Assert.Equal(req["payload"]["flowId"], "A")
+    Assert.Equal(req["payload"]["errorId"], "err-7")
+    peer.Answer(Map("ok", 1, "entry", Map("errorId", "err-7", "flowId", "A", "flowName", "Name A", "elementId", "t1"
+        , "message", "boom", "time", "2026-10-21 08:00:00", "vars", [Map("scope", "thread", "name", "A_X", "value", "1")]
+        , "omitted", 0)))
+    Assert.Equal(seen.Length, 1, "the answer is an event for the window")
+    Assert.Equal(seen[1]["ok"], true)
+    Assert.Equal(seen[1]["entry"]["vars"].Length, 1)
+    ; While the window is open, a new unhandled error is asked for as well.
+    m.OnEvent("evt.ui.notice", Evt(100, 12, Map("kind", "exception", "level", "error", "flowId", "B", "key", "Notice_exception"
+        , "args", ["Name B", "t2", "boom"], "held", 0, "errorId", "err-8")))
+    Assert.Equal(peer.Count("cmd.flow.error.get"), 1, "the new error of the open window is asked for (the first is answered)")
+    Assert.Equal(peer.requests[peer.requests.Length]["payload"]["errorId"], "err-8")
+    ; Closing the window stops that; a notice without an errorId or of another kind asks for nothing.
+    m.CloseError()
+    m.OnEvent("evt.ui.notice", Evt(100, 13, Map("kind", "exception", "level", "error", "flowId", "A", "key", "Notice_exception"
+        , "args", ["Name A", "t3", "boom"], "held", 0, "errorId", "err-9")))
+    m.OnEvent("evt.ui.notice", Evt(100, 14, Map("kind", "storage", "level", "error", "key", "Notice_storage"
+        , "args", ["flows.list", "", "x"], "held", 0)))
+    Assert.Equal(peer.Count("cmd.flow.error.get"), 1, "closed: nothing more is asked for")
+    Assert.Equal(m.notices[m.notices.Length]["kind"], "storage")
+    Assert.Equal(m.OpenError(m.notices[m.notices.Length]["n"]), false, "a storage notice has no variables")
+}
+
+TestRun.Case("An error that the engine no longer keeps is an answer that is not ok", () => CheckErrorGone())
+CheckErrorGone() {
+    pm := ReadyModel()
+    m := pm[2]
+    peer := pm[1]
+    m.OnEvent("evt.ui.notice", Evt(100, 11, Map("kind", "exception", "level", "error", "flowId", "A", "key", "Notice_exception"
+        , "args", ["Name A", "t1", "boom"], "held", 0, "errorId", "err-3")))
+    done := []
+    m.OpenError(m.notices[m.notices.Length]["n"], (data) => done.Push(data))
+    peer.Answer(Map("ok", 0, "error", Map("code", "not_found", "message", "gone")))
+    Assert.Equal(done.Length, 1)
+    Assert.Equal(done[1]["ok"], false)
+    Assert.Equal(done[1]["code"], "not_found")
+    Assert.Equal(m.errorShown["code"], "not_found", "the window shows the refusal")
+}
+
 TestRun.Finish()
 
 HasValue(list, value) {

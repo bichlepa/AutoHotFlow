@@ -104,6 +104,9 @@ class ManagerModel {
         ; Notices (WI-0075, PROTOCOL 4.8): the newest NOTICE_KEEP of topic notice, in memory only.
         this.notices := []
         this.noticeCount := 0          ; n of the newest notice (numbers are not reused)
+        this.errorN := 0              ; the notice whose variables the error window shows (WI-0113), 0 for none
+        this.errorFollow := false     ; the error window is open: a new unhandled error replaces its content (WI-0113)
+        this.errorShown := ""         ; the last answer of cmd.flow.error.get as the window has it (the "error" event)
         this.unseenIds := Map()        ; flowId -> true: an error notice the user has not looked at (kept until a snapshot knows the flow)
     }
 
@@ -333,7 +336,7 @@ class ManagerModel {
         this.noticeCount += 1
         entry := Map("n", this.noticeCount, "kind", p.Get("kind", ""), "level", p.Get("level", "")
             , "flowId", p.Get("flowId", ""), "key", p.Get("key", ""), "args", p.Get("args", []), "held", p.Get("held", 0)
-            , "clock", FormatTime(, "HH:mm:ss"), "ms", ManagerModel.WallMs())
+            , "errorId", p.Get("errorId", ""), "clock", FormatTime(, "HH:mm:ss"), "ms", ManagerModel.WallMs())
         this.notices.Push(entry)
         if (this.notices.Length > ManagerModel.NOTICE_KEEP)
             this.notices.RemoveAt(1)
@@ -346,6 +349,9 @@ class ManagerModel {
             }
         }
         this._Notify("notice", entry)
+        ; The error window is open: the new unhandled error replaces its content, as v1 did (WI-0113).
+        if (this.errorFollow && entry["kind"] = "exception" && entry["errorId"] != "")
+            this.OpenError(entry["n"])
     }
 
     ; The user opened the list of notices: the marks of the flows go (PROTOCOL 4.8).
@@ -365,8 +371,59 @@ class ManagerModel {
         out := []
         for e in this.notices
             out.Push(Map("n", e["n"], "kind", e["kind"], "level", e["level"], "flowId", e["flowId"], "key", e["key"]
-                , "args", e["args"], "held", e["held"]))
+                , "args", e["args"], "held", e["held"], "errorId", e["errorId"]))
         return out
+    }
+
+    ; The button "Show variables" of the list of notices and the error window (WI-0113, PROTOCOL 4.7a, 4.8): asks the engine
+    ; for the copy of the variables of notice n, which must be an exception notice with an errorId. The answer comes as the
+    ; event "error" (data: Map(n, ok, entry? | code, message)) and goes to done(data) when given. Returns false (nothing sent)
+    ; when notice n is no such notice. The window stays in step: while it is open, a new unhandled error is asked for too.
+    OpenError(n, done := "") {
+        for e in this.notices {
+            if (e["n"] != n)
+                continue
+            if (e["kind"] != "exception" || e["errorId"] = "" || e["flowId"] = "")
+                return false
+            this.errorN := n
+            this.errorFollow := true
+            try {
+                this.peer.Request("engine", "cmd.flow.error.get", Map("flowId", e["flowId"], "errorId", e["errorId"])
+                    , (ans) => this._OnError(n, ans, done), ManagerModel.COMMAND_MS)
+            } catch as err {
+                this._ErrorAnswered(Map("n", n, "ok", false, "code", "not_sent", "message", err.Message), done)
+            }
+            return true
+        }
+        return false
+    }
+
+    ; The error window is closed or hidden: a new unhandled error no longer replaces its content (WI-0113).
+    CloseError() {
+        this.errorFollow := false
+        this.errorN := 0
+    }
+
+    _OnError(n, ans, done) {
+        if (n != this.errorN)      ; an answer of an earlier request: the window shows the newest error asked for
+            return
+        p := ans.payload
+        if (p.Get("ok", 0)) {
+            entry := p.Get("entry", Map())
+            this._ErrorAnswered(Map("n", n, "ok", true, "entry", entry), done)
+            return
+        }
+        message := ""
+        if (p.Has("error") && IsObject(p["error"]))
+            message := p["error"].Get("message", "")
+        this._ErrorAnswered(Map("n", n, "ok", false, "code", ManagerModel.Outcome(p), "message", message), done)
+    }
+
+    _ErrorAnswered(data, done) {
+        this.errorShown := data
+        this._Notify("error", data)
+        if (IsObject(done))
+            done(data)
     }
 
     ; The button "Open editor" of the list of notices (WI-0103, PROTOCOL 4.8): the editor of the flow of notice n, when that

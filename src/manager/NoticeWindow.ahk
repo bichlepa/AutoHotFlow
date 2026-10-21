@@ -17,9 +17,10 @@ class NoticeWindow {
     static WIDTH := 760
     static HEIGHT := 420
 
-    __New(model, openEditor := "") {
+    __New(model, openEditor := "", openError := "") {
         this.model := model
         this.openEditor := openEditor      ; fn(flowId): the editor of a flow (WI-0103, the button "Open editor")
+        this.openError := openError        ; fn(n): the window of an unhandled error of notice n (WI-0113, "Show variables")
         this.rowNotices := []              ; the entry of each row, as the rows are shown
         this.win := UiWindow("manager.notices", "Notices", NoticeWindow.WIDTH, NoticeWindow.HEIGHT)
         this.win.hideOnClose := true
@@ -33,10 +34,30 @@ class NoticeWindow {
         this.lv.ModifyCol(3, GuiLayout.Scale(lay, 170))
         this.lv.ModifyCol(4, GuiLayout.Scale(lay, 380))
         this.status := g.AddText()
-        this.win.Place(this.status, 12, 390, 540, 20)
+        this.win.Place(this.status, 12, 390, 380, 20)
+        this.errorBtn := g.AddButton(, Lang("Notice_show_error"))
+        this.win.Place(this.errorBtn, 400, 386, 168, 26)
+        this.errorBtn.OnEvent("Click", (*) => this.OpenSelectedError())
         this.openBtn := g.AddButton(, Lang("Notice_open_editor"))
         this.win.Place(this.openBtn, 580, 386, 168, 26)
         this.openBtn.OnEvent("Click", (*) => this.OpenSelected())
+    }
+
+    ; The button "Show variables" (WI-0113): the error window of the selected notice, which must be an exception notice that
+    ; has an errorId. The model asks the engine (ManagerModel.OpenError); the window is made by the owner (openError).
+    OpenSelectedError() {
+        row := this.lv.GetNext(0)
+        if (row = 0 || row > this.rowNotices.Length) {
+            this.win.Text(this.status, "Notice_pick_error")
+            return
+        }
+        e := this.rowNotices[row]
+        if (e["kind"] != "exception" || e["errorId"] = "") {
+            this.win.Text(this.status, "Notice_not_error")
+            return
+        }
+        if (IsObject(this.openError))
+            this.openError(e["n"])
     }
 
     ; The button "Open editor" (WI-0103): the editor of the selected notice, which must be an editor notice. Nothing else

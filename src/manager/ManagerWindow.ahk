@@ -7,6 +7,7 @@
 #Include ManagerModel.ahk
 #Include LogWindow.ahk
 #Include NoticeWindow.ahk
+#Include ErrorWindow.ahk
 #Include ImportReportWindow.ahk
 #Include SettingsWindow.ahk
 #Include AboutWindow.ahk
@@ -74,6 +75,7 @@ class ManagerWindow {
         this.ops.ask := this
         this.logView := ""             ; the LogWindow, made at the first "Show log"
         this.noticeView := ""          ; the NoticeWindow (WI-0075), made at the first "Notices"
+        this.errorView := ""           ; the ErrorWindow (WI-0113), made at the first "Show variables"
         this.importView := ""         ; the report of the import from v1 (WI-0076), made at the first import
         this.settingsView := ""       ; the settings dialog (WI-0078), made by each click on "Settings"
         this.aboutView := ""          ; the about window (WI-0078), made by each click on "About"
@@ -129,8 +131,17 @@ class ManagerWindow {
     ; The list of notices (WI-0075): made at the first call, then shown. The model is changed by the role (OpenNotices).
     ShowNotices() {
         if (!IsObject(this.noticeView))
-            this.noticeView := NoticeWindow(this.model, (flowId) => this.model.OpenEditor(flowId))
+            this.noticeView := NoticeWindow(this.model, (flowId) => this.model.OpenEditor(flowId), (n) => this.ShowError(n))
         this.noticeView.Show()
+    }
+
+    ; The window of an unhandled error (WI-0113): made at the first call, shown at once; the model asks the engine for the
+    ; variables and answers with the event "error" (the window shows it when it comes).
+    ShowError(n) {
+        if (!IsObject(this.errorView))
+            this.errorView := ErrorWindow(this.model)
+        this.errorView.Show()
+        this.model.OpenError(n)
     }
 
     ; The redraw timer runs only while the window is visible (owner decision, 2026-10-17): it starts when the window is shown
@@ -183,6 +194,8 @@ class ManagerWindow {
             this.logView.Close()
         if (IsObject(this.noticeView))
             this.noticeView.Close()
+        if (IsObject(this.errorView))
+            this.errorView.Close()
         if (IsObject(this.importView))
             this.importView.Close()
         if (IsObject(this.settingsView))
@@ -206,6 +219,8 @@ class ManagerWindow {
             this.logView.Relabel()
         if (IsObject(this.noticeView))
             this.noticeView.Relabel()
+        if (IsObject(this.errorView))
+            this.errorView.Relabel()
     }
 
     ; The settings dialog (WI-0078): a new one each time it is opened; a dialog that is open is not made twice.
@@ -255,6 +270,8 @@ class ManagerWindow {
             this.ops.OfferElevatedRestart()
         else if ((kind = "notice" || kind = "notices") && IsObject(this.noticeView))
             this.noticeView.Refresh()
+        else if (kind = "error" && IsObject(this.errorView))
+            this.errorView.Update(data)
     }
 
     ; The tree follows a selection made by the model (the driver, an operation): the item is selected without rebuilding.

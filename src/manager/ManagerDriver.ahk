@@ -46,6 +46,8 @@ class ManagerDriver {
         this.ops["disable"] := (args, done) => this._OpSwitch(args, done, false)
         this.ops["edit"] := (args, done) => this._OpEdit(args, done)
         this.ops["openNotice"] := (args, done) => this._OpOpenNotice(args, done)
+        this.ops["openError"] := (args, done) => this._OpOpenError(args, done)
+        this.ops["errorState"] := (args, done) => this._OpErrorState(args, done)
         this.ops["create"] := (args, done) => this.flowOps.NewFlow(args.Get("category", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
         this.ops["duplicate"] := (args, done) => this.flowOps.Duplicate(args.Get("flowId", ""), (ans) => done(ManagerDriver.AnswerResult(ans)))
         this.ops["delete"] := (args, done) => this.flowOps.Delete(ManagerDriver.Ids(args), (ans) => done(ManagerDriver.AnswerResult(ans)))
@@ -106,6 +108,37 @@ class ManagerDriver {
             , "answerOk", Json.Bool(ans.Get("ok", false)), "code", ans.Get("code", ""))))
         if (!sent)
             done(Map("ok", Json.True, "sent", Json.False))
+    }
+
+    ; WI-0113: the button "Show variables" of the list of notices for notice n, without a window (the model asks the engine
+    ; as ManagerWindow.ShowError does). Answers { ok, sent, answerOk, code?, vars?, omitted? }: sent false when notice n is
+    ; no exception notice with an errorId (no request goes out); vars and omitted are those of the copy the engine answered.
+    _OpOpenError(args, done) {
+        n := args.Get("n", 0)
+        sent := this.model.OpenError(n, (data) => this._ErrorDone(data, done))
+        if (!sent)
+            done(Map("ok", Json.True, "sent", Json.False))
+    }
+
+    ; WI-0113: the error window of the model as it is: whether a new unhandled error replaces it (follow), the notice it asks
+    ; for (n) and the last answer (shown: the event "error" data, or "" when there is none). Answers { ok, follow, n, shown }.
+    _OpErrorState(args, done) {
+        shown := this.model.errorShown
+        if (IsObject(shown)) {
+            shown := Map("n", shown["n"], "ok", Json.Bool(shown["ok"]), "entry", shown.Get("entry", Map())
+                , "code", shown.Get("code", ""), "message", shown.Get("message", ""))
+        }
+        done(Map("ok", Json.True, "follow", Json.Bool(this.model.errorFollow), "n", this.model.errorN
+            , "shown", shown))
+    }
+
+    _ErrorDone(data, done) {
+        out := Map("ok", Json.True, "sent", Json.True, "answerOk", Json.Bool(data["ok"]), "code", data.Get("code", ""))
+        if (data["ok"]) {
+            out["vars"] := data["entry"]["vars"].Length
+            out["omitted"] := data["entry"].Get("omitted", 0)
+        }
+        done(out)
     }
 
     _OpEdit(args, done) {
