@@ -57,6 +57,8 @@ WI-0107 (haiku, wi-107).
 
 ## Last verified state
 
+Commit `9ed7e2ae` (WI-0111, WI-0115, the F-0177 test fix integrated; all tiers): fast 2208 passed, foundation 471 passed, slow 206 passed, VERDICT green (runs 20261021-212522-9ed7e2ae, -2, -3).
+
 Commit `b55810dc` (WI-0109 and WI-0110 integrated, F-0174 fix; all tiers): fast 2174 passed, 1 failed (`test_settings::test_the_log_thresholds_change_in_every_role_at_once`, F-0177: no peer tray, frequent under load), foundation 471 passed, slow 206 passed (runs 20261021-204324-b55810dc, -2, -3). VERDICT red only by F-0177 (hunter round).
 
 Commit `e597935a` (WI-0104, WI-0106 and the S0006 acceptance integrated; all tiers): fast 2109 passed, foundation 471 passed, slow 205 passed, 1 failed (`test_flow_autosave` every-10-s: `no peer engine` after about 60 patches under load, F-0174, a hunter entry; green alone) (runs 20261021-193520-e597935a, -2, -3). VERDICT red only by that.
