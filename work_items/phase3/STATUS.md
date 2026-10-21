@@ -57,6 +57,8 @@ WI-0102 (haiku, workspace wi-102).
 
 ## Last verified state
 
+Commit `cf085e1f` (WI-0101 and WI-0113 integrated, all tiers): fast 2066 passed, foundation 471 passed, slow 204 passed, 2 failed under load, both green alone (recheck): `test_log_burst` stand-still, and `test_flow_autosave` every-10-s (fourth load failure; the WI-0095 author investigates the cause: ok:false of a patch) (runs 20261021-091309-cf085e1f, -2, -3).
+
 Commit `f58bb0b2` (WI-0105, WI-0112, WI-0100 integrated; fast, foundation, slow): fast 2023 passed, 1 failed (`test_worker_reports_not_busy_after_a_cancel_too`, load flake), foundation 471, slow 205 passed, 1 failed (`test_flow_autosave::test_patches_every_second_give_a_write_at_least_every_10_s`: a patch answered `ok: false` at test line 174 under load; green alone in recheck 20261021-084542-recheck; third load failure of this test, to harden: it should tolerate or retry a refused patch) (runs 20261021-083332-f58bb0b2, -2, -3). VERDICT red only by these.
 
 Commit `be95b747` (WI-0098 and WI-0099 integrated; selection of 19 groups): 2179 passed, 2 failed under load, both green alone (`test_worker_lifecycle` cold start: recheck 20261021-075807-recheck; `test_flow_autosave` every-10-s timing: serial green; another autosave test failed alone once by a torn read of the flow file, fixed in the test helper); VERDICT red only by those (run 20261021-074758-be95b747). Earlier, `740897e1` (WI-0095): 13 red in the select run, all load or input tests (`test_hotkey_input` @input ids cannot be rechecked by `recheck.py`, skipped alone); not classified further.
