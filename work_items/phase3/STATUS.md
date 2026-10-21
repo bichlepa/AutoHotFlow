@@ -78,6 +78,8 @@ None.
 
 ## Last verified state
 
+Commit `852b9a03` (WI-0107 and WI-0114 integrated; selection of 13 groups and 5 files): 1859 passed, 1 skipped, VERDICT green (run 20261022-004728-852b9a03). The full tiers ran on `d6558ccb` (the code state of WI-0114, only documents differ): fast 2245, foundation 471, slow 206, stress 34, all green.
+
 Commit `9ed7e2ae` (WI-0111, WI-0115, the F-0177 test fix integrated; all tiers): fast 2208 passed, foundation 471 passed, slow 206 passed, VERDICT green (runs 20261021-212522-9ed7e2ae, -2, -3).
 
 Commit `b55810dc` (WI-0109 and WI-0110 integrated, F-0174 fix; all tiers): fast 2174 passed, 1 failed (`test_settings::test_the_log_thresholds_change_in_every_role_at_once`, F-0177: no peer tray, frequent under load), foundation 471 passed, slow 206 passed (runs 20261021-204324-b55810dc, -2, -3). VERDICT red only by F-0177 (hunter round).
