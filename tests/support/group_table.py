@@ -237,6 +237,7 @@ TEST_GROUPS = {
     "e2e/test_editor_clipboard.py": ["editor"],
     "e2e/test_editor_menus.py": ["editor"],
     "e2e/test_editor_settings.py": ["editor"],
+    "e2e/test_core_settings.py": ["editor", "elements-e2e"],
     "e2e/test_editor_flow_settings.py": ["editor"],
     "fault/test_editor_settings_gui.py": ["editor"],
     "fault/test_editor_flow_settings_gui.py": ["editor"],
