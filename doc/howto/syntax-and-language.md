@@ -464,3 +464,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Wrong:** `while (j >= 1 && KeyOf(sorted[j]) > KeyOf(value))` on text that does not look like a number.
 - **Right:** `StrCompare(a, b, "Off") > 0` (case-sensitive compare of texts), or `a < b` only for numbers.
 - **Status:** verified (`src/editor/ElementClipboard.ahk`, `tests/ahk/editor_clipboard.test.ahk`)
+
+### A parameter named like a built-in class hides the class in its function (verified)
+
+- **Problem:** `static ToIds(values, map)` called `out := Map()` inside, and the call failed with "This value of type \"Map\" has no method named \"Call\"". Names are case-insensitive in AutoHotkey v2, so the parameter `map` is the name `Map` in that function.
+- **Wrong:** Parameters or locals named like a built-in class or function (`map`, `string`, `array`, `type`).
+- **Right:** Name the parameter for what it holds (`mapping`).
+- **Status:** verified (`src/editor/assist/AssistantValues.ahk`, `tests/ahk/editor_assist.test.ahk`; the warning "same name as a global variable" of the interpreter shows it at load)
+- **Source:** `src/editor/assist/AssistantValues.ahk`
+
+### A callback held in a property is called with its object as first argument (verified)
+
+- **Problem:** `ColorAssistant.Pick(current, owner)` with `static Pick := (current, owner) => ...` failed with "Too many parameters passed to function": the object was passed as the first argument too.
+- **Wrong:** `obj.Prop(args)` for a function object stored in a property.
+- **Right:** `obj.Prop.Call(args)` passes exactly the arguments.
+- **Status:** verified (the test `StartColor` failed with the error and passed after the change; `src/editor/assist/ColorAssistant.ahk` and the callbacks `onDone` of the assistants use `.Call`, the same pattern)
+- **Source:** `src/editor/EditorSettings.ahk` (`StartAssistant`)

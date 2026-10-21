@@ -316,3 +316,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `g.AddDDL("AltSubmit", items)` (a list that the user types in is `AddComboBox`). With `AltSubmit`, `box.Value` is the index of the item.
 - **Status:** verified (tests/ahk/editor_flow_settings_window.test.ahk builds the window without showing it)
 - **Source:** src/editor/form/FlowSettingsWindow.ahk (WI-0109)
+
+### Hotkey variants of a HotIf criterion are found by the criterion object (assumed)
+
+- **Problem:** The Ctrl cursor keys of the mouse tracker are on while the tracker is open and must be off again when it closes. A `Hotkey(key, "Off")` must find the variant it turned on.
+- **Wrong:** `HotIf(this._Active)` in two places: each access of a method reference makes its own function object, and the variant is not found again.
+- **Right:** One function object for the criterion (`this.activeFn := (*) => ...` in `__New`), `HotIf(criterion)` before each `Hotkey` call, and `HotIf()` without a parameter afterwards, which resets the context of the thread (HotIf help page).
+- **Status:** assumed (the rule is from the HotIf help page; no run switched a hotkey off with a criterion; the owner's gui test covers the window assistant only)
+- **Source:** `src/editor/assist/MouseAssistant.ahk` (`_Nudging`)
