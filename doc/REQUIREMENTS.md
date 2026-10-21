@@ -731,6 +731,8 @@ Every element has a help page that says what it does and what its parameters mea
 
 The action and the trigger run AutoHotkey v2 code, separately from the flows (E0039). An imported v1 script is kept as text and marked; it does not run until it is ported, by hand or with the help of an AI (REQ-AI-040, MIGRATION M-0049).
 
+The variables are exchanged as in v1 (E0104): the variables the user names for import are global variables of the script when it starts; the variables named for export are read when the script ends (the action) or when the script calls `x_trigger()` (the trigger), and set in the flow. Texts, numbers, lists and objects can be exchanged. Stopping the flow ends the script.
+
 ### REQ-ELM-200 Variables and calculations
 
 - **v1:** yes
@@ -1386,7 +1388,7 @@ Export selected flows to an `.ahf` file (a ZIP archive); import from such a file
 - **Scope:** port
 - **Plan:** S0008
 
-AutoHotFlow ships demo flows in their own category. They cannot be deleted or renamed, but the user can hide them (setting "Hide demonstration flows").
+AutoHotFlow ships demo flows in their own category "Demonstration". They cannot be deleted, renamed or changed: the editor shows them read only and says that a duplicate can be edited. The user can hide them (setting "Hide demonstration flows"). They are disabled until the user enables them. v2 ships three of the four v1 demos; the "Update checker" is left out, because a check for updates is a feature of its own that is off until the user switches it on (REQ-SEC-050, E0105).
 
 ### REQ-MGR-070 Show the log
 
@@ -2660,16 +2662,6 @@ No interpreter extensions; the program follows the official AutoHotkey v2 releas
 - **Scope:** port
 - **Plan:** -
 - **Evidence:** `tests/test_architecture.py`
-
-### REQ-MNT-040 Elements can be ported largely mechanically
-
-- **v1:** n/a
-- **v2:** open
-- **Prio:** should
-- **Scope:** port
-- **Plan:** S0008 (E0036)
-
-A converter `tools/convert_element.py` turns a v1 element into a v2 class; the hand-ported core set of S0002 serves as its test cases.
 
 ### REQ-MNT-050 Deliberate changes are documented
 

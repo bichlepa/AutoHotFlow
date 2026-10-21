@@ -13,13 +13,14 @@ Kept by the orchestrator as described in `doc/ORCHESTRATOR.md`. This file shows 
 | S0005 Editor I: display | WI-0083 to WI-0092 | done (acceptance WI-0092 on 2026-10-20; manual check 9 passed, look accepted, E0088; step 25 (4K) not run, REQ-PRF-060 partial, F-0156 postponed) |
 | S0006 Editor II: editing | WI-0093 to WI-0104 | accepted by WI-0104 (agent part, 2026-10-21, E0091 to E0094); manual check 10 open for the owner |
 | S0007 Editor III: settings dialogs | WI-0105 to WI-0115 | detailed on 2026-10-20 together with S0006 (E0095 to E0100); refined by the retrospective of WI-0104 before its packages start |
-| S0008 to S0010 | | rough, see the plan |
+| S0008 Remaining elements | WI-0116 to WI-0135 | detailed on 2026-10-21 (E0102 to E0105); refined by the retrospective of WI-0114 before its element packages start |
+| S0009 to S0010 | | rough, see the plan |
 
 Step-independent: WI-0059 (test admission, load report, run history) is done.
 
 ## Work items of the next steps
 
-S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-0093 first, with WI-0097 and WI-0103 beside it; then WI-0094, WI-0095 and WI-0096; then WI-0098 to WI-0102 one after the other; then WI-0104. S0007 packages without an S0006 dependency (WI-0105, WI-0112, WI-0113) may run beside S0006 when the files do not clash (E0095). The history of S0005 is in the git history of this file (commit `830ddffc`).
+S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-0093 first, with WI-0097 and WI-0103 beside it; then WI-0094, WI-0095 and WI-0096; then WI-0098 to WI-0102 one after the other; then WI-0104. S0007 packages without an S0006 dependency (WI-0105, WI-0112, WI-0113) may run beside S0006 when the files do not clash (E0095). S0008 is detailed (README, section S0008): WI-0116 and WI-0117 may run beside WI-0107 and WI-0114; the element packages start after WI-0114 and its refinement. The history of S0005 is in the git history of this file (commit `830ddffc`).
 
 | WI | Title | State | Model | Commits | Date | Note |
 |---|---|---|---|---|---|---|
@@ -46,6 +47,26 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0113 | Window of an unhandled error | done | haiku | see git log | 2026-10-21 | PROTOCOL 4.7a; owner: variable values (also passwords) kept in engine memory and shown in clear text; cyclic object cannot be stringified (not reachable via normal assignment); tray click does not open it; slow/foundation tiers via verify | | | | may run beside S0006 (not with WI-0093/WI-0094: `Executor.ahk`) |
 | WI-0115 | Help viewer with WebView2 | done | haiku | f1e44ea5, 779b9531 | 2026-10-21 | E0099; spike ok (runtime 155, real window); loader DLL by the setup task (not committed, S0009 ships it); gui check at 100/225 % for the owner (tests/fault/test_help_webview2_gui.py); links to the web and the new-window request not checked; HOW-TO com-and-native-calls.md |
 | WI-0114 | Acceptance S0007 | open | | | | manual check 11 |
+| WI-0116 | Check of the parameter schema against v1 | open | | | |  |
+| WI-0117 | Seam `SystemOps` (E0103) | open | | | |  |
+| WI-0118 | Calculations, script, date and time | open | | | |  |
+| WI-0119 | Strings and list conversions | open | | | |  |
+| WI-0120 | Files and folders I | open | | | |  |
+| WI-0121 | Files and folders II, file loop, ini | open | | | |  |
+| WI-0122 | Archives, drives, internet | open | | | |  |
+| WI-0123 | Programs and processes, clipboard, power and session | open | | | |  |
+| WI-0124 | Sound and speech | open | | | |  |
+| WI-0125 | Windows and controls | open | | | |  |
+| WI-0126 | Mouse and keyboard | open | | | |  |
+| WI-0127 | Screen and images | open | | | |  |
+| WI-0128 | Input box, file and folder selection | open | | | |  |
+| WI-0129 | `Action_Set_element_parameter` | open | | | | after WI-0107 |
+| WI-0130 | AutoHotkey script action and trigger (E0104) | open | | | |  |
+| WI-0131 | Triggers: time of day, user idle time, clipboard, hotstring | open | | | |  |
+| WI-0132 | Triggers: windows and processes | open | | | |  |
+| WI-0133 | Shortcut trigger and the flow commands | open | | | |  |
+| WI-0134 | Demonstration flows (E0105) | open | | | |  |
+| WI-0135 | Acceptance S0008 | open | | | | manual check 12 |
 
 ## Pending integrations
 

@@ -473,9 +473,9 @@ Additionally: in v1, in the error case of the window parameter in `Element_enabl
 | `Return %x%` | `return x` |
 | `global` declaration in functions | explicit parameters or `static` |
 
-A converter (`tools/convert_element.py`, at the start of S0008, E0036; the core set of S0002 is ported by hand and serves as its before/after test cases) applies the rows of this table automatically, sets `Mode` by heuristic, and marks every place that cannot be converted unambiguously with `; TODO(v2-review): <reason>`.
+There is no converter (E0102, supersedes E0036): every element is ported by hand with this table, from the v1 help text and the behaviour of AutoHotkey v2 (E0035); the v1 code is a reference for the parameter schema, not for `Run`. The parameter schema of a ported class is checked against v1 (WI-0116).
 
-**Heuristic for `Mode`:** `worker` if the source contains one of `RunWait`, `WinWait*`, `MsgBox`, `InputBox`, `FileSelect*`, `URLDownloadToFile`, `HTTPRequest`, `DllCall`, `ComObject`, `Gui`, `Sleep` (outside of timers), `x_ExecuteInNewAHKThread`. Otherwise `inline`. Trigger classes are always `trigger`. The result is checked by hand.
+**Rule for `Mode`:** `worker` if the element accesses a file, a folder, a drive or an ini file (the architecture check forbids file access in an inline element, rule `inline-element`), or uses `RunWait`, `WinWait*`, another window or process, a dialog, the network, `DllCall`, `ComObject` or a `Gui`, or waits (`Sleep`). Otherwise `inline`: computations on numbers, strings, lists and times. Trigger classes are always `trigger`.
 
 **Marked as uncertain (do not guess):** everything with its own AHK thread, COM, DllCall, TTS, Eject, `Class_Monitor`, screen settings, `Block_User_Input`.
 

@@ -74,7 +74,7 @@ L296-316 9a. Dialog tests (E0038, WI-0051)
 L318-338 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (59.9 KB, 515 lines)
+## doc/ELEMENT-API-V2.md (60.0 KB, 515 lines)
 ```text
 L8-18 1. Guidelines
 L20-112 2. Class contract
