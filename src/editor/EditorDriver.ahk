@@ -24,6 +24,8 @@
 ;                                       pointer methods as the window (EditorPointer)
 ;   cmd.test.key {key, ctrl?, shift?}   a key of the editor window as WM_KEYDOWN gives it (WI-0098, EditorKeys): key "Esc" or
 ;                                       one letter; answers handled (the table has it)
+;   cmd.test.class {id}                 the answer of the open class list of a new element (WI-0099): the qualified ID the list
+;                                       offers, or "" for Cancel. The list is in cmd.test.state (choice)
 ;
 ; Booleans on the wire are Json.True and Json.False (PROTOCOL 2): the state fields enabled and armed are written with Json.Bool.
 class EditorDriver {
@@ -35,6 +37,7 @@ class EditorDriver {
         this.model := model
         this.answer := "no"           ; the answer to the questions of the flow commands (ask seam, Confirm)
         this.asked := []              ; the kinds of the questions asked so far (EditorFlowOps)
+        this.choice := ""             ; the open class list of a new element: Map(kind, groups, done), or "" (WI-0099)
         role.On("cmd.test.state", (msg) => Map("ok", true, "state", this.State()))
         role.On("cmd.test.render", (msg) => this._OnRender(msg))
         role.On("cmd.test.close", (msg) => this._OnClose())
@@ -47,6 +50,47 @@ class EditorDriver {
         role.On("cmd.test.undo", (msg) => this._OnStep(msg, "undo"))
         role.On("cmd.test.redo", (msg) => this._OnStep(msg, "redo"))
         role.On("cmd.test.select", (msg) => this._OnSelect(msg))
+        role.On("cmd.test.class", (msg) => this._OnClass(msg))
+    }
+
+    ; The class list of a new element (the chooser seam of EditorAdd): it stays open until cmd.test.class answers it.
+    Choose(kind, groups, done) {
+        this.choice := Map("kind", kind, "groups", groups, "done", done)
+    }
+
+    ; cmd.test.class {id}: the answer of the open list. id "" cancels; any other id must be one the list offers.
+    _OnClass(msg) {
+        if (!IsObject(this.choice))
+            return Map("ok", false, "error", Map("code", ErrCode.BUSY, "message", "no class list is open"))
+        id := msg.payload.Get("id", "")
+        if (IsObject(id) || (id != "" && !EditorDriver._Offers(this.choice["groups"], id)))
+            return Map("ok", false, "error", Map("code", ErrCode.BAD_PAYLOAD, "message", "id is one the list offers, or empty"))
+        done := this.choice["done"]
+        this.choice := ""
+        done(id)
+        return Map("ok", true)
+    }
+
+    static _Offers(groups, id) {
+        for group in groups {
+            for item in group[2] {
+                if (item[1] = id)
+                    return true
+            }
+        }
+        return false
+    }
+
+    ; The open class list for the state: its kind and its items in the order of the list ("" when none is open).
+    _ChoiceText() {
+        if (!IsObject(this.choice))
+            return ""
+        items := []
+        for group in this.choice["groups"] {
+            for item in group[2]
+                items.Push(Map("category", group[1], "id", item[1], "label", item[2]))
+        }
+        return Map("kind", this.choice["kind"], "items", items)
     }
 
     ; cmd.test.mouse {button, action, x, y, ctrl?}: the same calls as the window makes for its messages (EditorWindow._OnDown,
@@ -241,6 +285,10 @@ class EditorDriver {
         st["undo"] := m["undo"]
         st["redo"] := m["redo"]
         st["pending"] := m["pending"]
+        st["choice"] := this._ChoiceText()
+        sc := this.model.CurrentScene()
+        g := IsObject(sc) ? sc.Ghost : ""                     ; the box of a new element being placed (WI-0099)
+        st["ghost"] := (g is FlowRect) ? Map("x", g.X, "y", g.Y, "w", g.W, "h", g.H) : ""
         st["tray"] := this.role.tray.State()
         st["asked"] := this.asked.Clone()
         st["frames"] := r["frames"]

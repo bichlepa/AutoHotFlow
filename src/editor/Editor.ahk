@@ -6,6 +6,7 @@
 #Include EditorModel.ahk
 #Include render\Renderer.ahk
 #Include EditorFlowOps.ahk
+#Include EditorAdd.ahk
 #Include EditorTray.ahk
 #Include EditorPointer.ahk
 #Include EditorKeys.ahk
@@ -35,6 +36,7 @@ class Editor extends Role {
         this.canvas := ""             ; the offscreen bitmap of the headless driver (cmd.test.render)
         this.driver := ""
         this.flowOps := ""            ; EditorFlowOps: Run and Enable or disable (the tray menu, the questions of the window)
+        this.add := ""                ; EditorAdd: a new element, placed by the pointer and given its class (WI-0099)
         this.tray := ""               ; EditorTray: the icon and the menu of this editor (REQ-EDT-230)
         this.started := false
         this.tornDown := false
@@ -50,6 +52,8 @@ class Editor extends Role {
         this.model.session := this.session
         this.model.AddListener((kind, data) => this._OnModel(kind, data))
         this.pointer := EditorPointer(this.model)
+        this.add := EditorAdd(this.model)
+        this.pointer.onPlace := (kind, x, y) => this.add.Placed(kind, x, y)
         this.On("evt.", (msg) => this.model.OnEvent(msg.type, msg.payload))
         this.On("cmd.editor.show", (msg) => this._OnShow(msg))
         this.On("cmd.app.prepareExit", (msg) => Map("ok", true, "cancel", Json.False))
@@ -59,6 +63,7 @@ class Editor extends Role {
         if (this.headless) {
             this.driver := EditorDriver(this, this.model)
             this.flowOps.ask := this.driver      ; the questions of the flow commands are answered by the test
+            this.add.chooser := this.driver      ; the class list of a new element is answered by the test (cmd.test.class)
         }
     }
 
@@ -70,6 +75,7 @@ class Editor extends Role {
             if (!this.headless) {
                 this.window := EditorWindow(this)
                 this.flowOps.ask := this.window
+                this.add.chooser := this.window
                 this.window.Show()
             }
             this.tray.Start()              ; the icon of this editor (hidden with --headless), its menu, the window icon
@@ -85,6 +91,8 @@ class Editor extends Role {
     OnSettings(settings) {
         if (IsObject(this.window))
             this.window.Refresh()
+        if (IsObject(this.add))
+            this.add.userLevel := settings.Get("userLevel", "Beginner")     ; the class list of a new element (REQ-USE-010)
         this._Tray()
     }
 
