@@ -31,12 +31,12 @@ L408-419 9. Performance budgets (targets, measured in Phase 2)
 L421-431 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (166.6 KB, 726 lines)
+## doc/PROTOCOL.md (169.1 KB, 728 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-699 4. Message Catalog
+L95-701 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
@@ -50,10 +50,10 @@ L472-491   4.7 Dialogs
 L493-528   4.8 Manager (WI-0073, `src/manager/`)
 L530-592   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
 L594-613   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L615-699   4.11 Role `editor` (WI-0088, `src/editor/`)
-L701-720 5. Connection setup, reconnection, resync
-L711-720   5a Events before subscription (design question, WI-0007)
-L722-726 6. Versioning and extension
+L615-701   4.11 Role `editor` (WI-0088, `src/editor/`)
+L703-722 5. Connection setup, reconnection, resync
+L713-722   5a Events before subscription (design question, WI-0007)
+L724-728 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (55.3 KB, 338 lines)
@@ -178,7 +178,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (34.7 KB, 257 lines)
+## doc/howto/gui-and-hotkeys.md (35.8 KB, 265 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -211,7 +211,8 @@ L219-225 GdipSaveImageToFile returns Win32Error (7) for an invalid file name (ve
 L227-233 The status bar of a window is laid out by the parent's WM_SIZE, and its height must be read after that (assumed) (assumed)
 L235-241 Round(x, n) returns text with n decimals, so Round(1, 2) shows "1.00" (verified) (verified)
 L243-249 A click on a TrayTip balloon comes as the icon's callback with NIN_BALLOONUSERCLICK (assumed) (assumed)
-L251-257 The mouse capture follows the state of the pointer, not the mouse message that ends a drag (assumed) (assumed)
+L251-257 The second click of a double click can arrive as WM_LBUTTONDBLCLK, not as a press (assumed) (assumed)
+L259-265 The mouse capture follows the state of the pointer, not the mouse message that ends a drag (assumed) (assumed)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)
@@ -287,7 +288,7 @@ L390-396 A flow ID with a space on the command line of a child process (verified
 L398-404 One timer for many jobs: SetTimer with the same function moves the run (verified)
 ```
 
-## doc/howto/syntax-and-language.md (46.0 KB, 451 lines)
+## doc/howto/syntax-and-language.md (47.2 KB, 459 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -341,10 +342,11 @@ L392-398 `Loop files` with the folder flag: check `A_LoopFileAttrib` for "D" and
 L399-405 A parameter or variable named like a class hides the class (names ignore case) (verified)
 L407-413 Sorting strings: an Array has no Sort, and `<` compares numbers (verified) (verified)
 L415-421 SplitPath splits at backslashes only; a forward-slash path gives a wrong name (verified) (verified)
-L423-429 An Array has no Sort method, and a function returns one value (verified) (verified)
-L431-437 Names are case-insensitive: a global `W` makes every local `w` of the included files a warning (verified) (verified)
-L439-444 A one-line `if (...) continue` is flagged by the editor's analyzer (partly verified)
-L446-451 A function and a local with the same name: the `Op` helper of a test (verified)
+L423-429 A local named like a class hides the class (verified) (verified)
+L431-437 An Array has no Sort method, and a function returns one value (verified) (verified)
+L439-445 Names are case-insensitive: a global `W` makes every local `w` of the included files a warning (verified) (verified)
+L447-452 A one-line `if (...) continue` is flagged by the editor's analyzer (partly verified)
+L454-459 A function and a local with the same name: the `Op` helper of a test (verified)
 ```
 
 ## doc/howto/tests-and-tools.md (49.2 KB, 482 lines)

@@ -1563,12 +1563,13 @@ Select one or several elements and connections: a click selects one (Ctrl adds o
 ### REQ-EDT-070 Connect elements
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the gestures, the types and the moves are tested headless through the window's mouse handlers; the real mouse and the dialogs: owner's check, not written yet, as REQ-EDT-060)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0006 (WI-0100)
+- **Evidence:** `tests/e2e/test_editor_connect.py`, `tests/ahk/editor_connect.test.ahk`
 
-Draw a connection between two elements and choose its type; change the type later. Not allowed: a connection into a trigger, from an element to itself, a second identical connection.
+Draw a connection between two elements and choose its type; change the type later. Not allowed: a connection into a trigger, from an element to itself, a second identical connection; a refused connection is shown in the status bar and nothing is sent. The plus of an element draws a connection from it (a loop has one for its head and one for its foot); dropped on empty space, it makes the new element (kind, then class). The plus of a connection inserts an element into it; the move buttons of a selected connection move its start or its end. A condition asks its type (yes, no or exception) when the type does not fit; a double click on a connection, or its edit button, asks the type again. Esc or the right button cancels.
 
 ### REQ-EDT-080 Delete, cut, copy and paste
 

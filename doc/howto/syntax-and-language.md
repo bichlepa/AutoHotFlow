@@ -420,6 +420,14 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (`tests/ahk/helpers/render_samples.ahk`, AutoHotkey 2.0.30, 2026-10-19)
 - **Source:** `tests/ahk/helpers/render_samples.ahk` (`BaseName`)
 
+### A local named like a class hides the class (verified)
+
+- **Problem:** A test built a scene in a local `scene` and then called `Scene.ConnectingOf(...)`. Names are case-insensitive, so the local hid the class: `This value of type "Scene" has no method named "ConnectingOf"`.
+- **Wrong:** `scene := TwoElementScene()` followed by `Scene.ConnectingOf(scene.Elements, ...)` in the same function.
+- **Right:** Name the local differently (`sc`). The same holds for every class name: no local, parameter or property may have the name of a class in scope.
+- **Status:** verified (the unit test failed with that message before the rename; `tests/ahk/editor_connect.test.ahk`)
+- **Source:** `tests/ahk/editor_connect.test.ahk`
+
 ### An Array has no Sort method, and a function returns one value (verified)
 
 - **Problem:** `list.Sort("N")` on an Array raised "This value of type "Array" has no method named "Sort"". `return a, b` from a function is a syntax error, and `a, b := f()` does not take two values.

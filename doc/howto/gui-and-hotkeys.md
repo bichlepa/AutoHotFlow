@@ -248,6 +248,14 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** assumed (the codes and the message come from the AHK docs; the headless tests send the click as a test command; the real click is the gui test `tests/fault/test_editor_crash_notice_gui.py` (gui), which agents do not run; the owner's check is open). Not checked: the message on a real desktop.
 - **Source:** `src/tray/Tray.ahk`, `tests/e2e/test_editor_crash_notice.py`, `tests/fault/test_editor_crash_notice_gui.py`
 
+### The second click of a double click can arrive as WM_LBUTTONDBLCLK, not as a press (assumed)
+
+- **Problem:** The editor detects a double click on a connection by two presses. A window whose class has the double click style sends the second press as WM_LBUTTONDBLCLK, which was not routed to the pointer, so the second click never reached it.
+- **Wrong:** Route only WM_LBUTTONDOWN, WM_LBUTTONUP and WM_MOUSEMOVE to the pointer.
+- **Right:** Route WM_LBUTTONDBLCLK (0x0203) to the same press handler as WM_LBUTTONDOWN (`EditorWindow.mouseFns`). The release after it is WM_LBUTTONUP as before.
+- **Status:** assumed (the headless tests send two presses; the window's own double click is not checked by a test, the owner's gui check would show it)
+- **Source:** `src/editor/EditorWindow.ahk` (`WM_LBUTTONDBLCLK`), `src/editor/EditorPointer.ahk` (`_ConnectionClicked`)
+
 ### The mouse capture follows the state of the pointer, not the mouse message that ends a drag (assumed)
 
 - **Problem:** The editor's pointer can hold the mouse without a button (a new element follows the pointer until the next click, WI-0099). The capture was taken at a press and released only when a release ended a drag, so a drag ended by Esc (no mouse message) or a placing that ended at a press kept the capture: the window then got the mouse after it was done.
