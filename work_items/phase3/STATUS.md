@@ -53,7 +53,7 @@ None.
 
 ## Running agents
 
-WI-0104 (haiku, workspace wi-104).
+None.
 
 ## Last verified state
 
