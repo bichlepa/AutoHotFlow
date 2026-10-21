@@ -232,6 +232,7 @@ TEST_GROUPS = {
     "fault/test_editor_settings_gui.py": ["editor"],
     "ahk/editor_settings_window.test.ahk": ["editor", "editor-form"],
     "ahk/editor_flow_settings.test.ahk": ["editor"],
+    "ahk/editor_flow_settings_window.test.ahk": ["editor", "editor-form"],
     "ahk/editor_form.test.ahk": ["editor-form"],
     "ahk/editor_form_expr.test.ahk": ["editor-form"],
     "ahk/editor_window.test.ahk": ["editor"],
