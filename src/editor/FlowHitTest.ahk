@@ -36,4 +36,20 @@ class FlowHitTest {
         }
         return ""
     }
+
+    ; The element under (fx, fy) with the part under it (FlowHit "element", Index the part), or "" when no element is there.
+    ; Buttons and connections are not asked: the end of a connection that is dropped lands on the element beneath them
+    ; (WI-0100, a drop on empty space creates an element).
+    static ElementAt(scene, fx, fy) {
+        elements := scene.Elements
+        loop elements.Length {
+            element := elements[elements.Length + 1 - A_Index]
+            parts := element.Parts
+            loop parts.Length {
+                if (parts[A_Index].Contains(fx, fy))
+                    return FlowHit("element", element.Id, A_Index)
+            }
+        }
+        return ""
+    }
 }

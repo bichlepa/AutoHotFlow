@@ -15,7 +15,8 @@
 ;   selected    Map: element or connection ID -> true (the selection)
 ;   rect        FlowRect of the selection rectangle being drawn (flow units), or ""
 ;   connecting  Map("fromId", element ID, "fromPart", part, "type", connection type, "x", x, "y", y) for a connection
-;               being drawn from a part of an element to the point (x, y), or ""
+;               being drawn from a part of an element to the point (x, y), or Map("toId", element ID, "toPart", part,
+;               "x", x, "y", y) for one whose start is the point and whose end is the element (WI-0100), or ""
 ;   dragged     Map: ID -> true of the elements being dragged; dx, dy the offset of the drag (see WithDrag)
 ;   ghost       FlowRect of the box of a new element that is being placed (WI-0099), or ""
 ; Properties from it: Selected, Rect, Connecting (Map("start", [x, y], "aim", [x, y]) or ""), Dragged, DragX, DragY,
@@ -110,6 +111,19 @@ class Scene {
     static ConnectingOf(elements, request) {
         if (!(request is Map))
             return ""
+        if (request.Has("toId")) {             ; the start follows the pointer, the aim is the end element (WI-0100)
+            target := ""
+            for element in elements {
+                if (element.Id = request["toId"]) {
+                    target := element
+                    break
+                }
+            }
+            if (!(target is SceneElement))
+                return ""
+            aim := FlowGeometry.AimOf(target.Kind, target.X, target.Y, target.HeightOfVerticalBar, request.Get("toPart", ""))
+            return Map("start", [request.Get("x", 0), request.Get("y", 0)], "aim", aim)
+        }
         source := ""
         for element in elements {
             if (element.Id = request.Get("fromId", "")) {
