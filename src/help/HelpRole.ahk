@@ -16,10 +16,12 @@
 ; by the supervisor when the manager or an editor asks for a page (cmd.help.show). A hang of a browser engine stops this
 ; process only. It has no flows, no engine, no storage access and no element classes.
 ;
-; The viewer comes from the setting helpViewer (HelpPages.ViewerFor): classic (the browser control, HelpWindow), browser
-; (the default browser, no window). The window is created at the first page of the classic viewer and then kept hidden,
-; not closed. A page asked before the settings have arrived waits for them (OnSettings), so that the viewer is the one of
-; the setting.
+; The viewer comes from the setting helpViewer (HelpPages.ViewerFor): webview2 (WebView2, WI-0115, when its loader and
+; the runtime are there), classic (the browser control, HelpWindow), browser (the default browser, no window). The window
+; is created at the first page of a window viewer and then kept hidden, not closed; a window of the other kind is closed
+; when the setting changes. When WebView2 fails to start, the window shows the page with the classic viewer, and this
+; process does not ask WebView2 again (webviewBroken). A page asked before the settings have arrived waits for them
+; (OnSettings), so that the viewer is the one of the setting.
 ;
 ;   AutoHotkey64.exe src\entry\help.ahk --role=help --session=<id> --hub=<pipe> --data=<dir> [--headless]
 ;   --headless  no window (every test run). Adds cmd.test.command { item: "resolve" } (PROTOCOL 4.12).
@@ -33,7 +35,8 @@ class HelpRole extends Role {
         this.settingsKnown := false
         this.waiting := ""              ; the page asked before the settings came ("" for none; the index is "")
         this.hasWaiting := false
-        this.window := ""               ; HelpWindow, made at the first page of the classic viewer
+        this.window := ""               ; HelpWindow of the viewer kind of the last window page ("" for none)
+        this.webviewBroken := false     ; WebView2 failed to start in this process: the classic viewer from now on
         this.page := ""                 ; the page ID last shown ("" = the index)
         this.viewerName := ""           ; the viewer of the last page
         this.shown := 0
@@ -83,7 +86,7 @@ class HelpRole extends Role {
         resolved := HelpPages.Resolve(page, LangTable.Code)
         if (!resolved["found"])
             Log.Write("a0", "help", "help page '" page "' does not exist, the index is shown")
-        choice := HelpPages.ViewerFor(this.setting, HelpPages.WebView2Available())
+        choice := HelpPages.ViewerFor(this.setting, this._WebView2Usable())
         if (choice["fallback"])
             Log.Write("a0", "help", "the WebView2 viewer is not available, the classic viewer shows the page")
         this.page := page
@@ -95,19 +98,32 @@ class HelpRole extends Role {
                 BrowserViewer().Navigate(resolved["path"])
             else {
                 try {
-                    this._Window().Show(resolved["path"])
+                    this._WindowFor(choice["viewer"]).Show(resolved["path"])
                 } catch as e {
-                    Log.Write("a0", "help", "the classic viewer could not show the page: " e.Message)
+                    Log.Write("a0", "help", "the help window could not show the page: " e.Message)
                 }
             }
         }
         return Map("ok", true, "viewer", this.viewerName)
     }
 
-    _Window() {
+    ; WebView2 can be used: the loader and the runtime are there (asked once per process) and no start failed before.
+    _WebView2Usable() => !this.webviewBroken && HelpPages.WebView2Available()
+
+    ; The window of a viewer kind: made at the first page, and replaced when the kind changes (the setting).
+    _WindowFor(kind) {
+        if (IsObject(this.window) && this.window.kind != kind) {
+            this.window.Close()
+            this.window := ""
+        }
         if (!IsObject(this.window))
-            this.window := HelpWindow(this)
+            this.window := HelpWindow(this, kind)
         return this.window
+    }
+
+    ; The window's WebView2 viewer could not start (HelpWindow): the classic viewer is used from now on in this process.
+    WebView2Failed(reason) {
+        this.webviewBroken := true
     }
 
     ; cmd.test.command {item: "resolve", page, language?} (headless only): the viewer, the file and whether the page exists,
@@ -124,7 +140,7 @@ class HelpRole extends Role {
             throw AhfError("payload field 'language' must be text", ErrCode.BAD_PAYLOAD)
         code := (lang = "") ? LangTable.Code : SettingsModel.LanguageCode(lang)
         resolved := HelpPages.Resolve(page, code)
-        choice := HelpPages.ViewerFor(this.setting, HelpPages.WebView2Available())
+        choice := HelpPages.ViewerFor(this.setting, this._WebView2Usable())
         return Map("ok", true, "viewer", choice["viewer"], "path", resolved["path"]
             , "found", Json.Bool(resolved["found"]), "language", resolved["language"])
     }

@@ -1,9 +1,11 @@
 #Requires AutoHotkey v2.0
 #Include ..\core\HelpPageId.ahk
 #Include ..\core\SettingsModel.ahk
+#Include WebView2Loader.ahk
 
 ; The headless model of the help (WI-0111, PROTOCOL 4.12): which file shows a page ID, in which language, with which
-; viewer. No window and no COM here; the role (HelpRole) and the tests use it.
+; viewer. No window here; the only native call is the availability of WebView2 (WebView2Loader, cached). The role (HelpRole)
+; and the tests use it.
 ;
 ; Files (ARCHITECTURE 8, tools/gen_help.py, E0100): an element page is src\elements\Default\help\<lang>\<Kind>\<Name>.html,
 ; a general page is assets\help\<lang>\<Name>.html. The generated HTML is committed next to its Markdown source.
@@ -42,8 +44,10 @@ class HelpPages {
     ; file:// URL of a file path, for the viewers (spaces are escaped).
     static Url(path) => "file:///" StrReplace(StrReplace(path, "\", "/"), " ", "%20")
 
-    ; WebView2 is not in this version (WI-0115 adds it); this is the one place to change.
-    static WebView2Available() => false
+    ; The loader DLL of WebView2 (WI-0115): the setup tool (tools/fetch_webview2_loader.py) puts it into assets\bin; S0009
+    ; ships it. WebView2Available is the one question the choice of the viewer asks (cached for the process).
+    static WebView2Dll() => HelpPages.Root() "\assets\bin\WebView2Loader.dll"
+    static WebView2Available() => WebView2Loader.Available(HelpPages.WebView2Dll())
 
     ; The viewer of a setting (E0099): "classic", "browser" or "webview2". fallback is true when the setting asked for
     ; WebView2 and it is not available: the classic viewer shows the page, and the role logs it.

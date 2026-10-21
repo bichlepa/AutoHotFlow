@@ -39,7 +39,8 @@ def test_resolve_names_the_generated_page_of_an_element(chains):
     chain.wait_ready(["storage", "help"], timeout=READY_S)
     ans = resolve(chain, "Actions/Sleep", "en")
     assert ans["found"] is True
-    assert ans["viewer"] == "classic"           # the setting is not known yet: auto, and auto is classic in this version
+    # the setting is not known yet: auto, which is webview2 where the loader and the runtime are there, else classic
+    assert ans["viewer"] in ("webview2", "classic"), ans["viewer"]
     assert ans["path"].endswith(GENERATED_SLEEP), ans["path"]
     assert ans["language"] == "en"
 

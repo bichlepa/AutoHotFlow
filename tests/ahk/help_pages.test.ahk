@@ -68,7 +68,7 @@ MissingPageShowsTheIndex() {
 }
 
 ViewerOfTheSetting() {
-    Assert.Equal(HelpPages.ViewerFor("auto")["viewer"], "classic", "no WebView2 in this version")
+    Assert.Equal(HelpPages.ViewerFor("auto")["viewer"], "classic", "without WebView2 the classic viewer")
     Assert.Equal(HelpPages.ViewerFor("auto", true)["viewer"], "webview2")
     Assert.Equal(HelpPages.ViewerFor("classic", true)["viewer"], "classic")
     Assert.Equal(HelpPages.ViewerFor("browser", true)["viewer"], "browser")

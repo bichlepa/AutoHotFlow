@@ -1018,6 +1018,26 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: help window with WebView2 (gui, three pages in the WebView2 view, about 18 s; set the scaling first, 100 % and 225 %; do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/fault/test_help_webview2_gui.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Test: manager window (gui, a real window opens; the tree and the drag and drop of a flow move the mouse; do not use the PC)",
             "type": "shell",
             "command": "python",
