@@ -28,6 +28,10 @@ class FormField {
         this.contentId := FormField.Text(FormField.First(ParamEvaluator.Field(spec, "contentID")))
         this.contentDefault := FormField.Text(FormField.First(ParamEvaluator.Field(spec, "contentDefault")))
         this.warnIfEmpty := ParamEvaluator.Truthy(ParamEvaluator.Field(spec, "WarnIfEmpty"))
+        ; the value a choice stands for without enum values: "string" the text, else the index (the v1 result)
+        this.result := StrLower(FormField.Text(ParamEvaluator.Field(spec, "result")))
+        this.multi := ParamEvaluator.Truthy(ParamEvaluator.Field(spec, "multi"))
+        this.format := StrLower(FormField.Text(ParamEvaluator.Field(spec, "format")))   ; DateAndTime: Time, Date or DateTime
         this.isEnabled := true
         this.warnings := []
     }

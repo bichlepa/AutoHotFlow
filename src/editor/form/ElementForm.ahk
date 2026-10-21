@@ -99,7 +99,8 @@ class ElementForm {
             field.label := FormField.Text(text)
     }
 
-    ; The values that the choices of a field stand for: its enum values, or 1..n (the index) without enum values.
+    ; The values that the choices of a field stand for: its enum values, the texts of the choices when result is "string",
+    ; else 1..n (the index).
     ChoiceValues(id) {
         out := []
         field := this.FieldOf(id, "ChoiceValues")
@@ -108,6 +109,9 @@ class ElementForm {
         if (field.enum.Length) {
             for value in field.enum
                 out.Push(value)
+        } else if (field.result = "string") {
+            for choice in field.choices
+                out.Push(choice)
         } else {
             loop field.choices.Length
                 out.Push(A_Index)
