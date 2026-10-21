@@ -126,7 +126,7 @@ L503-520   19.1 The subset that is compared
 L522-539   19.2 Deliberate deviations from native AutoHotkey v2
 ```
 
-## doc/MEASUREMENTS.md (73.3 KB, 356 lines)
+## doc/MEASUREMENTS.md (75.0 KB, 372 lines)
 ```text
 L11-21 Important: one machine, not an idle machine
 L23-76 Overview
@@ -145,9 +145,10 @@ L282-324 Patches of the engine on a flow of 300 elements (WI-0093, MS-0053, MS-0
 L284-294   MS-0053: engine time of one patch on a flow of 300 elements (WI-0093, task 6)
 L296-309   MS-0054: steps of a running flow during 100 patches in a row, and a patch of 30 operations on the biggest flow (WI-0093)
 L311-324   MS-0055: patch round trip of the editor, running and idle, against a plain request (WI-0096)
-L326-356 Editing, measured again at the end of S0006 (WI-0104, task 4)
+L326-371 Editing, measured again at the end of S0006 (WI-0104, task 4)
 L330-344   MS-0056: frame of a drag and the rebuilds of the editor renderer, 300 elements (WI-0104, MS-0051 again)
 L346-356   MS-0057: engine time of a patch on a flow of 300 elements (WI-0104, MS-0053 again)
+L358-371   MS-0058: round trip of a patch during a run, 100 patches, 300 steps (WI-0104, MS-0054 again)
 ```
 
 ## doc/CONVENTIONS.md (8.5 KB, 63 lines)

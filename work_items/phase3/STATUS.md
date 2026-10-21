@@ -11,7 +11,7 @@ Kept by the orchestrator as described in `doc/ORCHESTRATOR.md`. This file shows 
 | S0003 Trigger host and triggers | WI-0060 to WI-0068 | done (acceptance WI-0067, 2026-10-17) |
 | S0004 UI foundation and manager | WI-0069 to WI-0082 | done (acceptance WI-0082 on 2026-10-19; the manual checks of the owner passed on 2026-10-19) |
 | S0005 Editor I: display | WI-0083 to WI-0092 | done (acceptance WI-0092 on 2026-10-20; manual check 9 passed, look accepted, E0088; step 25 (4K) not run, REQ-PRF-060 partial, F-0156 postponed) |
-| S0006 Editor II: editing | WI-0093 to WI-0104 | detailed on 2026-10-20 (E0091 to E0094), not started |
+| S0006 Editor II: editing | WI-0093 to WI-0104 | accepted by WI-0104 (agent part, 2026-10-21, E0091 to E0094); manual check 10 open for the owner |
 | S0007 Editor III: settings dialogs | WI-0105 to WI-0115 | detailed on 2026-10-20 together with S0006 (E0095 to E0100); refined by the retrospective of WI-0104 before its packages start |
 | S0008 to S0010 | | rough, see the plan |
 
@@ -34,7 +34,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0101 | Editor: delete, cut, copy, paste | done | haiku | see git log | 2026-10-21 | E0091; M-0093; REQ-EDT-080 partial; F-0168 (cold-start flake); clipboard limit 16 MB parsed on message path (consider 1-2 MB); ko/ru keys missing |
 | WI-0102 | Editor: menu bar, context menus, trigger buttons | done | haiku | see git log | 2026-10-21 | M-0094; gui test written, owner runs it; menu callbacks without own try/catch (cheap in WI-0104); trigger switch without the force question; ko/ru keys missing |
 | WI-0103 | Notice of a crashed editor | done | haiku | 5fe3f431..f7a7dad1 | 2026-10-21 | balloon shows the flow ID; real click not checked |
-| WI-0104 | Acceptance S0006 | open | | | | manual check 10; refines S0007 |
+| WI-0104 | Acceptance S0006 | done (agent part); manual check 10 open for the owner | haiku | 63ab5ba2..682873bf | 2026-10-21 | result `WI-0104-result-s6.md`; code fixes (2 MB paste limit, menu failure, activation refresh, tests of nothing lost and of running edits); MS-0056, MS-0057; F-9000* to F-9003* open; S0007 refinement proposed (E0095), owner decides |
 | WI-0105 | Form model and the `form` API | done | haiku | a7e46ddd..6e5558d2 (rebased) | 2026-10-21 | WI-0106 must re-render after SetChoices/SetLabel and include ElementForm in the editor entry; v1 percent-sign note for WI-0108 |
 | WI-0106 | Element settings window | done | haiku | see git log | 2026-10-21 | M-0095 (renumber WI-0104's if clashing); F-0169 fixed; window never shown, gui test written for owner; slider fixed to 0-100 (v1 passes options); help and assistant buttons disabled |
 | WI-0107 | Editor `ctx`, "Switch with the flow" | open | | | | |
