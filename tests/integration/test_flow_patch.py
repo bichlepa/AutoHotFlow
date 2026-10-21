@@ -13,6 +13,7 @@ import time
 import pytest
 
 from support.ahfclient import AhfClient
+from support.timing import scaled
 from test_engine import (DONE, SLEEP, StorageStub, ask, collect_until, element_states, engine, flowdir,  # noqa: F401
                          hub, is_type, make_flow, observer, pipe, runs, subscribe_flow, wait_ready)
 
@@ -180,6 +181,35 @@ def test_a_removed_next_element_is_not_run_and_the_running_element_ends_normally
     assert (SLEEP, "finished", 0, None) in states, states
     assert not [s for s in states if s[0] == DONE], "the removed element must not run"
     assert got[-1][1]["payload"]["reason"] == "finished"
+
+
+def test_a_running_element_keeps_the_parameters_it_started_with(pipe, flowdir, slow_flows, engine):
+    """ARCHITECTURE 4.2: the running element runs to the end with the parameters of its start (1 s), not the new 5 s."""
+    with subscribe_flow(pipe, "live") as obs:
+        wait_ready(obs)
+        ask(obs, "cmd.flow.start", {"flowId": "live"})
+        started = time.monotonic()
+        wait_until_sleeping(obs)
+        ops = [{"op": "element.update", "id": SLEEP, "fields": {"pars": {"Duration": "5000"}}}]
+        assert patch(obs, 1, ops, flow="live")["ok"] is True
+        got = collect_until(obs, is_type("evt.instance.ended"), timeout=scaled(10))
+        elapsed = time.monotonic() - started
+    states = element_states(got)
+    assert (SLEEP, "finished", 0, None) in states, states
+    assert elapsed < scaled(4.0), "the sleep took %.2f s: the new parameter (5 s) was used" % elapsed
+
+
+def test_a_running_element_that_is_removed_runs_to_its_end_and_the_instance_finishes(pipe, flowdir, slow_flows, engine):
+    """ARCHITECTURE 4.2: a running element that is deleted runs to the end; the thread ends normally afterwards."""
+    with subscribe_flow(pipe, "gone") as obs:
+        wait_ready(obs)
+        ask(obs, "cmd.flow.start", {"flowId": "gone"})
+        wait_until_sleeping(obs)
+        assert patch(obs, 1, [{"op": "element.remove", "id": SLEEP}], flow="gone")["ok"] is True
+        got = collect_until(obs, is_type("evt.instance.ended"), timeout=scaled(10))
+    states = element_states(got)
+    assert (SLEEP, "finished", 0, None) in states, states
+    assert got[-1][1]["payload"]["reason"] == "finished", got[-1]
 
 
 # --- the meta race (ARCHITECTURE 4.2) ---------------------------------------------------------------------------------
