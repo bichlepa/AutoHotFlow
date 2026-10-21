@@ -12,7 +12,7 @@
 class WinClipboard {
     static FORMAT_NAME := "AutoHotFlow.Elements"
     static GMEM_MOVEABLE := 0x0002
-    static MAX_BYTES := 16 * 1024 * 1024
+    static MAX_BYTES := 2 * 1024 * 1024       ; a copy of a flow of hundreds of elements is some 100 KB (WI-0104, was 16 MB)
     static _format := 0
     static _owner := 0
 

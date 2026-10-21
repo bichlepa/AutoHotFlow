@@ -139,6 +139,16 @@ def set_text(text):
         user32.SetClipboardData(CF_UNICODETEXT, handle)
 
 
+def set_format(fmt, data):
+    """Puts raw bytes into the clipboard in one format, as another program would (WI-0104: the 2 MB limit of a paste)."""
+    with open_clipboard():
+        user32.EmptyClipboard()
+        handle = kernel32.GlobalAlloc(GMEM_MOVEABLE, len(data))
+        ctypes.memmove(kernel32.GlobalLock(handle), data, len(data))
+        kernel32.GlobalUnlock(handle)
+        user32.SetClipboardData(fmt, handle)
+
+
 def format_available(fmt):
     with open_clipboard():
         return bool(user32.IsClipboardFormatAvailable(fmt))
@@ -383,6 +393,19 @@ def test_a_clipboard_without_our_format_pastes_nothing(procs, datadir, session_i
         rev = editor_state(obs)["rev"]
         press(obs, "V", ctrl=True, at=canvas(obs, *EMPTY))
         assert status_has(obs, "No elements found in clipboard")
+        assert editor_state(obs)["rev"] == rev, "nothing is pasted"
+    finally:
+        finish(sup, obs)
+
+
+def test_a_clipboard_of_our_format_above_2_mb_is_refused_and_nothing_is_pasted(procs, datadir, session_id):
+    """WI-0104: the limit of a paste is 2 MB (WinClipboard.MAX_BYTES); a bigger copy of our format is not parsed."""
+    sup, obs = start(procs, datadir, session_id)
+    try:
+        set_format(our_format(), b"x" * (3 * 1024 * 1024))
+        rev = editor_state(obs)["rev"]
+        press(obs, "V", ctrl=True, at=canvas(obs, *EMPTY))
+        assert status_has(obs, "The clipboard could not be used")
         assert editor_state(obs)["rev"] == rev, "nothing is pasted"
     finally:
         finish(sup, obs)
