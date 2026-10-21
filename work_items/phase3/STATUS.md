@@ -35,7 +35,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0102 | Editor: menu bar, context menus, trigger buttons | open | | | | |
 | WI-0103 | Notice of a crashed editor | done | haiku | 5fe3f431..f7a7dad1 | 2026-10-21 | balloon shows the flow ID; real click not checked |
 | WI-0104 | Acceptance S0006 | open | | | | manual check 10; refines S0007 |
-| WI-0105 | Form model and the `form` API | running (haiku, wi-105) | | | | may run beside S0006 |
+| WI-0105 | Form model and the `form` API | done | haiku | a7e46ddd..6e5558d2 (rebased) | 2026-10-21 | WI-0106 must re-render after SetChoices/SetLabel and include ElementForm in the editor entry; v1 percent-sign note for WI-0108 |
 | WI-0106 | Element settings window | open | | | | |
 | WI-0107 | Editor `ctx`, "Switch with the flow" | open | | | | |
 | WI-0108 | Expressions checked while typing | open | | | | E0096 |
