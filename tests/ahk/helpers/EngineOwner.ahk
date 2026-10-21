@@ -119,7 +119,7 @@ class EngineOwner {
     }
 
     ; An unhandled exception ended a branch of a flow (Engine.FlowException, WI-0075): the stand-in records it.
-    FlowException(flowId, elementId, message) {
+    FlowException(flowId, elementId, message, inst := "", thread := "") {   ; inst, thread: the branch (WI-0113)
         this.exceptions := this.HasProp("exceptions") ? this.exceptions : []
         this.exceptions.Push(Map("flowId", flowId, "elementId", elementId, "message", message))
     }
