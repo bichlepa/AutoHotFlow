@@ -53,7 +53,7 @@ None.
 
 ## Running agents
 
-Bug hunter on F-0174 (haiku, workspace hunt-1).
+WI-0110 (haiku, wi-110), WI-0111 (haiku, wi-111).
 
 ## Last verified state
 
