@@ -1043,6 +1043,21 @@
             "problemMatcher": []
         },
         {
+            "label": "Start: manual check 10, editing the imported v1 flows (manual_check.py)",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/manual_check.py",
+                "start",
+                "--",
+                "--start=storage,engine,triggerhost,manager"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Test: editor mouse input and status bar (gui, a real editor window; wheel and drag are sent; do not use the PC)",
             "type": "shell",
             "command": "python",
@@ -1092,6 +1107,24 @@
                 "-m",
                 "pytest",
                 "tests/fault/test_editor_settings_gui.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+        {
+            "label": "Test: editor crash notice, balloon click (gui, a killed editor gives a balloon; the click is sent; do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/fault/test_editor_crash_notice_gui.py",
                 "-q",
                 "--all",
                 "-m",

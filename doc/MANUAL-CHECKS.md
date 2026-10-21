@@ -2,7 +2,7 @@
 
 The automated tests do not cover the checks in this document. The project owner runs them by hand. Each step states the expected result. A step passes only if the expected result is seen. A dialog box (window class `#32770`) at any point is a failure.
 
-The checks cover the manager (section 1), the debug window (section 2), the dialog windows at other scaling (section 3), triggers (sections 4 and 5), start with Windows and run as administrator (section 7), the settings dialog (section 8) and the editor window (section 9). The numbers are kept as they were: section 6 ("Checks that wait for a decision of the project owner", empty) was removed, and other documents refer to sections 7 and 8. Use the "Result" template at the end to record a run.
+The checks cover the manager (section 1), the debug window (section 2), the dialog windows at other scaling (section 3), triggers (sections 4 and 5), start with Windows and run as administrator (section 7), the settings dialog (section 8), the editor window (section 9) and the editing of the flows in the editor (section 10). The numbers are kept as they were: section 6 ("Checks that wait for a decision of the project owner", empty) was removed, and other documents refer to sections 7 and 8. Use the "Result" template at the end to record a run.
 
 Where a step starts the application, the VS Code task is named by its label in `.vscode/tasks.json`, followed by the same call for a terminal.
 
@@ -328,6 +328,69 @@ The gui tests open real editor windows and send real mouse and keyboard input. R
 | 24 | VS Code task "Tool: renderer measurement with a window (WI-0092, owner; ...)" with the size 1920 x 1080 (whole flow). Close the other programs first. | The task opens a window of 1920 x 1080 for about two minutes and writes the line `WINDOW ...` into `temp/s5/renderer-window.txt`. Mean below 16 ms (R0002, REQ-PRF-060). Write the line in the result. | |
 | 25 | The same task with 3840 x 2160 (a 4K screen is needed, otherwise the window is cut; write that down). | The `WINDOW` line for 4K is recorded (a measurement; see MEASUREMENTS.md MS-0048). Without a screen of at least 3840 x 2160 (the primary screen) the file gets the line `WINDOW skipped ...` instead of a cut window; the `RESULT` line of 3840 x 2160 is written in both cases. Write down which of the two you got. | |
 
+## 10. Editing the flows in the editor (WI-0104, S0006: REQ-EDT-030 to REQ-EDT-110, REQ-EDT-100, REQ-ROB-120, REQ-TRG-030)
+
+Test by hand on the real editor windows, with the mouse and the keys, at 100 % and at 225 % display scaling. Not automated: the e2e tests drive the editor headless, the gui tests of part D send real input and are run by the owner only. This section is the acceptance of editing (S0006): the owner closes it. Until the owner writes the result, the editing requirements that depend on it stay `partial`.
+
+**Start, parts A to C.** Run section 9, part B first, or use the same folder: the editing checks need the imported v1 flows, which are disabled. VS Code task "Start: manual check 10, editing the imported v1 flows (manual_check.py)", or `python tools/manual_check.py start -- --start=storage,engine,triggerhost,manager`. Do not run an imported v1 flow: a running flow may act on the system. Edit and run the flow `skeleton` (a copy of the test skeleton) when a step says so. Nothing is asked when an editor closes (REQ-EDT-100); a change is written to the file a few seconds after it is made, so give it about 10 s before you close the application.
+
+**Scaling.** Part A is run at 100 % display scaling. Part B is run again at 225 % (set the scaling in the Windows settings and start the application again). The look is part of section 9; here only the editing is checked.
+
+### Steps, part A (100 %: editing with the mouse and the keys)
+
+Open `Flow 1384439262` with "Edit" in the manager. The flow has 129 elements; the grid is 35 units.
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 1 | Click an element, then a connection, then empty space. | The element is selected alone (a frame and its buttons near it). The connection is selected alone. Empty space unselects all. The status bar names the selection. | |
+| 2 | Ctrl+click a second element. Then press Ctrl+A, then Esc. | Ctrl+click adds the element to the selection. Ctrl+A selects every element and connection. Esc unselects all. | |
+| 3 | Drag a rectangle on empty space over three elements and the connection between two of them. | The elements the rectangle touches are selected, and the connection between selected elements is selected too. A Ctrl drag adds the rectangle to the selection. Esc during the drag cancels it. | |
+| 4 | Drag the selection by one element. Release. Press Ctrl+Z, then Ctrl+Y. | The elements follow the pointer and snap to the grid when the mouse is released. The move is one undo step: Ctrl+Z takes it back, Ctrl+Y makes it again. | |
+| 5 | Drag an element and press Esc before the release. | The element goes back to its place. No change is made (no undo step). | |
+| 6 | Select a loop. Drag the tail (the end of its bar) down and up. | The height of the bar changes on the grid, and the loop never gets shorter than two grid steps. One undo step per drag. | |
+| 7 | Click the field "action" at the top left of the canvas. Move the pointer, then click on empty space. | A box follows the pointer. The click places a new action there (snapped to the grid) and the class list opens, grouped by category. | |
+| 8 | In the class list at the user level Beginner: look at the classes. Choose one and press OK. Then start the placing again and press Cancel in the list. | The list shows only Beginner classes. OK adds the element with its default name and parameters, selected, one undo step. Cancel adds nothing. | |
+| 9 | Select an action. Click its plus button, then another element. | A connection is made from the action to the element. Ctrl+Z takes it back. | |
+| 10 | Connect an element to a trigger (drag from the plus button onto the trigger). | The connection is refused with a text in the status bar. Nothing is added. | |
+| 11 | Double-click a connection. Choose another connection type (for example a yes connection) and press OK. | The connection shows the new type (the tooltip names it). One undo step. | |
+| 12 | Select a connection. Move one of its ends with the move buttons. | The end moves to the other element; the connection follows. Ctrl+Z takes the move back. | |
+| 13 | Select an action. Press Del. Answer "no" to the question, then press Del again and answer "yes". | The question is asked once per press. "no" changes nothing; "yes" removes the element and its connections (one undo step). | |
+| 14 | Select an element. Click its trash button. Answer "no". | The question is asked. "no" changes nothing. | |
+| 15 | Select two elements. Press Ctrl+C, then Ctrl+V with the pointer on an empty place of the canvas. | The copies appear at the pointer, selected, with their connections between them. One undo step. Ctrl+X removes the selection without a question and copies it. | |
+| 16 | Use the menu Edit: Undo, Redo, Cut, Copy, Paste, Delete, Select all. | Each entry does what its key does. A disabled entry (for example Undo with no step) does nothing. | |
+| 17 | Make ten changes. Press Ctrl+Z ten times, then Ctrl+Y ten times. | Each press takes back or makes one change, in order. The flow ends as it was after the ten changes. | |
+| 18 | Press Ctrl+S. Look at the status bar. | The flow is saved (the status bar says so, or nothing is asked). No dialog. | |
+| 19 | Right-click an element. Right-click a connection. Right-click empty space. | The context menu of the element offers Cut, Copy, Delete (and the trigger entries for a trigger). The one of the connection offers Change type and Delete. The one of empty space offers Paste, Select all and "Create new action, condition, loop, trigger" at that place. | |
+| 20 | Right-drag the flow with the pointer over it. | The view moves. No context menu opens after the drag. | |
+| 21 | On a trigger of `Flow 1384439262` (a manual trigger, if there is one): click its switch. Then its star on another manual trigger, if there is one. | The switch enables or disables the trigger; the state shows at once. The star makes the trigger the default: one undo step. A refused change shows a text in the status bar. | |
+| 22 | Right-click the trigger of step 21. | The context menu offers the entry "Enable this trigger" or "Disable this trigger" (the opposite of the state shown) and "Set as default trigger" (for a manual trigger that is not the default). The entries do what their labels say. | |
+| 23 | Change the zoom and the offset, then close the editor (menu Exit or the close box). Open the editor again. | The zoom and the offset are as they were. Nothing is asked. | |
+
+### Steps, part B (the same at 225 %, and the killed editor)
+
+Repeat the steps 1 to 19 of part A on `Flow 1384439262` at 225 % (the look of the drawing is not the point; the clicks and the texts are). Then:
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 24 | Copy two elements in the editor of `Flow 1384439262`. Open `Flow 2052424815` (6 elements) with "Edit" in the manager, and paste into its editor (Ctrl+V with the pointer on its canvas). | The elements appear in the second flow. Both editors show the change. Nothing is pasted into the first flow by the paste. | |
+| 25 | Cut two elements of `Flow 2052424815` and paste them back into `Flow 2052424815`. | The elements come back as new copies with new IDs (the names stay). One undo step per paste. | |
+| 26 | Make a change in `skeleton` and wait about 10 s. Then end the editor process of `skeleton` in the Task Manager (not the window; the process of the editor). | The editor window and its tray icon disappear. Within a few seconds the tray icon of the application shows a balloon: the editor of `skeleton` has ended. Nothing reopens the editor by itself. | |
+| 27 | Click the balloon. | The editor of `skeleton` opens again. It shows the change of step 26 (the change was written before the kill). | |
+| 28 | Open the manager's list of notices (the window of the manager). Find the notice of the killed editor. | The notice is in the list, with its button "Open editor"; the button opens the editor again. | |
+| 29 | Watch for dialogs during part B. | No dialog (window class `#32770`) appears, except the questions of steps 13 and 14. | |
+
+### Steps, part C (the gui tests of S0006; the PC is not used during them)
+
+The gui tests open real editor windows and send real mouse and keyboard input. Run them alone, and do not move the mouse or press keys while they run. Expected result: all pass.
+
+| # | VS Code task (label) | Test file | Tests |
+|---|---|---|---|
+| 30 | "Test: editor menu bar and context menu (gui, a real editor window; a right click is sent; do not use the PC)" | `tests/fault/test_editor_menus_gui.py` | the menu bar has its seven entries, a right click opens a context menu that the editor answers while it is open |
+| 31 | "Test: editor mouse input and status bar (gui, a real editor window; wheel and drag are sent; do not use the PC)" | `tests/fault/test_editor_mouse_gui.py` | the status bar lies below the canvas; a real wheel zooms; a real drag moves the view |
+| 32 | "Test: editor crash notice, balloon click (gui, ...)" | `tests/fault/test_editor_crash_notice_gui.py` | a click on the balloon of an editor notice opens the editor again |
+
+Not in the gui tests yet: a real mouse selection, move, connection and placing of elements (REQ-EDT-060, REQ-EDT-070, REQ-EDT-080 stay `partial` until steps 1 to 16 are checked by hand; a gui test for them is open work).
+
 ## Result
 
 Record one result per run. Copy the template.
@@ -342,6 +405,7 @@ Triggers (sections 4 and 5): steps 1 to 7 and 1 to 6 pass / fail (list failed st
 Start with Windows and administrator (section 7): parts A to D pass / fail (list failed steps)
 Settings dialog (section 8): steps 44 to 59 pass / fail (list failed steps)
 Editor (section 9): steps 1 to 25 pass / fail (list failed steps); look accepted yes / no (step 3)
+Editing (section 10): steps 1 to 29 pass / fail (list failed steps) at 100 % and 225 %; gui tests 30 to 32 pass / fail; closed by the owner yes / no
 Notes:
 ```
 
