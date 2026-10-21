@@ -1618,7 +1618,7 @@ The menu bar of the editor has: save, run, stop, enable/disable, edit (undo, red
 ### REQ-EDT-120 Element settings dialog
 
 - **v1:** yes
-- **v2:** partial (the settings window of an element, WI-0106: opened by the edit button, a double click, the context menu and for a new element after the class list; every field type, the checks, one patch with the changed fields and one undo step, Cancel sends nothing, the migration places and an unknown class, headless; the window itself and the help button (WI-0111) are not done, and the change of the class (v1's type button) is not built yet)
+- **v2:** partial (the settings window of an element, WI-0106: opened by the edit button, a double click, the context menu and for a new element after the class list; every field type, the checks, one patch with the changed fields and one undo step, Cancel sends nothing, the migration places and an unknown class, headless; the help button (WI-0111) is not done, and the change of the class (v1's type button) is built, headless; the owner's gui check is open)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0007 (model WI-0105, window and settings WI-0106; the gui check of the window is the owner's; the class change and the help button follow)

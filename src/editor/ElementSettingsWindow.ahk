@@ -3,8 +3,10 @@
 #Include ..\core\Lang.ahk
 #Include ..\core\Log.ahk
 #Include ..\elements\base\ParamEvaluator.ahk
+#Include ..\ui_common\UiDialogs.ahk
 #Include ..\ui_common\UiFileDialogs.ahk
 #Include form\FormChecks.ahk
+#Include NewElementCatalog.ahk
 
 ; The settings window of an element (WI-0106, REQ-EDT-120, PROTOCOL 4.11): a Gui drawn from the form model (ElementForm, the
 ; headless model of WI-0105) that EditorSettings holds. The window shows the fields in order, in a scroll area; OK, Cancel
@@ -58,6 +60,9 @@ class ElementSettingsWindow {
     Show(controller) {
         this.Build(controller, "")
     }
+
+    ; True when hwnd is the top-level window of the open settings (the editor window ignores the wheel over it, F-9000).
+    Owns(hwnd) => this.open && IsObject(this.gui) && hwnd = this.gui.Hwnd
 
     ; Hides the window (the controller closed its session).
     Hide() {
@@ -115,6 +120,7 @@ class ElementSettingsWindow {
                 this._TextCtl(text, y, cw, "cRed", h)
                 y += h + ElementSettingsWindow.ROW
             }
+            y := this._TypeRow(s, y, cw)
             y := this._NameRows(form, y, cw)
             for index, field in form.fields
                 y := this._FieldRows(form, field, y, cw)
@@ -174,6 +180,30 @@ class ElementSettingsWindow {
             y := this._TextRow(key ": " (IsObject(value) ? "" : String(value)), y, cw)
         }
         return y
+    }
+
+    ; The type button (v1: "<kind> type: <class>"): opens the class list of the kind; the choice changes the class (WI-0106).
+    _TypeRow(s, y, cw) {
+        kindText := Lang(ElementSettingsWindow.KIND_KEY.Get(s["kind"], "Action"))
+        btn := this.gui.AddButton("", Lang("Settings_type", kindText, ElementRegistry.ClassOf(s["classId"])))
+        this._Put(btn, ElementSettingsWindow.MARGIN, y, cw, ElementSettingsWindow.BUTTON_H)
+        btn.OnEvent("Click", (*) => this._ChooseType())
+        return y + ElementSettingsWindow.BUTTON_H + ElementSettingsWindow.ROW
+    }
+
+    ; The class list of the kind (the tree of the new element's list, at the user's level and the current class). A choice goes
+    ; to EditorSettings.ChangeClass; Cancel changes nothing.
+    _ChooseType() {
+        s := this.controller.session
+        level := IsObject(this.controller.adder) ? this.controller.adder.userLevel : "Programmer"
+        groups := NewElementCatalog.Groups(s["kind"], level, s["classId"])
+        UiDialogs.Tree(this.gui.Hwnd, "Settings_type_title", "Choose the class of the new element", groups
+            , (ok, id) => this._TypeChosen(ok ? id : ""))
+    }
+
+    _TypeChosen(id) {
+        if (id != "" && this.open)
+            this.controller.ChangeClass(id)
     }
 
     _NameRows(form, y, cw) {
@@ -558,7 +588,7 @@ class ElementSettingsWindow {
     ; The signature of the structure: what changes the rows (kinds, labels, choices, content types). A change of it builds the
     ; window again.
     _Signature(form) {
-        sig := ""
+        sig := this.controller.session["classId"] "|"      ; a new class changes the type text and the fields
         for field in form.fields {
             sig .= field.kind "|" field.label "|" field.contentId "|" field.format "|"
             for c in field.choices

@@ -32,6 +32,7 @@ TestRun.Case("Settings: a disabled field is disabled in the window after a chang
 TestRun.Case("Settings: a change of the choices builds the window again", WindowRebuildsOnChoices)
 TestRun.Case("Settings: a long form gets a scroll area and a slider", WindowScrollArea)
 TestRun.Case("Settings: an unknown class is shown read only", WindowUnknownClass)
+TestRun.Case("Settings: a class of the same kind is taken and the window follows, another kind is refused", ClassChange)
 
 ; Opens the settings of the test element for a new element (no window): the controller with a session.
 OpenTestElement(pars := "") {
@@ -177,6 +178,19 @@ WindowUnknownClass() {
     window.Sync()
     window.Hide()
     settings.session := ""
+}
+
+ClassChange() {
+    settings := OpenTestElement()
+    window := ElementSettingsWindow(0)
+    settings.window := window
+    window.Build(settings, "", false)
+    AssertNot(settings.ChangeClass("Default.Condition_Expression"), "another kind is refused")
+    Assert.True(settings.ChangeClass("Test.Action_TestForm"), "the same class is no change")
+    Assert.True(settings.ChangeClass("Default.Action_Do_nothing"), "a class of the same kind is taken")
+    Assert.Equal(settings.session["classId"], "Default.Action_Do_nothing")
+    window.Hide()
+    settings.Discard()
 }
 
 TestRun.Finish()

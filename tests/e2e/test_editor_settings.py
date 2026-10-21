@@ -269,3 +269,26 @@ def test_cancel_of_a_new_element_adds_nothing(procs, datadir, session_id):
         assert elements_now(obs) == before, "a cancelled settings window adds nothing"
     finally:
         finish(sup, obs)
+
+
+def test_the_type_of_an_element_changes_its_class_in_one_patch_and_one_undo_step(procs, datadir, session_id):
+    """v1's type button: the class of the same kind changes; OK sends the class, its package and version, and the parameters
+    of the new class (a parameter of the old class that the new one lacks is removed)."""
+    sup, obs = start(procs, datadir, session_id)
+    try:
+        assert form(obs, "open", id=ACTION)["ok"]
+        assert form(obs, "class", id="Default.Condition_Expression")["ok"] is False, "another kind is refused"
+        assert form(obs, "class", id="Default.Action_Do_nothing")["ok"]
+        st = form_state(obs)
+        assert st["classId"] == "Default.Action_Do_nothing" and st["changed"] is True, st
+        assert all("Duration" not in item["ids"] for item in st["fields"]), "the fields are those of the new class"
+        assert form(obs, "ok")["changed"] is True
+        assert wait_until(lambda: settled(obs) and element(obs, ACTION)["class"] == "Action_Do_nothing", scaled(10)), \
+            element(obs, ACTION)
+        assert element(obs, ACTION)["package"] == "Default"
+        assert "Duration" not in element(obs, ACTION).get("pars", {}), element(obs, ACTION)
+        assert step(obs, "undo", EDITOR)["done"], "the class change is one undo step"
+        assert wait_until(lambda: settled(obs) and element(obs, ACTION)["class"] == "Action_Sleep", scaled(10)), \
+            element(obs, ACTION)
+    finally:
+        finish(sup, obs)

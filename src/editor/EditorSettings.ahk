@@ -47,7 +47,7 @@ class EditorSettings {
         qid := ElementRegistry.QualifiedId(package, EditorSettings._Text(el.Get("class", "")))
         cls := ElementRegistry.Get(qid)
         session := Map("mode", "edit", "id", elementId, "kind", EditorSettings._Text(el.Get("type", ""))
-            , "classId", qid, "cls", cls, "migration", EditorSettings._List(el.Get("migration", ""))
+            , "classId", qid, "origClassId", qid, "cls", cls, "migration", EditorSettings._List(el.Get("migration", ""))
             , "x", 0, "y", 0, "connect", "", "done", "", "placeholder", "", "unknown", !IsObject(cls))
         pars := el.Get("pars", Map())
         if (!IsObject(cls)) {
@@ -109,15 +109,18 @@ class EditorSettings {
             this.adder.Create(s["kind"], s["classId"], s["x"], s["y"], s["connect"], s["done"], final)
             return Map("ok", true, "changed", true)
         }
-        fields := EditorSettings.Changes(s["initial"], final)
-        if (fields.Count = 0)
-            return this._Close(Map("ok", true, "changed", false))
         draft := this.model.draft
         if (!(draft.root is Map) || !(draft.root.Get("allElements", "") is Map) || !draft.root["allElements"].Has(s["id"])) {
             this.model.Notice("Settings_gone")
             return this._Close(Map("ok", false, "changed", false, "code", ErrCode.BAD_PAYLOAD
                 , "message", "the element does not exist"))
         }
+        if (s["classId"] != s["origClassId"])
+            fields := this._ClassFields(s, final, draft.root["allElements"][s["id"]])
+        else
+            fields := EditorSettings.Changes(s["initial"], final)
+        if (fields.Count = 0)
+            return this._Close(Map("ok", true, "changed", false))
         res := draft.Commit([Map("op", "element.update", "id", s["id"], "fields", fields)], true)
         if (!res["ok"]) {
             this.model.Notice("Settings_refused")
@@ -177,6 +180,45 @@ class EditorSettings {
         this.session["form"].SetStandardName(flag)
         this._Sync()
         return true
+    }
+
+    ; Changes the class of the element being set (v1: the type button, WI-0106). The class keeps the kind; the form is built
+    ; again from the defaults of the new class (the name stays standard). Nothing is sent until OK. False when refused.
+    ChangeClass(classId) {
+        if (!this._Editable())
+            return false
+        s := this.session
+        cls := ElementRegistry.Get(classId)
+        if (!IsObject(cls) || NewElementCatalog.KindOf(classId) != s["kind"])
+            return false
+        if (classId = s["classId"])
+            return true
+        d := NewElementCatalog.Defaults(classId)
+        s["form"] := ElementForm(cls, d["pars"], d["name"], true)
+        s["classId"] := classId
+        s["cls"] := cls
+        this._Sync()
+        return true
+    }
+
+    ; The fields of an element.update that changes the class: the class, its package and version, the name and the standard
+    ; name, and every parameter of the form. A parameter that the element had and the new class does not has null (removed).
+    _ClassFields(s, final, el) {
+        package := ElementRegistry.PackageOf(s["classId"])
+        fields := Map("class", ElementRegistry.ClassOf(s["classId"]), "package", package
+            , "packageVersion", ElementRegistry.PackageVersion(package), "name", final["name"]
+            , "StandardName", final["standardName"] ? 1 : 0)
+        pars := Map()
+        for key, value in final["pars"]
+            pars[key] := value
+        if (el is Map && el.Get("pars", "") is Map) {
+            for key, value in el["pars"] {
+                if (!final["pars"].Has(key))
+                    pars[key] := Json.Null
+            }
+        }
+        fields["pars"] := pars
+        return fields
     }
 
     _Editable() => this.Busy && IsObject(this.session["form"])

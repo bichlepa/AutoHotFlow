@@ -32,7 +32,8 @@
 ;                                       Cancel. The question is in cmd.test.state (pick)
 ;   cmd.test.form {action, id?, value?, text?, flag?}   the settings of an element as the window works them (WI-0106, EditorSettings):
 ;                                       open {id} (the settings of an element), set {id, value} (a field), name {text},
-;                                       standardName {flag}, ok, cancel. The form is in cmd.test.state (form)
+;                                       standardName {flag}, class {id} (another class of the kind), ok, cancel. The form is in
+;                                       cmd.test.state (form)
 ;
 ; Booleans on the wire are Json.True and Json.False (PROTOCOL 2): the state fields enabled and armed are written with Json.Bool.
 class EditorDriver {
@@ -101,6 +102,12 @@ class EditorDriver {
             case "standardName":
                 if (!settings.SetStandardName(EditorDriver._Flag(p.Get("flag", 0))))
                     return Map("ok", false, "error", Map("code", ErrCode.BUSY, "message", "no settings form is open"))
+                return Map("ok", true)
+            case "class":
+                id := p.Get("id", "")
+                if (IsObject(id) || id = "" || !settings.ChangeClass(id))
+                    return Map("ok", false, "error", Map("code", ErrCode.BAD_PAYLOAD
+                        , "message", "no settings form or no class of the same kind"))
                 return Map("ok", true)
             case "ok":
                 res := settings.Ok()
