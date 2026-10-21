@@ -1085,6 +1085,27 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: editor settings window (gui, a real editor window; a double click and Esc are sent; do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/fault/test_editor_settings_gui.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: renderer measurement with a window (WI-0092, owner; opens a window of the size; run alone; result in temp/s5/renderer-window.txt)",
             "type": "shell",
             "command": "python",

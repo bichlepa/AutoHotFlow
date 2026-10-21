@@ -228,6 +228,7 @@ TEST_GROUPS = {
     "e2e/test_editor_clipboard.py": ["editor"],
     "e2e/test_editor_menus.py": ["editor"],
     "e2e/test_editor_settings.py": ["editor"],
+    "fault/test_editor_settings_gui.py": ["editor"],
     "ahk/editor_settings_window.test.ahk": ["editor", "editor-form"],
     "ahk/editor_form.test.ahk": ["editor-form"],
     "ahk/editor_window.test.ahk": ["editor"],
