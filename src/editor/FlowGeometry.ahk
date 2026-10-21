@@ -19,6 +19,9 @@ class FlowGeometry {
     static LABEL_HEIGHT := 17
     ; v1 Design.ahk default_SizeOfButtons: the size of a button of the selection (flow units, the box of its centre)
     static BUTTON_SIZE := 35
+    ; The marks of a trigger (WI-0102, v1 positions, the same numbers as EditorStyle.DrawMarks): the switch at 80 % of the
+    ; width and 25 % of the height, the star of a manual trigger at 15 % and 20 %; the box of a mark is MARK_SIZE wide.
+    static MARK_SIZE := 35
     ; v1 Element_SetType: the height of the bar of a new loop (WI-0099)
     static NEW_LOOP_BAR := 150
 
@@ -172,6 +175,10 @@ class FlowGeometry {
                 , "y", y + W / 8 + H * 4 / 3 + heightOfVerticalBar + B * 0.2))
         return out
     }
+
+    ; The centres of the marks of a trigger at the top left corner (x, y), as Map("switch", [x, y], "star", [x, y]).
+    static TriggerMarks(x, y) => Map("switch", [x + FlowGeometry.ELEMENT_WIDTH * 0.8, y + FlowGeometry.ELEMENT_HEIGHT * 0.25]
+        , "star", [x + FlowGeometry.ELEMENT_WIDTH * 0.15, y + FlowGeometry.ELEMENT_HEIGHT * 0.2])
 
     ; The buttons of a selected connection (v1 GDIp.ahk lines 861 to 900) from its five segments: edit, trash and plus
     ; on the middle of the third segment, and two move buttons at the ends (near the first and the last segment). The

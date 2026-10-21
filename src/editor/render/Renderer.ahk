@@ -362,6 +362,8 @@ class Renderer {
             this.DrawMark(target, this.AssetPath(switchIcon), x + 0.8 * w, y + 0.25 * h, size)
             if (element.Trigger["default"])
                 this.DrawMark(target, this.AssetPath(EditorStyle.StarFilled), x + 0.15 * w, y + 0.2 * h, size)
+            else if (element.Trigger["manual"])      ; a manual trigger that is not the default: the empty star sets it (WI-0102)
+                this.DrawMark(target, this.AssetPath(EditorStyle.StarEmpty), x + 0.15 * w, y + 0.2 * h, size)
         }
     }
 

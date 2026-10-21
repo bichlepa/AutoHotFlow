@@ -55,6 +55,7 @@ TestRun.Case("Scene: an empty flow gives an empty scene", EmptyFlow)
 TestRun.Case("Hit test: an element part, the parts of a loop", HitElementParts)
 TestRun.Case("Hit test: a connection segment within the margin of 20", HitConnectionSegment)
 TestRun.Case("Hit test: an element wins over a connection, nothing far away", HitOrderAndMiss)
+TestRun.Case("Hit test: the switch of a trigger, the star only of a manual trigger (WI-0102)", HitTriggerMarks)
 TestRun.Case("Scene: the default manual trigger comes from the definition (DefaultTrigger), not from a state key", DefaultTriggerFromDefinition)
 TestRun.Case("Scene: WithStates gives the states of Build and shares the objects whose state did not change", WithStatesSharesUnchanged)
 TestRun.Case("Scene: WithStates changes the view and keeps the flow", WithStatesChangesView)
@@ -80,6 +81,33 @@ DefaultTriggerFromDefinition() {
     Assert.Equal(ElementById(sc, "T1").Trigger["default"], 1, "the DefaultTrigger key marks the star")
     Assert.Equal(ElementById(sc, "T2").Trigger["default"], 0, "a state key 'default' does not mark it")
     Assert.Equal(ElementById(sc, "T3").Trigger["default"], 0, "only the class Trigger_Manual can be the default")
+}
+
+; The marks of a trigger (FlowGeometry.TriggerMarks): the switch at (80 %, 25 %) of the element, the star of a manual trigger
+; at (15 %, 20 %). Centres in flow units for an element at (0, y): switch (112, y + 26.25), star (21, y + 21).
+HitTriggerMarks() {
+    raw := FlowOf('{"allElements": {'
+        . '"T1": {"ID": "T1", "type": "trigger", "class": "Trigger_Manual", "package": "Default", "x": 0, "y": 0,'
+        . ' "DefaultTrigger": "1"},'
+        . '"T2": {"ID": "T2", "type": "trigger", "class": "Trigger_Manual", "package": "Default", "x": 0, "y": 300},'
+        . '"T3": {"ID": "T3", "type": "trigger", "class": "Trigger_Periodic_Timer", "package": "Default", "x": 0, "y": 600}},'
+        . '"allConnections": {}}')
+    sc := SceneBuilder.Build(raw)
+    h := FlowHitTest.At(sc, 112, 26)
+    Assert.Equal(h.Kind, "mark", "the switch of T1")
+    Assert.Equal(h.Id, "T1", "the switch belongs to its trigger")
+    Assert.Equal(h.Index, "switch", "the switch, not the star")
+    h := FlowHitTest.At(sc, 21, 21)
+    Assert.Equal(h.Kind, "mark", "the star of the default trigger")
+    Assert.Equal(h.Index, "star", "the star")
+    h := FlowHitTest.At(sc, 21, 321)
+    Assert.Equal(h.Index, "star", "the star of the manual trigger T2, which is not the default")
+    h := FlowHitTest.At(sc, 112, 626)
+    Assert.Equal(h.Index, "switch", "the switch of the timer trigger T3")
+    h := FlowHitTest.At(sc, 21, 621)
+    Assert.Equal(h.Kind, "element", "a timer trigger has no star: the element is hit")
+    h := FlowHitTest.At(sc, 70, 60)
+    Assert.Equal(h.Kind, "element", "the body of an element is not a mark")
 }
 
 ; A flow with three actions, the scene built, then the states changed: the result equals a build with those states,

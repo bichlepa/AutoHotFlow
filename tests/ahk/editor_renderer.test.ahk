@@ -100,7 +100,7 @@ CheckFillOfEachKind() {
         Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.Fill["action"], "an action is filled with the action fill")
         p := ProbeOf(view, sc, "C", 70, 3)
         Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.Fill["condition"], "a condition (diamond) is filled at its top")
-        p := ProbeOf(view, sc, "T", 8, 30)
+        p := ProbeOf(view, sc, "T", 70, 90)      ; not under the star (the empty star of a manual trigger is at the top left)
         Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.Fill["trigger"], "a trigger is filled with the trigger fill")
         p := ProbeOf(view, sc, "L", 8, 30)
         Assert.Equal(c.Pixel(p[1], p[2]), EditorStyle.Fill["loop"], "the head of a loop is filled with the loop fill")
@@ -397,8 +397,8 @@ CheckStarOnlyForTheDefaultTrigger() {
     try {
         r.Draw(plain, c)
         p := ProbeOf(view, plain, "T", 14, 14)     ; inside the rounded corner, where the star of the default sits
-        Assert.Equal(CountNot(c, p[1], p[2], 14, 14, EditorStyle.Fill["trigger"]), 0,
-            "no star at the top left of a trigger that is not the default")
+        Assert.True(CountNot(c, p[1], p[2], 14, 14, EditorStyle.Fill["trigger"]) > 0,
+            "a manual trigger that is not the default has the empty star at the top left (WI-0102)")
         r.Draw(star, c)
         Assert.True(CountNot(c, p[1], p[2], 14, 14, EditorStyle.Fill["trigger"]) > 0,
             "the star of the default trigger is drawn at the top left")
@@ -682,7 +682,7 @@ TestRun.Case("a loop is one object: no outline at its seams", CheckLoopIsOneObje
 TestRun.Case("an unknown class is drawn as a placeholder", CheckUnknownClassIsAPlaceholder)
 TestRun.Case("a warning puts a badge in the bottom right corner", CheckWarningBadgeIsDrawn)
 TestRun.Case("the switch of a trigger is drawn over its fill", CheckTriggerSwitchIsDrawn)
-TestRun.Case("the star is drawn for the default trigger only", CheckStarOnlyForTheDefaultTrigger)
+TestRun.Case("the filled star is drawn for the default trigger, the empty one for another manual trigger", CheckStarOnlyForTheDefaultTrigger)
 TestRun.Case("a run or trigger state does not rebuild the static layer", CheckStateChangeDoesNotRebuildTheLayer)
 TestRun.Case("a pan inside the layer does not rebuild it, a pan out of it does", CheckPanInsideTheLayerDoesNotRebuild)
 TestRun.Case("a zoom, a rename or a DPI change rebuilds the layer", CheckZoomAndStaticChangeRebuild)

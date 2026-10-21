@@ -45,6 +45,7 @@ class EditorStyle {
     static SwitchOn := "e_switch_on.ico"
     static SwitchOff := "e_switch_off.ico"
     static StarFilled := "e_star_filled.ico"
+    static StarEmpty := "e_star_empty.ico"
 
     ; badges (radius BadgeRadius, flow units): the places to migrate (v1 MIGRATION places) at the top right corner of an
     ; element, the warnings and the arming errors of a trigger at the bottom corners (see Renderer.DrawBadges)

@@ -16,6 +16,9 @@ class FlowHitTest {
             if (button["rect"].Contains(fx, fy))
                 return FlowHit("button", button["id"], button["name"])
         }
+        mark := FlowHitTest._MarkAt(scene, fx, fy)
+        if (IsObject(mark))
+            return mark
         elements := scene.Elements
         loop elements.Length {
             element := elements[elements.Length + 1 - A_Index]
@@ -32,6 +35,27 @@ class FlowHitTest {
             loop segments.Length {
                 if (segments[A_Index].Contains(fx, fy, FlowGeometry.CONNECTION_MARGIN))
                     return FlowHit("connection", connection.Id, A_Index)
+            }
+        }
+        return ""
+    }
+
+    ; The switch or the star of a trigger under (fx, fy) (FlowHit "mark"), or "". The star is a mark of a manual trigger only.
+    ; The marks lie on top of their element, so they are asked before the elements.
+    static _MarkAt(scene, fx, fy) {
+        elements := scene.Elements
+        loop elements.Length {
+            element := elements[elements.Length + 1 - A_Index]
+            if (element.Kind != "trigger" || !(element.Trigger is Map))
+                continue
+            marks := FlowGeometry.TriggerMarks(element.X, element.Y)
+            size := FlowGeometry.MARK_SIZE
+            for name in ["switch", "star"] {
+                if (name = "star" && !element.Trigger["manual"])
+                    continue
+                centre := marks[name]
+                if (FlowRect(centre[1] - size / 2, centre[2] - size / 2, size, size).Contains(fx, fy))
+                    return FlowHit("mark", element.Id, name)
             }
         }
         return ""

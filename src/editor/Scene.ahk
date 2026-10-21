@@ -180,7 +180,7 @@ class Scene {
             r := run.Get(element.Id, "")
             t := ""
             if (element.Kind = "trigger")
-                t := SceneBuilder.TriggerStateOf(trigger.Get(element.Id, ""), element.Trigger["default"])
+                t := SceneBuilder.TriggerStateOf(trigger.Get(element.Id, ""), element.Trigger["default"], element.Trigger["manual"])
             w := hasWarnings ? SceneBuilder.WarningOf(warnings.Get(element.Id, "")) : Map("count", element.WarningCount
                 , "text", element.Warning)
             if (r = element.Run && SceneBuilder.SameTrigger(t, element.Trigger) && w["count"] = element.WarningCount
