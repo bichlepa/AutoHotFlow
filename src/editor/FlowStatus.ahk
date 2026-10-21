@@ -7,10 +7,18 @@
 class FlowStatus {
     static SEPARATOR := "   |   "
 
-    ; view: EditorView; elementCount: the number of elements of the flow.
-    static Text(view, elementCount) {
+    ; view: EditorView; elementCount: the number of elements of the flow; selection: the selected IDs (a Map, WI-0098).
+    ; The last part is the v1 text of the selection: the elements, or one selected element (its ID), or the count.
+    static Text(view, elementCount, selection := "") {
+        count := (selection is Map) ? selection.Count : 0
+        if (count = 0)
+            middle := Lang("%1% elements", elementCount)
+        else if (count = 1) {
+            for id in selection
+                middle := Lang("1 selected element: %1%", id)
+        } else
+            middle := Lang("%1% selected elements", count)
         return Lang("Status_offset", Round(view.OffsetX), Round(view.OffsetY)) FlowStatus.SEPARATOR
-            . Lang("Status_zoom", Round(view.Zoom, 2)) FlowStatus.SEPARATOR
-            . Lang("%1% elements", elementCount)
+            . Lang("Status_zoom", Round(view.Zoom, 2)) FlowStatus.SEPARATOR . middle
     }
 }

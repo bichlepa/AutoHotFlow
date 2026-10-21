@@ -7,6 +7,8 @@
 #Include render\Renderer.ahk
 #Include EditorFlowOps.ahk
 #Include EditorTray.ahk
+#Include EditorPointer.ahk
+#Include EditorKeys.ahk
 #Include EditorWindow.ahk
 #Include EditorDriver.ahk
 
@@ -27,6 +29,7 @@ class Editor extends Role {
             throw AhfError("the editor needs --flow=<flowId>", ErrCode.BAD_ARGS)
         this.headless := args.Has("headless")
         this.model := ""
+        this.pointer := ""            ; EditorPointer: the mouse of the editor (selection, moves, view; WI-0098)
         this.window := ""             ; the EditorWindow (not with --headless)
         this.renderer := ""           ; the Renderer, created when GDI+ is started (the first frame)
         this.canvas := ""             ; the offscreen bitmap of the headless driver (cmd.test.render)
@@ -46,6 +49,7 @@ class Editor extends Role {
         this.model.later := (ms, fn) => SetTimer(fn, -ms)
         this.model.session := this.session
         this.model.AddListener((kind, data) => this._OnModel(kind, data))
+        this.pointer := EditorPointer(this.model)
         this.On("evt.", (msg) => this.model.OnEvent(msg.type, msg.payload))
         this.On("cmd.editor.show", (msg) => this._OnShow(msg))
         this.On("cmd.app.prepareExit", (msg) => Map("ok", true, "cancel", Json.False))

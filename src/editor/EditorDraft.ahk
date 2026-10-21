@@ -327,10 +327,11 @@ class EditorDraft {
     }
 
     ; The engine refused the change or the state is lost: the queue and the stacks go, the engine's state is asked for.
+    ; A refused or lost queue takes the undo and redo steps with it when one of its patches changed the flow (WI-0098,
+    ; F-0166): a dropped view patch (zoom, offset) alone is no reason to lose the steps.
     _Refuse(textKey, resync) {
-        this._DropQueue()
-        this.undoSteps := []
-        this.redoSteps := []
+        if (this._DropQueue())
+            this._ClearSteps()
         this.deferred := ""
         this.message := Lang(textKey)
         this.root := this.committed
@@ -341,9 +342,8 @@ class EditorDraft {
     }
 
     _Lost(why) {
-        this._DropQueue()
-        this.undoSteps := []
-        this.redoSteps := []
+        if (this._DropQueue())
+            this._ClearSteps()
         this.deferred := ""
         this.message := Lang("Status change lost")
         this.root := this.committed
@@ -352,14 +352,27 @@ class EditorDraft {
         this.model.Resync("patch lost: " why)
     }
 
-    ; Drops the queue; the callbacks of its patches get false.
+    _ClearSteps() {
+        this.undoSteps := []
+        this.redoSteps := []
+    }
+
+    ; Drops the queue; the callbacks of its patches get false. Returns true when a dropped patch is not a view patch.
     _DropQueue() {
         items := this.queue
         this.queue := []
         this.inFlight := false
-        for item in items
+        changed := false
+        for item in items {
+            if (!EditorDraft._IsView(item["ops"]))
+                changed := true
             EditorDraft._Call(item["done"], false)
+        }
+        return changed
     }
+
+    ; A patch that only sets the view (SaveView): one flow.settings operation with the view flag.
+    static _IsView(ops) => ops.Length = 1 && ops[1].Get("op", "") = "flow.settings" && ops[1].Has("view")
 
     ; --- helpers ---------------------------------------------------------------------------------------------------------
 

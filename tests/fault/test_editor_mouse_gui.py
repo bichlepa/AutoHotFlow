@@ -29,6 +29,8 @@ WHEEL_DELTA = 120
 MOUSEEVENTF_MOVE = 0x0001
 MOUSEEVENTF_LEFTDOWN = 0x0002
 MOUSEEVENTF_LEFTUP = 0x0004
+MOUSEEVENTF_RIGHTDOWN = 0x0008
+MOUSEEVENTF_RIGHTUP = 0x0010
 MOUSEEVENTF_WHEEL = 0x0800
 INPUT_MOUSE = 0
 SB_GETTEXTW = 0x040D            # WM_USER + 13: text of a status bar part (part 0 is the first part)
@@ -225,7 +227,8 @@ def test_the_status_bar_lies_below_the_canvas_and_does_not_overlap_it(chains):
 @pytest.mark.gui
 def test_real_wheel_and_drag_change_the_zoom_and_the_offset_of_the_shown_editor(chains):
     """REQ-EDT-030 with real mouse input: one wheel notch zooms in at the pointer (zoom 1.00 to 1.10 in the status bar), a
-    left drag of (80, 40) pixels moves the content by the movement divided by the zoom (offset -= movement / zoom)."""
+    right drag of (80, 40) pixels moves the content by the movement divided by the zoom (offset -= movement / zoom).
+    The right button moves the view (E0094): a left drag on an empty place draws the selection rectangle instead."""
     _skip_if_no_input()
     _enable_dpi_awareness()
     chain = chains("storage,engine", [])
@@ -241,13 +244,13 @@ def test_real_wheel_and_drag_change_the_zoom_and_the_offset_of_the_shown_editor(
             "the wheel did not zoom: %r" % (status_text(status),))
         zoomed = view_of(status)
         assert zoomed[0] == pytest.approx(before[0] * 1.1, abs=0.01), (before, zoomed)
-        # left drag of (80, 40) physical pixels, in ten steps with the button down
+        # right drag of (80, 40) physical pixels, in ten steps with the button down
         assert user32.SetCursorPos(cx, cy)
-        assert _send_mouse(MOUSEEVENTF_LEFTDOWN) == 1, "SendInput refused the button down"
+        assert _send_mouse(MOUSEEVENTF_RIGHTDOWN) == 1, "SendInput refused the button down"
         for step in range(1, 11):
             user32.SetCursorPos(cx + 8 * step, cy + 4 * step)
             time.sleep(0.03)
-        assert _send_mouse(MOUSEEVENTF_LEFTUP) == 1, "SendInput refused the button up"
+        assert _send_mouse(MOUSEEVENTF_RIGHTUP) == 1, "SendInput refused the button up"
         after_drag = (cx + 80, cy + 40)
         assert user32.SetCursorPos(*after_drag)
         time.sleep(0.2)

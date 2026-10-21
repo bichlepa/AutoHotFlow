@@ -20,6 +20,9 @@ class FlowGeometry {
     ; v1 Design.ahk default_SizeOfButtons: the size of a button of the selection (flow units, the box of its centre)
     static BUTTON_SIZE := 35
 
+    ; A position or a height snapped to the grid (v1 ui_FitGridX: the nearest multiple of GRID). WI-0098.
+    static Snap(v) => Round(v / FlowGeometry.GRID) * FlowGeometry.GRID
+
     ; The parts of an element as FlowRects, in the numbering of v1 (part 1 first). A trigger, an action and a condition
     ; have one part, the whole box. A loop has four (GDIp.ahk lines 800 to 816): the head, the bar on its left side
     ; (width 1/8, height HeightOfVerticalBar), the foot (height 1/3, up to 3/4 of the width) and the break field

@@ -29,6 +29,13 @@ class SceneElement {
         this.WarningCount := warningCount
     }
 
+    ; A copy of this element with another height of its bar (a loop whose tail is dragged, Scene.WithDrag). WI-0098.
+    Resized(heightOfVerticalBar) {
+        return SceneElement(this.Id, this.Kind, this.ClassName, this.Icon, this.X, this.Y, heightOfVerticalBar
+            , this.Run, this.Trigger, this.Migration, this.Placeholder, this.Warning, this.Package, this.Name
+            , this.WarningCount)
+    }
+
     ; A copy of this element moved by (dx, dy) in flow units (the drag of WI-0097, Scene.WithDrag). Everything else is
     ; the same; the Name is passed as it is (a name equal to the class name gives the same text).
     Moved(dx, dy) {

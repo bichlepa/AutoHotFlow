@@ -63,14 +63,20 @@ class Scene {
         return Scene(this.View, this.Version, this.Hovered, this.Elements, this.Connections, this.Warnings, interaction)
     }
 
-    ; The scene with the elements in dragged (Map: ID -> true) moved by (dx, dy) flow units, and their connections
-    ; routed again from the new ends (WI-0097). The base is the scene without a drag: its moved elements are computed
-    ; from their positions in this scene. Only the moved objects are new; the others are shared with this scene.
-    WithDrag(dragged, dx, dy) {
+    ; The scene with the elements in dragged (Map: ID -> true) moved by (dx, dy) flow units, and the loops in heights
+    ; (Map: ID -> height of the bar) given their new height, and their connections routed again from the new ends
+    ; (WI-0097, WI-0098). The base is the scene without a drag: its moved elements are computed from their positions in
+    ; this scene. Only the changed objects are new; the others are shared with this scene. version: the version of the
+    ; new scene ("" keeps the version of this one; the editor gives every drag a new one, so a frame is drawn).
+    WithDrag(dragged, dx, dy, version := "", heights := "") {
+        if (!(heights is Map))
+            heights := Map()
         elements := []
         byId := Map()
         for element in this.Elements {
             moved := dragged.Has(element.Id) ? element.Moved(dx, dy) : element
+            if (heights.Has(element.Id))
+                moved := moved.Resized(heights[element.Id])
             elements.Push(moved)
             byId[moved.Id] := moved
         }
@@ -78,8 +84,9 @@ class Scene {
         for connection in this.Connections {
             from := byId.Get(connection.From, "")
             to := byId.Get(connection.To, "")
-            if ((!dragged.Has(connection.From) && !dragged.Has(connection.To)) || !(from is SceneElement)
-                    || !(to is SceneElement)) {
+            affected := dragged.Has(connection.From) || dragged.Has(connection.To) || heights.Has(connection.From)
+                || heights.Has(connection.To)
+            if (!affected || !(from is SceneElement) || !(to is SceneElement)) {
                 connections.Push(connection)
                 continue
             }
@@ -92,7 +99,8 @@ class Scene {
         interaction["dragged"] := dragged
         interaction["dx"] := dx
         interaction["dy"] := dy
-        return Scene(this.View, this.Version, this.Hovered, elements, connections, this.Warnings, interaction)
+        return Scene(this.View, (version = "") ? this.Version : version, this.Hovered, elements, connections
+            , this.Warnings, interaction)
     }
 
     ; The start and the aim of a connection being drawn, or "" when its source element is not in the scene.

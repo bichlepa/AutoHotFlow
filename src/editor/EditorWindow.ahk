@@ -10,6 +10,7 @@
 #Include FlowTooltip.ahk
 #Include EditorFlowOps.ahk
 #Include EditorTray.ahk
+#Include EditorKeys.ahk
 
 ; The window of the editor (WI-0088, REQ-EDT-010, REQ-EDT-020, ARCHITECTURE 2.1): a UiWindow whose client area shows the
 ; back buffer of the renderer. The window copies the back buffer in WM_PAINT and answers WM_ERASEBKGND itself, so nothing
@@ -21,10 +22,11 @@
 ; First size: 90 % of the work area of the primary monitor (v1), in the sizes of UiWindow (96 dpi). A remembered place of
 ; the process wins (UiWindow). The close box calls the role's end (a planned end: the role says bye, exit 0).
 ;
-; The mouse (WI-0090, REQ-EDT-030, v1 mouse_wheel and ui_scrollwithMouse): the wheel zooms at the pointer (factor 1.1), a
-; drag with the right button, or with the left one on an empty place, moves the view. The drag holds the mouse with
-; SetCapture and follows WM_MOUSEMOVE; it never loops with Sleep (v1 did). A tooltip (FlowTooltip) appears when the mouse
-; has rested HOVER_MS on the flow, and hides on the next move or when the mouse leaves the window.
+; The mouse (WI-0090, WI-0098, REQ-EDT-030, REQ-EDT-060, E0094): the wheel zooms at the pointer (factor 1.1). The buttons go to
+; the pointer (EditorPointer: selection, rectangle, move, loop height on the left button; the view on the right one). The
+; pointer holds the mouse while it works (SetCapture, released when it stops holding); a drag follows WM_MOUSEMOVE and never
+; loops with Sleep (v1 did). A tooltip (FlowTooltip) appears when the mouse has rested HOVER_MS on the flow, and hides on the
+; next move or when the mouse leaves the window. The keys come as WM_KEYDOWN of this window (EditorKeys), never as hotkeys.
 ;
 ; The status bar (FlowStatus: offset, zoom, number of elements, v1 texts) is a native StatusBar below the canvas; the canvas
 ; is the client area above it.
@@ -40,6 +42,7 @@ class EditorWindow {
     static WM_RBUTTONUP := 0x0205
     static WM_MOUSEWHEEL := 0x020A
     static WM_MOUSELEAVE := 0x02A3
+    static WM_KEYDOWN := 0x0100
     static SIZE_SHARE := 0.9
     static HOVER_MS := 500
     static WHEEL_NOTCH := 120
@@ -52,7 +55,6 @@ class EditorWindow {
         this.lastVersion := -1        ; the scene version of the last frame that was drawn
         this.frames := 0
         this.closed := false
-        this.drag := ""               ; Map(button, x, y) while the view is dragged, else ""
         this.tracking := false        ; TrackMouseEvent is set for the next WM_MOUSELEAVE
         this.hoverX := 0
         this.hoverY := 0
@@ -73,17 +75,19 @@ class EditorWindow {
         this.sizeFn := (wParam, lParam, msg, hwnd) => this._OnSize(lParam, hwnd)
         this.frameFn := () => this._Frame()
         this.hoverFn := () => this._HoverTimer()
+        this.keyFn := (wParam, lParam, msg, hwnd) => this._OnKey(wParam, hwnd)
         this.mouseFns := Map(
             EditorWindow.WM_MOUSEMOVE, (wParam, lParam, msg, hwnd) => this._OnMove(wParam, lParam, hwnd),
             EditorWindow.WM_LBUTTONDOWN, (wParam, lParam, msg, hwnd) => this._OnDown("left", lParam, hwnd),
-            EditorWindow.WM_LBUTTONUP, (wParam, lParam, msg, hwnd) => this._OnUp("left", hwnd),
+            EditorWindow.WM_LBUTTONUP, (wParam, lParam, msg, hwnd) => this._OnUp("left", lParam, hwnd),
             EditorWindow.WM_RBUTTONDOWN, (wParam, lParam, msg, hwnd) => this._OnDown("right", lParam, hwnd),
-            EditorWindow.WM_RBUTTONUP, (wParam, lParam, msg, hwnd) => this._OnUp("right", hwnd),
+            EditorWindow.WM_RBUTTONUP, (wParam, lParam, msg, hwnd) => this._OnUp("right", lParam, hwnd),
             EditorWindow.WM_MOUSEWHEEL, (wParam, lParam, msg, hwnd) => this._OnWheel(wParam, lParam, hwnd),
             EditorWindow.WM_MOUSELEAVE, (wParam, lParam, msg, hwnd) => this._OnLeave(hwnd))
         OnMessage(EditorWindow.WM_PAINT, this.paintFn)
         OnMessage(EditorWindow.WM_ERASEBKGND, this.eraseFn)
         OnMessage(EditorWindow.WM_SIZE, this.sizeFn)
+        OnMessage(EditorWindow.WM_KEYDOWN, this.keyFn)
         for msg, fn in this.mouseFns
             OnMessage(msg, fn)
         this.Refresh()
@@ -262,26 +266,20 @@ class EditorWindow {
         this.status.SetText(text)
     }
 
-    ; WM_MOUSEMOVE: the drag moves the view by the pointer's movement; otherwise the tooltip waits for the rest.
+    ; WM_MOUSEMOVE: the pointer follows the mouse while it holds it (a drag, a rectangle, the view); otherwise the tooltip
+    ; waits for the rest. wParam tells the buttons that are down (MK_LBUTTON 0x1, MK_RBUTTON 0x2).
     _OnMove(wParam, lParam, hwnd) {
         if (hwnd != this.hwnd || this.closed)
             return
         pt := EditorWindow._Point(lParam)
         if (!this.tracking)
             this._TrackLeave()
-        if (IsObject(this.drag) && !(wParam & (this.drag["button"] = "left" ? 0x1 : 0x2))) {
-            this.drag := ""                     ; the button went up elsewhere (capture lost, e.g. by Alt+Tab)
-            DllCall("user32\ReleaseCapture")
-        }
-        if (IsObject(this.drag)) {
-            dx := pt[1] - this.drag["x"]
-            dy := pt[2] - this.drag["y"]
-            if (dx != 0 || dy != 0) {
-                this.drag["x"] := pt[1]
-                this.drag["y"] := pt[2]
-                model := this.role.model
-                model.ChangeView(model.view.Moved(dx, dy))
-            }
+        pointer := this.role.pointer
+        if (pointer.Holding) {
+            held := (wParam & 0x1) ? "left" : ((wParam & 0x2) ? "right" : "")
+            pointer.Move(pt[1], pt[2], held)
+            if (!pointer.Holding)
+                DllCall("user32\ReleaseCapture")       ; the drag ended (a lost button, or a cancel)
             return 0
         }
         this._HideTip()
@@ -291,26 +289,42 @@ class EditorWindow {
         return 0
     }
 
-    ; WM_LBUTTONDOWN / WM_RBUTTONDOWN: a drag starts on an empty place (left) or anywhere (right). A left click on an element
-    ; is left to the selection (S0006).
+    ; WM_LBUTTONDOWN / WM_RBUTTONDOWN: the pointer gets the press. It holds the mouse while it works (SetCapture).
     _OnDown(button, lParam, hwnd) {
         if (hwnd != this.hwnd || this.closed)
             return
         pt := EditorWindow._Point(lParam)
-        if (button = "left" && this._HitAt(pt[1], pt[2]) != "")
-            return
         this._HideTip()
-        this.drag := Map("button", button, "x", pt[1], "y", pt[2])
-        DllCall("user32\SetCapture", "ptr", this.hwnd)
+        pointer := this.role.pointer
+        pointer.Down(button, pt[1], pt[2], GetKeyState("Ctrl", "P"))
+        if (pointer.Holding)
+            DllCall("user32\SetCapture", "ptr", this.hwnd)
         return 0
     }
 
-    _OnUp(button, hwnd) {
-        if (hwnd != this.hwnd || !IsObject(this.drag) || this.drag["button"] != button)
+    ; WM_LBUTTONUP / WM_RBUTTONUP: the pointer ends its click or drag; the capture goes with it.
+    _OnUp(button, lParam, hwnd) {
+        if (hwnd != this.hwnd || this.closed)
             return
-        this.drag := ""
-        DllCall("user32\ReleaseCapture")
+        pt := EditorWindow._Point(lParam)
+        pointer := this.role.pointer
+        was := pointer.Holding
+        pointer.Up(button, pt[1], pt[2])
+        if (was && !pointer.Holding)
+            DllCall("user32\ReleaseCapture")
         return 0
+    }
+
+    ; WM_KEYDOWN of this window: the key table (EditorKeys) decides; a key it does not know goes on to Windows.
+    _OnKey(vk, hwnd) {
+        if (hwnd != this.hwnd || this.closed)
+            return
+        key := EditorKeys.KeyOf(vk)
+        if (key = "")
+            return
+        name := EditorKeys.Name(key, GetKeyState("Ctrl", "P"), GetKeyState("Shift", "P"))
+        if (EditorKeys.Handle(this.role.pointer, name))
+            return 0
     }
 
     ; WM_MOUSEWHEEL goes to the focused window, so it is taken when the pointer is over the canvas, whichever window got it.
@@ -349,7 +363,7 @@ class EditorWindow {
 
     ; The mouse has rested: the tooltip of what lies under it, if anything, next to the pointer.
     _HoverTimer() {
-        if (this.closed || IsObject(this.drag))
+        if (this.closed || this.role.pointer.Holding)
             return
         MouseGetPos(&mx, &my, &under)
         if (under != this.hwnd)
@@ -406,13 +420,13 @@ class EditorWindow {
             return
         this.closed := true
         this.scheduled := false
-        this.drag := ""
         SetTimer(this.frameFn, 0)
         SetTimer(this.hoverFn, 0)
         this._HideTip()
         OnMessage(EditorWindow.WM_PAINT, this.paintFn, 0)
         OnMessage(EditorWindow.WM_ERASEBKGND, this.eraseFn, 0)
         OnMessage(EditorWindow.WM_SIZE, this.sizeFn, 0)
+        OnMessage(EditorWindow.WM_KEYDOWN, this.keyFn, 0)
         for msg, fn in this.mouseFns
             OnMessage(msg, fn, 0)
         if (IsObject(this.canvas)) {

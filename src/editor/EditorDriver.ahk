@@ -19,6 +19,11 @@
 ;   cmd.test.edit {ops}                 the operations as one undo step (WI-0096, EditorDraft.Commit)
 ;   cmd.test.undo {}, cmd.test.redo {}  one step of the undo or the redo stack
 ;   cmd.test.select {mode, ids?}        the selection: one, toggle, all or none (WI-0096)
+;   cmd.test.mouse {button, action, x, y, ctrl?}   the mouse as the window gets it (WI-0098): button left, right (none for a
+;                                       move without a button); action down, move, up or double (two clicks). The same
+;                                       pointer methods as the window (EditorPointer)
+;   cmd.test.key {key, ctrl?, shift?}   a key of the editor window as WM_KEYDOWN gives it (WI-0098, EditorKeys): key "Esc" or
+;                                       one letter; answers handled (the table has it)
 ;
 ; Booleans on the wire are Json.True and Json.False (PROTOCOL 2): the state fields enabled and armed are written with Json.Bool.
 class EditorDriver {
@@ -36,11 +41,64 @@ class EditorDriver {
         role.On("cmd.test.view", (msg) => this._OnView(msg))
         role.On("cmd.test.hover", (msg) => this._OnHover(msg))
         role.On("cmd.test.command", (msg) => this._OnCommand(msg))
+        role.On("cmd.test.mouse", (msg) => this._OnMouse(msg))
+        role.On("cmd.test.key", (msg) => this._OnKey(msg))
         role.On("cmd.test.edit", (msg) => this._OnEdit(msg))
         role.On("cmd.test.undo", (msg) => this._OnStep(msg, "undo"))
         role.On("cmd.test.redo", (msg) => this._OnStep(msg, "redo"))
         role.On("cmd.test.select", (msg) => this._OnSelect(msg))
     }
+
+    ; cmd.test.mouse {button, action, x, y, ctrl?}: the same calls as the window makes for its messages (EditorWindow._OnDown,
+    ; _OnMove, _OnUp). The answer is the mode of the pointer and the selection.
+    _OnMouse(msg) {
+        p := msg.payload
+        button := p.Get("button", "")
+        action := p.Get("action", "")
+        x := p.Get("x", "")
+        y := p.Get("y", "")
+        if (!IsNumber(x) || !IsNumber(y))
+            throw AhfError("cmd.test.mouse: x and y are canvas pixels", ErrCode.BAD_PAYLOAD)
+        if (IsObject(button) || IsObject(action))
+            throw AhfError("cmd.test.mouse: button and action are texts", ErrCode.BAD_PAYLOAD)
+        moveWithoutButton := (action = "move" && button = "none")
+        if (!(button = "left" || button = "right" || moveWithoutButton)
+                || !(action = "down" || action = "move" || action = "up" || action = "double"))
+            throw AhfError("cmd.test.mouse: button left or right (none for a move), action down, move, up or double",
+                ErrCode.BAD_PAYLOAD)
+        ctrl := EditorDriver._Flag(p.Get("ctrl", 0))
+        pointer := this.role.pointer
+        switch action {
+            case "down":
+                pointer.Down(button, x, y, ctrl)
+            case "up":
+                pointer.Up(button, x, y)
+            case "move":
+                pointer.Move(x, y, moveWithoutButton ? "" : button)
+            case "double":
+                pointer.Down(button, x, y, ctrl)
+                pointer.Up(button, x, y)
+                pointer.Down(button, x, y, ctrl)
+                pointer.Up(button, x, y)
+        }
+        return Map("ok", true, "pointer", pointer.CurrentMode, "selection", this.model.SelectionIds(), "status", this._Status())
+    }
+
+    ; cmd.test.key {key, ctrl?, shift?}: the key as the window gets it (WM_KEYDOWN, EditorKeys). handled: the table has it.
+    _OnKey(msg) {
+        p := msg.payload
+        key := p.Get("key", "")
+        isLetter := (Type(key) = "String" && StrLen(key) = 1 && RegExMatch(key, "^[A-Za-z]$"))
+        if (!(Type(key) = "String" && key = "Esc") && !isLetter)
+            throw AhfError("cmd.test.key: key is Esc or one letter", ErrCode.BAD_PAYLOAD)
+        name := EditorKeys.Name(key, EditorDriver._Flag(p.Get("ctrl", 0)), EditorDriver._Flag(p.Get("shift", 0)))
+        handled := EditorKeys.Handle(this.role.pointer, name)
+        return Map("ok", true, "handled", Json.Bool(handled), "selection", this.model.SelectionIds()
+            , "status", this._Status())
+    }
+
+    ; True for a JSON true (1, or the Json.True object) in a payload; false, 0 and missing values are false.
+    static _Flag(v) => IsObject(v) ? (v == Json.True) : (IsNumber(v) && v != 0)
 
     ; cmd.test.edit {ops}: the operations as one undo step (EditorDraft.Commit). Answers at once; the engine's answer comes
     ; later (cmd.test.state shows pending while it is on its way).
@@ -179,6 +237,7 @@ class EditorDriver {
             , "lastFrameMs", 0, "slowestFrameMs", 0, "rebuilds", 0, "lastRebuildMs", 0)
         st["status"] := this._Status()
         st["selection"] := m["selection"]
+        st["pointer"] := this.role.pointer.CurrentMode          ; "", press, move, tail, rect or view (WI-0098)
         st["undo"] := m["undo"]
         st["redo"] := m["redo"]
         st["pending"] := m["pending"]

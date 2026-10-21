@@ -51,6 +51,9 @@ class EditorModel {
         this.scene := ""             ; the Scene of the last state, "" before the definition
         this.sceneVersion := 0
         this.view := EditorView()
+        this.viewLoaded := false     ; the view was read from the flow settings (the first definition, F-0166)
+        this.drag := ""              ; the drag of the pointer (SetDrag): Map("ids", Map, "dx", n, "dy", n, "heights", Map) or ""
+        this.dragCache := ""         ; Map("base", Scene, "version", n, "scene", Scene): the last drag scene (CurrentScene)
         this.epoch := 0
         this.lastSeq := 0            ; the seq of the last applied event or answer of this epoch
         this.engineState := EditorModel.ENGINE_WAITING
@@ -203,7 +206,13 @@ class EditorModel {
         if (!(definition is Map))
             definition := Map()
         this.name := EditorModel.TextOf(definition, "name")
-        this.view := EditorView.FromFlowSettings(definition.Get("flowSettings", ""), this.view.Dpi, this.view.Width, this.view.Height)
+        if (!this.viewLoaded) {
+            ; The view is read once, from the first definition: a later definition (a foreign change, an answer after a
+            ; refusal) must not take back a zoom the user made and that is not saved yet (WI-0098, F-0166).
+            this.view := EditorView.FromFlowSettings(definition.Get("flowSettings", ""), this.view.Dpi, this.view.Width
+                , this.view.Height)
+            this.viewLoaded := true
+        }
         this.draft.Accept(definition, p.Get("rev", this.draft.rev))   ; the draft tells the model (DraftChanged)
         this._AgainDefinition()
     }
@@ -217,8 +226,34 @@ class EditorModel {
     ; The selection changed (EditorDraft.SetSelection): the scene takes it, the scene is not built again.
     SelectionChanged() {
         if (this.scene != "")
-            this.scene := this.scene.WithInteraction(this.draft.selection)
+            this.scene := this.scene.WithInteraction(this.draft.selection, this.scene.Rect, this.scene.ConnectingRequest)
         this._Changed("state")
+    }
+
+    ; The IDs of the selection (an Array, in the order the selection has them).
+    SelectionIds() {
+        ids := []
+        for id in this.draft.selection
+            ids.Push(id)
+        return ids
+    }
+
+    ; The drag of the pointer (WI-0098): the elements of ids move by (dx, dy) flow units and the loops of heights take the
+    ; new heights; "" ends the drag. The flow does not change here: the pointer sends the patch on drop. The scene is drawn
+    ; as the drag makes it (CurrentScene), at once.
+    SetDrag(drag) {
+        this.drag := drag
+        this.sceneVersion += 1
+        this._Changed("view")
+    }
+
+    ; The selection rectangle being drawn (WI-0098, a FlowRect in flow units; "" removes it). The scene takes it at once.
+    SetRect(rect) {
+        if (this.scene = "")
+            return
+        this.sceneVersion += 1
+        this.scene := this.scene.WithInteraction(this.draft.selection, rect, this.scene.ConnectingRequest)
+        this._Changed("view")
     }
 
     ; Runs fn after ms through the role's timer (none in a test without one).
@@ -533,8 +568,9 @@ class EditorModel {
             return
         this.sceneVersion += 1
         this.restateDirty := false
+        rect := (this.scene != "") ? this.scene.Rect : ""          ; a rectangle being drawn survives a new definition
         this.scene := SceneBuilder.Build(root, this.view, this.run, this.triggers, this.warnings, ""
-            , this.sceneVersion).WithInteraction(this.draft.selection)
+            , this.sceneVersion).WithInteraction(this.draft.selection, rect)
     }
 
     ; Only the states changed: the scene shares its unchanged items (Scene.WithStates, F-0150). Called by CurrentScene.
@@ -599,7 +635,7 @@ class EditorModel {
 
     ; The text of the status bar: the view, the number of elements, and the last refusal of the draft (if any).
     StatusText() {
-        text := FlowStatus.Text(this.view, this.ElementCount())
+        text := FlowStatus.Text(this.view, this.ElementCount(), this.draft.selection)
         if (this.draft.message != "")
             text .= FlowStatus.SEPARATOR this.draft.message
         return text
@@ -610,7 +646,21 @@ class EditorModel {
     CurrentScene() {
         if (this.restateDirty)
             this._Restate()
-        return this.scene
+        if (!IsObject(this.drag) || this.scene = "")
+            return this.scene
+        return this._DragScene()
+    }
+
+    ; The scene with the drag of the pointer, from the scene without it (Scene.WithDrag is always given the base scene).
+    ; Kept while the base scene and the version stay the same (a frame and a hit test ask for it several times).
+    _DragScene() {
+        c := this.dragCache
+        if (IsObject(c) && ObjPtr(c["base"]) = ObjPtr(this.scene) && c["version"] = this.sceneVersion)
+            return c["scene"]
+        sc := this.scene.WithDrag(this.drag["ids"], this.drag["dx"], this.drag["dy"], this.sceneVersion
+            , this.drag["heights"])
+        this.dragCache := Map("base", this.scene, "version", this.sceneVersion, "scene", sc)
+        return sc
     }
 
     _Changed(kind) {

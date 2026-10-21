@@ -20,6 +20,14 @@ class FlowRect {
             && py >= this.Y - margin && py <= this.Bottom + margin
     }
 
+    ; True if the rectangle touches or crosses other (a shared edge counts). The selection rectangle uses it (WI-0098).
+    Overlaps(other) {
+        return this.X <= other.Right && other.X <= this.Right && this.Y <= other.Bottom && other.Y <= this.Bottom
+    }
+
+    ; The rectangle spanned by two corners (in any order), with W and H not negative.
+    static Between(x1, y1, x2, y2) => FlowRect(Min(x1, x2), Min(y1, y2), Abs(x2 - x1), Abs(y2 - y1))
+
     ; The smallest rectangle that holds all of rects. An empty list gives the empty rectangle at 0,0.
     static Union(rects) {
         if (rects.Length = 0)
