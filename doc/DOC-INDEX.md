@@ -169,7 +169,7 @@ L47-52 A drag keeps the static layer when the key leaves the dragged items out (
 L54-59 A drag of 30 elements draws live at 25 ms per frame (partly verified)
 ```
 
-## doc/howto/error-handling.md (3.8 KB, 49 lines)
+## doc/howto/error-handling.md (5.7 KB, 65 lines)
 ```text
 L5-9 A script without a summary line ends with exit code 0 (verified)
 L12-17 A callback that throws does not abort the state machine (verified)
@@ -177,6 +177,8 @@ L20-25 `OnError` handler: return 1 keeps the process alive (verified)
 L28-34 Console output is best effort and must not block shutdown (verified)
 L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
+L51-57 A copy of the variables of an error must be taken where the error is caught, and it must be text (verified)
+L59-65 A repeated error of the same flow within 10 s sends no notice at once (verified)
 ```
 
 ## doc/howto/gui-and-hotkeys.md (34.7 KB, 257 lines)

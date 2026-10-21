@@ -47,3 +47,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Schedule the next round first, then do the work that may throw. The trigger host runs the callback under try/catch and reports the error (`evt.trigger.error`), and the chain goes on.
 - **Status:** verified for the order that works (`test_a_throwing_callback_is_reported_and_the_trigger_stays_armed`: the rounds 1 and 2 are reported); the chain that ends without the reschedule is assumed, not tested
 - **Source:** `tests/elements/Test/Triggers/Trigger_TestCallbackThrows.ahk`, `src/triggerhost/TriggerContext.ahk`
+
+### A copy of the variables of an error must be taken where the error is caught, and it must be text
+
+- **Problem:** The variables of a branch are objects (Maps) that the branch keeps changing. A reference kept to them shows the state at the time of the look, not of the error, and a loop that is left with an exception pops its variables.
+- **Wrong:** Storing `thread.Vars` (or `thread.Loops.Visible`) of the failed thread and reading it later, from the window. The thread is removed and the instance goes on, so the values change under the reader.
+- **Right:** Take the copy at the moment of the error, in the branch that handles the unhandled result (`Executor._Advance`), and turn every value into text there (`VarJson.Stringify` for objects, cut to a fixed length). Nothing is taken on the normal path. The loop stack is not popped in the unhandled path (`Scheduler.Advance` returns before the pop), so the loop variables are still there.
+- **Status:** verified (`tests/integration/test_error_window.py::test_an_unhandled_error_keeps_the_variables_of_its_branch`, and the unit `tests/ahk/engine_error_snapshot.test.ahk`)
+- **Source:** `src/engine/core/ErrorSnapshot.ahk`, `src/engine/Executor.ahk` (`_Advance`)
+
+### A repeated error of the same flow within 10 s sends no notice at once
+
+- **Problem:** A test starts the same failing flow twice and waits for the second notice; the notice does not come within a few seconds.
+- **Wrong:** Expecting one notice per error. The throttle (`NoticeThrottle`, 10 s per kind and flow) holds the second one back and sends it with the count after the window.
+- **Right:** Use another flow for the second error when the test needs its notice at once, or wait for the count (`held`) and check the newest `errorId`, which the held notice carries.
+- **Status:** verified (`tests/integration/test_error_window.py`, the first version of the follow test timed out this way)
+- **Source:** `src/core/NoticeThrottle.ahk`, `src/engine/Engine.ahk` (`_Notice`)
