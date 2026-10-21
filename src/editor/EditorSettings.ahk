@@ -7,11 +7,15 @@
 #Include ..\elements\base\ParamEvaluator.ahk
 #Include form\ElementForm.ahk
 #Include NewElementCatalog.ahk
+<<<<<<< HEAD
 #Include assist\AssistantValues.ahk
 #Include assist\AssistantSource.ahk
 #Include assist\WindowAssistant.ahk
 #Include assist\MouseAssistant.ahk
 #Include assist\ColorAssistant.ahk
+=======
+#Include ..\ui_common\HelpRequest.ahk
+>>>>>>> 356d6d97... Help: the manager, the editor menu and the element settings open the help (WI-0111)
 
 ; The settings of one element in the editor (WI-0106, REQ-EDT-120, PROTOCOL 4.11): the form of the element (ElementForm,
 ; the headless model of WI-0105) is opened for an element of the flow (mode "edit") or for a class chosen for a new element
@@ -214,6 +218,14 @@ class EditorSettings {
         this.session["form"].SetStandardName(flag)
         this._Sync()
         return true
+    }
+
+    ; The Help button of the settings (WI-0111): the help page of the class of the element being set (PROTOCOL 4.12).
+    Help() {
+        s := this.session
+        if (!(s is Map) || !IsObject(s["cls"]))
+            return
+        HelpRequest.Open(this.model.peer, HelpPageId.ElementId(s["cls"].Name))
     }
 
     ; Changes the class of the element being set (v1: the type button, WI-0106). The class keeps the kind; the form is built

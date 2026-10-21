@@ -3,6 +3,7 @@
 #Include ..\core\Json.ahk
 #Include ..\core\Time.ahk
 #Include ..\core\SettingsModel.ahk
+#Include ..\ui_common\HelpRequest.ahk
 
 ; The model of the manager (WI-0073, doc/ARCHITECTURE.md 3, doc/PROTOCOL.md 4.8). It holds the UI state only: the flows with
 ; their state, the categories and their order, the settings and the state of the connection to the engine. The truth
@@ -728,8 +729,12 @@ class ManagerModel {
         return Map("NewCategory", up, "NewFlow", up, "ChangeCategory", flows && up, "Duplicate", one && up
             , "Delete", (flows || this.catSelected) && up, "Edit", this.SelectedFlows().Length = 1
             , "Enable", flows && up, "Run", flows && up
-            , "Settings", up, "ImportExport", up, "About", true, "Help", false, "ShowLog", true, "Exit", true, "Notices", true)
+            , "Settings", up, "ImportExport", up, "About", true, "Help", true, "ShowLog", true, "Exit", true, "Notices", true)
     }
+
+    ; The help window on a page (WI-0111, PROTOCOL 4.12): the menu Help and its button ask the supervisor, which shows the page
+    ; in the help role. "" is the index. The manager does not wait for the window.
+    OpenHelp(page := "") => HelpRequest.Open(this.peer, page)
 
     ; The settings dialog's set (WI-0078): the checked partial set (key -> value, SettingsModel form) goes to the engine as
     ; cmd.settings.set (PROTOCOL 4.2). Booleans become JSON booleans here. done(answer) gets the answer of Command.

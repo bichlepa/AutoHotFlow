@@ -56,6 +56,7 @@ class EditorMenus {
             EditorMenus._Entry("toggle", toggleLabel, true),
             EditorMenus._Entry("edit", Lang("Edit #verb"), true, edit),
             EditorMenus._Entry("settings", Lang("Settings"), true),       ; the flow settings dialog (WI-0109)
+            EditorMenus._Entry("help", Lang("Help #noun"), true),         ; the help window, the index (WI-0111)
             EditorMenus._Entry("exit", Lang("Exit #verb"), true)
         ]
     }
@@ -291,6 +292,8 @@ class EditorMenus {
                 role.settings.Open(this.target)         ; the settings of the element under the last context menu (WI-0106)
             case "settings":
                 role.flowSettings.Open(role.globals)    ; the flow settings of the flow (WI-0109)
+            case "help":
+                HelpRequest.Open(role.model.peer)             ; the help window, the index (WI-0111)
         }
     }
 

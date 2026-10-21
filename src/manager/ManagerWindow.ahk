@@ -331,6 +331,8 @@ class ManagerWindow {
                 this.ShowSettings()
             case "About":
                 this.ShowAbout()
+            case "Help":
+                this.model.OpenHelp("")
         }
     }
 
