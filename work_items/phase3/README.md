@@ -630,7 +630,7 @@ The retrospective of WI-0104 (E0095) refines the S0007 packages before they star
 - **Patch client:** a form writes with `EditorDraft.Commit(ops, true)`, as the trigger star does (one undo step per OK, nothing on Cancel). No form talks to the engine itself.
 - **New element:** the form goes between the class choice and the add (choice, form, OK = one `element.add`). This changes the answer of WI-0099 that adds at once with the defaults (M-0091 says so; the e2e test of that answer changes in WI-0106).
 - **Menus and keys:** the entries `edit` (element) and `settings` (flow) are disabled in `EditorMenus` until WI-0106 and WI-0109; the double click of an element opens the form. `Run` already catches the failure of an action (WI-0104), keep it around the new actions.
-- **Decision needed before WI-0106 and WI-0107:** the force question of the trigger switch (OPEN-ITEMS F-9000*). The "Switch with the flow" checkbox sits in the same dialogs.
+- **Decision needed before WI-0106 and WI-0107:** the force question of the trigger switch (OPEN-ITEMS F-0170). The "Switch with the flow" checkbox sits in the same dialogs.
 - **Lists of other flows** (WI-0107) use the request pattern of `EditorTriggers.Switch`.
 - **Keys in dialogs:** the keys of a dialog field do not reach the editor's keys (WI-0108 tests that Ctrl+Z in a field does not undo the flow).
 
