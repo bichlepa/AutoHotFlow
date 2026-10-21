@@ -31,30 +31,30 @@ L410-421 9. Performance budgets (targets, measured in Phase 2)
 L423-433 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (176.4 KB, 744 lines)
+## doc/PROTOCOL.md (180.1 KB, 761 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-717 4. Message Catalog
+L95-734 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
 L165-173   4.1c Unhandled errors (`evt.diag.error`, WI-0023)
-L175-244   4.2 Engine commands (clients → `engine`)
-L246-295   4.3 Engine events (`evt.*`, engine → topics)
-L297-330   4.4 Engine ↔ trigger host
-L332-397   4.5 Engine ↔ worker
-L399-471   4.6 Engine ↔ storage and log
-L473-492   4.7 Dialogs
-L494-500   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2, E0072)
-L502-538   4.8 Manager (WI-0073, `src/manager/`)
-L540-602   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
-L604-623   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L625-717   4.11 Role `editor` (WI-0088, `src/editor/`)
-L719-738 5. Connection setup, reconnection, resync
-L729-738   5a Events before subscription (design question, WI-0007)
-L740-744 6. Versioning and extension
+L175-257   4.2 Engine commands (clients → `engine`)
+L259-308   4.3 Engine events (`evt.*`, engine → topics)
+L310-343   4.4 Engine ↔ trigger host
+L345-410   4.5 Engine ↔ worker
+L412-484   4.6 Engine ↔ storage and log
+L486-505   4.7 Dialogs
+L507-513   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2, E0072)
+L515-551   4.8 Manager (WI-0073, `src/manager/`)
+L553-615   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
+L617-636   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
+L638-734   4.11 Role `editor` (WI-0088, `src/editor/`)
+L736-755 5. Connection setup, reconnection, resync
+L746-755   5a Events before subscription (design question, WI-0007)
+L757-761 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (55.3 KB, 338 lines)
@@ -73,7 +73,7 @@ L296-316 9a. Dialog tests (E0038, WI-0051)
 L318-338 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (56.8 KB, 494 lines)
+## doc/ELEMENT-API-V2.md (56.6 KB, 494 lines)
 ```text
 L8-18 1. Guidelines
 L20-110 2. Class contract
@@ -185,7 +185,7 @@ L51-57 A copy of the variables of an error must be taken where the error is caug
 L59-65 A repeated error of the same flow within 10 s sends no notice at once (verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (41.1 KB, 311 lines)
+## doc/howto/gui-and-hotkeys.md (39.9 KB, 303 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -225,7 +225,6 @@ L274-279 A menu bar entry without a submenu takes a callback (assumed) (assumed)
 L282-288 The format of a DateTime control is set by message, the option takes no spaces (verified) (partly verified)
 L290-296 A ListBox has no Click event in AHK v2 (verified) (verified)
 L297-303 A menu state that depends on another program is read only when the menu is refreshed (verified) (verified)
-L305-311 A one-shot timer that is set again restarts its delay: one `SetTimer` call per change is a debounce (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)
