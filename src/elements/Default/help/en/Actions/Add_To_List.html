@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Actions/New_Variable.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>New variable</title>
+<!-- Generated from src/elements/Default/help/en/Actions/Add_To_List.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Add to list</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,13 +98,21 @@ img {
 </head>
 <body>
 <main>
-<h1>New variable</h1>
-<p>The action <strong>New variable</strong> creates a new variable with a specified value.</p>
+<h1>Add to list</h1>
+<p>The action <strong>Add to list</strong> adds a value to a list. If the list does not exist, it will be created.</p>
 <h2>Settings</h2>
 <h3>Variable name</h3>
-<p>Name of the variable which will contain the value.</p>
-<h3>Value</h3>
-<p>The content of the variable.</p>
+<p>Name of the variable which contains a list. If the list doesn't exist, it will be created.</p>
+<h3>Number of elements</h3>
+<p>Either one or multiple elements can be added to the list.</p>
+<h3>Content to add</h3>
+<p>If <strong>Add one element</strong> is selected, this field can contain either a value or an expression.</p>
+<p>If <strong>Add multiple elements</strong> is selected, this multiline field can contain one or multiple values that will be added. Specify which delimiter will be used. The default setting is a new element in each line.</p>
+<h3>Key</h3>
+<p>Specify the position or key of insertion.</p>
+<p>If <strong>First position</strong> is selected, the value(s) will be added numerically as the first item(s) with the index 1 (, 2, …). The indexes of other items will be incremented.</p>
+<p>If <strong>Last position</strong> is selected, the value(s) will be added as the last item(s). For example if a list has three elements, the other element(s) will be added as the fourth element (, fifth element, …)</p>
+<p>If <strong>Following position or key</strong> is selected, the value(s) will be added into a specified position. You can specify the insertion method if position is an integer.</p>
 </main>
 </body>
 </html>

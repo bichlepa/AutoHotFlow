@@ -1,19 +1,9 @@
 # Variable is empty
 
-The condition **Variable is empty** hecks whether a variable is empty or unset.
-
-The result will be **Yes** if the variable is either unset or contains nothing.
-
-> **Warning:** TODOWarning
-
-> **Note:** TODOInfo
-
-> **Warning:** Be careful using that action. It may cause loss of data.
-
-> **Note:** This action has low performance, since a new AutoHotkey thread must be started.
+The condition **Variable is empty** decides whether a variable has an empty value. It decides between **Yes** and **No**.
 
 ## Settings
 
 ### Variable name
 
-Name of the variable which will be checked.
+The name of the variable to check. A variable that does not exist is empty. A list is not empty: it counts as a value.

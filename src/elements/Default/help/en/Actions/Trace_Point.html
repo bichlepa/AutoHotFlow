@@ -99,18 +99,15 @@ img {
 <body>
 <main>
 <h1>Trace point</h1>
-<p>The action <strong>Trace point</strong> is used to debug the flow.</p>
-<p>Trace points can be added anywhere in the flow. With the action <strong>Trace point check</strong> it is possible to check which trace points have passed.</p>
-<p>The trace point can also write a log message and stop the instance if a condtion is true.</p>
+<p>The action <strong>Trace point</strong> marks a place in the flow. It is used to debug a flow: the action <strong>Trace point check</strong> can later test which trace points have been passed.</p>
+<p>A trace point can also write a log message, and it can stop the instance when a condition is true.</p>
 <h2>Settings</h2>
 <h3>ID</h3>
-<p>ID of the trace point. It can have any id and it helps to identify the correct trace point in the action <strong>Trace point check</strong>.</p>
+<p>The ID of the trace point. Choose any text: the action <strong>Trace point check</strong> lists the trace points by this ID and the ID of their element.</p>
 <h3>Log message</h3>
-<p>The trace point can log a message.</p>
-<p>This field can be left empty.</p>
+<p>A message that is written to the log when the trace point is passed. This field can be left empty.</p>
 <h3>Stop condition</h3>
-<p>If the condition is true, the current instance with all its threads will be stopped.</p>
-<p>This field can be left empty.</p>
+<p>An expression. If it is true when the trace point is passed, the instance is stopped with all its threads, and the log names the condition as it is written. This field can be left empty.</p>
 </main>
 </body>
 </html>

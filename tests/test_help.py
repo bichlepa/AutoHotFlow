@@ -2,6 +2,7 @@
 current, the links resolve, and the generator does what its documentation says (tools/gen_help.py).
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -35,6 +36,13 @@ def _kind_and_name(class_name):
     return KIND_FOLDERS[prefix], name
 
 
+def _has_source(kind, name):
+    """The Markdown source `<name>.md` of a kind folder, with the exact spelling (a case-insensitive file system
+    would otherwise hide a wrong case that breaks on Linux)."""
+    folder = HELP / kind
+    return folder.is_dir() and (name + ".md") in os.listdir(folder)
+
+
 def test_the_core_set_has_29_elements():
     assert len(CORE_SET) == 29
     assert len(set(CORE_SET)) == 29
@@ -44,7 +52,7 @@ def test_the_core_set_has_29_elements():
 def test_every_core_element_has_a_help_source_of_its_own(class_name):
     kind, name = _kind_and_name(class_name)
     assert (ELEMENTS / kind / (class_name + ".ahk")).exists(), "the element file is missing"
-    assert (HELP / kind / (name + ".md")).exists(), "run the help page into src/elements/Default/help/en/%s/" % kind
+    assert _has_source(kind, name), "write the page as src/elements/Default/help/en/%s/%s.md" % (kind, name)
 
 
 def test_every_element_file_of_the_default_package_has_a_help_source():
@@ -52,7 +60,7 @@ def test_every_element_file_of_the_default_package_has_a_help_source():
     for folder in ("Actions", "Conditions", "Loops", "Triggers"):
         for element in sorted((ELEMENTS / folder).glob("*.ahk")):
             kind, name = _kind_and_name(element.stem)
-            if not (HELP / kind / (name + ".md")).exists():
+            if not _has_source(kind, name):
                 missing.append(element.name)
     assert missing == [], "element files without a help page (write it in S0008 with the element)"
 

@@ -99,20 +99,16 @@ img {
 <body>
 <main>
 <h1>Trace point check</h1>
-<p>The action <strong>Trace point check</strong> is used to debug the flow.</p>
-<p>Trace points can be added anywhere in the flow with the action <strong>Trace point</strong>. With this action it is possible to check which trace points have passed.</p>
-<p>You can define freely which trace points must have beed passed and which mustn't have been passed. You can also ignore any trace point.</p>
+<p>The action <strong>Trace point check</strong> tests which trace points (see <strong>Trace point</strong>) have been passed when the action runs. It is used to debug a flow.</p>
+<p>You can define which trace points must have been passed and which must not have been passed. You can also leave a trace point out of the test.</p>
 <h2>Settings</h2>
 <h3>Trace points which must have been passed</h3>
-<p>If <strong>All trace points</strong> is checked, all trace points will be checked.</p>
-<p>You may exclude some trace points under <strong>Trace points which must not have been passed</strong>.</p>
-<p>If <strong>All trace points</strong> is not checked, you can select which trace point will be checked. It is allowed not to select any trace point.</p>
-<p>The action will throw an exception if any of the selected tracepoints have not passed until the moment when this action is executed.</p>
+<p>If <strong>All trace points</strong> is checked, every trace point of the flow must have been passed, except the ones that you select under <strong>Trace points which must not have been passed</strong>. Otherwise, only the selected trace points are checked. Selecting none is allowed.</p>
 <h3>Trace points which must not have been passed</h3>
-<p>If <strong>All trace points</strong> is checked, all trace points will be checked.</p>
-<p>You may exclude some trace points under <strong>Trace points which must have been passed</strong>.</p>
-<p>If <strong>All trace points</strong> is not checked, you can select which trace point will be checked. It is allowed not to select any trace point.</p>
-<p>The action will throw an exception if any of the selected tracepoints have passed until the moment when this action is executed.</p>
+<p>If <strong>All trace points</strong> is checked, no trace point may have been passed, except the ones that you select under <strong>Trace points which must have been passed</strong>. Otherwise, only the selected trace points are checked. Selecting none is allowed.</p>
+<h3>Result</h3>
+<p>The action ends with the result <strong>normal</strong> if the test is true. Otherwise it ends with <strong>exception</strong>, and the message names the trace points that were not passed (or were passed, although they must not have been).</p>
+<p>Both <strong>All trace points</strong> options together are an error: the action then ends with <strong>exception</strong>.</p>
 </main>
 </body>
 </html>

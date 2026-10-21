@@ -1,37 +1,23 @@
 # Variable content is
 
-The condition **Variable content is** checks whether a variable contains a value of a certain type.
+The condition **Variable content is** checks the kind of the content of a variable and decides between **Yes** and **No**.
 
 ## Settings
 
 ### Variable name or expression
 
-Enter either a variable name or an expression.
+The name of the variable to check. Next to the field, you can choose an **expression** instead: its result is checked. A variable that does not exist is checked as an empty text.
 
 ### Expected content type
 
-The expected type.
+The kind of content that the condition expects:
 
-**List** (may also be called **Object**): True if value is a list, which may be empty. A list may contain an array or some key-value pairs.
+- **List**: the variable holds a list (an object, see [Variables and expressions](../../../../../../assets/help/en/Variables.md)).
+- **Time**: a timestamp in the form `YYYYMMDDHH24MISS`, checked like the AutoHotkey function `IsTime`.
+- **Number**, **Integer**, **Floating point number**: the text is a number of the given kind.
+- **Decimal digits**, **Hexadecimal digits**: the text consists of these digits only.
+- **Alphanumeric string**, **Alphabetic string**: letters, or letters and digits, only.
+- **String with only uppercase characters**, **String with only lowercase characters**: only upper or only lower case letters.
+- **Whitespaces**: only spaces, tabs and line breaks.
 
-**Time**: True if value contains a valid date-time stamp, which can be all or just the leading part of the `YYYYMMDDHH24MISS` format. For example, a 4-digit string such as `2004` is considered valid. Years less than `1601` are not considered valid because the operating system generally does not support them. The maximum year considered valid is `9999`. Example: `20201231235959`
-
-**Number**: True if value is either an **Integer** or a **Floating point number**
-
-**Integer**: True if value is non-empty and contains a purely numeric string (decimal or hexadecimal) without a decimal point. Leading and trailing spaces and tabs are allowed. The string may start with a plus or minus sign.
-
-**Floating point number**: True if value is non-empty and contains a floating point number; that is, a purely numeric string containing a decimal point. Leading and trailing spaces and tabs are allowed. The string may start with a plus sign, minus sign, or decimal point.
-
-**Decimal digits**: True if value is empty or contains only digits, which consist of the characters 0 through 9. Other characters such as the following are not allowed: spaces, tabs, plus signs, minus signs, decimal points, hexadecimal digits, and the 0x prefix.
-
-**Hexadecimal digits**: Same as **Decimal digits** except the characters A through F (uppercase or lowercase) are also allowed. A prefix of 0x is tolerated if present.
-
-**Alphanumeric string**: Same as **Alphabetic string** except that characters 0 through 9 are also allowed.
-
-**Alphabetic string**: True if value is empty or contains only alphabetic characters. False if there are any digits, spaces, tabs, punctuation, or other non-alphabetic characters anywhere in the string. For example, if value contains a space followed by a letter, it is not considered to be an alphabetic string.
-
-**String with only uppercase characters**: True if value is empty or contains only uppercase characters. False if there are any digits, spaces, tabs, punctuation, or other non-uppercase characters anywhere in the string.
-
-**String with only lowercase characters**: True if value is empty or contains only lowercase characters. False if there are any digits, spaces, tabs, punctuation, or other non-lowercase characters anywhere in the string.
-
-**Whitespaces**: True if value is empty or contains only whitespace, which consists of the following characters: space (`%A_Space%`), tab (`%A_Tab%`), linefeed (`%A_Linefeed%`), return (`%A_CarriageReturn%`), vertical tab (`%A_VerticalTab%`), and formfeed (`%A_Formfeed%`).
+The check uses the text of the value: the number `0.5` is a floating point number.

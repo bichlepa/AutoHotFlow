@@ -1,25 +1,19 @@
 # Trace point
 
-The action **Trace point** is used to debug the flow.
+The action **Trace point** marks a place in the flow. It is used to debug a flow: the action **Trace point check** can later test which trace points have been passed.
 
-Trace points can be added anywhere in the flow. With the action **Trace point check** it is possible to check which trace points have passed.
-
-The trace point can also write a log message and stop the instance if a condtion is true.
+A trace point can also write a log message, and it can stop the instance when a condition is true.
 
 ## Settings
 
 ### ID
 
-ID of the trace point. It can have any id and it helps to identify the correct trace point in the action **Trace point check**.
+The ID of the trace point. Choose any text: the action **Trace point check** lists the trace points by this ID and the ID of their element.
 
 ### Log message
 
-The trace point can log a message.
-
-This field can be left empty.
+A message that is written to the log when the trace point is passed. This field can be left empty.
 
 ### Stop condition
 
-If the condition is true, the current instance with all its threads will be stopped.
-
-This field can be left empty.
+An expression. If it is true when the trace point is passed, the instance is stopped with all its threads, and the log names the condition as it is written. This field can be left empty.

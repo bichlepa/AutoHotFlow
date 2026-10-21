@@ -1,29 +1,21 @@
 # Trace point check
 
-The action **Trace point check** is used to debug the flow.
+The action **Trace point check** tests which trace points (see **Trace point**) have been passed when the action runs. It is used to debug a flow.
 
-Trace points can be added anywhere in the flow with the action **Trace point**. With this action it is possible to check which trace points have passed.
-
-You can define freely which trace points must have beed passed and which mustn't have been passed. You can also ignore any trace point.
+You can define which trace points must have been passed and which must not have been passed. You can also leave a trace point out of the test.
 
 ## Settings
 
 ### Trace points which must have been passed
 
-If **All trace points** is checked, all trace points will be checked.
-
-You may exclude some trace points under **Trace points which must not have been passed**.
-
-If **All trace points** is not checked, you can select which trace point will be checked. It is allowed not to select any trace point.
-
-The action will throw an exception if any of the selected tracepoints have not passed until the moment when this action is executed.
+If **All trace points** is checked, every trace point of the flow must have been passed, except the ones that you select under **Trace points which must not have been passed**. Otherwise, only the selected trace points are checked. Selecting none is allowed.
 
 ### Trace points which must not have been passed
 
-If **All trace points** is checked, all trace points will be checked.
+If **All trace points** is checked, no trace point may have been passed, except the ones that you select under **Trace points which must have been passed**. Otherwise, only the selected trace points are checked. Selecting none is allowed.
 
-You may exclude some trace points under **Trace points which must have been passed**.
+### Result
 
-If **All trace points** is not checked, you can select which trace point will be checked. It is allowed not to select any trace point.
+The action ends with the result **normal** if the test is true. Otherwise it ends with **exception**, and the message names the trace points that were not passed (or were passed, although they must not have been).
 
-The action will throw an exception if any of the selected tracepoints have passed until the moment when this action is executed.
+Both **All trace points** options together are an error: the action then ends with **exception**.

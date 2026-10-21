@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Actions/Get_list_info.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Get list info</title>
+<!-- Generated from src/elements/Default/help/en/Actions/New_variable.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>New variable</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,15 +98,20 @@ img {
 </head>
 <body>
 <main>
-<h1>Get list info</h1>
-<p>The action <strong>Get list info</strong> gets an information about a list.</p>
+<h1>New variable</h1>
+<p>The action <strong>New variable</strong> creates a variable and gives it a value. If a variable with this name already exists, its value is replaced, unless <strong>Write only if variable does not exist</strong> is checked.</p>
 <h2>Settings</h2>
-<h3>Output variable name</h3>
-<p>Name of the variable which will contain the value.</p>
-<h3>Input list</h3>
-<p>Name of the variable which contains the list.</p>
-<h3>Which info</h3>
-<p>Information that will be retrieved.</p>
+<h3>Variable name</h3>
+<p>The name of the variable. Variable names are not case sensitive. A name that starts with <code>A_</code> cannot be set: the built-in variables (see <a href="../../../../../../assets/help/en/Variables.html">Variables and expressions</a>) are not written by an action, and the action then ends with the result <strong>exception</strong>.</p>
+<h3>Value</h3>
+<p>The value of the variable. Next to the field, choose whether the value is a <strong>text</strong> or an <strong>expression</strong>:</p>
+<ul>
+<li>A <strong>text</strong> is stored as it is.</li>
+<li>An <strong>expression</strong> is calculated first, and its result is stored. For example <code>count + 1</code>, or <code>"Total: " . sum</code> for a text together with a variable. Texts in an expression are written in double quotes, and the operator that joins two texts is <code>.</code> (with a space on both sides).</li>
+</ul>
+<p>See <a href="../../../../../../assets/help/en/Variables.html">Variables and expressions</a> for the rules.</p>
+<h3>Write only if variable does not exist</h3>
+<p>If checked, an existing variable keeps its value. The action then ends with the result <strong>normal</strong> and the message "Variable was not written, because it already exists."</p>
 </main>
 </body>
 </html>

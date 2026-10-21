@@ -99,24 +99,22 @@ img {
 <body>
 <main>
 <h1>Variable content is</h1>
-<p>The condition <strong>Variable content is</strong> checks whether a variable contains a value of a certain type.</p>
+<p>The condition <strong>Variable content is</strong> checks the kind of the content of a variable and decides between <strong>Yes</strong> and <strong>No</strong>.</p>
 <h2>Settings</h2>
 <h3>Variable name or expression</h3>
-<p>Enter either a variable name or an expression.</p>
+<p>The name of the variable to check. Next to the field, you can choose an <strong>expression</strong> instead: its result is checked. A variable that does not exist is checked as an empty text.</p>
 <h3>Expected content type</h3>
-<p>The expected type.</p>
-<p><strong>List</strong> (may also be called <strong>Object</strong>): True if value is a list, which may be empty. A list may contain an array or some key-value pairs.</p>
-<p><strong>Time</strong>: True if value contains a valid date-time stamp, which can be all or just the leading part of the <code>YYYYMMDDHH24MISS</code> format. For example, a 4-digit string such as <code>2004</code> is considered valid. Years less than <code>1601</code> are not considered valid because the operating system generally does not support them. The maximum year considered valid is <code>9999</code>. Example: <code>20201231235959</code></p>
-<p><strong>Number</strong>: True if value is either an <strong>Integer</strong> or a <strong>Floating point number</strong></p>
-<p><strong>Integer</strong>: True if value is non-empty and contains a purely numeric string (decimal or hexadecimal) without a decimal point. Leading and trailing spaces and tabs are allowed. The string may start with a plus or minus sign.</p>
-<p><strong>Floating point number</strong>: True if value is non-empty and contains a floating point number; that is, a purely numeric string containing a decimal point. Leading and trailing spaces and tabs are allowed. The string may start with a plus sign, minus sign, or decimal point.</p>
-<p><strong>Decimal digits</strong>: True if value is empty or contains only digits, which consist of the characters 0 through 9. Other characters such as the following are not allowed: spaces, tabs, plus signs, minus signs, decimal points, hexadecimal digits, and the 0x prefix.</p>
-<p><strong>Hexadecimal digits</strong>: Same as <strong>Decimal digits</strong> except the characters A through F (uppercase or lowercase) are also allowed. A prefix of 0x is tolerated if present.</p>
-<p><strong>Alphanumeric string</strong>: Same as <strong>Alphabetic string</strong> except that characters 0 through 9 are also allowed.</p>
-<p><strong>Alphabetic string</strong>: True if value is empty or contains only alphabetic characters. False if there are any digits, spaces, tabs, punctuation, or other non-alphabetic characters anywhere in the string. For example, if value contains a space followed by a letter, it is not considered to be an alphabetic string.</p>
-<p><strong>String with only uppercase characters</strong>: True if value is empty or contains only uppercase characters. False if there are any digits, spaces, tabs, punctuation, or other non-uppercase characters anywhere in the string.</p>
-<p><strong>String with only lowercase characters</strong>: True if value is empty or contains only lowercase characters. False if there are any digits, spaces, tabs, punctuation, or other non-lowercase characters anywhere in the string.</p>
-<p><strong>Whitespaces</strong>: True if value is empty or contains only whitespace, which consists of the following characters: space (<code>%A_Space%</code>), tab (<code>%A_Tab%</code>), linefeed (<code>%A_Linefeed%</code>), return (<code>%A_CarriageReturn%</code>), vertical tab (<code>%A_VerticalTab%</code>), and formfeed (<code>%A_Formfeed%</code>).</p>
+<p>The kind of content that the condition expects:</p>
+<ul>
+<li><strong>List</strong>: the variable holds a list (an object, see <a href="../../../../../../assets/help/en/Variables.html">Variables and expressions</a>).</li>
+<li><strong>Time</strong>: a timestamp in the form <code>YYYYMMDDHH24MISS</code>, checked like the AutoHotkey function <code>IsTime</code>.</li>
+<li><strong>Number</strong>, <strong>Integer</strong>, <strong>Floating point number</strong>: the text is a number of the given kind.</li>
+<li><strong>Decimal digits</strong>, <strong>Hexadecimal digits</strong>: the text consists of these digits only.</li>
+<li><strong>Alphanumeric string</strong>, <strong>Alphabetic string</strong>: letters, or letters and digits, only.</li>
+<li><strong>String with only uppercase characters</strong>, <strong>String with only lowercase characters</strong>: only upper or only lower case letters.</li>
+<li><strong>Whitespaces</strong>: only spaces, tabs and line breaks.</li>
+</ul>
+<p>The check uses the text of the value: the number <code>0.5</code> is a floating point number.</p>
 </main>
 </body>
 </html>

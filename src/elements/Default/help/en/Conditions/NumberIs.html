@@ -99,15 +99,18 @@ img {
 <body>
 <main>
 <h1>Number is</h1>
-<p>The condition <strong>Number is</strong> checks whether a number has a specified value. It can compare float values and allow a certain deviation.</p>
+<p>The condition <strong>Number is</strong> checks whether a number lies close to an expected number. It decides between <strong>Yes</strong> and <strong>No</strong>.</p>
 <h2>Settings</h2>
 <h3>Input number</h3>
-<p>The first number to compare.</p>
+<p>The number to check.</p>
 <h3>Expected number</h3>
-<p>The second number to compare.</p>
-<h3>Maximum difference.</h3>
-<p>Maximum absolute and realtive difference of the number.</p>
-<p>The relative difference is calculated with the (first) <strong>Input number</strong>.</p>
+<p>The number that the input is compared with.</p>
+<h3>Absolute difference</h3>
+<p>A difference that is always allowed, in the unit of the numbers. The default is 0.</p>
+<h3>Relative difference</h3>
+<p>A difference that is allowed relative to the expected number: <code>0.01</code> allows 1 percent of the expected number (its absolute value). The default is 0.01.</p>
+<p>The allowed difference is the absolute difference plus the relative difference times the absolute value of the expected number. The condition ends with <strong>Yes</strong> if the input lies within the expected number plus and minus this difference (both ends included), otherwise with <strong>No</strong>.</p>
+<p>Example: with the expected number 5, an absolute difference of 0 and a relative difference of 0.01, the input 5.04 gives <strong>Yes</strong> (the allowed difference is 0.05), and 5.1 gives <strong>No</strong>.</p>
 </main>
 </body>
 </html>

@@ -1,23 +1,17 @@
-# Expressions
+# Expression
 
-The condition **Expressions** evaluates an expression and decides whether the result is true or false. This is similar to an if-statement in most programming languages.
+The condition **Expression** calculates an expression and decides between **Yes** and **No**. It is similar to an `if` statement in other programming languages.
 
 ## Settings
 
 ### Expression
 
-Expression to evaluate.
+The expression to calculate, in the expression language of AutoHotFlow (see [Variables and expressions](../../../../../../assets/help/en/Variables.md)). The condition ends with **Yes** if the result is true, and with **No** if it is false. A number that is not 0 is true, 0 is false.
 
-The condition exits with **yes** if the result of the expression is not 0 or empty.
+Examples:
 
-The condition exits with **no** if the result is 0 or empty.
+- `count >= 10 and name = "Paul"`: yes if the variable `count` is at least 10 and the variable `name` is `Paul`
+- `not done`: yes if the variable `done` is 0
+- `(x + 1) // 2 = 3`: yes if `x` is 5 or 6 (`//` divides and keeps the whole part)
 
-*Examples:*
-
-- `(1 or 0) and 1` *(results to 1)*
-- `number > 5 && number <= 7` *(results to 1 if number is between 6 or 7)*
-- `Var%VarContainingTwo%` *(Accessing variable Var2)*
-
-## Remarks
-
-Read more about expressions in the chapter [Variables](../../../../../../assets/help/en/Variables.md).
+If the expression cannot be read or calculated, the condition ends with **exception**. An empty expression is an error too.
