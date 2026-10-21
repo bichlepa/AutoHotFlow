@@ -24,3 +24,9 @@ The notice of an unhandled error opens a window with the message, the element an
 ## Not part of this
 
 Changing the variables (the debugger, REQ-DBG-060, phase 4); the switch per flow (WI-0109).
+
+## Refinement from WI-0104 (proposal, not decided)
+
+Written by the acceptance of S0006 (WI-0104, E0095). The project owner decides whether this stands; the package may refine it again and says so in its result.
+
+- Nothing from this package is needed by the editor's menus. It touches `Executor.ahk` (see the plan's order); no change there while WI-0093 and WI-0094 were in progress, both are done now.

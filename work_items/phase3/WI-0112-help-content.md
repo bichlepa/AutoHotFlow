@@ -27,3 +27,9 @@ The help is written in Markdown and a tool generates the HTML that the viewers s
 ## Not part of this
 
 The viewers (WI-0111, WI-0115); the pages of the elements of S0008 (corrected with their element, E0097); translations and translation tools (S0009).
+
+## Refinement from WI-0104 (proposal, not decided)
+
+Written by the acceptance of S0006 (WI-0104, E0095). The project owner decides whether this stands; the package may refine it again and says so in its result.
+
+- The generator writes committed HTML (E0100); the check that the HTML is current must be a test in the fast tier, or the project will forget to regenerate it.

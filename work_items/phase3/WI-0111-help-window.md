@@ -31,3 +31,9 @@ The help is shown in a window of its own (E0098) through a viewer interface with
 ## Not part of this
 
 The WebView2 viewer (WI-0115); the content and the generator of the pages (WI-0112); translations (S0009).
+
+## Refinement from WI-0104 (proposal, not decided)
+
+Written by the acceptance of S0006 (WI-0104, E0095). The project owner decides whether this stands; the package may refine it again and says so in its result.
+
+- The help button of WI-0106 is wired here; the viewer setting goes into `src/core/SettingsModel.ahk` (the only shared file of this package), so run the settings tests with it (`tests/integration/test_settings.py`).
