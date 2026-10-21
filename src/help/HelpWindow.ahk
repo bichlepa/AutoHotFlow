@@ -28,7 +28,7 @@ class HelpWindow {
         contents := g.AddButton("", "")
         this.win.Place(contents, HelpWindow.MARGIN + HelpWindow.BUTTON_W + HelpWindow.MARGIN, HelpWindow.MARGIN
             , HelpWindow.BUTTON_W, HelpWindow.BUTTON_H)
-        this.win.Text(contents, "Help_contents")
+        this.win.Text(contents, "Help_index")
         contents.OnEvent("Click", (*) => this.role.ShowIndex())
         this.viewer := ClassicViewer(this)
         this.viewer.onLink := (url) => this._Followed(url)
