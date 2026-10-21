@@ -17,6 +17,10 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | ID | Title | Status | Phase 3 |
 |---|---|---|---|
 | F-0162 | The frame of a drag of 30 elements in a flow of 300 is 25 ms at 1920 × 1080 (budget 16 ms); one element meets it (WI-0097, MS-0051) | decision needed, measured; WI-0097 | WI-0097 |
+| F-9000 | The trigger switch of the editor does not ask the force question that the flow commands ask when a state cannot be read (WI-0104, REQ-TRG-030) | decision needed (add the question, or keep the status text as documented) | S0006 |
+| F-9001 | Real mouse and real keys of the editing actions (select, move, add, connect, delete, the menus) are not in any gui test; only the wheel, the drag of the view and the menus have one (WI-0104, REQ-EDT-050 to REQ-EDT-080) | open; owner's manual check 10 covers it | S0006 |
+| F-9002 | The editor texts of the Korean and Russian language files are missing; these languages show the English text (fallback of LangTable) (WI-0104) | open, low; translation not done | later |
+| F-9003 | Finding F-0158 (language files UTF-16) is not reproduced: `assets/language/basic/*.ini` and the manager files have no NUL bytes and are read as UTF-8 (WI-0104, checked by bytes) | open, to be closed or confirmed by the owner | S0006 |
 | F-0163 | The rename of a flow (`cmd.flow.meta.update`) writes the file at once, from the revision of the request; a patch committed while storage writes it is in memory only until the next `cmd.flow.save` (WI-0093, meta race) | closed, verified (WI-0095: the engine writes again after every commit; option (a)) | S0006 (WI-0093, WI-0095) |
 | F-0164 | A patch that changes the text of an element that still waits for its class (`v1Text` marker) keeps the marker: the new v2 text is converted when the class appears (WI-0093) | decision needed | S0006 (WI-0093) |
 | F-0154 | `verify.py --auto` (also `select_tests.py --from`, `pytest --changed-from`) refused every range that deletes a file with "not classified by any test rule": a deleted path has no rule once it is gone (WI-0088 removed `src/core/PlaceholderRole.ahk`) | closed, verified (`tests/test_groups.py`, a deleted path selects everything) | tooling |
@@ -336,7 +340,29 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 
 **What:** WI-0097 asks for a frame during a drag below 16 ms on average (1 and 30 elements, a flow of 300, 1920 × 1080). Measured with `tests/ahk/helpers/renderer_bench.ahk` (MS-0051, 100 frames, one run): 10.6 ms for 1 element (met), 25.0 ms for 30 elements (not met; the draw part is 20.0 ms, `Scene.WithDrag` 5.0 ms). The rebuilds at the start and after the drop are 90 to 107 ms, as for a flow change. The live drawing of the dragged items each frame is the cost; which part (elements or their connection labels) is not checked.
 **Options (for the owner):** (a) draw the dragged elements once into a group layer at the start of the drag and copy it per frame, the connections stay live (expected to help the elements part; not measured); (b) accept the 25 ms for large drags (a drag of many elements is rare, the one-element drag is inside the budget); (c) reduce the work of `Scene.WithDrag` (it builds the whole scene again per frame).
-**Status:** decision needed (the project owner), measured (MS-0051). Not checked: the real window and the feel of the drag on the owner's machine.
+**Status:** decision needed (the project owner), measured (MS-0051; again in MS-0056 of WI-0104: 26.9 ms mean for 30 elements, 12.6 ms for one, on a machine with other load). Not checked: the real window and the feel of the drag on the owner's machine.
+
+### F-9000: The trigger switch of the editor asks no force question
+
+**What:** the flow commands of the editor (run, stop, enable, disable) ask a question with the choice "force" when the engine cannot read the state of a flow (the tray and the menu do this, E0087). The switch of a trigger (`EditorTriggers.Switch`, `cmd.trigger.enable` or `cmd.trigger.disable`) does not: a refused switch is the status text "The trigger could not be switched: nothing changed" (WI-0102).
+**Options (for the owner):** (a) add the same question for the trigger switch (one more dialog path in `EditorFlowOps`, about one day); (b) keep the status text and write it into REQ-TRG-030 as the chosen behavior (the trigger keeps its state; the user retries).
+**Status:** decision needed. Measured: no (read of `src/editor/EditorTriggers.ahk`). Not checked: what the engine answers for a trigger whose state cannot be read.
+
+### F-9001: Real mouse and real keys of the editing actions have no gui test
+
+**What:** the gui tests of the editor send real input for the wheel, the drag of the view, the menus and the right click (`tests/fault/test_editor_mouse_gui.py`, `tests/fault/test_editor_menus_gui.py`). Select, rectangle, move, connect, add by a click on the field, delete and the keys Ctrl+Z, Ctrl+Y, Ctrl+S are tested headless only (through the window's handlers and `cmd.test.*`). The requirements REQ-EDT-050, 060, 070 and 080 stay `partial` for that reason.
+**Options:** (a) write the gui test of the editing gestures as the menus test is written (the owner runs it); (b) the owner's manual check 10 (steps 1 to 16) is the acceptance and no gui test is added.
+**Status:** open. Not checked: the feel of the gestures on the owner's screen (manual check 10).
+
+### F-9002: The editor texts of ko and ru are missing
+
+**What:** `assets/language/basic/ko.ini` and `ru.ini` hold about 80 keys each; the editor texts (`Editor_menu`, `Editor_view`, the "Create new ..." titles) are only in `en` and `de`. The language table falls back to English for a missing key (`LangTable.Fallback`), so the texts show in English.
+**Status:** open, low. Translation is the owner's or a later step (S0009 for the help; the editor texts can follow the same way). Not checked: the look of the English texts in the Korean window.
+
+### F-9003: F-0158 (language files read as UTF-16) is not reproduced
+
+**What:** F-0158 says that `basic/de.ini`, `ko.ini` and `ru.ini` are UTF-16 but read as UTF-8. On 2026-10-21 the files `assets/language/basic/*.ini` and `assets/language/manager/*.ini` were checked by their bytes: none contains a NUL byte, and `LangTable._Read` reads them as UTF-8 (`FileRead(path, "UTF-8")`). The finding therefore does not match the files of this branch; the status book names commit `60b41ad0` ("F-0158") as the fix, which fits this.
+**Status:** open, to be confirmed or closed by the owner (the finding is named in `work_items/phase3/WI-0092-result-s5.md`, not in this document; its text is not changed here). Verified (bytes read).
 
 ### F-0165: A plain request through the hub takes about 120 ms in the test client
 
