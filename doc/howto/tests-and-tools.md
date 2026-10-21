@@ -511,3 +511,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Wait until the roles the test uses are `ready` in `cmd.process.list` (bounded, as `wait_roles_ready` in `tests/integration/test_settings.py`), or until they subscribe to a topic, as `start_shown` in `tests/integration/test_notices.py` does.
 - **Status:** verified (the failing run's log: tray started 20:59:28, hub link 20:59:30, the test asked at 20:59:29; the fixed test passed under `-n 4` with the integration suite, see F-0177 for the runs)
 - **Source:** tests/integration/test_settings.py (F-0177)
+
+### A run's steps show an element once: count loop passes in the log, not in the names (verified)
+
+- **Problem:** The first version of the core-set test (WI-0114) counted the rounds of a loop with `run.names.count("BODY")`. The body ran three times, but the names showed it once, so the test read 1 instead of 3.
+- **Wrong:** Counting element names to count repetitions. A step list holds one entry per element, not one per pass.
+- **Right:** Let the body write one line per pass (an `Action_Trace_Point` with `LogMessage="P %a_index%"`), and read the lines of `run.log` that start with `P `, as `tests/integration/test_core_c_loops.py` does.
+- **Status:** verified (`tests/e2e/test_core_settings.py`, the four loop cases pass with the log lines; they failed with the name count)
+- **Source:** tests/e2e/test_core_settings.py (WI-0114)
+
+### A probe of a hidden variable reads "<missing>" (verified)
+
+- **Problem:** The trace point case probed `passed_Tracepoints` after the trace point and expected its text. The probe answered `<missing>`.
+- **Wrong:** Probing the hidden instance variables that the elements keep for their checks.
+- **Right:** Check the effect in the log (a `LogMessage` with a unique text), or in a check element that reads the hidden variable (`Action_Trace_Point_Check`).
+- **Status:** verified (the run with the probe failed, the run with the log line passed)
+- **Source:** tests/integration/test_core_a_trace_points.py (line 115 shows the same `<missing>` result); tests/e2e/test_core_settings.py (WI-0114)
