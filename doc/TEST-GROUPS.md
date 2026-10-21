@@ -63,6 +63,7 @@ The first matching pattern wins; `*` also matches `/`. Test groups that run in f
 | `element` | one element file or element library (`Actions/`, `Conditions/`, `Loops/`, `Triggers/`, `lib/`) | its `COVERS` tests |
 | `elements-pkg` | `_includes_*`, `package.json`, `language/`, icons | `element-units`, `packages` |
 | `elements-gen` | `entry/generated/` (written by `tools/gen_element_includes.py`) | `element-units` |
+| `help` | `src/elements/Default/help/` (Markdown sources and their generated HTML), `assets/help/`, `tools/gen_help.py` | `help` |
 | `manager` | `manager/`, `NoticeThrottle` | `manager` |
 | `tray` | `tray/` | `tray` |
 | `editor-form` | `editor/form/` (the settings form model of an element, WI-0105) | `editor-form` |
@@ -93,6 +94,7 @@ A test file may verify several things; its groups are listed in `tests/support/g
 | `editor-form` | the settings form of an element without a window: fields, values, checks, CheckSettings (headless) |
 | `editor-geometry` | the flow geometry, the view math (zoom, move, DPI), the scene and the hit test (headless) |
 | `element-units` | the `ahk/element_*.test.ahk` units and the generated include lists |
+| `help` | the help pages: every core element has its source, the generated HTML is current, the links resolve (`tests/test_help.py`, `tools/gen_help.py --check`) |
 | `elements-e2e` | flow-builder tests of single elements (only through `COVERS` or in a full run) |
 | `packages` | loading of element packages |
 | `perf` | scaling measurements (long loops); full runs only |

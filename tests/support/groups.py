@@ -45,6 +45,7 @@ OTHER_RULES = [
     ("tests/ahk/helpers/EngineOwner.ahk", EXECUTOR_KIT_USERS),
     ("tests/ahk/helpers/render_bench.ahk", ["render", "tools"]),   # the renderer bench, driven by tools/measure_render.py
     ("assets/icons/*", ["render"]),                                # the icons of the editor drawing (WI-0085)
+    ("assets/help/*", ["help"]),                                   # the general help pages and their stylesheet (WI-0112)
     ("tests/ahk/helpers/renderer_bench.ahk", ["render", "tools"]),   # the renderer measurement (VS Code task, WI-0085)
     ("tests/ahk/helpers/render_samples.ahk", ["render", "tools"]),   # the editor screenshots (VS Code task, WI-0085)
     ("tests/ahk/helpers/element_rate_bench.ahk", ["element-units", "engine"]),   # benches: run by hand (VS Code tasks)
@@ -104,6 +105,8 @@ OTHER_RULES = [
     ("doc/*", ["docs"]),
     ("tools/ahkrun.py", None),                                  # every test runs it
     ("tools/gen_element_includes.py", ["element-units", "architecture"]),
+    ("tools/gen_help.py", ["help", "tools"]),                    # the HTML of the help pages (WI-0112)
+    ("tools/convert_v1_help.py", ["tools"]),                     # one-time conversion of the v1 help (WI-0112)
     ("tools/arch_check.py", ["architecture"]),
     ("tools/doc_index.py", ["docs"]),
     ("tools/req_index.py", ["docs"]),

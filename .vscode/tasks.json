@@ -479,6 +479,38 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: generate help pages (HTML from the Markdown sources)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/gen_help.py"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: check help pages (no write, --check)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/gen_help.py",
+                "--check"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: convert v1 help to Markdown (one-time; overwrites the help sources, needs the v1 general pages)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/convert_v1_help.py",
+                "--general",
+                "C:/Users/bichl/Documents/git/AutoHotFlow/v1/Help/en"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: R0003 measurement, parse time and memory with N element classes (run alone, about 6 min)",
             "type": "shell",
             "command": "python",
