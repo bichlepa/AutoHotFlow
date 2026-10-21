@@ -247,3 +247,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `OnMessage 0x404` on the script (the callback message of the script's icon). The lParam is the notification: 1029 is NIN_BALLOONUSERCLICK, 1028 timeout or closed, 1026 shown, 1027 hidden (the codes of the AutoHotkey docs, `lib/TrayTip.htm`, example AHK_NOTIFYICON). Check `hwnd = A_ScriptHwnd`, because the message can come for another window. Code: `src/tray/Tray.ahk` (`_OnTrayMessage`).
 - **Status:** assumed (the codes and the message come from the AHK docs; the headless tests send the click as a test command; the real click is the gui test `tests/fault/test_editor_crash_notice_gui.py` (gui), which agents do not run; the owner's check is open). Not checked: the message on a real desktop.
 - **Source:** `src/tray/Tray.ahk`, `tests/e2e/test_editor_crash_notice.py`, `tests/fault/test_editor_crash_notice_gui.py`
+
+### The mouse capture follows the state of the pointer, not the mouse message that ends a drag (assumed)
+
+- **Problem:** The editor's pointer can hold the mouse without a button (a new element follows the pointer until the next click, WI-0099). The capture was taken at a press and released only when a release ended a drag, so a drag ended by Esc (no mouse message) or a placing that ended at a press kept the capture: the window then got the mouse after it was done.
+- **Wrong:** `SetCapture` after `pointer.Down` and `ReleaseCapture` only when `was && !pointer.Holding` after `pointer.Up`: a state change by a key or by the next press is not seen.
+- **Right:** One sync after every call of the pointer (press, move, release, key): take the capture when the pointer holds the mouse and the window has none, release it when the pointer does not hold it and the window has one (`EditorWindow._Sync`, with a flag `captured`).
+- **Status:** assumed (read from the code and the headless tests of the pointer; the capture itself is not visible to the unit tests; the owner's gui check of the editor window would show it)
+- **Source:** `src/editor/EditorWindow.ahk` (`_Sync`), `src/editor/EditorPointer.ahk`

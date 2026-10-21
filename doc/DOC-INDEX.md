@@ -31,12 +31,12 @@ L408-419 9. Performance budgets (targets, measured in Phase 2)
 L421-431 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (165.1 KB, 712 lines)
+## doc/PROTOCOL.md (166.6 KB, 726 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-685 4. Message Catalog
+L95-699 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
@@ -50,10 +50,10 @@ L472-491   4.7 Dialogs
 L493-528   4.8 Manager (WI-0073, `src/manager/`)
 L530-592   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
 L594-613   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L615-685   4.11 Role `editor` (WI-0088, `src/editor/`)
-L687-706 5. Connection setup, reconnection, resync
-L697-706   5a Events before subscription (design question, WI-0007)
-L708-712 6. Versioning and extension
+L615-699   4.11 Role `editor` (WI-0088, `src/editor/`)
+L701-720 5. Connection setup, reconnection, resync
+L711-720   5a Events before subscription (design question, WI-0007)
+L722-726 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (55.3 KB, 338 lines)
@@ -177,7 +177,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (33.5 KB, 249 lines)
+## doc/howto/gui-and-hotkeys.md (34.7 KB, 257 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -210,6 +210,7 @@ L219-225 GdipSaveImageToFile returns Win32Error (7) for an invalid file name (ve
 L227-233 The status bar of a window is laid out by the parent's WM_SIZE, and its height must be read after that (assumed) (assumed)
 L235-241 Round(x, n) returns text with n decimals, so Round(1, 2) shows "1.00" (verified) (verified)
 L243-249 A click on a TrayTip balloon comes as the icon's callback with NIN_BALLOONUSERCLICK (assumed) (assumed)
+L251-257 The mouse capture follows the state of the pointer, not the mouse message that ends a drag (assumed) (assumed)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)

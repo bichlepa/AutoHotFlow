@@ -1541,10 +1541,11 @@ Running elements and connections are highlighted while the flow runs; the editor
 ### REQ-EDT-050 Add elements
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the fields, the class list at the user's level and the default name, WI-0099; the settings dialog after the choice, WI-0106)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0006 (the fields for new elements and the class list, WI-0099), S0007 (the settings open after the choice, WI-0106)
+- **Evidence:** `tests/e2e/test_editor_add.py`, `tests/ahk/editor_new_element.test.ahk`
 
 The user chooses the kind (trigger, action, condition, loop) and then the class from a list grouped by category. The list shows only the elements of the user's level (REQ-USE-010) and marks experimental ones (REQ-USE-020). The new element gets a default name.
 
@@ -2677,21 +2678,22 @@ Every deliberate behaviour change compared to v1 has a MIGRATION ID; no silent c
 ### REQ-USE-010 User level hides advanced elements
 
 - **v1:** yes (Beginner, Advanced, Programmer)
-- **v2:** partial (the setting `userLevel` exists and is taken over from v1; the element list that uses it comes with S0007)
+- **v2:** done (the setting `userLevel` is taken over from v1; the class list of a new element shows the classes of the level, WI-0099)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0004 (setting, WI-0077, done), S0006 (the class list of a new element, WI-0099)
-- **Evidence:** `tests/ahk/core_settings.test.ahk`
+- **Plan:** S0004 (setting, WI-0077, done), S0006 (the class list of a new element, WI-0099, done)
+- **Evidence:** `tests/ahk/core_settings.test.ahk`, `tests/ahk/editor_new_element.test.ahk`, `tests/e2e/test_editor_add.py`
 
 Each element has a level; the setting "Shown elements" hides the elements above the user's level, so beginners are not overwhelmed. The first start proposes a level (REQ-USE-050).
 
 ### REQ-USE-020 Experimental elements are marked
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (marked in the class list, WI-0099, unit-tested with test classes; the Default package has no experimental class yet; the settings mark comes with WI-0106)
 - **Prio:** could
 - **Scope:** port
 - **Plan:** S0006 (the class list, WI-0099), S0007 (the settings, WI-0106)
+- **Evidence:** `tests/ahk/editor_new_element.test.ahk`
 
 An experimental element is marked in the list and in its settings ("This element is experimental!").
 
