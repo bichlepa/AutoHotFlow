@@ -228,7 +228,13 @@ class EditorMenus {
             return ""
         if (!entry["allowed"])
             return 0
-        this._Act(id)
+        try {
+            this._Act(id)
+        } catch as e {
+            ; an action that fails must not end the editor (AGENTS rule 8): the status bar says so, the log has the cause
+            this.role._Log("a0", "editor", "menu action " id " failed: " Type(e) ": " e.Message)
+            this.role.model.Notice("Menu_action_failed")
+        }
         return 1
     }
 
