@@ -32,3 +32,4 @@ Assistants of the elements of S0008 that v1 does not have.
 Written by the acceptance of S0006 (WI-0104, E0095). The project owner decides whether this stands; the package may refine it again and says so in its result.
 
 - The window-information and mouse assistants are the first dialog code that is not a plain form: they hide the dialog, watch the mouse and read a window. Keep their waiting on timers (no loop with Sleep on the message path, AGENTS rule 3).
+- **Refined by WI-0110 (decision of the implementer):** the settings window is disabled while an assistant runs, not hidden. Showing it again needs the DPI handling of the HOW-TO of the GUI (`Show` sizes the window with the DPI of the process start), and v1 disabled it too. The mouse tracker's colour comes from its `color` key, so the colour dialog only picks a colour from the list.

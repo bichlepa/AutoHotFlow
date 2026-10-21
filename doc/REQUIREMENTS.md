@@ -1629,12 +1629,15 @@ The dialog is built from the parameter schema of the class. Field types used in 
 ### REQ-EDT-130 Assistants in the element settings
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the three assistants work in tests with a fake window and pixel source; the pointing with the real mouse is the owner's gui test, not run yet; the control pick and the check box of hidden windows of v1 are not there)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0007 (WI-0110)
+- **Evidence:** `tests/ahk/editor_assist.test.ahk`, `tests/fault/test_editor_assist_gui.py` (written, not run)
 
 Get window and control information by pointing at a window; choose a color or pick it from the screen; take a position with the mouse.
+
+A button of an element starts its assistant: the window under the mouse (its title, class and process fill in the window identification of a hotkey), the mouse position (screen, window or client coordinates, with the colour under the mouse) or the colour dialog. The settings window waits while the assistant runs, and the values the user takes are the ones the element gets when the settings are confirmed. The window assistant takes the window the mouse rests on from a list, and OK takes the selected one.
 
 ### REQ-EDT-140 Flow settings dialog
 

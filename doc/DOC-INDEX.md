@@ -73,23 +73,23 @@ L296-316 9a. Dialog tests (E0038, WI-0051)
 L318-338 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (56.8 KB, 494 lines)
+## doc/ELEMENT-API-V2.md (57.3 KB, 496 lines)
 ```text
 L8-18 1. Guidelines
-L20-110 2. Class contract
-L91-110   2.1 Parameter fields of the settings form (WI-0105)
-L112-240 3. Context `ctx`
-L161-178   3.1 Parameter evaluation (WI-0042)
-L180-190   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
-L192-198   3.3 Dialogs (E0038, WI-0051)
-L200-215   3.4 Debug view (WI-0056, REQ-DBG-060)
-L217-240   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
-L242-324 4. Example 1: `Action_Sleep` (inline, with timer)
-L326-419 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L421-461 6. Mechanical conversion rules
-L463-484 7. What stays
-L470-484   7.1 Loop elements (WI-0054)
-L486-494 8. Still to be clarified (Phase 3)
+L20-112 2. Class contract
+L91-112   2.1 Parameter fields of the settings form (WI-0105)
+L114-242 3. Context `ctx`
+L163-180   3.1 Parameter evaluation (WI-0042)
+L182-192   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
+L194-200   3.3 Dialogs (E0038, WI-0051)
+L202-217   3.4 Debug view (WI-0056, REQ-DBG-060)
+L219-242   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+L244-326 4. Example 1: `Action_Sleep` (inline, with timer)
+L328-421 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L423-463 6. Mechanical conversion rules
+L465-486 7. What stays
+L472-486   7.1 Loop elements (WI-0054)
+L488-496 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
@@ -185,7 +185,7 @@ L51-57 A copy of the variables of an error must be taken where the error is caug
 L59-65 A repeated error of the same flow within 10 s sends no notice at once (verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (41.7 KB, 318 lines)
+## doc/howto/gui-and-hotkeys.md (42.5 KB, 326 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -227,6 +227,7 @@ L290-296 A ListBox has no Click event in AHK v2 (verified) (verified)
 L297-303 A menu state that depends on another program is read only when the menu is refreshed (verified) (verified)
 L305-311 A one-shot timer that is set again restarts its delay: one `SetTimer` call per change is a debounce (verified) (verified)
 L312-318 A drop-down list of a Gui is AddDDL, not AddDropDown (verified) (verified)
+L320-326 Hotkey variants of a HotIf criterion are found by the criterion object (assumed) (assumed)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)
@@ -303,7 +304,7 @@ L398-404 One timer for many jobs: SetTimer with the same function moves the run 
 L407-413 The sender of a message is its link name, which carries the flow of an editor (verified) (verified)
 ```
 
-## doc/howto/syntax-and-language.md (47.3 KB, 466 lines)
+## doc/howto/syntax-and-language.md (48.7 KB, 482 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -363,6 +364,8 @@ L439-445 Names are case-insensitive: a global `W` makes every local `w` of the i
 L447-452 A one-line `if (...) continue` is flagged by the editor's analyzer (partly verified)
 L454-459 A function and a local with the same name: the `Op` helper of a test (verified)
 L461-466 `<` and `>` on two strings that are not numbers throw "Expected a Number" (verified) (verified)
+L468-474 A parameter named like a built-in class hides the class in its function (verified) (verified)
+L476-482 A callback held in a property is called with its object as first argument (verified) (verified)
 ```
 
 ## doc/howto/tests-and-tools.md (51.1 KB, 505 lines)
