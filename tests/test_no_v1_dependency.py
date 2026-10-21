@@ -19,8 +19,9 @@ EXEMPT_PREFIXES = ("tests/golden/",)
 # the smoke test of the elements (WI-0048) looks at the v1 file of a class for parameters that v1 evaluates itself; it
 # skips that rule when v1/ is gone, so the test does not depend on it
 # the table of the test selection names the v1 paths as rule keys (strings only, nothing is read from v1/)
-EXEMPT_FILES = {"tests/test_no_v1_dependency.py", "tools/golden_v1.py", "tools/golden_corpus.py"
-                , "tests/ahk/element_smoke.test.ahk", "tests/support/groups.py"}
+EXEMPT_FILES = {"tests/test_no_v1_dependency.py", "tools/golden_v1.py", "tools/golden_corpus.py",
+                "tools/convert_v1_help.py",  # the one-time conversion of the v1 help reads v1 on purpose (WI-0112)
+                "tests/ahk/element_smoke.test.ahk", "tests/support/groups.py"}
 
 
 def is_comment(line):
