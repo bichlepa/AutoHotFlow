@@ -341,7 +341,6 @@ class EditorWindow {
         return 0
     }
 
-    ; WM_KEYDOWN of this window: the key table (EditorKeys) decides; a key it does not know goes on to Windows.
     ; WM_ACTIVATE: the window became active. The clipboard may have changed in another program, so the paste state of the
     ; menu bar is checked again (EditorMenus.Refresh). wParam's low word is 0 when the window was deactivated.
     _OnActivate(wParam, hwnd) {
@@ -350,6 +349,7 @@ class EditorWindow {
         try this.role.menus.Refresh()
     }
 
+    ; WM_KEYDOWN of this window: the key table (EditorKeys) decides; a key it does not know goes on to Windows.
     _OnKey(vk, hwnd) {
         if (hwnd != this.hwnd || this.closed)
             return

@@ -353,7 +353,7 @@ Status: **verified** for the numbers of the runs (one run each, two patch series
 | move 30 elements (one patch) | 200 | 3.10 | 3.32 | 6.03 |
 | add 30 elements with their connections | 200 | 12.47 | 13.63 | 31.56 |
 
-**Reading.** All cases are far below the budget proposed in MS-0053 (p95 below 40 ms for up to 30 operations, below 10 ms for one operation). The numbers are lower than in MS-0053 (4.5, 5.6 and 21.3 ms mean) for the same code path; the cause is not known (assumed: load). The answer that the user waits for is not the engine time but the round trip of a patch through the hub and the editor: about 140 ms median in MS-0055 (F-0165, not explained). The answer of the biggest flow through the chain is measured by the stress test `test_a_patch_of_30_operations_on_the_biggest_flow_is_answered_within_the_budget` (its MEASURE line is in the run log of the stress run of WI-0104, see WI-0104-result-s6.md). Status: **verified** for the numbers of this run.
+**Reading.** All cases are far below the budget proposed in MS-0053 (p95 below 40 ms for up to 30 operations, below 10 ms for one operation). The numbers are lower than in MS-0053 (4.5, 5.6 and 21.3 ms mean) for the same code path; the cause is not known (assumed: load). The answer that the user waits for is not the engine time but the round trip of a patch through the hub and the editor: about 140 ms median in MS-0055 (F-0165, not explained). The answer of the biggest flow through the chain is measured by the stress test `test_a_patch_of_30_operations_on_the_biggest_flow_is_answered_within_the_budget`. Status: **verified** for the numbers of this run.
 
 ### MS-0058: round trip of a patch during a run, 100 patches, 300 steps (WI-0104, MS-0054 again)
 
