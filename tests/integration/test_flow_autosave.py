@@ -114,7 +114,11 @@ def kill_engine(run):
 
 
 def on_disk_x(flowdir):
-    return json.loads((flowdir / FILE).read_text(encoding="utf-8"))["allElements"][SLEEP]["x"]
+    # the file is read while the storage may be writing it: a torn read counts as "not yet"
+    try:
+        return json.loads((flowdir / FILE).read_text(encoding="utf-8"))["allElements"][SLEEP]["x"]
+    except (ValueError, OSError):
+        return None
 
 
 def wait_until(predicate, timeout):
