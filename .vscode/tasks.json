@@ -93,6 +93,16 @@
             "problemMatcher": []
         },
         {
+            "label": "Setup: WebView2 loader DLL (download from nuget.org, checks SHA-256, assets/bin, not committed)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-I",
+                "tools/fetch_webview2_loader.py"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Setup: git hooks (core.hooksPath)",
             "type": "process",
             "command": "git",

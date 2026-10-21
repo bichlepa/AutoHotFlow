@@ -33,3 +33,6 @@ tests/.tmp/
 
 # private golden data of the project owner (his own flows and variables, never checked in)
 /tests/golden/private/
+
+# WebView2 loader DLL, fetched by tools/fetch_webview2_loader.py (WI-0115); shipped later by S0009, never committed
+/assets/bin/
