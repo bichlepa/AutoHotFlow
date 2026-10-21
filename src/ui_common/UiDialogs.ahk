@@ -24,6 +24,7 @@ class UiDialogs {
     static BUTTON_H := 30
     static EDIT_H := 24
     static LIST_H := 200
+    static TREE_H := 320
 
     ; Confirm: buttons is an Array of [id, labelKey, isDefault]; the buttons stand in this order, from the left. The default
     ; button (Enter) is the one DefaultIndex names. callback(true, id) for a button, callback(false, "close") otherwise.
@@ -158,6 +159,55 @@ class UiDialogs {
     static _Choose(st, index, ids) {
         if (index >= 1 && index <= ids.Length)
             UiDialogs.Answer(st, true, ids[index])
+    }
+
+    ; Tree: items grouped under category nodes (WI-0099, the class list of a new element). groups is an Array of
+    ; [categoryLabel, items], an item is [id, label]; the categories stand open. OK or a double click on an item chooses it:
+    ; callback(true, id). OK with a category or nothing selected does nothing. callback(false, "") on Cancel,
+    ; callback(false, "close") on the close box or Escape.
+    static Tree(owner, titleKey, textKey, groups, callback, args*) {
+        st := UiDialogs._Begin(owner, "tree", titleKey, callback)
+        if (!IsObject(st))
+            return false
+        m := this.MARGIN
+        width := this.WIDTH
+        textH := this._TextH(st["gui"], Lang(textKey, args*), 3 * m + 4 + this.TREE_H + this.BUTTON_H)
+        treeY := m + textH + 4
+        buttonY := treeY + this.TREE_H + m
+        height := buttonY + this.BUTTON_H + m
+        g := st["gui"]
+        lay := st["lay"] := GuiLayout.Create(g, width, height)
+        text := g.AddText("+0x80")
+        GuiLayout.Place(lay, text, m, m, width - 2 * m, textH)
+        UiTexts.Register(st["hwnd"], text, textKey, "Text", args*)
+        tree := g.AddTreeView()
+        GuiLayout.Place(lay, tree, m, treeY, width - 2 * m, this.TREE_H)
+        ids := Map()                  ; TreeView item ID -> the id of the item (the answer)
+        for group in groups {
+            node := tree.Add(group[1], 0, "Expand")
+            for item in group[2]
+                ids[tree.Add(item[2], node)] := item[1]
+        }
+        x := width - m - (2 * this.BUTTON_W + m)
+        ok := g.AddButton("Default")
+        GuiLayout.Place(lay, ok, x, buttonY, this.BUTTON_W, this.BUTTON_H)
+        UiTexts.Register(st["hwnd"], ok, "OK")
+        ok.OnEvent("Click", (*) => UiDialogs._ChooseNode(st, tree, ids))
+        tree.OnEvent("DoubleClick", (*) => UiDialogs._ChooseNode(st, tree, ids))
+        cancel := g.AddButton()
+        GuiLayout.Place(lay, cancel, x + this.BUTTON_W + m, buttonY, this.BUTTON_W, this.BUTTON_H)
+        UiTexts.Register(st["hwnd"], cancel, "Cancel")
+        cancel.OnEvent("Click", this._Pick(st, false, ""))
+        this._OnCancel(st, "close")
+        GuiLayout.Show(lay)
+        return true
+    }
+
+    ; The answer of a tree dialog: the selected item when it is an item (not a category).
+    static _ChooseNode(st, tree, ids) {
+        item := tree.GetSelection()
+        if (item && ids.Has(item))
+            UiDialogs.Answer(st, true, ids[item])
     }
 
     ; The answer of an input dialog: a refused value stays in the dialog with its error text.
