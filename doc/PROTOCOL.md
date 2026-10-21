@@ -216,6 +216,7 @@ It is sent by `Role._OnUnexpected` for every error that no `try/catch` caught (`
 | `notifyUnhandledErrors` | boolean | true | | engine: notices of unhandled exceptions (REQ-USE-070, 4.7) |
 | `startWithWindows`, `runAsAdmin` | boolean | false | | WI-0079 (the entry and the elevation themselves) |
 | `windowPositions` | object | `{}` | window name (letters, digits, `_ . - space`, at most 60) → `{ x, y, w, h }` whole numbers, at most 50 windows | the UI roles (UI state, WI-0073) |
+| `helpViewer` | text | `auto` | `auto`, `webview2`, `classic`, `browser` (WI-0111, E0099) | role `help` (4.12): `auto` takes WebView2 when it is available (WI-0115), otherwise the classic viewer; `webview2` falls back to the classic viewer with a log line when WebView2 cannot start; `classic` is the browser control of Windows; `browser` opens the page in the default browser and shows no window |
 
 **Order of the sources of an option (WI-0077):** the command line wins over the file, the file over the default. `--log-level=<n>` fixes all three log thresholds (a test option, 4.6 log threshold); `--language=<code>` fixes the language; `--workers=<n>` fixes the size of the pool. A setting that an option fixes is still stored and reported, it only does not take effect in that process. The supervisor learns the settings from the engine (the engine sends `evt.settings.changed` to the supervisor as well as to the topic) and starts new processes with `--log-levels=<app>,<flow>,<thread>` and `--start-language=<code>` (the values of the settings; the first `evt.settings.changed` or the answer of `cmd.settings.get` replaces them). The environment variable `AHF_WINDOWS_LANGUAGE` (a hexadecimal LCID, for example `0409`) replaces the language of Windows for `language` = `""`; the tests set it to English so that they do not depend on the machine. The product honours the variable too (it is not a test-only hook): a user who sets it changes the language of Windows for AutoHotFlow.
 
@@ -733,6 +734,25 @@ Test command: `cmd.test.class {id}` answers the open list (`id` is one the list 
 **Flow settings dialog (WI-0109, REQ-EDT-140, EditorFlowSettings):** the menu entry Settings of the editor opens the dialog of the flow's `flowSettings` (keys and their meaning: 4.2, flow settings). Its OK sends one `cmd.flow.patch` with one `flow.settings` operation that carries the changed keys (an undo step, 4.2); Cancel sends nothing; nothing changed sends nothing. A refused patch is a text in the status bar, as for the other edits. The dialog refuses to close with an invalid limit or an invalid working directory (the window keeps open and says so); a warning (switching a migrated flow to strict) does not block.
 
 **Show log (WI-0109):** the button "Show log" of the dialog sends `cmd.manager.showLog { flowId }` to the supervisor (the editor is the only sender; the request is answered `{ ok, started }`). The supervisor passes it on to the running manager as `cmd.manager.showLog { flowId }` (4.8), which opens its log window with the filter of the flow. A manager that is not running is started (as for `cmd.manager.show`, 4.8): the answer then says `started: true` and the log filter is not applied (the manager opens its main window; the log is one click further, not checked by a test).
+
+### 4.12 Role `help`: the help window (WI-0111, E0098, E0099, E0100)
+
+The help is shown in a window of its own, in a process of its own (ARCHITECTURE 3): a hang of a browser engine must not stop an editor or the manager. The role has no flows, no engine and no storage access, and it has no elements. The supervisor starts it on demand, not with the application: one process for the application, one window, as the manager.
+
+**Page IDs.** A page is named by its ID, the path of its Markdown source under the help root without `.md` (ARCHITECTURE 8, `tools/gen_help.py`): an element page `<Kind>/<Name>` (`Actions/Sleep`, `Conditions/NumberIs`, `Loops/Work_through_a_list`, `Triggers/Hotkey`; `<Name>` is the class name without its kind prefix), a general page its name (`Welcome`, `Variables`, `Key_list`, `Color_chart`). The empty ID is the index (`Welcome`). The ID is checked by the supervisor: letters, digits and `_`, at most one `/`, at most 80 characters.
+
+| Message | From → to | Payload → answer | Effect |
+|---|---|---|---|
+| `cmd.help.show` | `manager`, `editor:<flowId>` → `supervisor` | `{ page }` → `{ ok, started }` | the supervisor asks a running `help` role (below); a role that is not running is started with the page on its command line (`--page=<ID>`), `started: true`. Refused with `denied` for any other sender, `bad_payload` for a bad ID, `shutting_down` while the session ends |
+| `cmd.help.show` | `supervisor` → `help` | `{ page }` → `{ ok, viewer }` | shows the page (or brings the window to the front, or opens the browser, see below); `viewer` is the viewer that showed it (`classic`, `browser`, later `webview2`) |
+
+**Viewers (E0099).** The role holds one viewer interface with `Navigate(path)`, `Back()`, `Resize()` and `Close()`, and the window talks only to it. Three viewers exist: `classic` (the browser control of Windows, `Shell.Explorer`), `browser` (the default browser opens the file URL; no window of our own) and `webview2` (WI-0115, not in this version). The viewer comes from the setting `helpViewer` (4.2), read when a page is shown and followed when it changes. `auto` takes `webview2` when it is available, else `classic`; `webview2` falls back to `classic` with a log line (`a0`) when WebView2 cannot start.
+
+**Language.** The page is taken in the language of the user interface (`LangTable.Code`, 4.2 `language`), then in English; the element pages come from the package's `help/<code>/` folder (fallback `help/en/`), the general pages from `assets/help/<code>/` (fallback `en`). A page that does not exist (no generated HTML) is shown as the index with a log line (`a0`), the answer is still `ok`.
+
+**Test command (only with `--headless`, no window):** `cmd.test.command { item: "resolve", page, language? }` → `{ ok, viewer, path, found }`: the viewer that would show the page, the file that would be shown (the page in the language, or the English fallback) and whether the file exists. `language` replaces the setting for this request. Other items: `bad_payload`.
+
+**Snapshot (4.9), role part `info`:** `{ viewer: string (the viewer of the last page), page: string (the last page shown), shown: int, lastResult: string }`.
 
 ## 5. Connection setup, reconnection, resync
 

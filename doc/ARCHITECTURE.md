@@ -105,6 +105,7 @@ An incorrectly classified inline action does not fail silently: the engine watch
 | `engine` | 1 | flow definitions (committed), instances, threads, variables, execution of inline elements, trigger target state, categories and the order of the flow list (E0067) | runtime state | block, touch files, show dialogs |
 | `triggerhost` | 1 (later n) | arm triggers, report events | OS handles of the triggers (hotkeys, hooks, timers) | execute flows |
 | `tray` | 1 | the tray icon and the tray menu of the application ("Show manager", "Exit"; later language and log); sends its commands to the supervisor (E0075, WI-0072). A menu stops the threads of the process that shows it, so it has a process of its own; the supervisor starts it and starts it again when it dies (the icon must come back) | the menu | flows, engine, storage access, windows |
+| `help` | 0..1 | the help window and its viewers (WI-0111, E0098, E0099, PROTOCOL 4.12): the pages of the element packages and the general pages, shown by the classic viewer (`Shell.Explorer`), the default browser, later WebView2 (WI-0115). Started on demand by the supervisor (`cmd.help.show`), not with the application; a hang of a browser engine stops this role only | the window and the viewer | flows, engine, storage access, element classes |
 | `manager` | 0..1 | flow list, categories, settings, import/export, log display | window state | execute flows |
 | `editor:<flowId>` | 0..n | display a flow and draw it (since WI-0088, PROTOCOL 4.11), with its own tray icon and menu (WI-0091, E0087); from S0006 also edit it | the window and the renderer (WI-0088); the view (zoom/offset; read in S0005, written from S0006, E0086); from S0006 the draft and the selection | change runtime state; keep the run states (they come from the engine's events, the editor only shows them) |
 | `worker:<n>` | 0..N (elastic pool, section 6.4) | execute blocking/UI elements | only a short-lived copy of the task | hold state |
@@ -375,7 +376,7 @@ AutoHotFlow/
 │  │  ├─ Json.ahk  Ids.ahk  Errors.ahk  Log.ahk  Args.ahk
 │  │  ├─ FlowPatch.ahk      # the operations of cmd.flow.patch (WI-0093, PROTOCOL 4.2): Apply, Inverse, Diff; used by the engine and the editor
 │  │  └─ ipc/               # Pipe, Frame, Wake, Message, Dispatcher, Peer
-│  ├─ supervisor/  storage/  triggerhost/  worker/  tray/
+│  ├─ supervisor/  storage/  triggerhost/  worker/  tray/  help/   # help/: the help role (WI-0111, PROTOCOL 4.12): Help*.ahk, viewers Viewer*.ahk
 │  ├─ engine/               # Engine, Executor, WorkerBridge; core/ (flow model, state machines, FlowExprConvert); vars/ (variable model, WI-0040/41)
 │  ├─ ui_common/            # GUI helpers for the UI roles: UiWindow, UiDialogs, UiFileDialogs, UiTexts (WI-0069, E0076); the window layout is core/GuiLayout.ahk
 │  ├─ manager/  editor/     # editor/: the headless model since WI-0084 (geometry, view, scene), `form/` the settings form model of an element since WI-0105 (`ElementForm.ahk`, `FormField.ahk`, `FormChecks.ahk`: the fields of `Parameters()`, the values, `CheckSettings` and the checks, no window; doc/ELEMENT-API-V2.md section 2.1), render/ since WI-0083 (Gdip*.ahk, the GDI+ wrapper, E0085) and the Renderer interface (D0004) in WI-0085; the window of WI-0088
