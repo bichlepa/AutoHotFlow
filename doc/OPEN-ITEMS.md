@@ -17,8 +17,8 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | ID | Title | Status | Phase 3 |
 |---|---|---|---|
 | F-0175 | REQ-USE-080 names REQ-USE-070 for the switch of the notices, but REQ-USE-070 is the requirement of hints (WI-0109; PROTOCOL 4.7 follows the same wrong reference) | decision needed (correct the reference, or give the switch its own requirement); the owner decides | WI-0109 |
-| F-9111* | The settings test `test_the_log_thresholds_change_in_every_role_at_once` fails now and then: the tray role is not connected when its snapshot is asked (WI-0111 saw it while testing; the same on the unchanged state) | open, verified (3 of 5 runs), cause not checked | WI-0111 |
-| F-9112* | The help request of the supervisor for a role that is still starting (the page sent at its hello) and the requests of the manager and the editors are not tested end to end: the tests can only send as an observer, which the supervisor refuses (WI-0111) | open, not checked | WI-0111 |
+| F-0177 | The settings test `test_the_log_thresholds_change_in_every_role_at_once` fails now and then: the tray role is not connected when its snapshot is asked (WI-0111 saw it while testing; the same on the unchanged state) | open, verified (3 of 5 runs), cause not checked | WI-0111 |
+| F-0178 | The help request of the supervisor for a role that is still starting (the page sent at its hello) and the requests of the manager and the editors are not tested end to end: the tests can only send as an observer, which the supervisor refuses (WI-0111) | open, not checked | WI-0111 |
 | F-0176 | Show log with no running manager starts the manager, and the log window is not filtered to the flow (WI-0109, PROTOCOL 4.11) | open, low; the manager is normally running | WI-0109 |
 | F-0162 | The frame of a drag of 30 elements in a flow of 300 is 25 ms at 1920 × 1080 (budget 16 ms); one element meets it (WI-0097, MS-0051) | decision needed, measured; WI-0097 | WI-0097 |
 | F-0170 | The trigger switch of the editor does not ask the force question that the flow commands ask when a state cannot be read (WI-0104, REQ-TRG-030) | decision needed (add the question, or keep the status text as documented) | S0006 |
@@ -286,13 +286,13 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 **Status:** open, found by WI-0112. Decision for the project owner.
 
-### F-9111*: The settings test of the log thresholds is flaky (the tray role is not yet connected)
+### F-0177: The settings test of the log thresholds is flaky (the tray role is not yet connected)
 
 **What:** `tests/integration/test_settings.py::test_the_log_thresholds_change_in_every_role_at_once` fails now and then with `no peer 'tray'` at its first snapshot of the tray (the `shown` fixture starts the roles storage, engine and tray with `--headless`). It failed in 3 of 5 runs on WI-0111 and passed on the reruns. Once it failed with the working tree stashed (the state before the settings change of WI-0111), so the change is not the cause.
 **Options:** (a) the fixture waits for the hello of every role before the first snapshot; (b) find out why the tray role starts late in the test entry (its start is not in the log of the run).
 **Status:** open, verified (repeated runs), cause not checked.
 
-### F-9112*: The help request of a role that is still starting is not tested end to end
+### F-0178: The help request of a role that is still starting is not tested end to end
 
 **What:** The supervisor (`Supervisor._OnHelp`) asks the help role with the page that waits for its hello (`_SendHelp`, called from `_OnHelpSent` / `_OnHello`), and the manager and the editors send cmd.help.show. The tests in `tests/fault/test_help_role.py` send as an observer, which the supervisor refuses (`denied`); the sender rule and the role's answers are tested, the path of a real manager or editor and the pending page are not.
 **Options:** (a) a test that starts the headless manager and asks it to show a help page (the manager trace, as tests/fault/test_tray_role.py does for the tray); (b) a test entry that lets the observer send as manager.
