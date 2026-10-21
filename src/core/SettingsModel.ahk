@@ -32,6 +32,8 @@ class SettingsModel {
     static MAX_POSITIONS := 50
     static POLICIES := ["parallel", "skip", "wait", "stop"]
     static USER_LEVELS := ["Beginner", "Advanced", "Programmer"]
+    ; The viewers of the help window (WI-0111, E0099): the setting helpViewer.
+    static HELP_VIEWERS := ["auto", "webview2", "classic", "browser"]
     ; The Windows language (A_Language, a hexadecimal LCID) -> language code, by the primary language (LCID & 0x3FF).
     ; A language that has no entry gets English. A new language of AutoHotFlow adds a line here.
     static WINDOWS_LANGUAGES := Map(0x07, "de", 0x09, "en", 0x12, "ko", 0x19, "ru")
@@ -253,6 +255,7 @@ class SettingsModel {
         s.Push(Map("key", "notifyUnhandledErrors", "type", "bool", "default", 1))
         s.Push(Map("key", "startWithWindows", "type", "bool", "default", 0))
         s.Push(Map("key", "runAsAdmin", "type", "bool", "default", 0))
+        s.Push(Map("key", "helpViewer", "type", "enum", "default", "auto", "values", SettingsModel.HELP_VIEWERS))
         s.Push(Map("key", "windowPositions", "type", "positions", "default", ""))
         SettingsModel._table := s
         return s

@@ -29,6 +29,9 @@ class SettingsForm {
         Map("key", "startWithWindows", "tab", "general", "kind", "check", "label", "Start_with_windows"
             , "note", "Start_with_windows_note"),
         Map("key", "runAsAdmin", "tab", "general", "kind", "check", "label", "Run_as_admin", "note", "Run_as_admin_note"),
+        Map("key", "helpViewer", "tab", "general", "kind", "list", "label", "Help_viewer", "note", ""
+            , "items", [["auto", "Help_viewer_auto"], ["webview2", "Help_viewer_webview2"]
+                , ["classic", "Help_viewer_classic"], ["browser", "Help_viewer_browser"]]),
 
         Map("key", "executionPolicy", "tab", "flow", "kind", "list", "label", "Flow_execution_policy", "note", ""
             , "items", [["parallel", "Parallel_execution_of_multiple_instances"]
