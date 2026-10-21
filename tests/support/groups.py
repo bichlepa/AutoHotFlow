@@ -53,6 +53,7 @@ OTHER_RULES = [
     ("tests/ahk/helpers/flow_patch_bench.ahk", ["engine"]),   # the patch cost (WI-0093, MS-0051), run by hand
     ("tests/ahk/helpers/evalparams_bench.ahk", ["element-units", "expr"]),
     ("tests/ahk/helpers/expr_bench.ahk", ["expr"]),
+    ("tests/ahk/helpers/assist_gui_probe.ahk", ["editor-assist"]),   # the gui probe of the window assistant (WI-0110, owner)
     ("tests/ahk/helpers/expr_eval_bench.ahk", ["expr"]),
     ("tests/ahk/helpers/json_bench.ahk", ["base"]),      # used by tests/test_json_flows.py
     ("tests/ahk/helpers/json_flows.ahk", ["base"]),
