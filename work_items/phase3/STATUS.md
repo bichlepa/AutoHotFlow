@@ -29,13 +29,13 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0096 | Editor: draft, patch client, undo and redo, selection model, the view written | done | haiku | 1fc90266..c0f3f0ff | 2026-10-21 | F-0165, F-0166 |
 | WI-0097 | Scene and renderer for editing | done, screenshots await the owner | haiku | bb015aba..49f7edd4 | 2026-10-20 | F-0162 (30-element drag 25 ms) decision needed |
 | WI-0098 | Editor: select and move, loop height | done | haiku | see git log | 2026-10-21 | E0094; REQ-EDT-060 partial (real-mouse gui test unwritten); F-0166 part 1 tested; de/ko/ru texts of the status bar missing |
-| WI-0099 | Editor: add elements, class list | open | | | | |
+| WI-0099 | Editor: add elements, class list | done | haiku | see git log | 2026-10-21 | M-0091; open: dialog title "Create new <kind>" not a language key; Advanced level no e2e; tree dialog and real mouse are gui-only |
 | WI-0100 | Editor: connect | open | | | | |
 | WI-0101 | Editor: delete, cut, copy, paste | open | | | | E0091 |
 | WI-0102 | Editor: menu bar, context menus, trigger buttons | open | | | | |
 | WI-0103 | Notice of a crashed editor | done | haiku | 5fe3f431..f7a7dad1 | 2026-10-21 | balloon shows the flow ID; real click not checked |
 | WI-0104 | Acceptance S0006 | open | | | | manual check 10; refines S0007 |
-| WI-0105 | Form model and the `form` API | open | | | | may run beside S0006 |
+| WI-0105 | Form model and the `form` API | running (haiku, wi-105) | | | | may run beside S0006 |
 | WI-0106 | Element settings window | open | | | | |
 | WI-0107 | Editor `ctx`, "Switch with the flow" | open | | | | |
 | WI-0108 | Expressions checked while typing | open | | | | E0096 |
@@ -53,7 +53,7 @@ None.
 
 ## Running agents
 
-None.
+WI-0105 (haiku, workspace wi-105).
 
 ## Last verified state
 
