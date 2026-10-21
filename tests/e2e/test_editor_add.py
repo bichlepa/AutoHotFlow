@@ -171,6 +171,26 @@ def test_the_programmer_level_shows_the_programmer_classes(procs, datadir, sessi
         finish(sup, obs)
 
 
+def test_the_advanced_level_shows_the_beginner_classes_and_not_the_programmer_ones(procs, datadir, session_id):
+    """WI-0104: the Advanced rank in the class list (no Default class is Advanced; the Advanced class is in ahk unit test
+    editor_new_element.test.ahk). Beginner classes stay in the list, Programmer classes leave it."""
+    sup, obs = start(procs, datadir, session_id)
+    try:
+        ans = obs.request("engine", "cmd.settings.set", {"settings": {"userLevel": "Advanced"}}, timeout=scaled(5))
+        assert ans["payload"]["ok"], ans
+
+        def list_is_at_the_advanced_level():
+            place(obs, "action")
+            ids = offered(obs)
+            answer(obs, "")
+            wait_settled(obs)
+            return "Default.Action_Sleep" in ids and "Default.Action_Trace_Point" not in ids
+
+        assert wait_until(list_is_at_the_advanced_level, scaled(10)), "the list does not follow the Advanced level"
+    finally:
+        finish(sup, obs)
+
+
 def test_the_answer_adds_the_element_at_the_placed_place_with_its_defaults_and_selects_it(procs, datadir, session_id):
     sup, obs = start(procs, datadir, session_id)
     try:
