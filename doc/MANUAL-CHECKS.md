@@ -391,6 +391,25 @@ The gui tests open real editor windows and send real mouse and keyboard input. R
 
 Not in the gui tests yet: a real mouse selection, move, connection and placing of elements (REQ-EDT-060, REQ-EDT-070, REQ-EDT-080 stay `partial` until steps 1 to 16 are checked by hand; a gui test for them is open work).
 
+## 11. Expressions checked while typing, and the keys in a settings field (WI-0108, REQ-EDT-200; WI-0104 refinement)
+
+Test by hand on the real settings window, at 100 % display scaling. Not automated: the e2e test drives the settings headless (`tests/e2e/test_editor_settings.py`), and the window itself is the owner's. This section checks what the headless test cannot: the window's own edit field, and that its keys do not reach the editor behind it.
+
+**Start.** Run section 9, part B first (the folder with the flows of the manual checks). VS Code task "Start: manual check 10, editing the imported v1 flows (manual_check.py)". Open the flow `skeleton` with "Edit" in the manager. Double-click an action with an expression field (for example Sleep, its field Duration). If the flow has none, add one: click the field "action" on the canvas and choose Sleep.
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 1 | In Duration type `1 + * 2`. Stop typing and wait about one second. | Below the field, in red: "Syntax error at line 1, column 5: unexpected '*'; an operand is expected". The text is not changed. | |
+| 2 | Change the text to `1 + 2`. Wait about one second. | The red line disappears. | |
+| 3 | Change the text to `1 +`. Wait about one second. | "Syntax error at line 1, column 4: unexpected end of the input; an operand is expected". | |
+| 4 | Press Ctrl+Z, then Ctrl+Y, in the field. Then press Cancel. | They undo and redo the typing in the field only. The flow is unchanged: after the window is closed, the Edit menu's Undo undoes the last change made before the window was opened, as it did before step 4. | |
+| 5 | Press Del in the field, in the middle of the text. | One character is deleted. No question about deleting an element appears, and the element stays. | |
+| 6 | With a warning shown, press OK. | The window closes and the change is kept (the warning does not refuse OK). One undo step in the editor. | |
+| 7 | Open the settings again, type `1 + * 2`, and press Cancel before the warning shows. | The window closes, nothing is changed. | |
+| 8 | Watch for dialogs during the section. | No dialog (window class `#32770`) appears, except the answer of step 5 if it asks for one. | |
+
+Record the result of each step in the table. A failed step is a finding: write it into `doc/OPEN-ITEMS.md` with the steps that show it.
+
 ## Result
 
 Record one result per run. Copy the template.
