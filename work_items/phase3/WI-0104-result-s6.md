@@ -48,8 +48,8 @@ One machine. Runs with the marker `stress` were exclusive: the admission started
 | slow (`verify.py`) | `d3e830a3`, run `20261021-182554-d3e830a3-2` | 205 passed, 1 failed: `tests/integration/test_flow_autosave.py::test_patches_every_second_give_a_write_at_least_every_10_s`, a known load flake (its fourth; recheck `20261021-184115-recheck` green alone) |
 | stress, `-m stress` (`run_suite`) | `682873bf`, run `20261021-184149-682873bf` | 34 passed, 2747 deselected (11:22) |
 | stress, round trip with the measurement line (MS-0058) | `682873bf`, run `20261021-185339-682873bf` | 1 passed (24 s) |
-| SERIAL_RUN | | |
-| GUI_RUN | | |
+| SERIAL_RUN | not run: the serial run of the agent did not finish (machine standby); see the parallel runs and the verification of the integrated state in STATUS.md | |
+| GUI_RUN | not run (gui tests: owner; manual check 10 open) | |
 
 The `verify.py` VERDICT of `d3e830a3` was red: fast (the doc test and the cold worker start) and slow (the autosave flake). The doc test is green at `682873bf`; the two load flakes are green when they are rerun alone (recheck).
 
