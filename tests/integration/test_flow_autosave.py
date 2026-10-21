@@ -135,6 +135,8 @@ def patch(obs, base, ops, session=None):
     if session is not None:
         payload["session"] = session
     answer = obs.request("engine", "cmd.flow.patch", payload, timeout=5)
+    # every caller expects an accepted patch: a refusal shows its reason in the failure
+    assert answer["payload"].get("ok") is True, "patch on rev %s refused: %r" % (base, answer["payload"])
     return answer["payload"]
 
 
@@ -169,16 +171,20 @@ def test_patches_every_second_give_a_write_at_least_every_10_s(pipe, flowdir, st
     wait_ready(obs)
     rev = 1
     t0 = time.monotonic()
+    answered = {}                     # x of a patch -> time its answer arrived (the commit happened before that)
     while time.monotonic() - t0 < scaled(22.0):
         rev += 1
         assert patch(obs, rev - 1, [move(X_SAVED + rev)])["ok"] is True
+        answered[X_SAVED + rev] = time.monotonic()
         time.sleep(1.0)
     last = X_SAVED + rev
     assert wait_until(lambda: on_disk_x(flowdir) == last, timeout=scaled(6.0))
-    times = [w["at"] for w in storage.writes_of_flow()]
-    assert len(times) >= 2, "a write during the 22 s of patches and one after"
-    gaps = [b - a for a, b in zip([t0] + times, times)]
-    assert max(gaps) <= scaled(10.5), "a gap of %.1f s between two writes" % max(gaps)
+    writes = [(w["at"], json.loads(w["text"])["allElements"][SLEEP]["x"]) for w in storage.writes_of_flow()]
+    assert len(writes) >= 2, "a write during the 22 s of patches and one after"
+    # The promise is per commit (E0065, PROTOCOL 4.2): the file holds a commit at the latest 10 s after it. The gap
+    # between two writes is 10 s plus the time to the next commit, so the gaps are not the measure.
+    lags = [min(at for at, x_w in writes if x_w >= x) - c for x, c in answered.items()]
+    assert max(lags) <= scaled(10.5), "a commit reached the file after %.2f s, the promise is 10 s" % max(lags)
     obs.close()
 
 
