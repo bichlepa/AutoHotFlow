@@ -90,6 +90,7 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0144 | The fast tier takes 4 to 13 minutes, not the 1 to 2 minutes of the owner decision F-0108 | closed (owner decision E0089: no fixed budget, the test groups decide) | |
 | F-0151 | The static layer rebuild is slow at 4K | accepted | WI-0085 |
 | F-0158 | Three basic language files are UTF-16 but are read as UTF-8 | closed (files re-saved as UTF-8) | WI-0091 |
+| F-0174 | The engine of a slow autosave test is killed by the 60 s safety net of the test harness | closed (test fix) | WI-0095 |
 
 ## Findings
 
@@ -869,4 +870,10 @@ All sources are at the tag `v2-phase2-final` and can be read with `git show v2-p
 **What:** `assets/language/basic/de.ini`, `ko.ini` and `ru.ini` are UTF-16 LE with BOM and CRLF. `LangTable` reads every language file with `FileRead(path, "UTF-8")` (two places), so the keys of these files are probably not found and the program falls back to English. `basic/en.ini` and `assets/language/manager/*.ini` are ASCII or UTF-8. Seen while reviewing WI-0091, whose new key exists in `en.ini` only.
 **Status:** open; verified: the encodings and the read calls; not checked: what a run with the language German shows. Fix: convert the files to UTF-8 (or read them by their BOM) and add a test that every language file loads.
 **Closed:** the owner re-saved the three files as UTF-8 on 2026-10-20 (the language tests pass).
+
+### F-0174: the engine is no peer any more in the middle of a slow autosave test under load
+
+**What:** in the slow tier (run 20261021-193520-e597935a, commit e597935a) `test_patches_every_second_give_a_write_at_least_every_10_s` failed with `patch on rev 61 refused: {'ok': False, 'error': {'code': 'not_found', 'message': 'no peer engine'}}`. The test sends one patch per second for `scaled(22 s)`; under load the scale gives about 60 s, so the engine had run about a minute and then was no peer of the test hub: it exited, crashed or lost its pipe. Earlier failures of the same test (runs 20261021-083332-f58bb0b2-3, 20261021-091309-cf085e1f-3) were `ok: false` at line 174 without a printed reason; this is probably the same cause. Green alone in recheck (20261021-084542-recheck, serial run of the author). Possible causes: the engine ends on its own after some time without a supervisor stand-in answer (heartbeat, idle exit), a real crash of the engine with `FlowSaver` under load, or the test stand-in dropping the connection.
+**Options:** (a) a hunter reads the engine log of the failed run (`pytest-log/.../data/...`) and finds out why the engine ended; (b) if it is the stand-in heartbeat, fix the test.
+**Status:** closed. Cause (verified): the test harness, not the product. `RoleRun` (`tests/integration/test_role.py`) starts every role through `ahkrun.py --timeout 60`, which kills the process tree after 60 s; the slow test runs `scaled(22 s)` of patches, 66 s at the parallel factor 3, so the engine was killed at about the 60th patch (stderr of the failed runs: `TIMEOUT after 60 s, process tree killed`). The earlier failures of the same test (`ok: false`) probably had the same cause (their logs are no longer available). Fix: `RoleRun` takes an optional timeout, the test passes `scaled(120)`. Reproduced without load with `AHF_TIMING_FACTOR=3` (run 20261021-195826-3120); green after the fix: runs 20261021-200005-2816, 20261021-200123-17868 and the engine and transport groups (553 passed, run 20261021-200332-19176).
 
