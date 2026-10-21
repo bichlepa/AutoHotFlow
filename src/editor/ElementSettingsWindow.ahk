@@ -61,7 +61,7 @@ class ElementSettingsWindow {
         this.Build(controller, "")
     }
 
-    ; True when hwnd is the top-level window of the open settings (the editor window ignores the wheel over it, F-9000).
+    ; True when hwnd is the top-level window of the open settings (the editor window ignores the wheel over it, F-0169).
     Owns(hwnd) => this.open && IsObject(this.gui) && hwnd = this.gui.Hwnd
 
     ; Hides the window (the controller closed its session).

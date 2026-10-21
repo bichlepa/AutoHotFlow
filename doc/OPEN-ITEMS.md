@@ -356,7 +356,7 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 **Options:** (a) find out where the `running` event of a cold worker is lost (the test's event filter or the engine's event order); (b) mark the test as timing-sensitive and run it in the idle tier.
 **Status:** open, verified (repeated runs at both commits), cause not checked.
 
-### F-9000: A wheel over the settings window also zooms the canvas beneath it
+### F-0169: A wheel over the settings window also zooms the canvas beneath it
 
 **What:** EditorWindow._OnWheel takes every WM_MOUSEWHEEL whose pointer lies over the canvas, whichever window received it (WI-0090, by design). The settings window of an element (WI-0106) is an owned window over the canvas and has its own wheel handler for its scroll area. A wheel notch over the settings window therefore scrolls the settings and also zooms the flow under it.
 **Options:** (a) the editor window ignores wheel messages whose target window is not its own while a settings window is open; (b) accept it until the owner's gui check of the settings window shows whether it matters.

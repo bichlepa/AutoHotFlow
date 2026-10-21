@@ -386,7 +386,7 @@ class EditorWindow {
     _OnWheel(wParam, lParam, hwnd) {
         if (this.closed)
             return
-        ; a wheel over the settings window scrolls that window, not the flow beneath it (F-9000)
+        ; a wheel over the settings window scrolls that window, not the flow beneath it (F-0169)
         MouseGetPos(, , &under)
         if (IsObject(this.role.settingsWindow) && this.role.settingsWindow.Owns(under))
             return
