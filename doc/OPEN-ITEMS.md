@@ -286,6 +286,17 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 **Status:** open, found by WI-0112. Decision for the project owner.
 
+### F-0175: REQ-USE-080 names the wrong requirement for the switch of the notices
+
+**What:** REQ-USE-080 and PROTOCOL 4.7 name REQ-USE-070 for the per-flow switch of the notices of unhandled errors (`flowSettings.notifyUnhandledErrors`, WI-0109), but REQ-USE-070 is the requirement of hints.
+**Options:** (a) correct the reference to the requirement that fits; (b) give the switch its own requirement (a new requirement is a decision of the project owner).
+**Status:** decision needed (the owner decides). Verified: the references were read in the documents.
+
+### F-0176: Show log with no running manager starts the manager, and the log window is not filtered to the flow
+
+**What:** the flow settings button "Show log" (WI-0109, PROTOCOL 4.11) asks the supervisor to open the log window of the flow in the manager. When no manager runs, the supervisor starts it and the log window opens without the filter of the flow.
+**Status:** open, low priority: the manager normally runs. Verified by reading (the author of WI-0109 and the reviewer); not tested end to end.
+
 ### F-0177: The settings test of the log thresholds is flaky (the tray role is not yet connected)
 
 **What:** `tests/integration/test_settings.py::test_the_log_thresholds_change_in_every_role_at_once` fails now and then with `no peer 'tray'` at its first snapshot of the tray (the `shown` fixture starts the roles storage, engine and tray with `--headless`). It failed in 3 of 5 runs on WI-0111 and passed on the reruns. Once it failed with the working tree stashed (the state before the settings change of WI-0111), so the change is not the cause.
