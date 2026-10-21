@@ -1525,7 +1525,7 @@ Elements with icon and name, connections with their type, loops with their adjus
 - **Plan:** S0005 (zoom and move, WI-0090), S0006 (the view is saved, E0086, WI-0096; the left button goes to the rectangle selection, E0094, WI-0098)
 - **Evidence:** `tests/e2e/test_editor_select.py::test_the_right_button_moves_the_view_and_the_left_button_on_an_empty_place_does_not`, `tests/e2e/test_editor.py::test_the_wheel_zooms_one_step_at_the_pointer_and_keeps_the_point_under_it`, `tests/e2e/test_editor.py::test_a_drag_moves_the_view_by_the_movement_of_the_pointer`, `tests/e2e/test_editor_draft.py::test_the_view_is_saved_two_seconds_after_the_change_and_a_new_editor_uses_it`, `tests/e2e/test_editor_draft.py::test_a_view_change_closes_with_the_view_written`, `tests/fault/test_editor_mouse_gui.py` (gui: real wheel and drag with SendInput; not run by agents, owner: manual check 9, part D); `doc/MANUAL-CHECKS.md` (section 9, run record of 2026-10-20)
 
-Zoom, and move the view by dragging with the right mouse button (E0094; a left drag on an empty place draws the selection rectangle, REQ-EDT-060; v1 moved the view with the left button too, see `doc/MIGRATION.md` M-0089). Zoom and offset are saved with the flow (`flowSettings`, E0086).
+Zoom, and move the view by dragging with the right mouse button (E0094; a left drag on an empty place draws the selection rectangle, REQ-EDT-060; v1 moved the view with the left button too, see `doc/MIGRATION.md` M-0090). Zoom and offset are saved with the flow (`flowSettings`, E0086).
 
 ### REQ-EDT-040 Live execution state in the editor
 
