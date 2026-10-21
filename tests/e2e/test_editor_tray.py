@@ -211,7 +211,7 @@ def test_a_bad_item_of_the_test_command_is_bad_payload(procs, datadir, session_i
     try:
         op(obs, "select", flowId=FLOW)
         open_editor(obs)
-        ans = obs.request(EDITOR, "cmd.test.command", {"item": "exit"}, timeout=scaled(5))
+        ans = obs.request(EDITOR, "cmd.test.command", {"item": "no_such_item"}, timeout=scaled(5))
         assert ans["payload"].get("error", {}).get("code") == "bad_payload", ans
     finally:
         finish(sup, obs)
