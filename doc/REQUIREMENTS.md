@@ -1574,12 +1574,13 @@ Draw a connection between two elements and choose its type; change the type late
 ### REQ-EDT-080 Delete, cut, copy and paste
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (headless and with two editors: Del and the trash button ask once for the selection, cut, copy and paste with Ctrl+X, Ctrl+C, Ctrl+V, a paste under the mouse or in the middle of the view, one undo step per paste, a pasted manual trigger is no default, a busy clipboard and a foreign clipboard are said in the status bar; the real keys and the mouse are the owner's check of WI-0102)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0006 (WI-0101, E0091)
+- **Plan:** S0006 (WI-0101, E0091; the real keys and the mouse in the gui test of WI-0102)
+- **Evidence:** `tests/ahk/editor_clipboard.test.ahk`, `tests/e2e/test_editor_clipboard.py::test_ctrl_c_puts_the_selection_on_the_clipboard_in_our_format_only`, `tests/e2e/test_editor_clipboard.py::test_ctrl_v_pastes_new_elements_under_the_mouse_selected_and_as_one_undo_step`, `tests/e2e/test_editor_clipboard.py::test_a_copy_in_one_editor_is_pasted_in_the_editor_of_another_flow`
 
-Delete with confirmation (Del). Cut, copy and paste with Ctrl+X, Ctrl+C, Ctrl+V, also between two flows. The elements go through the Windows clipboard, in a format of AutoHotFlow only (E0091).
+Delete with confirmation (Del, and the trash button of the selection): one question for the selection, an answer of no changes nothing. Cut, copy and paste with Ctrl+X, Ctrl+C, Ctrl+V, also between two flows. A cut deletes without a question. The elements go through the Windows clipboard, in a format of AutoHotFlow only (E0091): a copy of elements is not text, so a paste into another program gets nothing. A paste goes under the mouse, or to the middle of the editor when the mouse is outside it; the pasted elements are selected.
 
 ### REQ-EDT-090 Undo and redo
 

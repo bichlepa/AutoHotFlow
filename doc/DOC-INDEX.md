@@ -31,7 +31,7 @@ L408-419 9. Performance budgets (targets, measured in Phase 2)
 L421-431 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (168.4 KB, 728 lines)
+## doc/PROTOCOL.md (168.7 KB, 728 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
@@ -178,7 +178,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (35.5 KB, 265 lines)
+## doc/howto/gui-and-hotkeys.md (36.4 KB, 272 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -213,6 +213,7 @@ L235-241 Round(x, n) returns text with n decimals, so Round(1, 2) shows "1.00" (
 L243-249 A click on a TrayTip balloon comes as the icon's callback with NIN_BALLOONUSERCLICK (assumed) (assumed)
 L251-257 The second click of a double click can arrive as WM_LBUTTONDBLCLK, not as a press (assumed) (assumed)
 L259-265 The mouse capture follows the state of the pointer, not the mouse message that ends a drag (assumed) (assumed)
+L267-272 OpenClipboard with no window does not keep another process out (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)
@@ -288,7 +289,7 @@ L390-396 A flow ID with a space on the command line of a child process (verified
 L398-404 One timer for many jobs: SetTimer with the same function moves the run (verified)
 ```
 
-## doc/howto/syntax-and-language.md (46.7 KB, 459 lines)
+## doc/howto/syntax-and-language.md (47.3 KB, 466 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -347,6 +348,7 @@ L431-437 An Array has no Sort method, and a function returns one value (verified
 L439-445 Names are case-insensitive: a global `W` makes every local `w` of the included files a warning (verified) (verified)
 L447-452 A one-line `if (...) continue` is flagged by the editor's analyzer (partly verified)
 L454-459 A function and a local with the same name: the `Op` helper of a test (verified)
+L461-466 `<` and `>` on two strings that are not numbers throw "Expected a Number" (verified) (verified)
 ```
 
 ## doc/howto/tests-and-tools.md (49.2 KB, 482 lines)

@@ -457,3 +457,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Name the local `item`; the warning is a check that the function is not hidden. The same rule as before: a local must not share a name with a function or class of the script.
 - **Status:** verified (warning seen in the run of `tests/ahk/core_flow_patch.test.ahk`, gone after the rename)
 - **Source:** `tests/ahk/core_flow_patch.test.ahk`
+
+### `<` and `>` on two strings that are not numbers throw "Expected a Number" (verified)
+
+- **Problem:** A `while` loop sorted the IDs of a flow with `>` on two keys such as `element0000000002`. The test failed with `TypeError: Expected a Number but got a String`.
+- **Wrong:** `while (j >= 1 && KeyOf(sorted[j]) > KeyOf(value))` on text that does not look like a number.
+- **Right:** `StrCompare(a, b, "Off") > 0` (case-sensitive compare of texts), or `a < b` only for numbers.
+- **Status:** verified (`src/editor/ElementClipboard.ahk`, `tests/ahk/editor_clipboard.test.ahk`)

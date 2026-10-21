@@ -263,3 +263,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** One sync after every call of the pointer (press, move, release, key): take the capture when the pointer holds the mouse and the window has none, release it when the pointer does not hold it and the window has one (`EditorWindow._Sync`, with a flag `captured`).
 - **Status:** assumed (read from the code and the headless tests of the pointer; the capture itself is not visible to the unit tests; the owner's gui check of the editor window would show it)
 - **Source:** `src/editor/EditorWindow.ahk` (`_Sync`), `src/editor/EditorPointer.ahk`
+
+### OpenClipboard with no window does not keep another process out (verified)
+
+- **Problem:** The editor opened the clipboard with `OpenClipboard(0)`. A test that held the clipboard open in another process saw the copy go through, so "clipboard busy" never showed.
+- **Wrong:** `DllCall("user32\OpenClipboard", "ptr", 0, "int")`: with no window the lock is not kept against another process (the second `OpenClipboard(0)` in a child process succeeded while the first one held it).
+- **Right:** Open with a window of the own process as owner: a hidden `Static` control made once (`CreateWindowExW`, `WinClipboard.Owner`). A second process then gets 0 from its `OpenClipboard`. The test holds the clipboard with its own hidden window the same way.
+- **Status:** verified (probe in Python with `ctypes` and two processes; `tests/e2e/test_editor_clipboard.py::test_a_busy_clipboard_is_said_in_the_status_bar_and_nothing_is_lost`)
