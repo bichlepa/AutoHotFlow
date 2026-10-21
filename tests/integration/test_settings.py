@@ -283,8 +283,19 @@ def test_the_global_limit_of_running_instances_refuses_a_start(flows):
     flows.request_ok("engine", "cmd.flow.start", {"flowId": flow_id})
 
 
+def wait_roles_ready(runner, names, timeout=WAIT_S):
+    """Waits until every role in names has said sys.hello (state ready in cmd.process.list). Start returns once the
+    engine is loaded; a role that starts later is no peer for the hub until it is connected, so asking it earlier
+    answers "no peer" (F-0177: the tray connected about 2 s after its start under load)."""
+    def ready():
+        states = {p["name"]: p["state"] for p in runner.request_ok("supervisor", "cmd.process.list", {})["processes"]}
+        return all(states.get(n) == "ready" for n in names)
+    assert wait_for(ready, timeout), "roles not ready: %s" % sorted(names)
+
+
 def test_the_log_thresholds_change_in_every_role_at_once(shown):
     shown.start(extra=("--headless",))
+    wait_roles_ready(shown, ("storage", "engine", "tray"))
     for name in ("storage", "engine", "tray"):
         assert snapshot(shown, name)["log"]["levels"] == [2, 2, 2], name
     put(shown, logLevelApp=0, workers=5)             # the pool logs "size 8 -> 5" at a1: below the new threshold
