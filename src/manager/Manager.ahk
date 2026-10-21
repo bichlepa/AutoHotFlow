@@ -48,6 +48,7 @@ class Manager extends Role {
         this.On("evt.", (msg) => this._OnEvent(msg))
         this.On("cmd.app.prepareExit", (msg) => this._OnPrepareExit(msg))
         this.On("cmd.manager.show", (msg) => this._OnShow(msg))
+        this.On("cmd.manager.showLog", (msg) => this._OnShowLog(msg))
         this.FollowSettings()      ; log thresholds and language (WI-0077)
         if (this.headless) {
             this.model.TraceOn()
@@ -182,6 +183,16 @@ class Manager extends Role {
         this.model.Note("manager.show", Map("headless", this.headless ? 1 : 0))
         if (IsObject(this.view))
             this.view.Raise()
+        return Map("ok", true)
+    }
+
+    ; cmd.manager.showLog {flowId} (WI-0109, PROTOCOL 4.8): from the supervisor only (the Show log button of the flow settings
+    ; asks it through the supervisor). Opens the log window with the filter of the flow and shows it. The flow ID is not checked
+    ; here (ManagerModel.OpenLog sets the filter as given): an unknown one shows no entries.
+    _OnShowLog(msg) {
+        if (msg.from != "supervisor")
+            throw AhfError(msg.type " is reserved for the supervisor, not for '" msg.from "'", ErrCode.DENIED)
+        this.OpenLog(msg.payload.Get("flowId", ""))
         return Map("ok", true)
     }
 }

@@ -244,6 +244,7 @@ class Supervisor {
         h.On("cmd.diag.snapshot", (msg) => Map("snapshot", this.Snapshot()))
         h.On("cmd.process.", (msg) => this._OnProcess(msg))
         h.On("cmd.editor.", (msg) => this._OnEditor(msg))
+        h.On("cmd.manager.showLog", (msg) => this._OnManagerLog(msg))
         h.On("cmd.diag.report", (msg) => this._OnReport(msg))
         h.On("evt.diag.error", (msg) => this._OnDiagError(msg))
         h.On("evt.settings.changed", (msg) => this._OnSettings(msg))
@@ -451,6 +452,36 @@ class Supervisor {
         started := this.children.OpenEditor(flowId)
         Log.Write("a1", "supervisor", "editor of '" flowId "' " (started ? "started" : "is running, asked to show itself"))
         return Map("started", Json.Bool(started))
+    }
+
+    ; cmd.manager.showLog {flowId} (WI-0109, PROTOCOL 4.11): the Show log button of the flow settings asks for the log window of
+    ; the manager, filtered to the flow. The manager is asked (cmd.manager.showLog, 4.8) and answers when its window is shown;
+    ; the editor's answer waits for it (Deferred). A manager that is not running is started instead: the answer then says so,
+    ; and the filter is not applied (PROTOCOL 4.11).
+    _OnManagerLog(msg) {
+        if (Role.BaseName(msg.from) != "editor")         ; the link name is editor:<flowId>
+            throw AhfError(msg.type " is reserved for the editor, not for '" msg.from "'", ErrCode.DENIED)
+        flowId := msg.payload.Get("flowId", "")
+        if (!Children.FlowIdOk(flowId))
+            throw AhfError("payload field 'flowId' must be a flow ID that a command line can carry", ErrCode.BAD_PAYLOAD)
+        if (this.children.shuttingDown)
+            throw AhfError("the supervisor is shutting down", ErrCode.SHUTTING_DOWN)
+        if (this.hub.HasLink("manager")) {
+            this.hub.Request("manager", "cmd.manager.showLog", Map("flowId", flowId)
+                , (ans) => this._OnLogAnswer(msg, ans), 3000)
+            return Deferred.Marker()
+        }
+        started := this.children.Open("manager")
+        Log.Write("a1", "supervisor", "log of '" flowId "': the manager was not running, " (started ? "started" : "starting"))
+        return Map("ok", true, "started", Json.True)
+    }
+
+    _OnLogAnswer(msg, ans) {
+        shown := (IsObject(ans) && ans.payload.Get("ok", false)) ? true : false
+        if (!shown)
+            Log.Write("a0", "supervisor", "log of a flow: the manager did not show it")
+        this.hub.Reply(msg, shown ? Map("ok", true, "started", Json.False)
+            : Map("ok", false, "message", "the manager did not show the log"))
     }
 
     static _RequireEngine(msg) {

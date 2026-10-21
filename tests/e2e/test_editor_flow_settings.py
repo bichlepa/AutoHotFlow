@@ -11,8 +11,8 @@ Deterministic: a test waits for a condition of the editor or of the engine (wait
 import test_editor_select as sel
 from support.timing import scaled
 from test_manager import FLOW, wait_until
-from test_manager_editor import finish
-from test_editor import editor_state
+from test_manager_editor import finish, op, start_manager, state as manager_state
+from test_editor import editor_state, open_editor
 from test_editor_draft import engine_definition, settled, step
 
 EDITOR = "editor:" + FLOW
@@ -123,6 +123,21 @@ def test_the_state_says_whether_the_flow_is_migrated(procs, datadir, session_id)
         assert dialog(obs, "open")["ok"]
         st = dialog_state(obs)
         assert st["migrated"] is ("strictTypes" not in flow_settings(obs)), (st, flow_settings(obs))
+        assert dialog(obs, "cancel")["ok"]
+    finally:
+        finish(sup, obs)
+
+
+def test_show_log_asks_the_supervisor_and_the_manager_opens_its_log_for_the_flow(procs, datadir, session_id):
+    sup, obs = start_manager(procs, datadir, session_id)
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        assert dialog(obs, "open")["ok"]
+        assert dialog(obs, "log")["ok"]
+        assert wait_until(lambda: manager_state(obs)["log"]["open"] is True
+                          and manager_state(obs)["log"]["flowId"] == FLOW, scaled(10)), manager_state(obs)["log"]
+        assert dialog_state(obs)["open"] is True, "the dialog stays open after Show log"
         assert dialog(obs, "cancel")["ok"]
     finally:
         finish(sup, obs)
