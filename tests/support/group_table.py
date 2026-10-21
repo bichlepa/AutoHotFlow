@@ -196,6 +196,9 @@ TEST_GROUPS = {
     "test_doc_index.py": ["docs"],
     "test_element_includes.py": ["element-units"],
     "test_help.py": ["help"],
+    "ahk/help_pages.test.ahk": ["help"],
+    "fault/test_help_role.py": ["help"],
+    "fault/test_help_window_gui.py": ["help"],
     "test_gitattributes.py": ["architecture"],
     "test_groups.py": ["architecture"],
     "test_history_tools.py": ["tools"],
@@ -485,7 +488,8 @@ SOURCE_AREAS = [
     ("ui", ["src/ui_common/*", "src/core/GuiLayout.ahk", "src/elements/base/DialogWindow.ahk",
             "src/elements/base/Dialogs.ahk"]),
     ("render", ["src/editor/render/*"]),
-    ("help", ["src/elements/Default/help/*"]),          # the help pages of the elements and their generated HTML (WI-0112)
+    ("help", ["src/elements/Default/help/*",            # the help pages of the elements and their generated HTML (WI-0112)
+              "src/help/*", "src/entry/help.ahk", "src/core/HelpPageId.ahk"]),   # the help role and its page IDs (WI-0111)
     ("element", ["src/elements/Default/Actions/*", "src/elements/Default/Conditions/*", "src/elements/Default/Loops/*",
                  "src/elements/Default/Triggers/*", "src/elements/Default/lib/*"]),
     ("elements-pkg", ["src/elements/Default/*"]),

@@ -67,6 +67,7 @@ OTHER_RULES = [
     ("tests/integration/helpers/entry/debug.ahk", ["diagnosis"]),
     ("tests/integration/helpers/entry/editor.ahk", ["editor"]),
     ("tests/integration/helpers/entry/engine.ahk", ["engine"]),
+    ("tests/integration/helpers/entry/help.ahk", ["help"]),
     ("tests/integration/helpers/entry/manager.ahk", ["manager"]),
     ("tests/integration/helpers/entry/storage.ahk", ["storage"]),
     ("tests/integration/helpers/entry/tray.ahk", ["tray"]),

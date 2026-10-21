@@ -988,6 +988,26 @@
             "problemMatcher": []
         },
         {
+            "label": "Test: help window (gui, the classic viewer shows a page in a window, then the default browser opens the index; both hold for about 12 s, do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/fault/test_help_window_gui.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Test: manager window (gui, a real window opens; the tree and the drag and drop of a flow move the mouse; do not use the PC)",
             "type": "shell",
             "command": "python",

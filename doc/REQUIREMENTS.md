@@ -708,7 +708,7 @@ An element is a class with: name, category, user level, stability (stable or exp
 ### REQ-ELM-020 Every element is documented by its help text
 
 - **v1:** yes (an HTML help page per element in `Help/en/`)
-- **v2:** partial (the 29 core elements have their page, checked by reading against the v2 elements; the other 120 pages are converted from v1 and not yet checked, S0008)
+- **v2:** partial (the 29 core elements have their page, checked by reading against the v2 elements; the other 120 pages are converted from v1 and not yet checked, S0008; the Help button of the element settings opens the page, WI-0111, the gui check is the owner's)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0007 (the core set, WI-0112, E0097), S0008 (the other elements, with their element)
@@ -1982,11 +1982,11 @@ Names, categories and parameter labels of the elements are translated by the lan
 ### REQ-LNG-040 Help pages
 
 - **v1:** yes (English only)
-- **v2:** partial (the pages are Markdown sources with generated HTML; links and the core set are checked by `tests/test_help.py`; the help window and its viewers (WI-0111, WI-0115) and the translations (S0009) are missing)
+- **v2:** partial (the pages are Markdown sources with generated HTML, checked by `tests/test_help.py`; the help window with the classic viewer and the browser, the setting `helpViewer` and the requests of the manager, the editor menu and the settings button are built and tested headless (`tests/fault/test_help_role.py`); not checked: the look of the classic viewer at 100 % and 225 %, the browser option in a window run (gui, owner); WebView2 (WI-0115) and the translations (S0009) are missing)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0007 (the window WI-0111, WebView2 WI-0115, E0098, E0099; the content WI-0112, E0097, E0100), S0009 (translations, shipping the WebView2 loader)
-- **Evidence:** `tests/test_help.py`
+- **Evidence:** `tests/test_help.py`, `tests/fault/test_help_role.py`, `tests/ahk/help_pages.test.ahk`
 
 A help window of its own (E0098) with general pages (welcome, variables, key list, color chart) and one page per element (REQ-ELM-020), opened from the manager and from the element settings. The pages are written in Markdown and shown as HTML (E0100). A setting chooses the viewer: automatic (WebView2 when it is available, otherwise the browser control of Windows), one of the two, or the default browser (E0099).
 
