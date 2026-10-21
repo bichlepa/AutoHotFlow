@@ -40,7 +40,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0107 | Editor `ctx`, "Switch with the flow" | open | | | | |
 | WI-0108 | Expressions checked while typing | done | haiku | see git log | 2026-10-21 | REQ-EDT-200 done; manual check 11 open (owner); String texts not checked (docs: no %var% in strings; owner to confirm); parser messages English |
 | WI-0109 | Flow settings dialog | done | haiku | see git log | 2026-10-21 | REQ-EDT-140 partial; gui test written for owner; F-0175 (wrong REQ reference), F-0176 (Show log starts manager without filter); `ExecutionPolicy.Decide` throws on an invalid hand-written value (start error only) |
-| WI-0110 | Assistants | open | | | | |
+| WI-0110 | Assistants | done | haiku | see git log | 2026-10-21 | M-0098; REQ-EDT-130 partial; gui test for owner; modal ChooseColorW not measured (suggest extending E0076); tracker window mode relative to the tracker itself |
 | WI-0111 | Help window: viewer interface, classic viewer, browser, setting | open | | | | E0099 |
 | WI-0112 | Help content: Markdown, generator, core pages | done | haiku | see git log | 2026-10-21 | F-0167 owner decision; 17 pages with v1 markers for S0008; markdown pinned (generated HTML compared byte for byte); `Variables.md` still says threads |
 | WI-0113 | Window of an unhandled error | done | haiku | see git log | 2026-10-21 | PROTOCOL 4.7a; owner: variable values (also passwords) kept in engine memory and shown in clear text; cyclic object cannot be stringified (not reachable via normal assignment); tray click does not open it; slow/foundation tiers via verify | | | | may run beside S0006 (not with WI-0093/WI-0094: `Executor.ahk`) |
@@ -53,7 +53,7 @@ None.
 
 ## Running agents
 
-WI-0110 (haiku, wi-110), WI-0111 (haiku, wi-111).
+WI-0111 (haiku, wi-111).
 
 ## Last verified state
 
