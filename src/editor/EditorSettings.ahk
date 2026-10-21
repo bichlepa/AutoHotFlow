@@ -2,10 +2,16 @@
 #Include ..\core\Errors.ahk
 #Include ..\core\Json.ahk
 #Include ..\core\Lang.ahk
+#Include ..\core\Log.ahk
 #Include ..\elements\base\ElementRegistry.ahk
 #Include ..\elements\base\ParamEvaluator.ahk
 #Include form\ElementForm.ahk
 #Include NewElementCatalog.ahk
+#Include assist\AssistantValues.ahk
+#Include assist\AssistantSource.ahk
+#Include assist\WindowAssistant.ahk
+#Include assist\MouseAssistant.ahk
+#Include assist\ColorAssistant.ahk
 
 ; The settings of one element in the editor (WI-0106, REQ-EDT-120, PROTOCOL 4.11): the form of the element (ElementForm,
 ; the headless model of WI-0105) is opened for an element of the flow (mode "edit") or for a class chosen for a new element
@@ -29,6 +35,8 @@ class EditorSettings {
         this.adder := ""              ; EditorAdd: Create(...) adds the new element after OK
         this.session := ""            ; Map of the open settings (see _Show), or "" when none is open
         this.checkFn := () => this._CheckTyped()   ; the one-shot timer of the syntax check (CHECK_DELAY)
+        this.assist := ""             ; the running assistant (WindowAssistant or MouseAssistant), "" when none (WI-0110)
+        this.assistSource := AssistantSource()   ; the window, mouse and pixel source; the tests replace it
     }
 
     ; The syntax check of the expressions runs this many ms after the last change of a value (WI-0108): a check at every
@@ -159,6 +167,7 @@ class EditorSettings {
 
     _Close(answer) {
         SetTimer(this.checkFn, 0)
+        this._EndAssistant()
         this.session := ""
         if (IsObject(this.window))
             this.window.Hide()
@@ -225,6 +234,72 @@ class EditorSettings {
         s["cls"] := cls
         this._Sync()
         return true
+    }
+
+    ; Starts the assistant of a Button field (WI-0110): "window" (the window under the mouse), "mouse" (the mouse tracker) or
+    ; "color" (the colour dialog). The values that the assistant takes go into the form when it ends (_AssistDone), by the
+    ; map of the field. One assistant at a time, and only while the settings are open. The settings window is disabled
+    ; meanwhile. False when nothing starts (no settings open, an assistant runs, an unknown kind, a failed start).
+    StartAssistant(field) {
+        if (!this._Editable() || IsObject(this.assist))
+            return false
+        kind := field.assistant
+        if (!AssistantValues.IsKnown(kind)) {
+            Log.Write("a0", "editor", "assistant: unknown kind '" kind "'")
+            return false
+        }
+        form := this.session["form"]
+        mapping := field.assistMap
+        initial := Map()
+        for key, id in mapping {
+            if (form.Has(id))
+                initial[key] := form.GetValue(id)
+        }
+        owner := IsObject(this.window) ? this.window.owner : 0
+        show := IsObject(this.window) ? this.window.showWindows : false
+        done := (values) => this._AssistDone(mapping, values)
+        if (kind = "color") {
+            current := initial.Get("color", "")
+            picked := ColorAssistant.Pick.Call(IsObject(current) ? "" : String(current), owner)
+            if (picked != "")
+                this._AssistDone(mapping, Map("color", picked))
+            return true
+        }
+        assist := (kind = "window") ? WindowAssistant(this.assistSource, done)
+            : MouseAssistant(this.assistSource, mapping, initial, done)
+        this.assist := assist
+        try {
+            assist.Open(show)
+        } catch as e {
+            this.assist := ""
+            assist.Close()
+            Log.Write("a0", "editor", "assistant '" kind "' does not open: " e.Message)
+            return false
+        }
+        if (IsObject(this.window))
+            this.window.AssistantBusy(true)
+        return true
+    }
+
+    ; The end of an assistant: its values go into the form (by the map; ids the form lacks are skipped), then the checks run.
+    _AssistDone(mapping, values) {
+        this._EndAssistant()
+        if (!this._Editable() || values.Count = 0)
+            return
+        for id, value in AssistantValues.ToIds(values, mapping) {
+            if (this.session["form"].Has(id))
+                this.SetValue(id, value)
+        }
+    }
+
+    ; Closes the running assistant (its window and timer) and enables the settings window again. Idempotent.
+    _EndAssistant() {
+        a := this.assist
+        this.assist := ""
+        if (IsObject(a))
+            a.Close()
+        if (IsObject(this.window))
+            this.window.AssistantBusy(false)
     }
 
     ; The fields of an element.update that changes the class: the class, its package and version, the name and the standard

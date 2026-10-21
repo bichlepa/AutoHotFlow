@@ -7,6 +7,7 @@
 #Include ..\ui_common\UiFileDialogs.ahk
 #Include form\FormChecks.ahk
 #Include NewElementCatalog.ahk
+#Include assist\AssistantValues.ahk
 
 ; The settings window of an element (WI-0106, REQ-EDT-120, PROTOCOL 4.11): a Gui drawn from the form model (ElementForm, the
 ; headless model of WI-0105) that EditorSettings holds. The window shows the fields in order, in a scroll area; OK, Cancel
@@ -16,8 +17,8 @@
 ;
 ; The window is not modal and does not block: it opens and returns at once, and the events call the controller. Layout at
 ; 100 % (96 dpi) through GuiLayout (DPI and the font). Content longer than the screen scrolls with the slider at the right
-; edge and the mouse wheel. Help is disabled until the help window (WI-0111). A button of an element (for example the
-; import of a window, WI-0110) is shown disabled until its assistant exists.
+; edge and the mouse wheel. Help is disabled until the help window (WI-0111). A button of an element is enabled when its
+; assistant is one of AssistantValues.KINDS (WI-0110), else it stays disabled; while an assistant runs the window is disabled.
 class ElementSettingsWindow {
     static WIDTH := 480
     static MARGIN := 12
@@ -275,8 +276,11 @@ class ElementSettingsWindow {
                 e["ctls"].Push(e["ed"])
                 y += ElementSettingsWindow.EDIT_H + ElementSettingsWindow.ROW
             case "button":
-                e["ed"] := this.gui.AddButton("Disabled", field.label)
+                known := AssistantValues.IsKnown(field.assistant)       ; an assistant (WI-0110); without one: disabled
+                e["ed"] := this.gui.AddButton(known ? "" : "Disabled", field.label)
                 this._Put(e["ed"], m, y, cw, ElementSettingsWindow.EDIT_H)
+                if (known)
+                    e["ed"].OnEvent("Click", (*) => this._Assist(field))
                 e["ctls"].Push(e["ed"])
                 y += ElementSettingsWindow.EDIT_H + ElementSettingsWindow.ROW
             case "file", "folder":
@@ -497,6 +501,19 @@ class ElementSettingsWindow {
             this._Set(id, path)
     }
 
+    ; A button of an element with an assistant (WI-0110): the assistant starts; it answers through the controller.
+    _Assist(field) {
+        if (IsObject(this.controller))
+            this.controller.StartAssistant(field)
+    }
+
+    ; Disables the window while an assistant runs (v1 disabled the settings window too) and enables it again. The
+    ; assistant has the mouse and the keys then.
+    AssistantBusy(flag) {
+        if (this.open && IsObject(this.gui))
+            this.gui.Opt(flag ? "+Disabled" : "-Disabled")
+    }
+
     _Ok() {
         this.controller.Ok()
     }
@@ -524,8 +541,9 @@ class ElementSettingsWindow {
     _SyncEntry(form, e) {
         field := e["field"]
         id := e["id"]
+        enabled := field.isEnabled && (e["kind"] != "button" || AssistantValues.IsKnown(field.assistant))
         for ctl in e["ctls"]
-            ctl.Enabled := field.isEnabled ? true : false
+            ctl.Enabled := enabled ? true : false
         if (e["warn"] is Object)
             e["warn"].Text := ElementSettingsWindow._Texts(form.FieldWarnings(field))
         if (e["mig"] is Object)
