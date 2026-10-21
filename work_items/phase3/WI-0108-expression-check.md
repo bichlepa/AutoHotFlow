@@ -33,7 +33,7 @@ Written by the acceptance of S0006 (WI-0104, E0095). The project owner decides w
 
 ## Result (implementer, 2026-10-21)
 
-Done: tasks 1 to 4. Commits on `wip/wi-108`: `c8ca2f33` (form model: `FormExpressions`, `ElementForm.CheckExpressions`, texts, model tests), `34fa2efc` (timer in `EditorSettings`, warning line in the window, e2e test, REQ-EDT-200 `done`, PROTOCOL 4.11, ELEMENT-API-V2 3.1), `2841aa39` (manual check 11), `5762fe26` (HOW-TO: one-shot timer restarts its delay).
+Done: tasks 1 to 4. Commits on `wip/wi-108`: `55781642` (window test; fix of the defaults of an id Array), `c8ca2f33` (form model: `FormExpressions`, `ElementForm.CheckExpressions`, texts, model tests), `34fa2efc` (timer in `EditorSettings`, warning line in the window, e2e test, REQ-EDT-200 `done`, PROTOCOL 4.11, ELEMENT-API-V2 3.1), `2841aa39` (manual check 11), `5762fe26` (HOW-TO: one-shot timer restarts its delay).
 
 **Decisions taken by the implementer** (the owner may change them):
 
@@ -51,6 +51,8 @@ Done: tasks 1 to 4. Commits on `wip/wi-108`: `c8ca2f33` (form model: `FormExpres
 
 **Tests** (commit = the state of the run):
 
+- **Outside the task, fixed:** `NewElementCatalog.Defaults` used an id Array as a key (a parameter with several ids, such as `Action_TestExprParams`): opening a new element of such a class failed with a type error. Fixed in `55781642` with a test (`tests/ahk/editor_settings_window.test.ahk`, `MultiIdDefaults`).
+- `tests/ahk/editor_settings_window.test.ahk`: 14 passed incl. the window's syntax warning line `WindowShowsSyntaxWarning` (run 20261021-195029-20628, the content of `55781642`).
 - `tests/ahk/editor_form_expr.test.ahk` (new, group `editor-form`): 12 cases and the file-completion test, 13 passed (run 20261021-194229-19656, the content of `c8ca2f33`).
 - `tests/test_groups.py`: 47 passed (run 20261021-194236-21300).
 - `tests/test_ahk_runner.py -k editor`: 223 passed (run 20261021-194434-5716, at `34fa2efc`).
