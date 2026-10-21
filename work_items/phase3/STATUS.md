@@ -32,7 +32,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0099 | Editor: add elements, class list | done | haiku | see git log | 2026-10-21 | M-0091; open: dialog title "Create new <kind>" not a language key; Advanced level no e2e; tree dialog and real mouse are gui-only |
 | WI-0100 | Editor: connect | done | haiku | see git log | 2026-10-21 | M-0092; REQ-EDT-070 partial (gui unwritten); author used --no-verify once (CRLF index sizes, see report); FlowPatch.Diff fix; moved connection not previewed |
 | WI-0101 | Editor: delete, cut, copy, paste | done | haiku | see git log | 2026-10-21 | E0091; M-0093; REQ-EDT-080 partial; F-0168 (cold-start flake); clipboard limit 16 MB parsed on message path (consider 1-2 MB); ko/ru keys missing |
-| WI-0102 | Editor: menu bar, context menus, trigger buttons | open | | | | |
+| WI-0102 | Editor: menu bar, context menus, trigger buttons | done | haiku | see git log | 2026-10-21 | M-0094; gui test written, owner runs it; menu callbacks without own try/catch (cheap in WI-0104); trigger switch without the force question; ko/ru keys missing |
 | WI-0103 | Notice of a crashed editor | done | haiku | 5fe3f431..f7a7dad1 | 2026-10-21 | balloon shows the flow ID; real click not checked |
 | WI-0104 | Acceptance S0006 | open | | | | manual check 10; refines S0007 |
 | WI-0105 | Form model and the `form` API | done | haiku | a7e46ddd..6e5558d2 (rebased) | 2026-10-21 | WI-0106 must re-render after SetChoices/SetLabel and include ElementForm in the editor entry; v1 percent-sign note for WI-0108 |
@@ -53,7 +53,7 @@ None.
 
 ## Running agents
 
-WI-0102 (haiku, workspace wi-102).
+None.
 
 ## Last verified state
 
