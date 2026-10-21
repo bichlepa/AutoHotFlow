@@ -31,29 +31,30 @@ L408-419 9. Performance budgets (targets, measured in Phase 2)
 L421-431 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (169.1 KB, 728 lines)
+## doc/PROTOCOL.md (172.9 KB, 738 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-701 4. Message Catalog
+L95-711 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
 L165-173   4.1c Unhandled errors (`evt.diag.error`, WI-0023)
-L175-243   4.2 Engine commands (clients → `engine`)
-L245-294   4.3 Engine events (`evt.*`, engine → topics)
-L296-329   4.4 Engine ↔ trigger host
-L331-396   4.5 Engine ↔ worker
-L398-470   4.6 Engine ↔ storage and log
-L472-491   4.7 Dialogs
-L493-528   4.8 Manager (WI-0073, `src/manager/`)
-L530-592   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
-L594-613   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L615-701   4.11 Role `editor` (WI-0088, `src/editor/`)
-L703-722 5. Connection setup, reconnection, resync
-L713-722   5a Events before subscription (design question, WI-0007)
-L724-728 6. Versioning and extension
+L175-244   4.2 Engine commands (clients → `engine`)
+L246-295   4.3 Engine events (`evt.*`, engine → topics)
+L297-330   4.4 Engine ↔ trigger host
+L332-397   4.5 Engine ↔ worker
+L399-471   4.6 Engine ↔ storage and log
+L473-492   4.7 Dialogs
+L494-500   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2, E0072)
+L502-538   4.8 Manager (WI-0073, `src/manager/`)
+L540-602   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
+L604-623   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
+L625-711   4.11 Role `editor` (WI-0088, `src/editor/`)
+L713-732 5. Connection setup, reconnection, resync
+L723-732   5a Events before subscription (design question, WI-0007)
+L734-738 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (55.3 KB, 338 lines)
@@ -168,7 +169,7 @@ L47-52 A drag keeps the static layer when the key leaves the dragged items out (
 L54-59 A drag of 30 elements draws live at 25 ms per frame (partly verified)
 ```
 
-## doc/howto/error-handling.md (3.8 KB, 49 lines)
+## doc/howto/error-handling.md (5.7 KB, 65 lines)
 ```text
 L5-9 A script without a summary line ends with exit code 0 (verified)
 L12-17 A callback that throws does not abort the state machine (verified)
@@ -176,6 +177,8 @@ L20-25 `OnError` handler: return 1 keeps the process alive (verified)
 L28-34 Console output is best effort and must not block shutdown (verified)
 L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
+L51-57 A copy of the variables of an error must be taken where the error is caught, and it must be text (verified)
+L59-65 A repeated error of the same flow within 10 s sends no notice at once (verified)
 ```
 
 ## doc/howto/gui-and-hotkeys.md (37.3 KB, 280 lines)
