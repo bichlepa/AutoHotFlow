@@ -39,7 +39,11 @@ class FormExpressions {
             return ""
         if (StrLen(text) > FormExpressions.MAX_CHARS)
             return Lang("Too long to check while typing: at most %1% characters", FormExpressions.MAX_CHARS)
-        errors := Expr.Parse(text, kind, false)["errors"]
+        try {
+            errors := Expr.Parse(text, kind, false)["errors"]
+        } catch as e {
+            return ""                    ; the parser never throws because of a text; a failure here must not reach the timer
+        }
         if (errors.Length = 0)
             return ""
         first := errors[1]
