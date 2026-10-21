@@ -309,3 +309,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** One function object for the whole window and one call per change: `SetTimer(fn, -300)`. A call before the first run restarts the delay, so the function runs once, 300 ms after the last call. `SetTimer(fn, 0)` cancels it, also when no timer is set. Cancel it when the window closes.
 - **Status:** verified: a scratch script set the timer at 0, 200 and 400 ms: it ran once, at 718 ms; a timer set and cancelled at once did not run. The window uses it in `src/editor/EditorSettings.ahk` (`_Typed`, `_Close`); the test `tests/e2e/test_editor_settings.py::test_a_syntax_error_of_an_expression_is_shown_after_typing_stops_and_goes_when_fixed` waits for the warning.
 - **Source:** `src/editor/EditorSettings.ahk`
+### A drop-down list of a Gui is AddDDL, not AddDropDown (verified)
+
+- **Problem:** A window that used `AddDropDown` failed at its first build with "This value of type \"Gui\" has no method named AddDropDown".
+- **Wrong:** `g.AddDropDown("AltSubmit", items)`
+- **Right:** `g.AddDDL("AltSubmit", items)` (a list that the user types in is `AddComboBox`). With `AltSubmit`, `box.Value` is the index of the item.
+- **Status:** verified (tests/ahk/editor_flow_settings_window.test.ahk builds the window without showing it)
+- **Source:** src/editor/form/FlowSettingsWindow.ahk (WI-0109)

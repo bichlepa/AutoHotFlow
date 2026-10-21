@@ -95,10 +95,10 @@ Each start of a flow creates an **instance**: one run of the flow, with its own 
 ### REQ-EXE-050 Execution policy per flow
 
 - **v1:** partial (`wait` behaves like `parallel`, MIGRATION M-0011)
-- **v2:** partial (the four policies work; `default` follows the global setting, which takes effect at once and is set in the settings dialog (WI-0078); the setting per flow comes with S0007)
+- **v2:** partial (the four policies work; `default` follows the global setting, which takes effect at once and is set in the settings dialog (WI-0078); the policy of a flow is set in the flow settings dialog (WI-0109) and read at each start; the dialog's window is the owner's gui check)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0004 (global setting, WI-0077, done)
+- **Plan:** S0004 (global setting, WI-0077, done), S0007 (flow settings dialog, WI-0109)
 - **Evidence:** `tests/integration/test_engine.py` (the `*_policy_*` tests), `tests/ahk/engine_wait.test.ahk`, `tests/integration/test_settings.py::test_the_global_execution_policy_decides_for_flows_set_to_default`
 
 A flow decides what happens when it is triggered while an instance of it is still running:
@@ -194,11 +194,11 @@ The action `Execute_Flow` starts a flow (this one or another) through its defaul
 ### REQ-EXE-130 Working directory of a flow
 
 - **v1:** yes
-- **v2:** partial (`A_WorkingDir` and the file parameters use the global setting `workingDir` at once; the own folder of a flow is kept from the flow file, its editing comes with S0007)
+- **v2:** partial (`A_WorkingDir` and the file parameters use the global setting `workingDir` at once; the own folder of a flow is set in the flow settings dialog (WI-0109, read when an instance or a trigger starts); the dialog's window is the owner's gui check)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (global, WI-0077, done), S0007 (flow settings, WI-0109)
-- **Evidence:** `tests/ahk/vars_model.test.ahk`, `tests/integration/test_settings.py::test_the_global_working_directory_is_a_working_directory_of_flows_at_once`
+- **Evidence:** `tests/ahk/vars_model.test.ahk`, `tests/integration/test_settings.py::test_the_global_working_directory_is_a_working_directory_of_flows_at_once`, `tests/e2e/test_editor_flow_settings.py::test_ok_sends_the_changed_keys_as_one_patch_and_one_undo_step`, `tests/ahk/editor_flow_settings.test.ahk`
 
 Relative paths in file and folder parameters refer to the working directory. Each flow uses the global working directory (default `A_MyDocuments "\AutoHotFlow"`, the same as in v1, so imported flows find their files) or its own (flow setting). Decision E0028.
 
@@ -238,11 +238,11 @@ Every element that can wait (REQ-EXE-100) has a setting "maximum run time". The 
 ### REQ-EXE-170 Runaway flows are stopped
 
 - **v1:** no
-- **v2:** partial (the three limits work per flow with the defaults from MS-0036, set in the flow file; the notice (tray and manager list, WI-0075) is there; the global defaults and the global switch of the notice are settings and take effect at once (WI-0077); their dialog is there (WI-0078); the editing per flow (S0007) is missing)
+- **v2:** partial (the three limits work per flow with the defaults from MS-0036, set in the flow file; the notice (tray and manager list, WI-0075) is there; the global defaults and the global switch of the notice are settings and take effect at once (WI-0077); their dialog is there (WI-0078); the limits of a flow are set in the flow settings dialog (WI-0109, headless; the owner's gui check is open))
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0003 (WI-0066, done), S0004 (global defaults, WI-0077, done; the notice, WI-0075, done), S0007 (per flow, editing, WI-0109)
-- **Evidence:** `tests/ahk/engine_runaway.test.ahk`, `tests/integration/test_settings.py::test_the_global_runaway_limit_stops_a_flow_without_its_own_limit`, `tests/integration/test_settings.py::test_a_limit_of_the_flow_wins_over_the_global_one`, `tests/integration/test_settings.py::test_the_global_limit_of_running_instances_refuses_a_start`, `tests/integration/test_settings.py::test_the_switch_for_notices_of_unhandled_errors`, `tests/integration/test_notices.py::test_a_stop_by_the_runaway_guard_gives_a_notice_with_the_limit`, `tests/integration/test_runaway.py::test_an_endless_loop_is_stopped_and_its_triggers_stay_disabled_after_a_restart`, `tests/integration/test_runaway.py::test_a_flood_of_refused_starts_is_answered_and_logged_a_few_times`
+- **Evidence:** `tests/ahk/engine_runaway.test.ahk`, `tests/e2e/test_editor_flow_settings.py::test_an_invalid_limit_keeps_the_dialog_open_and_sends_nothing`, `tests/integration/test_settings.py::test_the_global_runaway_limit_stops_a_flow_without_its_own_limit`, `tests/integration/test_settings.py::test_a_limit_of_the_flow_wins_over_the_global_one`, `tests/integration/test_settings.py::test_the_global_limit_of_running_instances_refuses_a_start`, `tests/integration/test_settings.py::test_the_switch_for_notices_of_unhandled_errors`, `tests/integration/test_notices.py::test_a_stop_by_the_runaway_guard_gives_a_notice_with_the_limit`, `tests/integration/test_runaway.py::test_an_endless_loop_is_stopped_and_its_triggers_stay_disabled_after_a_restart`, `tests/integration/test_runaway.py::test_a_flood_of_refused_starts_is_answered_and_logged_a_few_times`
 
 A flow that runs away does not disturb the others (decision E0062, after the model of the Android app AutoMagic). A flow that executes more elements per minute than its limit (the trigger of each new instance counts) is stopped and all its triggers are disabled, also those that do not switch with the flow; the user is told. A start that would exceed the limit of waiting instances (policy `wait`) or of running instances of a flow is refused like the policy `skip`; a flow that calls it learns this (`exception`). The limits have global defaults and can be changed per flow; 0 means no limit. The defaults are chosen so that a loop over a long list passes.
 
@@ -366,11 +366,11 @@ Each parameter is evaluated by its content type: `String` (with `%var%`), `RawSt
 ### REQ-VAR-100 Type errors: compatible or strict per flow
 
 - **v1:** no (only the lenient behaviour)
-- **v2:** done (both modes work; the engine counts the warnings per element, WI-0086; the editor shows them at the element, WI-0089)
+- **v2:** done (both modes work; the engine counts the warnings per element, WI-0086; the editor shows them at the element, WI-0089; the mode of a flow is set in the flow settings dialog, WI-0109, with a warning when a migrated flow is switched to strict)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0005 (display of the warnings, WI-0086, WI-0089)
-- **Evidence:** `tests/ahk/element_evalparams.test.ahk` (strict mode case), `tests/integration/test_engine_runstate.py::test_strict_mode_gives_an_exception_and_no_warning`
+- **Plan:** S0005 (display of the warnings, WI-0086, WI-0089), S0007 (the mode in the dialog, WI-0109)
+- **Evidence:** `tests/ahk/element_evalparams.test.ahk` (strict mode case), `tests/integration/test_engine_runstate.py::test_strict_mode_gives_an_exception_and_no_warning`, `tests/ahk/editor_flow_settings.test.ahk`, `tests/e2e/test_editor_flow_settings.py::test_the_state_says_whether_the_flow_is_migrated`
 
 Each flow has the option `strictTypes` (E0034). Migrated flows use the compatibility mode (a type error gives the empty text and a warning, as in v1); new flows use the strict mode (a type error ends the element with `exception`). In both modes the warnings are shown to the user in the editor.
 
@@ -1639,10 +1639,11 @@ Get window and control information by pointing at a window; choose a color or pi
 ### REQ-EDT-140 Flow settings dialog
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the entry Settings of the menu opens the dialog (WI-0109): the execution policy, the working directory with a folder dialog, the type mode with the warning for a migrated flow, the three limits, the notice switch; OK sends one patch (one undo step), Cancel sends nothing, an invalid value keeps the dialog open; the button Show log opens the log window of the manager filtered to the flow; headless, the owner's gui check and manual check are open)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0007 (WI-0109)
+- **Evidence:** `tests/e2e/test_editor_flow_settings.py`, `tests/ahk/editor_flow_settings.test.ahk`, `tests/ahk/editor_flow_settings_window.test.ahk`, `tests/integration/test_flow_settings.py`, `tests/e2e/test_editor_menus.py`
 
 Execution policy (REQ-EXE-050), working directory (REQ-EXE-130), the type mode (REQ-VAR-100), and a button that shows the log of the flow.
 
@@ -2782,11 +2783,11 @@ Every hint that is not critical (for example "take care with global variables", 
 ### REQ-USE-080 Unhandled errors of a flow are noticed
 
 - **v1:** yes (read: a window with the message that does not block; a new error replaces the window shown)
-- **v2:** partial (part 1 done in WI-0075: the notice (tray and list) and the mark of the flow until it is selected or the list is opened; part 2 done in WI-0113: the window with the variables of the branch, from the list of notices, follows a new error; the switch per flow is missing, WI-0109)
+- **v2:** partial (part 1 done in WI-0075: the notice (tray and list) and the mark of the flow until it is selected or the list is opened; part 2 done in WI-0113: the window with the variables of the branch, from the list of notices, follows a new error; the switch per flow and the global switch decide whether the notice goes out, WI-0109, the switch in the flow settings dialog)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0004 (notice and mark in the manager, WI-0075, done), S0007 (the window with the variables, WI-0113, done; the switch per flow, WI-0109), E0072
-- **Evidence:** `tests/integration/test_notices.py::test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray`, `tests/integration/test_notices.py::test_opening_the_list_of_notices_removes_the_marks_and_keeps_the_entries`, `tests/fault/test_manager_window.py::test_an_error_notice_shows_in_the_list_of_notices_opened_by_its_button`, `tests/ahk/manager_model.test.ahk`, `tests/integration/test_error_window.py::test_an_unhandled_error_keeps_the_variables_of_its_branch`, `tests/integration/test_error_window.py::test_the_copy_is_bounded_to_200_variables_and_the_long_values_are_cut`, `tests/integration/test_error_window.py::test_a_deleted_flow_keeps_no_error_and_an_unknown_error_is_not_found`, `tests/integration/test_error_window.py::test_the_manager_asks_for_the_variables_of_a_notice_and_follows_a_new_error`, `tests/ahk/engine_error_snapshot.test.ahk`
+- **Evidence:** `tests/integration/test_flow_settings.py`, `tests/ahk/engine_flow_notify.test.ahk`, `tests/integration/test_notices.py::test_an_unhandled_exception_gives_one_notice_marks_the_flow_and_reaches_the_tray`, `tests/integration/test_notices.py::test_opening_the_list_of_notices_removes_the_marks_and_keeps_the_entries`, `tests/fault/test_manager_window.py::test_an_error_notice_shows_in_the_list_of_notices_opened_by_its_button`, `tests/ahk/manager_model.test.ahk`, `tests/integration/test_error_window.py::test_an_unhandled_error_keeps_the_variables_of_its_branch`, `tests/integration/test_error_window.py::test_the_copy_is_bounded_to_200_variables_and_the_long_values_are_cut`, `tests/integration/test_error_window.py::test_a_deleted_flow_keeps_no_error_and_an_unknown_error_is_not_found`, `tests/integration/test_error_window.py::test_the_manager_asks_for_the_variables_of_a_notice_and_follows_a_new_error`, `tests/ahk/engine_error_snapshot.test.ahk`
 
 When a branch of a flow ends with an unhandled `exception` (REQ-EXE-090), the user learns it without reading the log: a window like the debug dialog (REQ-DBG-060) shows the error message, the element and the variables of the branch at the moment of the error. Unlike the debug dialog it does not halt anything, because the branch has already ended; the variables can be looked at, not changed. The flow also gets a mark in the manager until the user has looked at the error. Many errors in a short time give one notice. The notice can be switched off per flow and globally (REQ-USE-070).
 

@@ -14,7 +14,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 7 | 15 | 0 | 0 |
 | [Triggers (TRG)](#triggers-trg) | 14 | 1 | 0 | 7 | 6 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 15 | 2 | 0 | 8 | 5 | 0 | 0 |
-| [Editor (EDT)](#editor-edt) | 23 | 6 | 0 | 9 | 8 | 0 | 0 |
+| [Editor (EDT)](#editor-edt) | 23 | 5 | 0 | 10 | 8 | 0 | 0 |
 | [Settings (SET)](#settings-set) | 8 | 4 | 0 | 3 | 1 | 0 | 0 |
 | [Import and migration (MIG)](#import-and-migration-mig) | 8 | 5 | 0 | 2 | 1 | 0 | 0 |
 | [Languages and help (LNG)](#languages-and-help-lng) | 5 | 1 | 0 | 3 | 1 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 5 | 4 | 0 | 0 | 1 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 2 | 0 | 4 | 4 | 0 | 0 |
-| **All** | **221** | **75** | **1** | **65** | **79** | **1** | **5** |
+| **All** | **221** | **74** | **1** | **66** | **79** | **1** | **5** |
 
 ## Flows and execution (EXE)
 
@@ -38,7 +38,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-EXE-020](REQUIREMENTS.md#req-exe-020-connection-types-and-parallel-branches) | L62-71 | Connection types and parallel branches | yes | done | must | port | - |
 | [REQ-EXE-030](REQUIREMENTS.md#req-exe-030-loops-with-head-tail-and-break) | L73-82 | Loops with head, tail and break | yes | done | must | port | S0002 (WI-0054) |
 | [REQ-EXE-040](REQUIREMENTS.md#req-exe-040-instances-and-parallel-branches) | L84-93 | Instances and parallel branches | yes | done | must | port | - |
-| [REQ-EXE-050](REQUIREMENTS.md#req-exe-050-execution-policy-per-flow) | L95-114 | Execution policy per flow | partial | partial | must | port | S0004 (global setting, WI-0077, done) |
+| [REQ-EXE-050](REQUIREMENTS.md#req-exe-050-execution-policy-per-flow) | L95-114 | Execution policy per flow | partial | partial | must | port | S0004 (global setting, WI-0077, done), S0007 (flow settings dialog, WI-0109) |
 | [REQ-EXE-060](REQUIREMENTS.md#req-exe-060-start-and-stop-a-flow-by-hand) | L116-125 | Start and stop a flow by hand | yes | partial | must | port | S0004 (manager), S0006 (editor, WI-0102) |
 | [REQ-EXE-070](REQUIREMENTS.md#req-exe-070-enable-and-disable-a-flow) | L127-136 | Enable and disable a flow | yes | partial | must | port | S0003 (WI-0060, WI-0062 and WI-0063 done, WI-0064 to WI-0066), S0004 (manager); the per-flow state files (E0063, WI-0068) are done |
 | [REQ-EXE-080](REQUIREMENTS.md#req-exe-080-change-a-flow-while-it-runs) | L138-147 | Change a flow while it runs | yes | done | must | port | - |
@@ -65,7 +65,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-VAR-070](REQUIREMENTS.md#req-var-070-built-in-variables) | L333-342 | Built-in variables | yes | done | must | port | - |
 | [REQ-VAR-080](REQUIREMENTS.md#req-var-080-values-of-the-trigger-reach-the-instance) | L344-353 | Values of the trigger reach the instance | yes | partial | must | port | S0003 |
 | [REQ-VAR-090](REQUIREMENTS.md#req-var-090-parameter-evaluation-by-content-type) | L355-364 | Parameter evaluation by content type | yes | done | must | port | - |
-| [REQ-VAR-100](REQUIREMENTS.md#req-var-100-type-errors-compatible-or-strict-per-flow) | L366-375 | Type errors: compatible or strict per flow | no | done | must | port | S0005 (display of the warnings, WI-0086, WI-0089) |
+| [REQ-VAR-100](REQUIREMENTS.md#req-var-100-type-errors-compatible-or-strict-per-flow) | L366-375 | Type errors: compatible or strict per flow | no | done | must | port | S0005 (display of the warnings, WI-0086, WI-0089), S0007 (the mode in the dialog, WI-0109) |
 | [REQ-VAR-110](REQUIREMENTS.md#req-var-110-waiting-elements-can-use-all-variables) | L377-386 | Waiting elements can use all variables | yes | done | must | port | - |
 | [REQ-VAR-120](REQUIREMENTS.md#req-var-120-rounding-option-for-decimal-numbers) | L388-396 | Rounding option for decimal numbers | no | open | could | later | - |
 | [REQ-VAR-130](REQUIREMENTS.md#req-var-130-hints-on-global-and-static-variables) | L398-408 | Hints on global and static variables | no | open | could | later | - |
@@ -188,13 +188,13 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-EDT-110](REQUIREMENTS.md#req-edt-110-run-stop-and-enable-from-the-editor) | L1607-1616 | Run, stop and enable from the editor | yes | partial | must | port | S0005 (run and enable from the tray menu of the editor, E0087, WI-0091), S0006 (the menu bar, WI-0102) |
 | [REQ-EDT-120](REQUIREMENTS.md#req-edt-120-element-settings-dialog) | L1618-1627 | Element settings dialog | yes | partial | must | port | S0007 (model WI-0105, window and settings WI-0106; the gui check of the window is the owner's; the class change and the help button follow) |
 | [REQ-EDT-130](REQUIREMENTS.md#req-edt-130-assistants-in-the-element-settings) | L1629-1637 | Assistants in the element settings | yes | open | should | port | S0007 (WI-0110) |
-| [REQ-EDT-140](REQUIREMENTS.md#req-edt-140-flow-settings-dialog) | L1639-1647 | Flow settings dialog | yes | open | must | port | S0007 (WI-0109) |
-| [REQ-EDT-150](REQUIREMENTS.md#req-edt-150-warnings-of-the-evaluation-are-visible-in-the-editor) | L1649-1658 | Warnings of the evaluation are visible in the editor | no | done | must | port | S0005 (counted per element by the engine, WI-0086; shown at the element, WI-0089) |
-| [REQ-EDT-160](REQUIREMENTS.md#req-edt-160-flow-check-with-warnings) | L1660-1676 | Flow check with warnings | no | open | should | later | - |
-| [REQ-EDT-170](REQUIREMENTS.md#req-edt-170-refuse-invalid-edits) | L1678-1686 | Refuse invalid edits | partial | open | could | later | - |
-| [REQ-EDT-180](REQUIREMENTS.md#req-edt-180-quick-fixes-for-warnings) | L1688-1696 | Quick fixes for warnings | no | open | could | later | - |
-| [REQ-EDT-190](REQUIREMENTS.md#req-edt-190-help-with-variables-from-the-flow-analysis) | L1698-1706 | Help with variables from the flow analysis | no | open | could | later | - |
-| [REQ-EDT-200](REQUIREMENTS.md#req-edt-200-expressions-are-checked-while-editing) | L1708-1717 | Expressions are checked while editing | no | done | should | port | S0007 (WI-0108, E0096) |
+| [REQ-EDT-140](REQUIREMENTS.md#req-edt-140-flow-settings-dialog) | L1639-1648 | Flow settings dialog | yes | partial | must | port | S0007 (WI-0109) |
+| [REQ-EDT-150](REQUIREMENTS.md#req-edt-150-warnings-of-the-evaluation-are-visible-in-the-editor) | L1650-1659 | Warnings of the evaluation are visible in the editor | no | done | must | port | S0005 (counted per element by the engine, WI-0086; shown at the element, WI-0089) |
+| [REQ-EDT-160](REQUIREMENTS.md#req-edt-160-flow-check-with-warnings) | L1661-1677 | Flow check with warnings | no | open | should | later | - |
+| [REQ-EDT-170](REQUIREMENTS.md#req-edt-170-refuse-invalid-edits) | L1679-1687 | Refuse invalid edits | partial | open | could | later | - |
+| [REQ-EDT-180](REQUIREMENTS.md#req-edt-180-quick-fixes-for-warnings) | L1689-1697 | Quick fixes for warnings | no | open | could | later | - |
+| [REQ-EDT-190](REQUIREMENTS.md#req-edt-190-help-with-variables-from-the-flow-analysis) | L1699-1707 | Help with variables from the flow analysis | no | open | could | later | - |
+| [REQ-EDT-200](REQUIREMENTS.md#req-edt-200-expressions-are-checked-while-editing) | L1709-1717 | Expressions are checked while editing | no | open | should | port | S0007 (WI-0108, E0096) |
 | [REQ-EDT-210](REQUIREMENTS.md#req-edt-210-syntax-highlighting-and-auto-completion) | L1719-1727 | Syntax highlighting and auto-completion | no | open | could | later | - |
 | [REQ-EDT-220](REQUIREMENTS.md#req-edt-220-examples-and-templates-in-the-element-settings) | L1729-1737 | Examples and templates in the element settings | no | open | could | later | - |
 | [REQ-EDT-230](REQUIREMENTS.md#req-edt-230-tray-icon-of-an-editor) | L1739-1757 | Tray icon of an editor | yes | done | should | port | S0005 (icon and menu, E0087, WI-0091) |

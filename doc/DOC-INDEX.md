@@ -31,12 +31,12 @@ L410-421 9. Performance budgets (targets, measured in Phase 2)
 L423-433 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (180.1 KB, 761 lines)
+## doc/PROTOCOL.md (180.4 KB, 762 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-734 4. Message Catalog
+L95-735 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
@@ -48,13 +48,13 @@ L345-410   4.5 Engine ↔ worker
 L412-484   4.6 Engine ↔ storage and log
 L486-505   4.7 Dialogs
 L507-513   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2, E0072)
-L515-551   4.8 Manager (WI-0073, `src/manager/`)
-L553-615   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
-L617-636   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L638-734   4.11 Role `editor` (WI-0088, `src/editor/`)
-L736-755 5. Connection setup, reconnection, resync
-L746-755   5a Events before subscription (design question, WI-0007)
-L757-761 6. Versioning and extension
+L515-552   4.8 Manager (WI-0073, `src/manager/`)
+L554-616   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
+L618-637   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
+L639-735   4.11 Role `editor` (WI-0088, `src/editor/`)
+L737-756 5. Connection setup, reconnection, resync
+L747-756   5a Events before subscription (design question, WI-0007)
+L758-762 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (55.3 KB, 338 lines)
@@ -185,7 +185,7 @@ L51-57 A copy of the variables of an error must be taken where the error is caug
 L59-65 A repeated error of the same flow within 10 s sends no notice at once (verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (39.9 KB, 303 lines)
+## doc/howto/gui-and-hotkeys.md (40.5 KB, 311 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -225,6 +225,7 @@ L274-279 A menu bar entry without a submenu takes a callback (assumed) (assumed)
 L282-288 The format of a DateTime control is set by message, the option takes no spaces (verified) (partly verified)
 L290-296 A ListBox has no Click event in AHK v2 (verified) (verified)
 L297-303 A menu state that depends on another program is read only when the menu is refreshed (verified) (verified)
+L305-311 A drop-down list of a Gui is AddDDL, not AddDropDown (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)
@@ -250,7 +251,7 @@ L145-150 Copy on write: clone a shared map before its first write, and remember 
 L152-158 A field and a method with the same name clash (case-insensitive names) (verified)
 ```
 
-## doc/howto/processes-pipes-messages.md (46.9 KB, 405 lines)
+## doc/howto/processes-pipes-messages.md (47.6 KB, 413 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L13-17 `PostMessageW` with a NULL handle reports success (verified)
@@ -298,6 +299,7 @@ L375-380 A ListView that follows a growing list keeps the row numbers of the mod
 L382-388 A child process from a queue operation (tar.exe), without waiting (partly verified)
 L390-396 A flow ID with a space on the command line of a child process (verified)
 L398-404 One timer for many jobs: SetTimer with the same function moves the run (verified)
+L407-413 The sender of a message is its link name, which carries the flow of an editor (verified) (verified)
 ```
 
 ## doc/howto/syntax-and-language.md (47.3 KB, 466 lines)
@@ -362,7 +364,7 @@ L454-459 A function and a local with the same name: the `Op` helper of a test (v
 L461-466 `<` and `>` on two strings that are not numbers throw "Expected a Number" (verified) (verified)
 ```
 
-## doc/howto/tests-and-tools.md (50.6 KB, 497 lines)
+## doc/howto/tests-and-tools.md (51.1 KB, 505 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -424,6 +426,7 @@ L468-474 `cmd.editor.open` is reserved for the manager: a gui test sends it as t
 L476-482 AHK's FileAppend fails in a missing folder, and SplitPath needs backslashes (assumed) (assumed)
 L484-489 The wire-bool rule also flags internal Maps with `"enabled", 1` (verified) (verified)
 L491-497 A pytest run started as `(... ) &` in a bash subshell stops with the tool call (verified) (verified)
+L499-505 tests/ahk/lib/Assert.ahk has no False check (verified) (verified)
 ```
 
 ## doc/REQUIREMENTS.md

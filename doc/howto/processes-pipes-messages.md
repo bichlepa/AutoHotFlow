@@ -403,3 +403,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (WI-0095, `tests/integration/test_flow_autosave.py::test_cmd_flow_save_writes_at_once_and_answers_with_the_saved_revision`)
 - **Source:** `src/engine/FlowSaver.ahk` (`_Schedule`)
 
+
+### The sender of a message is its link name, which carries the flow of an editor (verified)
+
+- **Problem:** The supervisor refused a request of an editor with "reserved for the editor, not for 'editor:skeleton'": the link name of an editor is `editor:<flowId>`, not `editor`.
+- **Wrong:** `if (msg.from != "editor") throw ...`
+- **Right:** `if (Role.BaseName(msg.from) != "editor") throw ...` (the part before the colon, as `_OnBusy` does for workers).
+- **Status:** verified (tests/e2e/test_editor_flow_settings.py, the Show log test, failed before the fix and passes after)
+- **Source:** src/supervisor/Supervisor.ahk `_OnManagerLog` (WI-0109)

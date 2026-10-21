@@ -495,3 +495,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Start the run with the tool's own `run_in_background` (the notification comes when it ends), and write its output to a file in the scratchpad (not `/tmp`). Read the file only after the notification.
 - **Status:** verified (the output file of the first run held 66 bytes; the second run with `run_in_background` wrote the whole output).
 - **Source:** WI-0104 (agent work in the workspace `wi-104`)
+
+### tests/ahk/lib/Assert.ahk has no False check (verified)
+
+- **Problem:** A unit test that called `Assert.False(...)` stopped with an error at the first case.
+- **Wrong:** `Assert.False(FlowNotify.On(def, true))`
+- **Right:** `Assert.True(!value, "message")` (the library has `Equal`, `True` and `Throws` only).
+- **Status:** verified (tests/ahk/engine_flow_notify.test.ahk, tests/ahk/editor_flow_settings.test.ahk)
+- **Source:** tests/ahk/lib/Assert.ahk (WI-0109)
