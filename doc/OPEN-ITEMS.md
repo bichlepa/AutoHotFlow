@@ -350,3 +350,8 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 **Options:** (a) let view patches skip the clearing of the stacks, and keep the live view once the first definition has arrived; (b) accept it until the automatic saving (WI-0095) makes view patches rare.
 **Status:** partly fixed in WI-0098 (not closed). (2) is fixed and tested: the view is read from the first definition only (`EditorModel._OnDefinition`; `tests/e2e/test_editor_select.py::test_a_wheel_zoom_survives_a_change_of_the_flow_by_someone_else`). (1) is changed in code (`EditorDraft._Refuse` and `_Lost` keep the undo steps when only a view patch was dropped) but not tested yet.
 
+### F-9000*: The cold-start timing test of the worker is flaky (not caused by WI-0101)
+
+**What:** `tests/fault/test_worker_lifecycle.py::test_time_to_the_first_job_when_the_worker_has_to_be_started_cold` fails now and then: the worker element never reports its `running` state event (`started` is empty). Seen on the base commit `f58bb0b2` (1 of 3 serial runs, run_suite) and on the WI-0101 commit (2 of 3 serial runs); the same run in the fast tier failed too. The editor is not involved in the test.
+**Options:** (a) find out where the `running` event of a cold worker is lost (the test's event filter or the engine's event order); (b) mark the test as timing-sensitive and run it in the idle tier.
+**Status:** open, verified (repeated runs at both commits), cause not checked.
