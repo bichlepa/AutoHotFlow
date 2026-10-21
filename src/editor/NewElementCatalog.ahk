@@ -21,7 +21,6 @@
 class NewElementCatalog {
     static KINDS := Map("action", "Action_", "condition", "Condition_", "loop", "Loop_", "trigger", "Trigger_")
     static LEVELS := Map("Beginner", 1, "Advanced", 2, "Programmer", 3)
-    static LOOP_HEIGHT := 150        ; v1 Element_SetType: the height of the bar of a new loop
     static MANUAL_TRIGGER := "Trigger_Manual"
 
     ; The kind ("action", "condition", "loop", "trigger") of a qualified ID ("Default.Action_Sleep"), or "" for none.
@@ -132,16 +131,11 @@ class NewElementCatalog {
             , "packageVersion", d["packageVersion"], "x", x, "y", y, "name", d["name"], "StandardName", 1
             , "pars", d["pars"])
         if (kind = "loop")
-            el["HeightOfVerticalBar"] := NewElementCatalog.LOOP_HEIGHT
+            el["HeightOfVerticalBar"] := FlowGeometry.NEW_LOOP_BAR
         if (kind = "trigger" && d["class"] = NewElementCatalog.MANUAL_TRIGGER && !hasManualTrigger)
             el["DefaultTrigger"] := 1
         return el
     }
-
-    ; The top left corner (flow units, snapped to the grid) of a new element whose centre is at the flow point (fx, fy):
-    ; v1 put the element under the mouse (Editor GUI User Input, the menu of the new elements).
-    static Origin(fx, fy) => [FlowGeometry.Snap(fx - FlowGeometry.ELEMENT_WIDTH / 2)
-        , FlowGeometry.Snap(fy - FlowGeometry.ELEMENT_HEIGHT / 2)]
 
     ; True when the flow (a Map, the definition of the engine or the draft) has a manual trigger.
     static HasManualTrigger(root) {

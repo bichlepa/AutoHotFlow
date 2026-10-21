@@ -6,6 +6,7 @@
 #Warn All, StdOut
 #SingleInstance Off
 #Include lib\Assert.ahk
+#Include ..\..\src\editor\FlowGeometry.ahk
 #Include ..\..\src\editor\NewElementCatalog.ahk
 #Include ..\..\src\elements\Default\_includes_editor.ahk
 
@@ -230,7 +231,7 @@ HasManualTriggerLooksAtTheFlow() {
 }
 
 OriginCentresTheElementOnTheSnappedGrid() {
-    o := NewElementCatalog.Origin(500, 500)
+    o := FlowGeometry.CentredOrigin(500, 500)
     Assert.Equal(o[1], 420, "500 - 70 = 430, snapped to the grid of 35")
     Assert.Equal(o[2], 455, "500 - 52.5 = 447.5, snapped to 455")
 }
