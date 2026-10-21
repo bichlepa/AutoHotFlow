@@ -116,9 +116,10 @@ class FlowLifecycle {
         def.Pending := rec.Def.Pending.Clone()
         this._metaPending[flowId] := true
         this._ReserveName(name, flowId)
+        backup := this._engine.saver.BackupDue(flowId)     ; WI-0095: a manager write follows the backup interval
         this._engine.peer.Request("storage", "cmd.storage.flow.write"
-            , Map("path", "Flows/" flowId ".json", "text", def.ToFileText(), "backup", Json.True)
-            , (res) => this._OnMetaWritten(msg, flowId, rec, def, res), FlowLifecycle.TIMEOUT_MS)
+            , Map("path", "Flows/" flowId ".json", "text", def.ToFileText(), "backup", FlowLifecycle._Bool(backup))
+            , (res) => this._OnMetaWritten(msg, flowId, rec, def, res, backup), FlowLifecycle.TIMEOUT_MS)
         return Deferred.Marker()
     }
 
@@ -129,6 +130,7 @@ class FlowLifecycle {
         this._engine.flows.Require(flowId)
         this._RequireIdle(flowId)
         this._deleting[flowId] := true
+        this._engine.saver.Forget(flowId)      ; WI-0095: no automatic write may re-create the file (E0066)
         stopped := this._engine.executor.FlowDeleted(flowId)
         this._engine._Log("a1", "engine", "deleting flow '" flowId "': " stopped " instance(s) stopped")
         this._engine.peer.Request("storage", "cmd.storage.flow.delete", Map("flowId", flowId)
@@ -145,7 +147,7 @@ class FlowLifecycle {
         this._ids[flowId] := true
         this._ReserveName(def.Name, flowId)
         this._engine.peer.Request("storage", "cmd.storage.flow.write"
-            , Map("path", "Flows/" flowId ".json", "text", def.ToFileText(), "backup", Json.True, "createOnly", Json.True)
+            , Map("path", "Flows/" flowId ".json", "text", def.ToFileText(), "backup", Json.False, "createOnly", Json.True)
             , (res) => this._OnCreated(request, flowId, def, raw, pending, convert, attempt, res, fixedId)
             , FlowLifecycle.TIMEOUT_MS)
         return Deferred.Marker()
@@ -215,6 +217,7 @@ class FlowLifecycle {
 
     ; A truth value of the payload (JSON true is 1; the sentinel object Json.True is accepted too).
     static _Truth(v) => (v == Json.True || (!IsObject(v) && (v = 1 || v = "true")))
+    static _Bool(flag) => flag ? Json.True : Json.False
 
     ; The record of a new flow (its definition, converted when the definition came from outside).
     _Build(flowId, raw, pending, convert) {
@@ -247,7 +250,7 @@ class FlowLifecycle {
 
     ; --- rename and move -------------------------------------------------------------------------
 
-    _OnMetaWritten(request, flowId, rec, def, res) {
+    _OnMetaWritten(request, flowId, rec, def, res, backup := false) {
         try {
             this._metaPending.Delete(flowId)
             this._UnreserveName(def.Name, flowId)
@@ -255,6 +258,7 @@ class FlowLifecycle {
                 this._ReplyStorageError(request, "saving flow '" flowId "' failed", res)
                 return
             }
+            this._engine.saver.Backed(flowId, backup)
             if (!(this._engine.flows.Get(flowId) == rec)) {
                 this._ReplyError(request, ErrCode.NOT_FOUND, "flow '" flowId "' is not loaded any more")
                 return
@@ -267,6 +271,9 @@ class FlowLifecycle {
             next := FlowDefinition(flowId, raw, rec.Rev + 1)
             next.Pending := rec.Def.Pending.Clone()
             rec.Commit(next)
+            ; WI-0095 (F-0163): the file holds the text of the request. The commit is written again soon, so a patch
+            ; that was committed while storage wrote the rename reaches the file too.
+            this._engine.saver.NoteCommit(flowId)
             this._engine.categories.Sync(true)
             this._engine.Emit("topic:flow:" flowId, "evt.flow.committed"
                 , Map("flowId", flowId, "rev", rec.Rev, "byMeta", Json.True))
@@ -286,6 +293,7 @@ class FlowLifecycle {
                 ; nothing is removed: the held writes go on, the flow stays as it was (its instances are stopped)
                 this._engine.varWriter.Resume()
                 this._engine.flowState.Touch(flowId)
+                this._engine.saver.NoteCommit(flowId)     ; the flow is saved again (Forget dropped its write)
                 this._ReplyStorageError(request, "deleting flow '" flowId "' failed", res)
                 return
             }
@@ -406,17 +414,18 @@ class FlowLifecycle {
         def := FlowDefinition(flowId, raw, rec.Rev + 1)
         def.Pending := rec.Def.Pending.Clone()
         this._metaPending[flowId] := true
+        backup := this._engine.saver.BackupDue(flowId)     ; WI-0095: a manager write follows the backup interval
         try {
             this._engine.peer.Request("storage", "cmd.storage.flow.write"
-                , Map("path", "Flows/" flowId ".json", "text", def.ToFileText(), "backup", Json.True)
-                , (res) => this._OnCategorySet(flowId, rec, def, res, done), FlowLifecycle.TIMEOUT_MS)
+                , Map("path", "Flows/" flowId ".json", "text", def.ToFileText(), "backup", FlowLifecycle._Bool(backup))
+                , (res) => this._OnCategorySet(flowId, rec, def, res, done, backup), FlowLifecycle.TIMEOUT_MS)
         } catch as e {
             this._metaPending.Delete(flowId)
             throw e
         }
     }
 
-    _OnCategorySet(flowId, rec, def, res, done) {
+    _OnCategorySet(flowId, rec, def, res, done, backup := false) {
         ok := false
         err := Map()
         try {
@@ -428,7 +437,15 @@ class FlowLifecycle {
             } else if (!(this._engine.flows.Get(flowId) == rec)) {
                 err := Map("code", ErrCode.NOT_FOUND, "message", "flow '" flowId "' is not loaded any more")
             } else {
-                rec.Commit(def)
+                this._engine.saver.Backed(flowId, backup)
+                ; The revision is built on the one that is current now (as the rename, WI-0093): a patch committed while
+                ; storage wrote the file is kept, and the file is written again soon (WI-0095, F-0163).
+                raw := rec.Def.Raw.Clone()
+                raw["category"] := def.Category
+                next := FlowDefinition(flowId, raw, rec.Rev + 1)
+                next.Pending := rec.Def.Pending.Clone()
+                rec.Commit(next)
+                this._engine.saver.NoteCommit(flowId)
                 this._engine.Emit("topic:flow:" flowId, "evt.flow.committed"
                     , Map("flowId", flowId, "rev", rec.Rev, "byMeta", Json.True))
                 this._engine.Emit("topic:engine", "evt.flow.list.changed", Map("added", [], "removed", [], "changed", [flowId]))

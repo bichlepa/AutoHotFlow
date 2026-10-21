@@ -7,6 +7,7 @@
 #Include ..\core\NoticeThrottle.ahk
 #Include ..\core\FlowPatch.ahk
 #Include FlowRecord.ahk
+#Include FlowSaver.ahk
 #Include FlowTable.ahk
 #Include FlowStateFile.ahk
 #Include FlowLifecycle.ahk
@@ -61,8 +62,6 @@ class Engine extends Role {
     static LOAD_PARALLEL := 2
     ; Safety net for the dispatcher: a tick every 100 ms in case a kick was lost (ARCHITECTURE 2.3).
     static SAFETY_MS := 100
-    ; cmd.flow.save waits this long for the answer of storage (one write with a backup, WI-0039).
-    static SAVE_TIMEOUT_MS := 30000
 
     __New(args) {
         super.__New(args)
@@ -71,6 +70,8 @@ class Engine extends Role {
         this.flows := FlowTable()
         this.flowState := FlowStateFile(this, this.flows)   ; enabled state of the triggers (WI-0060)
         this.lifecycle := FlowLifecycle(this)               ; create, duplicate, rename and delete a flow (WI-0070)
+        saveOpts := Engine._SaveOptions(args)
+        this.saver := FlowSaver(this, saveOpts["delayMs"], saveOpts["maxDelayMs"], saveOpts["backupEveryMs"])   ; WI-0095
         this.categories := FlowCategories(this)             ; categories and the order of the list (WI-0071)
         this.settings := EngineSettings(this)               ; the global settings, read before the flows (WI-0077)
         this.arms := TriggerArms(this)                       ; arming of the enabled triggers in the trigger host (WI-0062)
@@ -168,7 +169,7 @@ class Engine extends Role {
                 , "writeInflight", this.varWriter.Inflight))
     }
 
-    ; sys.shutdown: every instance is stopped, then the variables that are not written yet go to storage, all before
+    ; sys.shutdown: every instance is stopped, then the flows and the variables that are not written yet go to storage, all before
     ; sys.bye (ARCHITECTURE 6.3, step 2). The requests carry the rest of the deadline as their limit. The engine does
     ; not wait for the answers: the frames are in the send queue ahead of sys.bye, and storage is the last process to
     ; end and empties its queue.
@@ -184,6 +185,13 @@ class Engine extends Role {
             this.executor.StopAll("shutdown")
         } catch as e {
             this._Log("a0", "engine", "shutdown: stopping the instances failed: " Type(e) ": " e.Message)
+        }
+        try {
+            sentFlows := this.saver.FlushAll(deadlineMs)
+            if (sentFlows > 0)
+                this._Log("a1", "engine", "shutdown: " sentFlows " unsaved flow(s) sent to storage")
+        } catch as e {
+            this._Log("a0", "engine", "shutdown: saving the flows failed: " Type(e) ": " e.Message)
         }
         try {
             this.flowState.FlushAll(deadlineMs)
@@ -842,6 +850,9 @@ class Engine extends Role {
         rec.Commit(def)
         this.Emit("topic:flow:" flowId, "evt.flow.committed", Map("flowId", flowId, "rev", rec.Rev, "byMeta", Json.False))
         this._ApplyTriggerChanges(rec, changes)
+        ; WI-0095: the revision is written soon (FlowSaver). A view change only never asks for a backup.
+        session := msg.payload.Get("session", "")
+        this.saver.NoteCommit(flowId, IsObject(session) ? "" : String(session), FlowSaver.IsViewPatch(ops))
         return Map("rev", rec.Rev)
     }
 
@@ -882,38 +893,17 @@ class Engine extends Role {
         this.flowState.Touch(flowId)
     }
 
-    ; cmd.flow.save (PROTOCOL 4.2, WI-0039): writes the committed definition through storage and answers when storage has
-    ; written it. The file carries the format version and the markers of the elements whose expression texts wait for
-    ; their class (FlowDefinition.ToFileText). The revision is the one that was written, even if a patch commits
-    ; another one while storage works.
+    ; cmd.flow.save (PROTOCOL 4.2, WI-0039, WI-0095): writes the committed definition now (FlowSaver) and answers when
+    ; storage has written a revision that is at least the committed one. The file carries the format version and the
+    ; markers of the elements whose expression texts wait for their class (FlowDefinition.ToFileText).
     _CmdFlowSave(msg) {
         flowId := Engine.Text(msg, "flowId")
         rec := this.flows.Require(flowId)
         ; A write queued behind a pending delete in storage would re-create the deleted file (WI-0070, E0066).
         if (this.IsDeleting(flowId))
             throw AhfError("flow '" flowId "' is being deleted", ErrCode.BUSY)
-        savedRev := rec.Rev
-        text := rec.Def.ToFileText()
-        this.peer.Request(Engine.STORAGE, "cmd.storage.flow.write"
-            , Map("path", "Flows/" flowId ".json", "text", text, "backup", Json.True)
-            , (res) => this._OnFlowSaved(msg, flowId, savedRev, res), Engine.SAVE_TIMEOUT_MS)
+        this.saver.Save(flowId, msg, rec.Rev)
         return Deferred.Marker()
-    }
-
-    _OnFlowSaved(request, flowId, savedRev, res) {
-        try {
-            if (res.payload.Get("ok", false)) {
-                this.Emit("topic:flow:" flowId, "evt.flow.saved", Map("flowId", flowId, "savedRev", savedRev))
-                this.peer.Reply(request, Map("savedRev", savedRev))
-                return
-            }
-            this._Log("a0", "engine", "saving flow '" flowId "' failed: " Engine._ErrorText(res))
-            err := res.payload.Get("error", "")
-            this.peer.Reply(request, Map("ok", false, "error", (err is Map) ? err
-                : Map("code", ErrCode.INTERNAL, "message", "storage did not write the flow")))
-        } catch as e {
-            this._Log("a0", "engine", "answering cmd.flow.save failed: " Type(e) ": " e.Message)
-        }
     }
 
     ; evt.trigger.fired (WI-0062): an event of an armed trigger starts an instance at it. An event of another generation,
@@ -982,6 +972,15 @@ class Engine extends Role {
     ; Options of the variable files (WI-0041): --var-write-delay-ms=<ms> (default 200, 0 to 60000): how long a change
     ; waits for more changes of the same variable; --var-write-timeout-ms=<ms> (default 10000, 100 to 120000): limit
     ; of one write request to storage. The supervisor passes both on to the engine.
+    ; Options of the automatic saving of the flows (WI-0095): --save-delay-ms=<ms> (default 3000, 0 to 60000) after the last
+    ; commit, --save-max-delay-ms=<ms> (default 10000, 0 to 600000) after the first unsaved commit, and
+    ; --backup-interval-ms=<ms> (default 600000, 1000 to 86400000) between two backups of a flow that the engine asks for.
+    static _SaveOptions(args) {
+        return Map("delayMs", Engine._IntOption(args, "save-delay-ms", FlowSaver.DELAY_MS, 0, 60000)
+            , "maxDelayMs", Engine._IntOption(args, "save-max-delay-ms", FlowSaver.MAX_DELAY_MS, 0, 600000)
+            , "backupEveryMs", Engine._IntOption(args, "backup-interval-ms", FlowSaver.BACKUP_EVERY_MS, 1000, 86400000))
+    }
+
     static _VarOptions(args) {
         return Map("delayMs", Engine._IntOption(args, "var-write-delay-ms", VarWriter.DELAY_MS, 0, 60000)
             , "timeoutMs", Engine._IntOption(args, "var-write-timeout-ms", VarWriter.TIMEOUT_MS, 100, 120000))

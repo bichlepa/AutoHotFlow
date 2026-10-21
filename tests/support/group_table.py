@@ -139,6 +139,7 @@ TEST_GROUPS = {
     "integration/test_flow_lifecycle_engine.py": ["engine"],
     "integration/test_flow_status_elements.py": ["elements-e2e", "triggers"],
     "integration/test_flowrun.py": ["engine"],
+    "integration/test_flow_autosave.py": ["engine"],
     "integration/test_hotkey_arming.py": ["triggers"],
     "integration/test_hotkey_input.py": ["triggers"],
     "integration/test_manual_flows.py": ["elements-e2e"],

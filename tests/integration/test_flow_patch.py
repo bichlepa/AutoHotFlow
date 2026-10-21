@@ -87,7 +87,7 @@ def wait_until_sleeping(obs):
 
 # --- commit, conflict, refusal ---------------------------------------------------------------------------------------
 
-def test_a_patch_commits_a_new_revision_at_once_and_the_file_waits_for_a_save(pipe, flowdir, engine):
+def test_a_patch_commits_a_new_revision_at_once_and_the_file_follows_after_the_delay(pipe, flowdir, engine):
     with subscribe_flow(pipe, FLOW) as obs:
         wait_ready(obs)
         answer = obs.request("engine", "cmd.flow.patch", {"flowId": FLOW, "baseRev": 1, "ops": [move(SLEEP, 77)]},
@@ -98,7 +98,7 @@ def test_a_patch_commits_a_new_revision_at_once_and_the_file_waits_for_a_save(pi
         assert definition(obs)["allElements"][SLEEP]["x"] == 77
         assert rev_of(obs) == 2
     on_disk = json.loads((flowdir / "Flows" / (FLOW + ".json")).read_text(encoding="utf-8"))
-    assert on_disk["allElements"][SLEEP]["x"] != 77, "a patch is not written before cmd.flow.save"
+    assert on_disk["allElements"][SLEEP]["x"] != 77, "a patch is not written at once (WI-0095: about 3 s later)"
 
 
 def test_a_second_patch_on_the_old_revision_is_a_conflict_and_changes_nothing(pipe, flowdir, engine):
@@ -212,3 +212,11 @@ def test_a_patch_committed_while_storage_writes_a_rename_is_kept(pipe, flowdir, 
         assert current["name"] == "Renamed"
         assert current["allElements"][SLEEP]["x"] == 77, "the patch committed during the rename is kept"
         assert rev_of(obs) == 3
+        # WI-0095 (F-0163): the file written at the request lacks the patch; the write-behind writes it again
+        deadline = time.monotonic() + 15
+        while time.monotonic() < deadline:
+            on_disk = json.loads((flowdir / "Flows" / (FLOW + ".json")).read_text(encoding="utf-8"))
+            if on_disk["allElements"][SLEEP]["x"] == 77 and on_disk["name"] == "Renamed":
+                break
+            time.sleep(0.2)
+        assert on_disk["allElements"][SLEEP]["x"] == 77 and on_disk["name"] == "Renamed", "the file keeps both"
