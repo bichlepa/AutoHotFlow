@@ -697,11 +697,11 @@ Each group of elements is one requirement with a table of its elements. The fiel
 ### REQ-ELM-010 Element contract and registry
 
 - **v1:** yes
-- **v2:** partial (class contract, registry, parameters and run/stop work; the metadata for the editor is not used yet)
+- **v2:** partial (class contract, registry, parameters and run/stop work; the settings check and the parameter schema are used by the settings form model, WI-0105; the window and the other editor metadata come with S0007)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0047), S0007 (editor)
-- **Evidence:** `tests/ahk/element_registry.test.ahk`, `tests/ahk/element_runner.test.ahk`
+- **Evidence:** `tests/ahk/element_registry.test.ahk`, `tests/ahk/element_runner.test.ahk`, `tests/ahk/editor_form.test.ahk`
 
 An element is a class with: name, category, user level, stability (stable or experimental), icon, parameter schema, `Run`, `Stop`, settings check (`CheckSettings`) and its execution mode (`inline`, `worker`, `trigger`). Contract: `ELEMENT-API-V2.md`.
 
@@ -1616,10 +1616,11 @@ The menu bar of the editor has: save, run, stop, enable/disable, edit (undo, red
 ### REQ-EDT-120 Element settings dialog
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the model of the dialog without a window: fields, values, checks and the element's settings check, WI-0105; the window is WI-0106)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0007 (model WI-0105, window WI-0106)
+- **Evidence:** `tests/ahk/editor_form.test.ahk`
 
 The dialog is built from the parameter schema of the class. Field types used in v1: label, edit, multi-line edit, checkbox, radio, drop-down, combo box, list box, slider, file, folder, hotkey, week days, date and time, button. An icon next to each edit field shows its content type (expression, string, variable name). The element checks its settings while the user edits them (enable or disable fields, warnings such as "the variable name is not valid"). The important buttons stay visible in long dialogs. A help button opens the help of the element.
 
