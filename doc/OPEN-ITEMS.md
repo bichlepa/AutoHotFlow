@@ -355,3 +355,9 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 **What:** `tests/fault/test_worker_lifecycle.py::test_time_to_the_first_job_when_the_worker_has_to_be_started_cold` fails now and then: the worker element never reports its `running` state event (`started` is empty). Seen on the base commit `f58bb0b2` (1 of 3 serial runs, run_suite) and on the WI-0101 commit (2 of 3 serial runs); the same run in the fast tier failed too. The editor is not involved in the test.
 **Options:** (a) find out where the `running` event of a cold worker is lost (the test's event filter or the engine's event order); (b) mark the test as timing-sensitive and run it in the idle tier.
 **Status:** open, verified (repeated runs at both commits), cause not checked.
+
+### F-9000: A wheel over the settings window also zooms the canvas beneath it
+
+**What:** EditorWindow._OnWheel takes every WM_MOUSEWHEEL whose pointer lies over the canvas, whichever window received it (WI-0090, by design). The settings window of an element (WI-0106) is an owned window over the canvas and has its own wheel handler for its scroll area. A wheel notch over the settings window therefore scrolls the settings and also zooms the flow under it.
+**Options:** (a) the editor window ignores wheel messages whose target window is not its own while a settings window is open; (b) accept it until the owner's gui check of the settings window shows whether it matters.
+**Status:** open, verified by reading the code (EditorWindow.ahk `_OnWheel`, ElementSettingsWindow.ahk `_OnWheel`); not checked in a real window.
