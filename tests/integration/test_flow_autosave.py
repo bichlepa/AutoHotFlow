@@ -91,10 +91,12 @@ def boot(procs, flowdir, runs, pipe, session_id, hub, storage):
     """Starts the engine with the given options. Every engine that is still running at the end is shut down."""
     started = []
 
-    def start(*options, label="engine"):
+    # The safety net of ahkrun must outlast the longest test here: the slow test runs scaled(22 s) of patches and
+    # waits scaled(6 s) more. With the default 60 s the engine was killed in the middle of it (F-0174).
+    def start(*options, label="engine", timeout=None):
         args = ["--role=engine", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(flowdir), "--workers=0"]
         args.extend(options)
-        run = RoleRun(procs, flowdir, label, args)
+        run = RoleRun(procs, flowdir, label, args, timeout=timeout or scaled(120.0))
         runs.append(run)
         started.append(run)
         return run

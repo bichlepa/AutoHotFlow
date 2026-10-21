@@ -83,12 +83,14 @@ def pongs_from(hub, name):
 class RoleRun:
     """One entry point process (ahkrun.py -> AutoHotkey). Output goes to files, not to pipes."""
 
-    def __init__(self, procs, datadir, label, args):
+    def __init__(self, procs, datadir, label, args, timeout=60):
+        # timeout: the safety net of ahkrun, which kills the whole process tree after this many seconds. A test whose
+        # body runs longer than the default must pass a larger one (F-0174).
         self.stdout_path = Path(datadir) / ("%s.stdout" % label)
         self.stderr_path = Path(datadir) / ("%s.stderr" % label)
         self._out = open(self.stdout_path, "wb")
         self._err = open(self.stderr_path, "wb")
-        cmd = [sys.executable, str(AHKRUN), "--timeout", "60", str(ENTRY), *args]
+        cmd = [sys.executable, str(AHKRUN), "--timeout", str(timeout), str(ENTRY), *args]
         self.proc = procs.start(cmd, stdout=self._out, stderr=self._err, cwd=str(ROOT))
         self.ahk_process = None   # psutil.Process of AutoHotkey, set by ahk_for()
 
