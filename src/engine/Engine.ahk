@@ -14,6 +14,8 @@
 #Include FlowCategories.ahk
 #Include EngineSettings.ahk
 #Include Executor.ahk
+#Include core\ErrorSnapshot.ahk
+#Include core\FlowErrors.ahk
 #Include TriggerArms.ahk
 #Include TriggerChanges.ahk
 #Include WorkerBridge.ahk
@@ -98,6 +100,7 @@ class Engine extends Role {
         this._tickFn := () => this._Tick()
         this._safetyFn := () => this._Tick()
         this._notices := NoticeThrottle(NoticeThrottle.WINDOW_MS)   ; notices per kind and flow (WI-0075, PROTOCOL 4.7)
+        this.errors := FlowErrors()   ; the last unhandled errors per flow with the copy of their variables (WI-0113, PROTOCOL 4.7a)
         this._noticePending := Map()   ; gkey -> Map(kind, flowId, key, args): a notice that was held back
         this._noticeFlushFn := () => this._FlushNotices()
         this._noticeArmed := false
@@ -108,6 +111,7 @@ class Engine extends Role {
     RegisterHandlers() {
         this.On("cmd.engine.snapshot", (msg) => this._CmdSnapshot(msg))
         this.On("cmd.flow.get", (msg) => this._CmdFlowGet(msg))
+        this.On("cmd.flow.error.get", (msg) => this._CmdFlowErrorGet(msg))
         this.On("cmd.flow.runstate", (msg) => this._CmdFlowRunstate(msg))
         this.On("cmd.flow.start", (msg) => this._CmdFlowStart(msg))
         this.On("cmd.flow.stop", (msg) => this._CmdFlowStop(msg))
@@ -256,6 +260,7 @@ class Engine extends Role {
         this.executor.FlowDeleted(flowId)
         this.executor.ForgetFlow(flowId)
         this.arms.FlowRemoved(flowId)
+        this.errors.Forget(flowId)           ; the errors and their variables go with the flow (WI-0113)
         return this.flows.Remove(flowId)
     }
 
@@ -512,13 +517,29 @@ class Engine extends Role {
 
     ; --- notices (WI-0075, PROTOCOL 4.7) -------------------------------------------------------------
 
-    ; An unhandled exception ended a branch of a flow (Executor._Advance, REQ-EXE-090). The notice names the flow, the element
-    ; and the message, never the variables (E0072). The global switch is the setting notifyUnhandledErrors (WI-0077,
-    ; REQ-USE-070); the per-flow switch comes with S0007.
-    FlowException(flowId, elementId, message) {
+    ; An unhandled exception ended a branch of a flow (Executor._Advance, REQ-EXE-090). The engine keeps the copy of the
+    ; variables of the branch (WI-0113, PROTOCOL 4.7a) and sends the notice with its errorId; the notice text names the
+    ; flow, the element and the message, never the variables (E0072). The copy is kept also when the notice is switched off.
+    ; The global switch is the setting notifyUnhandledErrors (WI-0077, REQ-USE-070); the per-flow switch comes with S0007.
+    FlowException(flowId, elementId, message, inst, thread) {
+        errorId := this._KeepError(flowId, elementId, message, inst, thread)
         if (!this.settings.Value("notifyUnhandledErrors"))
             return
-        this._Notice("exception", flowId, "Notice_exception", [this._FlowName(flowId), elementId, message])
+        this._Notice("exception", flowId, "Notice_exception", [this._FlowName(flowId), elementId, message], errorId)
+    }
+
+    ; The copy of the variables of a branch, kept for cmd.flow.error.get (WI-0113). Returns the errorId, or "" when the copy
+    ; could not be made (logged; the notice then goes without an errorId and its window cannot be opened).
+    _KeepError(flowId, elementId, message, inst, thread) {
+        try {
+            snap := ErrorSnapshot.Take(inst, thread)
+            return this.errors.Add(flowId, Map("elementId", elementId, "message", message
+                , "time", FormatTime(, "yyyy-MM-dd HH:mm:ss"), "instanceId", inst.Id
+                , "vars", snap["vars"], "omitted", snap["omitted"]))
+        } catch as e {
+            this._Log("a0", "engine", "error variables of flow " flowId " not kept: " Type(e) ": " e.Message)
+            return ""
+        }
     }
 
     _FlowName(flowId) {
@@ -529,7 +550,7 @@ class Engine extends Role {
     ; Sends a notice unless the throttle holds it back: the first notice of a kind and a flow goes out at once, the others
     ; within NoticeThrottle.WINDOW_MS are counted, and their count goes out with one notice when the window ends. Nothing
     ; here waits. An error in the notice path is logged; it does not reach the caller (the Executor calls it).
-    _Notice(kind, flowId, key, args) {
+    _Notice(kind, flowId, key, args, errorId := "") {
         gkey := kind "|" flowId
         try {
             if (this._notices.Offer(gkey, A_TickCount)) {
@@ -539,21 +560,24 @@ class Engine extends Role {
                     this._noticePending.Delete(gkey)
                     held := this._notices.Take(gkey)
                 }
-                this._EmitNotice(kind, flowId, key, args, held)
+                this._EmitNotice(kind, flowId, key, args, held, errorId)
                 return
             }
-            this._noticePending[gkey] := Map("kind", kind, "flowId", flowId, "key", key, "args", args)
+            ; A held back notice keeps the newest errorId: its window shows the latest error of the flow (WI-0113).
+            this._noticePending[gkey] := Map("kind", kind, "flowId", flowId, "key", key, "args", args, "errorId", errorId)
             this._ArmNotices()
         } catch as e {
             this._Log("a0", "engine", "notice " kind " not sent: " Type(e) ": " e.Message)
         }
     }
 
-    _EmitNotice(kind, flowId, key, args, held) {
+    _EmitNotice(kind, flowId, key, args, held, errorId := "") {
         level := kind = "limit" ? "warning" : "error"
         payload := Map("kind", kind, "level", level, "key", key, "args", args, "held", held)
         if (flowId != "")
             payload["flowId"] := flowId
+        if (errorId != "")
+            payload["errorId"] := errorId
         this.Emit("topic:notice", "evt.ui.notice", payload)
     }
 
@@ -582,7 +606,7 @@ class Engine extends Role {
             held := this._notices.Take(gkey)
             this._notices.Sent(gkey, now)
             if (held > 0)
-                this._EmitNotice(p["kind"], p["flowId"], p["key"], p["args"], held)
+                this._EmitNotice(p["kind"], p["flowId"], p["key"], p["args"], held, p["errorId"])
         }
         this._ArmNotices()
     }
@@ -629,6 +653,19 @@ class Engine extends Role {
     _CmdFlowGet(msg) {
         rec := this.flows.Require(Engine.Text(msg, "flowId"))
         return Map("rev", rec.Rev, "definition", rec.Def.WireDefinition())
+    }
+
+    ; cmd.flow.error.get { flowId, errorId } (WI-0113, PROTOCOL 4.2, 4.7a): the copy of the variables of an unhandled error.
+    ; not_found for a flow that is not loaded (a deleted flow keeps no error) and for an errorId that is not kept.
+    _CmdFlowErrorGet(msg) {
+        rec := this.flows.Require(Engine.Text(msg, "flowId"))
+        errorId := Engine.Text(msg, "errorId")
+        entry := this.errors.Get(rec.FlowId, errorId)
+        if (entry = "")
+            throw AhfError("error '" errorId "' of flow '" rec.FlowId "' is not kept", ErrCode.NOT_FOUND)
+        return Map("entry", Map("errorId", errorId, "flowId", rec.FlowId, "flowName", rec.Def.Name
+            , "elementId", entry["elementId"], "message", entry["message"], "time", entry["time"]
+            , "instanceId", entry["instanceId"], "vars", entry["vars"], "omitted", entry["omitted"]))
     }
 
     ; The states of one flow at once (WI-0086, PROTOCOL 4.2): the flow fields of evt.flow.state, the triggers of the

@@ -744,7 +744,9 @@ class Executor {
                     , run["flowId"])
                 if (run["error"] = "")      ; for the caller of the instance (CallFlow)
                     run["error"] := "element '" thread.ElementId "': " thread.Message
-                this._owner.FlowException(run["flowId"], thread.ElementId, thread.Message)   ; notice (WI-0075)
+                ; The notice (WI-0075) and the copy of the variables of the branch (WI-0113). An unhandled exception
+                ; neither pops the loop stack nor clones the thread, so the thread still holds the variables of the error.
+                this._owner.FlowException(run["flowId"], thread.ElementId, thread.Message, run["inst"], thread)
             }
             this._CheckEnded(run, advOutcome["unhandled"] ? "exception" : "finished")
         } finally {
