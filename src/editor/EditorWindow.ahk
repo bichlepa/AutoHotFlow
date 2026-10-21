@@ -38,6 +38,7 @@ class EditorWindow {
     static WM_MOUSEMOVE := 0x0200
     static WM_LBUTTONDOWN := 0x0201
     static WM_LBUTTONUP := 0x0202
+    static WM_LBUTTONDBLCLK := 0x0203      ; the second press of a double click: the pointer gets it as a press (WI-0100)
     static WM_RBUTTONDOWN := 0x0204
     static WM_RBUTTONUP := 0x0205
     static WM_MOUSEWHEEL := 0x020A
@@ -81,6 +82,7 @@ class EditorWindow {
             EditorWindow.WM_MOUSEMOVE, (wParam, lParam, msg, hwnd) => this._OnMove(wParam, lParam, hwnd),
             EditorWindow.WM_LBUTTONDOWN, (wParam, lParam, msg, hwnd) => this._OnDown("left", lParam, hwnd),
             EditorWindow.WM_LBUTTONUP, (wParam, lParam, msg, hwnd) => this._OnUp("left", lParam, hwnd),
+            EditorWindow.WM_LBUTTONDBLCLK, (wParam, lParam, msg, hwnd) => this._OnDown("left", lParam, hwnd),
             EditorWindow.WM_RBUTTONDOWN, (wParam, lParam, msg, hwnd) => this._OnDown("right", lParam, hwnd),
             EditorWindow.WM_RBUTTONUP, (wParam, lParam, msg, hwnd) => this._OnUp("right", lParam, hwnd),
             EditorWindow.WM_MOUSEWHEEL, (wParam, lParam, msg, hwnd) => this._OnWheel(wParam, lParam, hwnd),
@@ -163,6 +165,14 @@ class EditorWindow {
     Choose(kind, groups, done) {
         opened := UiDialogs.Tree(this.hwnd, "Create new " kind, "Choose the class of the new element", groups
             , (ok, id) => done(ok ? id : ""))
+        if (!opened)
+            done("")
+    }
+
+    ; A question of a connection (EditorConnect, WI-0100): a dialog with one button per id; done(id) once, "" for a cancel or
+    ; a dialog that cannot open. buttons: Array of [id, labelKey].
+    Pick(titleKey, textKey, buttons, done) {
+        opened := UiDialogs.Confirm(this.hwnd, titleKey, textKey, buttons, (answered, id) => done(answered ? id : ""))
         if (!opened)
             done("")
     }

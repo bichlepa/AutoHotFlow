@@ -28,10 +28,17 @@
 ; click leaves it following until the next left click places it. Esc or the right button cancels. A placed element goes to
 ; onPlace(kind, x, y) (the flow position of its top left corner); the class is asked there, not here.
 ;
-; Modes: "" (nothing), "press" (left button down, no drag yet, or a drag from a connection), "move", "tail", "rect", "view"
-; and "place". The mode is the state of the pointer; the model gets the drag (SetDrag) or the rectangle (SetRect) while it runs.
+; Connections (WI-0100, REQ-EDT-070): a left press on a button of the selection (plus, plus2, move1, move2, edit) starts a
+; gesture of EditorConnect, and the mode "connect" begins: the connection follows the pointer, as the placing does. A drag
+; drops it where the button goes up; a click leaves it following until the next left click drops it. Esc or the right
+; button cancels. A double click on a connection (two clicks within DOUBLE_MS) asks its type (EditorConnect.ChangeType).
+;
+; Modes: "" (nothing), "press" (left button down, no drag yet, or a drag from a connection), "move", "tail", "rect", "view",
+; "place" and "connect". The mode is the state of the pointer; the model gets the drag (SetDrag) or the rectangle (SetRect)
+; while it runs.
 class EditorPointer {
     static MOVE_PX := 3              ; the movement in canvas pixels that makes a drag (v1 detects 2 and more)
+    static DOUBLE_MS := 500          ; two clicks on a connection within this time are a double click (its type is asked)
 
     __New(model) {
         this.model := model
@@ -56,6 +63,11 @@ class EditorPointer {
         this.placeHeld := false      ; the press on the field is still held (no click or release yet)
         this.placeMoved := false     ; the pointer moved while the field's button was held: a drag places at the release
         this.onPlace := ""           ; function (kind, x, y): a new element was placed at the flow position x, y
+        this.connect := ""           ; EditorConnect: the gestures of the connections (the role gives it; WI-0100)
+        this.connectHeld := false    ; the press on a connection button is still held
+        this.connectMoved := false   ; the pointer moved while the button was held: a drag drops at the release
+        this.lastClickId := ""       ; the connection of the last click (a double click asks its type)
+        this.lastClickTick := 0
     }
 
     ; "" or the mode ("press", "move", "tail", "rect", "view"). The getter has another name than the field: AHK names are
@@ -73,6 +85,13 @@ class EditorPointer {
         if (this.mode = "place") {
             if (button = "left")
                 this._Place(cx, cy)
+            else if (button = "right")
+                this.Cancel()
+            return
+        }
+        if (this.mode = "connect") {
+            if (button = "left")
+                this._Drop(cx, cy)
             else if (button = "right")
                 this.Cancel()
             return
@@ -100,13 +119,15 @@ class EditorPointer {
         this.cx := cx
         this.cy := cy
         this.pressFlow := this.model.view.ToFlow(cx, cy)
+        hit := this._HitAt(this.pressFlow)
+        if (IsObject(hit) && hit.Kind = "button" && this._ButtonPress(hit, cx, cy))
+            return
         this.mode := "press"
         this.rule := ""
         this.itemId := ""
         this.itemKind := "empty"
         this.part := 0
         this.baseSelection := this._SelectionCopy()
-        hit := this._HitAt(this.pressFlow)
         if (!IsObject(hit)) {
             this.rule := "empty"
             return
@@ -127,6 +148,13 @@ class EditorPointer {
             if (held = "left")
                 this.placeMoved := true
             this.model.SetGhost(this._GhostAt(cx, cy))
+            return
+        }
+        if (this.mode = "connect") {
+            if (held = "left")
+                this.connectMoved := true
+            pt := this.model.view.ToFlow(cx, cy)
+            this.connect.Follow(pt[1], pt[2])
             return
         }
         if (this.mode = "view") {
@@ -176,6 +204,14 @@ class EditorPointer {
             }
             return
         }
+        if (this.mode = "connect") {
+            if (button = "left" && this.connectHeld) {
+                this.connectHeld := false
+                if (this.connectMoved)
+                    this._Drop(cx, cy)
+            }
+            return
+        }
         if (button != "left" || this.mode = "")
             return
         if (this.mode = "press") {
@@ -195,6 +231,11 @@ class EditorPointer {
     Cancel() {
         if (this.mode = "place") {
             this._EndPlace()
+            return
+        }
+        if (this.mode = "connect") {
+            this.connect.Cancel()
+            this._EndConnect()
             return
         }
         if (this.mode = "move" || this.mode = "tail")
@@ -260,6 +301,55 @@ class EditorPointer {
         origin := FlowGeometry.CentredOrigin(pt[1], pt[2])
         bar := (this.placeKind = "loop") ? FlowGeometry.NEW_LOOP_BAR : 0
         return FlowGeometry.Bounds(this.placeKind, origin[1], origin[2], bar)
+    }
+
+    ; --- connections (WI-0100) --------------------------------------------------------------------------------------------
+
+    ; A press on a button of the selection starts its gesture: true when the button is handled (the press selects nothing).
+    ; plus of an element and plus2 (the foot of a loop), plus, move1 and move2 of a connection, and edit of a connection
+    ; (the type is asked at once). Other buttons (edit and trash of an element) are not handled here.
+    _ButtonPress(hit, cx, cy) {
+        sc := this.model.CurrentScene()
+        kind := EditorPointer._KindOf(sc, hit.Id)
+        name := hit.Index
+        if (kind = "element" && (name = "plus" || name = "plus2")) {
+            if (!this.connect.BeginNew(hit.Id, name))
+                return false
+        } else if (kind = "connection" && name = "edit") {
+            this.connect.ChangeType(hit.Id)
+            return true
+        } else if (kind = "connection" && name = "plus") {
+            if (!this.connect.BeginSplit(hit.Id))
+                return false
+        } else if (kind = "connection" && name = "move1") {
+            if (!this.connect.BeginMoveFrom(hit.Id))
+                return false
+        } else if (kind = "connection" && name = "move2") {
+            if (!this.connect.BeginMoveTo(hit.Id))
+                return false
+        } else {
+            return false
+        }
+        this.mode := "connect"
+        this.connectHeld := true
+        this.connectMoved := false
+        pt := this.model.view.ToFlow(cx, cy)
+        this.connect.Follow(pt[1], pt[2])
+        return true
+    }
+
+    ; The end of a connection is dropped at the canvas pixel (the mode ends first, so the question of the drop is not held up
+    ; by the pointer).
+    _Drop(cx, cy) {
+        pt := this.model.view.ToFlow(cx, cy)
+        this._EndConnect()
+        this.connect.Drop(pt[1], pt[2])
+    }
+
+    _EndConnect() {
+        this.mode := ""
+        this.connectHeld := false
+        this.connectMoved := false
     }
 
     ; --- the drag ---------------------------------------------------------------------------------------------------------
@@ -358,6 +448,20 @@ class EditorPointer {
             this._Select([this.itemId], "one")
         } else if (this.rule = "toggle") {
             this._Select([this.itemId], "toggle")
+        }
+        if (this.itemKind = "connection" && !this.ctrl)
+            this._ConnectionClicked()
+    }
+
+    ; A second click on the same connection within DOUBLE_MS asks its type (WI-0100, v1 double click on a connection).
+    _ConnectionClicked() {
+        now := A_TickCount
+        if (this.lastClickId = this.itemId && now - this.lastClickTick < EditorPointer.DOUBLE_MS) {
+            this.lastClickId := ""
+            this.connect.ChangeType(this.itemId)
+        } else {
+            this.lastClickId := this.itemId
+            this.lastClickTick := now
         }
     }
 

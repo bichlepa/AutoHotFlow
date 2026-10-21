@@ -7,6 +7,7 @@
 #Include render\Renderer.ahk
 #Include EditorFlowOps.ahk
 #Include EditorAdd.ahk
+#Include EditorConnect.ahk
 #Include EditorTray.ahk
 #Include EditorPointer.ahk
 #Include EditorKeys.ahk
@@ -37,6 +38,7 @@ class Editor extends Role {
         this.driver := ""
         this.flowOps := ""            ; EditorFlowOps: Run and Enable or disable (the tray menu, the questions of the window)
         this.add := ""                ; EditorAdd: a new element, placed by the pointer and given its class (WI-0099)
+        this.connect := ""            ; EditorConnect: connections drawn, moved and typed with the pointer (WI-0100)
         this.tray := ""               ; EditorTray: the icon and the menu of this editor (REQ-EDT-230)
         this.started := false
         this.tornDown := false
@@ -53,6 +55,8 @@ class Editor extends Role {
         this.model.AddListener((kind, data) => this._OnModel(kind, data))
         this.pointer := EditorPointer(this.model)
         this.add := EditorAdd(this.model)
+        this.connect := EditorConnect(this.model, this.add)     ; the connections (WI-0100): the buttons, the drop, the questions
+        this.pointer.connect := this.connect
         this.pointer.onPlace := (kind, x, y) => this.add.Placed(kind, x, y)
         this.On("evt.", (msg) => this.model.OnEvent(msg.type, msg.payload))
         this.On("cmd.editor.show", (msg) => this._OnShow(msg))
@@ -64,6 +68,7 @@ class Editor extends Role {
             this.driver := EditorDriver(this, this.model)
             this.flowOps.ask := this.driver      ; the questions of the flow commands are answered by the test
             this.add.chooser := this.driver      ; the class list of a new element is answered by the test (cmd.test.class)
+            this.connect.picker := this.driver   ; the questions of a connection are answered by the test (cmd.test.pick)
         }
     }
 
@@ -76,6 +81,7 @@ class Editor extends Role {
                 this.window := EditorWindow(this)
                 this.flowOps.ask := this.window
                 this.add.chooser := this.window
+                this.connect.picker := this.window
                 this.window.Show()
             }
             this.tray.Start()              ; the icon of this editor (hidden with --headless), its menu, the window icon

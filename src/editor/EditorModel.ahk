@@ -267,6 +267,22 @@ class EditorModel {
         this._Changed("view")
     }
 
+    ; The connection being drawn or moved (WI-0100): a request as Scene takes it, "" removes it. The scene takes it at once.
+    SetConnecting(request) {
+        if (this.scene = "")
+            return
+        this.sceneVersion += 1
+        this.scene := this.scene.WithInteraction(this.draft.selection, this.scene.Rect, request, this.scene.Ghost)
+        this._Changed("view")
+    }
+
+    ; A change of the editor that the engine was not asked for and that was refused here (WI-0100): the text (a language key)
+    ; is shown in the status bar until the next change.
+    Notice(textKey) {
+        this.draft.message := Lang(textKey)
+        this._Changed("view")
+    }
+
     ; Runs fn after ms through the role's timer (none in a test without one).
     Schedule(ms, fn) {
         if (IsObject(this.later)) {

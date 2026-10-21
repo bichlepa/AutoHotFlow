@@ -26,6 +26,8 @@
 ;                                       one letter; answers handled (the table has it)
 ;   cmd.test.class {id}                 the answer of the open class list of a new element (WI-0099): the qualified ID the list
 ;                                       offers, or "" for Cancel. The list is in cmd.test.state (choice)
+;   cmd.test.pick {id}                  the answer of the open question of a connection (WI-0100): a kind, a type, or "" for
+;                                       Cancel. The question is in cmd.test.state (pick)
 ;
 ; Booleans on the wire are Json.True and Json.False (PROTOCOL 2): the state fields enabled and armed are written with Json.Bool.
 class EditorDriver {
@@ -38,6 +40,7 @@ class EditorDriver {
         this.answer := "no"           ; the answer to the questions of the flow commands (ask seam, Confirm)
         this.asked := []              ; the kinds of the questions asked so far (EditorFlowOps)
         this.choice := ""             ; the open class list of a new element: Map(kind, groups, done), or "" (WI-0099)
+        this.question := ""           ; the open question of a connection: Map(title, text, buttons, done), or "" (WI-0100)
         role.On("cmd.test.state", (msg) => Map("ok", true, "state", this.State()))
         role.On("cmd.test.render", (msg) => this._OnRender(msg))
         role.On("cmd.test.close", (msg) => this._OnClose())
@@ -51,6 +54,43 @@ class EditorDriver {
         role.On("cmd.test.redo", (msg) => this._OnStep(msg, "redo"))
         role.On("cmd.test.select", (msg) => this._OnSelect(msg))
         role.On("cmd.test.class", (msg) => this._OnClass(msg))
+        role.On("cmd.test.pick", (msg) => this._OnPick(msg))
+    }
+
+    ; The question of a connection (the picker seam of EditorConnect): it stays open until cmd.test.pick answers it.
+    Pick(titleKey, textKey, buttons, done) {
+        this.question := Map("title", titleKey, "text", textKey, "buttons", buttons, "done", done)
+    }
+
+    ; cmd.test.pick {id}: the answer of the open question. id "" cancels; any other id must be one of its buttons.
+    _OnPick(msg) {
+        if (!IsObject(this.question))
+            return Map("ok", false, "error", Map("code", ErrCode.BUSY, "message", "no question of a connection is open"))
+        id := msg.payload.Get("id", "")
+        if (IsObject(id) || (id != "" && !EditorDriver._HasButton(this.question["buttons"], id)))
+            return Map("ok", false, "error", Map("code", ErrCode.BAD_PAYLOAD, "message", "id is one of the buttons, or empty"))
+        done := this.question["done"]
+        this.question := ""
+        done(id)
+        return Map("ok", true)
+    }
+
+    static _HasButton(buttons, id) {
+        for button in buttons {
+            if (button[1] = id)
+                return true
+        }
+        return false
+    }
+
+    ; The open question for the state: its title and the IDs of its buttons ("" when none is open).
+    _PickText() {
+        if (!IsObject(this.question))
+            return ""
+        ids := []
+        for button in this.question["buttons"]
+            ids.Push(button[1])
+        return Map("title", this.question["title"], "ids", ids)
     }
 
     ; The class list of a new element (the chooser seam of EditorAdd): it stays open until cmd.test.class answers it.
@@ -286,9 +326,11 @@ class EditorDriver {
         st["redo"] := m["redo"]
         st["pending"] := m["pending"]
         st["choice"] := this._ChoiceText()
+        st["pick"] := this._PickText()                        ; the open question of a connection (WI-0100)
         sc := this.model.CurrentScene()
         g := IsObject(sc) ? sc.Ghost : ""                     ; the box of a new element being placed (WI-0099)
         st["ghost"] := (g is FlowRect) ? Map("x", g.X, "y", g.Y, "w", g.W, "h", g.H) : ""
+        st["buttons"] := EditorDriver._ButtonsText(sc)        ; the buttons of the selection, at their flow centres (WI-0100)
         st["tray"] := this.role.tray.State()
         st["asked"] := this.asked.Clone()
         st["frames"] := r["frames"]
@@ -297,6 +339,18 @@ class EditorDriver {
         st["slowestFrameMs"] := r["slowestFrameMs"]
         st["rebuilds"] := r["rebuilds"]
         return st
+    }
+
+    ; The buttons of the scene as Array of Maps("name", "id", "x", "y") in flow units, the centre of each (WI-0100).
+    static _ButtonsText(sc) {
+        out := []
+        if (!IsObject(sc))
+            return out
+        for button in sc.Buttons {
+            r := button["rect"]
+            out.Push(Map("name", button["name"], "id", button["id"], "x", r.X + r.W / 2, "y", r.Y + r.H / 2))
+        }
+        return out
     }
 
     ; The run states as the frame shows them: "running", "exception", or "recent" for a fade. The strength of a fade is not

@@ -20,28 +20,48 @@ class EditorAdd {
 
     ; An element of kind is placed with its top left corner at the flow position (x, y): the class list opens. Returns false
     ; when nothing opens (a list is open, no seam, or the flow is not loaded yet).
-    Placed(kind, x, y) {
+    Placed(kind, x, y) => this.Add(kind, x, y)
+
+    ; The same with more operations in the same patch (WI-0100, a connection to the new element): connect is "" or a function
+    ; (newId) => Array of operations that go into the patch after element.add. done(ok) is called once when the answer is
+    ; known: ok is false for a cancel and for a patch that was refused (then nothing is added).
+    Add(kind, x, y, connect := "", done := "") {
         if (this.busy || !IsObject(this.chooser) || !(this.model.draft.root is Map))
             return false
         groups := NewElementCatalog.Groups(kind, this.userLevel)
         this.busy := true
-        this.chooser.Choose(kind, groups, (classId) => this._Chosen(kind, x, y, classId))
+        this.chooser.Choose(kind, groups, (classId) => this._Chosen(kind, x, y, classId, connect, done))
         return true
     }
 
     ; The answer of the list: classId is the qualified ID of the class, or "" for a cancel (nothing is added).
-    _Chosen(kind, x, y, classId) {
+    _Chosen(kind, x, y, classId, connect, done) {
         this.busy := false
         draft := this.model.draft
-        if (classId = "" || !(draft.root is Map))
+        if (classId = "" || !(draft.root is Map)) {
+            if (IsObject(done))
+                done(false)
             return false
+        }
         id := draft.NextId("element")
         el := NewElementCatalog.NewElement(kind, classId, x, y, id, NewElementCatalog.HasManualTrigger(draft.root))
-        res := draft.Commit([Map("op", "element.add", "element", el)], true)
-        if (!res["ok"])
+        ops := [Map("op", "element.add", "element", el)]
+        if (IsObject(connect)) {
+            for op in connect(id)
+                ops.Push(op)
+        }
+        res := draft.Commit(ops, true)
+        if (!res["ok"]) {
+            if (IsObject(connect))
+                this.model.Notice("The connection was not made")
+            if (IsObject(done))
+                done(false)
             return false
+        }
         draft.SetSelection([id], "one")
         this.model.SelectionChanged()
+        if (IsObject(done))
+            done(true)
         return true
     }
 }
