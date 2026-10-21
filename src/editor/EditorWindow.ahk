@@ -44,6 +44,7 @@ class EditorWindow {
     static WM_MOUSEWHEEL := 0x020A
     static WM_MOUSELEAVE := 0x02A3
     static WM_KEYDOWN := 0x0100
+    static WM_ACTIVATE := 0x0006           ; the menu bar is brought up to date when the window is activated (paste, WI-0104)
     static SIZE_SHARE := 0.9
     static HOVER_MS := 500
     static WHEEL_NOTCH := 120
@@ -78,6 +79,7 @@ class EditorWindow {
         this.frameFn := () => this._Frame()
         this.hoverFn := () => this._HoverTimer()
         this.keyFn := (wParam, lParam, msg, hwnd) => this._OnKey(wParam, hwnd)
+        this.activateFn := (wParam, lParam, msg, hwnd) => this._OnActivate(wParam, hwnd)
         this.mouseFns := Map(
             EditorWindow.WM_MOUSEMOVE, (wParam, lParam, msg, hwnd) => this._OnMove(wParam, lParam, hwnd),
             EditorWindow.WM_LBUTTONDOWN, (wParam, lParam, msg, hwnd) => this._OnDown("left", lParam, hwnd),
@@ -91,6 +93,7 @@ class EditorWindow {
         OnMessage(EditorWindow.WM_ERASEBKGND, this.eraseFn)
         OnMessage(EditorWindow.WM_SIZE, this.sizeFn)
         OnMessage(EditorWindow.WM_KEYDOWN, this.keyFn)
+        OnMessage(EditorWindow.WM_ACTIVATE, this.activateFn)
         for msg, fn in this.mouseFns
             OnMessage(msg, fn)
         this.Refresh()
@@ -339,6 +342,14 @@ class EditorWindow {
     }
 
     ; WM_KEYDOWN of this window: the key table (EditorKeys) decides; a key it does not know goes on to Windows.
+    ; WM_ACTIVATE: the window became active. The clipboard may have changed in another program, so the paste state of the
+    ; menu bar is checked again (EditorMenus.Refresh). wParam's low word is 0 when the window was deactivated.
+    _OnActivate(wParam, hwnd) {
+        if (hwnd != this.hwnd || this.closed || (wParam & 0xFFFF) = 0)
+            return
+        try this.role.menus.Refresh()
+    }
+
     _OnKey(vk, hwnd) {
         if (hwnd != this.hwnd || this.closed)
             return
@@ -489,6 +500,7 @@ class EditorWindow {
         OnMessage(EditorWindow.WM_ERASEBKGND, this.eraseFn, 0)
         OnMessage(EditorWindow.WM_SIZE, this.sizeFn, 0)
         OnMessage(EditorWindow.WM_KEYDOWN, this.keyFn, 0)
+        OnMessage(EditorWindow.WM_ACTIVATE, this.activateFn, 0)
         for msg, fn in this.mouseFns
             OnMessage(msg, fn, 0)
         if (IsObject(this.canvas)) {
