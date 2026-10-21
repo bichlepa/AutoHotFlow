@@ -16,8 +16,8 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 | ID | Title | Status | Phase 3 |
 |---|---|---|---|
-| F-9000 | REQ-USE-080 names REQ-USE-070 for the switch of the notices, but REQ-USE-070 is the requirement of hints (WI-0109; PROTOCOL 4.7 follows the same wrong reference) | decision needed (correct the reference, or give the switch its own requirement); the owner decides | WI-0109 |
-| F-9001 | Show log with no running manager starts the manager, and the log window is not filtered to the flow (WI-0109, PROTOCOL 4.11) | open, low; the manager is normally running | WI-0109 |
+| F-9000* | REQ-USE-080 names REQ-USE-070 for the switch of the notices, but REQ-USE-070 is the requirement of hints (WI-0109; PROTOCOL 4.7 follows the same wrong reference) | decision needed (correct the reference, or give the switch its own requirement); the owner decides | WI-0109 |
+| F-9001* | Show log with no running manager starts the manager, and the log window is not filtered to the flow (WI-0109, PROTOCOL 4.11) | open, low; the manager is normally running | WI-0109 |
 | F-0162 | The frame of a drag of 30 elements in a flow of 300 is 25 ms at 1920 × 1080 (budget 16 ms); one element meets it (WI-0097, MS-0051) | decision needed, measured; WI-0097 | WI-0097 |
 | F-0170 | The trigger switch of the editor does not ask the force question that the flow commands ask when a state cannot be read (WI-0104, REQ-TRG-030) | decision needed (add the question, or keep the status text as documented) | S0006 |
 | F-0171 | Real mouse and real keys of the editing actions (select, move, add, connect, delete, the menus) are not in any gui test; only the wheel, the drag of the view and the menus have one (WI-0104, REQ-EDT-050 to REQ-EDT-080) | open; owner's manual check 10 covers it | S0006 |
