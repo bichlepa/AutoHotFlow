@@ -44,7 +44,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0111 | Help window: viewer interface, classic viewer, browser, setting | done | haiku | see git log | 2026-10-21 | E0099; role `help` on demand; F-0177 (settings log-threshold test flaky, 3 of 5), F-0178 (pending-page path untested); gui check at 100/225 % for the owner; no HOW-TO entry yet |
 | WI-0112 | Help content: Markdown, generator, core pages | done | haiku | see git log | 2026-10-21 | F-0167 owner decision; 17 pages with v1 markers for S0008; markdown pinned (generated HTML compared byte for byte); `Variables.md` still says threads |
 | WI-0113 | Window of an unhandled error | done | haiku | see git log | 2026-10-21 | PROTOCOL 4.7a; owner: variable values (also passwords) kept in engine memory and shown in clear text; cyclic object cannot be stringified (not reachable via normal assignment); tray click does not open it; slow/foundation tiers via verify | | | | may run beside S0006 (not with WI-0093/WI-0094: `Executor.ahk`) |
-| WI-0115 | Help viewer with WebView2 | open | | | | spike first; if it fails, the classic viewer stays (E0099) |
+| WI-0115 | Help viewer with WebView2 | done | haiku | f1e44ea5, 779b9531 | 2026-10-21 | E0099; spike ok (runtime 155, real window); loader DLL by the setup task (not committed, S0009 ships it); gui check at 100/225 % for the owner (tests/fault/test_help_webview2_gui.py); links to the web and the new-window request not checked; HOW-TO com-and-native-calls.md |
 | WI-0114 | Acceptance S0007 | open | | | | manual check 11 |
 
 ## Pending integrations

@@ -31,7 +31,7 @@ L411-422 9. Performance budgets (targets, measured in Phase 2)
 L424-434 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (184.3 KB, 782 lines)
+## doc/PROTOCOL.md (184.8 KB, 782 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
@@ -160,6 +160,20 @@ L21-37 3. Forbidden patterns (review rules)
 L39-44 4. Errors and protocol
 L46-55 5. AHK v2 pitfalls (short)
 L57-63 6. Tests and docs
+```
+
+## doc/howto/com-and-native-calls.md (6.9 KB, 85 lines)
+```text
+L7-13 A function stored in a property is called with its owner as first argument (verified)
+L15-21 COM method index = position in the header + 3 (verified)
+L23-29 Pointers handed to a callback belong to the caller until we AddRef them (verified)
+L31-37 A string from COM is freed with CoTaskMemFree (assumed)
+L39-45 HRESULT and pointer parameters of a callback: mask the upper bits (verified)
+L47-53 A handler object is a vtable of four callbacks plus one pointer (partly verified)
+L55-61 Global and function names are one name (verified)
+L63-69 A path for WebView2 must be a full path (assumed)
+L71-77 The WebView2 user data folder is created by the runtime (verified)
+L79-85 The event registration token is an Int64 out parameter (verified)
 ```
 
 ## doc/howto/drawing-gdip.md (5.9 KB, 59 lines)
