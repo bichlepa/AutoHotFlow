@@ -339,5 +339,5 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 
 **What:** the review of WI-0096 found two behaviours of the editor draft. (1) A refused or lost patch that only carries the view (zoom, offset) goes through the same path as a content patch and clears the undo stacks, so the user loses the undo because of a zoom. (2) `EditorModel._OnDefinition` sets the view from the flow settings of every definition, also from an `evt.flow.committed` of someone else, so an unsaved zoom jumps back.
 **Options:** (a) let view patches skip the clearing of the stacks, and keep the live view once the first definition has arrived; (b) accept it until the automatic saving (WI-0095) makes view patches rare.
-**Status:** open, found by reading, not reproduced. Best handled in WI-0098 (the first user of the view in the editor).
+**Status:** partly fixed in WI-0098 (not closed). (2) is fixed and tested: the view is read from the first definition only (`EditorModel._OnDefinition`; `tests/e2e/test_editor_select.py::test_a_wheel_zoom_survives_a_change_of_the_flow_by_someone_else`). (1) is changed in code (`EditorDraft._Refuse` and `_Lost` keep the undo steps when only a view patch was dropped) but not tested yet.
 
