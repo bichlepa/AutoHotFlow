@@ -26,7 +26,7 @@ Code state of the runs: commit `682873bf`. The code is that of `0e7a7c3f`; the l
 3. **Nothing lost:** new file `tests/e2e/test_editor_nothing_lost.py` (4 tests, commit `ea85d0dd`, groups `editor`, `tray`). All four passed serially on the first run. The 10 s rule for an engine killed before its write stays in the integration tests, whose timers are controlled.
 4. **Measurements:** MS-0056 (drag and rebuilds, renderer bench), MS-0057 (engine time of a patch, bench), MS-0058 (round trip during a run, stress). Commits `50ccd737`, `0b80b634`.
 5. **Manual check 10:** section 10 of `doc/MANUAL-CHECKS.md` and two VS Code tasks (the start, and the crash notice gui test, which had none). Commit `6b1fd465`. Open for the owner.
-6. **Documents:** REQUIREMENTS (`0fa79fdf`), MIGRATION M-0095 and OPEN-ITEMS F-9000* to F-9003* (`a678f74f`), ARCHITECTURE 4.2 and two HOW-TO entries (`268426bb`), STATUS and README (`0b80b634`, `1c680527`). PROTOCOL: no interface changed in this item (no message type, no field), so it was not touched. ARCHITECTURE 2.1, 8 and 10: no change needed by this item. `python tools/doc_index.py --check` passes.
+6. **Documents:** REQUIREMENTS (`0fa79fdf`), MIGRATION M-0096 and OPEN-ITEMS F-9000* to F-9003* (`a678f74f`), ARCHITECTURE 4.2 and two HOW-TO entries (`268426bb`), STATUS and README (`0b80b634`, `1c680527`). PROTOCOL: no interface changed in this item (no message type, no field), so it was not touched. ARCHITECTURE 2.1, 8 and 10: no change needed by this item. `python tools/doc_index.py --check` passes.
 7. **Retrospective and S0007 refinement:** section 7. The proposal is in the files `WI-0105` to `WI-0113` and `WI-0115` (section "Refinement from WI-0104", commits `1c680527`, `d3e830a3`) and in the plan (`### Refinement of S0007` in `README.md`), marked as a proposal for the owner.
 8. **Runs:** section 3.
 
@@ -58,7 +58,7 @@ The `verify.py` VERDICT of `d3e830a3` was red: fast (the doc test and the cold w
 - **The dialog title "Create new <kind>" needs no new keys.** `EditorWindow.Choose` passes `"Create new " kind` as the title key; `UiDialogs` resolves it through `Lang`. The keys `Create new action`, `... condition`, `... loop` and `... trigger` already exist in `assets/language/basic/en.ini` (lines 66 to 69) and `de.ini` (lines 256 to 259), and partly in `ko.ini` and `ru.ini`. The task asked for four keys en and de; they were not added because they exist. Verified by reading `LangTable` and `UiTexts`; not seen in a window.
 - **ko and ru editor texts:** not translated. The language table falls back to English (`LangTable.Fallback`). Open: F-9002*.
 - **Trigger switch, force question:** not added. Documented as an open decision, F-9000*: the owner chooses between the question and the documented status text.
-- **Paste limit 2 MB:** done (`63ab5ba2`), recorded as M-0095.
+- **Paste limit 2 MB:** done (`63ab5ba2`), recorded as M-0096.
 - **Real-mouse gui tests for the editing gestures:** not written in this item (time; the owner's manual check 10 covers them). Open: F-9001*.
 - **The patch numbers** come from the existing benches (MS-0057) and from a stress test (MS-0058); no new measurement test was added.
 - **`AHF_MEASURE_OUT`** was set for one stress run to keep the round-trip line (MS-0058); it is not a permanent part of the test.

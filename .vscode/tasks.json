@@ -1117,6 +1117,9 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             },
+            "group": "test",
+            "problemMatcher": []
+        },
         {
             "label": "Test: editor crash notice, balloon click (gui, a killed editor gives a balloon; the click is sent; do not use the PC)",
             "type": "shell",
