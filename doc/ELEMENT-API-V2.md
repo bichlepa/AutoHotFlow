@@ -87,6 +87,25 @@ class Action_Example extends AhfElement {
 
 **Parameter container:** `params` is an object with case-insensitive property access (`params.Duration` equals `params.duration`), as v1 uses it. Variable stores, on the other hand, are `Map` objects with `CaseSense := "Off"`, so that variable names remain case-insensitive as in v1 and v2 objects are not confused with them.
 
+### 2.1 Parameter fields of the settings form (WI-0105)
+
+`Parameters(ctx)` describes the settings dialog as in v1: an Array of objects (or Maps), one per field, in the order of the dialog. The settings form model (`src/editor/form/`, `ElementForm`, section 3) reads it; the window of WI-0106 shows it. The keys are those of v1 (`v1/Source_Editor/User Interface/Element settings.ahk`):
+
+| Key | Meaning |
+|---|---|
+| `type` | the kind of field (the list below). Compared **without regard to case** (`edit` and `Edit`, `multiLineEdit` and `multilineEdit`) |
+| `id` | the parameter the field holds: a text, or an Array when one field holds several parameters (then `default` is an Array too, one entry per id). A field without `id` holds no value |
+| `label` | the text shown with the field. `form.SetLabel` changes it while the form is open |
+| `default` | the value when the flow does not have the parameter (v1 writes it into the file when the flow is loaded) |
+| `content` | the content type of an edit field: one text (`String`, `Expression`, `Number`, `PositiveNumber`, `Integer`, `PositiveInteger`, `PositiveIntegerOrZero`, `VariableName`, `RawString`), or an Array when the user chooses one of them. Then `contentID` names the parameter that holds the choice (the text or the index of the entry) and `contentDefault` the choice when that parameter is missing |
+| `WarnIfEmpty` | the value must not be empty (a warning of the field, not a refusal) |
+| `choices`, `enum`, `result` | the texts of a radio, drop-down, combo box or list box, the values they stand for (`enum`) and the type of the value (`enum`: the enum value is stored, `number`: the index, `string`). `form.SetChoices` changes choices and enum while the form is open |
+| `size` | `small`: a smaller label (display only) |
+
+The field types (`type`): `Label`, `Edit`, `multilineEdit`, `Checkbox`, `Radio`, `Slider`, `DropDown`, `ComboBox`, `Hotkey`, `Button`, `File`, `Folder`, `weekdays`, `DateAndTime`, `listbox`. A `Label` and a `Button` hold no value; every other type holds the value of its `id`. An unknown type is logged; its value is kept, without any check.
+
+The checks of the form model (warnings, as in v1; they run after every change): `WarnIfEmpty` (an empty value), a `VariableName` content (the rules of the expression language; `%name%` is allowed), and the number content types when the text is a plain number (`IsNumber`, `IsInteger`, not negative for the positive types). An expression is not evaluated while the user types; that check is WI-0108.
+
 ---
 
 ## 3. Context `ctx`
@@ -127,8 +146,14 @@ class Action_Example extends AhfElement {
 | `ctx.Request(type, payload, callback, timeoutMs := 5000)` | – (new) | A `cmd.*` request to the engine with callback, `execId` added to the payload (WI-0050). Returns at once; `callback(answerPayload)` runs later on a thread of its own (it may call the variable functions), not at all when the element has ended or was stopped. An exception in the callback ends the element with `exception`. Workers only (triggers: when a trigger needs it); inline it throws. |
 | `ctx.RunScript(code, imports, exports)` | `x_ExecuteInNewAHKThread` | for AHK code elements. Always runs as a worker. |
 | `Lang(key, args*)` | `x_lang` | global function, language files unchanged |
-| `form.Disable(id, cond)`, `form.Enable(id, cond)` | `x_Par_Disable`/`x_Par_Enable` | only in `CheckSettings` |
-| `form.SetValue(id, v)`, `form.SetChoices(id, list)`, `form.SetLabel(id, text)` | `x_Par_SetValue` etc. | – |
+| `form.Disable(id, cond := true)`, `form.Enable(id, cond := true)` | `x_Par_Disable`/`x_Par_Enable` | enable or disable the field of `id` (a label id too). Also used by the window, not only in `CheckSettings` |
+| `form.SetValue(id, v)`, `form.GetValue(id)` | `x_Par_SetValue`, `x_Par_GetValue` | the value of a parameter (or of a content ID, section 2.1). `SetValue` runs `CheckSettings` again unless a check is running (then it only sets the value). The content type of an edit field is `form.GetValue(contentID)` |
+| `form.SetChoices(id, list, enums := "")`, `form.SetLabel(id, text)` | `x_Par_SetChoices`, `x_Par_SetLabel` | choices (and their enum values) and the label of a field |
+| `form.FirstCall` (property) | `x_FirstCallOfCheckSettings` | true during the first `CheckSettings` call after the form opened, false afterwards |
+| `form.staticValues` (a `Map`, property) | the `staticValuesForCheckSettingsFunction` array | kept as long as the form is open; `CheckSettings` gets the same `Map` as its third argument |
+| `form.Warnings()` | the warning text of the field (`warningText`) | an Array of Maps `id` and `text`, one per warning. `id` is `""` for a warning of the form itself, e.g. an exception of `CheckSettings`, which is also logged (`a0`) |
+
+`CheckSettings(form, params, staticValues)` gets the current values as `params` (object, property access) and runs at the start of the form and after every change of a value. An exception in it, or in `GenerateName`, becomes a warning of the form and a log line; the form goes on (element code never ends the editor). `GenerateName(ctx, params)` gives the name when the name is the standard name.
 
 The number of v1 helpers (`x_*`) actually used is 88. The most frequent: `x_lang` (2211 calls), `x_finish` (681), `x_Par_Disable`/`Enable` (~420), `x_SetVariable` (171), `x_AutoEvaluateParameters` (129).
 

@@ -376,7 +376,7 @@ AutoHotFlow/
 │  ├─ supervisor/  storage/  triggerhost/  worker/  tray/
 │  ├─ engine/               # Engine, Executor, WorkerBridge; core/ (flow model, state machines, FlowExprConvert); vars/ (variable model, WI-0040/41)
 │  ├─ ui_common/            # GUI helpers for the UI roles: UiWindow, UiDialogs, UiFileDialogs, UiTexts (WI-0069, E0076); the window layout is core/GuiLayout.ahk
-│  ├─ manager/  editor/     # editor/: the headless model since WI-0084 (geometry, view, scene), render/ since WI-0083 (Gdip*.ahk, the GDI+ wrapper, E0085) and the Renderer interface (D0004) in WI-0085; the window of WI-0088
+│  ├─ manager/  editor/     # editor/: the headless model since WI-0084 (geometry, view, scene), `form/` the settings form model of an element since WI-0105 (`ElementForm.ahk`, `FormField.ahk`, `FormChecks.ahk`: the fields of `Parameters()`, the values, `CheckSettings` and the checks, no window; doc/ELEMENT-API-V2.md section 2.1), render/ since WI-0083 (Gdip*.ahk, the GDI+ wrapper, E0085) and the Renderer interface (D0004) in WI-0085; the window of WI-0088
 │  ├─ expr/                 # library: expression language (tokenizer, parser, syntax tree, parse cache), doc/EXPRESSION-LANGUAGE.md
 │  ├─ debugview/            # role debug (WI-0028): DebugView.ahk, DebugGui.ahk
 │  └─ elements/
