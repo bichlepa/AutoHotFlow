@@ -6,6 +6,7 @@
 #Include ..\core\Time.ahk
 #Include ..\core\Snapshot.ahk
 #Include ..\core\SettingsModel.ahk
+#Include ..\core\HelpPageId.ahk
 #Include ..\core\PipeNames.ahk
 #Include ..\core\ipc\Wake.ahk
 #Include Hub.ahk
@@ -168,6 +169,7 @@ class Supervisor {
         this.startupWanted := false
         this.startupAction := ""
         this.pendingNotices := []
+        this.pendingHelp := false      ; the page of a cmd.help.show that waits for the help role's hello (a string, "" = index)
         this.elevationState := "not wanted"      ; for the snapshot: not wanted, declined
         this.restart := ""                       ; "" or Map(elevate) when cmd.app.restart started the exit
         ; Only with --test-roles: how long a finished report waits for storage (DiagReport.STORAGE_WAIT_MS).
@@ -245,6 +247,7 @@ class Supervisor {
         h.On("cmd.process.", (msg) => this._OnProcess(msg))
         h.On("cmd.editor.", (msg) => this._OnEditor(msg))
         h.On("cmd.manager.showLog", (msg) => this._OnManagerLog(msg))
+        h.On("cmd.help.show", (msg) => this._OnHelp(msg))
         h.On("cmd.diag.report", (msg) => this._OnReport(msg))
         h.On("evt.diag.error", (msg) => this._OnDiagError(msg))
         h.On("evt.settings.changed", (msg) => this._OnSettings(msg))
@@ -263,6 +266,8 @@ class Supervisor {
         this.shutdown.OnHello(link["name"])
         if (link["name"] = "tray")
             this._SendNotices()
+        if (link["name"] = "help")
+            this._SendHelp()
     }
 
     ; The notices the supervisor itself has (the elevation did not happen): to the tray, as soon as it is connected.
@@ -483,6 +488,51 @@ class Supervisor {
         this.hub.Reply(msg, shown ? Map("ok", true, "started", Json.False)
             : Map("ok", false, "message", "the manager did not show the log"))
     }
+
+    ; cmd.help.show {page} (WI-0111, PROTOCOL 4.12): the manager and the editors ask for a help page. A running help role is
+    ; asked (cmd.help.show, 4.12) and answers when its window shows the page; one that is not running is started, and the
+    ; page is sent when it says hello (the command line stays as it is). The answer says whether a process was started.
+    _OnHelp(msg) {
+        if (msg.from != "manager" && Role.BaseName(msg.from) != "editor")
+            throw AhfError(msg.type " is reserved for the manager and the editors, not for '" msg.from "'", ErrCode.DENIED)
+        page := msg.payload.Get("page", "")
+        if (!HelpPageId.IdOk(page))
+            throw AhfError("payload field 'page' must be a help page ID", ErrCode.BAD_PAYLOAD)
+        if (this.children.shuttingDown)
+            throw AhfError("the supervisor is shutting down", ErrCode.SHUTTING_DOWN)
+        if (this.hub.HasLink("help")) {
+            this.hub.Request("help", "cmd.help.show", Map("page", page), (ans) => this._OnHelpAnswer(msg, ans), 3000)
+            return Deferred.Marker()
+        }
+        this.pendingHelp := page
+        started := this.children.Open("help")
+        Log.Write("a1", "supervisor", "help page '" page "': the help role " (started ? "started" : "is starting"))
+        return Map("ok", true, "started", Json.Bool(started))
+    }
+
+    ; The page that waited for the hello of the help role goes to it now (PROTOCOL 4.12).
+    _SendHelp() {
+        if (!(this.pendingHelp is String))
+            return
+        page := this.pendingHelp
+        this.pendingHelp := false
+        this.hub.Request("help", "cmd.help.show", Map("page", page), (ans) => this._OnHelpSent(page, ans), 3000)
+    }
+
+    _OnHelpSent(page, ans) {
+        if (!this._HelpShown(ans))
+            Log.Write("a0", "supervisor", "help page '" page "': the help role did not show it")
+    }
+
+    _OnHelpAnswer(msg, ans) {
+        shown := this._HelpShown(ans)
+        if (!shown)
+            Log.Write("a0", "supervisor", "help page: the help role did not show it")
+        this.hub.Reply(msg, shown ? Map("ok", true, "started", Json.False)
+            : Map("ok", false, "message", "the help role did not show the page"))
+    }
+
+    _HelpShown(ans) => (IsObject(ans) && ans.payload.Get("ok", false)) ? true : false
 
     static _RequireEngine(msg) {
         if (msg.from != "engine")

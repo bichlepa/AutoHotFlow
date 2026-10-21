@@ -404,7 +404,7 @@ AutoHotFlow/
 - `engine/FlowStateFile.ahk` (WI-0060): the enabled state of the triggers in `FlowStates/<flowId>.json` (read per flow at start, written at most once per second per flow through storage); `engine/FlowRecord.ahk` holds the target state per trigger. `storage/StateFiles.ahk` is the file side.
 - `engine/vars/` (WI-0040): the variable model of the engine (scopes, built-in variables, `%var%` substitution, the resolver of the evaluator), doc/EXPRESSION-LANGUAGE.md section 18. It replaces `elements/base/VarStore.ahk` of Phase 2; `ExecContext` gets the access object from the engine. `VarLoader` and `VarWriter` (WI-0041) load the global and static variables through `storage` at the start and write the changes back, PROTOCOL 4.6.
 
-Rule: a folder under `src/` is a process role or library module. `core/` may not include anything from role folders. Role folders include only `core/`, `expr/` (library, includes only `core/`), `ui_common/` (UI roles only) and `elements/`, never each other.
+Rule: a folder under `src/` is a process role or library module. `core/` may not include anything from role folders. Role folders include only `core/`, `expr/` (library, includes only `core/`), `ui_common/` (UI roles only: manager, editor, help) and `elements/`, never each other.
 
 ---
 

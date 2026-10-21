@@ -29,6 +29,7 @@ INFO = {
     "debug": {"topics": list, "processes": list, "snapshots": list, "logEntries": int, "engineEvents": int,
               "dumps": list, "paused": bool},
     "tray": {"iconHidden": bool, "tip": str, "items": list, "requests": int, "lastResult": str},
+    "help": {"viewer": str, "page": str, "shown": int, "lastResult": str},
     "echo": {},
 }
 SUPERVISOR = {"hub": dict, "children": list, "diagErrors": list, "diagLog": dict, "processEvents": list,

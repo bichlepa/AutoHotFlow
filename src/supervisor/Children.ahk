@@ -801,6 +801,8 @@ class Children {
     _RankOf(role) {
         if (role = "manager" || role = "editor" || role = "debug" || role = "tray")
             return 0
+        if (role = "help")                  ; a window the user closes, as the manager: no automatic restart (WI-0111)
+            return 0
         if (role = "engine")
             return 1
         if (role = "triggerhost")

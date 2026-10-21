@@ -256,7 +256,7 @@ def check_text(relpath, text):
                 add(m.start(), "include-roles", f"#Include {target} ({role}/ must not include {troot}/)")
             continue
         if troot == "ui_common":
-            if role not in ("manager", "editor"):
+            if role not in ("manager", "editor", "help"):      # the UI roles (WI-0111 adds help)
                 add(m.start(), "include-roles", f"#Include {target} (ui_common/ is for UI roles only)")
             continue
         add(m.start(), "include-roles", f"#Include {target} ({role}/ must not include {troot}/)")
