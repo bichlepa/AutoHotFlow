@@ -87,6 +87,7 @@ This document lists findings that are closed or accepted. Entries are moved here
 | F-0142 | PROTOCOL documents message types that no source string uses | closed 2026-10-19: `evt.connection.state` and `cmd.ui.confirmDeleteFlowFile` removed from PROTOCOL (dead; M-0008, WI-0086), the status table brought to the code | WI-0082 |
 | F-0159 | REQ-EDT-230: the table of the editor's tray menu says that "Close" asks the question about unsaved changes, but REQ-EDT-100 says that closing the editor asks nothing | closed (decided by the owner on 2026-10-20: REQ-EDT-100 holds, REQ-EDT-230 corrected) | WI-0092 |
 | F-0143 | A `-m stress` run opens a real manager window | closed 2026-10-19: fixed in `tests/conftest.py` (a run that names stress, soak or idle but not gui leaves gui tests out, also with `--all`), test `tests/test_tier_selection.py` | WI-0082 |
+| F-0170 | The trigger switch of the editor does not ask the force question that the flow commands ask when a state cannot be read (WI-0104, REQ-TRG-030) | closed (option a, E0101; built in WI-0107) | WI-0107 |
 | F-0144 | The fast tier takes 4 to 13 minutes, not the 1 to 2 minutes of the owner decision F-0108 | closed (owner decision E0089: no fixed budget, the test groups decide) | |
 | F-0151 | The static layer rebuild is slow at 4K | accepted | WI-0085 |
 | F-0158 | Three basic language files are UTF-16 but are read as UTF-8 | closed (files re-saved as UTF-8) | WI-0091 |
@@ -846,6 +847,12 @@ This document lists findings that are closed or accepted. Entries are moved here
 **What:** REQ-EDT-230 (table of the tray menu) says that "Close" closes the editor "with the question about unsaved changes (REQ-EDT-100)". REQ-EDT-100 says that a flow has no unsaved state, so "closing the editor or the application asks nothing". Manual check 9, step 15 expects no question.
 **Status (before closing):** open; a decision of the project owner: either the question goes (as REQ-EDT-100 says) or the requirement names it again.
 **Closed (2026-10-20, decided by the owner):** REQ-EDT-100 holds, REQ-EDT-230 is corrected: "Close" closes the editor without a question, as the close box does (a flow has no unsaved state). The code (`EditorTray.Close`) and the planned-end test (`tests/e2e/test_editor_tray.py`) already did so.
+
+### F-0170: The trigger switch of the editor asks no force question
+
+**What:** the flow commands of the editor (run, stop, enable, disable) ask a question with the choice "force" when the engine cannot read the state of a flow (the tray and the menu do this, E0087). The switch of a trigger (`EditorTriggers.Switch`, `cmd.trigger.enable` or `cmd.trigger.disable`) does not: a refused switch is the status text "The trigger could not be switched: nothing changed" (WI-0102).
+**Options (for the owner):** (a) add the same question for the trigger switch (one more dialog path in `EditorFlowOps`, about one day); (b) keep the status text and write it into REQ-TRG-030 as the chosen behavior (the trigger keeps its state; the user retries).
+**Status:** closed (built in WI-0107, option (a), E0101). The switch asks the force question when the engine answers that the state of the flow cannot be read; yes sends `force: true`, no changes nothing. Test: `tests/e2e/test_editor_flow_ctx.py::test_a_switch_of_a_trigger_whose_state_cannot_be_read_asks_the_force_question_no_changes_nothing_yes_writes_it`, which also shows what the engine answers (`cannot be read (`). Measured: no (read of `src/editor/EditorTriggers.ahk`). Not checked: what the engine answers for a trigger whose state cannot be read.
 
 ## Sources
 

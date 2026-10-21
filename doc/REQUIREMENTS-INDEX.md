@@ -139,7 +139,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-TRG-010](REQUIREMENTS.md#req-trg-010-triggers-react-at-once-whatever-the-load) | L1127-1136 | Triggers react at once, whatever the load | no | done | must | port | S0003 (measured, MS-0038 and MS-0040) |
 | [REQ-TRG-020](REQUIREMENTS.md#req-trg-020-triggers-follow-the-enabled-state-also-after-a-restart) | L1138-1147 | Triggers follow the enabled state, also after a restart | yes | partial | must | port | S0003 (done), S0008 (the other trigger types) |
 | [REQ-TRG-040](REQUIREMENTS.md#req-trg-040-conflicting-hotkeys-are-reported) | L1149-1157 | Conflicting hotkeys are reported | no | open | should | later | - |
-| [REQ-TRG-030](REQUIREMENTS.md#req-trg-030-several-triggers-per-flow) | L1159-1168 | Several triggers per flow | yes | partial | must | port | S0003 (WI-0060 done), S0006 (WI-0094 done, WI-0102) |
+| [REQ-TRG-030](REQUIREMENTS.md#req-trg-030-several-triggers-per-flow) | L1159-1168 | Several triggers per flow | yes | partial | must | port | S0003 (WI-0060 done), S0006 (WI-0094 done, WI-0102), S0007 (the force question, WI-0107) |
 | [REQ-TRG-050](REQUIREMENTS.md#req-trg-050-triggers-that-switch-with-the-flow-or-on-their-own) | L1170-1189 | Triggers that switch with the flow or on their own | no | partial | should | port | S0003 (WI-0060 done, WI-0065 done), S0004 (manager), S0006 (new triggers, WI-0094 done, E0092), S0007 (the checkbox, WI-0107) |
 | [REQ-TRG-200](REQUIREMENTS.md#req-trg-200-manual-trigger) | L1191-1205 | Manual trigger | yes | partial | must | port | S0002 (WI-0047) |
 | [REQ-TRG-210](REQUIREMENTS.md#req-trg-210-time-triggers) | L1207-1219 | Time triggers | yes | partial | must | port | S0003 (WI-0063 done), S0008 |

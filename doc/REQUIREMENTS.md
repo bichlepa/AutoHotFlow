@@ -697,11 +697,11 @@ Each group of elements is one requirement with a table of its elements. The fiel
 ### REQ-ELM-010 Element contract and registry
 
 - **v1:** yes
-- **v2:** partial (class contract, registry, parameters and run/stop work; the settings check and the parameter schema are used by the settings form model, WI-0105; the window and the other editor metadata come with S0007)
+- **v2:** partial (class contract, registry, parameters and run/stop work; the settings check and the parameter schema are used by the settings form model, WI-0105; the settings of the flow elements list the other flows and their triggers by name (WI-0107, headless); the window and the other editor metadata come with S0007)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0047), S0007 (editor)
-- **Evidence:** `tests/ahk/element_registry.test.ahk`, `tests/ahk/element_runner.test.ahk`, `tests/ahk/editor_form.test.ahk`
+- **Evidence:** `tests/ahk/element_registry.test.ahk`, `tests/ahk/element_runner.test.ahk`, `tests/ahk/editor_form.test.ahk`, `tests/e2e/test_editor_flow_ctx.py::test_the_settings_list_the_flows_and_the_triggers_of_another_flow_with_their_names`
 
 An element is a class with: name, category, user level, stability (stable or experimental), icon, parameter schema, `Run`, `Stop`, settings check (`CheckSettings`) and its execution mode (`inline`, `worker`, `trigger`). Contract: `ELEMENT-API-V2.md`.
 
@@ -1159,22 +1159,22 @@ When two enabled flows, or two triggers of one flow, use the same hotkey or hots
 ### REQ-TRG-030 Several triggers per flow
 
 - **v1:** yes
-- **v2:** partial (each trigger has its own enabled state and can be switched on its own; the editor switches a trigger with its switch and makes a manual trigger the default with its star (WI-0102, headless; the real mouse: gui, owner); no trigger is armed yet; WI-0104: the switch of the editor asks no force question when the state of a trigger cannot be read, unlike the flow commands (open decision, OPEN-ITEMS F-0170); manual check 10, steps 21 and 22 (owner))
+- **v2:** partial (each trigger has its own enabled state and can be switched on its own; the editor switches a trigger with its switch and makes a manual trigger the default with its star (WI-0102, headless; the real mouse: gui, owner); when the state of the flow cannot be read, the switch asks the force question as the flow commands do: no changes nothing, yes writes the state of the session (E0101, WI-0107, headless); manual check 10, steps 21 and 22 (owner))
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003 (WI-0060 done), S0006 (WI-0094 done, WI-0102)
-- **Evidence:** `tests/e2e/test_editor_menus.py::test_a_click_on_the_switch_of_a_trigger_switches_it_and_selects_nothing`, `tests/e2e/test_editor_menus.py::test_a_click_on_the_star_of_another_manual_trigger_makes_it_the_default_as_one_undo_step`, `tests/ahk/editor_scene.test.ahk` (the marks), `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_flow_patch_triggers.py::test_a_changed_interval_of_an_enabled_trigger_fires_at_the_new_interval`, `tests/integration/test_flow_patch_triggers.py::test_a_removed_trigger_fires_no_more_and_leaves_the_state_file`
+- **Plan:** S0003 (WI-0060 done), S0006 (WI-0094 done, WI-0102), S0007 (the force question, WI-0107)
+- **Evidence:** `tests/e2e/test_editor_flow_ctx.py::test_a_switch_of_a_trigger_whose_state_cannot_be_read_asks_the_force_question_no_changes_nothing_yes_writes_it`, `tests/e2e/test_editor_menus.py::test_a_click_on_the_switch_of_a_trigger_switches_it_and_selects_nothing`, `tests/e2e/test_editor_menus.py::test_a_click_on_the_star_of_another_manual_trigger_makes_it_the_default_as_one_undo_step`, `tests/ahk/editor_scene.test.ahk` (the marks), `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_flow_patch_triggers.py::test_a_changed_interval_of_an_enabled_trigger_fires_at_the_new_interval`, `tests/integration/test_flow_patch_triggers.py::test_a_removed_trigger_fires_no_more_and_leaves_the_state_file`
 
 A flow can have several triggers. Each trigger can be enabled and disabled on its own, and can be set to switch with the flow or on its own (REQ-TRG-050). One manual trigger is the default trigger, used when the flow is started without naming a trigger.
 
 ### REQ-TRG-050 Triggers that switch with the flow or on their own
 
 - **v1:** no (every trigger switches with the flow)
-- **v2:** partial (the engine has the option "switch with the flow" and the independent triggers, and the flow is active by the following ones only; the elements Set flow status and Flow enabled switch and ask by it (WI-0065); the manager and the editor are missing)
+- **v2:** partial (the engine has the option "switch with the flow" and the independent triggers, and the flow is active by the following ones only; the elements Set flow status and Flow enabled switch and ask by it (WI-0065); the editor has the checkbox "Switch with the flow" in every trigger dialog (WI-0107, headless); the manager is missing)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0003 (WI-0060 done, WI-0065 done), S0004 (manager), S0006 (new triggers, WI-0094 done, E0092), S0007 (the checkbox, WI-0107)
-- **Evidence:** `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_engine.py::test_a_flow_without_a_following_trigger_answers_with_a_message`, `tests/integration/test_flow_status_elements.py::test_set_flow_status_every_choice_for_another_flow`, `tests/integration/test_flow_status_elements.py::test_condition_flow_enabled_every_choice`, `tests/e2e/test_manager_flows.py::test_disable_of_an_inactive_flow_with_independent_triggers_yes_disables_them`, `tests/integration/test_flow_patch_triggers.py::test_a_trigger_added_to_an_inactive_flow_starts_disabled`, `tests/integration/test_flow_patch_triggers.py::test_an_undo_of_a_removal_brings_the_trigger_back_with_its_old_id_and_the_rules_of_a_new_one`
+- **Evidence:** `tests/e2e/test_editor_flow_ctx.py::test_a_trigger_dialog_has_switch_with_the_flow_and_it_is_written_as_the_key_of_the_element`, `tests/e2e/test_editor_flow_ctx.py::test_an_action_has_no_switch_with_the_flow`, `tests/ahk/engine_trigger_state.test.ahk`, `tests/integration/test_engine.py::test_switches_report_the_trigger_states_and_the_independent_count`, `tests/integration/test_engine.py::test_a_flow_without_a_following_trigger_answers_with_a_message`, `tests/integration/test_flow_status_elements.py::test_set_flow_status_every_choice_for_another_flow`, `tests/integration/test_flow_status_elements.py::test_condition_flow_enabled_every_choice`, `tests/e2e/test_manager_flows.py::test_disable_of_an_inactive_flow_with_independent_triggers_yes_disables_them`, `tests/integration/test_flow_patch_triggers.py::test_a_trigger_added_to_an_inactive_flow_starts_disabled`, `tests/integration/test_flow_patch_triggers.py::test_an_undo_of_a_removal_brings_the_trigger_back_with_its_old_id_and_the_rules_of_a_new_one`
 
 Each trigger has the option "Switch with the flow", on by default, so that a flow behaves as in v1 (decision E0056).
 

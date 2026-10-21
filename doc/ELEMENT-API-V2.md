@@ -239,6 +239,25 @@ Errors (ARCHITECTURE 6.2, REQ-TRG-010):
 - A callback (`After`, `Guard`) throws: `evt.trigger.error {triggerKey, gen, message}` and an `f0` entry; the trigger stays armed. A repeating callback schedules its next round before it throws, otherwise its timer chain ends.
 - The message of an error is the text of an `ElementError` as it is; any other error reads `<type>: <message>`.
 
+### 3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
+
+The settings of an element (`ElementForm`, section 2.1) get a context of the editor, `EditorElementCtx` (`src/editor/EditorElementCtx.ahk`). It is passed as `ctx` to `Parameters(ctx)` and `GenerateName(ctx, params)`, and it is `form.ctx` in `CheckSettings(form, params, staticValues)`. It is not an engine context: it exists only in the editor, and an element that is run never gets it. Without a context (a new element of the class list, a test) the lists are empty and the names are the IDs.
+
+| Member | Meaning |
+|---|---|
+| `ctx.flowId` | the flow of the editor (the own flow) |
+| `ctx.elementId` | the element of the settings; `""` for a new element |
+| `ctx.Flows()` | an Array of Maps `id` and `name`: every flow, the own flow included, in the order of the engine. A name that is not known yet is `""` |
+| `ctx.FlowName(flowId)` | the name of a flow, `""` if not known |
+| `ctx.Triggers(flowId, manualOnly := false)` | an Array of Maps `elementId`, `name` and `manual`, sorted by ID: the triggers of a flow (`manualOnly`: only `Default.Trigger_Manual`, v1 `trigger_manual`). The own flow is read from the draft (unsaved changes included); another flow from the engine's answer (below). Empty while the answer is not known |
+| `ctx.TriggerName(flowId, elementId)` | the name of a trigger, `""` if not known |
+
+The lists of the other flows are asked from the engine when a settings window opens (`cmd.engine.snapshot` for the flows, `cmd.flow.triggers` per flow for its triggers, `EditorFlowCatalog`). The answers are kept until `evt.flow.list.changed`. A list that is not known yet is empty and shows nothing; when the answer arrives, the open form runs `CheckSettings` again, so nothing waits for the engine. A name that is not known yet shows the ID.
+
+Helpers of the element package (`src/elements/Default/lib/FlowChoices.ahk`, shared by the flow elements): `FlowChoices.Flows(form, id)` and `FlowChoices.Triggers(form, flowId, id, manualOnly)` fill a drop-down with the texts `ID: name` and the IDs as enum values; `FlowChoices.FlowName(ctx, flowId)` and `FlowChoices.TriggerName(ctx, flowId, triggerId)` give the names for `GenerateName`.
+
+**"Switch with the flow" (WI-0107, E0056):** the settings of a trigger (a class with `static Mode := "trigger"`) have the checkbox `followsFlow` in every dialog. The editor adds it (`ElementForm`), not the class. It is not a parameter: the value is written as the key `followsFlow` of the element (true or false, JSON) by the same patch as the other changes, and a missing key is on (the engine's `FlowDefinition.FollowsFlow`). A new trigger gets its value from the form before it is added.
+
 ---
 
 ## 4. Example 1: `Action_Sleep` (inline, with timer)

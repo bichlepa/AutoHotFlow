@@ -480,3 +480,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `obj.Prop.Call(args)` passes exactly the arguments.
 - **Status:** verified (the test `StartColor` failed with the error and passed after the change; `src/editor/assist/ColorAssistant.ahk` and the callbacks `onDone` of the assistants use `.Call`, the same pattern)
 - **Source:** `src/editor/EditorSettings.ahk` (`StartAssistant`)
+
+### A property name equal to a method name of the class ("Property is read-only")
+
+- **Problem:** The editor role failed at its start with `Property is read-only`. A field `this.triggers := Map()` was set in the constructor of a class that has a method `Triggers(flowId)`.
+- **Wrong:** Naming a data property like a method of the same class. AHK v2 names are case-insensitive, so `this.triggers` is the method `Triggers`, and assigning to it fails.
+- **Right:** Give the data property a name of its own, e.g. `this.triggerLists := Map()`. Check the class for a method with the same name (ignoring case) before adding a property.
+- **Status:** verified (the editor entry script loaded and started after the rename; `src/editor/EditorFlowCatalog.ahk`)
+- **Source:** `src/editor/EditorFlowCatalog.ahk`
+
+### A new element helper in a package lib folder needs the generated include blocks
+
+- **Problem:** After adding `#Include ..\lib\FlowChoices.ahk` to element files, the editor and engine scripts showed the load warning "This local variable appears to never be assigned a value" (name `FlowChoices`) and a dialog. Running the scripts alone worked.
+- **Wrong:** Changing only the element files: the blocks `src/elements/<package>/_includes_<role>.ahk` list the files each role includes, and they were out of date.
+- **Right:** Run `python tools/gen_element_includes.py` after an include of a package file changes, and check with `--check` (the test `tests/test_element_includes.py` fails otherwise).
+- **Status:** verified (the editor and engine entry scripts load without the dialog after the regeneration; `python tools/gen_element_includes.py --check` passes)
+- **Source:** `src/elements/Default/_includes_editor.ahk`, `tools/gen_element_includes.py`

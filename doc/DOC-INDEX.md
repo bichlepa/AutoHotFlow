@@ -31,12 +31,12 @@ L411-422 9. Performance budgets (targets, measured in Phase 2)
 L424-434 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (184.7 KB, 783 lines)
+## doc/PROTOCOL.md (185.4 KB, 785 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-756 4. Message Catalog
+L95-758 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
@@ -51,11 +51,11 @@ L509-515   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2
 L517-554   4.8 Manager (WI-0073, `src/manager/`)
 L556-618   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
 L620-639   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L641-737   4.11 Role `editor` (WI-0088, `src/editor/`)
-L739-756   4.12 Role `help`: the help window (WI-0111, E0098, E0099, E0100)
-L758-777 5. Connection setup, reconnection, resync
-L768-777   5a Events before subscription (design question, WI-0007)
-L779-783 6. Versioning and extension
+L641-739   4.11 Role `editor` (WI-0088, `src/editor/`)
+L741-758   4.12 Role `help`: the help window (WI-0111, E0098, E0099, E0100)
+L760-779 5. Connection setup, reconnection, resync
+L770-779   5a Events before subscription (design question, WI-0007)
+L781-785 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (55.3 KB, 338 lines)
@@ -74,23 +74,24 @@ L296-316 9a. Dialog tests (E0038, WI-0051)
 L318-338 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (57.3 KB, 496 lines)
+## doc/ELEMENT-API-V2.md (60.4 KB, 515 lines)
 ```text
 L8-18 1. Guidelines
 L20-112 2. Class contract
 L91-112   2.1 Parameter fields of the settings form (WI-0105)
-L114-242 3. Context `ctx`
+L114-261 3. Context `ctx`
 L163-180   3.1 Parameter evaluation (WI-0042)
 L182-192   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
 L194-200   3.3 Dialogs (E0038, WI-0051)
 L202-217   3.4 Debug view (WI-0056, REQ-DBG-060)
-L219-242   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
-L244-326 4. Example 1: `Action_Sleep` (inline, with timer)
-L328-421 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L423-463 6. Mechanical conversion rules
-L465-486 7. What stays
-L472-486   7.1 Loop elements (WI-0054)
-L488-496 8. Still to be clarified (Phase 3)
+L219-240   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+L242-261   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
+L263-345 4. Example 1: `Action_Sleep` (inline, with timer)
+L347-440 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L442-482 6. Mechanical conversion rules
+L484-505 7. What stays
+L491-505   7.1 Loop elements (WI-0054)
+L507-515 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
@@ -305,7 +306,7 @@ L398-404 One timer for many jobs: SetTimer with the same function moves the run 
 L407-413 The sender of a message is its link name, which carries the flow of an editor (verified) (verified)
 ```
 
-## doc/howto/syntax-and-language.md (48.7 KB, 482 lines)
+## doc/howto/syntax-and-language.md (50.4 KB, 498 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -367,6 +368,8 @@ L454-459 A function and a local with the same name: the `Op` helper of a test (v
 L461-466 `<` and `>` on two strings that are not numbers throw "Expected a Number" (verified) (verified)
 L468-474 A parameter named like a built-in class hides the class in its function (verified) (verified)
 L476-482 A callback held in a property is called with its object as first argument (verified) (verified)
+L484-490 A property name equal to a method name of the class ("Property is read-only") (verified)
+L492-498 A new element helper in a package lib folder needs the generated include blocks (verified)
 ```
 
 ## doc/howto/tests-and-tools.md (52.1 KB, 513 lines)
