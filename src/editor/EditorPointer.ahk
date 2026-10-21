@@ -69,6 +69,11 @@ class EditorPointer {
         this.lastClickId := ""       ; the connection of the last click (a double click asks its type)
         this.lastClickTick := 0
         this.transfer := ""          ; EditorTransfer: delete, cut, copy and paste (WI-0101; the role gives it)
+        this.commands := ""          ; EditorMenus: the menu commands of the keys (Ctrl+Z, Ctrl+Y, Ctrl+S; WI-0102)
+        this.onContext := ""         ; function (cx, cy, fx, fy): the right button went up without a movement (WI-0102)
+        this.viewPress := [0, 0]     ; the canvas pixel of the right press: a movement of MOVE_PX makes it a view drag
+        this.viewMoved := false
+        this.triggers := ""          ; EditorTriggers: the switch and the star of a trigger (WI-0102; the role gives it)
     }
 
     ; "" or the mode ("press", "move", "tail", "rect", "view"). The getter has another name than the field: AHK names are
@@ -106,6 +111,9 @@ class EditorPointer {
             this.mode := "view"
             this.cx := cx
             this.cy := cy
+            this.viewPress := [cx, cy]
+            this.viewMoved := false
+            this.pressFlow := this.model.view.ToFlow(cx, cy)
             return
         }
         if (button != "left")
@@ -123,6 +131,10 @@ class EditorPointer {
         hit := this._HitAt(this.pressFlow)
         if (IsObject(hit) && hit.Kind = "button" && this._ButtonPress(hit, cx, cy))
             return
+        if (IsObject(hit) && hit.Kind = "mark") {          ; the switch or the star of a trigger: it starts nothing (WI-0102)
+            this._MarkPress(hit)
+            return
+        }
         this.mode := "press"
         this.rule := ""
         this.itemId := ""
@@ -165,6 +177,8 @@ class EditorPointer {
             }
             dx := cx - this.cx
             dy := cy - this.cy
+            if (Abs(cx - this.viewPress[1]) >= EditorPointer.MOVE_PX || Abs(cy - this.viewPress[2]) >= EditorPointer.MOVE_PX)
+                this.viewMoved := true
             if (dx != 0 || dy != 0) {
                 this.cx := cx
                 this.cy := cy
@@ -193,8 +207,11 @@ class EditorPointer {
     ; the right button ends the view drag.
     Up(button, cx, cy) {
         if (this.mode = "view") {
-            if (button = "right")
+            if (button = "right") {
                 this.mode := ""
+                if (!this.viewMoved)
+                    this._Context(cx, cy)             ; a right click, not a drag: the context menu (WI-0102)
+            }
             return
         }
         if (this.mode = "place") {
@@ -262,6 +279,21 @@ class EditorPointer {
             this._Select([], "all")
     }
 
+    ; Ctrl+Z, Ctrl+Y and Ctrl+S (WI-0102, EditorKeys): the menu command of the id (EditorMenus.Run). Nothing during a drag.
+    Command(id) {
+        if (this.mode = "" && IsObject(this.commands))
+            this.commands.Run(id)
+    }
+
+    ; The context menu of the right button (WI-0102): the flow point of the press goes with the canvas pixel. The mode has
+    ; ended already, so the menu is not a view drag.
+    _Context(cx, cy) {
+        if (!IsObject(this.onContext))
+            return
+        onContext := this.onContext          ; not this.onContext(...): that would pass this as the first argument (HOW-TO)
+        onContext(cx, cy, this.pressFlow[1], this.pressFlow[2])
+    }
+
     ; Ctrl+C, Ctrl+X, Ctrl+V and Del (WI-0101, EditorKeys): the transfer of the selection (EditorTransfer). Nothing happens
     ; during a drag or a placing. at: the canvas pixel of the mouse for a paste ("" for the middle of the view).
     Copy() {
@@ -324,6 +356,19 @@ class EditorPointer {
         origin := FlowGeometry.CentredOrigin(pt[1], pt[2])
         bar := (this.placeKind = "loop") ? FlowGeometry.NEW_LOOP_BAR : 0
         return FlowGeometry.Bounds(this.placeKind, origin[1], origin[2], bar)
+    }
+
+    ; --- triggers (WI-0102) ----------------------------------------------------------------------------------------------
+
+    ; A press on the switch or the star of a trigger (FlowHit "mark"): the switch goes on or off, the star makes the trigger
+    ; the default one (EditorTriggers). The press selects nothing and starts no drag.
+    _MarkPress(hit) {
+        if (!IsObject(this.triggers))
+            return
+        if (hit.Index = "switch")
+            this.triggers.Switch(hit.Id)
+        else
+            this.triggers.SetDefault(hit.Id)
     }
 
     ; --- connections (WI-0100) --------------------------------------------------------------------------------------------

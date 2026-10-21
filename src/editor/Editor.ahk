@@ -9,6 +9,8 @@
 #Include EditorAdd.ahk
 #Include EditorConnect.ahk
 #Include EditorTransfer.ahk
+#Include EditorTriggers.ahk
+#Include EditorMenus.ahk
 #Include EditorTray.ahk
 #Include EditorPointer.ahk
 #Include EditorKeys.ahk
@@ -41,6 +43,8 @@ class Editor extends Role {
         this.add := ""                ; EditorAdd: a new element, placed by the pointer and given its class (WI-0099)
         this.connect := ""            ; EditorConnect: connections drawn, moved and typed with the pointer (WI-0100)
         this.transfer := ""           ; EditorTransfer: delete, cut, copy and paste of the elements (WI-0101)
+        this.triggers := ""           ; EditorTriggers: the switch and the star of a trigger (WI-0102)
+        this.menus := ""              ; EditorMenus: the menu bar, the context menus and the menu commands (WI-0102)
         this.tray := ""               ; EditorTray: the icon and the menu of this editor (REQ-EDT-230)
         this.started := false
         this.tornDown := false
@@ -61,6 +65,11 @@ class Editor extends Role {
         this.transfer := EditorTransfer(this.model)              ; delete, cut, copy and paste (WI-0101)
         this.pointer.connect := this.connect
         this.pointer.transfer := this.transfer
+        this.triggers := EditorTriggers(this.peer, this.flowId, this.model)
+        this.pointer.triggers := this.triggers
+        this.menus := EditorMenus(this)
+        this.pointer.commands := this.menus                 ; Ctrl+Z, Ctrl+Y and Ctrl+S (EditorKeys)
+        this.pointer.onContext := (cx, cy, fx, fy) => this.menus.Open(cx, cy, fx, fy)     ; the right click (WI-0102)
         this.pointer.onPlace := (kind, x, y) => this.add.Placed(kind, x, y)
         this.On("evt.", (msg) => this.model.OnEvent(msg.type, msg.payload))
         this.On("cmd.editor.show", (msg) => this._OnShow(msg))
@@ -88,6 +97,7 @@ class Editor extends Role {
                 this.add.chooser := this.window
                 this.connect.picker := this.window
                 this.transfer.ask := this.window
+                this.window.SetMenuBar(this.menus.Bar())
                 this.window.Show()
             }
             this.tray.Start()              ; the icon of this editor (hidden with --headless), its menu, the window icon
@@ -101,8 +111,10 @@ class Editor extends Role {
 
     ; The settings changed (WI-0077): the language is applied already; the title gets the new text.
     OnSettings(settings) {
-        if (IsObject(this.window))
+        if (IsObject(this.window)) {
             this.window.Refresh()
+            this.window.SetMenuBar(this.menus.Bar())      ; the menu texts follow the language (WI-0102)
+        }
         if (IsObject(this.add))
             this.add.userLevel := settings.Get("userLevel", "Beginner")     ; the class list of a new element (REQ-USE-010)
         this._Tray()
@@ -191,6 +203,8 @@ class Editor extends Role {
     _Tray() {
         if (IsObject(this.tray))
             this.tray.Refresh()
+        if (IsObject(this.menus))
+            this.menus.Refresh()                 ; the menu bar follows the same changes (WI-0102)
     }
 
     ; cmd.editor.show and the tray entry Show: the window comes to the front (without a window nothing happens).

@@ -113,6 +113,13 @@ class EditorWindow {
 
     Visible => this.win.Visible
 
+    ; The menu bar of the window (EditorMenus.Bar, WI-0102): set before the first Show; the bar takes a line of the window, the
+    ; canvas follows it at the next WM_SIZE. A new bar replaces the old one (a language change).
+    SetMenuBar(bar) {
+        if (!this.closed)
+            this.win.Gui.MenuBar := bar
+    }
+
     ; The icon of the window is the icon of the flow state (REQ-EDT-230, the same as the tray icon): big and small, at the DPI of
     ; the window. The handles are freed when the icon changes and at Close. A state that is already shown does nothing.
     SetIcon(state) {

@@ -66,6 +66,13 @@ class WinClipboard {
         return result
     }
 
+    ; True when the clipboard holds content of our format (WI-0102: the paste of the menus is enabled by it). It does not open
+    ; the clipboard and does not wait.
+    static Available() {
+        fmt := WinClipboard.Format()
+        return fmt != 0 && DllCall("user32\IsClipboardFormatAvailable", "uint", fmt, "int") ? true : false
+    }
+
     ; The text of our format, or state "none" when the clipboard holds no content of it.
     static Read() {
         fmt := WinClipboard.Format()

@@ -32,6 +32,34 @@ class EditorFlowOps {
         this._Send("cmd.flow.start", Map("flowId", this.flowId), done)
     }
 
+    ; Stops the flow: its running and waiting instances end (cmd.flow.stop, PROTOCOL 4.2, WI-0102). The answer is {stopped: n}
+    ; without an ok key, so it is ok when it has that key; a refusal is the usual error answer.
+    Stop(done := "") {
+        this._SendFlowCommand("cmd.flow.stop", "stopped", done)
+    }
+
+    ; Saves the flow now (cmd.flow.save, PROTOCOL 4.2, REQ-EDT-100): the answer is {savedRev} when storage has written it.
+    Save(done := "") {
+        this._SendFlowCommand("cmd.flow.save", "savedRev", done)
+    }
+
+    ; A command whose success answer has the key okKey and no ok (cmd.flow.stop, cmd.flow.save).
+    _SendFlowCommand(type, okKey, done) {
+        try {
+            this.peer.Request("engine", type, Map("flowId", this.flowId), (ans) => this._FlowCommandAnswered(ans, okKey, done)
+                , EditorFlowOps.COMMAND_MS)
+        } catch as e {
+            EditorFlowOps._Done(done, Map("ok", false, "code", "not_sent", "message", e.Message))
+        }
+    }
+
+    _FlowCommandAnswered(ans, okKey, done) {
+        if (ans.payload.Has(okKey))
+            EditorFlowOps._Done(done, Map("ok", true, "code", "", "message", ""))
+        else
+            this._Answered(ans, done)
+    }
+
     ; The entry "Disable" when the flow is enabled or one of its independent triggers is on, else "Enable" (the label is built
     ; from the same state, see EditorTray). A disable of a flow that is not enabled, while its independent triggers are on,
     ; asks first (yes: all triggers go off; no: nothing changes).

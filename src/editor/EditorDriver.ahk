@@ -247,9 +247,17 @@ class EditorDriver {
         p := msg.payload
         item := p.Get("item", "")
         answer := p.Get("answer", "no")
-        if (IsObject(item) || !EditorDriver.TRAY_ITEMS.Has(item) || (answer != "yes" && answer != "no"))
-            throw AhfError("cmd.test.command: item is show, run, toggle or close, answer yes or no", ErrCode.BAD_PAYLOAD)
+        if (IsObject(item) || (answer != "yes" && answer != "no"))
+            throw AhfError("cmd.test.command: item is a tray entry, a menu item or ctx:<item>, answer yes or no"
+                , ErrCode.BAD_PAYLOAD)
         this.answer := answer
+        if (!EditorDriver.TRAY_ITEMS.Has(item)) {
+            ; a menu item of the menu bar or of the open context menu (WI-0102): the same action as the click
+            ran := this.role.menus.Run(item)
+            if (ran = "")
+                throw AhfError("cmd.test.command: unknown item '" item "'", ErrCode.BAD_PAYLOAD)
+            return Map("ok", true, "ran", Json.Bool(ran))
+        }
         switch item {
             case "show": this.role.tray.Show()
             case "run": this.role.tray.Run()
@@ -349,6 +357,7 @@ class EditorDriver {
         st["ghost"] := (g is FlowRect) ? Map("x", g.X, "y", g.Y, "w", g.W, "h", g.H) : ""
         st["buttons"] := EditorDriver._ButtonsText(sc)        ; the buttons of the selection, at their flow centres (WI-0100)
         st["tray"] := this.role.tray.State()
+        st["menus"] := this.role.menus.State()                ; the menu bar and the open context menu (WI-0102)
         st["asked"] := this.asked.Clone()
         st["frames"] := r["frames"]
         st["meanFrameMs"] := r["meanFrameMs"]

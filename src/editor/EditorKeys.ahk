@@ -4,7 +4,7 @@
 ; window gets the keys as WM_KEYDOWN of its own window, never as a hotkey (a hotkey would also catch the keys of other
 ; windows). A name is the key with "Ctrl+" and "Shift+" in front: "Esc", "Ctrl+A", "Del". The table maps a name to a function
 ; of the pointer (EditorPointer) and the canvas pixel `at` of the mouse ("" when the mouse is not over the canvas; a paste
-; goes there); the packages that come later add their keys here (WI-0102, the menus).
+; goes there). Ctrl+Z, Ctrl+Y and Ctrl+S are the menu commands of the editor (WI-0102, EditorMenus): the pointer passes them on.
 class EditorKeys {
     static TABLE := Map(
         "Esc", (pointer, at) => pointer.Escape(),
@@ -12,6 +12,9 @@ class EditorKeys {
         "Ctrl+C", (pointer, at) => pointer.Copy(),
         "Ctrl+X", (pointer, at) => pointer.Cut(),
         "Ctrl+V", (pointer, at) => pointer.Paste(at),
+        "Ctrl+Z", (pointer, at) => pointer.Command("undo"),
+        "Ctrl+Y", (pointer, at) => pointer.Command("redo"),
+        "Ctrl+S", (pointer, at) => pointer.Command("save"),
         "Del", (pointer, at) => pointer.Delete()
     )
 
