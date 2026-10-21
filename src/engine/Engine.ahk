@@ -112,6 +112,7 @@ class Engine extends Role {
     RegisterHandlers() {
         this.On("cmd.engine.snapshot", (msg) => this._CmdSnapshot(msg))
         this.On("cmd.flow.get", (msg) => this._CmdFlowGet(msg))
+        this.On("cmd.flow.triggers", (msg) => this._CmdFlowTriggers(msg))
         this.On("cmd.flow.error.get", (msg) => this._CmdFlowErrorGet(msg))
         this.On("cmd.flow.runstate", (msg) => this._CmdFlowRunstate(msg))
         this.On("cmd.flow.start", (msg) => this._CmdFlowStart(msg))
@@ -657,6 +658,22 @@ class Engine extends Role {
     _CmdFlowGet(msg) {
         rec := this.flows.Require(Engine.Text(msg, "flowId"))
         return Map("rev", rec.Rev, "definition", rec.Def.WireDefinition())
+    }
+
+    ; cmd.flow.triggers {flowId} (WI-0107, PROTOCOL 4.2): the triggers of a flow with their names, sorted by ID. manual: the
+    ; class Default.Trigger_Manual (the choice of Execute flow). not_found for a flow that is not loaded.
+    _CmdFlowTriggers(msg) {
+        rec := this.flows.Require(Engine.Text(msg, "flowId"))
+        manual := Map()
+        for id in rec.Def.ElementIdsOfClass("Default.Trigger_Manual")
+            manual[id] := true
+        list := []
+        for id in rec.Def.Triggers() {
+            name := rec.Def.Element(id).Get("name", "")
+            list.Push(Map("elementId", id, "name", IsObject(name) ? "" : String(name), "manual", Json.Bool(manual.Has(id))))
+        }
+        list.Sort((a, b) => (a["elementId"] < b["elementId"]) ? -1 : (a["elementId"] > b["elementId"]) ? 1 : 0)
+        return Map("flowId", rec.FlowId, "triggers", list)
     }
 
     ; cmd.flow.error.get { flowId, errorId } (WI-0113, PROTOCOL 4.2, 4.7a): the copy of the variables of an unhandled error.

@@ -31,31 +31,31 @@ L411-422 9. Performance budgets (targets, measured in Phase 2)
 L424-434 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (184.8 KB, 782 lines)
+## doc/PROTOCOL.md (184.7 KB, 783 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-755 4. Message Catalog
+L95-756 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
 L165-173   4.1c Unhandled errors (`evt.diag.error`, WI-0023)
-L175-258   4.2 Engine commands (clients → `engine`)
-L260-309   4.3 Engine events (`evt.*`, engine → topics)
-L311-344   4.4 Engine ↔ trigger host
-L346-411   4.5 Engine ↔ worker
-L413-485   4.6 Engine ↔ storage and log
-L487-506   4.7 Dialogs
-L508-514   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2, E0072)
-L516-553   4.8 Manager (WI-0073, `src/manager/`)
-L555-617   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
-L619-638   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L640-736   4.11 Role `editor` (WI-0088, `src/editor/`)
-L738-755   4.12 Role `help`: the help window (WI-0111, E0098, E0099, E0100)
-L757-776 5. Connection setup, reconnection, resync
-L767-776   5a Events before subscription (design question, WI-0007)
-L778-782 6. Versioning and extension
+L175-259   4.2 Engine commands (clients → `engine`)
+L261-310   4.3 Engine events (`evt.*`, engine → topics)
+L312-345   4.4 Engine ↔ trigger host
+L347-412   4.5 Engine ↔ worker
+L414-486   4.6 Engine ↔ storage and log
+L488-507   4.7 Dialogs
+L509-515   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2, E0072)
+L517-554   4.8 Manager (WI-0073, `src/manager/`)
+L556-618   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
+L620-639   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
+L641-737   4.11 Role `editor` (WI-0088, `src/editor/`)
+L739-756   4.12 Role `help`: the help window (WI-0111, E0098, E0099, E0100)
+L758-777 5. Connection setup, reconnection, resync
+L768-777   5a Events before subscription (design question, WI-0007)
+L779-783 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (55.3 KB, 338 lines)
@@ -160,20 +160,6 @@ L21-37 3. Forbidden patterns (review rules)
 L39-44 4. Errors and protocol
 L46-55 5. AHK v2 pitfalls (short)
 L57-63 6. Tests and docs
-```
-
-## doc/howto/com-and-native-calls.md (6.9 KB, 85 lines)
-```text
-L7-13 A function stored in a property is called with its owner as first argument (verified)
-L15-21 COM method index = position in the header + 3 (verified)
-L23-29 Pointers handed to a callback belong to the caller until we AddRef them (verified)
-L31-37 A string from COM is freed with CoTaskMemFree (assumed)
-L39-45 HRESULT and pointer parameters of a callback: mask the upper bits (verified)
-L47-53 A handler object is a vtable of four callbacks plus one pointer (partly verified)
-L55-61 Global and function names are one name (verified)
-L63-69 A path for WebView2 must be a full path (assumed)
-L71-77 The WebView2 user data folder is created by the runtime (verified)
-L79-85 The event registration token is an Int64 out parameter (verified)
 ```
 
 ## doc/howto/drawing-gdip.md (5.9 KB, 59 lines)
