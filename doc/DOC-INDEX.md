@@ -185,7 +185,7 @@ L51-57 A copy of the variables of an error must be taken where the error is caug
 L59-65 A repeated error of the same flow within 10 s sends no notice at once (verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (39.9 KB, 303 lines)
+## doc/howto/gui-and-hotkeys.md (41.1 KB, 311 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -225,6 +225,7 @@ L274-279 A menu bar entry without a submenu takes a callback (assumed) (assumed)
 L282-288 The format of a DateTime control is set by message, the option takes no spaces (verified) (partly verified)
 L290-296 A ListBox has no Click event in AHK v2 (verified) (verified)
 L297-303 A menu state that depends on another program is read only when the menu is refreshed (verified) (verified)
+L305-311 A one-shot timer that is set again restarts its delay: one `SetTimer` call per change is a debounce (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)

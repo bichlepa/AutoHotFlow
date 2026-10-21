@@ -301,3 +301,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Also refresh when the window is activated: `OnMessage(0x0006, fn)` (WM_ACTIVATE) and in the handler `if ((wParam & 0xFFFF) = 0) return` (the low word is 0 when the window is deactivated). Unregister the handler in `Close()` with `OnMessage(msg, fn, 0)` like the other handlers.
 - **Status:** verified (read of the code and the message values); the fix itself is not run in a window (the gui check of the menus is the owner's, `tests/fault/test_editor_menus_gui.py`).
 - **Source:** `src/editor/EditorWindow.ahk` (`_OnActivate`), `src/editor/EditorMenus.ahk` (`Refresh`)
+
+### A one-shot timer that is set again restarts its delay: one `SetTimer` call per change is a debounce (verified)
+
+- **Problem:** The settings window checks the syntax of the expressions when the user stops typing, 300 ms after the last change. The check must not run at every key (a parse of a long text takes time), and it must not run once per change in parallel.
+- **Wrong:** A new timer object per change, or a check in every change event.
+- **Right:** One function object for the whole window and one call per change: `SetTimer(fn, -300)`. A call before the first run restarts the delay, so the function runs once, 300 ms after the last call. `SetTimer(fn, 0)` cancels it, also when no timer is set. Cancel it when the window closes.
+- **Status:** verified: a scratch script set the timer at 0, 200 and 400 ms: it ran once, at 718 ms; a timer set and cancelled at once did not run. The window uses it in `src/editor/EditorSettings.ahk` (`_Typed`, `_Close`); the test `tests/e2e/test_editor_settings.py::test_a_syntax_error_of_an_expression_is_shown_after_typing_stops_and_goes_when_fixed` waits for the warning.
+- **Source:** `src/editor/EditorSettings.ahk`
