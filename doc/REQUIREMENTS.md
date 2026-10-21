@@ -1159,7 +1159,7 @@ When two enabled flows, or two triggers of one flow, use the same hotkey or hots
 ### REQ-TRG-030 Several triggers per flow
 
 - **v1:** yes
-- **v2:** partial (each trigger has its own enabled state and can be switched on its own; the editor switches a trigger with its switch and makes a manual trigger the default with its star (WI-0102, headless; the real mouse: gui, owner); no trigger is armed yet)
+- **v2:** partial (each trigger has its own enabled state and can be switched on its own; the editor switches a trigger with its switch and makes a manual trigger the default with its star (WI-0102, headless; the real mouse: gui, owner); no trigger is armed yet; WI-0104: the switch of the editor asks no force question when the state of a trigger cannot be read, unlike the flow commands (open decision, OPEN-ITEMS F-9000); manual check 10, steps 21 and 22 (owner))
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003 (WI-0060 done), S0006 (WI-0094 done, WI-0102)
@@ -1541,18 +1541,18 @@ Running elements and connections are highlighted while the flow runs; the editor
 ### REQ-EDT-050 Add elements
 
 - **v1:** yes
-- **v2:** partial (the fields, the class list at the user's level and the default name, WI-0099; the settings of the class open after the choice, OK adds the element, Cancel adds nothing, WI-0106, headless; the window itself is a gui check of the owner)
+- **v2:** partial (the fields, the class list at the user's level and the default name, WI-0099; the settings of the class open after the choice, OK adds the element, Cancel adds nothing, WI-0106, headless; WI-0104: the Advanced level is tested headless; a real click on the field, the tree dialog and the settings window itself: manual check 10 and the gui checks of the owner)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0006 (the fields for new elements and the class list, WI-0099), S0007 (the settings open after the choice, WI-0106)
-- **Evidence:** `tests/e2e/test_editor_add.py`, `tests/e2e/test_editor_settings.py::test_a_new_element_gets_its_settings_before_it_is_added_and_ok_adds_it_with_them`, `tests/e2e/test_editor_settings.py::test_cancel_of_a_new_element_adds_nothing`, `tests/ahk/editor_new_element.test.ahk`
+- **Evidence:** `tests/e2e/test_editor_add.py`, `tests/e2e/test_editor_add.py::test_the_advanced_level_shows_the_beginner_classes_and_not_the_programmer_ones`, `tests/e2e/test_editor_settings.py::test_a_new_element_gets_its_settings_before_it_is_added_and_ok_adds_it_with_them`, `tests/e2e/test_editor_settings.py::test_cancel_of_a_new_element_adds_nothing`, `tests/ahk/editor_new_element.test.ahk`
 
 The user chooses the kind (trigger, action, condition, loop) and then the class from a list grouped by category. The list shows only the elements of the user's level (REQ-USE-010) and marks experimental ones (REQ-USE-020). The new element gets a default name.
 
 ### REQ-EDT-060 Select and move
 
 - **v1:** yes
-- **v2:** partial (click, Ctrl+click, Ctrl+A, the rectangle, the move on the grid with one undo step, the loop height and the cancels tested headless through the window's handlers (`tests/e2e/test_editor_select.py`, 13 tests); the real mouse: gui test part for click, rectangle and drag, owner, not written yet)
+- **v2:** partial (click, Ctrl+click, Ctrl+A, the rectangle, the move on the grid with one undo step, the loop height and the cancels tested headless through the window's handlers (`tests/e2e/test_editor_select.py`, 13 tests); the real mouse: gui test part for click, rectangle and drag, owner, not written yet; WI-0104: manual check 10, steps 1 to 6 (owner; the real-mouse gui test is open work))
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0006 (WI-0098, E0094)
@@ -1563,7 +1563,7 @@ Select one or several elements and connections: a click selects one (Ctrl adds o
 ### REQ-EDT-070 Connect elements
 
 - **v1:** yes
-- **v2:** partial (the gestures, the types and the moves are tested headless through the window's mouse handlers; the real mouse and the dialogs: owner's check, not written yet, as REQ-EDT-060)
+- **v2:** partial (the gestures, the types and the moves are tested headless through the window's mouse handlers; the real mouse and the dialogs: owner's check, not written yet, as REQ-EDT-060; WI-0104: manual check 10, steps 9 to 12 (owner))
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0006 (WI-0100)
@@ -1574,18 +1574,18 @@ Draw a connection between two elements and choose its type; change the type late
 ### REQ-EDT-080 Delete, cut, copy and paste
 
 - **v1:** yes
-- **v2:** partial (headless and with two editors: Del and the trash button ask once for the selection, cut, copy and paste with Ctrl+X, Ctrl+C, Ctrl+V, a paste under the mouse or in the middle of the view, one undo step per paste, a pasted manual trigger is no default, a busy clipboard and a foreign clipboard are said in the status bar; the real keys and the mouse are the owner's check of WI-0102)
+- **v2:** partial (headless and with two editors: Del and the trash button ask once for the selection, cut, copy and paste with Ctrl+X, Ctrl+C, Ctrl+V, a paste under the mouse or in the middle of the view, one undo step per paste, a pasted manual trigger is no default, a busy clipboard and a foreign clipboard are said in the status bar; the real keys and the mouse are the owner's check of WI-0102; WI-0104: a paste of more than 2 MB is refused with a text (headless); manual check 10, steps 13 to 15 (owner))
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0006 (WI-0101, E0091; the real keys and the mouse in the gui test of WI-0102)
-- **Evidence:** `tests/ahk/editor_clipboard.test.ahk`, `tests/e2e/test_editor_clipboard.py::test_ctrl_c_puts_the_selection_on_the_clipboard_in_our_format_only`, `tests/e2e/test_editor_clipboard.py::test_ctrl_v_pastes_new_elements_under_the_mouse_selected_and_as_one_undo_step`, `tests/e2e/test_editor_clipboard.py::test_a_copy_in_one_editor_is_pasted_in_the_editor_of_another_flow`
+- **Evidence:** `tests/ahk/editor_clipboard.test.ahk`, `tests/e2e/test_editor_clipboard.py::test_ctrl_c_puts_the_selection_on_the_clipboard_in_our_format_only`, `tests/e2e/test_editor_clipboard.py::test_ctrl_v_pastes_new_elements_under_the_mouse_selected_and_as_one_undo_step`, `tests/e2e/test_editor_clipboard.py::test_a_copy_in_one_editor_is_pasted_in_the_editor_of_another_flow`, `tests/e2e/test_editor_clipboard.py::test_a_clipboard_of_our_format_above_2_mb_is_refused_and_nothing_is_pasted`
 
 Delete with confirmation (Del, and the trash button of the selection): one question for the selection, an answer of no changes nothing. Cut, copy and paste with Ctrl+X, Ctrl+C, Ctrl+V, also between two flows. A cut deletes without a question. The elements go through the Windows clipboard, in a format of AutoHotFlow only (E0091): a copy of elements is not text, so a paste into another program gets nothing. A paste goes under the mouse, or to the middle of the editor when the mouse is outside it; the pasted elements are selected.
 
 ### REQ-EDT-090 Undo and redo
 
 - **v1:** yes
-- **v2:** partial (the undo and redo steps of the editor work headless: a change is one step, undo and redo are committed, at most 100 steps, a new change clears redo, a step that no longer applies is refused with a text; the keys Ctrl+Z and Ctrl+Y and the menu entries work headless (WI-0102); the real keys and menus: gui test, owner)
+- **v2:** partial (the undo and redo steps of the editor work headless: a change is one step, undo and redo are committed, at most 100 steps, a new change clears redo, a step that no longer applies is refused with a text; the keys Ctrl+Z and Ctrl+Y and the menu entries work headless (WI-0102); the real keys and menus: gui test, owner; WI-0104: manual check 10, step 17 (owner))
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0006 (WI-0096; keys and menu WI-0098 to WI-0102)
@@ -1596,18 +1596,18 @@ Ctrl+Z and Ctrl+Y and menu entries. A cancelled action (a move cancelled with Es
 ### REQ-EDT-100 Save, and changes during execution
 
 - **v1:** yes (unsaved flows are saved automatically at exit)
-- **v2:** partial (the commit of a change works: revisions, conflicts, the rules and the rename race; the editor makes its changes as patches, merges a rename of the manager and clears its undo steps on a restart of the engine; the automatic saving in the engine works (WI-0095: written about 3 s after a change, Ctrl+S writes at once, shutdown writes the rest, backups by session))
+- **v2:** partial (the commit of a change works: revisions, conflicts, the rules and the rename race; the editor makes its changes as patches, merges a rename of the manager and clears its undo steps on a restart of the engine; the automatic saving in the engine works (WI-0095: written about 3 s after a change, Ctrl+S writes at once, shutdown writes the rest, backups by session); WI-0104: a committed edit is on disk a few seconds later, a closed editor asks nothing and the engine writes its edit, a killed engine keeps the written edits (headless, `tests/e2e/test_editor_nothing_lost.py`); manual check 10, steps 18, 23, 26 and 27 (owner))
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0006 (automatic saving WI-0095; the editor part is done with WI-0096)
-- **Evidence:** `tests/e2e/test_editor_menus.py::test_ctrl_z_ctrl_y_and_ctrl_s_are_the_undo_redo_and_save_of_the_keys` (Ctrl+S), `tests/integration/test_flow_patch.py` (commit, conflict, refused list, busy deletion, rename race), `tests/ahk/core_flow_patch.test.ahk` (rules, inverse, shared revisions), `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`, `tests/ahk/editor_draft.test.ahk` (queue, conflict, refusal, lost answer), `tests/e2e/test_editor_draft.py::test_a_rename_by_the_manager_while_a_patch_is_on_its_way_is_merged`, `tests/e2e/test_editor_draft.py::test_a_restart_of_the_engine_clears_the_stacks_and_shows_the_saved_state`, `tests/integration/test_flow_autosave.py` (write-behind, save, shutdown, killed engine, delete, retries, backups)
+- **Evidence:** `tests/e2e/test_editor_menus.py::test_ctrl_z_ctrl_y_and_ctrl_s_are_the_undo_redo_and_save_of_the_keys` (Ctrl+S), `tests/integration/test_flow_patch.py` (commit, conflict, refused list, busy deletion, rename race), `tests/ahk/core_flow_patch.test.ahk` (rules, inverse, shared revisions), `tests/integration/test_engine.py::test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state`, `tests/ahk/editor_draft.test.ahk` (queue, conflict, refusal, lost answer), `tests/e2e/test_editor_draft.py::test_a_rename_by_the_manager_while_a_patch_is_on_its_way_is_merged`, `tests/e2e/test_editor_draft.py::test_a_restart_of_the_engine_clears_the_stacks_and_shows_the_saved_state`, `tests/integration/test_flow_autosave.py` (write-behind, save, shutdown, killed engine, delete, retries, backups), `tests/e2e/test_editor_nothing_lost.py::test_an_edit_is_on_disk_a_few_seconds_later_and_the_first_write_of_the_session_has_a_backup`, `tests/e2e/test_editor_nothing_lost.py::test_an_editor_closed_with_an_edit_not_yet_written_asks_nothing_and_the_engine_writes_it`, `tests/e2e/test_editor_nothing_lost.py::test_a_killed_engine_keeps_the_edit_that_was_written_and_the_editor_shows_it`, `tests/integration/test_flow_patch.py::test_a_running_element_keeps_the_parameters_it_started_with`, `tests/integration/test_flow_patch.py::test_a_running_element_that_is_removed_runs_to_its_end_and_the_instance_finishes`
 
 Every completed edit takes effect at once, also for running instances (REQ-EXE-080), and is saved automatically a few seconds later (E0065): about 3 s after the last change, at the latest every 10 s while the user keeps editing. A flow has no unsaved state, so closing the editor or the application asks nothing. Saving by hand (Ctrl+S, menu) only writes at once. Mistakes are undone with undo (REQ-EDT-090) or by a backup: a backup is made at the first write of an editing session and then at most every 10 minutes (REQ-ROB-060, REQ-MGR-110). A rename by the manager while the editor is open is merged.
 
 ### REQ-EDT-110 Run, stop and enable from the editor
 
 - **v1:** yes
-- **v2:** partial (run, and enable or disable, from the tray menu of the editor, E0087; manual check 9, steps 12 and 13, owner; the menu bar (save, run, stop, enable or disable, edit with undo, redo, cut, copy, paste, delete and select all, settings, exit) is built and tested headless (WI-0102); the settings entry waits for WI-0109; the real menu bar is the gui test `tests/fault/test_editor_menus_gui.py`, owner, not run yet)
+- **v2:** partial (run, and enable or disable, from the tray menu of the editor, E0087; manual check 9, steps 12 and 13, owner; the menu bar (save, run, stop, enable or disable, edit with undo, redo, cut, copy, paste, delete and select all, settings, exit) is built and tested headless (WI-0102); the settings entry waits for WI-0109; the real menu bar is the gui test `tests/fault/test_editor_menus_gui.py`, owner, not run yet; WI-0104: a menu action that fails is said in the status bar and does not end the editor; Paste follows the clipboard when the window is activated (gui check, owner, not run))
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0005 (run and enable from the tray menu of the editor, E0087, WI-0091), S0006 (the menu bar, WI-0102)
@@ -2352,11 +2352,11 @@ The broken file is reported; all other flows load.
 ### REQ-ROB-120 A crashed editor or manager loses nothing
 
 - **v1:** no (one process; a crash ends everything)
-- **v2:** partial (the manager part: a killed manager is not restarted by itself, the tray icon stays and opens a new one, which holds the 200 flows again; the owner's check of the real crash is MANUAL-CHECKS section 1 step 25; that the rest keeps running and a flow can still be started after a crash of the real manager is the gui test `test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted` (gui tier: the gui tests of WI-0073 are reported as passed in `work_items/phase3/STATUS.md`; not repeated by agents); the editor part (WI-0103): an ended editor gives a notice, and a click on its balloon or the button "Open editor" of the list of notices opens it again; nothing reopens it by itself (headless e2e tests; the real balloon click is the gui test `test_a_click_on_the_balloon_of_an_editor_notice_opens_the_editor_again` (gui), not run by agents; the owner's check is open); the edit part: the engine writes every commit about 3 s after it (WI-0095; tested with a killed engine, `tests/integration/test_flow_autosave.py`, not with a killed editor; the editor side follows in WI-0096)
+- **v2:** partial (the manager part: a killed manager is not restarted by itself, the tray icon stays and opens a new one, which holds the 200 flows again; the owner's check of the real crash is MANUAL-CHECKS section 1 step 25; that the rest keeps running and a flow can still be started after a crash of the real manager is the gui test `test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted` (gui tier: the gui tests of WI-0073 are reported as passed in `work_items/phase3/STATUS.md`; not repeated by agents); the editor part (WI-0103): an ended editor gives a notice, and a click on its balloon or the button "Open editor" of the list of notices opens it again; nothing reopens it by itself (headless e2e tests; the real balloon click is the gui test `test_a_click_on_the_balloon_of_an_editor_notice_opens_the_editor_again` (gui), not run by agents; the owner's check is open); the edit part: the engine writes every commit about 3 s after it (WI-0095; tested with a killed engine, `tests/integration/test_flow_autosave.py`, not with a killed editor; the editor side follows in WI-0096; WI-0104: a killed editor keeps its completed edits and the reopened editor shows them (`tests/e2e/test_editor_nothing_lost.py`); manual check 10, steps 26 and 27 (owner))
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0004 (manager), S0006 (editor: WI-0095, the notice WI-0103, E0093)
-- **Evidence:** `tests/fault/test_tray_role.py::test_a_crashed_manager_is_opened_again_by_the_show_manager_entry`, `tests/fault/test_manager_window.py::test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted (gui)`, `tests/stress/test_manager_big_flows.py::test_the_manager_holds_200_big_flows_quickly_and_in_little_memory`, `tests/e2e/test_editor_crash_notice.py::test_a_killed_editor_gives_one_notice_and_the_tray_links_its_balloon`, `tests/e2e/test_editor_crash_notice.py::test_a_closed_editor_gives_no_notice`, `tests/e2e/test_editor_crash_notice.py::test_a_click_on_the_balloon_opens_the_editor_again_once`, `tests/e2e/test_editor_crash_notice.py::test_the_button_open_editor_of_the_list_opens_the_editor_again`, `tests/e2e/test_editor_crash_notice.py::test_a_process_that_is_not_running_is_not_started_by_a_notice_alone`
+- **Evidence:** `tests/fault/test_tray_role.py::test_a_crashed_manager_is_opened_again_by_the_show_manager_entry`, `tests/fault/test_manager_window.py::test_a_crash_of_the_manager_leaves_the_rest_running_and_it_is_not_restarted (gui)`, `tests/stress/test_manager_big_flows.py::test_the_manager_holds_200_big_flows_quickly_and_in_little_memory`, `tests/e2e/test_editor_crash_notice.py::test_a_killed_editor_gives_one_notice_and_the_tray_links_its_balloon`, `tests/e2e/test_editor_crash_notice.py::test_a_closed_editor_gives_no_notice`, `tests/e2e/test_editor_crash_notice.py::test_a_click_on_the_balloon_opens_the_editor_again_once`, `tests/e2e/test_editor_crash_notice.py::test_the_button_open_editor_of_the_list_opens_the_editor_again`, `tests/e2e/test_editor_crash_notice.py::test_a_process_that_is_not_running_is_not_started_by_a_notice_alone`, `tests/e2e/test_editor_nothing_lost.py::test_a_killed_editor_loses_no_completed_edit_and_the_reopened_editor_shows_it`
 
 When an editor crashes, no completed edit is lost: every edit is in effect at once and is saved automatically (REQ-EDT-100, E0065). The user learns from a notice that the editor has ended, and a click on the notice opens the editor again; AutoHotFlow does not reopen it by itself (E0093). The editor opened again shows the flow with all edits. Only an edit in progress at that moment (an open dialog, a move with the mouse) may be lost. A crashed manager is opened again from the tray icon, which belongs to the application and stays (REQ-MGR-090, E0064). Flows and triggers keep running in both cases (REQ-ROB-010).
 
@@ -2686,7 +2686,7 @@ Every deliberate behaviour change compared to v1 has a MIGRATION ID; no silent c
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0004 (setting, WI-0077, done), S0006 (the class list of a new element, WI-0099, done)
-- **Evidence:** `tests/ahk/core_settings.test.ahk`, `tests/ahk/editor_new_element.test.ahk`, `tests/e2e/test_editor_add.py`
+- **Evidence:** `tests/ahk/core_settings.test.ahk`, `tests/ahk/editor_new_element.test.ahk`, `tests/e2e/test_editor_add.py`, `tests/e2e/test_editor_add.py::test_the_advanced_level_shows_the_beginner_classes_and_not_the_programmer_ones`
 
 Each element has a level; the setting "Shown elements" hides the elements above the user's level, so beginners are not overwhelmed. The first start proposes a level (REQ-USE-050).
 
