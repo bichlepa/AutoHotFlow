@@ -53,6 +53,8 @@ class FlowPatch {
 
     ; The operations that change `from` into `to` (both flows as Maps; `to` must be a valid flow). The order is chosen so
     ; that each operation sees a state in which its rules hold. ElementIDCounter is not part of it.
+    ; The removal of an element comes after the changes of the connections: removing it takes every connection that still
+    ; ends at it (WI-0100: the undo of a split points the connection back at its old end first, then removes the new element).
     static Diff(from, to) {
         ops := []
         fe := from["allElements"], te := to["allElements"]
@@ -65,10 +67,6 @@ class FlowPatch {
         for id in fc {
             if (!tc.Has(id))
                 ops.Push(Map("op", "connection.remove", "id", id))
-        }
-        for id in fe {
-            if (!te.Has(id))
-                ops.Push(Map("op", "element.remove", "id", id))
         }
         for id, el in te {
             if (fe.Has(id)) {
@@ -87,6 +85,10 @@ class FlowPatch {
                 if (fields.Count)
                     ops.Push(Map("op", "connection.update", "id", id, "fields", fields))
             }
+        }
+        for id in fe {
+            if (!te.Has(id))
+                ops.Push(Map("op", "element.remove", "id", id))
         }
         for id, c in tc {
             if (!fc.Has(id))

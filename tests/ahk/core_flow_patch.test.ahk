@@ -305,6 +305,22 @@ InverseOfADefaultPromotionRestoresTheOthers() {
     Assert.True(back["allElements"]["element0000000006"]["DefaultTrigger"] == Json.False)
 }
 
+; The inverse of a split (WI-0100): the connection that ends at the new element is pointed back at its old end, and only then
+; the element goes. Removing the element first would take that connection with it and the inverse would be refused.
+InverseOfASplitRestoresTheOldEnd() {
+    raw := BaseFlow()
+    ops := [
+        Op("element.add", "element", Elem("element0000000006", "action", "Action_Sleep")),
+        Op("connection.update", "id", "connection0000000005", "fields", Map("to", "element0000000006")),
+        Op("connection.add", "connection", Conn("connection0000000007", "element0000000006", "element0000000003"))
+    ]
+    after := FlowPatch.Apply(raw, ops)
+    back := FlowPatch.Apply(after, FlowPatch.Inverse(raw, ops))
+    Assert.Equal(Canon(back), Canon(raw))
+    Assert.Equal(back["allConnections"]["connection0000000005"]["to"], "element0000000003")
+    Assert.True(!back["allElements"].Has("element0000000006"), "the new element is gone")
+}
+
 ; Random lists of operations over every corpus flow: the operations are applied, then their inverse. The result must be
 ; the original flow again (without the counter). Refused lists are skipped; enough lists must be accepted.
 InverseOfRandomListsGivesTheOriginalOnTheCorpus() {
@@ -397,6 +413,7 @@ TestRun.Case("FlowPatch: unknown and malformed operations are refused", UnknownO
 TestRun.Case("FlowPatch: revisions share the maps that do not change", RevisionsShareTheMapsThatDoNotChange)
 TestRun.Case("FlowPatch: the inverse undoes each kind of operation", InverseUndoesEachKindOfOperation)
 TestRun.Case("FlowPatch: the inverse of a default promotion restores the others", InverseOfADefaultPromotionRestoresTheOthers)
+TestRun.Case("FlowPatch: the inverse of a split restores the old end before the new element goes", InverseOfASplitRestoresTheOldEnd)
 TestRun.Case("FlowPatch: the inverse of random lists gives the original on the corpus", InverseOfRandomListsGivesTheOriginalOnTheCorpus)
 
 TestRun.Finish()
