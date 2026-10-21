@@ -17,8 +17,9 @@
 ;   connecting  Map("fromId", element ID, "fromPart", part, "type", connection type, "x", x, "y", y) for a connection
 ;               being drawn from a part of an element to the point (x, y), or ""
 ;   dragged     Map: ID -> true of the elements being dragged; dx, dy the offset of the drag (see WithDrag)
+;   ghost       FlowRect of the box of a new element that is being placed (WI-0099), or ""
 ; Properties from it: Selected, Rect, Connecting (Map("start", [x, y], "aim", [x, y]) or ""), Dragged, DragX, DragY,
-; and Buttons: the buttons of the single selected element or connection (Array of Maps("name", "id", "rect" FlowRect);
+; Ghost, and Buttons: the buttons of the single selected element or connection (Array of Maps("name", "id", "rect" FlowRect);
 ; none while a drag runs). FlowHitTest asks Buttons first.
 class Scene {
     __New(view, version, hovered, elements, connections, warnings, interaction := "") {
@@ -36,6 +37,7 @@ class Scene {
         this.Dragged := interaction.Get("dragged", Map())
         this.DragX := interaction.Get("dx", 0)
         this.DragY := interaction.Get("dy", 0)
+        this.Ghost := interaction.Get("ghost", "")
         this.Connecting := Scene.ConnectingOf(elements, this.ConnectingRequest)
         this.Buttons := (this.Dragged.Count = 0) ? Scene.ButtonsOf(elements, connections, this.Selected) : []
         rects := []
@@ -50,16 +52,17 @@ class Scene {
     ; The interaction of this scene as the constructor takes it (the state that WithStates keeps).
     Interaction() {
         return Map("selected", this.Selected, "rect", this.Rect, "connecting", this.ConnectingRequest
-            , "dragged", this.Dragged, "dx", this.DragX, "dy", this.DragY)
+            , "dragged", this.Dragged, "dx", this.DragX, "dy", this.DragY, "ghost", this.Ghost)
     }
 
     ; The same flow and states with another selection, selection rectangle and connection being drawn (the drag of the
     ; scene stays as it is). The elements and connections are shared, nothing is built again.
-    WithInteraction(selected, rect := "", connecting := "") {
+    WithInteraction(selected, rect := "", connecting := "", ghost := "") {
         interaction := this.Interaction()
         interaction["selected"] := (selected is Map) ? selected : Map()
         interaction["rect"] := rect
         interaction["connecting"] := connecting
+        interaction["ghost"] := ghost
         return Scene(this.View, this.Version, this.Hovered, this.Elements, this.Connections, this.Warnings, interaction)
     }
 

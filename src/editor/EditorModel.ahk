@@ -226,7 +226,8 @@ class EditorModel {
     ; The selection changed (EditorDraft.SetSelection): the scene takes it, the scene is not built again.
     SelectionChanged() {
         if (this.scene != "")
-            this.scene := this.scene.WithInteraction(this.draft.selection, this.scene.Rect, this.scene.ConnectingRequest)
+            this.scene := this.scene.WithInteraction(this.draft.selection, this.scene.Rect, this.scene.ConnectingRequest
+                , this.scene.Ghost)
         this._Changed("state")
     }
 
@@ -252,7 +253,17 @@ class EditorModel {
         if (this.scene = "")
             return
         this.sceneVersion += 1
-        this.scene := this.scene.WithInteraction(this.draft.selection, rect, this.scene.ConnectingRequest)
+        this.scene := this.scene.WithInteraction(this.draft.selection, rect, this.scene.ConnectingRequest
+            , this.scene.Ghost)
+        this._Changed("view")
+    }
+
+    ; The box of the new element being placed (WI-0099, a FlowRect in flow units; "" removes it). The scene takes it at once.
+    SetGhost(rect) {
+        if (this.scene = "")
+            return
+        this.sceneVersion += 1
+        this.scene := this.scene.WithInteraction(this.draft.selection, this.scene.Rect, this.scene.ConnectingRequest, rect)
         this._Changed("view")
     }
 
@@ -569,8 +580,9 @@ class EditorModel {
         this.sceneVersion += 1
         this.restateDirty := false
         rect := (this.scene != "") ? this.scene.Rect : ""          ; a rectangle being drawn survives a new definition
+        ghost := (this.scene != "") ? this.scene.Ghost : ""         ; so does the box of a new element being placed
         this.scene := SceneBuilder.Build(root, this.view, this.run, this.triggers, this.warnings, ""
-            , this.sceneVersion).WithInteraction(this.draft.selection, rect)
+            , this.sceneVersion).WithInteraction(this.draft.selection, rect, "", ghost)
     }
 
     ; Only the states changed: the scene shares its unchanged items (Scene.WithStates, F-0150). Called by CurrentScene.

@@ -458,6 +458,10 @@ class Renderer {
             target.FillRect(this.OverlayBrush(EditorStyle.SelectionFill), x, y, rect.W * s, rect.H * s)
             target.DrawRect(pen, x, y, rect.W * s, rect.H * s)
         }
+        ; the box of a new element that follows the pointer until it is placed (WI-0099): its outline
+        ghost := scene.Ghost
+        if (ghost is FlowRect)
+            target.DrawRect(pen, (ghost.X - ox) * s, (ghost.Y - oy) * s, ghost.W * s, ghost.H * s)
         connecting := scene.Connecting
         if (connecting is Map) {
             a := connecting["start"]
