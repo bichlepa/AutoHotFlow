@@ -31,7 +31,7 @@ L408-419 9. Performance budgets (targets, measured in Phase 2)
 L421-431 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (169.1 KB, 728 lines)
+## doc/PROTOCOL.md (168.4 KB, 728 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
@@ -178,7 +178,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (35.8 KB, 265 lines)
+## doc/howto/gui-and-hotkeys.md (35.5 KB, 265 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -288,7 +288,7 @@ L390-396 A flow ID with a space on the command line of a child process (verified
 L398-404 One timer for many jobs: SetTimer with the same function moves the run (verified)
 ```
 
-## doc/howto/syntax-and-language.md (47.2 KB, 459 lines)
+## doc/howto/syntax-and-language.md (46.7 KB, 459 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
