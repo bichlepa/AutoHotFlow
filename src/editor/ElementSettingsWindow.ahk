@@ -527,7 +527,7 @@ class ElementSettingsWindow {
         for ctl in e["ctls"]
             ctl.Enabled := field.isEnabled ? true : false
         if (e["warn"] is Object)
-            e["warn"].Text := ElementSettingsWindow._Texts(field.warnings)
+            e["warn"].Text := ElementSettingsWindow._Texts(form.FieldWarnings(field))
         if (e["mig"] is Object)
             e["mig"].Text := this._MigrationOf(id)
         val := (id != "") ? form.GetValue(id) : ""

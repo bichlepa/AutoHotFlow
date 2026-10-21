@@ -1,6 +1,7 @@
 """WI-0106, REQ-EDT-120 (the settings of an element), REQ-MIG-070 (the migration places and an unknown class in the settings),
-REQ-USE-020 (the note of an experimental class), REQ-USE-090 (the dialog): the settings window of an element under the real
-supervisor, headless. The window is answered through cmd.test.form (the same calls as the window makes on EditorSettings).
+REQ-USE-020 (the note of an experimental class), REQ-USE-090 (the dialog), REQ-EDT-200 (a syntax error of an expression
+while typing): the settings window of an element under the real supervisor, headless. The window is answered through
+cmd.test.form (the same calls as the window makes on EditorSettings).
 The gui of the window is checked by tests/fault/test_editor_settings_gui.py (owner).
 
 The opening by the mouse (a double click, the edit button, the context menu) goes through cmd.test.mouse and cmd.test.command,
@@ -290,5 +291,20 @@ def test_the_type_of_an_element_changes_its_class_in_one_patch_and_one_undo_step
         assert step(obs, "undo", EDITOR)["done"], "the class change is one undo step"
         assert wait_until(lambda: settled(obs) and element(obs, ACTION)["class"] == "Action_Sleep", scaled(10)), \
             element(obs, ACTION)
+    finally:
+        finish(sup, obs)
+
+
+def test_a_syntax_error_of_an_expression_is_shown_after_typing_stops_and_goes_when_fixed(procs, datadir, session_id):
+    """REQ-EDT-200: the check runs when the typing stops (CHECK_DELAY), so the warning comes some time after the change."""
+    sup, obs = start(procs, datadir, session_id)
+    try:
+        assert form(obs, "open", id=ACTION)["ok"]
+        assert form(obs, "set", id="Duration", value="1 + * 2")["ok"]
+        assert wait_until(lambda: any("column 5" in text for text in field_of(obs, "Duration")["warnings"]), scaled(5)),             field_of(obs, "Duration")
+        assert any("'*'" in text for text in field_of(obs, "Duration")["warnings"]), field_of(obs, "Duration")
+        assert form(obs, "set", id="Duration", value="1 + 2")["ok"]
+        assert wait_until(lambda: field_of(obs, "Duration")["warnings"] == [], scaled(5)), field_of(obs, "Duration")
+        assert form(obs, "cancel")["ok"]
     finally:
         finish(sup, obs)

@@ -17,6 +17,9 @@
 ; of WI-0106, MIGRATION M-0095). window: the settings window (form/ElementSettingsWindow.ahk, not with --headless); the
 ; headless driver answers with cmd.test.form. Both read the state through State() and change the form through Set*.
 ;
+; The expressions of the form are checked for their syntax CHECK_DELAY ms after the last change of a value (WI-0108); the
+; warnings then go to the window. OK is not refused by a warning.
+;
 ; An element whose class is not in the registry (not installed, or unknown) has no form: its parameters are shown read only
 ; and OK only closes the settings (REQ-MIG-070). A class with the flag Experimental gets its note in the window (REQ-USE-020).
 class EditorSettings {
@@ -25,7 +28,12 @@ class EditorSettings {
         this.window := ""             ; ElementSettingsWindow: Show(this) and Hide(); "" with --headless
         this.adder := ""              ; EditorAdd: Create(...) adds the new element after OK
         this.session := ""            ; Map of the open settings (see _Show), or "" when none is open
+        this.checkFn := () => this._CheckTyped()   ; the one-shot timer of the syntax check (CHECK_DELAY)
     }
+
+    ; The syntax check of the expressions runs this many ms after the last change of a value (WI-0108): a check at every
+    ; key would parse the text again and again.
+    static CHECK_DELAY := 300
 
     ; True while a settings window (or its test answer) is open.
     Busy => IsObject(this.session)
@@ -90,6 +98,8 @@ class EditorSettings {
 
     _Show(session) {
         this.session := session
+        if (IsObject(session["form"]))
+            session["form"].CheckExpressions()          ; the values as they are: no typing before this
         if (IsObject(this.window))
             this.window.Show(this)
         return true
@@ -148,10 +158,24 @@ class EditorSettings {
     }
 
     _Close(answer) {
+        SetTimer(this.checkFn, 0)
         this.session := ""
         if (IsObject(this.window))
             this.window.Hide()
         return answer
+    }
+
+    ; (Re)starts the syntax check: it runs CHECK_DELAY ms after the last call (a one-shot timer, WI-0108).
+    _Typed() {
+        SetTimer(this.checkFn, -EditorSettings.CHECK_DELAY)
+    }
+
+    ; The timer of _Typed: checks the expressions of the form, and shows the warnings when they changed.
+    _CheckTyped() {
+        if (!this._Editable())
+            return
+        if (this.session["form"].CheckExpressions())
+            this._Sync()
     }
 
     ; --- the form, as the window and the test change it -----------------------------------------------------------------
@@ -161,6 +185,7 @@ class EditorSettings {
         if (!this._Editable())
             return false
         this.session["form"].SetValue(id, value)
+        this._Typed()
         this._Sync()
         return true
     }
@@ -195,6 +220,7 @@ class EditorSettings {
             return true
         d := NewElementCatalog.Defaults(classId)
         s["form"] := ElementForm(cls, d["pars"], d["name"], true)
+        s["form"].CheckExpressions()
         s["classId"] := classId
         s["cls"] := cls
         this._Sync()
@@ -311,7 +337,7 @@ class EditorSettings {
         for field in form.fields {
             value := (field.isValue && field.ids.Length) ? form.GetValue(field.ids[1]) : ""
             texts := []
-            for warning in field.warnings
+            for warning in form.FieldWarnings(field)
                 texts.Push(warning)
             out.Push(Map("type", field.kind, "label", field.label, "ids", field.ids, "contentId", field.contentId
                 , "content", field.content, "enabled", Json.Bool(field.isEnabled), "value", value

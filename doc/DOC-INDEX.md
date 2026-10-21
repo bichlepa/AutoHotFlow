@@ -31,7 +31,7 @@ L410-421 9. Performance budgets (targets, measured in Phase 2)
 L423-433 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (176.3 KB, 744 lines)
+## doc/PROTOCOL.md (176.4 KB, 744 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
@@ -73,7 +73,7 @@ L296-316 9a. Dialog tests (E0038, WI-0051)
 L318-338 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (56.6 KB, 494 lines)
+## doc/ELEMENT-API-V2.md (56.8 KB, 494 lines)
 ```text
 L8-18 1. Guidelines
 L20-110 2. Class contract

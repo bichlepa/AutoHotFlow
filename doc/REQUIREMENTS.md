@@ -1708,12 +1708,13 @@ The analysis of the flow (REQ-EDT-160) knows which variables can exist at an ele
 ### REQ-EDT-200 Expressions are checked while editing
 
 - **v1:** no
-- **v2:** open (the parser reports errors with their position, `EXPRESSION-LANGUAGE.md` section 10)
+- **v2:** done (expression fields and the parameters that the element evaluates itself; a script element comes with S0008; the place is not marked, the warning gives the line and the column)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0007 (WI-0108, E0096)
+- **Evidence:** `tests/ahk/editor_form_expr.test.ahk`, `tests/e2e/test_editor_settings.py::test_a_syntax_error_of_an_expression_is_shown_after_typing_stops_and_goes_when_fixed`
 
-The element settings check every expression field and every script field (REQ-VAR-010, REQ-VAR-020) while the user types, and show a warning with the position of the error.
+The element settings check every expression field and every script field (REQ-VAR-010, REQ-VAR-020) while the user types, and show a warning with the position of the error. The check runs when the typing stops (300 ms after the last change). A text longer than 4000 characters is not checked while typing, and the warning says so. A warning does not stop OK. The messages of the parser are English.
 
 ### REQ-EDT-210 Syntax highlighting and auto-completion
 

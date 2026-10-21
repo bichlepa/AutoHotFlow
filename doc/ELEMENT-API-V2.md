@@ -105,7 +105,7 @@ class Action_Example extends AhfElement {
 
 The field types (`type`): `Label`, `Edit`, `multilineEdit`, `Checkbox`, `Radio`, `Slider`, `DropDown`, `ComboBox`, `Hotkey`, `Button`, `File`, `Folder`, `weekdays`, `DateAndTime`, `listbox`. A `Label` and a `Button` hold no value; every other type holds the value of its `id`. An unknown type is logged; its value is kept, without any check.
 
-The checks of the form model (warnings, as in v1; they run after every change): `WarnIfEmpty` (an empty value), a `VariableName` content (the rules of the expression language; `%name%` is allowed), and the number content types when the text is a plain number (`IsNumber`, `IsInteger`, not negative for the positive types). An expression is not evaluated while the user types; that check is WI-0108.
+The checks of the form model (warnings, as in v1; they run after every change): `WarnIfEmpty` (an empty value), a `VariableName` content (the rules of the expression language; `%name%` is allowed), and the number content types when the text is a plain number (`IsNumber`, `IsInteger`, not negative for the positive types). An expression is not evaluated while the user types. Its syntax is checked 300 ms after the typing stops (WI-0108, `src/editor/form/FormExpressions.ahk`): a warning, as the other checks.
 
 ---
 
