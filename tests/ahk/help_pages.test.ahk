@@ -15,6 +15,7 @@ PageIdsAreChecked() {
     Assert.True(!HelpPageId.IdOk("Actions/Sleep/x"), "one slash at most")
     Assert.True(!HelpPageId.IdOk("../x"), "no path")
     Assert.True(!HelpPageId.IdOk("a b"), "no space")
+    Assert.True(!HelpPageId.IdOk("Welcome`n"), "no trailing newline")
     Assert.True(!HelpPageId.IdOk("/Sleep"), "no empty kind")
     Assert.True(!HelpPageId.IdOk(Map()), "not text")
     Assert.True(!HelpPageId.IdOk(StrRepeat("a", 81)), "at most 80 characters")

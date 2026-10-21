@@ -27,6 +27,6 @@ class HelpPageId {
             return false
         if (id = "")
             return true
-        return StrLen(id) <= HelpPageId.MAX_CHARS && RegExMatch(id, "^(?:[A-Za-z]+/)?[A-Za-z0-9_]+$")
+        return StrLen(id) <= HelpPageId.MAX_CHARS && RegExMatch(id, "D)^(?:[A-Za-z]+/)?[A-Za-z0-9_]+$")
     }
 }
