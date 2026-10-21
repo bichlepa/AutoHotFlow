@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Triggers/Hotstring.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Hotstring</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Hotstring</h1>
+<p>The trigger <strong>Hotstring</strong> triggers whenever the user presses a specified text. It may also replace the entered text with another text.</p>
+<h2>Settings</h2>
+<h3>Hotstring</h3>
+<p>Specify the text that should be entered in order to trigger the flow.</p>
+<h3>Options</h3>
+<p>If <strong>Require an ending character</strong> is checked, the hotstring must be finished by an ending character. Ending characters are <code>-()[]{}':;"/\,.?!</code>, a linefeed, a space and a tabulator. If it is not checked, it will trigger immediately after the text was entered.</p>
+<p>If <strong>Omit the ending character after replacement</strong> is checked, the ending character will be blocked. Otherwise it will be sent after the replacement.</p>
+<p>If <strong>Trigger inside another word</strong> is checked, the hotstring will be detected even if it is inside another word. For example, the <strong>Hotstring</strong> <code>al</code> will be triggered if user enters <code>practical</code>.</p>
+<p>If <strong>Case sensitive</strong> is not checked, the hotstring will be triggered even if the case of the entered text is different.</p>
+<p>If <strong>Backspace automatically the entered hotstring</strong> is checked, the text will be backspaced before the <strong>Replace text</strong> is entered.</p>
+<p>If <strong>Reset hotstring recognizer after each triggering</strong> is checked, the hotsring recognition will be reset after each trigger. For example, if the <strong>Hotstring</strong> is <code>aa</code>, typing <code>aaa</code> will trigger twice.</p>
+<h3>Replace text</h3>
+<p>Specify the text or keys that will be sent.</p>
+<p>If <strong>Raw mode</strong> is selected, the entered string will be sent as is.</p>
+<p>If <strong>Raw mode</strong> is not selected, some keys can be declared as described in the section Remarks.</p>
+<h3>Method</h3>
+<p>There are different methods to simulate keyboard events. If the sent keys are not recognized by the application using the default method, you may try to change it.</p>
+<p><strong>Input mode</strong> has best performance and is the recommended one in most cases.</p>
+<p><strong>Event mode</strong> has lower performance.</p>
+<p><strong>Play mode</strong> may require to disable the UAC to work. It may work better in games.</p>
+<p><strong>Input mode</strong> can only be used in one AutoHotFlow instance. If you run multiple AutoHotFlow instances simultanously, the second instance will not be able to use it. Also other applications and AutoHotkey scripts may block the input mode. If <strong>Input mode</strong> is blocked, it will automatically fall back to <strong>Event mode</strong>.</p>
+<h3>Scope</h3>
+<p>If <strong>Everywhere</strong> is selected, the hotstring will always trigger, regardless on the currently active window.</p>
+<p>If one of the other options is selected, the hotstring will only be active when a specific window is active or exists, or otherwise.</p>
+<h3>Window identification</h3>
+<p><strong>Title of window</strong>: Name of the window title. It can be chosen whether the title starts, contains or ends with the specified string.</p>
+<p><strong>Exclude title</strong>: Windows whose titles include this value will not be considered.</p>
+<p><strong>Text of a control in window</strong>: If present, this parameter must be a substring from a single text element of the target window. It can be specified whether hidden text will be found</p>
+<p><strong>Exclude text of a control in window</strong>: Windows whose text include this value will not be considered</p>
+<p><strong>Window class</strong>: A window class is a set of attributes that the system uses as a template to create a window. In other words, the class name of the window identifies what type of window it is.</p>
+<p><strong>Process name</strong>: The name or path of the executable that created that window.</p>
+<p><strong>Unique window ID</strong>: Each window or control has a unique ID, also known as a HWND (short for handle to window). This ID can be used to identify the window or control even if its title changes.</p>
+<p><strong>Unique process ID</strong>: Use the unique process id to identify a window belonging to a specific process. Each process has its unique ID, even if it has the same executable.</p>
+<p><strong>Hidden window</strong>: If detect hidden window is selected, a window that exists but is not visible will be found.</p>
+<p><strong>Import window identification</strong>: Use a wizard to get parameters of a window.</p>
+<p>At least <strong>Title of window</strong>, <strong>Window class</strong>, <strong>Process name</strong>, <strong>Unique window ID</strong> or <strong>Unique process ID</strong> must be set.</p>
+<h2>Supplied Variables</h2>
+<h3><code>A_ThisHotstring</code></h3>
+<p>The pressed hotstring as defined in <strong>Hotstring</strong>.</p>
+<h3><code>A_EndChar</code></h3>
+<p>The pressed end character.</p>
+<h2>Remarks</h2>
+<p>The available keys are listed in the <a href="../../../../../../assets/help/en/Key_list.html">key list</a>.</p>
+</main>
+</body>
+</html>

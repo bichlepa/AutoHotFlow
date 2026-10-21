@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Actions/Search_pixel.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Search pixel</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Search pixel</h1>
+<p>The action <strong>Search pixel</strong> searches a region of the screen for a pixel of the specified color.</p>
+<h2>Settings</h2>
+<h3>Screen region</h3>
+<p>Specify the rectangle region where the pixel should be found.</p>
+<p>The position can be specified relatively to screen, window or window client. This setting affects both, the coordinates of the screen region and the result coordinates.</p>
+<p>Optionally the whole screen or window can be specified as search area.</p>
+<p>The region to be searched must be visible; in other words, it is not possible to search a region of a window hidden behind another window. By contrast, pixels that lie partially beneath the mouse cursor can usually be detected. The exception to this is game cursors, which in most cases will obstruct any images beneath them.</p>
+<h3>Pixel color</h3>
+<p>The decimal or hexadecimal color ID to search for, in Red-Green-Blue (RGB) format. For example: 0x9d6346.</p>
+<p>The color ID can be determined either by using wizard <strong>Choose color</strong> or <strong>Get color from screen</strong>.</p>
+<h3>Variation</h3>
+<p>Specify a number between 0 and 255 to indicate the allowed number of shades of variation in either direction for the intensity of the red, green, and blue components of the pixel's color. For example, 2 would allow two shades of variation.</p>
+<p>This parameter is helpful to find a pixel which has not exact the same color as the specified one.</p>
+<p>If you specify 255 shades of variation, all colors will match. The default is 0 shades.</p>
+<h3>Method</h3>
+<p>There are two searching methods.</p>
+<p>If <strong>Fast method</strong> is selected, this action uses a faster searching method that in most cases dramatically reduces the amount of CPU time used by the search. Although color depths as low as 8-bit (256-color) are supported, the fast mode performs much better in 24-bit or 32-bit color.</p>
+<p>If the screen's color depth is 16-bit or lower, the Variation parameter might behave slightly differently in fast mode than it does in slow mode.</p>
+<p>Finally, the fast mode searches the screen row by row (top down) instead of column by column. Therefore, it might find a different pixel than that of the slow mode if there is more than one matching pixel.</p>
+<p>Slow mode only: By default, the search starts at the upper-left pixel of the region and checks all pixels vertically beneath it for a match. If no match is found there, the search continues to the right, column by column, until it finds a matching pixel. The default left-to-right search order can be inverted by swapping X1 and X2 in the parameter list. In other words, if X1 is greater than X2, the search will be conducted from right to left, starting at column X1. Similarly, if Y1 is greater than Y2, each column of pixels to be searched starting at the bottom rather than the top. Finally, if the region to be searched is large and the search is repeated with high frequency, it may consume a lot of CPU time. To alleviate this, keep the size of the area to a minimum.</p>
+</main>
+</body>
+</html>

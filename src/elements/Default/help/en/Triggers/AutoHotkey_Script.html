@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Triggers/AutoHotkey_Script.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>AutoHotkey script</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>AutoHotkey script</h1>
+<p>The trigger <strong>AutoHotkey script</strong> executes an AutoHotkey script in a new AutoHotkey thread. If the funciton x_trigger() will be called in the AutoHotkey script, it will trigger the trigger.</p>
+<blockquote>
+<p><strong>Warning:</strong> Don't use that action if you don't master the AutoHotkey scripting language.</p>
+<p><strong>Warning:</strong> If the AutoHotkey script crashes, AHF may crash too.</p>
+</blockquote>
+<h2>Settings</h2>
+<h3>AutoHotkey script</h3>
+<p>Script that will be executed.</p>
+<h3>Variables that should be imported to script prior to execution</h3>
+<p>Specify a list of variables that should be imported to the AutoHotkey script prior to execution.</p>
+<p>The list can be separated either by a space, linefeed, comma or tab.</p>
+<p>The variables will be available in global scope.</p>
+<h3>Variables that should be exported from script after execution</h3>
+<p>Specify a list of variables that should be exported from the AutoHotkey script after execution.</p>
+<p>The list can be separated either by a space, linefeed, comma or tab.</p>
+<p>The variables must be available in global scope and will be accessible in the flow with same.</p>
+<blockquote>
+<p><strong>Note:</strong> The variables must not start with <code>A_</code>.</p>
+</blockquote>
+<h2>Supplied Variables</h2>
+<h3><code>A_ManualTriggerID</code></h3>
+<p>The <strong>ID</strong> of the manual trigger.</p>
+<h2>Remarks</h2>
+<p>If the script reaches the bottom, it will end and won't be able to trigger, even if it is persistent.</p>
+<p>The script may be stopped with <code>exitapp</code>.</p>
+<p>Do not use command <code>onexit</code>.</p>
+<p>Do not use functions <code>EnterCriticalSection()</code> and <code>LeaveCriticalSection()</code> as well as other AHK_H specific functions.</p>
+<p>Do not use variable, function and label names which start with <code>ahf_</code>.</p>
+</main>
+</body>
+</html>

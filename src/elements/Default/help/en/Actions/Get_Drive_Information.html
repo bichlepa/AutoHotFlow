@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Actions/Get_Drive_Information.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Get drive information</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Get drive information</h1>
+<p>The action <strong>Get drive information</strong> retrieves some information about the connected drives.</p>
+<h2>Settings</h2>
+<h3>Output variable name</h3>
+<p>Name of the variable which will contain the value.</p>
+<h3>Which information</h3>
+<p>Select an information type which you want to retrieve. There are following options:</p>
+<h3>Label</h3>
+<p>Retrieves a drive's volume label</p>
+<h3>Type</h3>
+<p>Retrieves the drive type, which is one of the following words:</p>
+<ul>
+<li><code>Unknown</code></li>
+<li><code>Removable</code></li>
+<li><code>Fixed</code></li>
+<li><code>Network</code></li>
+<li><code>CDROM</code></li>
+<li><code>RAMDisk</code></li>
+</ul>
+<h3>Status</h3>
+<p>Retrieves the drive status, which is one of the following words:</p>
+<ul>
+<li><code>Unknown</code> (might indicate unformatted/RAW)</li>
+<li><code>Ready</code></li>
+<li><code>NotReady</code> (typical for removable drives that don't contain media)</li>
+<li><code>Invalid</code> (Path does not exist or is a network drive that is presently inaccessible, etc.)</li>
+</ul>
+<h3>Status of optical disc drive</h3>
+<p>Retrieves the media status of an optical drive. Output variable is made blank if the status cannot be determined. Otherwise, it will contain one of the following words:</p>
+<ul>
+<li><code>not ready</code> - The drive is not ready to be accessed, perhaps due to being engaged in a write operation. Known limitation: "not ready" also occurs when the drive contains a DVD rather than a CD.</li>
+<li><code>open</code> - The drive contains no disc, or the tray is ejected.</li>
+<li><code>playing</code> - The drive is playing a disc.</li>
+<li><code>paused</code> - The previously playing audio or video is now paused.</li>
+<li><code>seeking</code> - The drive is seeking.</li>
+<li><code>stopped</code> - The drive contains a CD but is not currently accessing it.</li>
+</ul>
+<h3>Capacity</h3>
+<p>Retrieves the total capacity of a path or drive, in Megabytes.</p>
+<h3>Free disk space</h3>
+<p>Retrieves the free disk space of a path or drive, in Megabytes.</p>
+<h3>File system</h3>
+<p>Retrieves the type of drive's file system, which is one of the following words:</p>
+<ul>
+<li><code>FAT</code></li>
+<li><code>FAT32</code></li>
+<li><code>NTFS</code></li>
+<li><code>CDFS</code> (typically indicates a CD)</li>
+<li><code>UDF</code> (typically indicates a DVD)</li>
+</ul>
+<h3>Serial number</h3>
+<p>Retrieves drive's volume serial number expressed as decimal integer.</p>
+<h3>Drive letter or UNC name</h3>
+<p>Specify a drive letter, followed by a colon and an optional backslash. In some cases a UNC name (such as <code>\\server1\share1</code>) might work.</p>
+<h3>Path</h3>
+<p>Name of the directory or a drive letter, followed by a colon and an optional backslash.</p>
+<p>Since NTFS supports mounted volumes and directory junctions, different values might result in different folders of the same "drive" in some cases.</p>
+</main>
+</body>
+</html>

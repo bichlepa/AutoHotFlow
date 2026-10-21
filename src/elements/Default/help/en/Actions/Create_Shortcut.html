@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Actions/Create_Shortcut.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Create shortcut</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Create shortcut</h1>
+<p>The action <strong>Create shortcut</strong> creates a shortcut (.lnk) file.</p>
+<h2>Settings</h2>
+<h3>Shortcut path</h3>
+<p>The path of the shortcut file. Be sure to include the <code>.lnk</code> extension.</p>
+<p>The destination directory must already exist. If the file already exists, it will be overwritten.</p>
+<h3>Target path</h3>
+<p>Name of the file that the shortcut refers to, which should include an absolute path unless the file is integrated with the system (e.g. Notepad.exe).</p>
+<p>The file does not have to exist at the time the shortcut is created; however, if it does not, some systems might alter the path in unexpected ways.</p>
+<h3>Target arguments</h3>
+<p>Parameters that will be passed to target when it is launched. Separate parameters with spaces. If a parameter contains spaces, enclose it in double quotes.</p>
+<h3>Working directory</h3>
+<p>Directory that will become target's current working directory when the shortcut is launched. If blank or omitted, the shortcut will have a blank "Start in" field and the system will provide a default working directory when the shortcut is launched.</p>
+<h3>Description</h3>
+<p>Comments that describe the shortcut (used by the OS to display a tooltip, etc.)</p>
+<h3>Icon path</h3>
+<p>The full path and name of the icon to be displayed for LinkFile. It must either be an ico file, an EXE or DLL.</p>
+<p>To use an icon in IconFile other than the first, check <strong>Set icon number</strong> and specify that number. For example, 2 is the second icon.</p>
+<h3>Run mode</h3>
+<p>Launch Target may be launched minimized or maximized.</p>
+</main>
+</body>
+</html>

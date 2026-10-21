@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Actions/HTTP_Request.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>HTTP Request</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>HTTP Request</h1>
+<p>The action <strong>HTTP Request</strong> is capable of making HTTP Request to an internet resource in the internet or in local network.</p>
+<h2>Settings</h2>
+<h3>URL</h3>
+<p>The URL of the internet resource you wish to access.</p>
+<h3>Post data</h3>
+<p>Data that will be uploaded. Either a specified text or a file may be uploaded.</p>
+<p>Check <strong>URI encode post data</strong> if the text should be URI encoded. Commonly, POST data from a web form must be URI encoded.</p>
+<p><strong>Charset</strong>: Change the charset or the codepage if the server does not accept UTF-8 charset.</p>
+<h3>Request headers</h3>
+<p>AHF automatically sets up some request headers. If additional headers are wished, they can be specified here.</p>
+<p>Check <strong>URI encode request headers</strong> if the text should be URI encoded.</p>
+<h3>Response data</h3>
+<p>The response data may be written to a variable or to a text file.</p>
+<p>If the download will contain binary data, please, use a file.</p>
+<p>If the response data are not needed, it can be left blank.</p>
+<h3>Response headers</h3>
+<p>Specify a variable which will contain the response headers.</p>
+<p>If the response headers are not needed, it can be left blank.</p>
+<h3>Content type</h3>
+<p>If some data is uploaded, AHF will automatically add the Content-Type header. It can be overridden by specifying an other content type. Default values for this header are:</p>
+<ul>
+<li><code>application/octet-stream</code> when uploading from a file and the file's extension is neither "txt" nor "xml"</li>
+<li><code>text/xml</code> when the string "&lt;?xml" appears near the beginning of the data</li>
+<li><code>application/x-www-form-urlencoded</code> in all other casesa</li>
+</ul>
+<h3>Content length</h3>
+<p>If some data is uploaded, AHF will automatically add the Content-Length header. It can be overridden by specifying an other content length.</p>
+<p>If AHF can't determine the content length automatically (e.g: you are uploading non-text data), you must provide the "Content-Length" header with the total number of bytes you wish to upload. Note for UTF-8 charset: if you are uploading text, the number of bytes in text is twice the length of the text.</p>
+<h3>Content MD5</h3>
+<p>If some data is uploaded, AHF will automatically add the Content-MD5 header. It can be overridden by specifying an other content MD5.</p>
+<h3>Method</h3>
+<p>If some data is uploaded, AHF will use POST method, otherwise GET method will be used. It can be overridden by specifying an other method.</p>
+<h3>User agent</h3>
+<p>AHF will add the "User-Agent" header to every request. By default, your script name, AHK version, and OS are used. If this is unacceptable to you, provide your own "User-Agent" header.</p>
+<h3>Flags</h3>
+<p>Some flags can be added using a + sign or removed using a - sign. Internet flags can be found here. Security flags can be found here.</p>
+<p><em>Examples:</em></p>
+<ul>
+<li><code>+INTERNET_FLAG_NO_COOKIES</code> <em>Tells WinINet to NOT automatically handle cookies (by default, WinINet uses Internet Explorer's cookie pool). This is required if you want your flow to manage cookies with this action. If your request headers contain any "Cookie" headers, this option is applied automatically.</em></li>
+<li><code>+INTERNET_FLAG_NO_AUTO_REDIRECT</code> <em>Does not automatically handle redirection in HttpSendRequest.</em></li>
+<li><code>+SECURITY_FLAG_IGNORE_UNKNOWN_CA</code> <em>Ignores unknown certificate authority problems.</em></li>
+</ul>
+<h3>Proxy</h3>
+<p>AutoHotFlow may use a proxy to access an internet resource. If Automatic is selected, Internet Exlporer's proxy configuration will be used. If your Internet Explorer is not configured to use a proxy, this option has no effect. If Custom is selected, AHF will use the specified proxy.</p>
+<p><em>Examples:</em></p>
+<ul>
+<li><code>http://www.exampleproxy.com:1234</code></li>
+</ul>
+<p>Bypass proxy: Tells AHF NOT to use a proxy to access a specified website. This has no effect unless AHF has been told to use a proxy via the Custom option.</p>
+<h2>Remarks</h2>
+<p>Many thanks to VxE for providing the outstanding HTTPRequest library.</p>
+</main>
+</body>
+</html>

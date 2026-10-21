@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Conditions/Confirmation_Dialog.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Confirmation dialog</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Confirmation dialog</h1>
+<p>The condition <strong>Confirmation dialog</strong> displays a dialog window with a message and the buttons "Yes" and "No".</p>
+<h2>Settings</h2>
+<h3><strong>Title and <strong>Message</strong>&gt;</strong></h3>
+<p>Message shown to the user.</p>
+<h3>Button text</h3>
+<p>You may change the text in the <strong>Yes</strong> and <strong>No</strong> buttons.</p>
+<h3>Timeout</h3>
+<p>If <strong>Define timeout</strong> is selected, the dialog will automatically close after the specified amount of time.</p>
+<p>You can select the result if the timer runs out.</p>
+<h3>Width and height</h3>
+<p>Specify the size of the window that will be shown. Make sure, that the window is not too small.</p>
+<h3>Cancelling</h3>
+<p>If <strong>Show cancel button</strong> is selected, a third button will be shown. The text can be modified.</p>
+<p>You can select the result if the cancels or closes the dialog.</p>
+<h3>Default button</h3>
+<p>You can specify which button should be the default one.</p>
+<p>The default button will be highlighted and focused when the dialog opens.</p>
+<h2>Supplied Variables</h2>
+<h3><code>A_UserAction</code></h3>
+<p>The operation used to close the dialog. Can be one of:</p>
+<p><strong>yes</strong>: when the user pressed the Yes-button</p>
+<p><strong>no</strong>: when the user pressed the No-button</p>
+<p><strong>timeout</strong>: when the dialog was closed by a timeout</p>
+<p><strong>cancel</strong>: when the user pressed the back key and the appropriate option is set</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Actions/Send_Keystrokes_To_Control.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Send keystrokes to a control</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Send keystrokes to a control</h1>
+<p>The action <strong>Send keystrokes to a control</strong> sends simulated keystrokes and mouse clicks to a window.</p>
+<h2>Settings</h2>
+<h3>Keys or text to send</h3>
+<p>Specify the keys that will be sent.</p>
+<p>If <strong>Raw mode</strong> is selected, the entered string will be sent as is.</p>
+<p>If <strong>Raw mode</strong> is not selected, some keys can be declared as described in the section Remarks.</p>
+<h3>Control identification</h3>
+<p>You can choose a <strong>method for control identification</strong>:</p>
+<p>If <strong>Text in control</strong> is selected, a control will be identified by its text, which must contain the entered string.</p>
+<p>If <strong>Classname and instance number of the control</strong> is selected, the control will be identified by its unique classname and instance number. Usually this identifier is always the same in every instance of the window.</p>
+<p>If <strong>Unique control ID</strong> is selected, the control will be identified by it unique ID. This ID is different in every instance of the window. So, if a window is closed and opened again, the ID of the same control is different.</p>
+<p>Choose whether the <strong>control identification</strong> start with, contain anywhere oder be exactly the specified value.</p>
+<h3>Window identification</h3>
+<p><strong>Title of window</strong>: Name of the window title. It can be chosen whether the title starts, contains or ends with the specified string.</p>
+<p><strong>Exclude title</strong>: Windows whose titles include this value will not be considered.</p>
+<p><strong>Text of a control in window</strong>: If present, this parameter must be a substring from a single text element of the target window. It can be specified whether hidden text will be found</p>
+<p><strong>Exclude text of a control in window</strong>: Windows whose text include this value will not be considered</p>
+<p><strong>Window class</strong>: A window class is a set of attributes that the system uses as a template to create a window. In other words, the class name of the window identifies what type of window it is.</p>
+<p><strong>Process name</strong>: The name or path of the executable that created that window.</p>
+<p><strong>Unique window ID</strong>: Each window or control has a unique ID, also known as a HWND (short for handle to window). This ID can be used to identify the window or control even if its title changes.</p>
+<p><strong>Unique process ID</strong>: Use the unique process id to identify a window belonging to a specific process. Each process has its unique ID, even if it has the same executable.</p>
+<p><strong>Hidden window</strong>: If detect hidden window is selected, a window that exists but is not visible will be found.</p>
+<p><strong>Import window identification</strong>: Use a wizard to get parameters of a window.</p>
+<p>At least <strong>Title of window</strong>, <strong>Window class</strong>, <strong>Process name</strong>, <strong>Unique window ID</strong> or <strong>Unique process ID</strong> must be set.</p>
+<h2>Supplied Variables</h2>
+<h3><code>A_WindowID</code></h3>
+<p>The unique ID of the found window.</p>
+<h3><code>A_ControlID</code></h3>
+<p>The unique ID of the found control.</p>
+<h2>Remarks</h2>
+<p>The available keys are listed in the <a href="../../../../../../assets/help/en/Key_list.html">key list</a>.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Loops/Loop_Through_Files.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Loop through files</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Loop through files</h1>
+<p>The loop <strong>Loop through files</strong> retrieves the specified files or folders, one at a time.</p>
+<h2>Settings</h2>
+<h3>File path</h3>
+<p>The path of a single file or folder, or a wildcard pattern.</p>
+<p>Both asterisks and question marks are supported as wildcards. A match occurs when the pattern appears in either the file's long/normal name or its 8.3 short name.</p>
+<p>The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
+<h3>Options</h3>
+<p>This action can perform on files, forlder or both. It can also iterate in the subfolders.</p>
+<h2>Supplied Variables</h2>
+<h3><code>A_Index</code></h3>
+<p>Index of the current iteration. It starts with the value 1 and increases on every loop.</p>
+<h3><code>A_LoopFileName</code></h3>
+<p>The name of the file or folder currently retrieved (without the path).</p>
+<h3><code>A_LoopFileNameNoExt</code></h3>
+<blockquote>
+<p>The name of the file or folder without extension.</p>
+</blockquote>
+<h3><code>A_LoopFileExt</code></h3>
+<p>The file's extension (e.g. TXT, DOC, or EXE). The period (.) is not included.</p>
+<h3><code>A_LoopFilePath</code></h3>
+<p>The path and name of the file/folder currently retrieved. If <strong>File path</strong> contains a relative path rather than an absolute path, the path here will also be relative. In addition, any short (8.3) folder names in <strong>File path</strong> will still be short (see next item to get the long version).</p>
+<h3><code>A_LoopFileLongPath</code></h3>
+<p>This is different than A_LoopFileFullPath in the following ways: 1) It always contains the absolute/complete path of the file even if <strong>File path</strong> contains a relative path; 2) Any short (8.3) folder names in <strong>File path</strong> itself are converted to their long names; 3) Characters in <strong>File path</strong> are converted to uppercase or lowercase to match the case stored in the file system. This is useful for converting file names -- such as those passed into a script as command line parameters -- to their exact path names as shown by Explorer.</p>
+<h3><code>A_LoopFileShortPath</code></h3>
+<p>The 8.3 short path and name of the file/folder currently retrieved. For example: C:\MYDOCU~1\ADDRES~1.txt. If File path contains a relative path rather than an absolute path, the path here will also be relative.</p>
+<blockquote>
+<p><strong>Note:</strong> This variable will be blank if the file does not have a short name, which can happen on systems where NtfsDisable8dot3NameCreation has been set in the registry. It will also be blank if File path contains a relative path and the body of the loop uses SetWorkingDir to switch away from the working directory in effect for the loop itself.</p>
+</blockquote>
+<h3><code>A_LoopFileShortName</code></h3>
+<p>The 8.3 short name, or alternate name of the file. If the file doesn't have one (due to the long name being shorter than 8.3 or perhaps because short-name generation is disabled on an NTFS file system), A_LoopFileName will be retrieved instead.</p>
+<h3><code>A_LoopFileDir</code></h3>
+<p>The path of the directory in which A_LoopFileName resides. If File path contains a relative path rather than an absolute path, the path here will also be relative. A root directory will not contain a trailing backslash. For example: C:</p>
+<h3><code>A_LoopFileTimeModified</code></h3>
+<p>The time the file was last modified. Format YYYYMMDDHH24MISS.</p>
+<h3><code>A_LoopFileTimeCreated</code></h3>
+<p>The time the file was created. Format YYYYMMDDHH24MISS.</p>
+<h3><code>A_LoopFileTimeAccessed</code></h3>
+<p>The time the file was last accessed. Format YYYYMMDDHH24MISS.</p>
+<h3><code>A_LoopFileAttrib</code></h3>
+<p>The attributes of the file currently retrieved.</p>
+<h3><code>A_LoopFileSize</code></h3>
+<p>The size in bytes of the file currently retrieved. Files larger than 4 gigabytes are also supported.</p>
+<h3><code>A_LoopFileSizeKB</code></h3>
+<p>The size in Kbytes of the file currently retrieved, rounded down to the nearest integer.</p>
+<h3><code>A_LoopFileSizeMB</code></h3>
+<p>The size in Mbytes of the file currently retrieved, rounded down to the nearest integer.</p>
+<h2>Remarks</h2>
+<p>All supplied variables will be removed after last iteration.</p>
+</main>
+</body>
+</html>

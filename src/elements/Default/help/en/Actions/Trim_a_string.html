@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Actions/Trim_a_string.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Trim a string</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Trim a string</h1>
+<p>The action <strong>Trim a string</strong> removes one or more characters from the beginning and/or end of a string.</p>
+<h2>Settings</h2>
+<h3>Output variable name</h3>
+<p>Name of the variable which will contain the trimmed string. It can be the same variable as the input string.</p>
+<h3>Input string</h3>
+<p>An input string which will be trimmed.</p>
+<h3>Operation</h3>
+<p>If <strong>Remove a number of characters</strong> is selected, a specified count of characters from left and/or right side of the string will be removed.</p>
+<p>If <strong>Remove specific characters</strong> is selected, some specific characters from left and/or right side of the string will be removed.</p>
+<h3>Remove from which side</h3>
+<p>Select whether the characters should be removed from left-hand and/or right-hand side of the string.</p>
+<h3>Count of characters</h3>
+<p>Only accessible if <strong>Remove a number of characters</strong> is selected.</p>
+<p>Specify how many characters will be removed.</p>
+<h3>Which characters</h3>
+<p>Only accessible if <strong>Remove specific characters</strong> is selected.</p>
+<p>This field contains the characters (case sensitive) to exclude from the beginning and/or end of the input string.</p>
+<p><em>Examples:</em></p>
+<ul>
+<li><code>,.:;-!?</code> <em>(Omit punctuation characters)</em></li>
+<li><code>%a_space%%a_tab%%a_lf%%a_cr%</code> <em>(omit whitespaces)</em></li>
+</ul>
+<h2>Examples</h2>
+<p>Extract the word "Hello" and the space from the string "Hello world!".</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operation</td>
+<td><code>◉ Remove a number of characters</code></td>
+</tr>
+<tr>
+<td>Remove from which side</td>
+<td><code>☑ Left-hand side ☐ Right-hand side</code></td>
+</tr>
+<tr>
+<td>Count of characters</td>
+<td><code>6</code></td>
+</tr>
+</tbody>
+</table>
+<p>Remove the spaces from both sides of the string " Hello world! ".</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operation</td>
+<td><code>◉ Remove specific characters</code></td>
+</tr>
+<tr>
+<td>Remove from which side</td>
+<td><code>☑ Left-hand side ☑ Right-hand side</code></td>
+</tr>
+<tr>
+<td>Which characters</td>
+<td><code>%a_space%</code></td>
+</tr>
+</tbody>
+</table>
+</main>
+</body>
+</html>

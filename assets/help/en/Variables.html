@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from assets/help/en/Variables.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Variables</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Variables</h1>
+<h2>Variable formats</h2>
+<p>There are some defined variable formats:</p>
+<p>Normal</p>
+<p>The value can be a number or some text. If a mathematical operation is applied to a string containing a number, it will be automatically interpreted as a number</p>
+<p>Date</p>
+<p>The value contains a date. If the date is shown, e.g. in a message box, it will be converted to a readable form. For example: 4:55 PM Saturday, November 27, 2004</p>
+<p>List</p>
+<p>The value contains a list with some elements. Each element has keys. Those keys can either be numerical (comparable to an array) or they can be an arbitrary name.</p>
+<p>You can add or access elements by using some specific actions. If the date is shown, e.g. in a message box, it will be converted to a readable form.</p>
+<h2>Variable names</h2>
+<p>Variable names are not case sensitive (for example, <em>CurrentDate</em> is the same as <em>currentdate</em>). Variable names may be up to 253 characters long and may consist of letters, numbers and the following punctuation: # _ @ $</p>
+<p>A variable name mustn’t start with the letters "A_", since those are built in variables.</p>
+<h2>Global and local variables</h2>
+<p><strong>Local variables</strong></p>
+<p>As local variable can have almost any name. As soon it is set, it is available in the current instance. An instance is one execution. As soon the instance ends, all local variables will be deleted.</p>
+<p><strong>Static variables</strong></p>
+<p>Static variables must begin with "Static_". For example: Static_MyVar. Those variables are available in the current flow in all instances. They are kept when the flow has ended, even after a reboot.</p>
+<p><strong>Global variables</strong></p>
+<p>Global variables must begin with "Global_". For example: Global_MyVar. Those variables are available in all flows and they are kept when the flow has ended, even after a reboot.</p>
+<h2>Using variables</h2>
+<p>Variables can be used in almost every edit field in the settings. If a string is needed, a variable's content can be inserted by enclosing them into percent signs.</p>
+<p><strong><em>Example:</em></strong></p>
+<p><strong>Expression</strong></p>
+<p>Expressions are used to perform one or more operations upon a series of variables, literal strings, and/or literal numbers. In other words, they may be used in order to do some calculations or to make some comparisons.</p>
+<p>Variable names in an expression are not enclosed in percent signs. Numbers are allowed.</p>
+<p>It is possible to make a double reference. If a variable is enclosed in percent signs within an expression (e.g. %Var%), whatever that variable contains is assumed to be the name or partial name of another variable.</p>
+<p><strong><em>Examples:</em></strong></p>
+<p>Following operands are supported:</p>
+<h2>Built in variables</h2>
+<p>The following variables are built in and are read only.</p>
+<p><strong>Special characters</strong></p>
+<p><strong>Flow variables</strong></p>
+<p>Some elements, especially loops and triggers may provide other read only variables. See in the description of each element.</p>
+<p>In contrast to other variables, the variables that are set by the actions are thread variables. So, if you separate the flow into two threads, the thread 1 will not access the variables of thread 2.</p>
+<p><strong>Date and time</strong></p>
+<p><strong>Operating system and user info</strong></p>
+<p><strong>Directories</strong></p>
+</main>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Actions/Input_Box.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Input box</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Input box</h1>
+<p>The action <strong>Input box</strong> displays an input box to ask the user to enter a string or number.</p>
+<h2>Settings</h2>
+<h3>Output variable name</h3>
+<p>Name of the variable which will contain the user input.</p>
+<h3>Title <em>and</em> Message</h3>
+<p>Message shown to the user.</p>
+<h3>Edit field</h3>
+<p>If <strong>Only allow numbers</strong> is selected, it will prevent the user from typing anything other than digits into the field (however, it is still possible to paste non-digits into it).</p>
+<p>If <strong>Mask user's input</strong> is selected, it will hide the user's input (such as for password entry) by substituting masking characters for what the user types</p>
+<p>If <strong>Use a multiline edit field</strong> is selected, the edit field will have multiple lines. The count of lines may be specified.</p>
+<p>If <strong>Default value</strong> contains some text, the edit field will contain that text when the dialog first appears.</p>
+<h3>Button Text</h3>
+<p>Enter the text which will be shown as the <strong>OK</strong> button.</p>
+<h3>Timeout</h3>
+<p>If <strong>Define timeout</strong> is selected, the dialog will automatically close after the specified amount of time.</p>
+<p><strong>Result on timeout</strong>: If timeout reaches zero, the action will end with the specified result.</p>
+<h3>Width and height</h3>
+<p>Specify the size of the window that will be shown. Make sure, that the window is not too small.</p>
+<h3>Cancelling</h3>
+<p>If <strong>Show cancel button</strong> is selected, a second button near to the OK button will be shown. The text can be specified.</p>
+<p><strong>Result if cancelled</strong>: If uses either closes the window or clicks on the cancel button, the action will end with the specified result.</p>
+<h2>Supplied Variables</h2>
+<h3><code>A_UserAction</code></h3>
+<p>The operation used to close the dialog. Can be one of:</p>
+<p><strong>ok</strong>: when the user pressed the OK-button</p>
+<p><strong>timeout</strong>: when the dialog was closed by a timeout</p>
+<p><strong>cancel</strong>: when the user pressed the back key and the appropriate option is set</p>
+</main>
+</body>
+</html>
