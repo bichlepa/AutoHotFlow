@@ -9,7 +9,7 @@
 ;
 ; Mode worker. The eject and the retraction go through the seam SystemOps (E0103): DriveEject and DriveRetract of AutoHotkey,
 ; which use the control code IOCTL_STORAGE_EJECT_MEDIA and IOCTL_STORAGE_LOAD_MEDIA (the AutoHotkey documentation).
-; The three v1 methods all end in that call (MIGRATION M-0140): the v1 method 1 (a library that ejects USB mass storage
+; The three v1 methods all end in that call (MIGRATION M-0145): the v1 method 1 (a library that ejects USB mass storage
 ; devices by their device instance) is not ported, and the choice of the method is kept in the flow but has no effect.
 ; A failing call ends with the exception "Drive ... could not be ejected" (or "retracted") and the error of AutoHotkey.
 class Action_Eject_Drive extends AhfElement {

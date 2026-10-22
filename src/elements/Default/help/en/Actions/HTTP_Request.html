@@ -110,7 +110,7 @@ img {
 <li><strong>Use file as source (upload)</strong>: the content of the file <strong>File path</strong> is sent as it is, without any text conversion. The method is POST.</li>
 </ul>
 <p>Check <strong>URI encode post data</strong> if the text must be encoded for a web form (spaces and special characters become <code>%20</code> and so on).</p>
-<p><strong>Charset</strong>: the text is sent in UTF-8 by default. Choose <strong>Define codepage</strong> to send it in another codepage, for example <code>1252</code>. <strong>Define charset</strong> takes a name that AutoHotkey knows, such as <code>UTF-8</code>, <code>UTF-16</code> or <code>CP1252</code>; the charset names of v1 (such as <code>iso-8859-1</code>) are not all known (MIGRATION M-0143).</p>
+<p><strong>Charset</strong>: the text is sent in UTF-8 by default. Choose <strong>Define codepage</strong> to send it in another codepage, for example <code>1252</code>. <strong>Define charset</strong> takes a name that AutoHotkey knows, such as <code>UTF-8</code>, <code>UTF-16</code> or <code>CP1252</code>; the charset names of v1 (such as <code>iso-8859-1</code>) are not all known (MIGRATION M-0148).</p>
 <h3>Request headers</h3>
 <p>One header per line, written as <code>Name: value</code>, for example <code>X-Token: 42</code>. A header without a colon ends the element with an exception. A header that the element sets itself (for example User-Agent) is replaced by the line of this field.</p>
 <h3>Response data</h3>
@@ -135,16 +135,16 @@ img {
 <h3>User agent</h3>
 <p>Automatic is the user agent of Windows. Custom sends the text of the field as the User-Agent header.</p>
 <h3>Flags</h3>
-<p>The field is kept so that flows of v1 load. It has no effect in AutoHotFlow 2: the WinINet flags of v1 have no equivalent in the library that the element uses (MIGRATION M-0142).</p>
+<p>The field is kept so that flows of v1 load. It has no effect in AutoHotFlow 2: the WinINet flags of v1 have no equivalent in the library that the element uses (MIGRATION M-0147).</p>
 <h3>Proxy</h3>
 <ul>
 <li><strong>No proxy</strong>: the request goes directly to the server.</li>
 <li><strong>Automatic</strong>: the proxy of the system is used, as Windows configures it.</li>
 <li><strong>Custom</strong>: the proxy in the form <code>host:port</code>, for example <code>proxy.example.com:8080</code>.</li>
 </ul>
-<p><strong>Bypass proxy</strong>: with a custom proxy, the addresses of the list are reached directly (for example <code>*.example.com</code>). It has no effect with the other choices (MIGRATION M-0144).</p>
+<p><strong>Bypass proxy</strong>: with a custom proxy, the addresses of the list are reached directly (for example <code>*.example.com</code>). It has no effect with the other choices (MIGRATION M-0149).</p>
 <h2>Status and errors</h2>
-<p>The status of the answer is not an error: a 404 or a 500 answer is stored like any other answer, as in v1. An exception ends the element when the request cannot be sent (no connection, a name that cannot be resolved), when the URL is not <code>http</code> or <code>https</code>, when a header has no colon, or when a file cannot be read or written. A request that takes longer than 10 minutes ends with the exception "worker timeout" (MIGRATION M-0141).</p>
+<p>The status of the answer is not an error: a 404 or a 500 answer is stored like any other answer, as in v1. An exception ends the element when the request cannot be sent (no connection, a name that cannot be resolved), when the URL is not <code>http</code> or <code>https</code>, when a header has no colon, or when a file cannot be read or written. A request that takes longer than 10 minutes ends with the exception "worker timeout" (MIGRATION M-0146).</p>
 <p>The variable <strong>A_BytesDownloaded</strong> (thread variable) gets the number of bytes of the answer.</p>
 <h2>Examples</h2>
 <p>Send a form and store the answer.</p>

@@ -8,7 +8,7 @@
 ; (Source_Elements/Default/Actions/Download_file.ahk).
 ;
 ; Mode worker: the download (AutoHotkey Download, the proxy of the Internet settings of the user) waits for the network. It
-; has a job deadline of 10 minutes (JobTimeoutMs, the class value; v1 had none, M-0141): a longer download ends with
+; has a job deadline of 10 minutes (JobTimeoutMs, the class value; v1 had none, M-0146): a longer download ends with
 ; "worker timeout" and the partial file stays. The target is a file; a folder or a drive root is refused (FileOps.Guard).
 ; AutoHotkey Download writes the body of an error page too, as v1 did (the download can "succeed" for a missing file).
 class Action_Download_File extends AhfElement {

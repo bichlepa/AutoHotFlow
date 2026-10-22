@@ -16,7 +16,7 @@ The address of the resource, for example `http://someorg.org/api`.
 
 Check **URI encode post data** if the text must be encoded for a web form (spaces and special characters become `%20` and so on).
 
-**Charset**: the text is sent in UTF-8 by default. Choose **Define codepage** to send it in another codepage, for example `1252`. **Define charset** takes a name that AutoHotkey knows, such as `UTF-8`, `UTF-16` or `CP1252`; the charset names of v1 (such as `iso-8859-1`) are not all known (MIGRATION M-0143).
+**Charset**: the text is sent in UTF-8 by default. Choose **Define codepage** to send it in another codepage, for example `1252`. **Define charset** takes a name that AutoHotkey knows, such as `UTF-8`, `UTF-16` or `CP1252`; the charset names of v1 (such as `iso-8859-1`) are not all known (MIGRATION M-0148).
 
 ### Request headers
 
@@ -55,7 +55,7 @@ Automatic is the user agent of Windows. Custom sends the text of the field as th
 
 ### Flags
 
-The field is kept so that flows of v1 load. It has no effect in AutoHotFlow 2: the WinINet flags of v1 have no equivalent in the library that the element uses (MIGRATION M-0142).
+The field is kept so that flows of v1 load. It has no effect in AutoHotFlow 2: the WinINet flags of v1 have no equivalent in the library that the element uses (MIGRATION M-0147).
 
 ### Proxy
 
@@ -63,11 +63,11 @@ The field is kept so that flows of v1 load. It has no effect in AutoHotFlow 2: t
 - **Automatic**: the proxy of the system is used, as Windows configures it.
 - **Custom**: the proxy in the form `host:port`, for example `proxy.example.com:8080`.
 
-**Bypass proxy**: with a custom proxy, the addresses of the list are reached directly (for example `*.example.com`). It has no effect with the other choices (MIGRATION M-0144).
+**Bypass proxy**: with a custom proxy, the addresses of the list are reached directly (for example `*.example.com`). It has no effect with the other choices (MIGRATION M-0149).
 
 ## Status and errors
 
-The status of the answer is not an error: a 404 or a 500 answer is stored like any other answer, as in v1. An exception ends the element when the request cannot be sent (no connection, a name that cannot be resolved), when the URL is not `http` or `https`, when a header has no colon, or when a file cannot be read or written. A request that takes longer than 10 minutes ends with the exception "worker timeout" (MIGRATION M-0141).
+The status of the answer is not an error: a 404 or a 500 answer is stored like any other answer, as in v1. An exception ends the element when the request cannot be sent (no connection, a name that cannot be resolved), when the URL is not `http` or `https`, when a header has no colon, or when a file cannot be read or written. A request that takes longer than 10 minutes ends with the exception "worker timeout" (MIGRATION M-0146).
 
 The variable **A_BytesDownloaded** (thread variable) gets the number of bytes of the answer.
 

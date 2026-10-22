@@ -106,7 +106,7 @@ Entries from the WebView2 viewer (WI-0115, E0099): COM interfaces through `ComCa
 - **Wrong:** Expecting the proxy to see `GET http://127.0.0.1:<port>/x` when `SetProxy(2, "127.0.0.1:<port>", "")` is set.
 - **Right:** Test a custom proxy only as accepted: the request to the loopback address goes direct. A request through a real proxy needs a second host, which the tests must not reach.
 - **Status:** verified (a Python listener on the proxy port received `GET /x HTTP/1.1` from `WinHttp.WinHttpRequest.5.1`; WI-0122, `tests/integration/test_internet_elements.py::test_a_custom_proxy_is_accepted_and_loopback_is_sent_direct`)
-- **Source:** src/elements/Default/lib/HttpOps.ahk (WI-0122, M-0144)
+- **Source:** src/elements/Default/lib/HttpOps.ahk (WI-0122, M-0149)
 
 ### The body of a WinHTTP answer is a SAFEARRAY that the element copies (verified)
 

@@ -2,7 +2,7 @@
 
 The action **Extract files** unpacks an archive into a folder.
 
-The formats that the `tar.exe` of Windows reads are supported: zip, 7z, tar, and tar archives compressed with gzip (`.tar.gz`), bzip2 (`.tar.bz2`), xz (`.tar.xz`) or lzma (`.tar.lzma`). A single file compressed with gzip, bzip2, xz or lzma without tar is not an archive for this element (MIGRATION M-0136).
+The formats that the `tar.exe` of Windows reads are supported: zip, 7z, tar, and tar archives compressed with gzip (`.tar.gz`), bzip2 (`.tar.bz2`), xz (`.tar.xz`) or lzma (`.tar.lzma`). A single file compressed with gzip, bzip2, xz or lzma without tar is not an archive for this element (MIGRATION M-0141).
 
 ## Settings
 
@@ -16,7 +16,7 @@ The folder where the files of the archive are extracted. It must exist. The root
 
 ### Format
 
-**\***: the format is found from the archive itself. This is the default. The other choices are kept so that flows of v1 load; they do not change the way the archive is read (MIGRATION M-0137).
+**\***: the format is found from the archive itself. This is the default. The other choices are kept so that flows of v1 load; they do not change the way the archive is read (MIGRATION M-0142).
 
 ## Safety
 

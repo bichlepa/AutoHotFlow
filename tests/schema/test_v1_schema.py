@@ -95,20 +95,20 @@ ALLOWED = {
     ("default.action_speech_output", "pitch", "type"): "M-0132",
     ("default.action_speech_output", "pitch", "content"): "M-0132",
     # WI-0122 (archives, drives, internet): the drive lists are filled by the editor, the schema of the engine has none
-    # (M-0138); the flag updateOnEdit is not used (M-0101); the default of Lock drive is the enum value (M-0099); the choice
-    # texts with a number are formatted by Lang (M-0146)
-    ("default.action_change_drive_label", "DriveLetter", "default"): "M-0138",
-    ("default.action_change_drive_label", "DriveLetter", "choices"): "M-0138",
+    # (M-0143); the flag updateOnEdit is not used (M-0101); the default of Lock drive is the enum value (M-0099); the choice
+    # texts with a number are formatted by Lang (M-0151)
+    ("default.action_change_drive_label", "DriveLetter", "default"): "M-0143",
+    ("default.action_change_drive_label", "DriveLetter", "choices"): "M-0143",
     ("default.action_change_drive_label", "", "updateOnEdit"): "M-0101",
-    ("default.action_eject_drive", "DriveLetter", "default"): "M-0138",
-    ("default.action_eject_drive", "DriveLetter", "choices"): "M-0138",
+    ("default.action_eject_drive", "DriveLetter", "default"): "M-0143",
+    ("default.action_eject_drive", "DriveLetter", "choices"): "M-0143",
     ("default.action_eject_drive", "", "updateOnEdit"): "M-0101",
-    ("default.action_eject_drive", "Method", "choices"): "M-0146",
-    ("default.action_get_drive_information", "DriveLetter", "default"): "M-0138",
-    ("default.action_get_drive_information", "DriveLetter", "choices"): "M-0138",
+    ("default.action_eject_drive", "Method", "choices"): "M-0151",
+    ("default.action_get_drive_information", "DriveLetter", "default"): "M-0143",
+    ("default.action_get_drive_information", "DriveLetter", "choices"): "M-0143",
     ("default.action_get_drive_information", "", "updateOnEdit"): "M-0101",
-    ("default.action_lock_or_unlock_drive", "DriveLetter", "default"): "M-0138",
-    ("default.action_lock_or_unlock_drive", "DriveLetter", "choices"): "M-0138",
+    ("default.action_lock_or_unlock_drive", "DriveLetter", "default"): "M-0143",
+    ("default.action_lock_or_unlock_drive", "DriveLetter", "choices"): "M-0143",
     ("default.action_lock_or_unlock_drive", "", "updateOnEdit"): "M-0101",
     ("default.action_lock_or_unlock_drive", "WhatDo", "default"): "M-0099",
 }

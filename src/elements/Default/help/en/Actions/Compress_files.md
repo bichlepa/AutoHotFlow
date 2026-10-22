@@ -17,7 +17,7 @@ The path of the archive to write. An archive that already exists at this path is
 - **zip**: a zip archive.
 - **7z**: a 7z archive.
 - **tar**: a tar archive without compression.
-- **gzip**, **BZIP2**, **xz**: a tar archive compressed with gzip, bzip2 or xz (the usual `.tar.gz`, `.tar.bz2` or `.tar.xz`). A single file is packed as a tar archive too: the compression of one file alone without tar is not available in AutoHotFlow 2 (MIGRATION M-0136).
+- **gzip**, **BZIP2**, **xz**: a tar archive compressed with gzip, bzip2 or xz (the usual `.tar.gz`, `.tar.bz2` or `.tar.xz`). A single file is packed as a tar archive too: the compression of one file alone without tar is not available in AutoHotFlow 2 (MIGRATION M-0141).
 
 The archive is written by the `tar.exe` of Windows. Its entries keep the name of the source: packing the folder `Reports` gives the entries `Reports/...`.
 

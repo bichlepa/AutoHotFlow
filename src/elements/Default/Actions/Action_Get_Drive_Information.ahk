@@ -11,7 +11,7 @@
 ;
 ; Mode worker (the drives are read from the operating system). The label, the status of an optical drive, the file system
 ; and the serial number need a drive letter; the type, the capacity and the free space need a folder (any path on the
-; drive). Differences from v1 (MIGRATION M-0139): "Status" needs a drive letter (v1 used an empty path), and the empty
+; drive). Differences from v1 (MIGRATION M-0144): "Status" needs a drive letter (v1 used an empty path), and the empty
 ; drive letter is the exception "Drive is not specified".
 class Action_Get_Drive_Information extends AhfElement {
     static Mode := "worker"

@@ -9,11 +9,11 @@
 ; (Source_Elements/Default/Actions/Extract_files.ahk).
 ;
 ; Mode worker: tar.exe of Windows reads the archive (TarOps), not 7za.exe (v1). The format is found by tar.exe itself, so
-; the choice of the format is not needed (M-0136): zip, 7z, tar and the tar archives with gzip, bzip2, xz or lzma are read;
+; the choice of the format is not needed (M-0141): zip, 7z, tar and the tar archives with gzip, bzip2, xz or lzma are read;
 ; a single file compressed with gzip, bzip2, xz or lzma (without tar) is not an archive and ends with an exception.
 ; Before anything is written, every entry is checked: an entry that would leave the folder (an absolute name, a drive, ".."),
 ; or a link or a device, refuses the whole archive (zip-slip, FileOps.Guard for the folder). Existing files of the same name
-; in the folder are replaced, as v1 did (MIGRATION M-0137).
+; in the folder are replaced, as v1 did (MIGRATION M-0142).
 class Action_Extract_files extends AhfElement {
     static Mode := "worker"
     static ActsOnSystem := true

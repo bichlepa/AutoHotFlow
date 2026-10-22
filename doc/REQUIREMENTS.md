@@ -979,7 +979,7 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 ### REQ-ELM-320 Archives
 
 - **v1:** yes
-- **v2:** done (zip, 7z, tar and tar archives with gzip, bzip2, xz or lzma with tar.exe of Windows; a single file compressed with gzip, bzip2 or xz is not read, MIGRATION M-0136; Z not checked)
+- **v2:** done (zip, 7z, tar and tar archives with gzip, bzip2, xz or lzma with tar.exe of Windows; a single file compressed with gzip, bzip2 or xz is not read, MIGRATION M-0141; Z not checked)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0008 (WI-0122)
@@ -993,7 +993,7 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 ### REQ-ELM-330 Drives
 
 - **v1:** yes
-- **v2:** done (the changing actions through the seam SystemOps, not tried on real drives; eject method 1 of v1 not ported, MIGRATION M-0140)
+- **v2:** done (the changing actions through the seam SystemOps, not tried on real drives; eject method 1 of v1 not ported, MIGRATION M-0145)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0008 (WI-0122)
@@ -1010,7 +1010,7 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 ### REQ-ELM-340 Internet
 
 - **v1:** yes
-- **v2:** done (WinHTTP instead of WinINet: the Flags field has no effect, MIGRATION M-0142; tested against a local server only)
+- **v2:** done (WinHTTP instead of WinINet: the Flags field has no effect, MIGRATION M-0147; tested against a local server only)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0008 (WI-0122)

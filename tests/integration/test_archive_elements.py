@@ -2,8 +2,8 @@
 Windows (TarOps). Every test works in its own temporary folder (pytest tmp_path). The archives that a test crafts (an entry
 that leaves the folder, a link) are written with the Python modules zipfile and tarfile.
 
-The formats: zip, 7z, tar, and the tar archives with gzip, bzip2 and xz are written and read back (M-0136). A single file
-compressed with gzip, bzip2 or xz without tar is not an archive for tar.exe, so Extract ends with an exception (M-0136).
+The formats: zip, 7z, tar, and the tar archives with gzip, bzip2 and xz are written and read back (M-0141). A single file
+compressed with gzip, bzip2 or xz without tar is not an archive for tar.exe, so Extract ends with an exception (M-0141).
 """
 
 import gzip
@@ -188,7 +188,7 @@ def test_a_drive_root_as_destination_is_refused(flows, tmp_path, tree):
 
 
 def test_a_gzip_file_without_tar_is_not_an_archive(flows, tmp_path):
-    """A single file compressed with gzip (v1 "gzip") is not a tar archive, and tar.exe does not read it (M-0136)."""
+    """A single file compressed with gzip (v1 "gzip") is not a tar archive, and tar.exe does not read it (M-0141)."""
     raw = tmp_path / "single.gz"
     raw.write_bytes(gzip.compress(b"plain text inside gzip\n"))
     back = tmp_path / "back"

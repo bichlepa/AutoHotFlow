@@ -448,7 +448,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 
 - **Problem:** v1 packed one file with gzip, BZIP2 or xz through 7za. `tar.exe` has no such mode: a raw `.gz`, `.bz2`, `.xz` or `.lzma` file fails with "Unrecognized archive format".
 - **Wrong:** Expecting `tar -xf file.gz` to unpack a plain gzip file, or `tar -czf file.gz file` to write a plain gzip file (it writes a tar archive compressed with gzip).
-- **Right:** Write a tar archive compressed with the filter (`-z`, `-j`, `-J`) and say so in the help (MIGRATION M-0136). Extracting a raw compressed file ends with the tar message as an exception.
+- **Right:** Write a tar archive compressed with the filter (`-z`, `-j`, `-J`) and say so in the help (MIGRATION M-0141). Extracting a raw compressed file ends with the tar message as an exception.
 - **Status:** verified (`tests/integration/test_archive_elements.py::test_a_gzip_file_without_tar_is_not_an_archive`; the write of `-z`, `-j`, `-J` and `--lzma` was run)
 - **Source:** src/elements/Default/lib/TarOps.ahk (WI-0122)
 

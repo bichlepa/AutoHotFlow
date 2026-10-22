@@ -14,7 +14,7 @@ The name and the path of the file that the download writes. A relative path is t
 
 ## Remarks
 
-The download waits for the server. A download that takes longer than 10 minutes ends with the exception "worker timeout" (MIGRATION M-0141); the part that was written stays in the file. An error page of the server is saved as well: the element does not check the status of the answer, as in v1.
+The download waits for the server. A download that takes longer than 10 minutes ends with the exception "worker timeout" (MIGRATION M-0146); the part that was written stays in the file. An error page of the server is saved as well: the element does not check the status of the answer, as in v1.
 
 ## Examples
 

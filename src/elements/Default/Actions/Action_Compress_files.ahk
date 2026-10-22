@@ -9,8 +9,8 @@
 ; (Source_Elements/Default/Actions/Compress_files.ahk).
 ;
 ; Mode worker: the archive is written by tar.exe of Windows (TarOps), not by 7za.exe (v1). The formats zip, 7z, tar, gzip,
-; BZIP2 and xz: gzip, BZIP2 and xz compress the tar archive, a single file is not compressed without it (MIGRATION M-0136).
-; An existing archive of that name is replaced (MIGRATION M-0137). A folder is packed with its contents.
+; BZIP2 and xz: gzip, BZIP2 and xz compress the tar archive, a single file is not compressed without it (MIGRATION M-0141).
+; An existing archive of that name is replaced (MIGRATION M-0142). A folder is packed with its contents.
 class Action_Compress_files extends AhfElement {
     static Mode := "worker"
     static ActsOnSystem := true

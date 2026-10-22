@@ -43,7 +43,7 @@ Shipping a newer `tar.exe` (S0009, if the minimum version of Windows needs it).
 ## Result
 
 - **Built:** 9 elements (`Action_Compress_files`, `Action_Extract_files`, `Action_List_drives`, `Action_Get_Drive_Information`, `Action_Change_Drive_Label`, `Action_Eject_Drive`, `Action_Lock_Or_Unlock_Drive`, `Action_Download_File`, `Action_HTTP_Request`), shared code `lib/TarOps.ahk`, `lib/DriveOps.ahk`, `lib/HttpOps.ahk`, seam function `DriveRetract` (E0103), local server `tests/support/localhttp.py`.
-- **Deviations:** MIGRATION M-0136 to M-0147 (tar.exe reads and writes archives only; drive lists in the editor; eject method 1 not ported; job deadline 10 minutes; HTTP flags and charset names; proxy rules; corpus flow fixes).
+- **Deviations:** MIGRATION M-0141 to M-0152 (tar.exe reads and writes archives only; drive lists in the editor; eject method 1 not ported; job deadline 10 minutes; HTTP flags and charset names; proxy rules; corpus flow fixes).
 - **Tests:** `test_archive_elements.py`, `test_drive_elements.py`, `test_internet_elements.py` (80 passed, commit 008b4cff, working tree at that time); corpus "HTTP Request" moved out of PENDING (test_corpus.py with --all: 33 passed incl. schema test). Fast tier: 2534 passed, 4 failed (editor tray load flake, doc index and help pages stale before regeneration, verify tier ordering); all four pass on rerun.
 - **Minimum tar.exe version:** not checked (this machine: bsdtar 3.8.9; older Windows 10 builds not checked).
 - **Not checked:** eject and lock on real hardware; automatic proxy; the 10-minute deadline; Z extraction.

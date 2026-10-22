@@ -38,7 +38,7 @@ HOST_ROLES = "storage,engine,triggerhost"       # the trigger host (S0003); the 
 # Empty since WI-0124: the speech output is back in the "Trigger test" copy (M-0077 resolved). The test provider of the
 # system seam answers SpeechVoices from the script of the test, and speaks nothing.
 FIX_LIST = [
-    # M-0147: "HTTP Request" (Flow 100439537) calls https://httpbin.org; the test rewrites its URLs to the local server, and
+    # M-0152: "HTTP Request" (Flow 100439537) calls https://httpbin.org; the test rewrites its URLs to the local server, and
     # the User-Agent of its second request is "myuseagent" while its check expects "myuseragent" (the test copy is corrected)
     ("Flow 100439537", "URLs of httpbin.org replaced by the local test server (127.0.0.1); User-Agent myuseagent corrected"),
 ]
@@ -301,7 +301,7 @@ def test_v1_trigger_test_runs_green_on_the_adapted_copy(host_flows):
 
 # --- "HTTP Request" (WI-0122) ---------------------------------------------------------------------------------------
 def test_v1_http_request_runs_green_against_the_local_server(flows, local_server, tmp_path):
-    """"HTTP Request" (Flow 100439537), as saved except its URLs (FIX_LIST, M-0147): httpbin.org is replaced by the local
+    """"HTTP Request" (Flow 100439537), as saved except its URLs (FIX_LIST, M-0152): httpbin.org is replaced by the local
     test server, which answers like httpbin (JSON with args, headers, data, form and url). The flow makes a GET and two
     POST requests (plain text with a UTF-8 codepage, and a form with a custom content type and an automatic Content-MD5
     header) and checks the answers with expressions and debug dialogs, which the dialog seam answers with yes."""

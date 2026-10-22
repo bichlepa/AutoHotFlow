@@ -22,7 +22,7 @@ The type of the drive that contains the folder: `Unknown`, `Removable`, `Fixed`,
 
 ### Status
 
-The status of the drive: `Unknown` (for example unformatted), `Ready`, `NotReady` (typical for a removable drive without media) or `Invalid`. Needs a drive letter (MIGRATION M-0139).
+The status of the drive: `Unknown` (for example unformatted), `Ready`, `NotReady` (typical for a removable drive without media) or `Invalid`. Needs a drive letter (MIGRATION M-0144).
 
 ### Status of optical disc drive
 

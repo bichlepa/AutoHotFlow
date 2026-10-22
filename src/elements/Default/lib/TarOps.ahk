@@ -11,7 +11,7 @@
 ; outside it is not readable in the listing, F-0131); the checks of the names do not need the exact names.
 ;
 ; What tar.exe cannot do (checked on this machine, bsdtar 3.8.9): it reads and writes archives only (tar, tar.gz, tar.bz2,
-; tar.xz, tar.lzma, zip, 7z), not a single file compressed with gzip, bzip2 or xz (MIGRATION M-0136). The Z format is not
+; tar.xz, tar.lzma, zip, 7z), not a single file compressed with gzip, bzip2 or xz (MIGRATION M-0141). The Z format is not
 ; checked. Names that cmd.exe cannot pass (a percent sign, a quote, a line break) are refused.
 class TarOps {
     static TIMEOUT_S := 900        ; one tar run that is still going after this long is killed
@@ -26,9 +26,9 @@ class TarOps {
             case "zip": return "--format zip"
             case "7z": return "--format 7zip"
             case "tar": return ""
-            case "gzip": return "-z"          ; a tar archive compressed with gzip (M-0136)
-            case "BZIP2": return "-j"         ; a tar archive compressed with bzip2 (M-0136)
-            case "xz": return "-J"            ; a tar archive compressed with xz (M-0136)
+            case "gzip": return "-z"          ; a tar archive compressed with gzip (M-0141)
+            case "BZIP2": return "-j"         ; a tar archive compressed with bzip2 (M-0141)
+            case "xz": return "-J"            ; a tar archive compressed with xz (M-0141)
         }
         throw ElementError(Lang("The archive format '%1%' is not known.", format))
     }
@@ -133,7 +133,7 @@ class TarOps {
             Lang("Extracting the archive"))
     }
 
-    ; Writes the archive. An existing archive is replaced (MIGRATION M-0137).
+    ; Writes the archive. An existing archive is replaced (MIGRATION M-0142).
     static Create(archive, format, parent, name) {
         opts := TarOps.WriteOptions(format)
         args := (opts = "" ? "" : opts " ") "-cf " TarOps.Quote(archive, Lang("Destination archive"))

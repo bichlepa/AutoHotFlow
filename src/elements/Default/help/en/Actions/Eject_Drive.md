@@ -15,7 +15,7 @@ A drive letter with its colon, for example `E:`. The letter alone (`E`) is accep
 
 ### Method
 
-The three methods of v1 are kept in the flow. All of them eject the drive with the same call of Windows (AutoHotkey `DriveEject`). The method 1 of v1 ("safely remove the removable drive", through a library that removes USB storage devices) is not available in AutoHotFlow 2, so a USB stick may not be removed as safely as with v1 (MIGRATION M-0140). The method has no effect on retracting the tray.
+The three methods of v1 are kept in the flow. All of them eject the drive with the same call of Windows (AutoHotkey `DriveEject`). The method 1 of v1 ("safely remove the removable drive", through a library that removes USB storage devices) is not available in AutoHotFlow 2, so a USB stick may not be removed as safely as with v1 (MIGRATION M-0145). The method has no effect on retracting the tray.
 
 ## Examples
 

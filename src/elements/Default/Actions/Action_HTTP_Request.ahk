@@ -11,7 +11,7 @@
 ;
 ; Mode worker: the request goes through WinHTTP (HttpOps) and waits for the network with the timeouts of HttpOps and a job
 ; deadline of 10 minutes (JobTimeoutMs, the class value; v1 had none). Only http and https. Differences from v1, all in
-; MIGRATION M-0142 to M-0144: the Flags field has no effect (WinINet flags have no WinHTTP equivalent); the codepage of the
+; MIGRATION M-0147 to M-0149: the Flags field has no effect (WinINet flags have no WinHTTP equivalent); the codepage of the
 ; post data encodes the body, and a charset name is only a codepage name that AutoHotkey knows; the proxy bypass list
 ; applies to a custom proxy only; Automatic method is POST with post data and GET without; a status other than 2xx is no
 ; error (as in v1). The response headers go to their variable as the server sent them.
