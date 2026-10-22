@@ -116,6 +116,9 @@ def test_system_seam_details():
         assert "system-seam" in rules("elements/Default/Actions/A.ahk", body % ("worker", call)), call
         assert "system-seam" in rules("elements/Default/Triggers/T.ahk", body % ("trigger", call)), call
         assert "system-seam" not in rules("elements/Default/Actions/A.ahk", body % ("worker", "SystemOps." + call)), call
+    # the command style of AutoHotkey v2 at the start of a statement is a hit as well
+    for call in ('Send "x"', "Shutdown 1", "Click 10, 20"):
+        assert "system-seam" in rules("elements/Default/Actions/A.ahk", body % ("worker", call)), call
     # the seam itself calls the real functions
     seam = "class SystemOps {\n    class Real {\n        Send(keys) {\n            return Send(keys)\n        }\n    }\n}\n"
     assert "system-seam" not in rules("elements/base/SystemOps.ahk", seam)

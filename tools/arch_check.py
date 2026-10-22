@@ -153,10 +153,13 @@ UI_SEAM_FILE = "ui_common/UiFileDialogs.ahk"
 UI_SEAM_ROLES = {"manager", "editor", "ui_common"}
 # Rule system-seam (E0103, WI-0117): an element calls a system function of SystemOps directly (shutdown, input, sound,
 # idle time, ...), or src/ registers a SystemOps provider. SYSTEM_SEAM_FILE calls the real functions and is exempt.
-SYSTEM_CALL_RE = re.compile(NOT_MEMBER + r"(Shutdown|LockWorkStation|Hibernate|Suspend|DriveEject|DriveSetLabel|DriveLock|"
-                            r"DriveUnlock|FileRecycleEmpty|ChangeDisplaySettings|SoundBeep|SoundPlay|SoundSetMute|"
-                            r"SoundSetVolume|SpeakText|SpeechVoices|BlockInput|Send|Click|MouseClickDrag|MouseMove|"
-                            r"SetCapsLockState|SetNumLockState|SetScrollLockState|TimeIdle|TimeIdlePhysical)\s*\(")
+SYSTEM_NAMES = ("(Shutdown|LockWorkStation|Hibernate|Suspend|DriveEject|DriveSetLabel|DriveLock|DriveUnlock|"
+                "FileRecycleEmpty|ChangeDisplaySettings|SoundBeep|SoundPlay|SoundSetMute|SoundSetVolume|SpeakText|"
+                "SpeechVoices|BlockInput|Send|Click|MouseClickDrag|MouseMove|SetCapsLockState|SetNumLockState|"
+                "SetScrollLockState|TimeIdle|TimeIdlePhysical)")
+SYSTEM_CALL_RE = re.compile(NOT_MEMBER + SYSTEM_NAMES + r"\s*\(")
+# The same functions called like a command at the start of a statement: Send "x", Click 10, 20, Shutdown 1.
+SYSTEM_CMD_RE = re.compile(r"^[ 	]*" + SYSTEM_NAMES + r"[ 	]+[\"'%\w{-]", re.M)
 SYSTEM_PROVIDER_RE = re.compile(NOT_MEMBER + r"SystemOps\s*\.\s*UseProvider", re.I)
 SYSTEM_SEAM_FILE = "elements/base/SystemOps.ahk"
 FILEIO_RE = re.compile(NOT_MEMBER + r"(FileRead|FileAppend|FileOpen|FileDelete|FileMove|FileCopy|DirCreate|"
@@ -311,8 +314,8 @@ def check_text(relpath, text):
             add(m.start(), "dialog-seam", "Dialogs.UseProvider is for the test entries only")
     # Rule system-seam (E0103, WI-0117): the system functions only through SystemOps; providers only in the test entries.
     if role == "elements" and relpath != SYSTEM_SEAM_FILE:
-        for m in SYSTEM_CALL_RE.finditer(code):
-            add(m.start(), "system-seam", m.group(1) + "( called directly, use SystemOps." + m.group(1))
+        for m in list(SYSTEM_CALL_RE.finditer(code)) + list(SYSTEM_CMD_RE.finditer(code)):
+            add(m.start(), "system-seam", m.group(1) + " called directly, use SystemOps." + m.group(1))
     for m in SYSTEM_PROVIDER_RE.finditer(code):
         add(m.start(), "system-seam", "SystemOps.UseProvider is for the test entries only")
     for m in FILEIO_RE.finditer(code):
