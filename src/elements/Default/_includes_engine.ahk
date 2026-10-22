@@ -9,6 +9,7 @@
 #Include lib\FlowChoices.ahk
 #Include lib\DialogOps.ahk
 #Include lib\FlowSwitchOps.ahk
+#Include lib\TimeOps.ahk
 #Include lib\DebugOps.ahk
 #Include lib\LoopOps.ahk
 #Include lib\WindowIdent.ahk
@@ -25,6 +26,7 @@ class Default {
     #Include Actions\Action_Get_List_Info.ahk
     #Include Actions\Action_Message_Box.ahk
     #Include Actions\Action_New_List.ahk
+    #Include Actions\Action_New_Time.ahk
     #Include Actions\Action_New_variable.ahk
     #Include Actions\Action_Random_number.ahk
     #Include Actions\Action_Rounding_A_Number.ahk
@@ -34,6 +36,8 @@ class Default {
     #Include Actions\Action_Sleep.ahk
     #Include Actions\Action_Square_Root.ahk
     #Include Actions\Action_Stop_Flow.ahk
+    #Include Actions\Action_Time_Calculation.ahk
+    #Include Actions\Action_Time_Difference.ahk
     #Include Actions\Action_Tooltip.ahk
     #Include Actions\Action_Trace_Point.ahk
     #Include Actions\Action_Trace_Point_Check.ahk
@@ -69,6 +73,7 @@ ElementRegistry.Register(Default.Action_Get_index_of_element_in_list)
 ElementRegistry.Register(Default.Action_Get_List_Info)
 ElementRegistry.Register(Default.Action_Message_Box)
 ElementRegistry.Register(Default.Action_New_List)
+ElementRegistry.Register(Default.Action_New_Time)
 ElementRegistry.Register(Default.Action_New_variable)
 ElementRegistry.Register(Default.Action_Random_number)
 ElementRegistry.Register(Default.Action_Rounding_A_Number)
@@ -78,6 +83,8 @@ ElementRegistry.Register(Default.Action_Shuffle_list)
 ElementRegistry.Register(Default.Action_Sleep)
 ElementRegistry.Register(Default.Action_Square_Root)
 ElementRegistry.Register(Default.Action_Stop_Flow)
+ElementRegistry.Register(Default.Action_Time_Calculation)
+ElementRegistry.Register(Default.Action_Time_Difference)
 ElementRegistry.Register(Default.Action_Tooltip)
 ElementRegistry.Register(Default.Action_Trace_Point)
 ElementRegistry.Register(Default.Action_Trace_Point_Check)

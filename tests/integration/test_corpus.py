@@ -56,8 +56,8 @@ PENDING = {
         "Action_Delete_Folder": "S0008", "Action_Get_File_Size": "S0008", "Action_Get_File_Time": "S0008",
         "Action_Get_Shortcut_Information": "S0008", "Action_Move_File": "S0008", "Action_Move_Folder": "S0008",
         "Action_Read_From_File": "S0008", "Action_Rename_File": "S0008", "Action_Rename_Folder": "S0008",
-        "Action_Run": "S0008", "Action_Set_File_Time": "S0008", "Action_Time_Calculation": "S0008",
-        "Action_Time_Difference": "S0008", "Action_Write_to_File": "S0008", "Condition_File_Exists": "S0008",
+        "Action_Run": "S0008", "Action_Set_File_Time": "S0008",
+        "Action_Write_to_File": "S0008", "Condition_File_Exists": "S0008",
         "Condition_File_Has_Attribute": "S0008", "Condition_Window_Exists": "S0008"}),
     "Flow 1587447767": dict(name="ini file test", missing={
         "Action_Read_from_INI": "S0008", "Action_Write_to_INI": "S0008"}),

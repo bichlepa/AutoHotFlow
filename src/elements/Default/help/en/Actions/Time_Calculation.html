@@ -99,14 +99,18 @@ img {
 <body>
 <main>
 <h1>Time calculation</h1>
-<p>The action <strong>Time calculation</strong> adds an amount of time to a timestamp.</p>
+<p>The action <strong>Time calculation</strong> adds an amount of time to a time stamp.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
-<p>Name of the variable which will contain the result.</p>
+<p>Name of the variable which will contain the result, a time stamp in the form <code>YYYYMMDDHH24MISS</code>.</p>
 <h3>Input time</h3>
-<p>Input timestamp</p>
+<p>The time stamp to which the time is added, a text or an expression, for example the variable of a time stamp. It must be a valid time stamp; otherwise the action ends with an exception.</p>
 <h3>Time to add</h3>
-<p>The amount of time which will be added to the input timestamp</p>
+<p>The amount to add, in the unit below. A whole number is expected; a decimal fraction is cut off.</p>
+<h3>Which unit</h3>
+<p>Seconds, Minutes, Hours or Days.</p>
+<h2>Remarks</h2>
+<p>A negative amount subtracts the time.</p>
 </main>
 </body>
 </html>

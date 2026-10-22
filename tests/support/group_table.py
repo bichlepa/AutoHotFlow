@@ -131,6 +131,7 @@ TEST_GROUPS = {
     "integration/test_core_c_loops.py": ["elements-e2e"],
     "integration/test_maths_elements.py": ["elements-e2e"],
     "integration/test_script_element.py": ["elements-e2e"],
+    "integration/test_time_elements.py": ["elements-e2e"],
     "integration/test_core_d_flows.py": ["engine"],
     "integration/test_core_e_dialogs.py": ["ui", "elements-e2e"],
     "integration/test_corpus.py": ["expr", "engine"],
@@ -316,6 +317,10 @@ COVERS = {
         "integration/test_core_b_lists.py::test_new_list_creates_empty_and_filled_lists",
         "integration/test_core_b_lists.py::test_new_list_scopes",
     ],
+    "src/elements/Default/Actions/Action_New_Time.ahk": [
+        "integration/test_time_elements.py::test_new_time_current_and_specified",
+        "integration/test_time_elements.py::test_new_time_of_an_invalid_time_stamp_is_an_exception",
+    ],
     "src/elements/Default/Actions/Action_New_variable.ahk": [
         "integration/test_core_a_elements.py::test_new_variable_only_if_not_exist",
         "integration/test_core_a_elements.py::test_new_variable_scopes_and_invalid_names",
@@ -365,6 +370,16 @@ COVERS = {
         "e2e/test_editor_flow_ctx.py",
         "ahk/engine_call_flow.test.ahk",
         "integration/test_core_d_flows.py::test_stop_flow_stops_running_and_queued_instances_and_its_own_flow",
+    ],
+    "src/elements/Default/Actions/Action_Time_Calculation.ahk": [
+        "integration/test_time_elements.py::test_time_calculation_in_each_unit",
+        "integration/test_time_elements.py::test_time_calculation_of_an_invalid_time_is_an_exception",
+        "integration/test_time_elements.py::test_time_calculation_text_amount_is_an_error_in_both_modes",
+    ],
+    "src/elements/Default/Actions/Action_Time_Difference.ahk": [
+        "integration/test_time_elements.py::test_time_difference_in_each_unit",
+        "integration/test_time_elements.py::test_time_difference_default_first_time_is_now",
+        "integration/test_time_elements.py::test_time_difference_of_an_invalid_time_is_an_exception",
     ],
     "src/elements/Default/Actions/Action_Tooltip.ahk": [
         "integration/test_core_e_dialogs.py",
@@ -487,6 +502,10 @@ COVERS = {
         "integration/test_core_c_loops.py::test_list_loop_members_that_are_lists",
         "integration/test_core_c_loops.py::test_list_loop_works_through_the_copy_it_made_at_the_start",
         "integration/test_core_c_loops.py::test_list_loop_keeps_values_with_text_that_looks_like_a_path_or_number",
+    ],
+    "src/elements/Default/lib/TimeOps.ahk": [
+        "integration/test_time_elements.py::test_time_calculation_in_each_unit",
+        "integration/test_time_elements.py::test_time_difference_in_each_unit",
     ],
     "src/elements/Default/lib/WindowIdent.ahk": [
         "ahk/element_window_ident.test.ahk",

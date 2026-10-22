@@ -99,18 +99,18 @@ img {
 <body>
 <main>
 <h1>Time difference</h1>
-<p>The action <strong>Time difference</strong> calculates the time difference between two timestamps.</p>
+<p>The action <strong>Time difference</strong> calculates the time between two time stamps.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
-<p>Name of the variable which will contain the result.</p>
+<p>Name of the variable which will contain the result: the difference as a whole number in the unit below.</p>
 <h3>First input time</h3>
-<p>First timestamp</p>
+<p>The first time stamp, a text or an expression. The default is the built-in variable <code>A_Now</code>, the current time.</p>
 <h3>Second input time</h3>
-<p>Second timestamp</p>
+<p>The second time stamp, a text or an expression.</p>
 <h3>Which unit</h3>
-<p>Unit of the resulting time difference</p>
+<p>Seconds, Minutes, Hours or Days.</p>
 <h2>Remarks</h2>
-<p>The formula of the calculation is: <code>FirstInputTime - SecondInputTime = Result</code></p>
+<p>The result is the first time stamp minus the second one: a positive result means that the first time is later. Both time stamps must be valid; otherwise the action ends with an exception.</p>
 </main>
 </body>
 </html>

@@ -736,11 +736,11 @@ The variables are exchanged as in v1 (E0104): the variables the user names for i
 ### REQ-ELM-200 Variables and calculations
 
 - **v1:** yes
-- **v2:** partial (`Action_New_Variable` is done in S0002; the calculations and `Action_Script` are S0008)
+- **v2:** done (`Action_New_Variable` in S0002; the calculations and `Action_Script` in S0008, WI-0118)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0052), S0008
-- **Evidence:** `tests/integration/test_core_a_elements.py::test_new_variable_sets_texts_numbers_and_lists`, `tests/integration/test_core_a_elements.py::test_new_variable_only_if_not_exist`, `tests/integration/test_core_a_elements.py::test_new_variable_scopes_and_invalid_names`, `tests/integration/test_core_a_elements.py::test_the_v1_flow_variable_test_runs_up_to_the_first_result_list`
+- **Plan:** S0002 (WI-0052), S0008 (WI-0118)
+- **Evidence:** `tests/integration/test_core_a_elements.py::test_new_variable_sets_texts_numbers_and_lists`, `tests/integration/test_core_a_elements.py::test_new_variable_only_if_not_exist`, `tests/integration/test_core_a_elements.py::test_new_variable_scopes_and_invalid_names`, `tests/integration/test_core_a_elements.py::test_the_v1_flow_variable_test_runs_up_to_the_first_result_list`, `tests/integration/test_maths_elements.py::test_square_root_of_exact_and_other_numbers`, `tests/integration/test_maths_elements.py::test_trigonometry_in_radians_and_degrees`, `tests/integration/test_maths_elements.py::test_rounding_normally_up_and_down`, `tests/integration/test_maths_elements.py::test_exponentiation_of_whole_and_decimal_numbers`, `tests/integration/test_script_element.py::test_script_sets_variables_and_the_last_value_is_not_stored`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
@@ -893,16 +893,17 @@ Dialogs run separately from the flows (MIGRATION M-0002) and can be answered by 
 ### REQ-ELM-280 Date and time
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (WI-0118)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0118)
+- **Evidence:** `tests/integration/test_time_elements.py::test_new_time_current_and_specified`, `tests/integration/test_time_elements.py::test_time_calculation_in_each_unit`, `tests/integration/test_time_elements.py::test_time_difference_in_each_unit`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_New_Time` | yes | open | S0008 |
-| `Action_Time_calculation` | yes | open | S0008 |
-| `Action_Time_difference` | yes | open | S0008 |
+| `Action_New_Time` | yes | done | S0008 (WI-0118) |
+| `Action_Time_calculation` | yes | done | S0008 (WI-0118) |
+| `Action_Time_difference` | yes | done | S0008 (WI-0118) |
 
 ### REQ-ELM-290 Clipboard
 
