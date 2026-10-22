@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Actions/Rounding_a_number.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Rounding a number</title>
+<!-- Generated from src/elements/Default/help/en/Actions/Time_Difference.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Time difference</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,20 +98,19 @@ img {
 </head>
 <body>
 <main>
-<h1>Rounding a number</h1>
-<p>The action <strong>Rounding a number</strong> finds the next integer number to another number or cuts off some digits after comma.</p>
+<h1>Time difference</h1>
+<p>The action <strong>Time difference</strong> calculates the time difference between two timestamps.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
 <p>Name of the variable which will contain the result.</p>
-<h3>Input number</h3>
-<p>The input number.</p>
-<h3>Places after comma</h3>
-<p>If this field contains 0, the result will be an integer.</p>
-<p>If field contains a positive integer, that many digits after comma will remain.</p>
-<p>If field contains a negative integer, that many digits before comma will be zero.</p>
-<h3>Operation</h3>
-<p>If Round normally is selected, the nearest integer will be found.</p>
-<p>It is also possible to round up or to round down.</p>
+<h3>First input time</h3>
+<p>First timestamp</p>
+<h3>Second input time</h3>
+<p>Second timestamp</p>
+<h3>Which unit</h3>
+<p>Unit of the resulting time difference</p>
+<h2>Remarks</h2>
+<p>The formula of the calculation is: <code>FirstInputTime - SecondInputTime = Result</code></p>
 </main>
 </body>
 </html>

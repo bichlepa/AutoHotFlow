@@ -129,6 +129,7 @@ TEST_GROUPS = {
     "integration/test_core_a_trace_points.py": ["elements-e2e"],
     "integration/test_core_b_lists.py": ["elements-e2e"],
     "integration/test_core_c_loops.py": ["elements-e2e"],
+    "integration/test_maths_elements.py": ["elements-e2e"],
     "integration/test_core_d_flows.py": ["engine"],
     "integration/test_core_e_dialogs.py": ["ui", "elements-e2e"],
     "integration/test_corpus.py": ["expr", "engine"],
@@ -265,6 +266,10 @@ TEST_GROUPS = {
 # test function as `file::function`. An element without an entry (a new one) or with an empty list runs the element
 # units only. The guard test requires an entry for every element file.
 COVERS = {
+    "src/elements/Default/Actions/Action_Absolute_number.ahk": [
+        "integration/test_maths_elements.py::test_absolute_number_of_negative_and_positive_numbers",
+        "integration/test_maths_elements.py::test_absolute_number_of_a_text_is_an_exception_with_the_v1_text",
+    ],
     "src/elements/Default/Actions/Action_Add_To_List.ahk": [
         "ahk/element_list_ops.test.ahk",
         "integration/test_core_b_lists.py::test_a_list_built_edited_and_searched_with_the_elements",
@@ -287,6 +292,11 @@ COVERS = {
         "e2e/test_editor_flow_ctx.py",
         "integration/test_core_d_flows.py",
         "ahk/engine_call_flow.test.ahk",
+    ],
+    "src/elements/Default/Actions/Action_Exponentiation.ahk": [
+        "integration/test_maths_elements.py::test_exponentiation_of_whole_and_decimal_numbers",
+        "integration/test_maths_elements.py::test_exponentiation_without_a_result_is_an_exception",
+        "integration/test_maths_elements.py::test_exponentiation_text_that_is_no_number_is_an_error_in_both_modes",
     ],
     "src/elements/Default/Actions/Action_Get_List_Info.ahk": [
         "integration/test_core_b_lists.py::test_a_list_built_edited_and_searched_with_the_elements",
@@ -312,6 +322,14 @@ COVERS = {
         "integration/test_core_a_elements.py::test_new_variable_type_errors_in_strict_and_compatibility_mode",
         "integration/test_core_a_elements.py::test_the_v1_flow_variable_test_runs_up_to_the_first_result_list",
     ],
+    "src/elements/Default/Actions/Action_Random_number.ahk": [
+        "integration/test_maths_elements.py::test_random_number_gives_a_number_between_the_limits",
+        "integration/test_maths_elements.py::test_random_number_text_that_is_no_number_is_an_error_in_both_modes",
+    ],
+    "src/elements/Default/Actions/Action_Rounding_A_Number.ahk": [
+        "integration/test_maths_elements.py::test_rounding_normally_up_and_down",
+        "integration/test_maths_elements.py::test_rounding_with_zero_and_negative_places",
+    ],
     "src/elements/Default/Actions/Action_Set_Flow_Status.ahk": [
         "e2e/test_editor_flow_ctx.py",
         "integration/test_flow_status_elements.py::test_a_switch_of_a_flow_whose_state_cannot_be_read_ends_the_element_with_exception",
@@ -331,6 +349,10 @@ COVERS = {
     "src/elements/Default/Actions/Action_Sleep.ahk": [
         "ahk/element_sleep.test.ahk",
     ],
+    "src/elements/Default/Actions/Action_Square_Root.ahk": [
+        "integration/test_maths_elements.py::test_square_root_of_exact_and_other_numbers",
+        "integration/test_maths_elements.py::test_square_root_of_a_negative_number_is_an_exception",
+    ],
     "src/elements/Default/Actions/Action_Stop_Flow.ahk": [
         "e2e/test_editor_flow_ctx.py",
         "ahk/engine_call_flow.test.ahk",
@@ -346,6 +368,10 @@ COVERS = {
     ],
     "src/elements/Default/Actions/Action_Trace_Point_Check.ahk": [
         "integration/test_core_a_trace_points.py::test_trace_point_check_every_option",
+    ],
+    "src/elements/Default/Actions/Action_Trigonometry.ahk": [
+        "integration/test_maths_elements.py::test_trigonometry_in_radians_and_degrees",
+        "integration/test_maths_elements.py::test_arcsine_outside_minus_one_to_one_is_an_exception",
     ],
     "src/elements/Default/Conditions/Condition_Confirmation_Dialog.ahk": [
         "integration/test_core_e_dialogs.py",

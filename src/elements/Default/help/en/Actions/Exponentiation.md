@@ -1,6 +1,6 @@
 # Exponentiation
 
-The action **Exponentiation** performs an exponentiation.
+The action **Exponentiation** raises a number to a power.
 
 ## Settings
 
@@ -10,12 +10,16 @@ Name of the variable which will contain the result.
 
 ### Base
 
-The base.
+The base, a number.
 
 ### Exponent
 
-The exponent.
+The exponent, a number.
 
 ## Remarks
 
-The formula of the calculation is: `Base^Exponent = Result`
+The formula of the calculation is: `Base ^ Exponent = Result`
+
+The power of two whole numbers is a whole number if it is exact (`3` to the power of `2` is `9`); a negative exponent gives a decimal number.
+
+Zero to a negative power, and a negative base to a fractional power, have no result: the action then ends with an exception, and the flow goes on at the exception connection.

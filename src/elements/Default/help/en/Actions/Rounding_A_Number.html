@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Actions/Time_calculation.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Time calculation</title>
+<!-- Generated from src/elements/Default/help/en/Actions/Rounding_A_Number.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Rounding a number</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,15 +98,21 @@ img {
 </head>
 <body>
 <main>
-<h1>Time calculation</h1>
-<p>The action <strong>Time calculation</strong> adds an amount of time to a timestamp.</p>
+<h1>Rounding a number</h1>
+<p>The action <strong>Rounding a number</strong> rounds a number to a number of digits after the decimal point, or to a multiple of a power of ten.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
 <p>Name of the variable which will contain the result.</p>
-<h3>Input time</h3>
-<p>Input timestamp</p>
-<h3>Time to add</h3>
-<p>The amount of time which will be added to the input timestamp</p>
+<h3>Input number</h3>
+<p>The input number.</p>
+<h3>Places after comma</h3>
+<p>If this field contains 0, the result is rounded to a whole number and is a whole number.</p>
+<p>If it contains a positive whole number, that many digits after the decimal point remain.</p>
+<p>If it contains a negative whole number, that many digits before the decimal point become zero (<code>-2</code> rounds <code>1234</code> to <code>1200</code>). A decimal fraction in this field is cut off.</p>
+<h3>Operation</h3>
+<p>Round normally gives the nearest value.</p>
+<p>Round up gives the next value towards plus infinity at that place (<code>1.21</code> at one place is <code>1.3</code>, <code>-1.29</code> is <code>-1.2</code>).</p>
+<p>Round down gives the next value towards minus infinity at that place (<code>1.29</code> at one place is <code>1.2</code>, <code>-1.21</code> is <code>-1.3</code>).</p>
 </main>
 </body>
 </html>

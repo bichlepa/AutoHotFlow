@@ -99,16 +99,18 @@ img {
 <body>
 <main>
 <h1>Exponentiation</h1>
-<p>The action <strong>Exponentiation</strong> performs an exponentiation.</p>
+<p>The action <strong>Exponentiation</strong> raises a number to a power.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
 <p>Name of the variable which will contain the result.</p>
 <h3>Base</h3>
-<p>The base.</p>
+<p>The base, a number.</p>
 <h3>Exponent</h3>
-<p>The exponent.</p>
+<p>The exponent, a number.</p>
 <h2>Remarks</h2>
-<p>The formula of the calculation is: <code>Base^Exponent = Result</code></p>
+<p>The formula of the calculation is: <code>Base ^ Exponent = Result</code></p>
+<p>The power of two whole numbers is a whole number if it is exact (<code>3</code> to the power of <code>2</code> is <code>9</code>); a negative exponent gives a decimal number.</p>
+<p>Zero to a negative power, and a negative base to a fractional power, have no result: the action then ends with an exception, and the flow goes on at the exception connection.</p>
 </main>
 </body>
 </html>

@@ -1,6 +1,6 @@
 # Trigonometry
 
-The action **Trigonometry** calculates the sinus, cosine, tangent or the arcsine, arccosine, arctangent of a number.
+The action **Trigonometry** calculates the sine, cosine or tangent of an angle, or the arcsine, arccosine or arctangent of a number.
 
 ## Settings
 
@@ -10,12 +10,16 @@ Name of the variable which will contain the result.
 
 ### Input number
 
-The input number.
+The input number. For arcsine and arccosine it must lie between -1 and 1; any other value ends the action with an exception.
 
 ### Operation
 
-Specify which tigonomic function should be done.
+The function to calculate: Sine, Cosine, Tangent, Arcsine, Arccosine or Arctangent.
 
 ### Unit
 
-Choose whether the input or output number (depending on the operation) is in radians or degrees.
+Radian or Degree. It is the unit of the angle: the input of sine, cosine and tangent, and the result of arcsine, arccosine and arctangent.
+
+## Remarks
+
+The result of an operation is a decimal number.

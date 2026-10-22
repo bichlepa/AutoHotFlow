@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Actions/Random_Number.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<!-- Generated from src/elements/Default/help/en/Actions/Random_number.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
 <title>Random number</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
@@ -99,15 +99,17 @@ img {
 <body>
 <main>
 <h1>Random number</h1>
-<p>The action <strong>Random number</strong> creates a new variable. The output variable will be of same type as the input variable.</p>
+<p>The action <strong>Random number</strong> writes a random number into a variable. The number lies between the minimum and the maximum value, both included.</p>
 <h2>Settings</h2>
 <h3>Variable name</h3>
-<p>Name of the variable which will contain the copy.</p>
-<h3>Minimum value <em>and</em> Maximum value</h3>
-<p>A number, variable or expression.</p>
-<p>If both numbers are integers, the generated number will be an integer. If one of them is a floating point, the generated number will be a floating point.</p>
+<p>Name of the variable which will contain the random number.</p>
+<h3>Minimum value and Maximum value</h3>
+<p>A number, a variable or an expression. If both values are whole numbers, the result is a whole number. If one of them has a decimal point, the result is a decimal number.</p>
+<p>If the minimum is greater than the maximum, the two values are used in the other order.</p>
+<h2>Remarks</h2>
+<p>The random number generator has no seed: the same flow gives other numbers at every run.</p>
 <h2>Examples</h2>
-<p>Get an integer between 1 and 10.</p>
+<p>Get a whole number between 1 and 10.</p>
 <table>
 <thead>
 <tr>
@@ -126,7 +128,7 @@ img {
 </tr>
 </tbody>
 </table>
-<p>Get a floating point number between -10 and 10.</p>
+<p>Get a decimal number between -10 and 10.</p>
 <table>
 <thead>
 <tr>

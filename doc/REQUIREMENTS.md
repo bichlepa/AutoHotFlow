@@ -745,12 +745,12 @@ The variables are exchanged as in v1 (E0104): the variables the user names for i
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
 | `Action_New_Variable` | yes | done | S0002 (WI-0052) |
-| `Action_Random_Number` | yes | open | S0008 |
-| `Action_Absolute_Number` | yes | open | S0008 |
-| `Action_Square_Root` | yes | open | S0008 |
-| `Action_Trigonometry` | yes | open | S0008 |
-| `Action_Rounding_a_number` | yes | open | S0008 |
-| `Action_Exponentiation` | yes | open | S0008 |
+| `Action_Random_Number` | yes | done | S0008 (WI-0118) |
+| `Action_Absolute_Number` | yes | done | S0008 (WI-0118) |
+| `Action_Square_Root` | yes | done | S0008 (WI-0118) |
+| `Action_Trigonometry` | yes | done | S0008 (WI-0118) |
+| `Action_Rounding_a_number` | yes | done | S0008 (WI-0118) |
+| `Action_Exponentiation` | yes | done | S0008 (WI-0118) |
 | `Action_Script` (REQ-VAR-020) | yes | open | S0008 |
 
 ### REQ-ELM-210 Conditions on values
