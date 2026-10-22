@@ -101,7 +101,7 @@ The reviewer gets the task, the report and `git diff v2-port...<branch>`, reads 
 
 **Result** (at most 20 lines): `APPROVED`, `APPROVED WITH FIXES` or `CHANGES REQUESTED` (numbered: what, where, why, how to check), plus doubtful decisions. `CHANGES REQUESTED` goes to the author by SendMessage (one feedback round); the same reviewer then checks the new commits only. A second `CHANGES REQUESTED` escalates to the next model with both results. At most two review rounds per model.
 
-**Last fix:** after the last review fix or change of a branch, run `python tools/select_tests.py --from v2-port --time` in its workspace and the selected tests. The result line goes into the report, before integration.
+**Last fix:** whoever makes the last change of a branch after the review (the reviewer with a `Review fix`, or the author on feedback) runs `python tools/select_tests.py --from v2-port --time` in the workspace and then the selected tests (`python -m pytest tests -q --changed-from v2-port`). The result line (run ID, commit, counts) goes into that agent's report, before integration.
 
 ## 4. Test runs and verification
 
@@ -130,7 +130,7 @@ For a branch that is approved (or needs no review), in the main checkout:
 
 1. Read the diff (`git diff --stat v2-port...<branch>`), commit messages, decisions and review. A report with `ESCALATE` is not integrated (section 1).
 2. Volatile names in the diff are corrected in the agent's workspace (or in one extra commit there).
-3. **Rebase in the branch's workspace** (the orchestrator runs it) when `git merge-base --is-ancestor v2-port <branch>` fails: `git rebase v2-port`. Append-only files (`doc/OPEN-ITEMS.md`, `doc/howto/*`, `doc/MIGRATION.md`, summary tables, `.vscode/tasks.json`): keep both sides. Generated indexes (`doc/REQUIREMENTS-INDEX.md`, `doc/DOC-INDEX.md`): take either side, run `python tools/doc_index.py`. Any other conflict: `git rebase --abort`; the author (SendMessage) or a new `haiku` agent (`sonnet` on `ESCALATE`) edits the files only, and the orchestrator continues the rebase. Conflicts are resolved in the workspace, never in the main checkout. After each rebase run `python tools/doc_index.py` and commit changed indexes; if code changed, rerun the short tests.
+3. **Rebase in the branch's workspace** (the orchestrator runs it) when `git merge-base --is-ancestor v2-port <branch>` fails: `git rebase v2-port`. Append-only files (`doc/OPEN-ITEMS.md`, `doc/howto/*`, `doc/MIGRATION.md`, summary tables, `.vscode/tasks.json`): keep both sides. Generated indexes (`doc/REQUIREMENTS-INDEX.md`, `doc/DOC-INDEX.md`): take either side, run `python tools/doc_index.py`. Any other conflict: leave the rebase stopped (no `--abort`); the author (SendMessage) or a new `haiku` agent (`sonnet` on `ESCALATE`) edits the conflicting files only (no git command), then the orchestrator runs `git add` and `git rebase --continue`. Conflicts are resolved in the workspace, never in the main checkout. After each rebase run `python tools/doc_index.py` and commit changed indexes; if code changed, the author reruns its short tests (the orchestrator starts no tests itself except `verify.py`).
 4. **Renumber:** `python tools/renumber_findings.py --commit` in the workspace (`nothing to renumber` is valid).
 5. `git cherry-pick v2-port..<branch>` in the main checkout. **No merge commits**, no temporary branches (`python tools/new_workspace.py --remove <name>` once its patches are on `v2-port`).
 6. Conflict because a commit arrived meanwhile: `git cherry-pick --abort`, back to step 3.
@@ -175,7 +175,7 @@ Give each agent a **short reading list**; the list is a maximum. Find sections o
 |---|---|
 | Implementer | `AGENTS.md`; the work item and its "Read first"; `doc/CONVENTIONS.md`; the named sections of `doc/ARCHITECTURE.md`; the HOW-TO entries of the area |
 | Bug hunter | `AGENTS.md`; the entry it takes in `doc/OPEN-ITEMS.md`; its code and tests; the HOW-TO entries of the area |
-| Reviewer | the task, the report, the diff, the changed files; `AGENTS.md` rules 2 to 12; the HOW-TO entries of the area |
+| Reviewer | the task, the report, the diff, the changed files; `AGENTS.md` rules 2 to 14; the HOW-TO entries of the area |
 | Helper | only the files it changes or the command it runs |
 
 ```
