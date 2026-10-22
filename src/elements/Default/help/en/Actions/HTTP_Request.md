@@ -1,87 +1,85 @@
-# HTTP Request
+# HTTP request
 
-The action **HTTP Request** is capable of making HTTP Request to an internet resource in the internet or in local network.
+The action **HTTP request** sends one request to an internet address or to an address of the local network, and stores the answer in a variable or in a file. Only `http` and `https` addresses are allowed.
 
 ## Settings
 
 ### URL
 
-The URL of the internet resource you wish to access.
+The address of the resource, for example `http://someorg.org/api`.
 
 ### Post data
 
-Data that will be uploaded. Either a specified text or a file may be uploaded.
+- **Do not upload any data**: the request has no body. The method is GET.
+- **Use following post data**: the text of the field **Post data** is sent. The method is POST.
+- **Use file as source (upload)**: the content of the file **File path** is sent as it is, without any text conversion. The method is POST.
 
-Check **URI encode post data** if the text should be URI encoded. Commonly, POST data from a web form must be URI encoded.
+Check **URI encode post data** if the text must be encoded for a web form (spaces and special characters become `%20` and so on).
 
-**Charset**: Change the charset or the codepage if the server does not accept UTF-8 charset.
+**Charset**: the text is sent in UTF-8 by default. Choose **Define codepage** to send it in another codepage, for example `1252`. **Define charset** takes a name that AutoHotkey knows, such as `UTF-8`, `UTF-16` or `CP1252`; the charset names of v1 (such as `iso-8859-1`) are not all known (MIGRATION M-0143).
 
 ### Request headers
 
-AHF automatically sets up some request headers. If additional headers are wished, they can be specified here.
-
-Check **URI encode request headers** if the text should be URI encoded.
+One header per line, written as `Name: value`, for example `X-Token: 42`. A header without a colon ends the element with an exception. A header that the element sets itself (for example User-Agent) is replaced by the line of this field.
 
 ### Response data
 
-The response data may be written to a variable or to a text file.
-
-If the download will contain binary data, please, use a file.
-
-If the response data are not needed, it can be left blank.
+- **Write response data to a variable**: the text of the answer is stored in the variable **Output variable**. The text is decoded with the charset that the server sends.
+- **Write response data to file (download)**: the bytes of the answer are written to **File path**. Use this for binary data. The file is replaced.
 
 ### Response headers
 
-Specify a variable which will contain the response headers.
-
-If the response headers are not needed, it can be left blank.
+The name of the variable that receives the response headers, one per line, as the server sent them.
 
 ### Content type
 
-If some data is uploaded, AHF will automatically add the Content-Type header. It can be overridden by specifying an other content type. Default values for this header are:
-
-- `application/octet-stream` when uploading from a file and the file's extension is neither "txt" nor "xml"
-- `text/xml` when the string "&lt;?xml" appears near the beginning of the data
-- `application/x-www-form-urlencoded` in all other casesa
+Automatic sends no Content-Type header. Custom sends the text of the field. Only with post data.
 
 ### Content length
 
-If some data is uploaded, AHF will automatically add the Content-Length header. It can be overridden by specifying an other content length.
-
-If AHF can't determine the content length automatically (e.g: you are uploading non-text data), you must provide the "Content-Length" header with the total number of bytes you wish to upload. Note for UTF-8 charset: if you are uploading text, the number of bytes in text is twice the length of the text.
+Automatic lets Windows calculate the length of the body. Custom sends the text of the field as the Content-Length header. Only with post data.
 
 ### Content MD5
 
-If some data is uploaded, AHF will automatically add the Content-MD5 header. It can be overridden by specifying an other content MD5.
+- **Do not use**: no Content-MD5 header.
+- **Automatic**: the MD5 digest of the body, in the form that the header needs (base64).
+- **Custom**: the text of the field as the Content-MD5 header.
 
 ### Method
 
-If some data is uploaded, AHF will use POST method, otherwise GET method will be used. It can be overridden by specifying an other method.
+Automatic is POST with post data and GET without it. Custom takes one of GET, HEAD, POST, PUT, DELETE, OPTIONS or TRACE.
 
 ### User agent
 
-AHF will add the "User-Agent" header to every request. By default, your script name, AHK version, and OS are used. If this is unacceptable to you, provide your own "User-Agent" header.
+Automatic is the user agent of Windows. Custom sends the text of the field as the User-Agent header.
 
 ### Flags
 
-Some flags can be added using a + sign or removed using a - sign. Internet flags can be found here. Security flags can be found here.
-
-*Examples:*
-
-- `+INTERNET_FLAG_NO_COOKIES` *Tells WinINet to NOT automatically handle cookies (by default, WinINet uses Internet Explorer's cookie pool). This is required if you want your flow to manage cookies with this action. If your request headers contain any "Cookie" headers, this option is applied automatically.*
-- `+INTERNET_FLAG_NO_AUTO_REDIRECT` *Does not automatically handle redirection in HttpSendRequest.*
-- `+SECURITY_FLAG_IGNORE_UNKNOWN_CA` *Ignores unknown certificate authority problems.*
+The field is kept so that flows of v1 load. It has no effect in AutoHotFlow 2: the WinINet flags of v1 have no equivalent in the library that the element uses (MIGRATION M-0142).
 
 ### Proxy
 
-AutoHotFlow may use a proxy to access an internet resource. If Automatic is selected, Internet Exlporer's proxy configuration will be used. If your Internet Explorer is not configured to use a proxy, this option has no effect. If Custom is selected, AHF will use the specified proxy.
+- **No proxy**: the request goes directly to the server.
+- **Automatic**: the proxy of the system is used, as Windows configures it.
+- **Custom**: the proxy in the form `host:port`, for example `proxy.example.com:8080`.
 
-*Examples:*
+**Bypass proxy**: with a custom proxy, the addresses of the list are reached directly (for example `*.example.com`). It has no effect with the other choices (MIGRATION M-0144).
 
-- `http://www.exampleproxy.com:1234`
+## Status and errors
 
-Bypass proxy: Tells AHF NOT to use a proxy to access a specified website. This has no effect unless AHF has been told to use a proxy via the Custom option.
+The status of the answer is not an error: a 404 or a 500 answer is stored like any other answer, as in v1. An exception ends the element when the request cannot be sent (no connection, a name that cannot be resolved), when the URL is not `http` or `https`, when a header has no colon, or when a file cannot be read or written. A request that takes longer than 10 minutes ends with the exception "worker timeout" (MIGRATION M-0141).
 
-## Remarks
+The variable **A_BytesDownloaded** (thread variable) gets the number of bytes of the answer.
 
-Many thanks to VxE for providing the outstanding HTTPRequest library.
+## Examples
+
+Send a form and store the answer.
+
+| Parameter | Value |
+| --- | --- |
+| URL | `http://someorg.org/form` |
+| Post data | Use following post data |
+| Post data text | `name=Paul&lang=de` |
+| URI encode post data | off |
+| Content type | Custom: `application/x-www-form-urlencoded` |
+| Output variable | `answer` |

@@ -1,13 +1,15 @@
 # Change drive label
 
-The action **Change drive label** changes a drive's volume label.
+The action **Change drive label** changes the volume label of a drive.
+
+Windows usually needs administrator rights for this. A flow that runs without them gets the exception "Label ... could not be set to drive ...".
 
 ## Settings
 
 ### Drive letter
 
-Specify a drive letter, followed by a colon and an optional backslash. In some cases a UNC name (such as \\\\server1\\share1) might work.
+A drive letter with its colon, for example `E:`. The letter alone (`E`) is accepted. An empty drive letter ends the element with an exception.
 
 ### New label
 
-Specify the new label for the drive. This field can be left empty in order to remove the label.
+The new label of the drive. An empty label removes the label.

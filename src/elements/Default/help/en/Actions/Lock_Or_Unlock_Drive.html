@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Actions/List_Drives.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>List drives</title>
+<!-- Generated from src/elements/Default/help/en/Actions/Lock_Or_Unlock_Drive.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Lock or unlock drive</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,16 +98,17 @@ img {
 </head>
 <body>
 <main>
-<h1>List drives</h1>
-<p>The action <strong>List drives</strong> lists all drives in the system.</p>
+<h1>Lock or unlock drive</h1>
+<p>The action <strong>Lock or unlock drive</strong> prevents a drive from being ejected (lock), or allows it again (unlock).</p>
+<p>A drive that is locked by a flow stays locked when the flow ends, until a program or the next restart unlocks it. Most drives cannot be locked; a read-only drive ignores the lock.</p>
 <h2>Settings</h2>
-<h3>Output variable name</h3>
-<p>Name of the variable which will contain the list of found drives.</p>
-<h3>Drive type</h3>
-<p>If Find all drives is selected, all drives types are retrieved.</p>
-<p>If Get only a specific type of drive is selected, you can choose which type of drive are retrieved.</p>
-<h3>If no drive can be found</h3>
-<p>Choose whether the variable will be empty or this action should throw an exception if no drive can be found.</p>
+<h3>Action</h3>
+<ul>
+<li><strong>Lock drive</strong>: the eject of the drive is prevented.</li>
+<li><strong>Unlock drive</strong>: the eject of the drive is allowed again.</li>
+</ul>
+<h3>Drive letter</h3>
+<p>A drive letter with its colon, for example <code>D:</code>. The letter alone (<code>D</code>) is accepted. An empty drive letter ends the element with an exception.</p>
 </main>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Generated from src/elements/Default/help/en/Actions/HTTP_Request.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>HTTP Request</title>
+<title>HTTP request</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,58 +98,90 @@ img {
 </head>
 <body>
 <main>
-<h1>HTTP Request</h1>
-<p>The action <strong>HTTP Request</strong> is capable of making HTTP Request to an internet resource in the internet or in local network.</p>
+<h1>HTTP request</h1>
+<p>The action <strong>HTTP request</strong> sends one request to an internet address or to an address of the local network, and stores the answer in a variable or in a file. Only <code>http</code> and <code>https</code> addresses are allowed.</p>
 <h2>Settings</h2>
 <h3>URL</h3>
-<p>The URL of the internet resource you wish to access.</p>
+<p>The address of the resource, for example <code>http://someorg.org/api</code>.</p>
 <h3>Post data</h3>
-<p>Data that will be uploaded. Either a specified text or a file may be uploaded.</p>
-<p>Check <strong>URI encode post data</strong> if the text should be URI encoded. Commonly, POST data from a web form must be URI encoded.</p>
-<p><strong>Charset</strong>: Change the charset or the codepage if the server does not accept UTF-8 charset.</p>
+<ul>
+<li><strong>Do not upload any data</strong>: the request has no body. The method is GET.</li>
+<li><strong>Use following post data</strong>: the text of the field <strong>Post data</strong> is sent. The method is POST.</li>
+<li><strong>Use file as source (upload)</strong>: the content of the file <strong>File path</strong> is sent as it is, without any text conversion. The method is POST.</li>
+</ul>
+<p>Check <strong>URI encode post data</strong> if the text must be encoded for a web form (spaces and special characters become <code>%20</code> and so on).</p>
+<p><strong>Charset</strong>: the text is sent in UTF-8 by default. Choose <strong>Define codepage</strong> to send it in another codepage, for example <code>1252</code>. <strong>Define charset</strong> takes a name that AutoHotkey knows, such as <code>UTF-8</code>, <code>UTF-16</code> or <code>CP1252</code>; the charset names of v1 (such as <code>iso-8859-1</code>) are not all known (MIGRATION M-0143).</p>
 <h3>Request headers</h3>
-<p>AHF automatically sets up some request headers. If additional headers are wished, they can be specified here.</p>
-<p>Check <strong>URI encode request headers</strong> if the text should be URI encoded.</p>
+<p>One header per line, written as <code>Name: value</code>, for example <code>X-Token: 42</code>. A header without a colon ends the element with an exception. A header that the element sets itself (for example User-Agent) is replaced by the line of this field.</p>
 <h3>Response data</h3>
-<p>The response data may be written to a variable or to a text file.</p>
-<p>If the download will contain binary data, please, use a file.</p>
-<p>If the response data are not needed, it can be left blank.</p>
+<ul>
+<li><strong>Write response data to a variable</strong>: the text of the answer is stored in the variable <strong>Output variable</strong>. The text is decoded with the charset that the server sends.</li>
+<li><strong>Write response data to file (download)</strong>: the bytes of the answer are written to <strong>File path</strong>. Use this for binary data. The file is replaced.</li>
+</ul>
 <h3>Response headers</h3>
-<p>Specify a variable which will contain the response headers.</p>
-<p>If the response headers are not needed, it can be left blank.</p>
+<p>The name of the variable that receives the response headers, one per line, as the server sent them.</p>
 <h3>Content type</h3>
-<p>If some data is uploaded, AHF will automatically add the Content-Type header. It can be overridden by specifying an other content type. Default values for this header are:</p>
-<ul>
-<li><code>application/octet-stream</code> when uploading from a file and the file's extension is neither "txt" nor "xml"</li>
-<li><code>text/xml</code> when the string "&lt;?xml" appears near the beginning of the data</li>
-<li><code>application/x-www-form-urlencoded</code> in all other casesa</li>
-</ul>
+<p>Automatic sends no Content-Type header. Custom sends the text of the field. Only with post data.</p>
 <h3>Content length</h3>
-<p>If some data is uploaded, AHF will automatically add the Content-Length header. It can be overridden by specifying an other content length.</p>
-<p>If AHF can't determine the content length automatically (e.g: you are uploading non-text data), you must provide the "Content-Length" header with the total number of bytes you wish to upload. Note for UTF-8 charset: if you are uploading text, the number of bytes in text is twice the length of the text.</p>
+<p>Automatic lets Windows calculate the length of the body. Custom sends the text of the field as the Content-Length header. Only with post data.</p>
 <h3>Content MD5</h3>
-<p>If some data is uploaded, AHF will automatically add the Content-MD5 header. It can be overridden by specifying an other content MD5.</p>
+<ul>
+<li><strong>Do not use</strong>: no Content-MD5 header.</li>
+<li><strong>Automatic</strong>: the MD5 digest of the body, in the form that the header needs (base64).</li>
+<li><strong>Custom</strong>: the text of the field as the Content-MD5 header.</li>
+</ul>
 <h3>Method</h3>
-<p>If some data is uploaded, AHF will use POST method, otherwise GET method will be used. It can be overridden by specifying an other method.</p>
+<p>Automatic is POST with post data and GET without it. Custom takes one of GET, HEAD, POST, PUT, DELETE, OPTIONS or TRACE.</p>
 <h3>User agent</h3>
-<p>AHF will add the "User-Agent" header to every request. By default, your script name, AHK version, and OS are used. If this is unacceptable to you, provide your own "User-Agent" header.</p>
+<p>Automatic is the user agent of Windows. Custom sends the text of the field as the User-Agent header.</p>
 <h3>Flags</h3>
-<p>Some flags can be added using a + sign or removed using a - sign. Internet flags can be found here. Security flags can be found here.</p>
-<p><em>Examples:</em></p>
-<ul>
-<li><code>+INTERNET_FLAG_NO_COOKIES</code> <em>Tells WinINet to NOT automatically handle cookies (by default, WinINet uses Internet Explorer's cookie pool). This is required if you want your flow to manage cookies with this action. If your request headers contain any "Cookie" headers, this option is applied automatically.</em></li>
-<li><code>+INTERNET_FLAG_NO_AUTO_REDIRECT</code> <em>Does not automatically handle redirection in HttpSendRequest.</em></li>
-<li><code>+SECURITY_FLAG_IGNORE_UNKNOWN_CA</code> <em>Ignores unknown certificate authority problems.</em></li>
-</ul>
+<p>The field is kept so that flows of v1 load. It has no effect in AutoHotFlow 2: the WinINet flags of v1 have no equivalent in the library that the element uses (MIGRATION M-0142).</p>
 <h3>Proxy</h3>
-<p>AutoHotFlow may use a proxy to access an internet resource. If Automatic is selected, Internet Exlporer's proxy configuration will be used. If your Internet Explorer is not configured to use a proxy, this option has no effect. If Custom is selected, AHF will use the specified proxy.</p>
-<p><em>Examples:</em></p>
 <ul>
-<li><code>http://www.exampleproxy.com:1234</code></li>
+<li><strong>No proxy</strong>: the request goes directly to the server.</li>
+<li><strong>Automatic</strong>: the proxy of the system is used, as Windows configures it.</li>
+<li><strong>Custom</strong>: the proxy in the form <code>host:port</code>, for example <code>proxy.example.com:8080</code>.</li>
 </ul>
-<p>Bypass proxy: Tells AHF NOT to use a proxy to access a specified website. This has no effect unless AHF has been told to use a proxy via the Custom option.</p>
-<h2>Remarks</h2>
-<p>Many thanks to VxE for providing the outstanding HTTPRequest library.</p>
+<p><strong>Bypass proxy</strong>: with a custom proxy, the addresses of the list are reached directly (for example <code>*.example.com</code>). It has no effect with the other choices (MIGRATION M-0144).</p>
+<h2>Status and errors</h2>
+<p>The status of the answer is not an error: a 404 or a 500 answer is stored like any other answer, as in v1. An exception ends the element when the request cannot be sent (no connection, a name that cannot be resolved), when the URL is not <code>http</code> or <code>https</code>, when a header has no colon, or when a file cannot be read or written. A request that takes longer than 10 minutes ends with the exception "worker timeout" (MIGRATION M-0141).</p>
+<p>The variable <strong>A_BytesDownloaded</strong> (thread variable) gets the number of bytes of the answer.</p>
+<h2>Examples</h2>
+<p>Send a form and store the answer.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>URL</td>
+<td><code>http://someorg.org/form</code></td>
+</tr>
+<tr>
+<td>Post data</td>
+<td>Use following post data</td>
+</tr>
+<tr>
+<td>Post data text</td>
+<td><code>name=Paul&amp;lang=de</code></td>
+</tr>
+<tr>
+<td>URI encode post data</td>
+<td>off</td>
+</tr>
+<tr>
+<td>Content type</td>
+<td>Custom: <code>application/x-www-form-urlencoded</code></td>
+</tr>
+<tr>
+<td>Output variable</td>
+<td><code>answer</code></td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

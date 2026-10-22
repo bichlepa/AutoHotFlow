@@ -1,80 +1,63 @@
 # Get drive information
 
-The action **Get drive information** retrieves some information about the connected drives.
+The action **Get drive information** stores one piece of information about a drive or a folder in a variable.
 
 ## Settings
 
 ### Output variable name
 
-Name of the variable which will contain the value.
+The name of the variable that receives the value.
 
 ### Which information
 
-Select an information type which you want to retrieve. There are following options:
+Select the information that you want. The choices are described below. Each choice needs either a drive letter or a folder.
 
 ### Label
 
-Retrieves a drive's volume label
+The volume label of a drive. Needs a drive letter. Empty when the drive has no label.
 
 ### Type
 
-Retrieves the drive type, which is one of the following words:
-
-- `Unknown`
-- `Removable`
-- `Fixed`
-- `Network`
-- `CDROM`
-- `RAMDisk`
+The type of the drive that contains the folder: `Unknown`, `Removable`, `Fixed`, `Network`, `CDROM` or `RAMDisk`. Needs a folder.
 
 ### Status
 
-Retrieves the drive status, which is one of the following words:
-
-- `Unknown` (might indicate unformatted/RAW)
-- `Ready`
-- `NotReady` (typical for removable drives that don't contain media)
-- `Invalid` (Path does not exist or is a network drive that is presently inaccessible, etc.)
+The status of the drive: `Unknown` (for example unformatted), `Ready`, `NotReady` (typical for a removable drive without media) or `Invalid`. Needs a drive letter (MIGRATION M-0139).
 
 ### Status of optical disc drive
 
-Retrieves the media status of an optical drive. Output variable is made blank if the status cannot be determined. Otherwise, it will contain one of the following words:
-
-- `not ready` - The drive is not ready to be accessed, perhaps due to being engaged in a write operation. Known limitation: "not ready" also occurs when the drive contains a DVD rather than a CD.
-- `open` - The drive contains no disc, or the tray is ejected.
-- `playing` - The drive is playing a disc.
-- `paused` - The previously playing audio or video is now paused.
-- `seeking` - The drive is seeking.
-- `stopped` - The drive contains a CD but is not currently accessing it.
+The media status of an optical drive: `not ready`, `open`, `playing`, `paused`, `seeking` or `stopped`. Empty when the status cannot be read. Needs a drive letter.
 
 ### Capacity
 
-Retrieves the total capacity of a path or drive, in Megabytes.
+The total capacity of the drive that contains the folder, in megabytes. Needs a folder.
 
 ### Free disk space
 
-Retrieves the free disk space of a path or drive, in Megabytes.
+The free space of the drive that contains the folder, in megabytes. Needs a folder.
 
 ### File system
 
-Retrieves the type of drive's file system, which is one of the following words:
-
-- `FAT`
-- `FAT32`
-- `NTFS`
-- `CDFS` (typically indicates a CD)
-- `UDF` (typically indicates a DVD)
+The file system of the drive, for example `FAT32`, `NTFS`, `CDFS` or `UDF`. Needs a drive letter.
 
 ### Serial number
 
-Retrieves drive's volume serial number expressed as decimal integer.
+The volume serial number as a decimal number. Needs a drive letter.
 
-### Drive letter or UNC name
+### Drive letter
 
-Specify a drive letter, followed by a colon and an optional backslash. In some cases a UNC name (such as `\\server1\share1`) might work.
+A drive letter with its colon, for example `C:`. The letter alone (`C`) is accepted. An empty drive letter ends the element with an exception.
 
 ### Path
 
-Name of the directory or a drive letter, followed by a colon and an optional backslash.
+A folder, or a drive letter with its colon. The folder must exist. For Type, Capacity and Free disk space, the drive that contains the folder is used.
 
-Since NTFS supports mounted volumes and directory junctions, different values might result in different folders of the same "drive" in some cases.
+## Examples
+
+Get the free space of the drive of the documents folder in megabytes.
+
+| Parameter | Value |
+| --- | --- |
+| Output variable name | FreeMB |
+| Which information | Free disk space |
+| Path | `%A_MyDocuments%` |

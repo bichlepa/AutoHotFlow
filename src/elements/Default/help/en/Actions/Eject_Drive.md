@@ -1,23 +1,27 @@
 # Eject drive
 
-The action **Eject drive** ejects a drive. It can also retract a CD/DVD tray.
+The action **Eject drive** ejects a drive, or retracts the tray of an optical drive.
 
 ## Settings
 
 ### Drive letter
 
-Specify a drive letter, followed by a colon and an optional backslash. In some cases a UNC name (such as `\\server1\share1`) might work.
+A drive letter with its colon, for example `E:`. The letter alone (`E`) is accepted. An empty drive letter ends the element with an exception.
 
 ### Action
 
-Choose what should be done.
+- **Eject drive**: the drive is ejected. For an optical drive the tray opens; for a removable drive the media is dismissed, as the Eject item of the Explorer does. Open files on the drive are not checked: the eject goes on even while a program uses the drive. **Warning: this may cause a loss of data.**
+- **Retract the tray of a optical disc drive**: the tray of an optical drive closes.
 
 ### Method
 
-There are three methods for ejecting a drive. All three methods work with a CD or DVD drive. If removing a removable drive, like a USB Flash drive or an external hard disk drive, each method behave differently.
+The three methods of v1 are kept in the flow. All of them eject the drive with the same call of Windows (AutoHotkey `DriveEject`). The method 1 of v1 ("safely remove the removable drive", through a library that removes USB storage devices) is not available in AutoHotFlow 2, so a USB stick may not be removed as safely as with v1 (MIGRATION M-0140). The method has no effect on retracting the tray.
 
-Method 1: The recommended method. It is safely removing the removable drive. If the drive is in use, the ejection will fail.
+## Examples
 
-Method 2: The drive will be ejected, regardless whether it is in use. **Warning: This may cause a loss of data!**
+Eject the optical drive `E:`.
 
-Method 3: This method only works with CD or DVD drives.
+| Parameter | Value |
+| --- | --- |
+| Drive letter | `E:` |
+| Action | Eject drive |

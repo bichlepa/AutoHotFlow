@@ -8,12 +8,15 @@
 #Include lib\WindowIdent.ahk
 #Include lib\ListOps.ahk
 #Include lib\TextOps.ahk
+#Include lib\DriveOps.ahk
+#Include lib\FileOps.ahk
+#Include lib\TarOps.ahk
 #Include lib\ListFormats.ahk
 #Include lib\DialogOps.ahk
-#Include lib\FileOps.ahk
 #Include lib\IniOps.ahk
 #Include lib\FlowChoices.ahk
 #Include lib\ControlIdent.ahk
+#Include lib\HttpOps.ahk
 #Include lib\ProcessOps.ahk
 #Include lib\SoundOps.ahk
 #Include lib\FlowSwitchOps.ahk
@@ -28,7 +31,9 @@ class Default {
     #Include Actions\Action_Add_To_List.ahk
     #Include Actions\Action_Beep.ahk
     #Include Actions\Action_Change_character_case.ahk
+    #Include Actions\Action_Change_Drive_Label.ahk
     #Include Actions\Action_Close_Window.ahk
+    #Include Actions\Action_Compress_files.ahk
     #Include Actions\Action_Convert_list_to_string.ahk
     #Include Actions\Action_Convert_string_to_list.ahk
     #Include Actions\Action_Copy_File.ahk
@@ -40,12 +45,16 @@ class Default {
     #Include Actions\Action_Delete_From_Ini.ahk
     #Include Actions\Action_Delete_from_list.ahk
     #Include Actions\Action_Do_nothing.ahk
+    #Include Actions\Action_Download_File.ahk
+    #Include Actions\Action_Eject_Drive.ahk
     #Include Actions\Action_Empty_Recycle_Bin.ahk
     #Include Actions\Action_Encode_string.ahk
     #Include Actions\Action_Execute_Flow.ahk
     #Include Actions\Action_Exponentiation.ahk
+    #Include Actions\Action_Extract_files.ahk
     #Include Actions\Action_Get_Clipboard.ahk
     #Include Actions\Action_Get_Control_Text.ahk
+    #Include Actions\Action_Get_Drive_Information.ahk
     #Include Actions\Action_Get_File_Attributes.ahk
     #Include Actions\Action_Get_File_Size.ahk
     #Include Actions\Action_Get_File_Time.ahk
@@ -57,8 +66,11 @@ class Default {
     #Include Actions\Action_Get_Volume.ahk
     #Include Actions\Action_Hibernate_Computer.ahk
     #Include Actions\Action_Hide_Window.ahk
+    #Include Actions\Action_HTTP_Request.ahk
     #Include Actions\Action_Kill_Process.ahk
+    #Include Actions\Action_List_drives.ahk
     #Include Actions\Action_Lock_Computer.ahk
+    #Include Actions\Action_Lock_Or_Unlock_Drive.ahk
     #Include Actions\Action_Log_Off.ahk
     #Include Actions\Action_Message_Box.ahk
     #Include Actions\Action_Minimize_all_windows.ahk
@@ -142,7 +154,9 @@ ElementRegistry.Register(Default.Action_Activate_Window)
 ElementRegistry.Register(Default.Action_Add_To_List)
 ElementRegistry.Register(Default.Action_Beep)
 ElementRegistry.Register(Default.Action_Change_character_case)
+ElementRegistry.Register(Default.Action_Change_Drive_Label)
 ElementRegistry.Register(Default.Action_Close_Window)
+ElementRegistry.Register(Default.Action_Compress_files)
 ElementRegistry.Register(Default.Action_Convert_list_to_string)
 ElementRegistry.Register(Default.Action_Convert_string_to_list)
 ElementRegistry.Register(Default.Action_Copy_File)
@@ -154,12 +168,16 @@ ElementRegistry.Register(Default.Action_Delete_Folder)
 ElementRegistry.Register(Default.Action_Delete_From_Ini)
 ElementRegistry.Register(Default.Action_Delete_from_list)
 ElementRegistry.Register(Default.Action_Do_nothing)
+ElementRegistry.Register(Default.Action_Download_File)
+ElementRegistry.Register(Default.Action_Eject_Drive)
 ElementRegistry.Register(Default.Action_Empty_Recycle_Bin)
 ElementRegistry.Register(Default.Action_Encode_string)
 ElementRegistry.Register(Default.Action_Execute_Flow)
 ElementRegistry.Register(Default.Action_Exponentiation)
+ElementRegistry.Register(Default.Action_Extract_files)
 ElementRegistry.Register(Default.Action_Get_Clipboard)
 ElementRegistry.Register(Default.Action_Get_Control_Text)
+ElementRegistry.Register(Default.Action_Get_Drive_Information)
 ElementRegistry.Register(Default.Action_Get_File_Attributes)
 ElementRegistry.Register(Default.Action_Get_File_Size)
 ElementRegistry.Register(Default.Action_Get_File_Time)
@@ -171,8 +189,11 @@ ElementRegistry.Register(Default.Action_Get_String_Length)
 ElementRegistry.Register(Default.Action_Get_Volume)
 ElementRegistry.Register(Default.Action_Hibernate_Computer)
 ElementRegistry.Register(Default.Action_Hide_Window)
+ElementRegistry.Register(Default.Action_HTTP_Request)
 ElementRegistry.Register(Default.Action_Kill_Process)
+ElementRegistry.Register(Default.Action_List_drives)
 ElementRegistry.Register(Default.Action_Lock_Computer)
+ElementRegistry.Register(Default.Action_Lock_Or_Unlock_Drive)
 ElementRegistry.Register(Default.Action_Log_Off)
 ElementRegistry.Register(Default.Action_Message_Box)
 ElementRegistry.Register(Default.Action_Minimize_all_windows)

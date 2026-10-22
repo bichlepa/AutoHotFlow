@@ -99,12 +99,13 @@ img {
 <body>
 <main>
 <h1>Change drive label</h1>
-<p>The action <strong>Change drive label</strong> changes a drive's volume label.</p>
+<p>The action <strong>Change drive label</strong> changes the volume label of a drive.</p>
+<p>Windows usually needs administrator rights for this. A flow that runs without them gets the exception "Label ... could not be set to drive ...".</p>
 <h2>Settings</h2>
 <h3>Drive letter</h3>
-<p>Specify a drive letter, followed by a colon and an optional backslash. In some cases a UNC name (such as \\server1\share1) might work.</p>
+<p>A drive letter with its colon, for example <code>E:</code>. The letter alone (<code>E</code>) is accepted. An empty drive letter ends the element with an exception.</p>
 <h3>New label</h3>
-<p>Specify the new label for the drive. This field can be left empty in order to remove the label.</p>
+<p>The new label of the drive. An empty label removes the label.</p>
 </main>
 </body>
 </html>

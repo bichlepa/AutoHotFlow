@@ -143,6 +143,9 @@ TEST_GROUPS = {
     "integration/test_power_elements.py": ["elements-e2e"],
     "integration/test_clipboard_elements.py": ["elements-e2e"],
     "integration/test_sound_elements.py": ["elements-e2e"],
+    "integration/test_archive_elements.py": ["elements-e2e"],
+    "integration/test_drive_elements.py": ["elements-e2e"],
+    "integration/test_internet_elements.py": ["elements-e2e"],
     "integration/test_path_guards.py": ["elements-e2e"],
     "integration/test_core_d_flows.py": ["engine"],
     "integration/test_core_e_dialogs.py": ["ui", "elements-e2e"],
@@ -853,6 +856,21 @@ COVERS = {
         "integration/test_window_elements.py::test_the_text_of_a_control_uses_the_match_mode_of_the_setting",
         "integration/test_window_elements.py::test_control_errors_are_the_v1_texts",
     ],
+
+    # WI-0122: archives (tar.exe, the zip-slip and link checks), drives (the reading elements run for real, the changing ones
+    # through the seam) and the internet elements (a local server, no request leaves the computer)
+    "src/elements/Default/Actions/Action_Compress_files.ahk": ["integration/test_archive_elements.py"],
+    "src/elements/Default/Actions/Action_Extract_files.ahk": ["integration/test_archive_elements.py"],
+    "src/elements/Default/lib/TarOps.ahk": ["integration/test_archive_elements.py"],
+    "src/elements/Default/Actions/Action_List_drives.ahk": ["integration/test_drive_elements.py"],
+    "src/elements/Default/Actions/Action_Get_Drive_Information.ahk": ["integration/test_drive_elements.py"],
+    "src/elements/Default/Actions/Action_Change_Drive_Label.ahk": ["integration/test_drive_elements.py"],
+    "src/elements/Default/Actions/Action_Eject_Drive.ahk": ["integration/test_drive_elements.py"],
+    "src/elements/Default/Actions/Action_Lock_Or_Unlock_Drive.ahk": ["integration/test_drive_elements.py"],
+    "src/elements/Default/lib/DriveOps.ahk": ["integration/test_drive_elements.py"],
+    "src/elements/Default/Actions/Action_Download_File.ahk": ["integration/test_internet_elements.py"],
+    "src/elements/Default/Actions/Action_HTTP_Request.ahk": ["integration/test_internet_elements.py"],
+    "src/elements/Default/lib/HttpOps.ahk": ["integration/test_internet_elements.py"],
 }
 
 # Test functions whose group differs from the group of their file (`file::function`). The generic loop logic

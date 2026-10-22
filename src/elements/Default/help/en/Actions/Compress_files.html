@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Actions/Compress_files.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Compress files</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Compress files</h1>
+<p>The action <strong>Compress files</strong> packs one file, or one folder with all its contents, into an archive.</p>
+<h2>Settings</h2>
+<h3>Source file</h3>
+<p>The file or the folder to pack. A wildcard pattern such as <code>*.txt</code> is not allowed. A relative path is taken from the working directory of the flow.</p>
+<h3>Destination archive</h3>
+<p>The path of the archive to write. An archive that already exists at this path is replaced. The folder that contains the archive must exist, and the path must not be a folder or the root of a drive.</p>
+<h3>Format</h3>
+<ul>
+<li><strong>zip</strong>: a zip archive.</li>
+<li><strong>7z</strong>: a 7z archive.</li>
+<li><strong>tar</strong>: a tar archive without compression.</li>
+<li><strong>gzip</strong>, <strong>BZIP2</strong>, <strong>xz</strong>: a tar archive compressed with gzip, bzip2 or xz (the usual <code>.tar.gz</code>, <code>.tar.bz2</code> or <code>.tar.xz</code>). A single file is packed as a tar archive too: the compression of one file alone without tar is not available in AutoHotFlow 2 (MIGRATION M-0136).</li>
+</ul>
+<p>The archive is written by the <code>tar.exe</code> of Windows. Its entries keep the name of the source: packing the folder <code>Reports</code> gives the entries <code>Reports/...</code>.</p>
+<h2>Errors</h2>
+<p>The element ends with an exception when the source does not exist, when the destination is a folder, when its folder does not exist, when it is the root of a drive, or when a path contains a percent sign, a quote or a line break (these cannot be passed to <code>tar.exe</code>). A failure of <code>tar.exe</code> ends the element with its message.</p>
+<h2>Examples</h2>
+<p>Pack the folder of the documents into a zip file.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source file</td>
+<td><code>%A_MyDocuments%\Reports</code></td>
+</tr>
+<tr>
+<td>Destination archive</td>
+<td><code>%A_Desktop%\Reports.zip</code></td>
+</tr>
+<tr>
+<td>Format</td>
+<td>zip</td>
+</tr>
+</tbody>
+</table>
+<p>Pack one file into a compressed tar archive.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source file</td>
+<td><code>C:\Logs\app.log</code></td>
+</tr>
+<tr>
+<td>Destination archive</td>
+<td><code>C:\Backup\app.log.tar.gz</code></td>
+</tr>
+<tr>
+<td>Format</td>
+<td>gzip</td>
+</tr>
+</tbody>
+</table>
+</main>
+</body>
+</html>
