@@ -130,6 +130,7 @@ TEST_GROUPS = {
     "integration/test_core_b_lists.py": ["elements-e2e"],
     "integration/test_core_c_loops.py": ["elements-e2e"],
     "integration/test_maths_elements.py": ["elements-e2e"],
+    "integration/test_script_element.py": ["elements-e2e"],
     "integration/test_core_d_flows.py": ["engine"],
     "integration/test_core_e_dialogs.py": ["ui", "elements-e2e"],
     "integration/test_corpus.py": ["expr", "engine"],
@@ -329,6 +330,13 @@ COVERS = {
     "src/elements/Default/Actions/Action_Rounding_A_Number.ahk": [
         "integration/test_maths_elements.py::test_rounding_normally_up_and_down",
         "integration/test_maths_elements.py::test_rounding_with_zero_and_negative_places",
+    ],
+    "src/elements/Default/Actions/Action_Script.ahk": [
+        "integration/test_script_element.py::test_script_sets_variables_and_the_last_value_is_not_stored",
+        "integration/test_script_element.py::test_script_text_is_not_substituted_as_a_variable",
+        "integration/test_script_element.py::test_script_error_ends_with_exception",
+        "integration/test_script_element.py::test_script_division_by_zero_in_strict_mode_is_an_exception",
+        "integration/test_script_element.py::test_empty_script_is_an_exception",
     ],
     "src/elements/Default/Actions/Action_Set_Flow_Status.ahk": [
         "e2e/test_editor_flow_ctx.py",

@@ -28,6 +28,7 @@ class Default {
     #Include Actions\Action_New_variable.ahk
     #Include Actions\Action_Random_number.ahk
     #Include Actions\Action_Rounding_A_Number.ahk
+    #Include Actions\Action_Script.ahk
     #Include Actions\Action_Set_Flow_Status.ahk
     #Include Actions\Action_Shuffle_list.ahk
     #Include Actions\Action_Sleep.ahk
@@ -71,6 +72,7 @@ ElementRegistry.Register(Default.Action_New_List)
 ElementRegistry.Register(Default.Action_New_variable)
 ElementRegistry.Register(Default.Action_Random_number)
 ElementRegistry.Register(Default.Action_Rounding_A_Number)
+ElementRegistry.Register(Default.Action_Script)
 ElementRegistry.Register(Default.Action_Set_Flow_Status)
 ElementRegistry.Register(Default.Action_Shuffle_list)
 ElementRegistry.Register(Default.Action_Sleep)

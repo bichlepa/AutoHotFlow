@@ -8,7 +8,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | Area | Total | done | implemented | partial | open | dropped | in doubt |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | [Flows and execution (EXE)](#flows-and-execution-exe) | 17 | 10 | 0 | 5 | 2 | 0 | 1 |
-| [Expressions and variables (VAR)](#expressions-and-variables-var) | 15 | 9 | 0 | 2 | 4 | 0 | 2 |
+| [Expressions and variables (VAR)](#expressions-and-variables-var) | 15 | 10 | 0 | 1 | 4 | 0 | 2 |
 | [Script language (SCR)](#script-language-scr) | 15 | 0 | 0 | 3 | 12 | 0 | 1 |
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
 | [Elements (ELM)](#elements-elm) | 24 | 2 | 0 | 7 | 15 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 4 | 4 | 0 | 0 | 0 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 2 | 0 | 4 | 4 | 0 | 0 |
-| **All** | **220** | **74** | **1** | **68** | **76** | **1** | **5** |
+| **All** | **220** | **75** | **1** | **67** | **76** | **1** | **5** |
 
 ## Flows and execution (EXE)
 
@@ -57,7 +57,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | ID | Lines | Requirement | v1 | v2 | Prio | Scope | Plan |
 |---|---|---|---|---|---|---|---|
 | [REQ-VAR-010](REQUIREMENTS.md#req-var-010-expression-language-with-autohotkey-v2-semantics) | L251-264 | Expression language with AutoHotkey v2 semantics | partial | done | must | port | - |
-| [REQ-VAR-020](REQUIREMENTS.md#req-var-020-script-form-for-several-statements) | L266-275 | Script form for several statements | yes | partial | should | port | S0008 (element) |
+| [REQ-VAR-020](REQUIREMENTS.md#req-var-020-script-form-for-several-statements) | L266-275 | Script form for several statements | yes | done | should | port | S0008 (element, WI-0118) |
 | [REQ-VAR-030](REQUIREMENTS.md#req-var-030-var-substitution-in-text-parameters) | L277-287 | `%var%` substitution in text parameters *(in doubt)* | yes | done | must | port | - |
 | [REQ-VAR-040](REQUIREMENTS.md#req-var-040-variable-scopes) | L289-309 | Variable scopes | yes | done | must | port | - |
 | [REQ-VAR-050](REQUIREMENTS.md#req-var-050-permanent-global-and-static-variables) | L311-320 | Permanent global and static variables | yes | done | must | port | - |

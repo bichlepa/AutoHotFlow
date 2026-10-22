@@ -99,13 +99,30 @@ img {
 <body>
 <main>
 <h1>Script</h1>
-<p>The action <strong>Script</strong> allows to execute a script.</p>
+<p>The action <strong>Script</strong> runs a few statements of the expression language. It is for what a chain of elements would make long: setting several variables, or a small calculation with a condition.</p>
 <blockquote>
-<p><strong>Warning:</strong> This action is in a very early stage and the scripting language is not complete. There is no detailed help available yet. Compatibilty breaking changes are likely in future.</p>
+<p><strong>Warning:</strong> This action is experimental. The scripting language is not complete: there are no loops, no error handling and no own functions yet. Changes that break existing scripts are possible in later versions.</p>
 </blockquote>
 <h2>Settings</h2>
 <h3>Script</h3>
-<p>Script that will be executed</p>
+<p>The statements, one per line. The variables of the script are the variables of the flow, named as everywhere else: a name with the prefix <code>global_</code> is global, <code>static_</code> is static, any other name belongs to the running instance (see the help page "Variables").</p>
+<p>The statements are:</p>
+<ul>
+<li>an assignment, for example <code>x := 2 * 3</code> or <code>list.1 := "first"</code>;</li>
+<li>a call of a function, for example <code>y := round(x / 3, 2)</code>;</li>
+<li>an <code>if</code> with a statement or a block <code>{ ... }</code> behind it, optionally an <code>else</code>.</li>
+</ul>
+<pre><code>total := price * count
+if total &gt; 100 {
+    discount := 10
+} else {
+    discount := 0
+}
+</code></pre>
+<p>A line with only a value (<code>1 + 1</code>) is an error: the script has no result. The action ends with an exception when the script cannot be read or a statement fails. The text <code>%name%</code> is not replaced in the script.</p>
+<h2>Remarks</h2>
+<p>The action sets variables only through assignments in the script. The value of the last line is not stored anywhere.</p>
+<p>Within a script a calculation that fails (for example a division by zero) is a warning and does not stop the action, unless the flow is in strict mode: then it ends with an exception. A variable that does not exist is empty.</p>
 </main>
 </body>
 </html>

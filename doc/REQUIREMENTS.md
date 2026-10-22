@@ -266,11 +266,11 @@ Expressions are checked while the user edits them: REQ-EDT-200. The language gro
 ### REQ-VAR-020 Script form for several statements
 
 - **v1:** yes (action `Script`, marked experimental)
-- **v2:** partial (the language has the script form; the element is missing)
+- **v2:** done (the language has the script form; the element `Action_Script` runs it, WI-0118)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0008 (element)
-- **Evidence:** `tests/ahk/expr_script.test.ahk`
+- **Plan:** S0008 (element, WI-0118)
+- **Evidence:** `tests/ahk/expr_script.test.ahk`, `tests/integration/test_script_element.py::test_script_sets_variables_and_the_last_value_is_not_stored`, `tests/integration/test_script_element.py::test_script_error_ends_with_exception`
 
 One statement per line: assignments, function calls, `if`/`else` and blocks (`EXPRESSION-LANGUAGE.md` section 8). Loops, error handling and own functions: SCR.
 
@@ -751,7 +751,7 @@ The variables are exchanged as in v1 (E0104): the variables the user names for i
 | `Action_Trigonometry` | yes | done | S0008 (WI-0118) |
 | `Action_Rounding_a_number` | yes | done | S0008 (WI-0118) |
 | `Action_Exponentiation` | yes | done | S0008 (WI-0118) |
-| `Action_Script` (REQ-VAR-020) | yes | open | S0008 |
+| `Action_Script` (REQ-VAR-020) | yes | done | S0008 (WI-0118) |
 
 ### REQ-ELM-210 Conditions on values
 
