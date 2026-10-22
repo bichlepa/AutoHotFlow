@@ -31,6 +31,7 @@ class Action_Delete_File extends AhfElement {
 
     static Run(ctx, params) {
         p := ctx.EvalParams(params)
+        FileOps.Guard(Lang("Source file"), TextOps.Par(params, "file"), p.file)
         FileOps.CheckFileSource(p.file)
         if (p.deleteFileMethod = "Recycle") {
             try SystemOps.FileRecycle(p.file)

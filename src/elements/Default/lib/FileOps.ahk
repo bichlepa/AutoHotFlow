@@ -73,4 +73,34 @@ class FileOps {
 
     ; The exception for a wildcard in a path that does not allow one (the rename of one file).
     static NoWildcard(path) => ElementError(Lang("Wildcards are not allowed in '%1%'.", path))
+
+    ; The full path of a path (GetFullPathNameW): "." and ".." are resolved. Used to compare paths, never to act on them.
+    static _Full(path) {
+        buf := Buffer(2048)
+        n := DllCall("GetFullPathNameW", "str", path, "uint", 1024, "ptr", buf, "ptr", 0, "uint")
+        return (n > 0 && n < 1024) ? StrGet(buf, n, "UTF-16") : path
+    }
+
+    ; Refuses a path that could reach a whole drive: an empty path, a drive root ("C:", "C:\", "C:\*") and a path relative
+    ; to the root of the drive ("\x"). label is the Lang text of the parameter. v1 took an empty path as the working
+    ; directory, which an empty working directory made the drive root (MIGRATION M-0119).
+    static Guard(label, raw, path) {
+        if (Trim(String(raw)) = "")
+            throw ElementError(Lang("The path of '%1%' is empty.", label))
+        trimmed := RTrim(path, "\*")
+        if (trimmed = "" || RegExMatch(trimmed, "^[A-Za-z]:$") || (SubStr(trimmed, 1, 1) = "\" && SubStr(trimmed, 2, 1) != "\"))
+            throw ElementError(Lang("'%1%' is a drive root and is not allowed here.", path))
+        full := RTrim(FileOps._Full(trimmed), "\")
+        if (RegExMatch(full, "^[A-Za-z]:$"))
+            throw ElementError(Lang("'%1%' is a drive root and is not allowed here.", path))
+    }
+
+    ; Refuses the working directory of the flow itself (a folder deleted with its contents would take everything).
+    static GuardWorkingDir(path, workingDir) {
+        if (workingDir = "")
+            return
+        full := RTrim(FileOps._Full(RTrim(path, "\*")), "\")
+        if (StrLower(full) = StrLower(RTrim(FileOps._Full(workingDir), "\")))
+            throw ElementError(Lang("'%1%' is the working directory of the flow and is not allowed here.", path))
+    }
 }

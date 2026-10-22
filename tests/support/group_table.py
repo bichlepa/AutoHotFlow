@@ -136,6 +136,7 @@ TEST_GROUPS = {
     "integration/test_list_conversions.py": ["elements-e2e"],
     "integration/test_file_elements.py": ["elements-e2e"],
     "integration/test_folder_elements.py": ["elements-e2e"],
+    "integration/test_path_guards.py": ["elements-e2e"],
     "integration/test_core_d_flows.py": ["engine"],
     "integration/test_core_e_dialogs.py": ["ui", "elements-e2e"],
     "integration/test_corpus.py": ["expr", "engine"],
@@ -587,6 +588,7 @@ COVERS = {
         "integration/test_file_elements.py::test_relative_paths_are_in_the_working_directory_of_the_flow",
     ],
     "src/elements/Default/Actions/Action_Write_To_File.ahk": [
+        "integration/test_path_guards.py",
         "integration/test_file_elements.py::test_write_appends_and_overwrites",
         "integration/test_file_elements.py::test_write_utf8_bom_only_when_asked",
         "integration/test_file_elements.py::test_write_linefeeds_become_crlf_once",
@@ -600,6 +602,7 @@ COVERS = {
         "integration/test_file_elements.py::test_copy_without_overwrite_refuses_an_existing_file",
     ],
     "src/elements/Default/Actions/Action_Move_File.ahk": [
+        "integration/test_path_guards.py",
         "integration/test_file_elements.py::test_move_one_file_and_refuse_an_existing_target",
     ],
     "src/elements/Default/Actions/Action_Rename_File.ahk": [
@@ -607,6 +610,7 @@ COVERS = {
         "integration/test_file_elements.py::test_rename_refuses_a_wildcard_and_an_existing_name",
     ],
     "src/elements/Default/Actions/Action_Delete_File.ahk": [
+        "integration/test_path_guards.py",
         "integration/test_file_elements.py::test_delete_a_file_and_send_one_to_the_recycle_bin_through_the_seam",
         "integration/test_file_elements.py::test_delete_a_missing_file_is_an_exception",
     ],
@@ -616,17 +620,21 @@ COVERS = {
         "integration/test_folder_elements.py::test_create_folder_where_a_file_is_is_an_exception",
     ],
     "src/elements/Default/Actions/Action_Copy_Folder.ahk": [
+        "integration/test_path_guards.py",
         "integration/test_folder_elements.py::test_copy_folder_copies_subfolders_and_refuses_an_existing_destination",
         "integration/test_folder_elements.py::test_copy_folder_with_overwrite_merges_into_the_destination",
         "integration/test_folder_elements.py::test_copy_folder_source_must_be_a_folder",
     ],
     "src/elements/Default/Actions/Action_Move_Folder.ahk": [
+        "integration/test_path_guards.py",
         "integration/test_folder_elements.py::test_move_folder_moves_it_with_its_contents",
     ],
     "src/elements/Default/Actions/Action_Rename_Folder.ahk": [
+        "integration/test_path_guards.py",
         "integration/test_folder_elements.py::test_rename_folder_keeps_its_parent",
     ],
     "src/elements/Default/Actions/Action_Delete_Folder.ahk": [
+        "integration/test_path_guards.py",
         "integration/test_folder_elements.py::test_delete_folder_with_contents",
         "integration/test_folder_elements.py::test_delete_folder_only_if_empty_keeps_a_folder_with_contents",
         "integration/test_folder_elements.py::test_delete_folder_missing_is_an_exception_unless_switched_off",
@@ -638,6 +646,7 @@ COVERS = {
         "integration/test_file_elements.py::test_file_exists_takes_yes_or_no",
     ],
     "src/elements/Default/lib/FileOps.ahk": [
+        "integration/test_path_guards.py",
         "integration/test_file_elements.py",
         "integration/test_folder_elements.py",
     ],

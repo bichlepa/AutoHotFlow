@@ -33,6 +33,7 @@ class Action_Copy_Folder extends AhfElement {
 
     static Run(ctx, params) {
         p := ctx.EvalParams(params)
+        FileOps.Guard(Lang("Source folder"), TextOps.Par(params, "folder"), p.folder)
         FileOps.CheckFolderSource(p.folder)
         overwrite := DialogOps.Truthy(p.Overwrite)
         attr := FileOps.Attr(p.destFolder)

@@ -33,6 +33,8 @@ class Action_Move_File extends AhfElement {
 
     static Run(ctx, params) {
         p := ctx.EvalParams(params)
+        FileOps.Guard(Lang("Source file"), TextOps.Par(params, "file"), p.file)
+        FileOps.Guard(Lang("Destination file or folder"), TextOps.Par(params, "destFile"), p.destFile)
         FileOps.CheckFileSource(p.file)
         overwrite := DialogOps.Truthy(p.Overwrite)
         try FileMove(p.file, p.destFile, overwrite ? 1 : 0)

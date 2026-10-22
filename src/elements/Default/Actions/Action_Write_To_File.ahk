@@ -47,6 +47,8 @@ class Action_Write_To_File extends AhfElement {
     static Run(ctx, params) {
         p := ctx.EvalParams(params, "CodePageIdentifier")     ; the code page is needed only for "other" (as v1)
         file := p.file
+        if (FileOps.IsWild(file))                             ; Overwrite would delete every match before the append fails
+            throw FileOps.NoWildcard(file)
         text := TextOps.Text(p.text, "text")
         if (p.Encoding = "other")
             p := ctx.EvalMoreParams(p, params, "CodePageIdentifier")

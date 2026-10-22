@@ -35,6 +35,8 @@ class Action_Delete_Folder extends AhfElement {
 
     static Run(ctx, params) {
         p := ctx.EvalParams(params)
+        FileOps.Guard(Lang("Destination folder"), TextOps.Par(params, "Folder"), p.Folder)
+        FileOps.GuardWorkingDir(p.Folder, ctx.GetVar("A_WorkingDir"))
         attr := FileOps.Attr(p.Folder)
         if (attr = "") {
             if (DialogOps.Truthy(p.ExceptionIfNotExist))

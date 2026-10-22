@@ -30,6 +30,7 @@ class Action_Rename_Folder extends AhfElement {
 
     static Run(ctx, params) {
         p := ctx.EvalParams(params)
+        FileOps.Guard(Lang("Source folder"), TextOps.Par(params, "folder"), p.folder)
         FileOps.CheckFolderSource(p.folder)
         if (p.newName = "")
             throw ElementError(Lang("%1% is not specified.", Lang("New folder name")))

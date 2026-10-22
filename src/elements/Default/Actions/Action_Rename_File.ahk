@@ -30,6 +30,7 @@ class Action_Rename_File extends AhfElement {
 
     static Run(ctx, params) {
         p := ctx.EvalParams(params)
+        FileOps.Guard(Lang("Source file"), TextOps.Par(params, "file"), p.file)
         if (FileOps.IsWild(p.file))
             throw FileOps.NoWildcard(p.file)
         FileOps.CheckFileSource(p.file)
