@@ -55,8 +55,8 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0121 | Files and folders II, file loop, ini | done | haiku | see git log (up to b07e249f) | 2026-10-22 | 13 classes, PROTOCOL 4.5 env.entryPoint, M-0124 to M-0129, REQ-ELM-240/300/310; review fix: Guard in Set attributes/time; owner: M-0128 ini empty default, M-0125 no attribute = no-op, Empty_Recycle_Bin.Parameters queries drives at editor time, file loop snapshots the whole list (huge folders unmeasured), help pages renamed (check old links), corpus ini flow runs with own working dir; no test stops a flow during a file loop; Delete From Ini unknown action ends silently |
 | WI-0122 | Archives, drives, internet | open | | | |  |
 | WI-0123 | Programs and processes, clipboard, power and session | done | haiku | see git log (up to 4c164df5) | 2026-10-22 | 12 classes, M-0120 to M-0123, REQ-ELM-290/400 done, REQ-ELM-390 partial; owner: Kill_Process has no guard for AHF's own processes, ActsOnSystem on all 12 incl. readers, real power/clipboard behaviour is the owner's manual check; priority test misses BelowNormal |
-| WI-0124 | Sound and speech | open | | | |  |
-| WI-0125 | Windows and controls | open | | | |  |
+| WI-0124 | Sound and speech | done | haiku | see git log (up to 5a9b1a93) | 2026-10-23 | 6 classes, seam extended (SoundStop, SpeechWait, SpeakText, SpeechVoices), M-0130 to M-0135, REQ-ELM-380 partial, F-0189, F-0190; owner: async sound lives in the starting worker only (M-0131), unbounded waits (F-0190), SAPI and real sound unchecked (manual), Preview buttons and OS-language voice dropped |
+| WI-0125 | Windows and controls | running | haiku | | 2026-10-23 | workspace wi0125 |
 | WI-0126 | Mouse and keyboard | open | | | |  |
 | WI-0127 | Screen and images | open | | | |  |
 | WI-0128 | Input box, file and folder selection | open | | | |  |
@@ -74,9 +74,11 @@ None.
 
 ## Running agents
 
-None.
+- WI-0125 implementer (haiku), workspace `wi0125`, branch `wip/wi0125`.
 
 ## Last verified state
+
+Commit `7292ee95` (WI-0124 integrated; selection of the groups element-units, engine, expr, help, packages, triggers, workers): 1273 passed, 2 skipped, VERDICT green (run 20261023-000614-7292ee95). Partial run; last full tiers: `b07e249f`.
 
 Commit `b07e249f` (WI-0121 integrated, WI-0123 included; all tiers): fast 2434 passed (2 skipped), foundation 471 passed, slow 209 passed, VERDICT green (runs 20261022-232325-b07e249f, -3, -2).
 
