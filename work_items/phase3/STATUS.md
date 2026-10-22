@@ -48,7 +48,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0115 | Help viewer with WebView2 | done | haiku | f1e44ea5, 779b9531 | 2026-10-21 | E0099; spike ok (runtime 155, real window); loader DLL by the setup task (not committed, S0009 ships it); gui check at 100/225 % for the owner (tests/fault/test_help_webview2_gui.py); links to the web and the new-window request not checked; HOW-TO com-and-native-calls.md |
 | WI-0114 | Acceptance S0007 | agent part done | haiku | see git log | 2026-10-22 | result: `WI-0114-result-s7.md`; S0007 NOT accepted: manual check 11 and the gui tests are the owner's; F-0180 to F-0187; REQ-EDT-120/130/140/200 and REQ-LNG-040 partial |
 | WI-0116 | Check of the parameter schema against v1 | done | haiku | c873cf46..448ca8a7 | 2026-10-22 | M-0099 to M-0103; owner to confirm M-0099 (numeric radio default becomes the enum value); review fix masks A_Now in the test data; clipboard e2e tests fail while a foreign AutoHotkeyU32 script holds the clipboard (environment) |
-| WI-0117 | Seam `SystemOps` (E0103) | open | | | |  |
+| WI-0117 | Seam `SystemOps` (E0103) | done | haiku | see git log (up to bdd9d5d5) | 2026-10-22 | review fix: system-seam also flags the command style; engine/editor test entries register no system provider (a future inline element would call the real function there; consider a provider or test-mode guard); SoundGet* stay outside the seam |
 | WI-0118 | Calculations, script, date and time | open | | | |  |
 | WI-0119 | Strings and list conversions | open | | | |  |
 | WI-0120 | Files and folders I | open | | | |  |
@@ -77,6 +77,8 @@ None.
 None.
 
 ## Last verified state
+
+Commit `bdd9d5d5` (WI-0117 integrated; all tiers): fast 2263 passed (1 skipped), foundation 471 passed, slow 206 passed, VERDICT green (runs 20261022-183415-bdd9d5d5, -3, -2). The clipboard e2e tests passed in this run.
 
 Commit `448ca8a7` (WI-0116 integrated; selection of the groups element-units and tools): 565 passed, 1 skipped, VERDICT green (run 20261022-175907-448ca8a7). The author's full fast run (20261022-174846-22404, commit ec06f031) had 15 errors in `tests/e2e/test_editor_clipboard.py` from a foreign process holding the clipboard; not rerun clean.
 
