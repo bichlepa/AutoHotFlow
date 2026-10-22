@@ -922,35 +922,36 @@ Dialogs run separately from the flows (MIGRATION M-0002) and can be answered by 
 ### REQ-ELM-300 Files and folders
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (WI-0120: read, write, copy, move, rename, delete, folders, exists, split path; WI-0121 open)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0120, WI-0121)
+- **Evidence:** `tests/integration/test_file_elements.py::test_read_utf8_replaces_crlf_by_linefeed`, `tests/integration/test_file_elements.py::test_write_appends_and_overwrites`, `tests/integration/test_file_elements.py::test_copy_one_file_into_a_folder_and_with_a_new_name`, `tests/integration/test_file_elements.py::test_move_one_file_and_refuse_an_existing_target`, `tests/integration/test_file_elements.py::test_rename_a_file_keeps_its_folder`, `tests/integration/test_file_elements.py::test_delete_a_file_and_send_one_to_the_recycle_bin_through_the_seam`, `tests/integration/test_file_elements.py::test_split_path_writes_the_parts_and_skips_empty_names`, `tests/integration/test_file_elements.py::test_file_exists_takes_yes_or_no`, `tests/integration/test_folder_elements.py::test_create_folder_makes_the_folders_above_too`, `tests/integration/test_folder_elements.py::test_copy_folder_copies_subfolders_and_refuses_an_existing_destination`, `tests/integration/test_folder_elements.py::test_move_folder_moves_it_with_its_contents`, `tests/integration/test_folder_elements.py::test_rename_folder_keeps_its_parent`, `tests/integration/test_folder_elements.py::test_delete_folder_only_if_empty_keeps_a_folder_with_contents`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Read_From_File` | yes | open | S0008 |
-| `Action_Write_To_File` | yes | open | S0008 |
-| `Action_Copy_file` | yes | open | S0008 |
-| `Action_Move_File` | yes | open | S0008 |
-| `Action_Rename_file` | yes | open | S0008 |
-| `Action_Delete_file` | yes | open | S0008 |
-| `Action_Create_folder` | yes | open | S0008 |
-| `Action_Copy_folder` | yes | open | S0008 |
-| `Action_Move_Folder` | yes | open | S0008 |
-| `Action_Rename_Folder` | yes | open | S0008 |
-| `Action_Delete_folder` | yes | open | S0008 |
-| `Action_Empty_Recycle_bin` | yes | open | S0008 |
-| `Action_Get_file_attributes` | yes | open | S0008 |
-| `Action_Get_file_size` | yes | open | S0008 |
-| `Action_Get_file_time` | yes | open | S0008 |
-| `Action_Set_file_attributes` | yes | open | S0008 |
-| `Action_Set_file_time` | yes | open | S0008 |
-| `Action_Get_shortcut_information` | yes | open | S0008 |
-| `Action_Create_Shortcut` | yes | open | S0008 |
-| `Action_Split_path` | yes | open | S0008 |
-| `Condition_File_Exists` | yes | open | S0008 |
-| `Condition_File_Has_Attribute` | yes | open | S0008 |
+| `Action_Read_From_File` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Action_Write_To_File` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Action_Copy_File` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Action_Move_File` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Action_Rename_File` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Action_Delete_File` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Action_Create_Folder` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Action_Copy_Folder` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Action_Move_Folder` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Action_Rename_Folder` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Action_Delete_Folder` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Action_Empty_Recycle_bin` | yes | open | S0008 (WI-0121) |
+| `Action_Get_file_attributes` | yes | open | S0008 (WI-0121) |
+| `Action_Get_file_size` | yes | open | S0008 (WI-0121) |
+| `Action_Get_file_time` | yes | open | S0008 (WI-0121) |
+| `Action_Set_file_attributes` | yes | open | S0008 (WI-0121) |
+| `Action_Set_file_time` | yes | open | S0008 (WI-0121) |
+| `Action_Get_shortcut_information` | yes | open | S0008 (WI-0121) |
+| `Action_Create_Shortcut` | yes | open | S0008 (WI-0121) |
+| `Action_Split_path` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Condition_File_Exists` | yes | done (WI-0120) | S0008 (WI-0120) |
+| `Condition_File_Has_Attribute` | yes | open | S0008 (WI-0121) |
 
 The loop over files is in REQ-ELM-240.
 

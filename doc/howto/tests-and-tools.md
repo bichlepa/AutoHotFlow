@@ -543,3 +543,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** The element file itself includes the library: `#Include ..\lib\TestSystemKit.ahk`. The generator then hoists it into the block of each role.
 - **Status:** verified (tests/integration/test_system_seam.py passes after the include was added to the element files)
 - **Source:** tests/elements/Test/Actions/Action_TestSystemWorker.ahk (WI-0117)
+
+### A file held open by a test is a file in use for FileDelete (verified)
+
+- **Problem:** A test needs an element to meet a file that another process uses, without a second process.
+- **Wrong:** Creating the file with the path of the test and expecting the element to see it as free; a file that the test writes last is not in use.
+- **Right:** Open it with `open(path, "r+b")` in the test and keep the `with` block open while the flow runs. Python opens without delete sharing, so `FileDelete` and `FileMove` of the element fail with the system code 32. Whether a read-only open blocks the delete too is not checked.
+- **Status:** verified for `r+b` (`tests/integration/test_file_elements.py::test_write_overwrite_of_a_file_in_use_is_an_exception`)
+- **Source:** tests/integration/test_file_elements.py
+
+### One run_all per test: a second start of the session fails (verified)
+
+- **Problem:** A test that calls `run_all` twice (two groups of flows) fails with "session already running".
+- **Wrong:** Two `run_all` calls in one test to check the result of the first run.
+- **Right:** Put all flows of the test in one `run_all` list and check the results by their index; the file state is read after all runs, so a later flow that changes a file changes what the earlier check sees.
+- **Status:** verified (the first version of the folder and file tests failed this way; `tests/integration/test_folder_elements.py` passes)
+- **Source:** tests/support/coreflows.py (`run_all`), tests/support/flowrun.py (`start`)

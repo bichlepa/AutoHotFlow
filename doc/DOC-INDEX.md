@@ -192,7 +192,7 @@ L47-52 A drag keeps the static layer when the key leaves the dragged items out (
 L54-59 A drag of 30 elements draws live at 25 ms per frame (partly verified)
 ```
 
-## doc/howto/error-handling.md (5.7 KB, 65 lines)
+## doc/howto/error-handling.md (6.7 KB, 73 lines)
 ```text
 L5-9 A script without a summary line ends with exit code 0 (verified)
 L12-17 A callback that throws does not abort the state machine (verified)
@@ -202,6 +202,7 @@ L37-42 `FileAppend` to `**` writes to stderr without creating a file (verified)
 L44-49 A timer chain that throws must schedule its next round first (partly verified)
 L51-57 A copy of the variables of an error must be taken where the error is caught, and it must be text (verified)
 L59-65 A repeated error of the same flow within 10 s sends no notice at once (verified)
+L67-73 The reason of a failed file call is the OSError number (verified) (partly verified)
 ```
 
 ## doc/howto/gui-and-hotkeys.md (42.5 KB, 326 lines)
@@ -323,7 +324,7 @@ L398-404 One timer for many jobs: SetTimer with the same function moves the run 
 L407-413 The sender of a message is its link name, which carries the flow of an editor (verified) (verified)
 ```
 
-## doc/howto/syntax-and-language.md (57.8 KB, 578 lines)
+## doc/howto/syntax-and-language.md (59.0 KB, 594 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -397,9 +398,11 @@ L548-554 InStr searches from the right with a negative start and a negative occu
 L556-562 An empty needle throws in InStr and StrReplace (verified) (verified)
 L564-570 A local variable named like a class is a warning (verified) (verified)
 L572-578 Property access with a name in a variable (assumed) (assumed)
+L580-586 A NUL character ends a text (verified) (verified)
+L588-594 Skip an output of SplitPath with a comma (verified) (verified)
 ```
 
-## doc/howto/tests-and-tools.md (55.1 KB, 545 lines)
+## doc/howto/tests-and-tools.md (56.6 KB, 561 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -467,6 +470,8 @@ L515-521 A run's steps show an element once: count loop passes in the log, not i
 L523-529 A probe of a hidden variable reads "<missing>" (verified) (verified)
 L531-537 A trigger gets its parameters only when Parameters() declares them (verified) (verified)
 L539-545 A generated block includes a lib file only if the element file includes it (verified) (verified)
+L547-553 A file held open by a test is a file in use for FileDelete (verified) (verified)
+L555-561 One run_all per test: a second start of the session fails (verified) (verified)
 ```
 
 ## doc/REQUIREMENTS.md

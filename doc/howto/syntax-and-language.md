@@ -576,3 +576,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `params.HasProp(name) ? params.%name% : ""` (as `TextOps.Par`).
 - **Status:** assumed (the helper runs in the element tests of WI-0119; the indexed form and the error on a missing property were not checked)
 - **Source:** `src/elements/Default/lib/TextOps.ahk`
+
+### A NUL character ends a text (verified)
+
+- **Problem:** Raw bytes read with `FileRead(file, "RAW")` and turned into text by `StrGet` with a code page of one byte per character: the text stops at the first byte with the value 0.
+- **Wrong:** Expecting `"A" Chr(0) "B"` to keep the characters behind the NUL.
+- **Right:** Accept the limit, or convert the bytes to another representation (hex, Base64). The element documents it (MIGRATION M-0113).
+- **Status:** verified (`tests/integration/test_file_elements.py::test_read_raw_gives_one_character_per_byte` first gave `A` only, with a NUL byte in the file)
+- **Source:** `src/elements/Default/Actions/Action_Read_From_File.ahk` (`_Read`)
+
+### Skip an output of SplitPath with a comma (verified)
+
+- **Problem:** `SplitPath` needs all its output parameters in order when one is wanted later.
+- **Wrong:** Passing a dummy variable for the outputs that are not needed.
+- **Right:** Leave the parameter empty with a comma: `SplitPath(path, , &folder)`. The name of the file is then not written.
+- **Status:** verified (`src/elements/Default/Actions/Action_Rename_Folder.ahk`, `Action_Split_path.ahk` run in the element tests)
+- **Source:** `src/elements/Default/Actions/Action_Split_path.ahk`

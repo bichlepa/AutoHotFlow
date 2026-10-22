@@ -63,3 +63,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Use another flow for the second error when the test needs its notice at once, or wait for the count (`held`) and check the newest `errorId`, which the held notice carries.
 - **Status:** verified (`tests/integration/test_error_window.py`, the first version of the follow test timed out this way)
 - **Source:** `src/core/NoticeThrottle.ahk`, `src/engine/Engine.ahk` (`_Notice`)
+
+### The reason of a failed file call is the OSError number (verified)
+
+- **Problem:** A failed `FileDelete`, `FileRead` or `FileAppend` says only "could not be ..."; the users need to know a file in use from a missing right or a path that is too long.
+- **Wrong:** Passing the v1 text on without the cause.
+- **Right:** In the `catch`, read the reason from `err.Number` of an `OSError` (the system error code, 32 for a file in use). The copy, move and delete functions throw a plain `Error` whose `Extra` property counts the failed files (AutoHotkey docs, FileCopy): there the code is `A_LastError`, read first thing in the `catch`.
+- **Status:** verified (`tests/integration/test_file_elements.py::test_write_overwrite_of_a_file_in_use_is_an_exception` shows the reason; the count of FileCopy is read from the docs, not run with failing files; the path-too-long code 206 is not checked)
+- **Source:** `src/elements/Default/lib/FileOps.ahk` (`Code`, `Failures`, `Reason`)
