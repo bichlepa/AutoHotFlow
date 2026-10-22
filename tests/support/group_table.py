@@ -136,6 +136,9 @@ TEST_GROUPS = {
     "integration/test_list_conversions.py": ["elements-e2e"],
     "integration/test_file_elements.py": ["elements-e2e"],
     "integration/test_folder_elements.py": ["elements-e2e"],
+    "integration/test_process_elements.py": ["elements-e2e"],
+    "integration/test_power_elements.py": ["elements-e2e"],
+    "integration/test_clipboard_elements.py": ["elements-e2e"],
     "integration/test_path_guards.py": ["elements-e2e"],
     "integration/test_core_d_flows.py": ["engine"],
     "integration/test_core_e_dialogs.py": ["ui", "elements-e2e"],
@@ -650,6 +653,50 @@ COVERS = {
         "integration/test_file_elements.py",
         "integration/test_folder_elements.py",
     ],
+
+    # WI-0123: programs, processes, clipboard and power
+    "src/elements/Default/Actions/Action_Run.ahk": [
+        "integration/test_process_elements.py::test_run_starts_the_program_in_the_working_directory_of_the_flow",
+        "integration/test_process_elements.py::test_run_hidden_starts_the_command",
+        "integration/test_process_elements.py::test_run_a_following_working_directory_must_exist",
+        "integration/test_process_elements.py::test_run_a_missing_program_is_an_exception_with_the_v1_text",
+    ],
+    "src/elements/Default/Actions/Action_Kill_Process.ahk": [
+        "integration/test_process_elements.py::test_kill_by_pid_ends_only_that_process",
+        "integration/test_process_elements.py::test_kill_by_name_ends_only_the_copy_with_that_name",
+        "integration/test_process_elements.py::test_kill_a_process_that_does_not_exist_is_an_exception",
+        "integration/test_process_elements.py::test_an_empty_process_name_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Set_Process_Priority.ahk": [
+        "integration/test_process_elements.py::test_set_priority_changes_the_priority_class_of_that_process",
+        "integration/test_process_elements.py::test_set_priority_of_a_missing_process_is_an_exception",
+        "integration/test_process_elements.py::test_an_empty_process_name_is_an_exception",
+    ],
+    "src/elements/Default/Conditions/Condition_Process_Is_Running.ahk": [
+        "integration/test_process_elements.py::test_process_is_running_by_pid_and_by_name",
+        "integration/test_process_elements.py::test_an_empty_process_name_is_an_exception",
+    ],
+    "src/elements/Default/lib/ProcessOps.ahk": [
+        "integration/test_process_elements.py",
+    ],
+    "src/elements/Default/Actions/Action_Get_Clipboard.ahk": [
+        "integration/test_clipboard_elements.py::test_get_clipboard_reads_the_text_into_a_variable",
+    ],
+    "src/elements/Default/Actions/Action_Set_Clipboard.ahk": [
+        "integration/test_clipboard_elements.py::test_set_clipboard_puts_the_text_on_the_clipboard",
+        "integration/test_clipboard_elements.py::test_set_clipboard_with_an_empty_text_clears_it",
+        "integration/test_clipboard_elements.py::test_a_busy_clipboard_is_an_exception_and_nothing_changes",
+    ],
+    "src/elements/Default/Actions/Action_Lock_Computer.ahk": ["integration/test_power_elements.py"],
+    "src/elements/Default/Actions/Action_Log_Off.ahk": ["integration/test_power_elements.py"],
+    "src/elements/Default/Actions/Action_Shutdown.ahk": [
+        "integration/test_power_elements.py::test_shutdown_and_reboot_send_the_v1_codes_and_the_force_bit",
+    ],
+    "src/elements/Default/Actions/Action_Reboot_Computer.ahk": [
+        "integration/test_power_elements.py::test_shutdown_and_reboot_send_the_v1_codes_and_the_force_bit",
+    ],
+    "src/elements/Default/Actions/Action_Hibernate_Computer.ahk": ["integration/test_power_elements.py"],
+    "src/elements/Default/Actions/Action_Suspend_Computer.ahk": ["integration/test_power_elements.py"],
 }
 
 # Test functions whose group differs from the group of their file (`file::function`). The generic loop logic
