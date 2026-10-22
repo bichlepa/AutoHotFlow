@@ -19,6 +19,20 @@ Open (full text in `doc/OPEN-ITEMS.md`): **F-0162** (drag of 30 elements 25 ms v
 - **Stress tests:** run when a work item requires them (your permission of 2026-10-17). A stress run no longer opens the manager window (F-0143 fixed); the window variant needs `-m "stress or gui"`.
 - **Slow tier:** relevant again (your decision of 2026-10-17); the verification of a state includes it.
 
+## S0008 so far (2026-10-23): decisions and checks for you
+
+Done: WI-0116 to WI-0125 (schema check against v1, `SystemOps` seam, maths/time/script, strings/lists, files and folders I and II with the file loop and ini, programs/clipboard/power, sound/speech, windows/controls, archives/drives/internet). Details per work item: `work_items/phase3/STATUS.md`. Decisions the agents took (say so if you want it differently):
+
+- **M-0099** numeric radio defaults of v1 (`default: 1`) become the enum value in v2. Please confirm.
+- **Paths of destructive file elements** (M-0119, M-0129): an empty path, a drive root, a drive-relative path and (Delete folder, Set attributes/time) the flow's working directory are refused with an error. In v1 an empty path meant the working directory. F-0188 lists the remaining gaps of these guards.
+- **ActsOnSystem** is true for all file, process, power and clipboard elements, readers included (they appear in the import warning). Reader elements could get `false`.
+- **Kill process** has no guard for AutoHotFlow's own processes or critical system processes.
+- **Sound and speech without waiting** live only in the worker that started them (M-0131): Stop sound reaches only that worker, and an idle worker that ends cuts the sound. Alternative: a shared player process. F-0190: the waits of the sound elements have no deadline.
+- **Window elements:** Activate waits 2 s and then continues without an error (M-0136); control text uses `ControlTextMatchMode` (M-0137, old flows may match differently); an unknown close method closes.
+- **Archives/HTTP:** fixed deadline of 10 minutes for Download and HTTP request instead of a parameter (M-0146); Eject always uses the IOCTL path (the USB library of v1 is not ported); Compress replaces an existing archive; Extract overwrites existing files.
+- **Other deliberate differences:** M-0104 to M-0107 (maths/time), M-0108 to M-0112 (strings: YAML throws, JSON keys sorted, new text mode Plain/RegEx), M-0128 (ini read with an empty default), M-0125 (Set attributes with no attribute chosen does nothing), M-0123 (Force option name of Shutdown/Reboot was inverted in v1). The v1 originals are in the MIGRATION entries.
+- **Manual check 12 (planned for WI-0135)** will cover what no agent can check: real shutdown/lock/hibernate, clipboard, sound, speech, eject/lock of a drive, Minimize all windows, DPI of other monitors, the recycle bin, a real shortcut.
+
 ## Waiting for you (2026-10-22)
 
 - **Manual checks:** 10 (S0006, editing at 100 % and 225 %) and 11 (S0007, settings, assistants, help in the three viewers, flow settings, error window). The gui tests are written and not run (VS Code tasks `Test: ... (gui ...)` and `Start: manual check ...`). Until then REQ-EDT-050/060/070/080/090, 120, 130, 140, 200 and REQ-LNG-040 stay `partial`.
