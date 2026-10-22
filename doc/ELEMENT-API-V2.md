@@ -210,7 +210,8 @@ Actions that disturb the computer or cannot be undone run through the same kind 
 | Recycle bin | `FileRecycle(args*)`, `FileRecycleEmpty(args*)` | `FileRecycle` (sends a file or folder to the recycle bin; permanent where AutoHotkey finds no bin, WI-0120), `FileRecycleEmpty` |
 | Screen | `ChangeDisplaySettings(args*)` | not implemented yet (WI-0127): throws `AhfError` |
 | Sound | `SoundSetVolume(args*)`, `SoundSetMute(args*)`, `SoundPlay(args*)`, `SoundBeep(args*)` | the AutoHotkey function of the same name |
-| Speech | `SpeakText(text, rate := 0, volume := 100, wait := 1)`, `SpeechVoices()` | SAPI (`ComObject("SAPI.SpVoice")`): synchronous Speak when `wait` is 1; `SpeechVoices` returns an Array of the voice descriptions |
+| Sound stop | `SoundStop()` | `SoundPlay` of a file that does not exist (AutoHotkey stops the playing file); the error of that call is ignored. Reaches the sound of this process only (MIGRATION M-0125) |
+| Speech | `SpeakText(text, voice := "", rate := 0, volume := 100, pitch := 0, wait := 1, purge := 0)`, `SpeechVoices()`, `SpeechWait()` | SAPI (`ComObject("SAPI.SpVoice")`), one voice object per process: `wait` 1 speaks synchronously, `purge` 1 stops the speech of this process first, `voice` "" is the default voice, `pitch` is an XML tag. `SpeechVoices` returns an Array of the voice names (the Name attribute). `SpeechWait` returns when the speech of this process has ended (3.3a: never called from the engine; the Speech element only) |
 | Input | `BlockInput(args*)`, `Send(keys, mode := "")`, `Click(args*)`, `MouseMove(args*)`, `MouseClickDrag(args*)`, `SetCapsLockState(args*)`, `SetNumLockState(args*)`, `SetScrollLockState(args*)` | the AutoHotkey function of the same name; `Send` with a `mode` (Input, Event, Play, Raw) sets `SendMode` for that call and restores the previous mode |
 | Idle time | `TimeIdle()`, `TimeIdlePhysical()` | `A_TimeIdle`, `A_TimeIdlePhysical` (milliseconds) |
 
@@ -221,6 +222,7 @@ Rules:
 - **Additions.** A package that needs one more function adds it here and in `SystemOps.ahk` (sorted by group) in the same commit.
 - **Failures.** A call inside an element is covered by the `try/catch` of the element (section 2); an error of the real function ends the element with `exception`.
 - **Not in the seam:** files, processes, the clipboard, windows and controls (`ControlSend`), and reading the sound volume. They run for real in the tests.
+- **Asynchronous sound and speech (WI-0124).** `Action_Play_Sound` (no wait) and `Action_Speech_output` (no wait) are workers that finish at once; the sound or the speech goes on in the worker process, which stays alive while it plays (AutoHotkey stops a file when its script exits; the voice object is kept in `SystemOps.speaker`). `Action_Stop_Sound` and the purge and wait options of the speech reach only the sound and speech of the worker process they run in: the engine cannot send a stop to another worker, so a sound started by another worker is not stopped (MIGRATION M-0125). A worker that the pool ends after its idle time ends its sound too.
 
 ### 3.4 Debug view (WI-0056, REQ-DBG-060)
 

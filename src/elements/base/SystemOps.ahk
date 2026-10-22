@@ -16,6 +16,7 @@
 class SystemOps {
     static provider := ""
     static _realOps := ""
+    static speaker := ""                ; the SAPI voice of this process (SpeakText), created on the first speech
     static flowId := ""
     static elementId := ""
 
@@ -54,8 +55,11 @@ class SystemOps {
     static SoundPlay(args*) => SystemOps._Provider().SoundPlay(args*)
     static SoundSetMute(args*) => SystemOps._Provider().SoundSetMute(args*)
     static SoundSetVolume(args*) => SystemOps._Provider().SoundSetVolume(args*)
-    static SpeakText(text, rate := 0, volume := 100, wait := 1) => SystemOps._Provider().SpeakText(text, rate, volume, wait)
+    static SoundStop() => SystemOps._Provider().SoundStop()
+    static SpeakText(text, voice := "", rate := 0, volume := 100, pitch := 0, wait := 1, purge := 0) =>
+        SystemOps._Provider().SpeakText(text, voice, rate, volume, pitch, wait, purge)
     static SpeechVoices() => SystemOps._Provider().SpeechVoices()
+    static SpeechWait() => SystemOps._Provider().SpeechWait()
 
     ; --- input (the whole desktop) -----------------------------------------------------------------------------------
     static BlockInput(args*) => SystemOps._Provider().BlockInput(args*)
@@ -77,6 +81,13 @@ class SystemOps {
         if (!IsObject(SystemOps._realOps))
             SystemOps._realOps := SystemOps.Real()
         return SystemOps._realOps
+    }
+
+    ; The text as XML character data (for SAPI, SpeakText): &, < and > become entities.
+    static _XmlEscape(text) {
+        text := StrReplace(text, "&", "&amp;")
+        text := StrReplace(text, "<", "&lt;")
+        return StrReplace(text, ">", "&gt;")
     }
 
     ; The real functions: the built-in functions, called with the same arguments. The only place in src/elements/ that
@@ -146,21 +157,47 @@ class SystemOps {
             return SoundSetVolume(args*)
         }
 
-        ; SAPI through COM. wait 1 returns when the text is spoken; rate -10 to 10, volume 0 to 100.
-        SpeakText(text, rate := 0, volume := 100, wait := 1) {
-            voice := ComObject("SAPI.SpVoice")
-            voice.Rate := rate
-            voice.Volume := volume
-            voice.Speak(text, wait ? 0 : 1)     ; SPF_ASYNC (1) when not waiting
+        ; Stops the sound of this process: AutoHotkey stops the playing file when it plays a file that does not exist
+        ; (SoundPlay remarks), and the error of that call is expected. A sound of another process is not reached (M-0125).
+        SoundStop() {
+            try SoundPlay("ahf-no-such-sound.wav")
         }
 
-        ; The descriptions of the voices installed on the machine (for a drop-down).
+        ; SAPI through COM (WI-0124). The voice object lives as long as the process: a speech that does not wait goes on
+        ; after the job has ended, and the next speech of this process reuses the object. voice "" is the default voice;
+        ; rate -10 to 10, volume 0 to 100, pitch -10 to 10 (an XML tag in front of the text). wait 1 returns when the text
+        ; is spoken; purge 1 stops the speech of this process before the text starts (SPF_PURGEBEFORESPEAK).
+        SpeakText(text, voice := "", rate := 0, volume := 100, pitch := 0, wait := 1, purge := 0) {
+            if (!IsObject(SystemOps.speaker))
+                SystemOps.speaker := ComObject("SAPI.SpVoice")
+            sp := SystemOps.speaker
+            if (voice != "")
+                sp.Voice := sp.GetVoices("Name=" voice).Item(0)
+            sp.Rate := rate
+            sp.Volume := volume
+            flags := 8                          ; SPF_IS_XML: the text is written as XML (the pitch tag, escaped text)
+            if (!wait)
+                flags |= 1                      ; SPF_ASYNC
+            if (purge)
+                flags |= 2                      ; SPF_PURGEBEFORESPEAK
+            sp.Speak("<pitch absmiddle='" Integer(pitch) "'/>" SystemOps._XmlEscape(text), flags)
+        }
+
+        ; The names of the voices installed on the machine (the Name attribute, which SpeakText takes).
         SpeechVoices() {
-            voices := []
+            names := []
             tokens := ComObject("SAPI.SpVoice").GetVoices()
             loop tokens.Count
-                voices.Push(tokens.Item(A_Index - 1).GetDescription())
-            return voices
+                names.Push(tokens.Item(A_Index - 1).GetAttribute("Name"))
+            return names
+        }
+
+        ; Returns when the speech of this process has ended (SAPI RunningState 2 = reading, v1 Default_Lib_TTS).
+        SpeechWait() {
+            if (!IsObject(SystemOps.speaker))
+                return
+            while (SystemOps.speaker.Status.RunningState = 2)
+                Sleep(50)    ; arch-ok: blocking the speech wait runs in a worker only (the engine never calls SpeechWait)
         }
 
         BlockInput(args*) {

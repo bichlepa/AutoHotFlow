@@ -54,8 +54,11 @@ class TestSystemProvider {
     SoundPlay(args*) => this._Call("SoundPlay", args, 0)
     SoundSetMute(args*) => this._Call("SoundSetMute", args, 0)
     SoundSetVolume(args*) => this._Call("SoundSetVolume", args, 0)
-    SpeakText(text, rate := 0, volume := 100, wait := 1) => this._Call("SpeakText", [text, rate, volume, wait], 0)
+    SoundStop() => this._Call("SoundStop", [], 0)
+    SpeakText(text, voice := "", rate := 0, volume := 100, pitch := 0, wait := 1, purge := 0) =>
+        this._Call("SpeakText", [text, voice, rate, volume, pitch, wait, purge], 0)
     SpeechVoices() => this._Call("SpeechVoices", [], [])
+    SpeechWait() => this._Call("SpeechWait", [], 0)
 
     BlockInput(args*) => this._Call("BlockInput", args, 0)
     Click(args*) => this._Call("Click", args, 0)
