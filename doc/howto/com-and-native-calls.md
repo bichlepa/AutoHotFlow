@@ -83,3 +83,19 @@ Entries from the WebView2 viewer (WI-0115, E0099): COM interfaces through `ComCa
 - **Right:** `"Int64*"` with a variable (`&tok`); the token is not needed (the handlers stay for the process).
 - **Status:** verified (the location changes reached the window through `add_SourceChanged`)
 - **Source:** `src/help/WebView2Viewer.ahk`
+
+### SoundPlay stops a playing file only through a file that does not exist
+
+- **Problem:** A sound that the flow does not wait for keeps playing after the element has ended, and the element "Stop sound" has to end it. AutoHotkey has no stop function; the documentation says that a `SoundPlay` of a file that does not exist stops the playing file (the call itself throws).
+- **Wrong:** `SoundPlay("")` or `SoundPlay("*")` to stop, which are not stops in AutoHotkey v2, or a stop call without `try`.
+- **Right:** `try SoundPlay("ahf-no-such-sound.wav")` in one place (`SystemOps.Real.SoundStop`). The stop reaches only the sound of the same process (a second process has its own sound device object).
+- **Status:** assumed (AutoHotkey v2 docs, `SoundPlay` remarks); the test provider records the call, the real stop is not checked (owner, gui)
+- **Source:** src/elements/base/SystemOps.ahk (WI-0124, M-0125)
+
+### SAPI speech: the voice object must outlive the job
+
+- **Problem:** A speech that does not wait should go on after the job has ended. A `ComObject("SAPI.SpVoice")` held in a local variable is released when the thread ends, and the speech is then cut off (assumed; not checked on this machine).
+- **Wrong:** `voice := ComObject("SAPI.SpVoice")` inside the element function, then `voice.Speak(text, 1)`.
+- **Right:** keep the object in a static property of the seam (`SystemOps.speaker`) and reuse it. The voice is chosen by its `Name` attribute (`GetVoices("Name=" ...)`); the pitch is an XML tag in front of an escaped text (`SPF_IS_XML`, flag 8).
+- **Status:** assumed (design from the v1 TTS library, `v1/Source_Elements/Default/lib/TTS/TTS by Learning One.ahk`); COM is not tested here (test provider only), the owner checks it by hand
+- **Source:** src/elements/base/SystemOps.ahk (WI-0124)

@@ -1079,19 +1079,20 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 ### REQ-ELM-380 Sound and speech
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (WI-0124: the six elements; the sound and the speech reach only the process of their own action, M-0125; v1's preselection of the voice by OS language is missing, M-0129)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0124)
+- **Evidence:** `tests/integration/test_sound_elements.py::test_play_a_sound_file_without_waiting`, `tests/integration/test_sound_elements.py::test_play_a_sound_file_and_wait_until_it_has_finished`, `tests/integration/test_sound_elements.py::test_beep_sends_frequency_and_duration`, `tests/integration/test_sound_elements.py::test_set_volume_mute_states`, `tests/integration/test_sound_elements.py::test_set_volume_absolute_sets_the_volume`, `tests/integration/test_sound_elements.py::test_speech_output_passes_the_text_voice_and_options`, `tests/integration/test_sound_elements.py::test_get_volume_stores_the_master_volume_in_the_variable`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Play_Sound` | yes | open | S0008 |
-| `Action_Stop_Sound` | yes | open | S0008 |
-| `Action_Beep` | yes | open | S0008 |
-| `Action_Get_Volume` | yes | open | S0008 |
-| `Action_Set_Volume` | yes | open | S0008 |
-| `Action_Speech_output` | yes | open | S0008 |
+| `Action_Play_Sound` | yes | done (WI-0124, M-0124) | S0008 (WI-0124) |
+| `Action_Stop_Sound` | yes | partial (WI-0124, M-0125) | S0008 (WI-0124) |
+| `Action_Beep` | yes | done (WI-0124) | S0008 (WI-0124) |
+| `Action_Get_Volume` | yes | done (WI-0124) | S0008 (WI-0124) |
+| `Action_Set_Volume` | yes | done (WI-0124, M-0126, M-0128) | S0008 (WI-0124) |
+| `Action_Speech_output` | yes | partial (WI-0124, M-0125, M-0129) | S0008 (WI-0124) |
 
 ### REQ-ELM-390 Programs and processes
 

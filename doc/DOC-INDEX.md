@@ -76,25 +76,25 @@ L329-347 9b. System action tests (E0103, WI-0117)
 L349-369 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (63.6 KB, 538 lines)
+## doc/ELEMENT-API-V2.md (64.8 KB, 540 lines)
 ```text
 L8-18 1. Guidelines
 L20-112 2. Class contract
 L91-112   2.1 Parameter fields of the settings form (WI-0105)
-L114-284 3. Context `ctx`
+L114-286 3. Context `ctx`
 L163-180   3.1 Parameter evaluation (WI-0042)
 L182-192   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
 L194-200   3.3 Dialogs (E0038, WI-0051)
-L202-223   3.3a System actions (E0103, WI-0117)
-L225-240   3.4 Debug view (WI-0056, REQ-DBG-060)
-L242-263   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
-L265-284   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
-L286-368 4. Example 1: `Action_Sleep` (inline, with timer)
-L370-463 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L465-505 6. Mechanical conversion rules
-L507-528 7. What stays
-L514-528   7.1 Loop elements (WI-0054)
-L530-538 8. Still to be clarified (Phase 3)
+L202-225   3.3a System actions (E0103, WI-0117)
+L227-242   3.4 Debug view (WI-0056, REQ-DBG-060)
+L244-265   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+L267-286   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
+L288-370 4. Example 1: `Action_Sleep` (inline, with timer)
+L372-465 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L467-507 6. Mechanical conversion rules
+L509-530 7. What stays
+L516-530   7.1 Loop elements (WI-0054)
+L532-540 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
@@ -166,7 +166,7 @@ L47-56 5. AHK v2 pitfalls (short)
 L58-64 6. Tests and docs
 ```
 
-## doc/howto/com-and-native-calls.md (6.9 KB, 85 lines)
+## doc/howto/com-and-native-calls.md (8.7 KB, 101 lines)
 ```text
 L7-13 A function stored in a property is called with its owner as first argument (verified)
 L15-21 COM method index = position in the header + 3 (verified)
@@ -178,6 +178,8 @@ L55-61 Global and function names are one name (verified)
 L63-69 A path for WebView2 must be a full path (assumed)
 L71-77 The WebView2 user data folder is created by the runtime (verified)
 L79-85 The event registration token is an Int64 out parameter (verified)
+L87-93 SoundPlay stops a playing file only through a file that does not exist (assumed)
+L95-101 SAPI speech: the voice object must outlive the job (assumed)
 ```
 
 ## doc/howto/drawing-gdip.md (5.9 KB, 59 lines)
