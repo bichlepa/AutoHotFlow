@@ -26,6 +26,7 @@ class Test {
     #Include Actions\Action_TestThrowWorker.ahk
     #Include Actions\Action_TestVarBenchWorker.ahk
     #Include Actions\Action_TestVarFunctionsWorker.ahk
+    #Include Loops\Loop_TestWorkerLoop.ahk
 }
 
 ElementRegistry.RegisterPackage("Test", "1.0.0")
@@ -43,3 +44,4 @@ ElementRegistry.Register(Test.Action_TestSystemWorker)
 ElementRegistry.Register(Test.Action_TestThrowWorker)
 ElementRegistry.Register(Test.Action_TestVarBenchWorker)
 ElementRegistry.Register(Test.Action_TestVarFunctionsWorker)
+ElementRegistry.Register(Test.Loop_TestWorkerLoop)

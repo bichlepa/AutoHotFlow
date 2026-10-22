@@ -195,6 +195,18 @@ def test_evaluated_that_is_not_a_list_of_entries_is_bad_payload(worker):
         assert ans["error"]["code"] == "bad_payload", bad
 
 
+@pytest.mark.parametrize("entry, result", [("head", "head"), ("tail", "tail"), ("break", "tail"), ("", "exception")])
+def test_worker_loop_gets_the_entry_point_of_the_connection(worker, entry, result):
+    """WI-0121: env.entryPoint reaches ctx.entryPoint of a worker loop (PROTOCOL 4.5): head starts a pass, tail and break
+    leave, a connection that names no part is an exception, as inline (LoopOps.Entry)."""
+    payload = run_payload("loop-" + (entry or "none"), "Test.Loop_TestWorkerLoop")
+    payload["env"]["entryPoint"] = entry
+    assert send_run(worker, payload)["ok"]
+    done = done_for(worker, payload["execId"])
+    assert done["result"] == result, done
+    assert done["exports"].get("entry", "") == entry, done
+
+
 def test_cancel_of_unknown_execution_is_not_found(worker):
     ans = worker.request("worker:1", "cmd.worker.cancel", {"execId": "nope"}, timeout=ROOT_TIMEOUT_S)["payload"]
     assert not ans["ok"]

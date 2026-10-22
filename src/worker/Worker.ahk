@@ -104,6 +104,7 @@ class Worker extends Role {
         ctx := WorkerContext(env.Get("flowId", ""), env.Get("elementId", ""), env.Get("instanceId", "")
             , env.Get("threadId", ""), job["imports"], ObjBindMethod(this, "_OnFinish", execId), job["evaluated"]
             , execId, ObjBindMethod(this.peer, "Request"))
+        ctx.entryPoint := env.Get("entryPoint", "")     ; "head", "tail", "break" or "" (WI-0121, PROTOCOL 4.5)
         job["ctx"] := ctx
         cls := ElementRegistry.Get(job["classId"])
         if (!IsObject(cls)) {

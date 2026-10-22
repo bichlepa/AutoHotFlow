@@ -624,8 +624,10 @@ class Executor {
             return
         }
         params := Executor._ParamMap(def, thread.ElementId)
+        ; entryPoint: the part of a loop that the connection ends at ("head", "tail", "break" or ""), ctx.entryPoint in
+        ; the worker (WI-0121, PROTOCOL 4.5). A loop in a worker needs it to tell its passes apart.
         env := Map("flowId", run["flowId"], "elementId", thread.ElementId, "instanceId", run["instanceId"]
-            , "threadId", thread.Id)
+            , "threadId", thread.Id, "entryPoint", thread.EntryPoint)
         act := Map("cls", cls, "ctx", ctx, "params", Executor._Params(def, thread.ElementId))
         ; Workers.Run may end the job before it returns (send error). The entry is made first so that the end
         ; (_OnFinish) removes it, and the execId is added only if the job is still open. Without Critical a

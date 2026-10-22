@@ -34,6 +34,7 @@ class Test {
     #Include Actions\Action_TestVarBenchWorker.ahk
     #Include Actions\Action_TestVarFunctions.ahk
     #Include Actions\Action_TestVarFunctionsWorker.ahk
+    #Include Loops\Loop_TestWorkerLoop.ahk
     #Include Triggers\Trigger_TestCallbackThrows.ahk
     #Include Triggers\Trigger_TestDisableThrows.ahk
     #Include Triggers\Trigger_TestFail.ahk
@@ -64,6 +65,7 @@ ElementRegistry.Register(Test.Action_TestThrowWorker)
 ElementRegistry.Register(Test.Action_TestVarBenchWorker)
 ElementRegistry.Register(Test.Action_TestVarFunctions)
 ElementRegistry.Register(Test.Action_TestVarFunctionsWorker)
+ElementRegistry.Register(Test.Loop_TestWorkerLoop)
 ElementRegistry.Register(Test.Trigger_TestCallbackThrows)
 ElementRegistry.Register(Test.Trigger_TestDisableThrows)
 ElementRegistry.Register(Test.Trigger_TestFail)
