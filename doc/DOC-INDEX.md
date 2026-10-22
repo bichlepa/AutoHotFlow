@@ -323,7 +323,7 @@ L398-404 One timer for many jobs: SetTimer with the same function moves the run 
 L407-413 The sender of a message is its link name, which carries the flow of an editor (verified) (verified)
 ```
 
-## doc/howto/syntax-and-language.md (51.2 KB, 506 lines)
+## doc/howto/syntax-and-language.md (54.1 KB, 538 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -388,6 +388,10 @@ L476-482 A callback held in a property is called with its object as first argume
 L484-490 A property name equal to a method name of the class ("Property is read-only") (verified)
 L492-498 A new element helper in a package lib folder needs the generated include blocks (verified)
 L500-506 Array has no Sort method in AutoHotkey v2 (the error is a runtime one) (verified)
+L508-514 Round gives a text for more than zero places (verified) (verified)
+L516-522 Sqrt, ASin, ACos and the power of an undefined value throw (verified) (verified)
+L524-530 DateAdd and DateDiff: truncated units, padded stamps, IsTime rejects odd lengths (verified) (verified)
+L532-538 Random with the limits in either order (verified) (verified)
 ```
 
 ## doc/howto/tests-and-tools.md (55.1 KB, 545 lines)

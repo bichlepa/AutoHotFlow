@@ -504,3 +504,35 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Insert in order (`loop list.Length { if (StrCompare(list[A_Index]["id"], id) > 0) { at := A_Index; break } }`, then `list.InsertAt(at, entry)`), or sort a plain list of keys by hand. Compare texts with `StrCompare`, not with a relational operator.
 - **Status:** verified (the command `cmd.flow.triggers` answers after the change; `src/engine/Engine.ahk`, `src/editor/EditorElementCtx.ahk`)
 - **Source:** `src/engine/Engine.ahk` (`_CmdFlowTriggers`)
+
+### Round gives a text for more than zero places (verified)
+
+- **Problem:** `Round(1.2, 2)` returns the text `1.20`, so a result of the maths elements was a text with trailing zeros, and `Round(1.5, 1.7)` returned a text too. `Round(x, 0)` and `Round(1234, -2)` give Integers.
+- **Wrong:** Storing `Round(value, places)` as the result of an element.
+- **Right:** `result := Number(Round(value, places))`; cut a fraction of the places off first with `Integer(places)`.
+- **Status:** verified (`Round(1.2, 2)`, `Round(1.5, 1.7)`, `Round(1234, -2)` with AutoHotkey v2 64 bit; `src/elements/Default/Actions/Action_Rounding_A_Number.ahk`)
+- **Source:** `src/elements/Default/Actions/Action_Rounding_A_Number.ahk`
+
+### Sqrt, ASin, ACos and the power of an undefined value throw (verified)
+
+- **Problem:** `Sqrt(-1)`, `ASin(2)`, `ACos(-2)` throw "Parameter #1 is invalid", `0 ** -1` throws "Divide by zero" and `(-8) ** 0.5` throws "Error evaluating expression". v1 (AutoHotkey_H) gave an empty text for the same calls. `Sqrt(16)` is `4.0`, a Float.
+- **Wrong:** Calling the function without a `try` and expecting an empty result.
+- **Right:** Check the range before the call, or wrap the call in `try`/`catch` and set the result to `""`. An exact root of an Integer is made an Integer by hand when the result must be one.
+- **Status:** verified (AutoHotkey v2 64 bit probe, and v1 with `v1/AutoHotKey/AutoHotFlow.exe` for the empty texts)
+- **Source:** `src/elements/Default/Actions/Action_Square_Root.ahk`, `src/elements/Default/Actions/Action_Trigonometry.ahk`, `src/elements/Default/Actions/Action_Exponentiation.ahk`
+
+### DateAdd and DateDiff: truncated units, padded stamps, IsTime rejects odd lengths (verified)
+
+- **Problem:** `DateAdd` cuts a fraction of the units off (1.5 seconds add 1), it pads a short stamp (`DateAdd("2010", 1826, "Days")` gives `20150101000000`), `DateDiff(a, b, unit)` is `a - b`, and `IsTime("2015023")` and `IsTime("20231340000000")` are false, while `IsTime("2015")` is true. An unknown unit throws "Parameter #3 is invalid".
+- **Wrong:** Expecting `DateAdd` to reject a fraction, or to return the full 14 digits for a short stamp.
+- **Right:** Check the unit with a list before the call, and check the stamp with `IsTime` before `DateAdd`/`DateDiff`; the result of `DateAdd` is always 14 digits.
+- **Status:** verified (AutoHotkey v2 64 bit probe; `src/elements/Default/lib/TimeOps.ahk`)
+- **Source:** `src/elements/Default/Actions/Action_Time_Calculation.ahk`, `src/elements/Default/Actions/Action_Time_Difference.ahk`
+
+### Random with the limits in either order (verified)
+
+- **Problem:** `Random(5, 1)` gives values from 1 to 5 (checked with 300 draws), so the limits do not have to be ordered.
+- **Wrong:** Swapping the limits before the call, as a precaution.
+- **Right:** Pass the limits as they are; a Float limit gives a Float result.
+- **Status:** verified (300 draws each, AutoHotkey v2 64 bit)
+- **Source:** `src/elements/Default/Actions/Action_Random_number.ahk`
