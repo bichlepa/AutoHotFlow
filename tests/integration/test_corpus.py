@@ -51,14 +51,10 @@ PENDING = {
     "Flow 1333431302": dict(name="User idle test", missing={
         "Trigger_User_Idle_Time": "S0008"}),
     "Flow 1384439262": dict(name="file test", missing={
-        "Action_Close_Window": "S0008", "Action_Copy_File": "S0008", "Action_Copy_Folder": "S0008",
-        "Action_Create_Folder": "S0008", "Action_Create_Shortcut": "S0008", "Action_Delete_File": "S0008",
-        "Action_Delete_Folder": "S0008", "Action_Get_File_Size": "S0008", "Action_Get_File_Time": "S0008",
-        "Action_Get_Shortcut_Information": "S0008", "Action_Move_File": "S0008", "Action_Move_Folder": "S0008",
-        "Action_Read_From_File": "S0008", "Action_Rename_File": "S0008", "Action_Rename_Folder": "S0008",
-        "Action_Run": "S0008", "Action_Set_File_Time": "S0008",
-        "Action_Write_to_File": "S0008", "Condition_File_Exists": "S0008",
-        "Condition_File_Has_Attribute": "S0008", "Condition_Window_Exists": "S0008"}),
+        "Action_Close_Window": "S0008", "Action_Create_Shortcut": "S0008", "Action_Get_File_Size": "S0008",
+        "Action_Get_File_Time": "S0008", "Action_Get_Shortcut_Information": "S0008", "Action_Run": "S0008",
+        "Action_Set_File_Time": "S0008", "Condition_File_Has_Attribute": "S0008",
+        "Condition_Window_Exists": "S0008"}),
     "Flow 1587447767": dict(name="ini file test", missing={
         "Action_Read_from_INI": "S0008", "Action_Write_to_INI": "S0008"}),
     "Flow 1849072261": dict(name="external script test", missing={
@@ -72,8 +68,7 @@ PENDING = {
     "Flow 65341778": dict(name="_AutomaticTest starter", missing={
         "Action_Play_Sound": "S0008"}),
     "Flow 74366368": dict(name="File link test", missing={
-        "Action_Delete_File": "S0008", "Action_Run": "S0008",
-        "Condition_File_Exists": "S0008", "Trigger_Shortcut": "S0008"}),
+        "Action_Run": "S0008", "Trigger_Shortcut": "S0008"}),
 }
 
 
