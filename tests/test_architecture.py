@@ -65,6 +65,9 @@ CASES = [
     ("dialog-seam", "elements/Default/Actions/A.ahk",
      "class A {\n    static Mode := \"worker\"\n    M() {\n        ToolTip(\"x\")\n    }\n}\n",
      "class A {\n    static Mode := \"worker\"\n    M() {\n        Dialogs.ToolTip(\"x\")\n    }\n}\n"),
+    ("system-seam", "elements/Default/Actions/A.ahk",
+     "class A {\n    static Mode := \"worker\"\n    M() {\n        Send(\"x\")\n    }\n}\n",
+     "class A {\n    static Mode := \"worker\"\n    M() {\n        SystemOps.Send(\"x\")\n    }\n}\n"),
     ("arch-ok", "engine/A.ahk", "; arch-ok: dialog\nclass A {\n}\n", "; arch-ok: dialog a dialog is needed here\nclass A {\n}\n"),
 ]
 
@@ -102,6 +105,25 @@ def test_dialog_seam_of_the_ui_roles():
     assert "dialog-seam" not in rules("ui_common/UiFileDialogs.ahk", seam)
     # a provider is registered by the test entries, never by src/
     assert "dialog-seam" in rules("manager/A.ahk", body % "UiFileDialogs.UseProvider(P())")
+
+
+def test_system_seam_details():
+    # every group of SystemOps: a direct call in an element is a hit, in any mode, the seam file itself is exempt
+    body = "class A {\n    static Mode := \"%s\"\n    M() {\n        %s\n    }\n}\n"
+    for call in ("Shutdown(1)", "LockWorkStation()", "DriveEject(\"E:\")", "FileRecycleEmpty()", "SoundBeep(800, 100)",
+                 "BlockInput(\"On\")", "Send(\"{Enter}\")", "Click()", "MouseMove(1, 2)", "SetCapsLockState(\"On\")",
+                 "TimeIdle()", "TimeIdlePhysical()", "ChangeDisplaySettings()"):
+        assert "system-seam" in rules("elements/Default/Actions/A.ahk", body % ("worker", call)), call
+        assert "system-seam" in rules("elements/Default/Triggers/T.ahk", body % ("trigger", call)), call
+        assert "system-seam" not in rules("elements/Default/Actions/A.ahk", body % ("worker", "SystemOps." + call)), call
+    # the seam itself calls the real functions
+    seam = "class SystemOps {\n    class Real {\n        Send(keys) {\n            return Send(keys)\n        }\n    }\n}\n"
+    assert "system-seam" not in rules("elements/base/SystemOps.ahk", seam)
+    # a name that only contains one of them, or a method call, is no hit
+    assert "system-seam" not in rules("elements/Default/Actions/A.ahk", body % ("worker", "x := ResendKeys(1) + obj.Click()"))
+    # a provider is registered by the test entries, never by src/ (every role)
+    assert "system-seam" in rules("engine/A.ahk", "class A {\n    M() {\n        SystemOps.UseProvider(P())\n    }\n}\n")
+    assert "system-seam" in rules("elements/Default/Actions/A.ahk", body % ("worker", "SystemOps.UseProvider(P())"))
 
 
 def test_requires_hit_and_miss():

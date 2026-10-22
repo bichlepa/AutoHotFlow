@@ -24,7 +24,8 @@ from pathlib import Path, PurePosixPath
 REPO = Path(__file__).resolve().parent.parent
 
 RULES = ("requires", "one-class", "include-core", "include-roles", "include-tests", "dialog", "file-io",
-         "blocking", "inline-element", "warn", "critical", "empty-catch", "builtin-class", "wire-bool", "dialog-seam")
+         "blocking", "inline-element", "warn", "critical", "empty-catch", "builtin-class", "wire-bool", "dialog-seam",
+         "system-seam")
 
 # Folders under src/ that are libraries, not process roles.
 LIB_DIRS = {"core", "elements", "ui_common", "expr"}
@@ -150,6 +151,14 @@ SEAM_FILE = "elements/base/Dialogs.ahk"
 UI_SEAM_CALL_RE = re.compile(NOT_MEMBER + r"(FileSelect|DirSelect)\s*\(")
 UI_SEAM_FILE = "ui_common/UiFileDialogs.ahk"
 UI_SEAM_ROLES = {"manager", "editor", "ui_common"}
+# Rule system-seam (E0103, WI-0117): an element calls a system function of SystemOps directly (shutdown, input, sound,
+# idle time, ...), or src/ registers a SystemOps provider. SYSTEM_SEAM_FILE calls the real functions and is exempt.
+SYSTEM_CALL_RE = re.compile(NOT_MEMBER + r"(Shutdown|LockWorkStation|Hibernate|Suspend|DriveEject|DriveSetLabel|DriveLock|"
+                            r"DriveUnlock|FileRecycleEmpty|ChangeDisplaySettings|SoundBeep|SoundPlay|SoundSetMute|"
+                            r"SoundSetVolume|SpeakText|SpeechVoices|BlockInput|Send|Click|MouseClickDrag|MouseMove|"
+                            r"SetCapsLockState|SetNumLockState|SetScrollLockState|TimeIdle|TimeIdlePhysical)\s*\(")
+SYSTEM_PROVIDER_RE = re.compile(NOT_MEMBER + r"SystemOps\s*\.\s*UseProvider", re.I)
+SYSTEM_SEAM_FILE = "elements/base/SystemOps.ahk"
 FILEIO_RE = re.compile(NOT_MEMBER + r"(FileRead|FileAppend|FileOpen|FileDelete|FileMove|FileCopy|DirCreate|"
                        r"DirDelete|DirMove|DirCopy)\b(?!\s*:=)|\bLoop[\s,]+(Files|Read)\b", re.I)
 SLEEP_RE = re.compile(NOT_MEMBER + r"Sleep\b(?!\s*:=)\s*\(?\s*([^\s,)]*)")
@@ -300,6 +309,12 @@ def check_text(relpath, text):
                     ("File" if m.group(1) == "FileSelect" else "Dir"))
         for m in SEAM_PROVIDER_RE.finditer(code):
             add(m.start(), "dialog-seam", "Dialogs.UseProvider is for the test entries only")
+    # Rule system-seam (E0103, WI-0117): the system functions only through SystemOps; providers only in the test entries.
+    if role == "elements" and relpath != SYSTEM_SEAM_FILE:
+        for m in SYSTEM_CALL_RE.finditer(code):
+            add(m.start(), "system-seam", m.group(1) + "( called directly, use SystemOps." + m.group(1))
+    for m in SYSTEM_PROVIDER_RE.finditer(code):
+        add(m.start(), "system-seam", "SystemOps.UseProvider is for the test entries only")
     for m in FILEIO_RE.finditer(code):
         forbid("file-io", m.start(), (m.group(1) or m.group(0)) + " (file access)")
     for m in SLEEP_RE.finditer(code):

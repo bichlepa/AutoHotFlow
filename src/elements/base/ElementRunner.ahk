@@ -17,6 +17,7 @@ class ElementRunner {
     ; onSlow(classId, ms) is called after a Run that took longer than SlowMs (synchronous part only).
     static Run(cls, ctx, params, onSlow := "") {
         startMs := Time.NowMs()
+        SystemOps.Enter(ctx.flowId, ctx.elementId)     ; the test provider of SystemOps logs the element of a call (WI-0117)
         try {
             cls.Run(ctx, params)
         } catch as e {

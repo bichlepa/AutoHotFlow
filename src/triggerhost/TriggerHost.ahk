@@ -67,6 +67,7 @@ class TriggerHost extends Role {
         this._Disarm(key)
         ctx := TriggerContext(this, key, flowId, elementId, Integer(gen), String(context))
         this._armed[key] := Map("ctx", ctx, "cls", cls, "class", classId, "gen", Integer(gen), "armedMs", Time.NowMs())
+        SystemOps.Enter(flowId, elementId)     ; the test provider of SystemOps logs the element of a call (WI-0117)
         try {
             message := cls.Enable(ctx, TriggerHost._Params(params))
         } catch as e {
