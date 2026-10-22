@@ -20,6 +20,7 @@ EXEMPT_PREFIXES = ("tests/golden/",)
 # skips that rule when v1/ is gone, so the test does not depend on it
 # the table of the test selection names the v1 paths as rule keys (strings only, nothing is read from v1/)
 EXEMPT_FILES = {"tests/test_no_v1_dependency.py", "tools/golden_v1.py", "tools/golden_corpus.py",
+                "tools/v1_schema.py",  # the v1 schema is read from the unchanged v1 code on purpose (WI-0116)
                 "tools/convert_v1_help.py",  # the one-time conversion of the v1 help reads v1 on purpose (WI-0112)
                 "tests/ahk/element_smoke.test.ahk", "tests/support/groups.py"}
 
