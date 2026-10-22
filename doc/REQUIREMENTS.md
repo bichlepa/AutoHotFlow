@@ -1079,7 +1079,7 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 ### REQ-ELM-380 Sound and speech
 
 - **v1:** yes
-- **v2:** partial (WI-0124: the six elements; the sound and the speech reach only the process of their own action, M-0125; v1's preselection of the voice by OS language is missing, M-0129)
+- **v2:** partial (WI-0124: the six elements; the sound and the speech reach only the process of their own action, M-0131; v1's preselection of the voice by OS language is missing, M-0135)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0008 (WI-0124)
@@ -1087,12 +1087,12 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Play_Sound` | yes | done (WI-0124, M-0124) | S0008 (WI-0124) |
-| `Action_Stop_Sound` | yes | partial (WI-0124, M-0125) | S0008 (WI-0124) |
+| `Action_Play_Sound` | yes | done (WI-0124, M-0130) | S0008 (WI-0124) |
+| `Action_Stop_Sound` | yes | partial (WI-0124, M-0131) | S0008 (WI-0124) |
 | `Action_Beep` | yes | done (WI-0124) | S0008 (WI-0124) |
 | `Action_Get_Volume` | yes | done (WI-0124) | S0008 (WI-0124) |
-| `Action_Set_Volume` | yes | done (WI-0124, M-0126, M-0128) | S0008 (WI-0124) |
-| `Action_Speech_output` | yes | partial (WI-0124, M-0125, M-0129) | S0008 (WI-0124) |
+| `Action_Set_Volume` | yes | done (WI-0124, M-0132, M-0134) | S0008 (WI-0124) |
+| `Action_Speech_output` | yes | partial (WI-0124, M-0131, M-0135) | S0008 (WI-0124) |
 
 ### REQ-ELM-390 Programs and processes
 

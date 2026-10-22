@@ -158,7 +158,7 @@ class SystemOps {
         }
 
         ; Stops the sound of this process: AutoHotkey stops the playing file when it plays a file that does not exist
-        ; (SoundPlay remarks), and the error of that call is expected. A sound of another process is not reached (M-0125).
+        ; (SoundPlay remarks), and the error of that call is expected. A sound of another process is not reached (M-0131).
         SoundStop() {
             try SoundPlay("ahf-no-such-sound.wav")
         }

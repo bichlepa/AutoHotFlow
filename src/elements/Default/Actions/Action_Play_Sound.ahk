@@ -11,10 +11,10 @@
 ; Mode worker. The sound is played by the worker process that runs the job and goes on after the job has ended when the
 ; element does not wait (WI-0124 task 1, ELEMENT-API-V2 3.3a): AutoHotkey plays it in its own process, and the worker
 ; is free for other jobs meanwhile. A new sound of the same process stops the playing one (AutoHotkey). The sound is
-; reached by Action_Stop_Sound only in the same worker process (MIGRATION M-0125).
+; reached by Action_Stop_Sound only in the same worker process (MIGRATION M-0131).
 ;
-; New option (MIGRATION M-0124): "Wait until the sound has finished" (default off, as v1: the flow goes on at once).
-; The Preview buttons of v1 are not in v2 (M-0124). The file check is done before the call: a missing file is the
+; New option (MIGRATION M-0130): "Wait until the sound has finished" (default off, as v1: the flow goes on at once).
+; The Preview buttons of v1 are not in v2 (M-0130). The file check is done before the call: a missing file is the
 ; exception of v1 ("Sound could not be played").
 class Action_Play_Sound extends AhfElement {
     static Mode := "worker"

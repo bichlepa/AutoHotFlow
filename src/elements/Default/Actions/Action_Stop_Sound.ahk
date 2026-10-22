@@ -6,7 +6,7 @@
 ; (Source_Elements/Default/Actions/Stop_Sound.ahk).
 ;
 ; Mode worker. A sound is played by the worker process of the job that started it, and only that process is reached
-; (ELEMENT-API-V2 3.3a, MIGRATION M-0125): a sound that another worker plays goes on. The stop goes through the seam.
+; (ELEMENT-API-V2 3.3a, MIGRATION M-0131): a sound that another worker plays goes on. The stop goes through the seam.
 class Action_Stop_Sound extends AhfElement {
     static Mode := "worker"
     static ActsOnSystem := true

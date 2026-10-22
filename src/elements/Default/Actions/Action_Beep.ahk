@@ -8,7 +8,7 @@
 ;
 ; Mode worker: the tone takes the duration and the script waits for it (AutoHotkey). The frequency must be from 37 to
 ; 32767 Hz, the duration is rounded to whole milliseconds. The v1 text for a duration that is not a number named the
-; frequency; the v2 text names the duration (MIGRATION M-0127).
+; frequency; the v2 text names the duration (MIGRATION M-0133).
 class Action_Beep extends AhfElement {
     static Mode := "worker"
     static ActsOnSystem := true

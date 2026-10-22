@@ -6,7 +6,7 @@
 
 ; Action Speech output of the package Default (WI-0124): reads a text with an installed speech voice (SAPI). Specification:
 ; the help text of v1 (help/en/Actions/Speech_output.md). Class ID, parameter IDs, defaults and language keys are those of v1
-; (Source_Elements/Default/Actions/Speech_output.ahk), except the default voice (MIGRATION M-0129).
+; (Source_Elements/Default/Actions/Speech_output.ahk), except the default voice (MIGRATION M-0135).
 ;
 ; Mode worker. SAPI is called through the seam SystemOps (E0103): a test records the text, the voice and the options and
 ; speaks nothing. A speech that does not wait goes on in the worker process after the job has ended (ELEMENT-API-V2 3.3a).
@@ -14,7 +14,7 @@
 ;   "Wait until this speech output finishes" (on: the job waits for the end of the speech, SAPI synchronous)
 ; Speed and pitch are integers from -10 to 10 and the volume 0 to 100 (SAPI). The voice is one of the voices of the
 ; machine; an empty voice is the default voice of the system. A voice that is not installed is an exception with the
-; v1 text. Speech of another worker process is neither waited for nor stopped (MIGRATION M-0125).
+; v1 text. Speech of another worker process is neither waited for nor stopped (MIGRATION M-0131).
 class Action_Speech_output extends AhfElement {
     static Mode := "worker"
     static ActsOnSystem := true

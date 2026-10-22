@@ -9,8 +9,8 @@
 ;
 ; Mode worker. The calls go through the seam SystemOps (E0103): a test records them and changes no volume.
 ; Differences from v1: the default of the action is the value of the radio (enum "Mute", v1 wrote the position 1; M-0099),
-; the relative amount is a number field and not a slider (the editor draws sliders from 0 to 100 only; M-0126).
-; A failing call ends with the exception "Volume could not be set" (MIGRATION M-0128).
+; the relative amount is a number field and not a slider (the editor draws sliders from 0 to 100 only; M-0132).
+; A failing call ends with the exception "Volume could not be set" (MIGRATION M-0134).
 class Action_Set_Volume extends AhfElement {
     static Mode := "worker"
     static ActsOnSystem := true
