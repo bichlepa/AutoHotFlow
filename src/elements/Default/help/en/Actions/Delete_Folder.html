@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Actions/Create_folder.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Create folder</title>
+<!-- Generated from src/elements/Default/help/en/Actions/Delete_Folder.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Delete folder</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,14 +98,35 @@ img {
 </head>
 <body>
 <main>
-<h1>Create folder</h1>
-<p>The action <strong>Create folder</strong> creates a new directory.</p>
+<h1>Delete folder</h1>
+<p>The action <strong>Delete folder</strong> deletes a folder. Be careful with this action: data can be lost.</p>
 <h2>Settings</h2>
 <h3>Folder path</h3>
-<p>Path of the directory to create.</p>
-<p>The folder path is assumed to be in the working directory if an absolute path isn't specified.</p>
-<h3>Options</h3>
-<p>If <strong>Throw exception if folder already exists</strong> is not selected, nothing will happen, if the folder already exists.</p>
+<p>The path of the folder. A relative path is taken from the working directory of the flow.</p>
+<h3>Remove only if the folder is empty</h3>
+<p>If checked, the folder is deleted only when it contains no file and no folder. If not checked, the folder is deleted with everything in it.</p>
+<h3>Throw exception if folder does not exist</h3>
+<p>If checked, a folder that does not exist ends the element with an exception. If not checked, the element ends normally with a message.</p>
+<h2>Examples</h2>
+<p>Delete a folder with its contents from the documents folder.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Folder path</td>
+<td><code>%A_MyDocuments%\ExampleFolder</code></td>
+</tr>
+<tr>
+<td>Remove only if the folder is empty</td>
+<td>off</td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

@@ -99,21 +99,16 @@ img {
 <body>
 <main>
 <h1>Move folder</h1>
-<p>The action <strong>Move folder</strong> moves a folder along with all its sub-folders and files.</p>
+<p>The action <strong>Move folder</strong> moves a folder with all its subfolders and files.</p>
 <h2>Settings</h2>
 <h3>Source folder</h3>
-<p>Path of the source directory (with no trailing backslash).</p>
-<p>The folder path is assumed to be in the working directory if an absolute path isn't specified.</p>
+<p>The path of the folder, without a trailing backslash. A relative path is taken from the working directory of the flow.</p>
 <h3>Destination folder</h3>
-<p>Name of the destination, which is assumed to be in the working directory if an absolute path isn't specified.</p>
-<p>If the folder does not exist, it will be created.</p>
+<p>The path of the destination, the new location of the folder.</p>
 <h3>Overwrite</h3>
-<p>If Overwrite is checked, existing files will be overwritten.</p>
-<blockquote>
-<p><strong>Warning:</strong> Be careful using that option. It may cause loss of data.</p>
-</blockquote>
+<p>If checked, an existing destination is replaced. Without it, an existing destination folder ends the element with an exception.</p>
 <h2>Examples</h2>
-<p>Move a folder from one drive to MyDocuments folder.</p>
+<p>Move a folder to the documents folder.</p>
 <table>
 <thead>
 <tr>
@@ -123,31 +118,12 @@ img {
 </thead>
 <tbody>
 <tr>
-<td>Source</td>
+<td>Source folder</td>
 <td><code>G:\exampleFolder</code></td>
 </tr>
 <tr>
-<td>Destination</td>
+<td>Destination folder</td>
 <td><code>%A_MyDocuments%\exampleFolder</code></td>
-</tr>
-</tbody>
-</table>
-<p>Move one folder from desktop to the working directory and rename it.</p>
-<table>
-<thead>
-<tr>
-<th>Parameter</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Source</td>
-<td><code>%A_Desktop%\exampleFolder</code></td>
-</tr>
-<tr>
-<td>Destination</td>
-<td><code>RenamedExampleFolder</code></td>
 </tr>
 </tbody>
 </table>

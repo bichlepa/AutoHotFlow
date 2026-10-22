@@ -99,21 +99,54 @@ img {
 <body>
 <main>
 <h1>Write to file</h1>
-<p>The action <strong>Write to file</strong> writes some text to a file.</p>
+<p>The action <strong>Write to file</strong> writes a text to a file. The file is created if it does not exist.</p>
 <h2>Settings</h2>
 <h3>Text to write</h3>
-<p>Text that will be written to the file.</p>
+<p>The text that is written. It may be a string or an expression.</p>
 <h3>File path</h3>
-<p>Path of the file. The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
-<h3>Encoding</h3>
-<p>The text in the files may be encoded differently.</p>
-<p>UTF-8 is the recommended encoding.</p>
+<p>The path of the file. A relative path is taken from the working directory of the flow.</p>
 <h3>Append or overwrite</h3>
-<p>If <strong>Append</strong> is selected and the specified file exists, the existing file will remain and text will be written to the end of the file.</p>
-<p>If <strong>Overwrite</strong> is selected and the specified file exists, the file will be overwritten.</p>
+<ul>
+<li><strong>Append</strong>: the text is written at the end of the existing file.</li>
+<li><strong>Overwrite</strong>: an existing file is deleted first, then the text is written. Use it with care: data can be lost.</li>
+</ul>
+<h3>Encoding</h3>
+<ul>
+<li><strong>UTF-8</strong> is recommended.</li>
+<li><strong>System default ANSI codepage</strong>, <strong>Unicode UTF-16</strong> and <strong>Other</strong> (the code page number below).</li>
+</ul>
+<h3>Add byte order mark (BOM)</h3>
+<p>For UTF-8 and UTF-16 only: writes a byte order mark when the file is created.</p>
 <h3>Linefeed</h3>
-<p>A line break can be represented either by a single linefeed character or by the two characters linefeed and carriage return.</p>
-<p>Standard text files in windows use both characters, a linefeed and a carriage return, when there is a line break.</p>
+<p>If enabled, every linefeed in the text is written as a carriage return and a linefeed (the Windows line break). A carriage return and a linefeed that are already in the text stay one line break.</p>
+<h2>Examples</h2>
+<p>Write a line of text to a log file and append it.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Text to write</td>
+<td><code>Started</code></td>
+</tr>
+<tr>
+<td>File path</td>
+<td><code>%A_MyDocuments%\log.txt</code></td>
+</tr>
+<tr>
+<td>Append or overwrite</td>
+<td>Append</td>
+</tr>
+<tr>
+<td>Encoding</td>
+<td>Unicode UTF-8</td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

@@ -99,22 +99,17 @@ img {
 <body>
 <main>
 <h1>Move file</h1>
-<p>The action <strong>Move file</strong> moves one or more files.</p>
+<p>The action <strong>Move file</strong> moves one file, or all files that match a wildcard pattern, to another folder or to a new name.</p>
 <h2>Settings</h2>
 <h3>Source file</h3>
-<p>The name of a single file or folder, or a wildcard pattern.</p>
-<p>Both asterisks and question marks are supported as wildcards. A match occurs when the pattern appears in either the file's long/normal name or its 8.3 short name.</p>
-<p>The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
+<p>The path of a file, or a wildcard pattern (<code>*</code> and <code>?</code>, as in Copy file). A relative path is taken from the working directory of the flow.</p>
 <h3>Destination file or folder</h3>
-<p>The path of the destination. To perform a simple copy -- retaining the existing file name(s) -- specify only the folder path.</p>
-<p>The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
+<p>The path of the destination. To keep the file names, give only the folder; the folder must exist. Otherwise give the new file name.</p>
 <h3>Overwrite</h3>
-<p>If Overwrite is checked, existing files will be overwritten.</p>
-<blockquote>
-<p><strong>Warning:</strong> Be careful using that option. It may cause loss of data.</p>
-</blockquote>
+<p>If checked, existing files are overwritten. Without it, a destination file that exists ends the element with an exception.</p>
+<p>If some of the files of a pattern cannot be moved, the exception tells how many.</p>
 <h2>Examples</h2>
-<p>Move one file from one drive to MyDocuments folder.</p>
+<p>Move one file to the documents folder.</p>
 <table>
 <thead>
 <tr>
@@ -124,16 +119,16 @@ img {
 </thead>
 <tbody>
 <tr>
-<td>Source</td>
+<td>Source file</td>
 <td><code>G:\example.txt</code></td>
 </tr>
 <tr>
-<td>Destination</td>
+<td>Destination file or folder</td>
 <td><code>%A_MyDocuments%</code></td>
 </tr>
 </tbody>
 </table>
-<p>Move all files from one drive to other drive.</p>
+<p>Move a file from the desktop to the working directory and rename it.</p>
 <table>
 <thead>
 <tr>
@@ -143,30 +138,11 @@ img {
 </thead>
 <tbody>
 <tr>
-<td>Source</td>
-<td><code>G:\*</code></td>
-</tr>
-<tr>
-<td>Destination</td>
-<td><code>H:\*</code></td>
-</tr>
-</tbody>
-</table>
-<p>Move one file from desktop to the working directory and rename it.</p>
-<table>
-<thead>
-<tr>
-<th>Parameter</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Source</td>
+<td>Source file</td>
 <td><code>%A_Desktop%\example.txt</code></td>
 </tr>
 <tr>
-<td>Destination</td>
+<td>Destination file or folder</td>
 <td><code>RenamedExample.txt</code></td>
 </tr>
 </tbody>

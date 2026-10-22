@@ -1,39 +1,26 @@
 # Move folder
 
-The action **Move folder** moves a folder along with all its sub-folders and files.
+The action **Move folder** moves a folder with all its subfolders and files.
 
 ## Settings
 
 ### Source folder
 
-Path of the source directory (with no trailing backslash).
-
-The folder path is assumed to be in the working directory if an absolute path isn't specified.
+The path of the folder, without a trailing backslash. A relative path is taken from the working directory of the flow.
 
 ### Destination folder
 
-Name of the destination, which is assumed to be in the working directory if an absolute path isn't specified.
-
-If the folder does not exist, it will be created.
+The path of the destination, the new location of the folder.
 
 ### Overwrite
 
-If Overwrite is checked, existing files will be overwritten.
-
-> **Warning:** Be careful using that option. It may cause loss of data.
+If checked, an existing destination is replaced. Without it, an existing destination folder ends the element with an exception.
 
 ## Examples
 
-Move a folder from one drive to MyDocuments folder.
+Move a folder to the documents folder.
 
 | Parameter | Value |
 | --- | --- |
-| Source | `G:\exampleFolder` |
-| Destination | `%A_MyDocuments%\exampleFolder` |
-
-Move one folder from desktop to the working directory and rename it.
-
-| Parameter | Value |
-| --- | --- |
-| Source | `%A_Desktop%\exampleFolder` |
-| Destination | `RenamedExampleFolder` |
+| Source folder | `G:\exampleFolder` |
+| Destination folder | `%A_MyDocuments%\exampleFolder` |

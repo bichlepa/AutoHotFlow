@@ -6,18 +6,44 @@
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
 #Include lib\DialogOps.ahk
+#Include lib\FileOps.ahk
+#Include lib\TextOps.ahk
 #Include lib\DebugOps.ahk
 
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Default {
+    #Include Actions\Action_Copy_File.ahk
+    #Include Actions\Action_Copy_Folder.ahk
+    #Include Actions\Action_Create_Folder.ahk
+    #Include Actions\Action_Delete_File.ahk
+    #Include Actions\Action_Delete_Folder.ahk
     #Include Actions\Action_Message_Box.ahk
+    #Include Actions\Action_Move_File.ahk
+    #Include Actions\Action_Move_Folder.ahk
+    #Include Actions\Action_Read_From_File.ahk
+    #Include Actions\Action_Rename_File.ahk
+    #Include Actions\Action_Rename_Folder.ahk
     #Include Actions\Action_Tooltip.ahk
+    #Include Actions\Action_Write_To_File.ahk
     #Include Conditions\Condition_Confirmation_Dialog.ahk
     #Include Conditions\Condition_Debug_Dialog.ahk
+    #Include Conditions\Condition_File_Exists.ahk
 }
 
 ElementRegistry.RegisterPackage("Default", "1.2.1")
+ElementRegistry.Register(Default.Action_Copy_File)
+ElementRegistry.Register(Default.Action_Copy_Folder)
+ElementRegistry.Register(Default.Action_Create_Folder)
+ElementRegistry.Register(Default.Action_Delete_File)
+ElementRegistry.Register(Default.Action_Delete_Folder)
 ElementRegistry.Register(Default.Action_Message_Box)
+ElementRegistry.Register(Default.Action_Move_File)
+ElementRegistry.Register(Default.Action_Move_Folder)
+ElementRegistry.Register(Default.Action_Read_From_File)
+ElementRegistry.Register(Default.Action_Rename_File)
+ElementRegistry.Register(Default.Action_Rename_Folder)
 ElementRegistry.Register(Default.Action_Tooltip)
+ElementRegistry.Register(Default.Action_Write_To_File)
 ElementRegistry.Register(Default.Condition_Confirmation_Dialog)
 ElementRegistry.Register(Default.Condition_Debug_Dialog)
+ElementRegistry.Register(Default.Condition_File_Exists)

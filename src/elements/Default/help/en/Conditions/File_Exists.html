@@ -99,12 +99,26 @@ img {
 <body>
 <main>
 <h1>File exists</h1>
-<p>The condition <strong>File exists</strong> checks whether a file or folder exists.</p>
+<p>The condition <strong>File exists</strong> checks whether a file or a folder exists at the path. The connection <strong>yes</strong> is taken when it exists, <strong>no</strong> when it does not.</p>
 <h2>Settings</h2>
 <h3>File path</h3>
-<p>The name of a single file or folder, or a wildcard pattern.</p>
-<p>Both asterisks and question marks are supported as wildcards. A match occurs when the pattern appears in either the file's long/normal name or its 8.3 short name.</p>
-<p>The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
+<p>The path to check. A relative path is taken from the working directory of the flow. A wildcard pattern is "yes" when at least one file matches.</p>
+<h2>Examples</h2>
+<p>Check whether a file exists in the documents folder and write a message only if it does.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>File path</td>
+<td><code>%A_MyDocuments%\notes.txt</code></td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

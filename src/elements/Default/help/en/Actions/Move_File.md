@@ -1,48 +1,35 @@
 # Move file
 
-The action **Move file** moves one or more files.
+The action **Move file** moves one file, or all files that match a wildcard pattern, to another folder or to a new name.
 
 ## Settings
 
 ### Source file
 
-The name of a single file or folder, or a wildcard pattern.
-
-Both asterisks and question marks are supported as wildcards. A match occurs when the pattern appears in either the file's long/normal name or its 8.3 short name.
-
-The file path is assumed to be in the working directory if an absolute path isn't specified.
+The path of a file, or a wildcard pattern (`*` and `?`, as in Copy file). A relative path is taken from the working directory of the flow.
 
 ### Destination file or folder
 
-The path of the destination. To perform a simple copy -- retaining the existing file name(s) -- specify only the folder path.
-
-The file path is assumed to be in the working directory if an absolute path isn't specified.
+The path of the destination. To keep the file names, give only the folder; the folder must exist. Otherwise give the new file name.
 
 ### Overwrite
 
-If Overwrite is checked, existing files will be overwritten.
+If checked, existing files are overwritten. Without it, a destination file that exists ends the element with an exception.
 
-> **Warning:** Be careful using that option. It may cause loss of data.
+If some of the files of a pattern cannot be moved, the exception tells how many.
 
 ## Examples
 
-Move one file from one drive to MyDocuments folder.
+Move one file to the documents folder.
 
 | Parameter | Value |
 | --- | --- |
-| Source | `G:\example.txt` |
-| Destination | `%A_MyDocuments%` |
+| Source file | `G:\example.txt` |
+| Destination file or folder | `%A_MyDocuments%` |
 
-Move all files from one drive to other drive.
-
-| Parameter | Value |
-| --- | --- |
-| Source | `G:\*` |
-| Destination | `H:\*` |
-
-Move one file from desktop to the working directory and rename it.
+Move a file from the desktop to the working directory and rename it.
 
 | Parameter | Value |
 | --- | --- |
-| Source | `%A_Desktop%\example.txt` |
-| Destination | `RenamedExample.txt` |
+| Source file | `%A_Desktop%\example.txt` |
+| Destination file or folder | `RenamedExample.txt` |

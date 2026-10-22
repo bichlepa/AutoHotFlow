@@ -99,13 +99,32 @@ img {
 <body>
 <main>
 <h1>Rename folder</h1>
-<p>The action <strong>Rename folder</strong> renames one folder.</p>
+<p>The action <strong>Rename folder</strong> gives a folder a new name. The folder stays in its parent folder.</p>
 <h2>Settings</h2>
 <h3>Source folder</h3>
-<p>The name of a single folder.</p>
-<p>The folder is assumed to be in the working directory if an absolute path isn't specified.</p>
-<h3>New name</h3>
-<p>The new folder name.</p>
+<p>The path of the folder. A relative path is taken from the working directory of the flow.</p>
+<h3>New folder name</h3>
+<p>The new name, without a path. A folder with that name must not exist already. A wildcard is not allowed.</p>
+<h2>Examples</h2>
+<p>Rename a folder on the desktop.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source folder</td>
+<td><code>%A_Desktop%\old folder</code></td>
+</tr>
+<tr>
+<td>New folder name</td>
+<td><code>new folder</code></td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

@@ -1,15 +1,22 @@
 # Rename folder
 
-The action **Rename folder** renames one folder.
+The action **Rename folder** gives a folder a new name. The folder stays in its parent folder.
 
 ## Settings
 
 ### Source folder
 
-The name of a single folder.
+The path of the folder. A relative path is taken from the working directory of the flow.
 
-The folder is assumed to be in the working directory if an absolute path isn't specified.
+### New folder name
 
-### New name
+The new name, without a path. A folder with that name must not exist already. A wildcard is not allowed.
 
-The new folder name.
+## Examples
+
+Rename a folder on the desktop.
+
+| Parameter | Value |
+| --- | --- |
+| Source folder | `%A_Desktop%\old folder` |
+| New folder name | `new folder` |

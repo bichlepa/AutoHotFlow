@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Actions/Delete_folder.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Delete folder</title>
+<!-- Generated from src/elements/Default/help/en/Actions/Create_Folder.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Create folder</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,21 +98,15 @@ img {
 </head>
 <body>
 <main>
-<h1>Delete folder</h1>
-<p>The action <strong>Delete folder</strong> deletes a folder.</p>
-<blockquote>
-<p><strong>Warning:</strong> Be careful using that action. It may cause loss of data.</p>
-</blockquote>
+<h1>Create folder</h1>
+<p>The action <strong>Create folder</strong> creates a folder. Missing folders above it are created too.</p>
 <h2>Settings</h2>
 <h3>Folder path</h3>
-<p>Path of the directory to delete.</p>
-<p>The folder path is assumed to be in the working directory if an absolute path isn't specified.</p>
-<h3>Options</h3>
-<p>If <strong>Remove only if the folder is empty</strong> is selected, the folder will not be deleted, if it contains any file or folder.</p>
-<h3>Error handling</h3>
-<p>If <strong>Throw exception if folder does not exist</strong> is not selected, nothing will happen, if the folder doesn't exists.</p>
+<p>The path of the folder. A relative path is taken from the working directory of the flow.</p>
+<h3>Throw exception if folder already exists</h3>
+<p>If checked, an existing folder ends the element with an exception. If not checked, nothing happens when the folder exists. A file with the same name always ends the element with an exception.</p>
 <h2>Examples</h2>
-<p>Delete one folder from MyDocuments folder.</p>
+<p>Create a folder in the documents folder.</p>
 <table>
 <thead>
 <tr>

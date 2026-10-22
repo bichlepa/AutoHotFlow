@@ -99,19 +99,48 @@ img {
 <body>
 <main>
 <h1>Read from file</h1>
-<p>The action <strong>Read from file</strong> reads the content of a file.</p>
+<p>The action <strong>Read from file</strong> reads the content of a file into a variable.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
-<p>Name of the variable which will contain the result.</p>
+<p>The variable that receives the text of the file.</p>
 <h3>File path</h3>
-<p>Path of the file which contents will be read.</p>
-<p>The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
+<p>The path of the file. A relative path is taken from the working directory of the flow. <code>%name%</code> variables in the path are replaced first.</p>
 <h3>Encoding</h3>
-<p>The text in the files may be encoded differently. If the encoding is not set correctly, some of the characters can't be read properly.</p>
+<p>The encoding of the text in the file. If it is not set correctly, some characters cannot be read.</p>
+<ul>
+<li><strong>Raw data</strong>: the bytes of the file, one character per byte (ISO-8859-1). Use it for binary files; the variable holds no binary buffer, and a byte with the value 0 ends the text.</li>
+<li><strong>System default ANSI codepage</strong>: the codepage of the Windows language setting.</li>
+<li><strong>Unicode UTF-8</strong> and <strong>Unicode UTF-16</strong>: a byte order mark in the file decides over the choice.</li>
+<li><strong>Other</strong>: the code page with the number that you enter in the field below.</li>
+</ul>
 <h3>Size limit</h3>
-<p>The amount of read data can be limited.</p>
+<p>If enabled, only the first bytes of the file are read. The number must be a positive whole number.</p>
 <h3>Linefeed</h3>
-<p>Standard text files in windows use a carriage return &amp; linefeed when there is a line break. It might be useful to replace the two characters with a single linefeed.</p>
+<p>If enabled, Windows line breaks (carriage return and linefeed) become single linefeeds. Not used with raw data.</p>
+<h2>Examples</h2>
+<p>Read a text file that is written with UTF-8 into the variable <code>FileText</code>, with the default settings.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Output variable name</td>
+<td><code>FileText</code></td>
+</tr>
+<tr>
+<td>File path</td>
+<td><code>%A_MyDocuments%\notes.txt</code></td>
+</tr>
+<tr>
+<td>Encoding</td>
+<td>Unicode UTF-8</td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>
