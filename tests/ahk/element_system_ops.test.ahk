@@ -31,8 +31,10 @@ class StubSystemProvider {
     SoundPlay(args*) => this._Record("SoundPlay", args)
     SoundSetMute(args*) => this._Record("SoundSetMute", args)
     SoundSetVolume(args*) => this._Record("SoundSetVolume", args)
-    SpeakText(text, rate, volume, wait) => this._Record("SpeakText", [text, rate, volume, wait])
+    SoundStop() => this._Record("SoundStop", [])
+    SpeakText(text, voice, rate, volume, pitch, wait, purge) => this._Record("SpeakText", [text, voice, rate, volume, pitch, wait, purge])
     SpeechVoices() => this._Record("SpeechVoices", [])
+    SpeechWait() => this._Record("SpeechWait", [])
     BlockInput(args*) => this._Record("BlockInput", args)
     Click(args*) => this._Record("Click", args)
     MouseClickDrag(args*) => this._Record("MouseClickDrag", args)
@@ -56,7 +58,7 @@ TestRun.Case("every group passes its arguments on and returns the answer of the 
     Assert.Equal(SystemOps.DriveEject("E:", 1), "DriveEject"),
     Assert.Equal(SystemOps.FileRecycleEmpty("C:\"), "FileRecycleEmpty"),
     Assert.Equal(SystemOps.SoundBeep(800, 100), "SoundBeep"),
-    Assert.Equal(SystemOps.SpeakText("hi", 1, 50, 0), "SpeakText"),
+    Assert.Equal(SystemOps.SpeakText("hi", "", 1, 50, 0, 0, 0), "SpeakText"),
     Assert.Equal(SystemOps.BlockInput("On"), "BlockInput"),
     Assert.Equal(SystemOps.Send("{Enter}", "Input"), "Send"),
     Assert.Equal(SystemOps.MouseMove(10, 20, 0), "MouseMove"),
@@ -78,6 +80,18 @@ TestRun.Case("Enter gives the provider the element and the flow of the call", ()
     SystemOps.Enter("flow-1", "elem-2"),
     Assert.Equal(SystemOps.flowId, "flow-1"),
     Assert.Equal(SystemOps.elementId, "elem-2"),
+    SystemOps.UseProvider("")
+))
+
+TestRun.Case("the sound stop and the speech functions pass their arguments on (WI-0124)", () => (
+    p := StubSystemProvider(),
+    SystemOps.UseProvider(p),
+    Assert.Equal(SystemOps.SoundStop(), "SoundStop"),
+    Assert.Equal(SystemOps.SpeechWait(), "SpeechWait"),
+    Assert.Equal(SystemOps.SpeakText("Hello", "Voice A", -2, 80, 3, 0, 1), "SpeakText"),
+    Assert.Equal(p.calls[3][2].Length, 7, "SpeakText passes all seven arguments in order"),
+    Assert.Equal(p.calls[3][2][2], "Voice A"),
+    Assert.Equal(p.calls[3][2][7], 1, "purge is the seventh argument"),
     SystemOps.UseProvider("")
 ))
 
