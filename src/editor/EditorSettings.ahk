@@ -250,8 +250,8 @@ class EditorSettings {
         return true
     }
 
-    ; Starts the assistant of a Button field (WI-0110): "window" (the window under the mouse), "mouse" (the mouse tracker) or
-    ; "color" (the colour dialog). The values that the assistant takes go into the form when it ends (_AssistDone), by the
+    ; Starts the assistant of a Button field (WI-0110): "window" (the window under the mouse), "control" and "position" (the
+    ; window with its control or its position, WI-0125), "mouse" (the mouse tracker) or "color" (the colour dialog). The values that the assistant takes go into the form when it ends (_AssistDone), by the
     ; map of the field. One assistant at a time, and only while the settings are open. The settings window is disabled
     ; meanwhile. False when nothing starts (no settings open, an assistant runs, an unknown kind, a failed start).
     StartAssistant(field) {
@@ -279,8 +279,8 @@ class EditorSettings {
                 this._AssistDone(mapping, Map("color", picked))
             return true
         }
-        assist := (kind = "window") ? WindowAssistant(this.assistSource, done)
-            : MouseAssistant(this.assistSource, mapping, initial, done)
+        assist := (kind = "mouse") ? MouseAssistant(this.assistSource, mapping, initial, done)
+            : WindowAssistant(this.assistSource, done, kind)
         this.assist := assist
         try {
             assist.Open(show)

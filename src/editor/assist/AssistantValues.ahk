@@ -5,7 +5,7 @@
 ; PixelGetColor) in the settings; the colour dialog of Windows takes a COLORREF (0x00BBGGRR).
 class AssistantValues {
     ; The kinds that a Button field of an element may start (FormField.assistant).
-    static KINDS := Map("window", 1, "mouse", 1, "color", 1)
+    static KINDS := Map("window", 1, "control", 1, "position", 1, "mouse", 1, "color", 1)
 
     static IsKnown(kind) => AssistantValues.KINDS.Has(kind)
 

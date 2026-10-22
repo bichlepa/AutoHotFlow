@@ -32,8 +32,36 @@ class AssistantSource {
         }
     }
 
-    ; The handles of the visible top-level windows.
-    WindowList() => WinGetList()
+    ; The handles of the top-level windows: the visible ones, and the hidden ones too when hidden is true (WI-0125).
+    ; DetectHiddenWindows is set for this call only and restored after it.
+    WindowList(hidden := false) {
+        old := A_DetectHiddenWindows
+        DetectHiddenWindows(hidden ? true : false)
+        try {
+            return WinGetList()
+        } finally {
+            DetectHiddenWindows(old)
+        }
+    }
+
+    ; The controls of a window (WI-0125): an Array of Map("hwnd", "class" (ClassNN), "text") in the order of the window. A
+    ; control that cannot be read gives the empty text (logged); a window that vanished gives an empty Array.
+    Controls(hwnd) {
+        controls := []
+        if (!WinExist("ahk_id " hwnd))
+            return controls
+        for ctl in WinGetControlsHwnd("ahk_id " hwnd) {
+            entry := Map("hwnd", ctl, "class", "", "text", "")
+            try {
+                entry["class"] := ControlGetClassNN(ctl)
+                entry["text"] := ControlGetText(ctl)
+            } catch as e {
+                Log.Write("a0", "editor", "assistant: a control of window " hwnd " cannot be read: " e.Message)
+            }
+            controls.Push(entry)
+        }
+        return controls
+    }
 
     ; Map("id", hwnd, "title", "class", "exe" (process name), "pid", "x", "y", "w", "h") of a window. A window that vanished
     ; gives the empty values it has (logged).

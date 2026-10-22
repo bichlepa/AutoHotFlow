@@ -21,7 +21,9 @@ class FakeAssistSource {
         this.infos := Map(101, Map("id", 101, "title", "Untitled - Notepad", "class", "Notepad", "exe", "notepad.exe"
                 , "pid", 4321, "x", 10, "y", 20, "w", 300, "h", 200)
             , 102, Map("id", 102, "title", "Folder", "class", "CabinetWClass", "exe", "explorer.exe"
-                , "pid", 555, "x", 0, "y", 0, "w", 800, "h", 600))
+                , "pid", 555, "x", 0, "y", 0, "w", 800, "h", 600)
+            , 103, Map("id", 103, "title", "Hidden", "class", "HiddenClass", "exe", "hidden.exe"
+                , "pid", 777, "x", 5, "y", 6, "w", 70, "h", 80))
         this.modes := []
     }
 
@@ -36,7 +38,14 @@ class FakeAssistSource {
         return this.colors.Has(key) ? this.colors[key] : "0x000000"
     }
 
-    WindowList() => [101, 102]
+    ; The hidden windows of the fake desktop: 103 (hidden) is listed only with the checkbox (WI-0125).
+    WindowList(hidden := false) => hidden ? [101, 102, 103] : [101, 102]
+
+    ; The controls of a window: two edits and a button in window 101, none in the others (WI-0125).
+    Controls(hwnd) => (hwnd = 101)
+        ? [Map("hwnd", 5001, "class", "Edit1", "text", "First"), Map("hwnd", 5002, "class", "Edit2", "text", "Second")
+            , Map("hwnd", 5003, "class", "Button1", "text", "OK")]
+        : []
 
     WindowInfo(hwnd) => this.infos.Has(hwnd) ? this.infos[hwnd] : Map("id", hwnd, "title", "", "class", "", "exe", ""
         , "pid", 0, "x", 0, "y", 0, "w", 0, "h", 0)
@@ -68,6 +77,9 @@ TestRun.Case("Assist: the mouse tracker gives the values it shows (the coordinat
 TestRun.Case("Assist: the mouse tracker switches its Ctrl hotkeys off when it closes, and closes twice without error", MouseHotkeysOff)
 TestRun.Case("Assist: StartAssistant of the colour dialog writes the picked colour into the form by the map", StartColor)
 TestRun.Case("Assist: StartAssistant of the window assistant disables the window, and OK writes the values into the form", StartWindow)
+TestRun.Case("Assist: the control assistant takes the control of the selected window by text, class or handle", ControlTake)
+TestRun.Case("Assist: the position assistant takes the position and size of the selected window", PositionTake)
+TestRun.Case("Assist: the hidden checkbox lists the hidden windows too, and the controls follow the selected window", HiddenList)
 TestRun.Case("Assist: an unknown kind is refused; a second assistant is refused while one runs", StartRefusals)
 TestRun.Case("Assist: discarding the settings closes a running assistant", DiscardClosesAssistant)
 TestRun.Case("Assist: a Button with an assistant is enabled in the window, a Button without one stays disabled", ButtonEnabled)
@@ -112,6 +124,68 @@ WindowFollows() {
     Assert.Equal(assist.list.Value, 3, "after it rested there, the window is added and selected")
     Assert.Equal(assist.hwnds.Length, 3)
     assist.Cancel()
+}
+
+ControlTake() {
+    src := FakeAssistSource()
+    got := []
+    assist := WindowAssistant(src, (values) => got.Push(values), "control")
+    assist.Open(false)
+    assist.list.Value := 1                  ; the window 101 with the controls Edit1 "First", Edit2 "Second", Button1 "OK"
+    assist.controlList.Value := 2
+    assist.byText.Value := 1
+    assist.Take()
+    Assert.Equal(got[1]["IdentifyControlBy"], "Text", "the text radio button")
+    Assert.Equal(got[1]["Control_identifier"], "Second", "the text of the selected control")
+    Assert.Equal(got[1]["ahk_class"], "Notepad", "the window values stay")
+
+    assist := WindowAssistant(src, (values) => got.Push(values), "control")
+    assist.Open(false)
+    assist.list.Value := 1
+    assist.controlList.Value := 1           ; the class is the default radio button
+    assist.Take()
+    Assert.Equal(got[2]["IdentifyControlBy"], "Class")
+    Assert.Equal(got[2]["Control_identifier"], "Edit1", "the ClassNN of the selected control")
+
+    assist := WindowAssistant(src, (values) => got.Push(values), "control")
+    assist.Open(false)
+    assist.list.Value := 1
+    assist.controlList.Value := 3
+    assist.byId.Value := 1
+    assist.Take()
+    Assert.Equal(got[3]["IdentifyControlBy"], "ID")
+    Assert.Equal(got[3]["Control_identifier"], "5003", "the window handle of the control")
+}
+
+PositionTake() {
+    src := FakeAssistSource()
+    got := []
+    assist := WindowAssistant(src, (values) => got.Push(values), "position")
+    assist.Open(false)
+    assist.list.Value := 1                  ; window 101 at 10, 20 with 300 x 200
+    assist.Take()
+    Assert.Equal(got[1]["Xpos"], "10")
+    Assert.Equal(got[1]["Ypos"], "20")
+    Assert.Equal(got[1]["Width"], "300")
+    Assert.Equal(got[1]["Height"], "200")
+    AssertNot(got[1].Has("IdentifyControlBy"), "a position assistant takes no control")
+}
+
+HiddenList() {
+    src := FakeAssistSource()
+    assist := WindowAssistant(src, (values) => 0, "control")
+    assist.Open(false)
+    Assert.Equal(assist.hwnds.Length, 2, "the visible windows without the hidden ones")
+    assist.hidden.Value := 1
+    assist._Refill()
+    Assert.Equal(assist.hwnds.Length, 3, "the hidden window is listed with the checkbox")
+    assist.list.Value := 1
+    assist._Detail()
+    Assert.Equal(assist.controls.Length, 3, "the controls of the selected window (101)")
+    assist.list.Value := 3
+    assist._Detail()
+    Assert.Equal(assist.controls.Length, 0, "a window without controls has none")
+    assist.Close()
 }
 
 WindowTake() {
