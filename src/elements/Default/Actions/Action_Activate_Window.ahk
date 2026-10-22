@@ -8,7 +8,7 @@
 ;
 ; Worker element (another window, the focus). The v1 code has no wait: it activates and finishes. Here the element waits
 ; up to ActivateWaitS seconds for the window to become the active one, so that a flow that goes on sees the window active;
-; a window that does not get the focus (Windows refuses it) is not an exception, as in v1 (MIGRATION M-0130). The test of
+; a window that does not get the focus (Windows refuses it) is not an exception, as in v1 (MIGRATION M-0136). The test of
 ; this element takes the focus and holds the input lock (doc/TEST-STRATEGY.md).
 class Action_Activate_Window extends AhfElement {
     static Mode := "worker"

@@ -95,13 +95,13 @@ ALLOWED = {
     ("default.action_speech_output", "pitch", "type"): "M-0132",
     ("default.action_speech_output", "pitch", "content"): "M-0132",
 }
-# M-0133: the window identification of the window and control elements (WI-0125), as M-0102 for Trigger_Hotkey
+# M-0139: the window identification of the window and control elements (WI-0125), as M-0102 for Trigger_Hotkey
 for _cls in ("action_activate_window", "action_show_window", "action_hide_window", "action_close_window",
              "action_move_window", "action_get_control_text", "action_set_control_text",
              "condition_window_active", "condition_window_exists"):
-    ALLOWED[("default." + _cls, "GetWindowInformation", "id")] = "M-0133"
-    ALLOWED[("default." + _cls, "TitleMatchMode", "enum")] = "M-0133"
-    ALLOWED[("default." + _cls, "TitleMatchMode", "result")] = "M-0133"
+    ALLOWED[("default." + _cls, "GetWindowInformation", "id")] = "M-0139"
+    ALLOWED[("default." + _cls, "TitleMatchMode", "enum")] = "M-0139"
+    ALLOWED[("default." + _cls, "TitleMatchMode", "result")] = "M-0139"
 
 
 def load_v1():

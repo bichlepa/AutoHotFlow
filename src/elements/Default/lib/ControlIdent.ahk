@@ -13,7 +13,7 @@
 ;   exactly) or "ID" (the window handle of the control; no window parameters are needed, and the window parameters are
 ;   disabled in the settings), Control_identifier (the identifier), ControlTextMatchMode (1 start, 2 contains, 3 exact).
 ;
-; Deliberate difference to v1 (MIGRATION M-0131): v1 applied ControlTextMatchMode only for the value "name", which the
+; Deliberate difference to v1 (MIGRATION M-0137): v1 applied ControlTextMatchMode only for the value "name", which the
 ; settings never store, so the match mode of the window was used for the text of a control. Here the text of a control
 ; uses ControlTextMatchMode, as the setting says.
 class ControlIdent {

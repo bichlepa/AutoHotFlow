@@ -196,7 +196,7 @@ WINDOW_HELPER = ROOT / "tests" / "integration" / "helpers" / "own_window.ahk"
 
 
 def test_v1_file_test_runs_green_with_an_own_window(flows, tmp_path):
-    """"file test" (Flow 1384439262), as saved except its window (WI-0125, M-0134). The flow creates a shortcut to Notepad
+    """"file test" (Flow 1384439262), as saved except its window (WI-0125, M-0140). The flow creates a shortcut to Notepad
     and runs it, and checks the shortcut and the window with the window elements. The test runs the flow in a temporary
     folder (as the ini test). The shortcut starts an own test window instead (helpers/own_window.ahk, a copy in the
     folder, run by the AutoHotkey interpreter), with a title of its own, so the window elements never see a Notepad window

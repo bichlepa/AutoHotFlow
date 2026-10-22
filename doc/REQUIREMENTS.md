@@ -1042,7 +1042,7 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0008 (WI-0125)
-- **Evidence:** `tests/integration/test_window_elements.py` (the window and control elements, headless, with own test windows; the test of Minimize all windows records the call of the provider), `tests/schema/test_v1_schema.py` (the parameters against v1, M-0133), `tests/integration/test_corpus.py::test_v1_file_test_runs_green_with_an_own_window`
+- **Evidence:** `tests/integration/test_window_elements.py` (the window and control elements, headless, with own test windows; the test of Minimize all windows records the call of the provider), `tests/schema/test_v1_schema.py` (the parameters against v1, M-0139), `tests/integration/test_corpus.py::test_v1_file_test_runs_green_with_an_own_window`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|

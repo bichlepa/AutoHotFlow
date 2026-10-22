@@ -45,6 +45,6 @@ class Action_Close_Window extends AhfElement {
     }
 
     ; True for the method "kill" (the text, or the position 2 of the choices). Any other value closes: the first choice is
-    ; the default, and v1 did nothing for a value that was neither (MIGRATION M-0132).
+    ; the default, and v1 did nothing for a value that was neither (MIGRATION M-0138).
     static Kill(method) => (method = "kill" || method = 2)
 }
