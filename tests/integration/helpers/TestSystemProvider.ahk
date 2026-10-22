@@ -69,6 +69,9 @@ class TestSystemProvider {
     SetNumLockState(args*) => this._Call("SetNumLockState", args, 0)
     SetScrollLockState(args*) => this._Call("SetScrollLockState", args, 0)
 
+    WinMinimizeAll() => this._Call("WinMinimizeAll", [], 0)
+    WinMinimizeAllUndo() => this._Call("WinMinimizeAllUndo", [], 0)
+
     TimeIdle() => this._Idle("TimeIdle")
     TimeIdlePhysical() => this._Idle("TimeIdlePhysical")
 

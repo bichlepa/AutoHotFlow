@@ -213,6 +213,7 @@ Actions that disturb the computer or cannot be undone run through the same kind 
 | Sound stop | `SoundStop()` | `SoundPlay` of a file that does not exist (AutoHotkey stops the playing file); the error of that call is ignored. Reaches the sound of this process only (MIGRATION M-0131) |
 | Speech | `SpeakText(text, voice := "", rate := 0, volume := 100, pitch := 0, wait := 1, purge := 0)`, `SpeechVoices()`, `SpeechWait()` | SAPI (`ComObject("SAPI.SpVoice")`), one voice object per process: `wait` 1 speaks synchronously, `purge` 1 stops the speech of this process first, `voice` "" is the default voice, `pitch` is an XML tag. `SpeechVoices` returns an Array of the voice names (the Name attribute). `SpeechWait` returns when the speech of this process has ended (3.3a: never called from the engine; the Speech element only) |
 | Input | `BlockInput(args*)`, `Send(keys, mode := "")`, `Click(args*)`, `MouseMove(args*)`, `MouseClickDrag(args*)`, `SetCapsLockState(args*)`, `SetNumLockState(args*)`, `SetScrollLockState(args*)` | the AutoHotkey function of the same name; `Send` with a `mode` (Input, Event, Play, Raw) sets `SendMode` for that call and restores the previous mode |
+| Windows of the desktop | `WinMinimizeAll()`, `WinMinimizeAllUndo()` | the AutoHotkey function of the same name (every window of the user; WI-0125) |
 | Idle time | `TimeIdle()`, `TimeIdlePhysical()` | `A_TimeIdle`, `A_TimeIdlePhysical` (milliseconds) |
 
 Rules:

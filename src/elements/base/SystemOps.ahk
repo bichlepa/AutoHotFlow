@@ -71,6 +71,10 @@ class SystemOps {
     static SetNumLockState(args*) => SystemOps._Provider().SetNumLockState(args*)
     static SetScrollLockState(args*) => SystemOps._Provider().SetScrollLockState(args*)
 
+    ; --- windows of the desktop (WI-0125): every window of the user, not one of the element ---------------------------
+    static WinMinimizeAll() => SystemOps._Provider().WinMinimizeAll()
+    static WinMinimizeAllUndo() => SystemOps._Provider().WinMinimizeAllUndo()
+
     ; --- idle time of the user (milliseconds) ------------------------------------------------------------------------
     static TimeIdle() => SystemOps._Provider().TimeIdle()
     static TimeIdlePhysical() => SystemOps._Provider().TimeIdlePhysical()
@@ -239,6 +243,14 @@ class SystemOps {
 
         SetScrollLockState(args*) {
             return SetScrollLockState(args*)
+        }
+
+        WinMinimizeAll() {
+            return WinMinimizeAll()
+        }
+
+        WinMinimizeAllUndo() {
+            return WinMinimizeAllUndo()
         }
 
         TimeIdle() {

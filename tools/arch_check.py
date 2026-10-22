@@ -156,7 +156,7 @@ UI_SEAM_ROLES = {"manager", "editor", "ui_common"}
 SYSTEM_NAMES = ("(Shutdown|LockWorkStation|Hibernate|Suspend|DriveEject|DriveSetLabel|DriveLock|DriveUnlock|"
                 "FileRecycle|FileRecycleEmpty|ChangeDisplaySettings|SoundBeep|SoundPlay|SoundSetMute|SoundSetVolume|SpeakText|"
                 "SpeechVoices|BlockInput|Send|Click|MouseClickDrag|MouseMove|SetCapsLockState|SetNumLockState|"
-                "SetScrollLockState|TimeIdle|TimeIdlePhysical)")
+                "SetScrollLockState|WinMinimizeAll|WinMinimizeAllUndo|TimeIdle|TimeIdlePhysical)")
 SYSTEM_CALL_RE = re.compile(NOT_MEMBER + SYSTEM_NAMES + r"\s*\(")
 # The same functions called like a command at the start of a statement: Send "x", Click 10, 20, Shutdown 1.
 SYSTEM_CMD_RE = re.compile(r"^[ 	]*" + SYSTEM_NAMES + r"[ 	]+[\"'%\w{-]", re.M)
