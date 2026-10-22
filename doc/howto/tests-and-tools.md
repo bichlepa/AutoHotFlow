@@ -527,3 +527,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Check the effect in the log (a `LogMessage` with a unique text), or in a check element that reads the hidden variable (`Action_Trace_Point_Check`).
 - **Status:** verified (the run with the probe failed, the run with the log line passed)
 - **Source:** tests/integration/test_core_a_trace_points.py (line 115 shows the same `<missing>` result); tests/e2e/test_core_settings.py (WI-0114)
+
+### A trigger gets its parameters only when Parameters() declares them (verified)
+
+- **Problem:** A test trigger read `params.Function` in `Enable`, but the trigger host saw an empty value, and the trigger was reported as "not armed: unknown function ''".
+- **Wrong:** Relying on a flow parameter that the element class does not declare in `Parameters()`.
+- **Right:** Declare every parameter the trigger reads: `static Parameters(ctx) => [{id: "Function", content: "String"}]`. Workers did not need it (the parameter came through without a declaration in the worker test).
+- **Status:** verified (tests/integration/test_system_seam.py, trigger test: failed before the declaration, passes after it)
+- **Source:** tests/elements/Test/Triggers/Trigger_TestSystemCall.ahk (WI-0117)
+
+### A generated block includes a lib file only if the element file includes it (verified)
+
+- **Problem:** A shared test library in `lib/` of a test package was not visible in the worker; the element failed with "This local variable has not been assigned a value" for the library class name.
+- **Wrong:** Expecting `tools/gen_element_includes.py` to include every file of `lib/` in the role block.
+- **Right:** The element file itself includes the library: `#Include ..\lib\TestSystemKit.ahk`. The generator then hoists it into the block of each role.
+- **Status:** verified (tests/integration/test_system_seam.py passes after the include was added to the element files)
+- **Source:** tests/elements/Test/Actions/Action_TestSystemWorker.ahk (WI-0117)

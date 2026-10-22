@@ -390,7 +390,7 @@ L492-498 A new element helper in a package lib folder needs the generated includ
 L500-506 Array has no Sort method in AutoHotkey v2 (the error is a runtime one) (verified)
 ```
 
-## doc/howto/tests-and-tools.md (53.6 KB, 529 lines)
+## doc/howto/tests-and-tools.md (55.1 KB, 545 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -456,6 +456,8 @@ L499-505 tests/ahk/lib/Assert.ahk has no False check (verified) (verified)
 L507-513 A role started by the supervisor is no peer until its `sys.hello`: wait for it (verified) (verified)
 L515-521 A run's steps show an element once: count loop passes in the log, not in the names (verified) (verified)
 L523-529 A probe of a hidden variable reads "<missing>" (verified) (verified)
+L531-537 A trigger gets its parameters only when Parameters() declares them (verified) (verified)
+L539-545 A generated block includes a lib file only if the element file includes it (verified) (verified)
 ```
 
 ## doc/REQUIREMENTS.md
