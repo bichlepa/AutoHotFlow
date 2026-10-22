@@ -536,3 +536,43 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Pass the limits as they are; a Float limit gives a Float result.
 - **Status:** verified (300 draws each, AutoHotkey v2 64 bit)
 - **Source:** `src/elements/Default/Actions/Action_Random_number.ahk`
+
+### StrPut returns the size with the terminator (verified)
+
+- **Problem:** `StrPut(text, "UTF-8")` returns the number of bytes including the terminating zero, so the byte count of a text is one less. Writing into a `Buffer` of that size is one byte short of the terminator.
+- **Wrong:** Using the return value as the length of the text bytes without subtracting 1, or allocating only the text bytes and writing the terminator into it.
+- **Right:** `size := StrPut(text, "UTF-8") - 1`, then `buf := Buffer(size + 1)` and `StrPut(text, buf, "UTF-8")`. The bytes are then read with `NumGet(buf, i, "UChar")`; this needs no `DllCall`.
+- **Status:** verified (`tests/integration/test_text_elements.py::test_encode_string_as_url`, `src/elements/Default/lib/TextOps.ahk`)
+- **Source:** `src/elements/Default/lib/TextOps.ahk`
+
+### InStr searches from the right with a negative start and a negative occurrence (verified)
+
+- **Problem:** A negative `StartingPos` searches from the right only when `Occurrence` is omitted. With a given `Occurrence` the direction comes from the sign of the occurrence, and the start still limits the match to the potential occurrences that end at or before that position.
+- **Wrong:** Passing only a negative start position when an occurrence count is also passed, and expecting the search to go from the right.
+- **Right:** For a search from the right pass both, a negative start and a negative occurrence: `InStr(h, n, cs, -offset, -occurrence)`. The position returned is still counted from the left.
+- **Status:** verified (`tests/integration/test_text_elements.py::test_search_gives_the_position_from_the_left_and_the_right`)
+- **Source:** `src/elements/Default/Actions/Action_Search_in_a_string.ahk`
+
+### An empty needle throws in InStr and StrReplace (verified)
+
+- **Problem:** `InStr(h, "")` throws a `ValueError`; `StrReplace` with an empty needle is not something the element should pass on either.
+- **Wrong:** Passing the search text of the user on without a check.
+- **Right:** Check the needle before the call. The parameter check of the element refuses an empty text already (`WarnIfEmpty`); the code checks again, because a flow can hold an empty text too.
+- **Status:** verified (AutoHotkey v2 64 bit: the throw; the element tests for the refusal)
+- **Source:** `src/elements/Default/Actions/Action_replace_in_a_string.ahk`, `src/elements/Default/Conditions/Condition_String_Contains_Text.ahk`
+
+### A local variable named like a class is a warning (verified)
+
+- **Problem:** A local `json` in a static method of an element is a warning at load time ("has the same name as a global variable"), because the class `Json` is global and AutoHotkey names are case-insensitive. The warning shows as a blocking dialog in `ahkrun.py`.
+- **Wrong:** Naming a local after a global class, for example `json := ...` next to `Json.Stringify`.
+- **Right:** Use a name that differs in more than case, such as `isJson`.
+- **Status:** verified (`tests/ahk/element_smoke.test.ahk` run, the dialog text of `ahkrun.py`)
+- **Source:** `src/elements/Default/Actions/Action_Convert_list_to_string.ahk`
+
+### Property access with a name in a variable (verified)
+
+- **Problem:** Reading a parameter by a name held in a variable needs the dynamic form `params.%name%`; `params[name]` is not the same for an object with property names.
+- **Wrong:** Writing `params[name]` for a parameter object.
+- **Right:** `params.HasProp(name) ? params.%name% : ""` (as `TextOps.Par`).
+- **Status:** verified (the element tests of WI-0119 pass with the helper)
+- **Source:** `src/elements/Default/lib/TextOps.ahk`

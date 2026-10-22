@@ -323,7 +323,7 @@ L398-404 One timer for many jobs: SetTimer with the same function moves the run 
 L407-413 The sender of a message is its link name, which carries the flow of an editor (verified) (verified)
 ```
 
-## doc/howto/syntax-and-language.md (54.1 KB, 538 lines)
+## doc/howto/syntax-and-language.md (57.7 KB, 578 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -392,6 +392,11 @@ L508-514 Round gives a text for more than zero places (verified) (verified)
 L516-522 Sqrt, ASin, ACos and the power of an undefined value throw (verified) (verified)
 L524-530 DateAdd and DateDiff: truncated units, padded stamps, IsTime rejects odd lengths (verified) (verified)
 L532-538 Random with the limits in either order (verified) (verified)
+L540-546 StrPut returns the size with the terminator (verified) (verified)
+L548-554 InStr searches from the right with a negative start and a negative occurrence (verified) (verified)
+L556-562 An empty needle throws in InStr and StrReplace (verified) (verified)
+L564-570 A local variable named like a class is a warning (verified) (verified)
+L572-578 Property access with a name in a variable (verified) (verified)
 ```
 
 ## doc/howto/tests-and-tools.md (55.1 KB, 545 lines)
