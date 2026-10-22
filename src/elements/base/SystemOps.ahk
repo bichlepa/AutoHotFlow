@@ -43,6 +43,7 @@ class SystemOps {
     static DriveUnlock(args*) => SystemOps._Provider().DriveUnlock(args*)
 
     ; --- recycle bin -------------------------------------------------------------------------------------------------
+    static FileRecycle(args*) => SystemOps._Provider().FileRecycle(args*)
     static FileRecycleEmpty(args*) => SystemOps._Provider().FileRecycleEmpty(args*)
 
     ; --- screen ------------------------------------------------------------------------------------------------------
@@ -113,6 +114,10 @@ class SystemOps {
 
         DriveUnlock(args*) {
             return DriveUnlock(args*)
+        }
+
+        FileRecycle(args*) {
+            return FileRecycle(args*)
         }
 
         FileRecycleEmpty(args*) {

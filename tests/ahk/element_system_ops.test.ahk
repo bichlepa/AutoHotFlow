@@ -24,6 +24,7 @@ class StubSystemProvider {
     DriveSetLabel(args*) => this._Record("DriveSetLabel", args)
     DriveLock(args*) => this._Record("DriveLock", args)
     DriveUnlock(args*) => this._Record("DriveUnlock", args)
+    FileRecycle(args*) => this._Record("FileRecycle", args)
     FileRecycleEmpty(args*) => this._Record("FileRecycleEmpty", args)
     ChangeDisplaySettings(args*) => this._Record("ChangeDisplaySettings", args)
     SoundBeep(args*) => this._Record("SoundBeep", args)
@@ -61,12 +62,13 @@ TestRun.Case("every group passes its arguments on and returns the answer of the 
     Assert.Equal(SystemOps.MouseMove(10, 20, 0), "MouseMove"),
     Assert.Equal(SystemOps.SetCapsLockState("AlwaysOff"), "SetCapsLockState"),
     Assert.Equal(SystemOps.TimeIdle(), "TimeIdle"),
+    Assert.Equal(SystemOps.FileRecycle("C:\x.txt"), "FileRecycle"),
     Assert.Equal(p.calls[1][2][1], 4, "Shutdown gets its flags"),
     Assert.Equal(p.calls[4][2].Length, 2, "a variadic call passes all its arguments"),
     Assert.Equal(p.calls[9][2][2], "Input", "Send passes its mode"),
     Assert.Equal(p.calls[10][2].Length, 3),
     Assert.Equal(p.calls[11][2][1], "AlwaysOff"),
-    Assert.Equal(p.calls.Length, 12),
+    Assert.Equal(p.calls.Length, 13),
     SystemOps.UseProvider("")
 ))
 

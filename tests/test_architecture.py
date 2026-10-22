@@ -110,7 +110,7 @@ def test_dialog_seam_of_the_ui_roles():
 def test_system_seam_details():
     # every group of SystemOps: a direct call in an element is a hit, in any mode, the seam file itself is exempt
     body = "class A {\n    static Mode := \"%s\"\n    M() {\n        %s\n    }\n}\n"
-    for call in ("Shutdown(1)", "LockWorkStation()", "DriveEject(\"E:\")", "FileRecycleEmpty()", "SoundBeep(800, 100)",
+    for call in ("Shutdown(1)", "LockWorkStation()", "DriveEject(\"E:\")", "FileRecycle(\"x\")", "FileRecycleEmpty()", "SoundBeep(800, 100)",
                  "BlockInput(\"On\")", "Send(\"{Enter}\")", "Click()", "MouseMove(1, 2)", "SetCapsLockState(\"On\")",
                  "TimeIdle()", "TimeIdlePhysical()", "ChangeDisplaySettings()"):
         assert "system-seam" in rules("elements/Default/Actions/A.ahk", body % ("worker", call)), call

@@ -45,6 +45,7 @@ class TestSystemProvider {
     DriveLock(args*) => this._Call("DriveLock", args, 0)
     DriveUnlock(args*) => this._Call("DriveUnlock", args, 0)
 
+    FileRecycle(args*) => this._Call("FileRecycle", args, 0)
     FileRecycleEmpty(args*) => this._Call("FileRecycleEmpty", args, 0)
 
     ChangeDisplaySettings(args*) => this._Call("ChangeDisplaySettings", args, 0)

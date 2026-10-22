@@ -207,7 +207,7 @@ Actions that disturb the computer or cannot be undone run through the same kind 
 |---|---|---|
 | Power and session | `Shutdown(flags)`, `LockWorkStation()`, `Hibernate(force := 0)`, `Suspend(force := 0)` | `Shutdown`; `DllCall("LockWorkStation")`; `SetSuspendState` (PowrProf) with hibernate 1 or 0 |
 | Drives | `DriveEject(args*)`, `DriveSetLabel(args*)`, `DriveLock(args*)`, `DriveUnlock(args*)` | the AutoHotkey function of the same name (`args*`: its arguments, passed on) |
-| Recycle bin | `FileRecycleEmpty(args*)` | `FileRecycleEmpty` |
+| Recycle bin | `FileRecycle(args*)`, `FileRecycleEmpty(args*)` | `FileRecycle` (sends a file or folder to the recycle bin; permanent where AutoHotkey finds no bin, WI-0120), `FileRecycleEmpty` |
 | Screen | `ChangeDisplaySettings(args*)` | not implemented yet (WI-0127): throws `AhfError` |
 | Sound | `SoundSetVolume(args*)`, `SoundSetMute(args*)`, `SoundPlay(args*)`, `SoundBeep(args*)` | the AutoHotkey function of the same name |
 | Speech | `SpeakText(text, rate := 0, volume := 100, wait := 1)`, `SpeechVoices()` | SAPI (`ComObject("SAPI.SpVoice")`): synchronous Speak when `wait` is 1; `SpeechVoices` returns an Array of the voice descriptions |

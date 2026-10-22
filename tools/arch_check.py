@@ -154,7 +154,7 @@ UI_SEAM_ROLES = {"manager", "editor", "ui_common"}
 # Rule system-seam (E0103, WI-0117): an element calls a system function of SystemOps directly (shutdown, input, sound,
 # idle time, ...), or src/ registers a SystemOps provider. SYSTEM_SEAM_FILE calls the real functions and is exempt.
 SYSTEM_NAMES = ("(Shutdown|LockWorkStation|Hibernate|Suspend|DriveEject|DriveSetLabel|DriveLock|DriveUnlock|"
-                "FileRecycleEmpty|ChangeDisplaySettings|SoundBeep|SoundPlay|SoundSetMute|SoundSetVolume|SpeakText|"
+                "FileRecycle|FileRecycleEmpty|ChangeDisplaySettings|SoundBeep|SoundPlay|SoundSetMute|SoundSetVolume|SpeakText|"
                 "SpeechVoices|BlockInput|Send|Click|MouseClickDrag|MouseMove|SetCapsLockState|SetNumLockState|"
                 "SetScrollLockState|TimeIdle|TimeIdlePhysical)")
 SYSTEM_CALL_RE = re.compile(NOT_MEMBER + SYSTEM_NAMES + r"\s*\(")
