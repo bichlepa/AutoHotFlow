@@ -44,9 +44,9 @@ FIX_LIST = [
 # (WI-0057 task 3). The test below keeps this table equal to the element registry.
 PENDING = {
     "Flow 100439537": dict(name="HTTP Request", missing={
-        "Action_Convert_String_to_List": "S0008", "Action_HTTP_Request": "S0008"}),
+        "Action_HTTP_Request": "S0008"}),
     "Flow 130786371": dict(name="Dialog test", missing={
-        "Action_Close_Window": "S0008", "Action_Convert_String_to_List": "S0008", "Action_Get_Control_Text": "S0008",
+        "Action_Close_Window": "S0008", "Action_Get_Control_Text": "S0008",
         "Action_Input_Box": "S0008", "Action_Send_Keystrokes_to_Control": "S0008", "Condition_Window_Exists": "S0008"}),
     "Flow 1333431302": dict(name="User idle test", missing={
         "Trigger_User_Idle_Time": "S0008"}),
@@ -65,10 +65,6 @@ PENDING = {
         "Action_AutoHotkey_Script": "S0008 (E0039: v1 code is kept as text, M-0049)"}),
     "Flow 2133155705": dict(name="Hotkey test", missing={
         "Action_Send_Keystrokes": "S0008"}),
-    "Flow 369404488": dict(name="string test", missing={
-        "Action_Search_in_a_string": "S0008", "Action_Split_a_string": "S0008",
-        "Action_Substring": "S0008", "Action_Substring2": "S0008", "Action_Trim_a_string": "S0008",
-        "Condition_String_contains_text": "S0008"}),
     "Flow 561135904": dict(name="Process Test", missing={
         "Action_Kill_Process": "S0008", "Action_Run": "S0008",
         "Condition_Process_is_running": "S0008", "Trigger_Process_closes": "S0008",
@@ -156,6 +152,21 @@ def test_v1_list_test_runs_green(flows):
     assert run.exceptions == ["The list 'russianList' does not contain the value 'asdf'."], run.exceptions
     assert run.path[-1] == "element0000000112"
     assert any("Variable 'global_testResults' is empty" in e["text"] for e in run.log)
+
+
+def test_v1_string_test_runs_green(flows):
+    """"string test" (Flow 369404488), unchanged (WI-0119): the start trigger enables the flow and runs the string tests
+    one after the other (contains text, split and trim, substring, search in a string); the flow runs to its end
+    without an exception."""
+    flow_id = flows.add_file(V1 / "Flow 369404488.json")
+    flows.start()
+    flows.enable(flow_id)
+    run = flows.run(flow_id, trigger="element0000000025", timeout=scaled(120))
+    assert run.reason == "finished", run.reason
+    # three searches of the flow were not found and ended on their exception connection (the path decides, not the
+    # flow); the success path ends with Add to list, never with the error box
+    assert set(run.exceptions) <= {"Searched text was not found"}, run.exceptions
+    assert run.names[-1] == "element0000000045" and "element0000000046" not in run.names, run.names[-5:]
 
 
 def test_v1_loop_test_runs_green(flows):
