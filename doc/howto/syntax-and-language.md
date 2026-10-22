@@ -569,10 +569,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Status:** verified (`tests/ahk/element_smoke.test.ahk` run, the dialog text of `ahkrun.py`)
 - **Source:** `src/elements/Default/Actions/Action_Convert_list_to_string.ahk`
 
-### Property access with a name in a variable (verified)
+### Property access with a name in a variable (assumed)
 
-- **Problem:** Reading a parameter by a name held in a variable needs the dynamic form `params.%name%`; `params[name]` is not the same for an object with property names.
-- **Wrong:** Writing `params[name]` for a parameter object.
+- **Problem:** Reading a parameter by a name held in a variable is written with the dynamic form `params.%name%`; the indexed form `params[name]` was not tried.
+- **Wrong:** Not checking `HasProp` first, because a missing parameter raises an error on read.
 - **Right:** `params.HasProp(name) ? params.%name% : ""` (as `TextOps.Par`).
-- **Status:** verified (the element tests of WI-0119 pass with the helper)
+- **Status:** assumed (the helper runs in the element tests of WI-0119; the indexed form and the error on a missing property were not checked)
 - **Source:** `src/elements/Default/lib/TextOps.ahk`
