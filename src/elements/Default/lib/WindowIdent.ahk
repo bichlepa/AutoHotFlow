@@ -16,6 +16,7 @@ class WindowIdent {
     ; (v1 option of the same name). The button that imports a window (GetWindowInformation) is the editor's job (S0007).
     static AddIdentificationParameters(p, opts := {}) {
         noExcludes := opts.HasProp("noExcludes") && opts.noExcludes
+        control := opts.HasProp("control") && opts.control
         p.Push({type: "Label", label: Lang("Window identification")})
         p.Push({type: "Label", label: Lang("Title_of_Window"), size: "small"})
         p.Push({type: "Radio", id: "TitleMatchMode", default: 1, result: "enum"
@@ -44,11 +45,38 @@ class WindowIdent {
         p.Push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: Lang("Detect hidden window")})
         p.Push({type: "Label", label: Lang("Assistant"), size: "small"})
         ; the assistant "window" takes the window under the mouse (WI-0110); its keys go to these parameters (the excludes
-        ; are skipped when the element has none)
-        p.Push({type: "Button", id: "GetWindowInformation", label: Lang("Import window identification"), assistant: "window"
-            , map: {Wintitle: "Wintitle", ahk_class: "ahk_class", ahk_exe: "ahk_exe", excludeTitle: "excludeTitle"
-                , ExcludeText: "ExcludeText", ahk_id: "ahk_id", ahk_pid: "ahk_pid"}})
+        ; are skipped when the element has none). opts.control: the assistant "control" also takes the control of the
+        ; window (v1 "Import control and window identification", WI-0125): its keys go to the control parameters too.
+        if (control) {
+            p.Push({type: "Button", id: "GetWindowInformation", label: Lang("Import control and window identification")
+                , assistant: "control", map: {Wintitle: "Wintitle", ahk_class: "ahk_class", ahk_exe: "ahk_exe"
+                , excludeTitle: "excludeTitle", ExcludeText: "ExcludeText", ahk_id: "ahk_id", ahk_pid: "ahk_pid"
+                , IdentifyControlBy: "IdentifyControlBy", Control_identifier: "Control_identifier"}})
+        } else {
+            p.Push({type: "Button", id: "GetWindowInformation", label: Lang("Import window identification"), assistant: "window"
+                , map: {Wintitle: "Wintitle", ahk_class: "ahk_class", ahk_exe: "ahk_exe", excludeTitle: "excludeTitle"
+                    , ExcludeText: "ExcludeText", ahk_id: "ahk_id", ahk_pid: "ahk_pid"}})
+        }
         return p
+    }
+
+    ; The name part of an element with a window identification (v1 windowFunctions_generateWindowIdentificationName):
+    ; one line per field that is set, the window title with its match mode first. params may be the evaluated or the
+    ; stored parameters; a missing field is skipped. Returns "" when no field is set.
+    static Name(params) {
+        text := ""
+        if (WindowIdent._Field(params, "Wintitle") != "") {
+            mode := WindowIdent._Field(params, "TitleMatchMode", 1)
+            label := (mode = 1) ? Lang("Title begins with") : (mode = 2) ? Lang("Title includes") : Lang("Title is exatly")
+            text .= "`n" label ": " WindowIdent._Field(params, "Wintitle")
+        }
+        for pair in [["excludeTitle", "Exclude title"], ["winText", "Control text"], ["ExcludeText", "Exclude control text"]
+            , ["ahk_class", "Window Class"], ["ahk_exe", "Process"], ["ahk_id", "Window ID"], ["ahk_pid", "Process ID"]] {
+            value := WindowIdent._Field(params, pair[1])
+            if (value != "")
+                text .= "`n" Lang(pair[2]) ": " value
+        }
+        return text
     }
 
     ; The evaluated parameters as a window spec (a Map): the WinExist arguments and the settings of the match.

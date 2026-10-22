@@ -150,6 +150,7 @@ TEST_GROUPS = {
     "integration/test_dialog_windows_gui.py": ["ui"],
     "integration/test_dialogs.py": ["ui"],
     "integration/test_system_seam.py": ["element-units", "triggers", "workers"],
+    "integration/test_window_elements.py": ["elements-e2e", "workers"],
     "integration/test_engine.py": ["engine"],
     "integration/test_flow_patch.py": ["engine"],
     "integration/test_flow_patch_triggers.py": ["triggers", "engine"],
@@ -585,6 +586,7 @@ COVERS = {
     ],
     "src/elements/Default/lib/WindowIdent.ahk": [
         "ahk/element_window_ident.test.ahk",
+        "integration/test_window_elements.py::test_a_hidden_window_is_found_only_with_detect_hidden_window",
     ],
     "src/elements/Default/Actions/Action_Read_From_File.ahk": [
         "integration/test_file_elements.py::test_read_utf8_replaces_crlf_by_linefeed",
@@ -808,6 +810,49 @@ COVERS = {
         "integration/test_sound_elements.py::test_a_failing_speech_call_is_an_exception",
     ],
     "src/elements/Default/lib/SoundOps.ahk": ["integration/test_sound_elements.py"],
+    # WI-0125: windows and controls (the own test window helpers/own_window.ahk, the provider for minimize all)
+    "src/elements/Default/Actions/Action_Activate_Window.ahk": ["integration/test_window_elements.py::test_activate_brings_the_own_window_to_the_front"],
+    "src/elements/Default/Actions/Action_Show_Window.ahk": [
+        "integration/test_window_elements.py::test_hide_and_show_change_the_visibility_of_the_own_window",
+        "integration/test_window_elements.py::test_a_hidden_window_is_found_only_with_detect_hidden_window",
+    ],
+    "src/elements/Default/Actions/Action_Hide_Window.ahk": [
+        "integration/test_window_elements.py::test_hide_and_show_change_the_visibility_of_the_own_window",
+        "integration/test_window_elements.py::test_a_hidden_window_is_found_only_with_detect_hidden_window",
+    ],
+    "src/elements/Default/Actions/Action_Close_Window.ahk": [
+        "integration/test_window_elements.py::test_close_sends_the_close_message_and_kill_ends_the_process",
+    ],
+    "src/elements/Default/Actions/Action_Move_Window.ahk": [
+        "integration/test_window_elements.py::test_move_sets_the_position_size_and_state_of_the_own_window",
+        "integration/test_window_elements.py::test_move_checks_the_size_only_for_the_move_event",
+    ],
+    "src/elements/Default/Actions/Action_Minimize_all_windows.ahk": [
+        "integration/test_window_elements.py::test_minimize_all_windows_is_recorded_by_the_provider",
+    ],
+    "src/elements/Default/Actions/Action_Get_Control_Text.ahk": [
+        "integration/test_window_elements.py::test_get_control_text_finds_the_control_by_class_text_and_handle",
+        "integration/test_window_elements.py::test_the_text_of_a_control_uses_the_match_mode_of_the_setting",
+        "integration/test_window_elements.py::test_control_errors_are_the_v1_texts",
+    ],
+    "src/elements/Default/Actions/Action_Set_control_text.ahk": [
+        "integration/test_window_elements.py::test_set_control_text_changes_the_edit_control",
+        "integration/test_window_elements.py::test_control_errors_are_the_v1_texts",
+    ],
+    "src/elements/Default/Conditions/Condition_Window_Active.ahk": [
+        "integration/test_window_elements.py::test_activate_brings_the_own_window_to_the_front",
+        "integration/test_window_elements.py::test_a_missing_window_is_no_for_the_conditions_and_an_exception_for_the_actions",
+    ],
+    "src/elements/Default/Conditions/Condition_Window_Exists.ahk": [
+        "integration/test_window_elements.py::test_a_hidden_window_is_found_only_with_detect_hidden_window",
+        "integration/test_window_elements.py::test_a_missing_window_is_no_for_the_conditions_and_an_exception_for_the_actions",
+        "integration/test_window_elements.py::test_an_empty_window_identification_is_an_exception",
+    ],
+    "src/elements/Default/lib/ControlIdent.ahk": [
+        "integration/test_window_elements.py::test_get_control_text_finds_the_control_by_class_text_and_handle",
+        "integration/test_window_elements.py::test_the_text_of_a_control_uses_the_match_mode_of_the_setting",
+        "integration/test_window_elements.py::test_control_errors_are_the_v1_texts",
+    ],
 }
 
 # Test functions whose group differs from the group of their file (`file::function`). The generic loop logic
