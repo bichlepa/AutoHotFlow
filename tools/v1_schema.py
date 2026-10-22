@@ -156,6 +156,23 @@ def parse_output(text):
     return result
 
 
+NOW_MARKER = "<A_Now>"
+
+
+def mask_now(value):
+    """A default of a date and time field is A_Now at the time of the run (14 digits): a volatile value, so
+    it is written as a marker, and the generated file is the same at every run."""
+    if isinstance(value, dict):
+        if str(value.get("type", "")).lower() == "dateandtime" and re.fullmatch(r"\d{14}", str(value.get("default", ""))):
+            value["default"] = NOW_MARKER
+        for item in value.values():
+            mask_now(item)
+    elif isinstance(value, list):
+        for item in value:
+            mask_now(item)
+    return value
+
+
 def generate():
     """Runs the v1 script and returns (schema, stubs): the schema of the v1 classes and the names of the stand-ins."""
     classes = v1_element_files()
@@ -189,7 +206,7 @@ def generate():
     schema = {
         "description": "Parameter schema of the v1 element classes (Element_getParametrizationDetails_<class>), "
                        "written by tools/v1_schema.py from the unchanged v1 code. Regenerate on purpose only.",
-        "classes": {PACKAGE + "." + name: parsed[name] for name in sorted(parsed)},
+        "classes": {PACKAGE + "." + name: mask_now(parsed[name]) for name in sorted(parsed)},
     }
     return schema, sorted(stubs, key=str.lower)
 

@@ -4270,7 +4270,7 @@
         "type": "Radio"
       },
       {
-        "default": "20261022174425",
+        "default": "<A_Now>",
         "format": "DateTime",
         "id": "Time",
         "type": "Dateandtime"
@@ -9622,7 +9622,7 @@
         "type": "Label"
       },
       {
-        "default": "20261022174426",
+        "default": "<A_Now>",
         "format": "Time",
         "id": "Time",
         "type": "DateAndTime"
