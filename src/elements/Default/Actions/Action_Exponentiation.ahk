@@ -10,8 +10,8 @@
 ;   VarValue  the base (content Number)
 ;   Exponent  the exponent (content Number)
 ;
-; A result that is not defined (zero to a negative power, a negative base to a fractional power) ends the element with
-; exception (MIGRATION M-0104): v1 wrote an empty text.
+; A result that is not defined (zero to a negative power, a negative base to a fractional power) gives the empty text, as
+; in v1, and a warning in the log (MIGRATION M-0104).
 class Action_Exponentiation extends AhfElement {
     static Mode := "inline"
     static ActsOnSystem := false
@@ -40,7 +40,8 @@ class Action_Exponentiation extends AhfElement {
         try {
             result := p.VarValue ** p.Exponent
         } catch {
-            throw ElementError(Lang("The result of '%1%' ^ '%2%' is not defined.", p.VarValue, p.Exponent))
+            ctx.Log("f1", Lang("The result of '%1%' ^ '%2%' is not defined.", p.VarValue, p.Exponent))
+            result := ""
         }
         if (!ctx.SetVar(p.Varname, result))
             throw ElementError("The variable '" p.Varname "' could not be set (the reason is in the log).")

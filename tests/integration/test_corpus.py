@@ -6,7 +6,7 @@ of a trigger (TriggerVariables, WI-0062, M-0069 is done), so the old copy with i
 
 Then 16 synthetic flows (flow builder, WI-0049) that use the core set wider than the v1 flows do: each flow is a chain
 of checks or steps that ends in the marker DONE; a flow that does not behave as expected goes to FAIL or ends with an
-exception. The PENDING table lists the other 12 "Automatic tests" flows with the elements that are still missing and
+exception. The PENDING table lists the other 11 "Automatic tests" flows with the elements that are still missing and
 the step that brings them (S0003 and S0008); a test keeps the table equal to the element registry in src/.
 """
 
@@ -45,10 +45,6 @@ FIX_LIST = [
 PENDING = {
     "Flow 100439537": dict(name="HTTP Request", missing={
         "Action_Convert_String_to_List": "S0008", "Action_HTTP_Request": "S0008"}),
-    "Flow 1087828277": dict(name="maths test", missing={
-        "Action_Absolute_number": "S0008", "Action_Exponentiation": "S0008", "Action_Random_number": "S0008",
-        "Action_Rounding_a_number": "S0008", "Action_Square_root": "S0008",
-        "Action_Trigonometry": "S0008"}),
     "Flow 130786371": dict(name="Dialog test", missing={
         "Action_Close_Window": "S0008", "Action_Convert_String_to_List": "S0008", "Action_Get_Control_Text": "S0008",
         "Action_Input_Box": "S0008", "Action_Send_Keystrokes_to_Control": "S0008", "Condition_Window_Exists": "S0008"}),
@@ -172,6 +168,22 @@ def test_v1_loop_test_runs_green(flows):
     assert run.state_of("element0000000012") == ["finished"] and run.path[-1] == "element0000000030"
     pair = flows.wait_var("global_testResults")
     assert pair is not None and json.loads(pair[1]) == ["Loop test"], pair
+
+
+def test_v1_maths_test_runs_green(flows):
+    """"maths test" (Flow 1087828277), as saved (WI-0118). The trigger "start" sets the counter and starts the seven checks
+    of the maths elements, each a trigger of this flow with one element (Absolute number, Random number, Square root,
+    Trigonometry, Rounding a number, Exponentiation, Number is). The Absolute number check of the text "aegasdf" ends in
+    its exception connection on purpose; the flow adds its name to the global list only when all seven checks succeeded.
+    A negative square root gives the empty text (MIGRATION M-0104), which the flow checks."""
+    flow_id = flows.add_file(V1 / "Flow 1087828277.json")
+    flows.start()
+    run = flows.run(flow_id, trigger="element0000000021", timeout=scaled(120))
+    assert run.reason == "finished", (run.reason, run.exceptions)
+    assert run.exceptions == ["Value is not a number: aegasdf"], run.exceptions
+    assert run.path[-1] == "element0000000026"
+    pair = flows.wait_var("global_testResults")
+    assert pair is not None and json.loads(pair[1]) == ["maths test"], pair
 
 
 # --- the v1 "Trigger test" (S0003, E0061) -------------------------------------------------------------------------------

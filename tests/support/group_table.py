@@ -296,7 +296,7 @@ COVERS = {
     ],
     "src/elements/Default/Actions/Action_Exponentiation.ahk": [
         "integration/test_maths_elements.py::test_exponentiation_of_whole_and_decimal_numbers",
-        "integration/test_maths_elements.py::test_exponentiation_without_a_result_is_an_exception",
+        "integration/test_maths_elements.py::test_exponentiation_without_a_result_is_empty_and_logged",
         "integration/test_maths_elements.py::test_exponentiation_text_that_is_no_number_is_an_error_in_both_modes",
     ],
     "src/elements/Default/Actions/Action_Get_List_Info.ahk": [
@@ -359,7 +359,7 @@ COVERS = {
     ],
     "src/elements/Default/Actions/Action_Square_Root.ahk": [
         "integration/test_maths_elements.py::test_square_root_of_exact_and_other_numbers",
-        "integration/test_maths_elements.py::test_square_root_of_a_negative_number_is_an_exception",
+        "integration/test_maths_elements.py::test_square_root_of_a_negative_number_is_empty_and_logged",
     ],
     "src/elements/Default/Actions/Action_Stop_Flow.ahk": [
         "e2e/test_editor_flow_ctx.py",
@@ -379,7 +379,7 @@ COVERS = {
     ],
     "src/elements/Default/Actions/Action_Trigonometry.ahk": [
         "integration/test_maths_elements.py::test_trigonometry_in_radians_and_degrees",
-        "integration/test_maths_elements.py::test_arcsine_outside_minus_one_to_one_is_an_exception",
+        "integration/test_maths_elements.py::test_arcsine_outside_minus_one_to_one_is_empty_and_logged",
     ],
     "src/elements/Default/Conditions/Condition_Confirmation_Dialog.ahk": [
         "integration/test_core_e_dialogs.py",

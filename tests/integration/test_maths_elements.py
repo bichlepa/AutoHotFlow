@@ -3,8 +3,8 @@ Trigonometry, Rounding a number and Exponentiation. Every test builds small flow
 the data folder of one session and runs them one after the other (`support/coreflows.py`). The result is read with a
 probe of the variable `x` after the element; an error is the exception of the run.
 
-Expected values are those of v1 where v1 has a result; where v1 wrote an empty text for a result that is not defined,
-the element ends with an exception (MIGRATION M-0104). The square root of an exact whole number is a whole number, any
+Expected values are those of v1; a result that is not defined is the empty text in both, with a warning in the log
+(MIGRATION M-0104). The square root of an exact whole number is a whole number, any
 other result a decimal number (decision of WI-0118, Action_Square_Root.ahk).
 """
 
@@ -103,10 +103,16 @@ def test_square_root_of_exact_and_other_numbers(flows):
     close(runs[3], 1.5)
 
 
-def test_square_root_of_a_negative_number_is_an_exception(flows):
+def logged(run, text):
+    """True when the log of the run has a warning (f1) with the text."""
+    return any(e["level"] == "f1" and text in e["text"] for e in run.log)
+
+
+def test_square_root_of_a_negative_number_is_empty_and_logged(flows):
     run = run_all(flows, [maths_flow("sqrt_negative", "Action_Square_Root", VarValue=-1)])[0]
-    assert run.exceptions == ["Square root of a negative number is not defined: '-1'."], run.exceptions
-    assert value(run) is None
+    assert run.reason == "finished" and not run.exceptions, run.exceptions
+    assert value(run) == ("", "String")
+    assert logged(run, "Square root of a negative number is not defined: '-1'.")
 
 
 # --- Action_Trigonometry --------------------------------------------------------------------------------------------
@@ -135,9 +141,11 @@ def test_trigonometry_in_radians_and_degrees(flows):
     close(runs[7], math.sin(0.5))
 
 
-def test_arcsine_outside_minus_one_to_one_is_an_exception(flows):
+def test_arcsine_outside_minus_one_to_one_is_empty_and_logged(flows):
     run = run_all(flows, [trig("trig_asin_out", "Arcsine", "Radian", "2")])[0]
-    assert run.exceptions == ["Arcsine and arccosine need a value between -1 and 1: '2'."], run.exceptions
+    assert run.reason == "finished" and not run.exceptions, run.exceptions
+    assert value(run) == ("", "String")
+    assert logged(run, "Arcsine and arccosine need a value between -1 and 1: '2'.")
 
 
 # --- Action_Rounding_A_Number ---------------------------------------------------------------------------------------
@@ -192,10 +200,11 @@ def test_exponentiation_of_whole_and_decimal_numbers(flows):
 
 
 @pytest.mark.parametrize("base, exponent", [(0, -1), (-8, "0.5")], ids=["zero_to_negative", "negative_to_fraction"])
-def test_exponentiation_without_a_result_is_an_exception(flows, base, exponent):
+def test_exponentiation_without_a_result_is_empty_and_logged(flows, base, exponent):
     run = run_all(flows, [power("pow_undefined", base, exponent)])[0]
-    assert len(run.exceptions) == 1 and "is not defined" in run.exceptions[0], run.exceptions
-    assert value(run) is None
+    assert run.reason == "finished" and not run.exceptions, run.exceptions
+    assert value(run) == ("", "String")
+    assert any(e["level"] == "f1" and "is not defined" in e["text"] for e in run.log)
 
 
 @pytest.mark.parametrize("strict", [True, False], ids=["strict", "compat"])

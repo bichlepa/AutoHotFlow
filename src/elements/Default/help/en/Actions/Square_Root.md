@@ -10,7 +10,7 @@ Name of the variable which will contain the result.
 
 ### Input number
 
-The input number. It must not be negative: a negative number ends the action with an exception, and the flow goes on at the exception connection.
+The input number. A negative number gives an empty result, and a warning is written to the log.
 
 ## Remarks
 

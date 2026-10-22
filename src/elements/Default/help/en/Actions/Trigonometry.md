@@ -10,7 +10,7 @@ Name of the variable which will contain the result.
 
 ### Input number
 
-The input number. For arcsine and arccosine it must lie between -1 and 1; any other value ends the action with an exception.
+The input number. For arcsine and arccosine it must lie between -1 and 1; another value gives an empty result, and a warning is written to the log.
 
 ### Operation
 

@@ -8,9 +8,10 @@
 ;   Varname   the variable that gets the result
 ;   VarValue  the input number (content Number)
 ;
-; A negative input ends the element with exception (MIGRATION M-0104): v1 wrote an empty text. The root of an Integer
-; that is exact is an Integer (the root of 16 is 4, not 4.0), as 3 ** 2 is 9 in the expression language; any other root
-; is a Float. AutoHotkey v2 gives 4.0 for Sqrt(16), so this rule is ours (decision of WI-0118, to be confirmed).
+; A negative input gives the empty text, as in v1 (the maths test flow checks it), and a warning in the log (M-0104).
+; The root of an Integer that is exact is an Integer (the root of 16 is 4, not 4.0), as 3 ** 2 is 9 in the expression
+; language; any other root is a Float. AutoHotkey v2 gives 4.0 for Sqrt(16), so this rule is ours (decision of WI-0118,
+; to be confirmed).
 class Action_Square_Root extends AhfElement {
     static Mode := "inline"
     static ActsOnSystem := false
@@ -35,11 +36,14 @@ class Action_Square_Root extends AhfElement {
     static Run(ctx, params) {
         p := ctx.EvalParams(params)
         x := p.VarValue
-        if (x < 0)
-            throw ElementError(Lang("Square root of a negative number is not defined: '%1%'.", x))
-        result := Sqrt(x)
-        if (IsInteger(x) && result = Floor(result))
-            result := Integer(result)
+        if (x < 0) {
+            ctx.Log("f1", Lang("Square root of a negative number is not defined: '%1%'.", x))
+            result := ""
+        } else {
+            result := Sqrt(x)
+            if (IsInteger(x) && result = Floor(result))
+                result := Integer(result)
+        }
         if (!ctx.SetVar(p.Varname, result))
             throw ElementError("The variable '" p.Varname "' could not be set (the reason is in the log).")
         ctx.Finish("normal")

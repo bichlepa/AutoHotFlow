@@ -11,8 +11,7 @@
 ;   Unit      Radian or Degree: the unit of the angle, the input of Sine, Cosine and Tangent and the output of the
 ;             arc functions
 ;
-; An arcsine or arccosine of a number outside -1 to 1 ends the element with exception (MIGRATION M-0104): v1 wrote an
-; empty text.
+; An arcsine or arccosine of a number outside -1 to 1 gives the empty text, as in v1, and a warning in the log (M-0104).
 class Action_Trigonometry extends AhfElement {
     static Mode := "inline"
     static ActsOnSystem := false
@@ -49,20 +48,23 @@ class Action_Trigonometry extends AhfElement {
         degrees := (p.Unit = "Degree")
         if (degrees && (operation = "Sine" || operation = "Cosine" || operation = "Tangent"))
             x := x * 3.141592653589793 / 180          ; degrees to radians, as v1
-        if ((operation = "Arcsine" || operation = "Arccosine") && (x < -1 || x > 1))
-            throw ElementError(Lang("Arcsine and arccosine need a value between -1 and 1: '%1%'.", p.VarValue))
-        switch operation {
-            case "Sine":      result := Sin(x)
-            case "Cosine":    result := Cos(x)
-            case "Tangent":   result := Tan(x)
-            case "Arcsine":   result := ASin(x)
-            case "Arccosine": result := ACos(x)
-            case "Arctangent": result := ATan(x)
-            default:
-                throw ElementError(Lang("Operation '%1%' is not known.", operation))
+        if ((operation = "Arcsine" || operation = "Arccosine") && (x < -1 || x > 1)) {
+            ctx.Log("f1", Lang("Arcsine and arccosine need a value between -1 and 1: '%1%'.", p.VarValue))
+            result := ""
+        } else {
+            switch operation {
+                case "Sine":      result := Sin(x)
+                case "Cosine":    result := Cos(x)
+                case "Tangent":   result := Tan(x)
+                case "Arcsine":   result := ASin(x)
+                case "Arccosine": result := ACos(x)
+                case "Arctangent": result := ATan(x)
+                default:
+                    throw ElementError(Lang("Operation '%1%' is not known.", operation))
+            }
+            if (degrees && (operation = "Arcsine" || operation = "Arccosine" || operation = "Arctangent"))
+                result := result * 180 / 3.141592653589793  ; radians to degrees, as v1
         }
-        if (degrees && (operation = "Arcsine" || operation = "Arccosine" || operation = "Arctangent"))
-            result := result * 180 / 3.141592653589793  ; radians to degrees, as v1
         if (!ctx.SetVar(p.Varname, result))
             throw ElementError("The variable '" p.Varname "' could not be set (the reason is in the log).")
         ctx.Finish("normal")
