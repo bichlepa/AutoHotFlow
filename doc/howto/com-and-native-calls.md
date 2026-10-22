@@ -99,3 +99,19 @@ Entries from the WebView2 viewer (WI-0115, E0099): COM interfaces through `ComCa
 - **Right:** keep the object in a static property of the seam (`SystemOps.speaker`) and reuse it. The voice is chosen by its `Name` attribute (`GetVoices("Name=" ...)`); the pitch is an XML tag in front of an escaped text (`SPF_IS_XML`, flag 8).
 - **Status:** assumed (design from the v1 TTS library, `v1/Source_Elements/Default/lib/TTS/TTS by Learning One.ahk`); COM is not tested here (test provider only), the owner checks it by hand
 - **Source:** src/elements/base/SystemOps.ahk (WI-0124)
+
+### WinHTTP does not send a loopback request through a proxy (verified)
+
+- **Problem:** A custom proxy of the HTTP element was to be tested with the local test server as the proxy. The request to `http://127.0.0.1:<port>/x` reached the server directly, with the path `/x`, not as a request for the absolute URL that a proxy receives.
+- **Wrong:** Expecting the proxy to see `GET http://127.0.0.1:<port>/x` when `SetProxy(2, "127.0.0.1:<port>", "")` is set.
+- **Right:** Test a custom proxy only as accepted: the request to the loopback address goes direct. A request through a real proxy needs a second host, which the tests must not reach.
+- **Status:** verified (a Python listener on the proxy port received `GET /x HTTP/1.1` from `WinHttp.WinHttpRequest.5.1`; WI-0122, `tests/integration/test_internet_elements.py::test_a_custom_proxy_is_accepted_and_loopback_is_sent_direct`)
+- **Source:** src/elements/Default/lib/HttpOps.ahk (WI-0122, M-0144)
+
+### The body of a WinHTTP answer is a SAFEARRAY that the element copies (verified)
+
+- **Problem:** `WinHttpRequest.ResponseBody` returns the bytes as a `VT_ARRAY | VT_UI1` value. The text (`ResponseText`) decodes the charset, so it is no use for a file download or for the byte count.
+- **Wrong:** Writing `http.ResponseText` to a file (the bytes change), or reading the array without the pointer.
+- **Right:** `ComObjValue(value)` gives the address of the SAFEARRAY. On 64 bit, `cElements` is at offset 24 (`NumGet(psa, 24, "uint")`) and `pvData` at offset 16 (`NumGet(psa, 16, "ptr")`). Copy the bytes into a `Buffer` at once. To send bytes, `SafeArrayCreateVector(17, 0, n)`, `SafeArrayAccessData`, copy, `SafeArrayUnaccessData`, wrap it as `ComValue(0x2011, psa)` and destroy it after `Send`.
+- **Status:** verified (`tests/integration/test_internet_elements.py::test_the_response_goes_into_a_file_and_no_variable_is_set`, `::test_post_data_from_a_file_is_uploaded_as_it_is`, `::test_post_text_in_a_codepage_is_sent_in_that_codepage`)
+- **Source:** src/elements/Default/lib/HttpOps.ahk (WI-0122)

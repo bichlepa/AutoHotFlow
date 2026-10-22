@@ -23,6 +23,7 @@ from support.dialogs import DialogScript, answer
 from support.flowbuilder import FlowBuilder
 from support.ahk import find_ahk_exe
 from support.flowrun import FlowRunner, flows, var_value  # noqa: F401  (flows: fixture)
+from support.localhttp import local_server  # noqa: F401  (fixture: the HTTP request of the corpus, WI-0122)
 from support.system import SystemScript, value
 from support.timing import scaled
 
@@ -36,14 +37,16 @@ HOST_ROLES = "storage,engine,triggerhost"       # the trigger host (S0003); the 
 # --- the fix list (every change of a loaded v1 flow in the copies of v2_adapted/) ---------------------------------------
 # Empty since WI-0124: the speech output is back in the "Trigger test" copy (M-0077 resolved). The test provider of the
 # system seam answers SpeechVoices from the script of the test, and speaks nothing.
-FIX_LIST = []
+FIX_LIST = [
+    # M-0147: "HTTP Request" (Flow 100439537) calls https://httpbin.org; the test rewrites its URLs to the local server, and
+    # the User-Agent of its second request is "myuseagent" while its check expects "myuseragent" (the test copy is corrected)
+    ("Flow 100439537", "URLs of httpbin.org replaced by the local test server (127.0.0.1); User-Agent myuseagent corrected"),
+]
 
 # --- the flows that are not in the corpus yet ---------------------------------------------------------------------
 # The v1 flow "Automatic tests" flows that are not in this corpus yet: the elements they lack and the step that brings them
 # (WI-0057 task 3). The test below keeps this table equal to the element registry.
 PENDING = {
-    "Flow 100439537": dict(name="HTTP Request", missing={
-        "Action_HTTP_Request": "S0008"}),
     "Flow 130786371": dict(name="Dialog test", missing={
         "Action_Input_Box": "S0008", "Action_Send_Keystrokes_to_Control": "S0008"}),
     "Flow 1333431302": dict(name="User idle test", missing={
@@ -294,6 +297,35 @@ def test_v1_trigger_test_runs_green_on_the_adapted_copy(host_flows):
     assert run.path[-1] == "element0000000130", run.names[-5:]
     pair = host_flows.wait_var("static_testSuccess", lambda p: var_value(p) == "1", flow_id=flow_id)
     assert pair is not None, (run.names[-5:], dialogs.requests())
+
+
+# --- "HTTP Request" (WI-0122) ---------------------------------------------------------------------------------------
+def test_v1_http_request_runs_green_against_the_local_server(flows, local_server, tmp_path):
+    """"HTTP Request" (Flow 100439537), as saved except its URLs (FIX_LIST, M-0147): httpbin.org is replaced by the local
+    test server, which answers like httpbin (JSON with args, headers, data, form and url). The flow makes a GET and two
+    POST requests (plain text with a UTF-8 codepage, and a form with a custom content type and an automatic Content-MD5
+    header) and checks the answers with expressions and debug dialogs, which the dialog seam answers with yes."""
+    data = json.loads((V1 / "Flow 100439537.json").read_text(encoding="utf-8-sig"))
+    for element in data["allElements"].values():
+        pars = element.get("pars", {})
+        url = pars.get("URL", "")
+        if isinstance(url, str) and url.startswith("https://httpbin.org"):
+            pars["URL"] = local_server.url(url[len("https://httpbin.org"):])
+        if pars.get("UserAgent") == "myuseagent":
+            pars["UserAgent"] = "myuseragent"          # the check of the flow expects this text (FIX_LIST)
+    source = tmp_path / "src" / "Flow 100439537.json"
+    source.parent.mkdir()
+    source.write_text(json.dumps(data), encoding="utf-8")
+    dialogs = DialogScript(flows.datadir)
+    dialogs.script(*[answer("yes")] * 4)           # the four debug dialogs of the flow
+    flow_id = flows.add_file(source)
+    flows.start()
+    run = flows.run(flow_id, trigger="element0000000001", timeout=scaled(60))
+    assert run.reason == "finished" and not run.exceptions, (run.reason, run.exceptions, run.names[-5:])
+    assert {"element0000000002", "element0000000014", "element0000000024"} <= set(run.path), run.path
+    pair = flows.wait_var("global_testResults")
+    assert pair is not None and json.loads(pair[1]) == [data["name"]], pair
+    assert [r["method"] for r in local_server.requests()] == ["GET", "POST", "POST"], local_server.requests()
 
 
 # --- the synthetic flows -----------------------------------------------------------------------------------------------

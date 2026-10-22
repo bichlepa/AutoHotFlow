@@ -979,44 +979,47 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 ### REQ-ELM-320 Archives
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (zip, 7z, tar and tar archives with gzip, bzip2, xz or lzma with tar.exe of Windows; a single file compressed with gzip, bzip2 or xz is not read, MIGRATION M-0136; Z not checked)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0122)
+- **Evidence:** `tests/integration/test_archive_elements.py::test_a_folder_is_compressed_and_extracted_again`, `tests/integration/test_archive_elements.py::test_a_single_file_is_compressed_to_a_zip_archive`, `tests/integration/test_archive_elements.py::test_an_existing_archive_is_replaced`, `tests/integration/test_archive_elements.py::test_the_name_with_umlauts_survives_a_zip_round_trip`, `tests/integration/test_archive_elements.py::test_an_entry_that_leaves_the_folder_refuses_the_whole_archive`, `tests/integration/test_archive_elements.py::test_a_tar_symlink_refuses_the_archive`, `tests/integration/test_archive_elements.py::test_a_gzip_file_without_tar_is_not_an_archive`, `tests/integration/test_archive_elements.py::test_a_drive_root_as_destination_is_refused`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Compress_files` | yes | open | S0008 |
-| `Action_Extract_files` | yes | open | S0008 |
+| `Action_Compress_files` | yes | done | S0008 (WI-0122) |
+| `Action_Extract_files` | yes | done | S0008 (WI-0122) |
 
 ### REQ-ELM-330 Drives
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (the changing actions through the seam SystemOps, not tried on real drives; eject method 1 of v1 not ported, MIGRATION M-0140)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0122)
+- **Evidence:** `tests/integration/test_drive_elements.py::test_list_drives_gives_every_drive_letter_of_the_system`, `tests/integration/test_drive_elements.py::test_drive_information_of_a_folder_on_a_drive`, `tests/integration/test_drive_elements.py::test_change_label_passes_drive_and_label_to_the_seam`, `tests/integration/test_drive_elements.py::test_eject_passes_the_drive_to_the_seam`, `tests/integration/test_drive_elements.py::test_retract_the_tray_calls_drive_retract`, `tests/integration/test_drive_elements.py::test_lock_passes_the_drive_to_the_seam`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_List_Drives` | yes | open | S0008 |
-| `Action_Get_Drive_Information` | yes | open | S0008 |
-| `Action_Change_Drive_Label` | yes | open | S0008 |
-| `Action_Eject_Drive` | yes | open | S0008 |
-| `Action_Lock_Or_Unlock_Drive` | yes | open | S0008 |
+| `Action_List_Drives` | yes | done | S0008 (WI-0122) |
+| `Action_Get_Drive_Information` | yes | done | S0008 (WI-0122) |
+| `Action_Change_Drive_Label` | yes | done | S0008 (WI-0122) |
+| `Action_Eject_Drive` | yes | done | S0008 (WI-0122) |
+| `Action_Lock_Or_Unlock_Drive` | yes | done | S0008 (WI-0122) |
 
 ### REQ-ELM-340 Internet
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (WinHTTP instead of WinINet: the Flags field has no effect, MIGRATION M-0142; tested against a local server only)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0122)
+- **Evidence:** `tests/integration/test_internet_elements.py::test_download_writes_the_body_of_the_url_to_the_file`, `tests/integration/test_internet_elements.py::test_get_puts_the_body_and_the_headers_into_variables`, `tests/integration/test_internet_elements.py::test_post_form_data_is_parsed_by_the_server`, `tests/integration/test_internet_elements.py::test_automatic_content_md5_is_the_md5_of_the_body`, `tests/integration/test_internet_elements.py::test_the_response_goes_into_a_file_and_no_variable_is_set`, `tests/integration/test_internet_elements.py::test_redirect_is_followed`, `tests/integration/test_corpus.py::test_v1_http_request_runs_green_against_the_local_server`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Download_file` | yes | open | S0008 |
-| `Action_HTTP_Request` | yes | open | S0008 |
+| `Action_Download_file` | yes | done | S0008 (WI-0122) |
+| `Action_HTTP_Request` | yes | done | S0008 (WI-0122) |
 
 ### REQ-ELM-350 Screen and images
 

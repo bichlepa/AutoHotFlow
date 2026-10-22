@@ -435,3 +435,27 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `try A_Clipboard := p.text` and `catch` with the element's own text ("The clipboard could not be used"). Reading `A_Clipboard` is not covered by this test.
 - **Status:** verified (tests/integration/test_clipboard_elements.py::test_a_busy_clipboard_is_an_exception_and_nothing_changes)
 - **Source:** src/elements/Default/Actions/Action_Set_Clipboard.ahk (WI-0123, MIGRATION M-0122)
+
+### tar.exe writes its output in the ANSI code page (verified)
+
+- **Problem:** The listing of `tar -tf` that goes to a file contains the names as bytes of the ANSI code page: a name with `ö`, `ß` or `ü` is `ö`, `ß`, `ü` (cp1252), not UTF-8. Names outside that code page are lost (F-0131).
+- **Wrong:** `FileRead(out)` (UTF-8 by default) for the listing of an archive, which gives wrong names or a decoding error.
+- **Right:** `FileRead(out, "CP0")` reads the ANSI code page. The checks of the names (absolute path, drive, `..`) do not need the exact spelling; an extraction gets its names from the archive, not from the listing.
+- **Status:** verified (`tests/integration/test_archive_elements.py::test_the_name_with_umlauts_survives_a_zip_round_trip`; the bytes of a listing were read on this machine)
+- **Source:** src/elements/Default/lib/TarOps.ahk (WI-0122)
+
+### tar.exe reads and writes archives only, not a single compressed file (verified)
+
+- **Problem:** v1 packed one file with gzip, BZIP2 or xz through 7za. `tar.exe` has no such mode: a raw `.gz`, `.bz2`, `.xz` or `.lzma` file fails with "Unrecognized archive format".
+- **Wrong:** Expecting `tar -xf file.gz` to unpack a plain gzip file, or `tar -czf file.gz file` to write a plain gzip file (it writes a tar archive compressed with gzip).
+- **Right:** Write a tar archive compressed with the filter (`-z`, `-j`, `-J`) and say so in the help (MIGRATION M-0136). Extracting a raw compressed file ends with the tar message as an exception.
+- **Status:** verified (`tests/integration/test_archive_elements.py::test_a_gzip_file_without_tar_is_not_an_archive`; the write of `-z`, `-j`, `-J` and `--lzma` was run)
+- **Source:** src/elements/Default/lib/TarOps.ahk (WI-0122)
+
+### ProcessWaitClose with a deadline: 0 when the process ended, its PID when the deadline passed (verified)
+
+- **Problem:** A tar run inside a worker must not block forever. `RunWait` has no deadline.
+- **Wrong:** `RunWait(cmd)` (no deadline, and no way to kill the child of `cmd.exe`).
+- **Right:** `Run(cmd, , "Hide", &pid)` and `if (ProcessWaitClose(pid, seconds))` (a PID comes back at the deadline). Then `taskkill /T /F /PID pid` ends the process tree. The answer of the command goes into a file ("ok" or "fail"), because `Run` gives no exit code.
+- **Status:** verified (the normal runs return 0; the deadline path is not run by a test)
+- **Source:** src/elements/Default/lib/TarOps.ahk (WI-0122)

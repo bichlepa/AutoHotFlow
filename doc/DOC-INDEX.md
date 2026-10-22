@@ -166,7 +166,7 @@ L47-56 5. AHK v2 pitfalls (short)
 L58-64 6. Tests and docs
 ```
 
-## doc/howto/com-and-native-calls.md (8.7 KB, 101 lines)
+## doc/howto/com-and-native-calls.md (10.7 KB, 117 lines)
 ```text
 L7-13 A function stored in a property is called with its owner as first argument (verified)
 L15-21 COM method index = position in the header + 3 (verified)
@@ -180,6 +180,8 @@ L71-77 The WebView2 user data folder is created by the runtime (verified)
 L79-85 The event registration token is an Int64 out parameter (verified)
 L87-93 SoundPlay stops a playing file only through a file that does not exist (assumed)
 L95-101 SAPI speech: the voice object must outlive the job (assumed)
+L103-109 WinHTTP does not send a loopback request through a proxy (verified) (verified)
+L111-117 The body of a WinHTTP answer is a SAFEARRAY that the element copies (verified) (verified)
 ```
 
 ## doc/howto/drawing-gdip.md (5.9 KB, 59 lines)
@@ -279,7 +281,7 @@ L145-150 Copy on write: clone a shared map before its first write, and remember 
 L152-158 A field and a method with the same name clash (case-insensitive names) (verified)
 ```
 
-## doc/howto/processes-pipes-messages.md (49.8 KB, 437 lines)
+## doc/howto/processes-pipes-messages.md (52.2 KB, 461 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L13-17 `PostMessageW` with a NULL handle reports success (verified)
@@ -331,6 +333,9 @@ L407-413 The sender of a message is its link name, which carries the flow of an 
 L415-421 ProcessSetPriority throws for a missing process, ProcessClose returns 0 (verified)
 L423-429 ProcessClose ends a process with exit code 0 (verified)
 L431-437 Assigning A_Clipboard throws while another program holds the clipboard (verified)
+L439-445 tar.exe writes its output in the ANSI code page (verified) (verified)
+L447-453 tar.exe reads and writes archives only, not a single compressed file (verified) (verified)
+L455-461 ProcessWaitClose with a deadline: 0 when the process ended, its PID when the deadline passed (verified) (verified)
 ```
 
 ## doc/howto/syntax-and-language.md (62.1 KB, 626 lines)
