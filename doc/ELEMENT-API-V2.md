@@ -199,6 +199,29 @@ A test entry registers a provider (`Dialogs.UseProvider`) that answers from a sc
 
 **Windows (WI-0056).** Two more indirections of the same kind: `Dialogs.Window(spec)` shows a text with buttons (`spec` a Map: `title`, `text`, `buttons` an Array of Maps `id` and `label`, `width`, `height`, `timeoutMs` 0 = none, `defaultId`); it returns the id of the pressed button, `"close"` (close button or Escape) or `"timeout"`. `Dialogs.DebugWindow(view)` shows the debug window (section 3.4) and returns `"yes"`, `"no"` or `"close"`. The product window is `src/elements/base/DialogWindow.ahk` (a Gui, DPI aware per thread); the test provider answers both from the script (`doc/TEST-STRATEGY.md` 9a).
 
+### 3.3a System actions (E0103, WI-0117)
+
+Actions that disturb the computer or cannot be undone run through the same kind of indirection: `SystemOps` (`src/elements/base/SystemOps.ahk`, included by `AhfElement.ahk`). An element never calls the functions below directly; it calls `SystemOps.<name>(...)` with the arguments of the AutoHotkey function of the same name, in the same order (`Shutdown(flags)` takes the `Code` of `Shutdown`: 0 log off, 1 shut down, 2 reboot, 4 force, 8 power off). Where a function has optional arguments the element passes only those it has. The return value is the one of the AutoHotkey function (nothing where it returns nothing).
+
+| Group | Functions (arguments) | Real behaviour |
+|---|---|---|
+| Power and session | `Shutdown(flags)`, `LockWorkStation()`, `Hibernate(force := 0)`, `Suspend(force := 0)` | `Shutdown`; `DllCall("LockWorkStation")`; `SetSuspendState` (PowrProf) with hibernate 1 or 0 |
+| Drives | `DriveEject(args*)`, `DriveSetLabel(args*)`, `DriveLock(args*)`, `DriveUnlock(args*)` | the AutoHotkey function of the same name (`args*`: its arguments, passed on) |
+| Recycle bin | `FileRecycleEmpty(args*)` | `FileRecycleEmpty` |
+| Screen | `ChangeDisplaySettings(args*)` | not implemented yet (WI-0127): throws `AhfError` |
+| Sound | `SoundSetVolume(args*)`, `SoundSetMute(args*)`, `SoundPlay(args*)`, `SoundBeep(args*)` | the AutoHotkey function of the same name |
+| Speech | `SpeakText(text, rate := 0, volume := 100, wait := 1)`, `SpeechVoices()` | SAPI (`ComObject("SAPI.SpVoice")`): synchronous Speak when `wait` is 1; `SpeechVoices` returns an Array of the voice descriptions |
+| Input | `BlockInput(args*)`, `Send(keys, mode := "")`, `Click(args*)`, `MouseMove(args*)`, `MouseClickDrag(args*)`, `SetCapsLockState(args*)`, `SetNumLockState(args*)`, `SetScrollLockState(args*)` | the AutoHotkey function of the same name; `Send` with a `mode` (Input, Event, Play, Raw) sets `SendMode` for that call and restores the previous mode |
+| Idle time | `TimeIdle()`, `TimeIdlePhysical()` | `A_TimeIdle`, `A_TimeIdlePhysical` (milliseconds) |
+
+Rules:
+
+- **Never directly.** An element never calls one of these names as a function: `SystemOps.Send(...)` is the call, a bare `Send(...)` in `src/elements/` is a violation (rule `system-seam`, `doc/CONVENTIONS.md` section 3).
+- **Tests never reach the real function.** A test entry registers a provider (`SystemOps.UseProvider`, `tests/integration/helpers/TestSystemProvider.ahk`) that records every call (function, arguments, element, flow) and answers from a script (`doc/TEST-STRATEGY.md` 9b). The product entries cannot register one (rule `system-seam`).
+- **Additions.** A package that needs one more function adds it here and in `SystemOps.ahk` (sorted by group) in the same commit.
+- **Failures.** A call inside an element is covered by the `try/catch` of the element (section 2); an error of the real function ends the element with `exception`.
+- **Not in the seam:** files, processes, the clipboard, windows and controls (`ControlSend`), and reading the sound volume. They run for real in the tests.
+
 ### 3.4 Debug view (WI-0056, REQ-DBG-060)
 
 `Dialogs.DebugWindow(view)` gets an object of the element's package (`lib/DebugOps.ahk` of `Default`, class `DebugOps(ctx, readOnly)`) and uses only these members:

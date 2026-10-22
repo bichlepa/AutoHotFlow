@@ -58,7 +58,7 @@ L770-779   5a Events before subscription (design question, WI-0007)
 L781-785 6. Versioning and extension
 ```
 
-## doc/TEST-STRATEGY.md (58.1 KB, 349 lines)
+## doc/TEST-STRATEGY.md (60.7 KB, 369 lines)
 ```text
 L5-11 1. Principles
 L13-22 2. Levels
@@ -72,27 +72,29 @@ L286-288 8a. Smoke test of every element (WI-0048)
 L290-294 8b. Test triggers (WI-0061)
 L296-305 8c. Parameter schema against v1 (WI-0116)
 L307-327 9a. Dialog tests (E0038, WI-0051)
-L329-349 9. Flow builder and headless runner (WI-0049)
+L329-347 9b. System action tests (E0103, WI-0117)
+L349-369 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (60.0 KB, 515 lines)
+## doc/ELEMENT-API-V2.md (63.0 KB, 538 lines)
 ```text
 L8-18 1. Guidelines
 L20-112 2. Class contract
 L91-112   2.1 Parameter fields of the settings form (WI-0105)
-L114-261 3. Context `ctx`
+L114-284 3. Context `ctx`
 L163-180   3.1 Parameter evaluation (WI-0042)
 L182-192   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
 L194-200   3.3 Dialogs (E0038, WI-0051)
-L202-217   3.4 Debug view (WI-0056, REQ-DBG-060)
-L219-240   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
-L242-261   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
-L263-345 4. Example 1: `Action_Sleep` (inline, with timer)
-L347-440 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L442-482 6. Mechanical conversion rules
-L484-505 7. What stays
-L491-505   7.1 Loop elements (WI-0054)
-L507-515 8. Still to be clarified (Phase 3)
+L202-223   3.3a System actions (E0103, WI-0117)
+L225-240   3.4 Debug view (WI-0056, REQ-DBG-060)
+L242-263   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+L265-284   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
+L286-368 4. Example 1: `Action_Sleep` (inline, with timer)
+L370-463 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L465-505 6. Mechanical conversion rules
+L507-528 7. What stays
+L514-528   7.1 Loop elements (WI-0054)
+L530-538 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
@@ -154,14 +156,14 @@ L346-356   MS-0057: engine time of a patch on a flow of 300 elements (WI-0104, M
 L358-371   MS-0058: round trip of a patch during a run, 100 patches, 300 steps (WI-0104, MS-0054 again)
 ```
 
-## doc/CONVENTIONS.md (8.5 KB, 63 lines)
+## doc/CONVENTIONS.md (9.3 KB, 64 lines)
 ```text
 L5-13 1. Files and structure
 L15-19 2. Names
-L21-37 3. Forbidden patterns (review rules)
-L39-44 4. Errors and protocol
-L46-55 5. AHK v2 pitfalls (short)
-L57-63 6. Tests and docs
+L21-38 3. Forbidden patterns (review rules)
+L40-45 4. Errors and protocol
+L47-56 5. AHK v2 pitfalls (short)
+L58-64 6. Tests and docs
 ```
 
 ## doc/howto/com-and-native-calls.md (6.9 KB, 85 lines)

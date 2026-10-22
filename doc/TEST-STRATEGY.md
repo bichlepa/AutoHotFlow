@@ -326,6 +326,26 @@ def test_a_message_box(flows):
 - **Windows (WI-0056).** `Window` (Message_Box, Confirmation_Dialog): the answer is a button id, `"close"` or `"timeout"`; `noAnswer` returns `"timeout"` after the `timeoutMs` of the window. `DebugWindow` (Condition_Debug_Dialog): the answer is `"yes"`, `"no"` or `"close"`, and the entry may have `actions` that the window takes first: `set` (name, value, object, convert), `delete`, `read`, `rows`. The log row keeps the rows the window showed (name and scope), readOnly and the result of each action. `noAnswer` keeps the debug window open until the flow is stopped. Tests: `tests/integration/test_core_e_dialogs.py`; the unit tests of the view: `tests/ahk/element_debug_ops.test.ahk`. Gui tests of the windows (one per element, `tests/integration/test_dialog_windows_gui.py`) are run by the owner only.
 - **The real dialog.** One `gui` test (`test_the_product_path_opens_the_real_dialog`, only the project owner runs it) shows that without a provider the real `MsgBox` opens.
 
+## 9b. System action tests (E0103, WI-0117)
+
+Actions that disturb the computer (shutdown, lock, eject, recycle bin, screen, sound, input, idle time; `doc/ELEMENT-API-V2.md` 3.3a) run headless the same way as the dialogs: the elements call `SystemOps.*`, the test entries of the worker and the trigger host register `TestSystemProvider` (`tests/integration/helpers/TestSystemProvider.ahk`), which records every call and answers from a script. The real functions are never called in a test: no shutdown, no eject, no input block, no mouse move, no sound. The real behaviour is checked by `gui` tests and by the manual check of the owner (WI-0135).
+
+```python
+from support.system import SystemScript
+
+def test_a_shutdown_is_recorded(flows):
+    system = SystemScript(flows.datadir)
+    system.script({"Shutdown": [{"value": 1}]})        # the first Shutdown call returns 1
+    ...build and run the flow...
+    assert system.requests()[0]["function"] == "Shutdown"
+```
+
+- **Script.** `<data folder>/TestSystem/script.json`: `answers` maps a function name to a list of entries, used in order (the n-th call of the function takes the n-th entry, in any process). An entry is `{"value": ...}` (the return value), `{"error": "text"}` (the call throws `AhfError`, so the element ends with `exception`) and optionally `delayMs`. A call with no entry left returns the empty value of the function (0, "" or an empty Array) and is logged with `scripted` false; it does not block, because nothing real runs. `idleBaseMs` sets the idle time: `TimeIdle()` and `TimeIdlePhysical()` return `idleBaseMs` plus the time since the provider started, so the idle time grows with the clock of the test.
+- **Log.** `<data folder>/TestSystem/requests.jsonl`, one row per call: `index`, `function`, `args` (the arguments as passed), `scripted`, `answer` or `error`, `element` and `flow` (the element that made the call; a trigger callback that runs later may show the element of the last start, `assumed`), `pid` and `role` (`worker` or `triggerhost`).
+- **Strictness.** A product entry cannot register a provider: the architecture check (rule `system-seam`, `doc/CONVENTIONS.md` section 3) forbids `SystemOps.UseProvider` in `src/`, and an element that calls a function directly fails the check.
+- **Test elements.** `Action_TestSystemWorker` (worker, package Test) calls the function named in its parameter `Function` with the parameters `Args`; the tests run it once for each group of `doc/ELEMENT-API-V2.md` 3.3a. `Trigger_TestSystemCall` (trigger, package Test) calls the function named in its `Function` parameter in `Enable`.
+- **Not covered:** the real behaviour of each function (gui tests and the manual check of the owner, WI-0135).
+
 ## 9. Flow builder and headless runner (WI-0049)
 
 How an e2e test of an element is written: the flow in Python, one call to run it, the result as data. `tests/support/flowbuilder.py` builds the flow file, `tests/support/flowrun.py` runs it in a real session (supervisor, storage, engine, entry point with the test elements); both have docstrings with the full API. Tests: `tests/support/test_flowbuilder.py` (no process), `tests/integration/test_flowrun.py` (one fast smoke test, three `slow`).
