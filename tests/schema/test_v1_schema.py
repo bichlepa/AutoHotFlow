@@ -77,6 +77,23 @@ ALLOWED = {
     ("default.condition_string_contains_text", "CaseSensitive", "default"): "M-0099",
     # M-0108: the new text mode (plain or regular expression) of Replace in a string (WI-0119)
     ("default.action_replace_in_a_string", "TextMode", "id"): "M-0108",
+    # WI-0124 (sound and speech): Play sound has the option "Wait until the sound has finished", no Preview buttons, and
+    # the editor fills its list of system sounds; Set volume and Speech output use number fields for the ranges that the
+    # slider does not show (M-0126); the default voice of Speech output is the system default (M-0129)
+    ("default.action_play_sound", "", "updateOnEdit"): "M-0101",
+    ("default.action_play_sound", "WaitUntilFinished", "id"): "M-0124",
+    ("default.action_play_sound", "startSoundNow", "id"): "M-0124",
+    ("default.action_play_sound", "stopSoundNow", "id"): "M-0124",
+    ("default.action_play_sound", "systemSound", "choices"): "M-0124",
+    ("default.action_set_volume", "Action", "default"): "M-0099",
+    ("default.action_set_volume", "Mute", "result"): "M-0128",
+    ("default.action_set_volume", "volumeRelative", "type"): "M-0126",
+    ("default.action_speech_output", "TTSEngine", "default"): "M-0129",
+    ("default.action_speech_output", "TTSEngine", "choices"): "M-0129",
+    ("default.action_speech_output", "speed", "type"): "M-0126",
+    ("default.action_speech_output", "speed", "content"): "M-0126",
+    ("default.action_speech_output", "pitch", "type"): "M-0126",
+    ("default.action_speech_output", "pitch", "content"): "M-0126",
 }
 
 
