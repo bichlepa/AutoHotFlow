@@ -411,3 +411,27 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `if (Role.BaseName(msg.from) != "editor") throw ...` (the part before the colon, as `_OnBusy` does for workers).
 - **Status:** verified (tests/e2e/test_editor_flow_settings.py, the Show log test, failed before the fix and passes after)
 - **Source:** src/supervisor/Supervisor.ahk `_OnManagerLog` (WI-0109)
+
+### ProcessSetPriority throws for a missing process, ProcessClose returns 0
+
+- **Problem:** The priority element of WI-0123 expected 0 from `ProcessSetPriority` for a process that does not exist. AutoHotkey v2 throws "Target process not found." instead, so the element ended with that text and not with the v1 text.
+- **Wrong:** `pid := ProcessSetPriority(level, target)` and then `if (pid = 0)`.
+- **Right:** `try pid := ProcessSetPriority(level, target)` with `catch` setting `pid := 0`, then the existence check (`ProcessExist`) decides the text. `ProcessClose` is different: it returns 0 for a missing process and throws nothing.
+- **Status:** verified (tests/integration/test_process_elements.py::test_set_priority_of_a_missing_process_is_an_exception, failed before the fix, passes after)
+- **Source:** src/elements/Default/Actions/Action_Set_Process_Priority.ahk (WI-0123)
+
+### ProcessClose ends a process with exit code 0
+
+- **Problem:** A test expected a non-zero exit code from a child process that the element ended with `ProcessClose`. The code is 0 (AutoHotkey calls TerminateProcess with 0).
+- **Wrong:** `assert child.wait() != 0` after a kill.
+- **Right:** Check that the process has ended (`wait` returns, `poll` is not None), not its exit code.
+- **Status:** verified (tests/integration/test_process_elements.py::test_kill_by_pid_ends_only_that_process)
+- **Source:** tests/integration/test_process_elements.py (WI-0123)
+
+### Assigning A_Clipboard throws while another program holds the clipboard
+
+- **Problem:** When another program (or a test of the same machine) keeps the clipboard open, `A_Clipboard := text` fails with an exception, not silently. The element must not report success, and the clipboard keeps its content.
+- **Wrong:** `A_Clipboard := p.text` without a `try`, which ends the element with the raw AutoHotkey message.
+- **Right:** `try A_Clipboard := p.text` and `catch` with the element's own text ("The clipboard could not be used"). Reading `A_Clipboard` is not covered by this test.
+- **Status:** verified (tests/integration/test_clipboard_elements.py::test_a_busy_clipboard_is_an_exception_and_nothing_changes)
+- **Source:** src/elements/Default/Actions/Action_Set_Clipboard.ahk (WI-0123, MIGRATION M-0122)

@@ -273,7 +273,7 @@ L145-150 Copy on write: clone a shared map before its first write, and remember 
 L152-158 A field and a method with the same name clash (case-insensitive names) (verified)
 ```
 
-## doc/howto/processes-pipes-messages.md (47.6 KB, 413 lines)
+## doc/howto/processes-pipes-messages.md (49.8 KB, 437 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L13-17 `PostMessageW` with a NULL handle reports success (verified)
@@ -322,9 +322,12 @@ L382-388 A child process from a queue operation (tar.exe), without waiting (part
 L390-396 A flow ID with a space on the command line of a child process (verified)
 L398-404 One timer for many jobs: SetTimer with the same function moves the run (verified)
 L407-413 The sender of a message is its link name, which carries the flow of an editor (verified) (verified)
+L415-421 ProcessSetPriority throws for a missing process, ProcessClose returns 0 (verified)
+L423-429 ProcessClose ends a process with exit code 0 (verified)
+L431-437 Assigning A_Clipboard throws while another program holds the clipboard (verified)
 ```
 
-## doc/howto/syntax-and-language.md (59.0 KB, 594 lines)
+## doc/howto/syntax-and-language.md (59.9 KB, 602 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -400,6 +403,7 @@ L564-570 A local variable named like a class is a warning (verified) (verified)
 L572-578 Property access with a name in a variable (assumed) (assumed)
 L580-586 A NUL character ends a text (verified) (verified)
 L588-594 Skip an output of SplitPath with a comma (verified) (verified)
+L596-602 WarnIfEmpty refuses an empty value at run time in v2 (verified)
 ```
 
 ## doc/howto/tests-and-tools.md (56.6 KB, 561 lines)

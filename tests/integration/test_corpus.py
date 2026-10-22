@@ -52,7 +52,7 @@ PENDING = {
         "Trigger_User_Idle_Time": "S0008"}),
     "Flow 1384439262": dict(name="file test", missing={
         "Action_Close_Window": "S0008", "Action_Create_Shortcut": "S0008", "Action_Get_File_Size": "S0008",
-        "Action_Get_File_Time": "S0008", "Action_Get_Shortcut_Information": "S0008", "Action_Run": "S0008",
+        "Action_Get_File_Time": "S0008", "Action_Get_Shortcut_Information": "S0008",
         "Action_Set_File_Time": "S0008", "Condition_File_Has_Attribute": "S0008",
         "Condition_Window_Exists": "S0008"}),
     "Flow 1587447767": dict(name="ini file test", missing={
@@ -62,13 +62,12 @@ PENDING = {
     "Flow 2133155705": dict(name="Hotkey test", missing={
         "Action_Send_Keystrokes": "S0008"}),
     "Flow 561135904": dict(name="Process Test", missing={
-        "Action_Kill_Process": "S0008", "Action_Run": "S0008",
-        "Condition_Process_is_running": "S0008", "Trigger_Process_closes": "S0008",
+        "Trigger_Process_closes": "S0008",
         "Trigger_Process_starts": "S0008"}),
     "Flow 65341778": dict(name="_AutomaticTest starter", missing={
         "Action_Play_Sound": "S0008"}),
     "Flow 74366368": dict(name="File link test", missing={
-        "Action_Run": "S0008", "Trigger_Shortcut": "S0008"}),
+        "Trigger_Shortcut": "S0008"}),
 }
 
 

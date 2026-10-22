@@ -592,3 +592,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Leave the parameter empty with a comma: `SplitPath(path, , &folder)`. The name of the file is then not written.
 - **Status:** verified (`src/elements/Default/Actions/Action_Rename_Folder.ahk`, `Action_Split_path.ahk` run in the element tests)
 - **Source:** `src/elements/Default/Actions/Action_Split_path.ahk`
+
+### WarnIfEmpty refuses an empty value at run time in v2
+
+- **Problem:** A v1 field with `WarnIfEmpty` only warned in the settings dialog. In v2 the parameter check refuses an empty value when the element runs ("String 'text' is empty"), so `Action_Set_Clipboard` could not clear the clipboard any more, which the v1 help describes.
+- **Wrong:** Copying the v1 flag to every edit field.
+- **Right:** Take `WarnIfEmpty` only from a field where an empty value is an error; for a field where v1 accepted an empty value (clipboard text, process name checked by the element itself), leave the flag out and check the value in the element.
+- **Status:** verified (tests/integration/test_clipboard_elements.py::test_set_clipboard_with_an_empty_text_clears_it, failed with the flag, passes without it)
+- **Source:** src/elements/base/ParamEvaluator.ahk; src/elements/Default/Actions/Action_Set_Clipboard.ahk (WI-0123)

@@ -909,15 +909,16 @@ Dialogs run separately from the flows (MIGRATION M-0002) and can be answered by 
 ### REQ-ELM-290 Clipboard
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (WI-0123)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0123)
+- **Evidence:** `tests/integration/test_clipboard_elements.py::test_get_clipboard_reads_the_text_into_a_variable`, `tests/integration/test_clipboard_elements.py::test_set_clipboard_puts_the_text_on_the_clipboard`, `tests/integration/test_clipboard_elements.py::test_set_clipboard_with_an_empty_text_clears_it`, `tests/integration/test_clipboard_elements.py::test_a_busy_clipboard_is_an_exception_and_nothing_changes`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Get_Clipboard` | yes | open | S0008 |
-| `Action_Set_Clipboard` | yes | open | S0008 |
+| `Action_Get_Clipboard` | yes | done (WI-0123) | S0008 (WI-0123) |
+| `Action_Set_Clipboard` | yes | done (WI-0123) | S0008 (WI-0123) |
 
 ### REQ-ELM-300 Files and folders
 
@@ -1094,17 +1095,18 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 ### REQ-ELM-390 Programs and processes
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (WI-0123: run, kill, priority, process is running; the output of a program is a later row)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0123)
+- **Evidence:** `tests/integration/test_process_elements.py::test_run_starts_the_program_in_the_working_directory_of_the_flow`, `tests/integration/test_process_elements.py::test_kill_by_pid_ends_only_that_process`, `tests/integration/test_process_elements.py::test_kill_by_name_ends_only_the_copy_with_that_name`, `tests/integration/test_process_elements.py::test_set_priority_changes_the_priority_class_of_that_process`, `tests/integration/test_process_elements.py::test_process_is_running_by_pid_and_by_name`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Run` | yes | open | S0008 |
-| `Action_Kill_Process` | yes | open | S0008 |
-| `Action_Set_Process_Priority` | yes | open | S0008 |
-| `Condition_Process_Is_Running` | yes | open | S0008 |
+| `Action_Run` | yes | done (WI-0123) | S0008 (WI-0123) |
+| `Action_Kill_Process` | yes | done (WI-0123) | S0008 (WI-0123) |
+| `Action_Set_Process_Priority` | yes | done (WI-0123) | S0008 (WI-0123) |
+| `Condition_Process_Is_Running` | yes | done (WI-0123) | S0008 (WI-0123) |
 | Run a program and get its output (stdout, stderr) and its exit code | no | open | later |
 | Talk to a console program: send input and read its output while it runs | no | open | later |
 
@@ -1113,19 +1115,20 @@ Talking to a console program is an element of its own, because it is much more c
 ### REQ-ELM-400 Power and session
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (WI-0123)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0123)
+- **Evidence:** `tests/integration/test_power_elements.py::test_power_actions_call_the_seam_with_the_v1_arguments`, `tests/integration/test_power_elements.py::test_shutdown_and_reboot_send_the_v1_codes_and_the_force_bit`, `tests/integration/test_power_elements.py::test_a_failing_system_call_ends_the_element_with_an_exception`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Lock_Computer` | yes | open | S0008 |
-| `Action_Log_Off` | yes | open | S0008 |
-| `Action_Shutdown` | yes | open | S0008 |
-| `Action_Reboot_Computer` | yes | open | S0008 |
-| `Action_Hibernate_Computer` | yes | open | S0008 |
-| `Action_Suspend_Computer` | yes | open | S0008 |
+| `Action_Lock_Computer` | yes | done (WI-0123) | S0008 (WI-0123) |
+| `Action_Log_Off` | yes | done (WI-0123) | S0008 (WI-0123) |
+| `Action_Shutdown` | yes | done (WI-0123) | S0008 (WI-0123) |
+| `Action_Reboot_Computer` | yes | done (WI-0123) | S0008 (WI-0123) |
+| `Action_Hibernate_Computer` | yes | done (WI-0123) | S0008 (WI-0123) |
+| `Action_Suspend_Computer` | yes | done (WI-0123) | S0008 (WI-0123) |
 
 ## Triggers (TRG)
 
