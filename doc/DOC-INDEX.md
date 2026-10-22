@@ -76,25 +76,25 @@ L329-347 9b. System action tests (E0103, WI-0117)
 L349-369 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (64.8 KB, 540 lines)
+## doc/ELEMENT-API-V2.md (65.1 KB, 541 lines)
 ```text
 L8-18 1. Guidelines
 L20-112 2. Class contract
 L91-112   2.1 Parameter fields of the settings form (WI-0105)
-L114-286 3. Context `ctx`
+L114-287 3. Context `ctx`
 L163-180   3.1 Parameter evaluation (WI-0042)
 L182-192   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
 L194-200   3.3 Dialogs (E0038, WI-0051)
-L202-225   3.3a System actions (E0103, WI-0117)
-L227-242   3.4 Debug view (WI-0056, REQ-DBG-060)
-L244-265   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
-L267-286   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
-L288-370 4. Example 1: `Action_Sleep` (inline, with timer)
-L372-465 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L467-507 6. Mechanical conversion rules
-L509-530 7. What stays
-L516-530   7.1 Loop elements (WI-0054)
-L532-540 8. Still to be clarified (Phase 3)
+L202-226   3.3a System actions (E0103, WI-0117)
+L228-243   3.4 Debug view (WI-0056, REQ-DBG-060)
+L245-266   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+L268-287   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
+L289-371 4. Example 1: `Action_Sleep` (inline, with timer)
+L373-466 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L468-508 6. Mechanical conversion rules
+L510-531 7. What stays
+L517-531   7.1 Loop elements (WI-0054)
+L533-541 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
@@ -156,7 +156,7 @@ L346-356   MS-0057: engine time of a patch on a flow of 300 elements (WI-0104, M
 L358-371   MS-0058: round trip of a patch during a run, 100 patches, 300 steps (WI-0104, MS-0054 again)
 ```
 
-## doc/CONVENTIONS.md (9.3 KB, 64 lines)
+## doc/CONVENTIONS.md (9.4 KB, 64 lines)
 ```text
 L5-13 1. Files and structure
 L15-19 2. Names
