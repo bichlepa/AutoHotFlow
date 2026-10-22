@@ -49,7 +49,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0114 | Acceptance S0007 | agent part done | haiku | see git log | 2026-10-22 | result: `WI-0114-result-s7.md`; S0007 NOT accepted: manual check 11 and the gui tests are the owner's; F-0180 to F-0187; REQ-EDT-120/130/140/200 and REQ-LNG-040 partial |
 | WI-0116 | Check of the parameter schema against v1 | done | haiku | c873cf46..448ca8a7 | 2026-10-22 | M-0099 to M-0103; owner to confirm M-0099 (numeric radio default becomes the enum value); review fix masks A_Now in the test data; clipboard e2e tests fail while a foreign AutoHotkeyU32 script holds the clipboard (environment) |
 | WI-0117 | Seam `SystemOps` (E0103) | done | haiku | see git log (up to bdd9d5d5) | 2026-10-22 | review fix: system-seam also flags the command style; engine/editor test entries register no system provider (a future inline element would call the real function there; consider a provider or test-mode guard); SoundGet* stay outside the seam |
-| WI-0118 | Calculations, script, date and time | open | | | |  |
+| WI-0118 | Calculations, script, date and time | done | haiku | see git log (up to 7977e8a9) | 2026-10-22 | M-0104 to M-0107, M-0099 extended; owner to confirm: undefined maths results are empty text + f1 (as v1), sqrt of exact integer is Integer, default Unit Minutes (old flow with numeric 2 untested), odd-length time stamps invalid; fast-tier flake test_worker_lifecycle cold start seen once under load in the author's run; German texts and help in the viewer not checked |
 | WI-0119 | Strings and list conversions | open | | | |  |
 | WI-0120 | Files and folders I | open | | | |  |
 | WI-0121 | Files and folders II, file loop, ini | open | | | |  |
@@ -77,6 +77,8 @@ None.
 None.
 
 ## Last verified state
+
+Commit `7977e8a9` (WI-0118 integrated; selection of the groups element-units, help, packages): 478 passed, 2 skipped, VERDICT green (run 20261022-192348-7977e8a9). Partial run: the full tiers are still due (last full: bdd9d5d5).
 
 Commit `bdd9d5d5` (WI-0117 integrated; all tiers): fast 2263 passed (1 skipped), foundation 471 passed, slow 206 passed, VERDICT green (runs 20261022-183415-bdd9d5d5, -3, -2). The clipboard e2e tests passed in this run.
 
