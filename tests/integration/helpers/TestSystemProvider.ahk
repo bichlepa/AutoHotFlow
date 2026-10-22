@@ -43,6 +43,7 @@ class TestSystemProvider {
     DriveEject(args*) => this._Call("DriveEject", args, 0)
     DriveSetLabel(args*) => this._Call("DriveSetLabel", args, 0)
     DriveLock(args*) => this._Call("DriveLock", args, 0)
+    DriveRetract(args*) => this._Call("DriveRetract", args, 0)
     DriveUnlock(args*) => this._Call("DriveUnlock", args, 0)
 
     FileRecycle(args*) => this._Call("FileRecycle", args, 0)

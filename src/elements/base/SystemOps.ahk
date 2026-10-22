@@ -41,6 +41,7 @@ class SystemOps {
     static DriveEject(args*) => SystemOps._Provider().DriveEject(args*)
     static DriveSetLabel(args*) => SystemOps._Provider().DriveSetLabel(args*)
     static DriveLock(args*) => SystemOps._Provider().DriveLock(args*)
+    static DriveRetract(args*) => SystemOps._Provider().DriveRetract(args*)
     static DriveUnlock(args*) => SystemOps._Provider().DriveUnlock(args*)
 
     ; --- recycle bin -------------------------------------------------------------------------------------------------
@@ -125,6 +126,10 @@ class SystemOps {
 
         DriveLock(args*) {
             return DriveLock(args*)
+        }
+
+        DriveRetract(args*) {
+            return DriveRetract(args*)
         }
 
         DriveUnlock(args*) {

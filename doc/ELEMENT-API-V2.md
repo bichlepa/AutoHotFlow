@@ -206,7 +206,7 @@ Actions that disturb the computer or cannot be undone run through the same kind 
 | Group | Functions (arguments) | Real behaviour |
 |---|---|---|
 | Power and session | `Shutdown(flags)`, `LockWorkStation()`, `Hibernate(force := 0)`, `Suspend(force := 0)` | `Shutdown`; `DllCall("LockWorkStation")`; `SetSuspendState` (PowrProf) with hibernate 1 or 0 |
-| Drives | `DriveEject(args*)`, `DriveSetLabel(args*)`, `DriveLock(args*)`, `DriveUnlock(args*)` | the AutoHotkey function of the same name (`args*`: its arguments, passed on) |
+| Drives | `DriveEject(args*)`, `DriveRetract(args*)`, `DriveSetLabel(args*)`, `DriveLock(args*)`, `DriveUnlock(args*)` | the AutoHotkey function of the same name (`args*`: its arguments, passed on). `DriveRetract` closes the tray of an optical drive (WI-0122) |
 | Recycle bin | `FileRecycle(args*)`, `FileRecycleEmpty(args*)` | `FileRecycle` (sends a file or folder to the recycle bin; permanent where AutoHotkey finds no bin, WI-0120), `FileRecycleEmpty` |
 | Screen | `ChangeDisplaySettings(args*)` | not implemented yet (WI-0127): throws `AhfError` |
 | Sound | `SoundSetVolume(args*)`, `SoundSetMute(args*)`, `SoundPlay(args*)`, `SoundBeep(args*)` | the AutoHotkey function of the same name |
