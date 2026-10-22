@@ -21,6 +21,7 @@ from support.coreflows import run_all, setvar
 from support.dialogs import DialogScript, answer
 from support.flowbuilder import FlowBuilder
 from support.flowrun import FlowRunner, flows, var_value  # noqa: F401  (flows: fixture)
+from support.system import SystemScript, value
 from support.timing import scaled
 
 pytestmark = pytest.mark.slow          # each test starts a session (acceptance tier, `-m slow`)
@@ -31,13 +32,9 @@ V2 = ROOT / "tests" / "data" / "flows" / "v2_adapted"
 HOST_ROLES = "storage,engine,triggerhost"       # the trigger host (S0003); the flows fixture starts without it
 
 # --- the fix list (every change of a loaded v1 flow in the copies of v2_adapted/) ---------------------------------------
-FIX_LIST = [
-    dict(flow="Flow 884290977", element="element0000000174", parameter="element class (the whole element)",
-         v1="Action_Speech_output, text \"Hello\", engine Microsoft Hedda Desktop", new="Action_Do_nothing",
-         migration="M-0077",
-         reason="The speech output is S0008. The element is the end of the path of Trigger_Start_up, so the connection "
-                "stays and the paths of the flow stay the same; the trigger itself is kept."),
-]
+# Empty since WI-0124: the speech output is back in the "Trigger test" copy (M-0077 resolved). The test provider of the
+# system seam answers SpeechVoices from the script of the test, and speaks nothing.
+FIX_LIST = []
 
 # --- the flows that are not in the corpus yet ---------------------------------------------------------------------
 # The v1 flow "Automatic tests" flows that are not in this corpus yet: the elements they lack and the step that brings them
@@ -59,8 +56,8 @@ PENDING = {
     "Flow 561135904": dict(name="Process Test", missing={
         "Trigger_Process_closes": "S0008",
         "Trigger_Process_starts": "S0008"}),
-    "Flow 65341778": dict(name="_AutomaticTest starter", missing={
-        "Action_Play_Sound": "S0008"}),
+    # its elements are all registered since WI-0124 (Action_Play_Sound); the flow itself runs with the acceptance (WI-0135)
+    "Flow 65341778": dict(name="_AutomaticTest starter", missing={}),
     "Flow 74366368": dict(name="File link test", missing={
         "Trigger_Shortcut": "S0008"}),
 }
@@ -233,6 +230,8 @@ def test_v1_trigger_test_runs_green_on_the_adapted_copy(host_flows):
         json.dumps({"formatVersion": 1, "enabled": ["element0000000172"]}), encoding="utf-8")
     dialogs = DialogScript(host_flows.datadir)
     dialogs.script(*[{"answer": "yes", "actions": []}] * 8)
+    # the speech output of the flow (WI-0124): its voice is installed in the test, and nothing is spoken (system seam)
+    SystemScript(host_flows.datadir).script({"SpeechVoices": [value(["Microsoft Hedda Desktop"])]})
     host_flows.start()
     startup = host_flows.wait_message(
         lambda m: m.get("type") == "evt.instance.started" and m["payload"].get("flowId") == flow_id,

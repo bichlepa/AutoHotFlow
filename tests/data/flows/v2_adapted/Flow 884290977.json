@@ -938,13 +938,19 @@
       "y": "-175"
     },
     "element0000000174": {
-      "class": "Action_Do_nothing",
+      "class": "Action_Speech_output",
       "ID": "element0000000174",
-      "name": "Speech output (replaced by Action_Do_nothing, S0008)",
+      "name": "Speech output -  - Microsoft Hedda Desktop",
       "package": "Default",
       "packageVersion": "1.2.0",
       "pars": {
-        "executionResult": "Normal"
+        "pitch": 0,
+        "speed": 0,
+        "text": "Hello",
+        "TTSEngine": "Microsoft Hedda Desktop",
+        "volume": 100,
+        "WaitUntilCurrentFinishes": 1,
+        "WaitUntilPreviousFinished": ""
       },
       "StandardName": "1",
       "type": "Action",
