@@ -30,7 +30,7 @@ StrictFlow(elements, connections) {
 }
 
 ; Runs the flow to its end. seen: the lines that the elements put into Probe by onRun, in order.
-Run(text, onRun) {
+RunFlowText(text, onRun) {
     owner := NewOwner(text)
     Probe.onRun := onRun
     owner.executor.StartFlow(owner.flows.Get("f"))
@@ -70,7 +70,7 @@ SimpleLoopPasses() {
     text := StrictFlow([LoopEl("L", "Loop_SimpleLoop", '{"Infinite":0,"repeatCount":3}'), Cnt("b"), Cnt("z")]
         , [Link("c1", "t0", "L", "", "HEAD"), Link("c2", "L", "b", "HEAD"), Link("c3", "b", "L", "", "TAIL")
         , Link("c4", "L", "z", "TAIL")])
-    owner := Run(text, Recorder(seen))
+    owner := RunFlowText(text, Recorder(seen))
     Assert.Equal(Joined(seen), "b:1/-/- b:2/-/- b:3/-/- z:-/-/-")
     Assert.Equal(owner.LastEndReason(), "finished")
 }
@@ -80,14 +80,14 @@ SimpleLoopZeroPassesAndBreak() {
     zero := StrictFlow([LoopEl("L", "Loop_SimpleLoop", '{"Infinite":0,"repeatCount":0}'), Cnt("b"), Cnt("z")]
         , [Link("c1", "t0", "L", "", "HEAD"), Link("c2", "L", "b", "HEAD"), Link("c3", "b", "L", "", "TAIL")
         , Link("c4", "L", "z", "TAIL")])
-    Run(zero, Recorder(seen))
+    RunFlowText(zero, Recorder(seen))
     Assert.Equal(Joined(seen), "z:-/-/-")
     ; the body leads to the break part: one pass, then the loop is left
     seen := []
     broken := StrictFlow([LoopEl("L", "Loop_SimpleLoop", '{"Infinite":1}'), Cnt("b"), Cnt("z")]
         , [Link("c1", "t0", "L", "", "HEAD"), Link("c2", "L", "b", "HEAD"), Link("c3", "b", "L", "", "break")
         , Link("c4", "L", "z", "TAIL")])
-    Run(broken, Recorder(seen))
+    RunFlowText(broken, Recorder(seen))
     Assert.Equal(Joined(seen), "b:1/-/- z:-/-/-")
 }
 
@@ -100,7 +100,7 @@ ListLoopVariablesAndCopy() {
     text := StrictFlow([Cnt("s"), LoopEl("L", "Loop_Work_through_a_list", '{"VarValue":"l"}'), Cnt("b"), Cnt("z")]
         , [Link("c0", "t0", "s"), Link("c1", "s", "L", "", "HEAD"), Link("c2", "L", "b", "HEAD")
         , Link("c3", "b", "L", "", "TAIL"), Link("c4", "L", "z", "TAIL")])
-    Run(text, onRun)
+    RunFlowText(text, onRun)
     Assert.Equal(Joined(seen), "s:-/-/- b:1/1/x b:2/2/y b:3/3/z z:-/-/-")
 }
 
@@ -143,7 +143,7 @@ NestedLoopsRestoreTheOuterVariables() {
         , [Link("c0", "t0", "s"), Link("c1", "s", "LO", "", "HEAD"), Link("c2", "LO", "LI", "HEAD", "HEAD")
         , Link("c3", "LI", "bi", "HEAD"), Link("c4", "bi", "LI", "", "TAIL"), Link("c5", "LI", "bo", "TAIL")
         , Link("c6", "bo", "LO", "", "TAIL"), Link("c7", "LO", "z", "TAIL")])
-    Run(text, onRun)
+    RunFlowText(text, onRun)
     ; The inner loop sets A_Index and A_LoopField and leaves A_LoopKey alone, so inside it A_LoopKey is the one of the outer
     ; loop (as in v1: entering a loop saves the loop variables and does not clear them). After it, all are the outer's.
     Assert.Equal(Joined(seen), "s:-/-/- bi:1/1/p bi:2/1/q bo:1/1/x bi:1/2/p bi:2/2/q bo:2/2/y z:-/-/-")
@@ -160,7 +160,7 @@ LeavingThroughExceptionRestoresTheOuterVariables() {
         , [Link("c0", "t0", "s"), Link("c1", "s", "LO", "", "HEAD"), Link("c2", "LO", "LI", "HEAD", "HEAD")
         , Link("c3", "LI", "bi", "HEAD"), Link("c4", "bi", "LI", "", "TAIL"), Link("c5", "LI", "be", "", "", "exception")
         , Link("c6", "be", "LO", "", "TAIL"), Link("c7", "LO", "z", "TAIL")])
-    owner := Run(text, onRun)
+    owner := RunFlowText(text, onRun)
     Assert.Equal(Joined(seen), "s:-/-/- bi:1/1/x be:1/1/x bi:1/2/y be:2/2/y z:-/-/-")
     Assert.Equal(owner.LastEndReason(), "finished")
 }
