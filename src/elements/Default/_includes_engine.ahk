@@ -11,6 +11,7 @@
 #Include lib\DialogOps.ahk
 #Include lib\FileOps.ahk
 #Include lib\FlowChoices.ahk
+#Include lib\ProcessOps.ahk
 #Include lib\FlowSwitchOps.ahk
 #Include lib\TimeOps.ahk
 #Include lib\DebugOps.ahk
@@ -34,10 +35,15 @@ class Default {
     #Include Actions\Action_Encode_string.ahk
     #Include Actions\Action_Execute_Flow.ahk
     #Include Actions\Action_Exponentiation.ahk
+    #Include Actions\Action_Get_Clipboard.ahk
     #Include Actions\Action_Get_From_List.ahk
     #Include Actions\Action_Get_index_of_element_in_list.ahk
     #Include Actions\Action_Get_List_Info.ahk
     #Include Actions\Action_Get_String_Length.ahk
+    #Include Actions\Action_Hibernate_Computer.ahk
+    #Include Actions\Action_Kill_Process.ahk
+    #Include Actions\Action_Lock_Computer.ahk
+    #Include Actions\Action_Log_Off.ahk
     #Include Actions\Action_Message_Box.ahk
     #Include Actions\Action_Move_File.ahk
     #Include Actions\Action_Move_Folder.ahk
@@ -46,14 +52,19 @@ class Default {
     #Include Actions\Action_New_variable.ahk
     #Include Actions\Action_Random_number.ahk
     #Include Actions\Action_Read_From_File.ahk
+    #Include Actions\Action_Reboot_Computer.ahk
     #Include Actions\Action_Rename_File.ahk
     #Include Actions\Action_Rename_Folder.ahk
     #Include Actions\Action_replace_in_a_string.ahk
     #Include Actions\Action_Rounding_A_Number.ahk
+    #Include Actions\Action_Run.ahk
     #Include Actions\Action_Script.ahk
     #Include Actions\Action_Search_in_a_string.ahk
+    #Include Actions\Action_Set_Clipboard.ahk
     #Include Actions\Action_Set_Flow_Status.ahk
+    #Include Actions\Action_Set_Process_Priority.ahk
     #Include Actions\Action_Shuffle_list.ahk
+    #Include Actions\Action_Shutdown.ahk
     #Include Actions\Action_Sleep.ahk
     #Include Actions\Action_Split_a_string.ahk
     #Include Actions\Action_Split_path.ahk
@@ -61,6 +72,7 @@ class Default {
     #Include Actions\Action_Stop_Flow.ahk
     #Include Actions\Action_Substring.ahk
     #Include Actions\Action_Substring2.ahk
+    #Include Actions\Action_Suspend_Computer.ahk
     #Include Actions\Action_Time_Calculation.ahk
     #Include Actions\Action_Time_Difference.ahk
     #Include Actions\Action_Tooltip.ahk
@@ -78,6 +90,7 @@ class Default {
     #Include Conditions\Condition_Flow_Running.ahk
     #Include Conditions\Condition_List_Contains_Element.ahk
     #Include Conditions\Condition_NumberIs.ahk
+    #Include Conditions\Condition_Process_Is_Running.ahk
     #Include Conditions\Condition_String_Contains_Text.ahk
     #Include Conditions\Condition_Variable_content_is.ahk
     #Include Conditions\Condition_Variable_Is_Empty.ahk
@@ -107,10 +120,15 @@ ElementRegistry.Register(Default.Action_Do_nothing)
 ElementRegistry.Register(Default.Action_Encode_string)
 ElementRegistry.Register(Default.Action_Execute_Flow)
 ElementRegistry.Register(Default.Action_Exponentiation)
+ElementRegistry.Register(Default.Action_Get_Clipboard)
 ElementRegistry.Register(Default.Action_Get_From_List)
 ElementRegistry.Register(Default.Action_Get_index_of_element_in_list)
 ElementRegistry.Register(Default.Action_Get_List_Info)
 ElementRegistry.Register(Default.Action_Get_String_Length)
+ElementRegistry.Register(Default.Action_Hibernate_Computer)
+ElementRegistry.Register(Default.Action_Kill_Process)
+ElementRegistry.Register(Default.Action_Lock_Computer)
+ElementRegistry.Register(Default.Action_Log_Off)
 ElementRegistry.Register(Default.Action_Message_Box)
 ElementRegistry.Register(Default.Action_Move_File)
 ElementRegistry.Register(Default.Action_Move_Folder)
@@ -119,14 +137,19 @@ ElementRegistry.Register(Default.Action_New_Time)
 ElementRegistry.Register(Default.Action_New_variable)
 ElementRegistry.Register(Default.Action_Random_number)
 ElementRegistry.Register(Default.Action_Read_From_File)
+ElementRegistry.Register(Default.Action_Reboot_Computer)
 ElementRegistry.Register(Default.Action_Rename_File)
 ElementRegistry.Register(Default.Action_Rename_Folder)
 ElementRegistry.Register(Default.Action_replace_in_a_string)
 ElementRegistry.Register(Default.Action_Rounding_A_Number)
+ElementRegistry.Register(Default.Action_Run)
 ElementRegistry.Register(Default.Action_Script)
 ElementRegistry.Register(Default.Action_Search_in_a_string)
+ElementRegistry.Register(Default.Action_Set_Clipboard)
 ElementRegistry.Register(Default.Action_Set_Flow_Status)
+ElementRegistry.Register(Default.Action_Set_Process_Priority)
 ElementRegistry.Register(Default.Action_Shuffle_list)
+ElementRegistry.Register(Default.Action_Shutdown)
 ElementRegistry.Register(Default.Action_Sleep)
 ElementRegistry.Register(Default.Action_Split_a_string)
 ElementRegistry.Register(Default.Action_Split_path)
@@ -134,6 +157,7 @@ ElementRegistry.Register(Default.Action_Square_Root)
 ElementRegistry.Register(Default.Action_Stop_Flow)
 ElementRegistry.Register(Default.Action_Substring)
 ElementRegistry.Register(Default.Action_Substring2)
+ElementRegistry.Register(Default.Action_Suspend_Computer)
 ElementRegistry.Register(Default.Action_Time_Calculation)
 ElementRegistry.Register(Default.Action_Time_Difference)
 ElementRegistry.Register(Default.Action_Tooltip)
@@ -151,6 +175,7 @@ ElementRegistry.Register(Default.Condition_Flow_Enabled)
 ElementRegistry.Register(Default.Condition_Flow_Running)
 ElementRegistry.Register(Default.Condition_List_Contains_Element)
 ElementRegistry.Register(Default.Condition_NumberIs)
+ElementRegistry.Register(Default.Condition_Process_Is_Running)
 ElementRegistry.Register(Default.Condition_String_Contains_Text)
 ElementRegistry.Register(Default.Condition_Variable_content_is)
 ElementRegistry.Register(Default.Condition_Variable_Is_Empty)

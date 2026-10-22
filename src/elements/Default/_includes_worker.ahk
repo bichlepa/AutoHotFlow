@@ -8,6 +8,7 @@
 #Include lib\DialogOps.ahk
 #Include lib\FileOps.ahk
 #Include lib\TextOps.ahk
+#Include lib\ProcessOps.ahk
 #Include lib\DebugOps.ahk
 
 ; arch-ok: one-class the generated package class is named after the package, not after this file
@@ -17,17 +18,29 @@ class Default {
     #Include Actions\Action_Create_Folder.ahk
     #Include Actions\Action_Delete_File.ahk
     #Include Actions\Action_Delete_Folder.ahk
+    #Include Actions\Action_Get_Clipboard.ahk
+    #Include Actions\Action_Hibernate_Computer.ahk
+    #Include Actions\Action_Kill_Process.ahk
+    #Include Actions\Action_Lock_Computer.ahk
+    #Include Actions\Action_Log_Off.ahk
     #Include Actions\Action_Message_Box.ahk
     #Include Actions\Action_Move_File.ahk
     #Include Actions\Action_Move_Folder.ahk
     #Include Actions\Action_Read_From_File.ahk
+    #Include Actions\Action_Reboot_Computer.ahk
     #Include Actions\Action_Rename_File.ahk
     #Include Actions\Action_Rename_Folder.ahk
+    #Include Actions\Action_Run.ahk
+    #Include Actions\Action_Set_Clipboard.ahk
+    #Include Actions\Action_Set_Process_Priority.ahk
+    #Include Actions\Action_Shutdown.ahk
+    #Include Actions\Action_Suspend_Computer.ahk
     #Include Actions\Action_Tooltip.ahk
     #Include Actions\Action_Write_To_File.ahk
     #Include Conditions\Condition_Confirmation_Dialog.ahk
     #Include Conditions\Condition_Debug_Dialog.ahk
     #Include Conditions\Condition_File_Exists.ahk
+    #Include Conditions\Condition_Process_Is_Running.ahk
 }
 
 ElementRegistry.RegisterPackage("Default", "1.2.1")
@@ -36,14 +49,26 @@ ElementRegistry.Register(Default.Action_Copy_Folder)
 ElementRegistry.Register(Default.Action_Create_Folder)
 ElementRegistry.Register(Default.Action_Delete_File)
 ElementRegistry.Register(Default.Action_Delete_Folder)
+ElementRegistry.Register(Default.Action_Get_Clipboard)
+ElementRegistry.Register(Default.Action_Hibernate_Computer)
+ElementRegistry.Register(Default.Action_Kill_Process)
+ElementRegistry.Register(Default.Action_Lock_Computer)
+ElementRegistry.Register(Default.Action_Log_Off)
 ElementRegistry.Register(Default.Action_Message_Box)
 ElementRegistry.Register(Default.Action_Move_File)
 ElementRegistry.Register(Default.Action_Move_Folder)
 ElementRegistry.Register(Default.Action_Read_From_File)
+ElementRegistry.Register(Default.Action_Reboot_Computer)
 ElementRegistry.Register(Default.Action_Rename_File)
 ElementRegistry.Register(Default.Action_Rename_Folder)
+ElementRegistry.Register(Default.Action_Run)
+ElementRegistry.Register(Default.Action_Set_Clipboard)
+ElementRegistry.Register(Default.Action_Set_Process_Priority)
+ElementRegistry.Register(Default.Action_Shutdown)
+ElementRegistry.Register(Default.Action_Suspend_Computer)
 ElementRegistry.Register(Default.Action_Tooltip)
 ElementRegistry.Register(Default.Action_Write_To_File)
 ElementRegistry.Register(Default.Condition_Confirmation_Dialog)
 ElementRegistry.Register(Default.Condition_Debug_Dialog)
 ElementRegistry.Register(Default.Condition_File_Exists)
+ElementRegistry.Register(Default.Condition_Process_Is_Running)
