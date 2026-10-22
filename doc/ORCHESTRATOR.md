@@ -21,7 +21,7 @@ The text below is addressed to the orchestrator, in English like the repository.
 9. Each verify verdict goes into `STATUS.md` with sha and run IDs.
 10. A git command refused by a permission: the agent reports `ESCALATE` and stops.
 11. Rate limit (HTTP 429) or standby with clock jump: the run is invalid, rerun it fresh.
-12. Work independently; ask only in the two cases of section 0.
+12. Work independently; ask only in the two cases of "You are the orchestrator".
 
 ---
 
@@ -55,7 +55,7 @@ Start agents in the background; their completion notifications wake you. Do not 
 ## 2. Rules for all agents (put the relevant ones into every prompt)
 
 - English only: code, comments, docs, logs, commit messages, issue text.
-- Work only in the given workspace. Never touch the main checkout, `v1/` or another workspace. Never merge, rebase or push; the orchestrator alone runs `git rebase` and `git cherry-pick`. Small commits, one change each, message explains why, ending with `Co-Authored-By: <the model's own name> <noreply@anthropic.com>`.
+- Work only in the given workspace. Never touch the main checkout, `v1/` or another workspace. Agents never merge, rebase or push; the orchestrator alone runs `git rebase` and `git cherry-pick`. Small commits, one change each, message explains why, ending with `Co-Authored-By: <the model's own name> <noreply@anthropic.com>`.
 - Read only what the prompt lists (section 9). Never start `.ahk` scripts directly (`python tools/ahkrun.py`). No shell heredocs with backslashes; use the editor tools.
 - Mark every statement verified, assumed or not checked, and every test result with its run ID (section 4).
 - **Decisions:** an agent decides itself when the solution is obvious, or when it strongly recommends one option and is fairly sure the owner wants it. It lists each such decision (what, why, alternative). Anything else is marked `decision needed` and work goes on around it.
@@ -130,7 +130,7 @@ For a branch that is approved (or needs no review), in the main checkout:
 
 1. Read the diff (`git diff --stat v2-port...<branch>`), commit messages, decisions and review. A report with `ESCALATE` is not integrated (section 1).
 2. Volatile names in the diff are corrected in the agent's workspace (or in one extra commit there).
-3. **Rebase in the branch's workspace** (the orchestrator runs it) when `git merge-base --is-ancestor v2-port <branch>` fails: `git rebase v2-port`. Append-only files (`doc/OPEN-ITEMS.md`, `doc/howto/*`, `doc/MIGRATION.md`, summary tables, `.vscode/tasks.json`): keep both sides. Generated indexes (`doc/REQUIREMENTS-INDEX.md`, `doc/DOC-INDEX.md`): take either side, run `python tools/doc_index.py`. Any other conflict: leave the rebase stopped (no `--abort`); the author (SendMessage) or a new `haiku` agent (`sonnet` on `ESCALATE`) edits the conflicting files only (no git command), then the orchestrator runs `git add` and `git rebase --continue`. Conflicts are resolved in the workspace, never in the main checkout. After each rebase run `python tools/doc_index.py` and commit changed indexes; if code changed, the author reruns its short tests (the orchestrator starts no tests itself except `verify.py`).
+3. **Rebase in the branch's workspace** (the orchestrator runs it) when `git merge-base --is-ancestor v2-port <branch>` fails: `git rebase v2-port`. Append-only files (`doc/OPEN-ITEMS.md`, `doc/howto/*`, `doc/MIGRATION.md`, summary tables, `.vscode/tasks.json`): keep both sides. Generated indexes (`doc/REQUIREMENTS-INDEX.md`, `doc/DOC-INDEX.md`): take either side, run `python tools/doc_index.py`. Any other conflict: leave the rebase stopped (no `--abort`); the author (SendMessage) or a new `haiku` agent (`sonnet` on `ESCALATE`) edits the conflicting files only (no git command), then the orchestrator runs `git add` and `git rebase --continue`. Conflicts are resolved in the workspace, never in the main checkout. After each rebase run `python tools/doc_index.py` and commit changed indexes; if code changed, the author reruns its short tests. The orchestrator runs no tests itself except `verify.py` and the index and ID checks (`tests/test_doc_index.py`, `tests/test_open_items_ids.py`, `tests/test_groups.py`), which it may run after a rebase.
 4. **Renumber:** `python tools/renumber_findings.py --commit` in the workspace (`nothing to renumber` is valid).
 5. `git cherry-pick v2-port..<branch>` in the main checkout. **No merge commits**, no temporary branches (`python tools/new_workspace.py --remove <name>` once its patches are on `v2-port`).
 6. Conflict because a commit arrived meanwhile: `git cherry-pick --abort`, back to step 3.
@@ -195,7 +195,7 @@ Delivery: hand the report back once, as the last action (SubagentHandback); then
 
 ## 10. Status book and resuming
 
-`work_items/phase3/STATUS.md` holds **only the current state**: the work-item table, pending integrations, running agents with workspace and model, the last verified state (sha, tree hashes of `src`, `tests`, `tools`, verdict, run IDs), this session's hunter entries, and the review log if review mode ran. No session log; replace lines instead of appending. Keep it under about 15 KB. Commit it with the integration it belongs to, or at session end; never just for "agent started".
+`work_items/phase3/STATUS.md` holds **only the current state**: the work-item table, pending integrations, running agents with workspace and model, the last verified state (sha, tree hashes of `src`, `tests`, `tools`, verdict, run IDs), this session's hunter entries, and the review log if review mode ran. In wishes mode (3a) keep a "Wishes" table with the same columns. No session log; replace lines instead of appending. Keep it under about 15 KB. Commit it with the integration it belongs to, or at session end; never just for "agent started".
 
 Quota limits will recur. Agents commit often; an agent that hits a limit commits what works, notes where it stopped, and ends. At session start read `STATUS.md` and `new_workspace.py --list`, check the owner's state (5a), retry `integration pending`. A workspace with commits not on `v2-port` is unfinished work: continue or integrate it. A workspace without commits and changes is removed.
 
