@@ -122,6 +122,7 @@ TEST_GROUPS = {
     "golden/test_ahkrun_interpreter.py": ["tools"],
     "golden/test_golden_format.py": ["tools"],
     "golden/test_golden_v2.py": ["expr"],
+    "schema/test_v1_schema.py": ["element-units"],
     "integration/test_categories.py": ["engine", "storage"],
     "integration/test_core_a_elements.py": ["elements-e2e"],
     "integration/test_core_a_trace_points.py": ["elements-e2e"],

@@ -32,6 +32,8 @@ OTHER_RULES = [
     ("tests/support/groups.py", ["architecture"]),
     ("tests/golden/*", ["expr"]),                        # the golden data of the expression language (frozen)
     ("tests/oracle/*", ["expr"]),                        # the oracle corpus and harness of the expression language
+    ("tests/schema/v2_schema.ahk", ["element-units"]),    # the v2 side of the parameter schema check (WI-0116)
+    ("tests/data/v1_schema.json", ["element-units"]),     # the v1 side of it, written by tools/v1_schema.py
     ("tests/conftest.py", None),                         # fixtures, options and the run record of every test
     ("tests/support/*", None),                           # process kit, admission, history, dialogs: any test may use them
     ("tests/requirements.txt", None),                    # pinned test dependencies: a new version may break any test
@@ -113,6 +115,7 @@ OTHER_RULES = [
     ("tools/doc_index.py", ["docs"]),
     ("tools/req_index.py", ["docs"]),
     ("tools/golden_*.py", ["expr"]),
+    ("tools/v1_schema.py", ["element-units", "tools"]),          # writes the v1 side of the schema check (WI-0116)
     ("tools/*", ["tools"]),
     (".vscode/*", ["tools"]),
     (".gitignore", ["tools"]),                                  # run_suite copies the files that are not ignored

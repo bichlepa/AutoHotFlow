@@ -898,6 +898,31 @@
             "problemMatcher": []
         },
         {
+            "label": "Testdata: regenerate the v1 parameter schema (tests/data/v1_schema.json)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/v1_schema.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Testdata: check that the v1 parameter schema is up to date (no write)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/v1_schema.py",
+                "--check"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Test: expression oracle (fixed corpus)",
             "type": "shell",
             "command": "python",
@@ -1526,6 +1551,23 @@
             "args": [
                 "tools/golden_compare.py",
                 "--private"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: parameter schema of the element classes against v1 (tests/schema)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/schema",
+                "-q",
+                "-n",
+                "0"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
