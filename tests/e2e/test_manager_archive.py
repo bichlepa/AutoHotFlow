@@ -249,7 +249,7 @@ def test_a_real_v1_export_imports_both_flows_disabled_and_the_warning_lists_thei
     assert wait_until(lambda: all(i in v2_flows(obs) for i in ids), scaled(20)), sorted(v2_flows(obs))
     assert all(not v2_flows(obs)[i]["enabled"] for i in ids)
     text = [q for q in questions(obs) if q["kind"] == "importWarning"][0]["args"][0]
-    assert "Default.action_Run (unknown element)" in text, text
+    assert "Default.action_Run (unknown element)" not in text, text     # Action_Run is registered since WI-0123
     assert "Default.action_Send_Keystrokes (unknown element)" in text, text
 
 
