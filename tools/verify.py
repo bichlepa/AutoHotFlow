@@ -254,10 +254,22 @@ def run_suite_runner(tier, sha, base=None):
     return proc.returncode, (proc.stdout + proc.stderr).decode("utf-8", "replace")
 
 
-def run_tiers(tiers, sha, runner):
-    """Starts the tiers at the same time and returns their outcomes in TIERS order."""
+def progress_line(tier, event):
+    """One progress line with the time, e.g. '[14:02:11] fast: started'. event: 'started' or 'finished (exit 0)'."""
+    return "[%s] %s: %s" % (time.strftime("%H:%M:%S"), tier, event)
+
+
+def run_tiers(tiers, sha, runner, progress=say):
+    """Starts the tiers at the same time and returns their outcomes in TIERS order. progress gets one line when a
+    tier starts and one when it ends, so that a waiting reader sees the run move on."""
+    def timed(tier):
+        progress(progress_line(tier, "started"))
+        code, text = runner(tier, sha)
+        progress(progress_line(tier, "finished (exit %d)" % code))
+        return code, text
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(tiers)) as pool:
-        futures = {tier: pool.submit(runner, tier, sha) for tier in tiers}
+        futures = {tier: pool.submit(timed, tier) for tier in tiers}
         outcomes = []
         for tier in ORDER:
             if tier in futures:
@@ -365,7 +377,9 @@ def main(argv=None, runner=None, repo=REPO):
                 say(line)
         return EXIT_GREEN
 
-    outcomes = run_tiers(tiers, sha, runner or functools.partial(run_suite_runner, base=base))
+    # with --json the progress goes to stderr, so that stdout stays one JSON object
+    progress = functools.partial(print, file=sys.stderr if args.json else sys.stdout, flush=True)
+    outcomes = run_tiers(tiers, sha, runner or functools.partial(run_suite_runner, base=base), progress)
     verdict, detail = verdict_of(outcomes)
     code = EXIT_GREEN if verdict == "green" else EXIT_RED
     if verdict == "green":

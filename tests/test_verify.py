@@ -328,6 +328,24 @@ def test_json_output_is_one_object(repo, tmp_path, capsys):
     assert data["sha"] == verify.resolve(repo, "HEAD")
 
 
+def test_each_tier_reports_its_start_and_its_end(repo, tmp_path, capsys):
+    assert verify.main(["--tiers", "fast,slow"], runner=FakeRunner(tmp_path / "runs"), repo=repo) == 0
+    out = capsys.readouterr().out
+    for tier in ("fast", "slow"):
+        started = [line for line in out.splitlines() if line.endswith("%s: started" % tier)]
+        finished = [line for line in out.splitlines() if line.endswith("%s: finished (exit 0)" % tier)]
+        assert len(started) == 1 and len(finished) == 1
+        assert started[0].startswith("[") and "] " in started[0]          # with the time
+    assert "VERDICT: green" in out                                       # the verdict line is unchanged
+
+
+def test_progress_goes_to_stderr_when_the_output_is_json(repo, tmp_path, capsys):
+    assert verify.main(["--tiers", "fast", "--json"], runner=FakeRunner(tmp_path / "runs"), repo=repo) == 0
+    captured = capsys.readouterr()
+    assert json.loads(captured.out)["verdict"] == "green"                # stdout is still one JSON object
+    assert "fast: started" in captured.err and "fast: finished (exit 0)" in captured.err
+
+
 def test_auto_and_tiers_exclude_each_other(repo, capsys):
     assert verify.main(["--auto", "--tiers", "fast"], runner=FakeRunner(repo), repo=repo) == 2
 
