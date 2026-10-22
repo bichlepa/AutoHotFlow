@@ -99,14 +99,19 @@ img {
 <body>
 <main>
 <h1>Change character case</h1>
-<p>The action <strong>Change character case</strong> converts a string to lowercase or uppercase.</p>
+<p>The action <strong>Change character case</strong> writes a string in upper case, in lower case, or with the first letter of every word in upper case, to a variable.</p>
 <h2>Settings</h2>
-<h3>Output variable name</h3>
-<p>Name of the variable which will contain the result.</p>
+<h3>Output Variable name</h3>
+<p>The variable that receives the result. It may be the same variable as the input string.</p>
 <h3>Input string</h3>
-<p>String that will be converted to lowercase or uppercase.</p>
+<p>The string to convert.</p>
 <h3>Which case</h3>
-<p>Specify the desired character case.</p>
+<p><strong>Uppercase</strong> writes every letter in upper case.</p>
+<p><strong>Lowercase</strong> writes every letter in lower case.</p>
+<p><strong>First character of a word is uppercase</strong> (title case) writes the first letter of every word in upper case and the other letters of the word in lower case: "hello WORLD" becomes "Hello World".</p>
+<p>Letters outside the English alphabet (for example "ä" or "é") are converted too.</p>
+<h2>Examples</h2>
+<p>"Hello World" in uppercase is "HELLO WORLD"; in lowercase it is "hello world".</p>
 </main>
 </body>
 </html>

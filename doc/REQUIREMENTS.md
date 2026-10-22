@@ -772,32 +772,33 @@ The variables are exchanged as in v1 (E0104): the variables the user names for i
 ### REQ-ELM-220 Strings
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0119)
+- **Evidence:** `tests/integration/test_text_elements.py::test_search_gives_the_position_from_the_left_and_the_right`, `tests/integration/test_text_elements.py::test_substring2_between_two_texts`, `tests/integration/test_text_elements.py::test_replace_regular_expression_and_its_groups`, `tests/integration/test_text_elements.py::test_trim_a_number_of_characters_from_each_side`, `tests/integration/test_text_elements.py::test_split_gives_one_value_per_field`, `tests/integration/test_text_elements.py::test_change_character_case`, `tests/integration/test_text_elements.py::test_encode_string_as_url`, `tests/integration/test_text_elements.py::test_contains_text_at_start_end_and_anywhere`, `tests/integration/test_text_elements.py::test_get_string_length_counts_characters`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Search_in_a_string` | yes | open | S0008 |
-| `Action_Substring` | yes | open | S0008 |
-| `Action_Substring2` | yes | open | S0008 |
-| `Action_Get_string_Length` | yes | open | S0008 |
-| `Action_Replace_in_a_string` | yes | open | S0008 |
-| `Action_Trim_a_string` | yes | open | S0008 |
-| `Action_Split_a_string` | yes | open | S0008 |
-| `Action_Change_character_case` | yes | open | S0008 |
-| `Action_Encode_string` | yes | open | S0008 |
-| `Condition_String_Contains_Text` | yes | open | S0008 |
+| `Action_Search_in_a_string` | yes | done | S0008 (WI-0119) |
+| `Action_Substring` | yes | done | S0008 (WI-0119) |
+| `Action_Substring2` | yes | done | S0008 (WI-0119) |
+| `Action_Get_string_Length` | yes | done | S0008 (WI-0119) |
+| `Action_Replace_in_a_string` | yes | done (with a regular expression mode, MIGRATION M-0108) | S0008 (WI-0119) |
+| `Action_Trim_a_string` | yes | done | S0008 (WI-0119) |
+| `Action_Split_a_string` | yes | done | S0008 (WI-0119) |
+| `Action_Change_character_case` | yes | done | S0008 (WI-0119) |
+| `Action_Encode_string` | yes | done | S0008 (WI-0119) |
+| `Condition_String_Contains_Text` | yes | done | S0008 (WI-0119) |
 
 ### REQ-ELM-230 Lists
 
 - **v1:** yes
-- **v2:** partial (the seven list elements are done in S0002; `Action_Get_from_list` and the conversions are S0008)
+- **v2:** partial (the seven list elements are done in S0002; `Action_Get_from_list` and the two conversions are done in S0008 (WI-0119) for JSON; YAML is later, REQ-ELM-310)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0053), S0008
-- **Evidence:** `tests/integration/test_core_b_lists.py::test_new_list_creates_empty_and_filled_lists`, `tests/integration/test_core_b_lists.py::test_add_to_list_every_position_and_method`, `tests/integration/test_core_b_lists.py::test_get_list_info_all_four_infos`, `tests/integration/test_core_b_lists.py::test_list_contains_element_key_and_content`, `tests/integration/test_core_b_lists.py::test_delete_from_list_every_position_and_method`, `tests/integration/test_core_b_lists.py::test_get_index_of_element_in_list`, `tests/integration/test_core_b_lists.py::test_shuffle_list_keeps_content_and_count`, `tests/integration/test_core_b_lists.py::test_the_v1_flow_list_test_runs`, `tests/ahk/element_list_ops.test.ahk`
+- **Plan:** S0002 (WI-0053), S0008 (WI-0119)
+- **Evidence:** `tests/integration/test_core_b_lists.py::test_new_list_creates_empty_and_filled_lists`, `tests/integration/test_core_b_lists.py::test_add_to_list_every_position_and_method`, `tests/integration/test_core_b_lists.py::test_get_list_info_all_four_infos`, `tests/integration/test_core_b_lists.py::test_list_contains_element_key_and_content`, `tests/integration/test_core_b_lists.py::test_delete_from_list_every_position_and_method`, `tests/integration/test_core_b_lists.py::test_get_index_of_element_in_list`, `tests/integration/test_core_b_lists.py::test_shuffle_list_keeps_content_and_count`, `tests/integration/test_core_b_lists.py::test_the_v1_flow_list_test_runs`, `tests/ahk/element_list_ops.test.ahk`, `tests/integration/test_list_conversions.py::test_get_from_list_first_last_and_specified`, `tests/integration/test_list_conversions.py::test_convert_list_to_compact_json_and_indented`, `tests/integration/test_list_conversions.py::test_convert_string_to_list_reads_a_json_array_and_writes_it_back`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
@@ -808,11 +809,11 @@ The variables are exchanged as in v1 (E0104): the variables the user names for i
 | `Action_Get_index_of_element_in_list` | yes | done | S0002 (WI-0053) |
 | `Action_Shuffle_list` | yes | done | S0002 (WI-0053) |
 | `Condition_List_Contains_Element` | yes | done | S0002 (WI-0053) |
-| `Action_Get_from_list` | yes | open | S0008 |
-| `Action_Convert_list_to_string` | yes | open | S0008 |
-| `Action_Convert_string_to_list` | yes | open | S0008 |
+| `Action_Get_from_list` | yes | done | S0008 (WI-0119) |
+| `Action_Convert_list_to_string` | yes | done (JSON; YAML later, REQ-ELM-310) | S0008 (WI-0119) |
+| `Action_Convert_string_to_list` | yes | done (JSON; YAML later, REQ-ELM-310) | S0008 (WI-0119) |
 
-The differences from v1 that the list elements bring are in MIGRATION M-0057 and M-0058.
+The differences from v1 that the list elements bring are in MIGRATION M-0057, M-0058, M-0109 and M-0110.
 
 ### REQ-ELM-240 Loops
 

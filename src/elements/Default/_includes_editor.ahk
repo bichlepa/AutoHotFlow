@@ -6,6 +6,8 @@
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
 #Include lib\ListOps.ahk
+#Include lib\TextOps.ahk
+#Include lib\ListFormats.ahk
 #Include lib\FlowChoices.ahk
 #Include lib\DialogOps.ahk
 #Include lib\FlowSwitchOps.ahk
@@ -18,30 +20,42 @@
 class Default {
     #Include Actions\Action_Absolute_number.ahk
     #Include Actions\Action_Add_To_List.ahk
+    #Include Actions\Action_Change_character_case.ahk
+    #Include Actions\Action_Convert_list_to_string.ahk
+    #Include Actions\Action_Convert_string_to_list.ahk
     #Include Actions\Action_Delete_from_list.ahk
     #Include Actions\Action_Do_nothing.ahk
+    #Include Actions\Action_Encode_string.ahk
     #Include Actions\Action_Execute_Flow.ahk
     #Include Actions\Action_Exponentiation.ahk
+    #Include Actions\Action_Get_From_List.ahk
     #Include Actions\Action_Get_index_of_element_in_list.ahk
     #Include Actions\Action_Get_List_Info.ahk
+    #Include Actions\Action_Get_String_Length.ahk
     #Include Actions\Action_Message_Box.ahk
     #Include Actions\Action_New_List.ahk
     #Include Actions\Action_New_Time.ahk
     #Include Actions\Action_New_variable.ahk
     #Include Actions\Action_Random_number.ahk
+    #Include Actions\Action_replace_in_a_string.ahk
     #Include Actions\Action_Rounding_A_Number.ahk
     #Include Actions\Action_Script.ahk
+    #Include Actions\Action_Search_in_a_string.ahk
     #Include Actions\Action_Set_Flow_Status.ahk
     #Include Actions\Action_Shuffle_list.ahk
     #Include Actions\Action_Sleep.ahk
+    #Include Actions\Action_Split_a_string.ahk
     #Include Actions\Action_Square_Root.ahk
     #Include Actions\Action_Stop_Flow.ahk
+    #Include Actions\Action_Substring.ahk
+    #Include Actions\Action_Substring2.ahk
     #Include Actions\Action_Time_Calculation.ahk
     #Include Actions\Action_Time_Difference.ahk
     #Include Actions\Action_Tooltip.ahk
     #Include Actions\Action_Trace_Point.ahk
     #Include Actions\Action_Trace_Point_Check.ahk
     #Include Actions\Action_Trigonometry.ahk
+    #Include Actions\Action_Trim_a_string.ahk
     #Include Conditions\Condition_Confirmation_Dialog.ahk
     #Include Conditions\Condition_Debug_Dialog.ahk
     #Include Conditions\Condition_Do_nothing.ahk
@@ -50,6 +64,7 @@ class Default {
     #Include Conditions\Condition_Flow_Running.ahk
     #Include Conditions\Condition_List_Contains_Element.ahk
     #Include Conditions\Condition_NumberIs.ahk
+    #Include Conditions\Condition_String_Contains_Text.ahk
     #Include Conditions\Condition_Variable_content_is.ahk
     #Include Conditions\Condition_Variable_Is_Empty.ahk
     #Include Loops\Loop_Condition.ahk
@@ -65,30 +80,42 @@ class Default {
 ElementRegistry.RegisterPackage("Default", "1.2.1")
 ElementRegistry.Register(Default.Action_Absolute_number)
 ElementRegistry.Register(Default.Action_Add_To_List)
+ElementRegistry.Register(Default.Action_Change_character_case)
+ElementRegistry.Register(Default.Action_Convert_list_to_string)
+ElementRegistry.Register(Default.Action_Convert_string_to_list)
 ElementRegistry.Register(Default.Action_Delete_from_list)
 ElementRegistry.Register(Default.Action_Do_nothing)
+ElementRegistry.Register(Default.Action_Encode_string)
 ElementRegistry.Register(Default.Action_Execute_Flow)
 ElementRegistry.Register(Default.Action_Exponentiation)
+ElementRegistry.Register(Default.Action_Get_From_List)
 ElementRegistry.Register(Default.Action_Get_index_of_element_in_list)
 ElementRegistry.Register(Default.Action_Get_List_Info)
+ElementRegistry.Register(Default.Action_Get_String_Length)
 ElementRegistry.Register(Default.Action_Message_Box)
 ElementRegistry.Register(Default.Action_New_List)
 ElementRegistry.Register(Default.Action_New_Time)
 ElementRegistry.Register(Default.Action_New_variable)
 ElementRegistry.Register(Default.Action_Random_number)
+ElementRegistry.Register(Default.Action_replace_in_a_string)
 ElementRegistry.Register(Default.Action_Rounding_A_Number)
 ElementRegistry.Register(Default.Action_Script)
+ElementRegistry.Register(Default.Action_Search_in_a_string)
 ElementRegistry.Register(Default.Action_Set_Flow_Status)
 ElementRegistry.Register(Default.Action_Shuffle_list)
 ElementRegistry.Register(Default.Action_Sleep)
+ElementRegistry.Register(Default.Action_Split_a_string)
 ElementRegistry.Register(Default.Action_Square_Root)
 ElementRegistry.Register(Default.Action_Stop_Flow)
+ElementRegistry.Register(Default.Action_Substring)
+ElementRegistry.Register(Default.Action_Substring2)
 ElementRegistry.Register(Default.Action_Time_Calculation)
 ElementRegistry.Register(Default.Action_Time_Difference)
 ElementRegistry.Register(Default.Action_Tooltip)
 ElementRegistry.Register(Default.Action_Trace_Point)
 ElementRegistry.Register(Default.Action_Trace_Point_Check)
 ElementRegistry.Register(Default.Action_Trigonometry)
+ElementRegistry.Register(Default.Action_Trim_a_string)
 ElementRegistry.Register(Default.Condition_Confirmation_Dialog)
 ElementRegistry.Register(Default.Condition_Debug_Dialog)
 ElementRegistry.Register(Default.Condition_Do_nothing)
@@ -97,6 +124,7 @@ ElementRegistry.Register(Default.Condition_Flow_Enabled)
 ElementRegistry.Register(Default.Condition_Flow_Running)
 ElementRegistry.Register(Default.Condition_List_Contains_Element)
 ElementRegistry.Register(Default.Condition_NumberIs)
+ElementRegistry.Register(Default.Condition_String_Contains_Text)
 ElementRegistry.Register(Default.Condition_Variable_content_is)
 ElementRegistry.Register(Default.Condition_Variable_Is_Empty)
 ElementRegistry.Register(Default.Loop_Condition)

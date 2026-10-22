@@ -99,17 +99,21 @@ img {
 <body>
 <main>
 <h1>String contains text</h1>
-<p>The condition <strong>String contains text</strong> checks whether a string contains the specified text.</p>
+<p>The condition <strong>String contains text</strong> checks whether a string starts with, ends with or contains a text. It ends with "yes" if it does and with "no" if it does not.</p>
 <h2>Settings</h2>
 <h3>Input string</h3>
-<p>A string its contents will be read from.</p>
+<p>The string to check.</p>
 <h3>Text to search</h3>
-<p>The string to search for.</p>
+<p>The text to look for. It must not be empty.</p>
 <h3>Search text position</h3>
-<p>Specify whether the input string must start or end with the searched text or just contain it anywhere.</p>
+<p><strong>Starts with</strong>: the string begins with the text.</p>
+<p><strong>Ends with</strong>: the string ends with the text.</p>
+<p><strong>Contains anywhere</strong>: the text occurs somewhere in the string.</p>
 <h3>Case sensitivity</h3>
-<p>If <strong>Case insensitive</strong> is selected, the character case will be ignored. For example if the input string is “Hello World”, the search text “world” will match.</p>
-<p>If <strong>Case sensitive</strong> is selected, the character case will not be ignored.</p>
+<p>If <strong>Case insensitive</strong> is selected, the character case is ignored: "Hello World" contains "world".</p>
+<p>If <strong>Case sensitive</strong> is selected, the character case matters.</p>
+<h2>Remarks</h2>
+<p>The condition has two results, so it is used with the "yes" and "no" connections of the flow.</p>
 </main>
 </body>
 </html>

@@ -132,6 +132,8 @@ TEST_GROUPS = {
     "integration/test_maths_elements.py": ["elements-e2e"],
     "integration/test_script_element.py": ["elements-e2e"],
     "integration/test_time_elements.py": ["elements-e2e"],
+    "integration/test_text_elements.py": ["elements-e2e"],
+    "integration/test_list_conversions.py": ["elements-e2e"],
     "integration/test_core_d_flows.py": ["engine"],
     "integration/test_core_e_dialogs.py": ["ui", "elements-e2e"],
     "integration/test_corpus.py": ["expr", "engine"],
@@ -268,6 +270,70 @@ TEST_GROUPS = {
 # test function as `file::function`. An element without an entry (a new one) or with an empty list runs the element
 # units only. The guard test requires an entry for every element file.
 COVERS = {
+    "src/elements/Default/Actions/Action_Change_character_case.ahk": [
+        "integration/test_text_elements.py::test_change_character_case",
+    ],
+    "src/elements/Default/Actions/Action_Convert_list_to_string.ahk": [
+        "integration/test_list_conversions.py::test_convert_list_to_compact_json_and_indented",
+        "integration/test_list_conversions.py::test_convert_list_with_text_keys_is_an_object_with_sorted_keys",
+        "integration/test_list_conversions.py::test_convert_list_to_yaml_is_an_exception",
+        "integration/test_list_conversions.py::test_convert_string_to_list_reads_a_json_array_and_writes_it_back",
+    ],
+    "src/elements/Default/Actions/Action_Convert_string_to_list.ahk": [
+        "integration/test_list_conversions.py::test_convert_string_to_list_reads_a_json_array_and_writes_it_back",
+        "integration/test_list_conversions.py::test_convert_string_to_list_errors_are_exceptions",
+    ],
+    "src/elements/Default/Actions/Action_Encode_string.ahk": [
+        "integration/test_text_elements.py::test_encode_string_as_url",
+    ],
+    "src/elements/Default/Actions/Action_Get_From_List.ahk": [
+        "integration/test_list_conversions.py::test_get_from_list_first_last_and_specified",
+        "integration/test_list_conversions.py::test_get_from_list_random_is_one_of_the_values",
+        "integration/test_list_conversions.py::test_get_from_list_with_a_text_key",
+        "integration/test_list_conversions.py::test_get_from_list_of_a_number_key_written_as_text",
+    ],
+    "src/elements/Default/Actions/Action_Get_String_Length.ahk": [
+        "integration/test_text_elements.py::test_get_string_length_counts_characters",
+    ],
+    "src/elements/Default/Actions/Action_Search_in_a_string.ahk": [
+        "integration/test_text_elements.py::test_search_gives_the_position_from_the_left_and_the_right",
+        "integration/test_text_elements.py::test_search_case_and_not_found_are_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Split_a_string.ahk": [
+        "integration/test_text_elements.py::test_split_gives_one_value_per_field",
+    ],
+    "src/elements/Default/Actions/Action_Substring.ahk": [
+        "integration/test_text_elements.py::test_substring_from_the_left_and_the_right",
+        "integration/test_text_elements.py::test_substring_from_a_position_to_the_right_and_to_the_left",
+        "integration/test_text_elements.py::test_substring_umlauts_are_characters",
+    ],
+    "src/elements/Default/Actions/Action_Substring2.ahk": [
+        "integration/test_text_elements.py::test_substring2_from_the_left_with_a_count_and_a_position",
+        "integration/test_text_elements.py::test_substring2_between_two_texts",
+        "integration/test_text_elements.py::test_substring2_text_that_is_not_found_gives_the_empty_text",
+        "integration/test_text_elements.py::test_substring2_without_a_start_text_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Trim_a_string.ahk": [
+        "integration/test_text_elements.py::test_trim_a_number_of_characters_from_each_side",
+        "integration/test_text_elements.py::test_trim_specified_characters_from_each_side",
+    ],
+    "src/elements/Default/Actions/Action_replace_in_a_string.ahk": [
+        "integration/test_text_elements.py::test_replace_plain_first_all_case_and_delete",
+        "integration/test_text_elements.py::test_replace_regular_expression_and_its_groups",
+    ],
+    "src/elements/Default/Conditions/Condition_String_Contains_Text.ahk": [
+        "integration/test_text_elements.py::test_contains_text_at_start_end_and_anywhere",
+        "integration/test_text_elements.py::test_contains_text_default_and_stored_numbers_are_read",
+    ],
+    "src/elements/Default/lib/ListFormats.ahk": [
+        "integration/test_list_conversions.py::test_convert_list_to_compact_json_and_indented",
+        "integration/test_list_conversions.py::test_convert_string_to_list_reads_a_json_array_and_writes_it_back",
+    ],
+    "src/elements/Default/lib/TextOps.ahk": [
+        "integration/test_text_elements.py::test_substring_from_the_left_and_the_right",
+        "integration/test_text_elements.py::test_split_gives_one_value_per_field",
+        "integration/test_text_elements.py::test_encode_string_as_url",
+    ],
     "src/elements/Default/Actions/Action_Absolute_number.ahk": [
         "integration/test_maths_elements.py::test_absolute_number_of_negative_and_positive_numbers",
         "integration/test_maths_elements.py::test_absolute_number_of_a_text_is_an_exception_with_the_v1_text",

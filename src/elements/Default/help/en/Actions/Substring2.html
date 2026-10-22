@@ -99,23 +99,25 @@ img {
 <body>
 <main>
 <h1>Substring2</h1>
-<p>The action <strong>Substring2</strong> retrieves one or more characters from the specified position in a string.</p>
+<p>The action <strong>Substring2</strong> writes the part of a string between a start and an end to a variable. The start and the end are positions or texts.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
-<p>Name of the variable which will contain the substring.</p>
+<p>The variable that receives the part.</p>
 <h3>Input string</h3>
-<p>A string from which the substring will be extracted.</p>
+<p>The string the part is taken from.</p>
 <h3>Start position</h3>
-<p>If <strong>Start from left</strong> is selected, the substring will contain characters from the start of the input string.</p>
-<p>If <strong>Start from following position</strong> is selected, the substring will start at the specified position.</p>
-<p>If <strong>Search for a string and start there</strong> is selected, the substring will start at the first occurence of the specified text. There are two text fields. The text in the first field won't be included in the substring, the text in the second field will be included. At least one field must contain any text. If the <strong>Start position</strong> is greater than 1, the occurences before this position will not be found.</p>
+<p><strong>Start from left</strong> starts at the first character.</p>
+<p><strong>Start from following position</strong> starts at the position given in the field below.</p>
+<p><strong>Search for a string and start there</strong> starts at the first occurrence of a text, searched from the position given in the field below. There are two text fields: the text in the first field is <strong>not</strong> part of the result, the text in the second field <strong>is</strong>. At least one field must hold a text.</p>
 <h3>End position</h3>
-<p>If <strong>End at the end of the string</strong> is selected, the substring will contain all characters until the end of the input string.</p>
-<p>If <strong>End after a count of characters</strong> is selected, the substring will contain the specified count of characters.</p>
-<p>If <strong>End at following position</strong> is selected, the substring will contain all characters until the specified position.</p>
-<p>If <strong>Search for a string and end there</strong> is selected, the substring will end at the specified text. There are two text fields. The text in the first field will be included in the substring, the text in the second field won't be included.</p>
+<p><strong>End at the end of the string</strong> takes everything up to the end.</p>
+<p><strong>End after a count of characters</strong> takes the number of characters given below.</p>
+<p><strong>End at following position</strong> takes everything up to the position given below (the position is included).</p>
+<p><strong>Search for a string and end there</strong> ends at the first occurrence of a text after the start. There are two text fields: the text in the first field <strong>is</strong> part of the result, the text in the second field is <strong>not</strong>.</p>
+<h3>Case sensitive</h3>
+<p>Each text search has its own check box for the case.</p>
 <h2>Examples</h2>
-<p>Extract the word "Hello" from the string "Hello world!".</p>
+<p>Take "Hello" from "Hello world!":</p>
 <table>
 <thead>
 <tr>
@@ -130,15 +132,11 @@ img {
 </tr>
 <tr>
 <td>End position</td>
-<td><code>◉ End after a count of characters</code></td>
-</tr>
-<tr>
-<td>End position - Count of characters</td>
-<td><code>5</code></td>
+<td><code>◉ End after a count of characters</code>, <code>5</code></td>
 </tr>
 </tbody>
 </table>
-<p>Extract the content of a the first header in a HTML page.</p>
+<p>Take the text of the first header in an HTML page:</p>
 <table>
 <thead>
 <tr>
@@ -149,24 +147,17 @@ img {
 <tbody>
 <tr>
 <td>Start position</td>
-<td><code>◉ Search for a string and start there</code></td>
-</tr>
-<tr>
-<td>Start position - Text (excluding and including)</td>
-<td><code>&lt;h1&gt; and empty</code></td>
+<td><code>◉ Search for a string and start there</code>, first text field <code>&lt;h1&gt;</code> (not included), second text field empty</td>
 </tr>
 <tr>
 <td>End position</td>
-<td><code>◉ Search for a string and end there</code></td>
-</tr>
-<tr>
-<td>End position - Text (including and excluding)</td>
-<td><code>empty and &lt;/h1&gt;</code></td>
+<td><code>◉ Search for a string and end there</code>, first text field empty, second text field <code>&lt;/h1&gt;</code> (not included)</td>
 </tr>
 </tbody>
 </table>
 <h2>Remarks</h2>
-<p>There action "Substring" is similar but has different parametrers. The combination of all parameters in one element was too complicated therefore I created two elements.</p>
+<p>If a text is not found, the output variable gets the empty text and the action ends normally: check the variable with a condition. The thread variables <code>a_startPos</code> (0 if the start text was not found) and <code>a_length</code> (the empty text if the end is not known) are set after each run.</p>
+<p>If <strong>End at following position</strong> is before the start position, the action ends with an exception.</p>
 </main>
 </body>
 </html>

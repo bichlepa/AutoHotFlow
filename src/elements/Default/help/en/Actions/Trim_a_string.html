@@ -99,30 +99,24 @@ img {
 <body>
 <main>
 <h1>Trim a string</h1>
-<p>The action <strong>Trim a string</strong> removes one or more characters from the beginning and/or end of a string.</p>
+<p>The action <strong>Trim a string</strong> removes characters from the beginning and/or the end of a string and writes the result to a variable.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
-<p>Name of the variable which will contain the trimmed string. It can be the same variable as the input string.</p>
+<p>The variable that receives the trimmed string. It may be the same variable as the input string.</p>
 <h3>Input string</h3>
-<p>An input string which will be trimmed.</p>
+<p>The string to trim.</p>
 <h3>Operation</h3>
-<p>If <strong>Remove a number of characters</strong> is selected, a specified count of characters from left and/or right side of the string will be removed.</p>
-<p>If <strong>Remove specific characters</strong> is selected, some specific characters from left and/or right side of the string will be removed.</p>
+<p><strong>Remove a number of characters</strong> removes the count given below from the left and/or the right side.</p>
+<p><strong>Remove Specified caracters</strong> removes every character of the list in <strong>Which characters</strong> from the left and/or the right side, as long as they are there.</p>
 <h3>Remove from which side</h3>
-<p>Select whether the characters should be removed from left-hand and/or right-hand side of the string.</p>
+<p>The sides to trim. At least one side is always ticked. With no side ticked the text is written unchanged.</p>
 <h3>Count of characters</h3>
-<p>Only accessible if <strong>Remove a number of characters</strong> is selected.</p>
-<p>Specify how many characters will be removed.</p>
+<p>Only with <strong>Remove a number of characters</strong>: how many characters are removed. A count of 0 or less removes nothing.</p>
 <h3>Which characters</h3>
-<p>Only accessible if <strong>Remove specific characters</strong> is selected.</p>
-<p>This field contains the characters (case sensitive) to exclude from the beginning and/or end of the input string.</p>
-<p><em>Examples:</em></p>
-<ul>
-<li><code>,.:;-!?</code> <em>(Omit punctuation characters)</em></li>
-<li><code>%a_space%%a_tab%%a_lf%%a_cr%</code> <em>(omit whitespaces)</em></li>
-</ul>
+<p>Only with <strong>Remove Specified caracters</strong>: the characters to remove (case sensitive). Every character of the text is one entry, there are no separators.</p>
+<p>The default is the whitespace: <code>%a_space%%a_tab%%a_lf%%a_cr%</code> (space, tab, line feed and carriage return).</p>
 <h2>Examples</h2>
-<p>Extract the word "Hello" and the space from the string "Hello world!".</p>
+<p>Remove the last 6 characters ("world!") from "Hello world!", which leaves "Hello " with its space:</p>
 <table>
 <thead>
 <tr>
@@ -137,7 +131,7 @@ img {
 </tr>
 <tr>
 <td>Remove from which side</td>
-<td><code>☑ Left-hand side ☐ Right-hand side</code></td>
+<td><code>☐ Left-hand side</code>, <code>☑ Right-hand side</code></td>
 </tr>
 <tr>
 <td>Count of characters</td>
@@ -145,7 +139,7 @@ img {
 </tr>
 </tbody>
 </table>
-<p>Remove the spaces from both sides of the string " Hello world! ".</p>
+<p>Remove the spaces from both sides of " Hello world! ":</p>
 <table>
 <thead>
 <tr>
@@ -156,11 +150,11 @@ img {
 <tbody>
 <tr>
 <td>Operation</td>
-<td><code>◉ Remove specific characters</code></td>
+<td><code>◉ Remove Specified caracters</code></td>
 </tr>
 <tr>
 <td>Remove from which side</td>
-<td><code>☑ Left-hand side ☑ Right-hand side</code></td>
+<td><code>☑ Left-hand side</code>, <code>☑ Right-hand side</code></td>
 </tr>
 <tr>
 <td>Which characters</td>

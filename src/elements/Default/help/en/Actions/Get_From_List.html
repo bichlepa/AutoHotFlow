@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Actions/Get_from_list.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<!-- Generated from src/elements/Default/help/en/Actions/Get_From_List.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
 <title>Get from list</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
@@ -99,17 +99,20 @@ img {
 <body>
 <main>
 <h1>Get from list</h1>
-<p>The action <strong>Get from list</strong> retrieves a value from an existing list.</p>
+<p>The action <strong>Get from list</strong> writes one value of a list to a variable. The list is not changed.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
-<p>Name of the variable which will contain the value.</p>
+<p>The variable that receives the value.</p>
 <h3>Input list</h3>
-<p>Name of the variable which contains the list.</p>
+<p>The list, as the name of a variable that holds it (or an expression that gives a list).</p>
 <h3>Key or position</h3>
-<p>Specify the position or key of the value to retrieve.</p>
-<p>If First position is selected, the first value (usually with the key 1) will be retrieved.</p>
-<p>If Last position is selected, the first value with the highest key will be retrieved.</p>
-<p>If Following position or key is selected, the specified key will be retrieved.</p>
+<p><strong>First integer position</strong> takes the value with the lowest integer key (usually key 1).</p>
+<p><strong>Last integer position</strong> takes the value with the highest integer key.</p>
+<p><strong>Random integer position</strong> takes the value of a random integer key of the list.</p>
+<p><strong>Following position or key</strong> takes the value of the key in the field below. A key can be a number or a text.</p>
+<p>If the list has no integer key, the first, last and random choices end with an exception. A key that the list does not have ends the action with an exception too.</p>
+<h2>Remarks</h2>
+<p>Version 1 took a random number between the lowest and the highest key, which gave an empty value if that key was missing. Version 2 takes one of the keys that the list has (MIGRATION M-0109).</p>
 </main>
 </body>
 </html>

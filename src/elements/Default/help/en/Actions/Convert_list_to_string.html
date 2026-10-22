@@ -99,17 +99,19 @@ img {
 <body>
 <main>
 <h1>Convert list to string</h1>
-<p>The action <strong>Convert list to string</strong> converts a list to a string. Supported formats are JSON and YAML.</p>
+<p>The action <strong>Convert list to string</strong> writes a list as a text in JSON format. The list is not changed.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
-<p>Name of the variable which will contain the string.</p>
+<p>The variable that receives the text.</p>
 <h3>Input list</h3>
-<p>The input list.</p>
+<p>The list (an expression that gives a list, usually the name of a variable).</p>
+<p>A list whose keys are 1, 2, ..., n is written as a JSON array, every other list as a JSON object with its keys as text.</p>
 <h3>Output format</h3>
-<p>Specify the format of the string.</p>
+<p><strong>JSON</strong> is the only format of this version. <strong>YAML</strong> is not available yet: the action ends with an exception.</p>
 <h3>Options</h3>
-<p>If <strong>JSON</strong> is selected, some options can be set.</p>
-<p>If <strong>Compact mode</strong> is selected, the output string will not have any linebreaks or indentation. Otherwise the <strong>intentation length</strong> can be set.</p>
+<p><strong>Compact mode</strong> writes the JSON text on one line. Otherwise every value is on its own line, indented by the <strong>Indentation length</strong> (the number of spaces per level).</p>
+<h2>Remarks</h2>
+<p>The keys of a JSON object are written in alphabetical order. The text can be read back with the action <strong>Convert string to list</strong>.</p>
 </main>
 </body>
 </html>

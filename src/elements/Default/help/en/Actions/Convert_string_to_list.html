@@ -99,14 +99,16 @@ img {
 <body>
 <main>
 <h1>Convert string to list</h1>
-<p>The action <strong>Convert string to list</strong> converts a string to a list. Supported formats are JSON and YAML.</p>
+<p>The action <strong>Convert string to list</strong> reads a text in JSON format and writes it as a list to a variable.</p>
 <h2>Settings</h2>
 <h3>Output list name</h3>
-<p>Name of the variable which will contain the list.</p>
+<p>The variable that receives the list.</p>
 <h3>Input string</h3>
-<p>The input string.</p>
+<p>The text to read. It must be a JSON object or a JSON array; the values of the object or array become the values of the list (an array gets the keys 1, 2, ...).</p>
 <h3>Input format</h3>
-<p>Specify the format of the string.</p>
+<p><strong>JSON</strong> is the only format of this version. <strong>YAML</strong> is not available yet: the action ends with an exception.</p>
+<h2>Remarks</h2>
+<p>If the text is not valid JSON, the action ends with an exception that names the error. A JSON text that is a number, a text or <code>true</code> is not a list: the action ends with an exception too (MIGRATION M-0110).</p>
 </main>
 </body>
 </html>

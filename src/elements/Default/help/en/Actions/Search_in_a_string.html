@@ -99,21 +99,75 @@ img {
 <body>
 <main>
 <h1>Search in a string</h1>
-<p>The action <strong>Search in a string</strong> searches for the position of the specified substring in a string.</p>
+<p>The action <strong>Search in a string</strong> searches for a text in a string and writes the position where it was found. The position counts from the left, the first character is 1.</p>
 <h2>Settings</h2>
 <h3>Output variable</h3>
-<p>Name of the variable which will contain the result. This is the position of the substring.</p>
+<p>The variable that receives the position. If the text is not found, the variable is empty and the action ends with an exception ("Searched text was not found"), so the flow can continue on that connection.</p>
 <h3>Input string</h3>
-<p>A string whose contents will be read from.</p>
+<p>The string to search in.</p>
 <h3>Text to search</h3>
-<p>The string to search for.</p>
-<h3>Which occurrence</h3>
-<p>Defines which occurrence from left or right will be found.</p>
+<p>The text to search for. An empty text is never found.</p>
+<h3>Which occurence</h3>
+<p>The number of the occurrence to find: 1 is the first one, 2 the second one, and so on. The count starts at the side that <strong>Start position</strong> names.</p>
 <h3>Start position</h3>
-<p>Defines the offset from left or right where the search begins. Position 1 is the first character.</p>
+<p><strong>Search from left to right</strong> starts at the position given in the field below and counts to the right.</p>
+<p><strong>Search from right to left</strong> starts at that position counted from the right end: 1 is the last character. The occurrence is then counted from the right. The position written is still counted from the left.</p>
 <h3>Case sensitivity</h3>
-<p>If <strong>Case insensitive</strong> is selected, the character case will be ignored. For example if the input string is “Hello World”, the search text “world” will match.</p>
-<p>If <strong>Case sensitive</strong> is selected, the character case will not be ignored.</p>
+<p>If <strong>Case insensitive</strong> is selected, the character case is ignored: with the input string "Hello World", the search text "world" is found.</p>
+<p>If <strong>Case sensitive</strong> is selected, the character case matters.</p>
+<h2>Examples</h2>
+<p>Find the first "World" in "Hello World": the variable gets 7.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Input string</td>
+<td><code>Hello World</code></td>
+</tr>
+<tr>
+<td>Text to search</td>
+<td><code>World</code></td>
+</tr>
+<tr>
+<td>Which occurence</td>
+<td><code>1</code></td>
+</tr>
+</tbody>
+</table>
+<p>Find the last "o" in "Hello World": the variable gets 8.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Input string</td>
+<td><code>Hello World</code></td>
+</tr>
+<tr>
+<td>Text to search</td>
+<td><code>o</code></td>
+</tr>
+<tr>
+<td>Which occurence</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>Start position</td>
+<td><code>◉ Search from right to left</code>, <code>1</code></td>
+</tr>
+</tbody>
+</table>
+<h2>Remarks</h2>
+<p>The positions are the same as those of AutoHotkey v2 <code>InStr</code>. The element is the same as the function <code>InStr(String, Text, CaseSensitive, Offset, Occurrence)</code> with a negative offset and occurrence for the search from the right.</p>
 </main>
 </body>
 </html>

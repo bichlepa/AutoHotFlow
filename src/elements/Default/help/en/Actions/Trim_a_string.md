@@ -1,58 +1,51 @@
 # Trim a string
 
-The action **Trim a string** removes one or more characters from the beginning and/or end of a string.
+The action **Trim a string** removes characters from the beginning and/or the end of a string and writes the result to a variable.
 
 ## Settings
 
 ### Output variable name
 
-Name of the variable which will contain the trimmed string. It can be the same variable as the input string.
+The variable that receives the trimmed string. It may be the same variable as the input string.
 
 ### Input string
 
-An input string which will be trimmed.
+The string to trim.
 
 ### Operation
 
-If **Remove a number of characters** is selected, a specified count of characters from left and/or right side of the string will be removed.
+**Remove a number of characters** removes the count given below from the left and/or the right side.
 
-If **Remove specific characters** is selected, some specific characters from left and/or right side of the string will be removed.
+**Remove Specified caracters** removes every character of the list in **Which characters** from the left and/or the right side, as long as they are there.
 
 ### Remove from which side
 
-Select whether the characters should be removed from left-hand and/or right-hand side of the string.
+The sides to trim. At least one side is always ticked. With no side ticked the text is written unchanged.
 
 ### Count of characters
 
-Only accessible if **Remove a number of characters** is selected.
-
-Specify how many characters will be removed.
+Only with **Remove a number of characters**: how many characters are removed. A count of 0 or less removes nothing.
 
 ### Which characters
 
-Only accessible if **Remove specific characters** is selected.
+Only with **Remove Specified caracters**: the characters to remove (case sensitive). Every character of the text is one entry, there are no separators.
 
-This field contains the characters (case sensitive) to exclude from the beginning and/or end of the input string.
-
-*Examples:*
-
-- `,.:;-!?` *(Omit punctuation characters)*
-- `%a_space%%a_tab%%a_lf%%a_cr%` *(omit whitespaces)*
+The default is the whitespace: `%a_space%%a_tab%%a_lf%%a_cr%` (space, tab, line feed and carriage return).
 
 ## Examples
 
-Extract the word "Hello" and the space from the string "Hello world!".
+Remove the last 6 characters ("world!") from "Hello world!", which leaves "Hello " with its space:
 
 | Parameter | Value |
 | --- | --- |
 | Operation | `◉ Remove a number of characters` |
-| Remove from which side | `☑ Left-hand side ☐ Right-hand side` |
+| Remove from which side | `☐ Left-hand side`, `☑ Right-hand side` |
 | Count of characters | `6` |
 
-Remove the spaces from both sides of the string " Hello world! ".
+Remove the spaces from both sides of " Hello world! ":
 
 | Parameter | Value |
 | --- | --- |
-| Operation | `◉ Remove specific characters` |
-| Remove from which side | `☑ Left-hand side ☑ Right-hand side` |
+| Operation | `◉ Remove Specified caracters` |
+| Remove from which side | `☑ Left-hand side`, `☑ Right-hand side` |
 | Which characters | `%a_space%` |

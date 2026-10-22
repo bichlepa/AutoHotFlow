@@ -71,6 +71,12 @@ ALLOWED = {
     ("default.trigger_hotkey", "GetWindowInformation", "id"): "M-0102",
     ("default.trigger_hotkey", "TitleMatchMode", "enum"): "M-0102",
     ("default.trigger_hotkey", "TitleMatchMode", "result"): "M-0102",
+    # M-0099: radio defaults that v1 writes as a position (1, 3) and v2 as the enum value of that position (WI-0119)
+    ("default.action_get_from_list", "WhichPosition", "default"): "M-0099",
+    ("default.condition_string_contains_text", "WhereToBegin", "default"): "M-0099",
+    ("default.condition_string_contains_text", "CaseSensitive", "default"): "M-0099",
+    # M-0108: the new text mode (plain or regular expression) of Replace in a string (WI-0119)
+    ("default.action_replace_in_a_string", "TextMode", "id"): "M-0108",
 }
 
 
