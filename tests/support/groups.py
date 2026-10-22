@@ -88,6 +88,7 @@ OTHER_RULES = [
     ("tests/integration/helpers/pipe_echo_server.ahk", ["transport"]),
     ("tests/integration/helpers/rawpipe.py", ["transport"]),
     ("tests/integration/helpers/TestDialogProvider.ahk", ["element-units", "elements-e2e", "engine", "ui", "workers"]),
+    ("tests/integration/helpers/TestSystemProvider.ahk", ["element-units", "triggers", "workers"]),
     ("tests/integration/helpers/hotkey_window.ahk", ["triggers"]),
     ("tests/integration/helpers/key_observer.ahk", ["triggers"]),
     ("tests/fault/faultkit.py", FAULT_GROUPS),

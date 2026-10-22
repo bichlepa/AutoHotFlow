@@ -7,6 +7,7 @@
 #Include ..\..\..\src\elements\base\ElementRegistry.ahk
 #Include lib\TestExprParamsKit.ahk
 #Include ..\..\..\src\core\Json.ahk
+#Include lib\TestSystemKit.ahk
 #Include ..\..\..\src\core\Time.ahk
 #Include lib\TestVarFunctionsKit.ahk
 
@@ -27,6 +28,7 @@ class Test {
     #Include Actions\Action_TestPackageName.ahk
     #Include Actions\Action_TestPackageNameWorker.ahk
     #Include Actions\Action_TestSetVar.ahk
+    #Include Actions\Action_TestSystemWorker.ahk
     #Include Actions\Action_TestThrow.ahk
     #Include Actions\Action_TestThrowWorker.ahk
     #Include Actions\Action_TestVarBenchWorker.ahk
@@ -36,6 +38,7 @@ class Test {
     #Include Triggers\Trigger_TestDisableThrows.ahk
     #Include Triggers\Trigger_TestFail.ahk
     #Include Triggers\Trigger_TestFireOnEnable.ahk
+    #Include Triggers\Trigger_TestSystemCall.ahk
     #Include Triggers\Trigger_TestTimer.ahk
 }
 
@@ -55,6 +58,7 @@ ElementRegistry.Register(Test.Action_TestLongBlockWorker)
 ElementRegistry.Register(Test.Action_TestPackageName)
 ElementRegistry.Register(Test.Action_TestPackageNameWorker)
 ElementRegistry.Register(Test.Action_TestSetVar)
+ElementRegistry.Register(Test.Action_TestSystemWorker)
 ElementRegistry.Register(Test.Action_TestThrow)
 ElementRegistry.Register(Test.Action_TestThrowWorker)
 ElementRegistry.Register(Test.Action_TestVarBenchWorker)
@@ -64,4 +68,5 @@ ElementRegistry.Register(Test.Trigger_TestCallbackThrows)
 ElementRegistry.Register(Test.Trigger_TestDisableThrows)
 ElementRegistry.Register(Test.Trigger_TestFail)
 ElementRegistry.Register(Test.Trigger_TestFireOnEnable)
+ElementRegistry.Register(Test.Trigger_TestSystemCall)
 ElementRegistry.Register(Test.Trigger_TestTimer)

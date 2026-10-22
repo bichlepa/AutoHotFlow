@@ -134,6 +134,7 @@ TEST_GROUPS = {
     "integration/test_corpus.py": ["expr", "engine"],
     "integration/test_dialog_windows_gui.py": ["ui"],
     "integration/test_dialogs.py": ["ui"],
+    "integration/test_system_seam.py": ["element-units", "triggers", "workers"],
     "integration/test_engine.py": ["engine"],
     "integration/test_flow_patch.py": ["engine"],
     "integration/test_flow_patch_triggers.py": ["triggers", "engine"],

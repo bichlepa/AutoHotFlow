@@ -11,6 +11,8 @@
 #Include ..\..\..\..\src\triggerhost\TriggerHost.ahk
 #Include ..\..\..\..\src\entry\generated\Elements_triggerhost.ahk
 #Include generated\TestElements_triggerhost.ahk
+#Include ..\TestSystemProvider.ahk
 
+TestSystemProvider.Register()   ; system actions of trigger elements are recorded and answered from the script (E0103)
 RoleRegistry.Register("triggerhost", TriggerHost)
 AhfMain()

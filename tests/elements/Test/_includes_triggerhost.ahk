@@ -5,6 +5,7 @@
 ; The files that the classes include come first, outside the class body; inside it AutoHotkey skips them.
 #Include ..\..\..\src\elements\base\AhfElement.ahk
 #Include ..\..\..\src\elements\base\ElementRegistry.ahk
+#Include lib\TestSystemKit.ahk
 
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Test {
@@ -12,6 +13,7 @@ class Test {
     #Include Triggers\Trigger_TestDisableThrows.ahk
     #Include Triggers\Trigger_TestFail.ahk
     #Include Triggers\Trigger_TestFireOnEnable.ahk
+    #Include Triggers\Trigger_TestSystemCall.ahk
     #Include Triggers\Trigger_TestTimer.ahk
 }
 
@@ -20,4 +22,5 @@ ElementRegistry.Register(Test.Trigger_TestCallbackThrows)
 ElementRegistry.Register(Test.Trigger_TestDisableThrows)
 ElementRegistry.Register(Test.Trigger_TestFail)
 ElementRegistry.Register(Test.Trigger_TestFireOnEnable)
+ElementRegistry.Register(Test.Trigger_TestSystemCall)
 ElementRegistry.Register(Test.Trigger_TestTimer)
