@@ -54,7 +54,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0120 | Files and folders I | done | haiku | see git log (up to 6fd6a7cd) | 2026-10-22 | 13 classes, SystemOps.FileRecycle, M-0113 to M-0119; review fix: path guards (empty path, drive root, working directory, wildcard with overwrite); F-0188 gaps; owner: ActsOnSystem for readers, empty path now an error (v1: working directory), Delete_Folder honours only-if-empty |
 | WI-0121 | Files and folders II, file loop, ini | open | | | |  |
 | WI-0122 | Archives, drives, internet | open | | | |  |
-| WI-0123 | Programs and processes, clipboard, power and session | open | | | |  |
+| WI-0123 | Programs and processes, clipboard, power and session | done | haiku | see git log (up to 4c164df5) | 2026-10-22 | 12 classes, M-0120 to M-0123, REQ-ELM-290/400 done, REQ-ELM-390 partial; owner: Kill_Process has no guard for AHF's own processes, ActsOnSystem on all 12 incl. readers, real power/clipboard behaviour is the owner's manual check; priority test misses BelowNormal |
 | WI-0124 | Sound and speech | open | | | |  |
 | WI-0125 | Windows and controls | open | | | |  |
 | WI-0126 | Mouse and keyboard | open | | | |  |
@@ -77,6 +77,8 @@ None.
 None.
 
 ## Last verified state
+
+Commit `4c164df5` (WI-0123 integrated; selection of the groups element-units, help, packages, triggers, workers): 764 passed, 2 skipped, 1 failed under load (`test_worker::test_worker_reports_not_busy_after_a_cancel_too`, green alone in recheck 20261022-222717-recheck; third load failure of this test); run 20261022-221646-4c164df5. Partial run: the last full tiers are of `c38d7d67`.
 
 Commit `c38d7d67` (WI-0120 integrated; all tiers): fast 2364 passed, 2 failed under load (`test_editor_flow_ctx` and `test_editor_tray`, the force question of an unreadable state; both green in recheck 20261022-213224-recheck; the fast run took 24 minutes), foundation 471, slow 208 (runs 20261022-210344-c38d7d67-3, -2, and 20261022-210344-c38d7d67). VERDICT red only by those load flakes; the force-question tests have now failed under load three times.
 
