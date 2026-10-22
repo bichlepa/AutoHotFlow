@@ -192,7 +192,7 @@ L47-52 A drag keeps the static layer when the key leaves the dragged items out (
 L54-59 A drag of 30 elements draws live at 25 ms per frame (partly verified)
 ```
 
-## doc/howto/error-handling.md (6.7 KB, 73 lines)
+## doc/howto/error-handling.md (7.5 KB, 81 lines)
 ```text
 L5-9 A script without a summary line ends with exit code 0 (verified)
 L12-17 A callback that throws does not abort the state machine (verified)
@@ -203,6 +203,7 @@ L44-49 A timer chain that throws must schedule its next round first (partly veri
 L51-57 A copy of the variables of an error must be taken where the error is caught, and it must be text (verified)
 L59-65 A repeated error of the same flow within 10 s sends no notice at once (verified)
 L67-73 The reason of a failed file call is the OSError number (verified) (partly verified)
+L75-81 FileSetAttrib and FileSetTime do not throw when no file matches (verified) (verified)
 ```
 
 ## doc/howto/gui-and-hotkeys.md (42.5 KB, 326 lines)
@@ -327,7 +328,7 @@ L423-429 ProcessClose ends a process with exit code 0 (verified)
 L431-437 Assigning A_Clipboard throws while another program holds the clipboard (verified)
 ```
 
-## doc/howto/syntax-and-language.md (59.9 KB, 602 lines)
+## doc/howto/syntax-and-language.md (62.1 KB, 626 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -404,9 +405,12 @@ L572-578 Property access with a name in a variable (assumed) (assumed)
 L580-586 A NUL character ends a text (verified) (verified)
 L588-594 Skip an output of SplitPath with a comma (verified) (verified)
 L596-602 WarnIfEmpty refuses an empty value at run time in v2 (verified)
+L604-610 IniRead returns the empty text for an empty default (verified) (verified)
+L612-618 Loop variable of the full path is A_LoopFileFullPath in v2 (verified) (verified)
+L620-626 Language keys are case-sensitive (verified) (verified)
 ```
 
-## doc/howto/tests-and-tools.md (56.6 KB, 561 lines)
+## doc/howto/tests-and-tools.md (57.6 KB, 569 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -476,6 +480,7 @@ L531-537 A trigger gets its parameters only when Parameters() declares them (ver
 L539-545 A generated block includes a lib file only if the element file includes it (verified) (verified)
 L547-553 A file held open by a test is a file in use for FileDelete (verified) (verified)
 L555-561 One run_all per test: a second start of the session fails (verified) (verified)
+L563-569 Local times in file functions: compare file times through the elements (verified) (partly verified)
 ```
 
 ## doc/REQUIREMENTS.md

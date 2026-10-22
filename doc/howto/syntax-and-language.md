@@ -600,3 +600,27 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Take `WarnIfEmpty` only from a field where an empty value is an error; for a field where v1 accepted an empty value (clipboard text, process name checked by the element itself), leave the flag out and check the value in the element.
 - **Status:** verified (tests/integration/test_clipboard_elements.py::test_set_clipboard_with_an_empty_text_clears_it, failed with the flag, passes without it)
 - **Source:** src/elements/base/ParamEvaluator.ahk; src/elements/Default/Actions/Action_Set_Clipboard.ahk (WI-0123)
+
+### IniRead returns the empty text for an empty default (verified)
+
+- **Problem:** The v1 element passed a single space as the default when the default text was empty, because v1 read an empty default as "no default". The port kept that workaround for a while.
+- **Wrong:** Substituting a single space for an empty default, to keep the v1 code path.
+- **Right:** Pass the default as it is. `IniRead(file, section, key, "")` returns the empty text for a missing key, and so does a default of one space (run with `tools/ahkrun.py`). Omit `Key` (leave the argument empty) to read a whole section: `IniRead(file, section, , "")` returns an empty text for a section that does not exist.
+- **Status:** verified (run, WI-0121, `tests/integration/test_ini_elements.py`)
+- **Source:** `Action_Read_From_Ini`, MIGRATION M-0128
+
+### Loop variable of the full path is A_LoopFileFullPath in v2 (verified)
+
+- **Problem:** The v1 loop variable `A_LoopFileLongPath` (the full path of the file) does not exist in v2.
+- **Wrong:** Reading `A_LoopFileLongPath` in a v2 loop: it is not a built-in variable of v2 (not in the help list of the file loop).
+- **Right:** Read `A_LoopFileFullPath` and store it under the v1 name when the port needs the v1 names (`Loop_Loop_Through_Files` does this). `A_LoopFileNameNoExt` does not exist either: compute it with `SplitPath(A_LoopFileFullPath, , , , &nameNoExt)`.
+- **Status:** verified (the v2 help of `LoopFiles`, and `tests/integration/test_loop_files.py::test_loop_variables_of_the_file_are_set_in_every_pass`)
+- **Source:** `src/elements/Default/Loops/Loop_Loop_Through_Files.ahk`
+
+### Language keys are case-sensitive (verified)
+
+- **Problem:** `Lang("New time")` found no text and showed the key itself; the en.ini key is `New Time`. The lookup logs an f3 entry only, so a test that does not read the log sees a plain key.
+- **Wrong:** Copying a v1 key text with the wrong capital letter, as `Output variable name` for `Output Variable name`.
+- **Right:** Check a new `Lang()` key with a script against the language file (the key with `_` read as a space, exact case), and test the text of the element's parameters.
+- **Status:** verified (WI-0121 check of the used keys against `en.ini` and `de.ini`)
+- **Source:** `src/core/LangTable.ahk`

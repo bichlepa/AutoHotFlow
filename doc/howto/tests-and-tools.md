@@ -559,3 +559,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Put all flows of the test in one `run_all` list and check the results by their index; the file state is read after all runs, so a later flow that changes a file changes what the earlier check sees.
 - **Status:** verified (the first version of the folder and file tests failed this way; `tests/integration/test_folder_elements.py` passes)
 - **Source:** tests/support/coreflows.py (`run_all`), tests/support/flowrun.py (`start`)
+
+### Local times in file functions: compare file times through the elements (verified)
+
+- **Problem:** A test wrote a time with `os.utime` (python converts a local time with the rule of its own date) and read it back with `FileGetTime` (AutoHotkey converts with the time-zone rule of the current date). On a machine in summer time, a winter date differed by one hour, and the same for a March date set with `FileSetTime`.
+- **Wrong:** Comparing `FileGetTime` or `os.path.getmtime` with a python `datetime(...).timestamp()` of a date that has another summer or winter offset than today.
+- **Right:** Check a file time as a round trip through the elements (`Set file time`, then `Get file time`, both AutoHotkey), or compare with a date whose offset equals today's offset. Do not rely on the one-hour difference being absent.
+- **Status:** verified (run on this machine, 2026-10-22, the time zone of Central Europe; not checked on other machines)
+- **Source:** `tests/integration/test_file_info_elements.py` (the comment above the time tests)

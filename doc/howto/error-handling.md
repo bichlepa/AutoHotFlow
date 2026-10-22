@@ -71,3 +71,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** In the `catch`, read the reason from `err.Number` of an `OSError` (the system error code, 32 for a file in use). The copy, move and delete functions throw a plain `Error` whose `Extra` property counts the failed files (AutoHotkey docs, FileCopy): there the code is `A_LastError`, read first thing in the `catch`.
 - **Status:** verified (`tests/integration/test_file_elements.py::test_write_overwrite_of_a_file_in_use_is_an_exception` shows the reason; the count of FileCopy is read from the docs, not run with failing files; the path-too-long code 206 is not checked)
 - **Source:** `src/elements/Default/lib/FileOps.ahk` (`Code`, `Failures`, `Reason`)
+
+### FileSetAttrib and FileSetTime do not throw when no file matches (verified)
+
+- **Problem:** A set element with a path that matches nothing ended normally. The help says the functions throw when a file they found could not be changed; a pattern without a match is not such a failure.
+- **Wrong:** `try FileSetAttrib(attr, path, mode)` as the only check: a missing file gave no exception, and the v1 text "does not exist" was lost.
+- **Right:** Check the path first with `FileExist(path)` (empty when nothing matches) and throw the v1 text; then call the function in the `try`, and report the reason from the error on failure.
+- **Status:** verified (run, WI-0121: `test_set_file_attributes_of_a_missing_file_is_an_exception` failed before the check was added)
+- **Source:** `src/elements/Default/Actions/Action_Set_file_attributes.ahk`, `Action_Set_file_time.ahk`

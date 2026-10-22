@@ -818,11 +818,11 @@ The differences from v1 that the list elements bring are in MIGRATION M-0057, M-
 ### REQ-ELM-240 Loops
 
 - **v1:** yes
-- **v2:** partial (the four loops of the core set are done in S0002; `Loop_Loop_Through_Files` is S0008)
+- **v2:** done (the four loops of the core set in S0002; `Loop_Loop_Through_Files` in S0008, WI-0121, the first worker loop)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0054), S0008
-- **Evidence:** `tests/integration/test_core_c_loops.py::test_every_loop_makes_its_passes_and_removes_its_variables`, `tests/integration/test_core_c_loops.py::test_simple_loop_counts`, `tests/integration/test_core_c_loops.py::test_condition_loop`, `tests/integration/test_core_c_loops.py::test_condition_loop_converts_the_v1_text_on_load`, `tests/integration/test_core_c_loops.py::test_list_loop`, `tests/integration/test_core_c_loops.py::test_list_loop_works_through_the_copy_it_made_at_the_start`, `tests/integration/test_core_c_loops.py::test_parse_loop`, `tests/ahk/element_loops.test.ahk`
+- **Plan:** S0002 (WI-0054), S0008 (WI-0121)
+- **Evidence:** `tests/integration/test_core_c_loops.py::test_every_loop_makes_its_passes_and_removes_its_variables`, `tests/integration/test_core_c_loops.py::test_simple_loop_counts`, `tests/integration/test_core_c_loops.py::test_condition_loop`, `tests/integration/test_core_c_loops.py::test_condition_loop_converts_the_v1_text_on_load`, `tests/integration/test_core_c_loops.py::test_list_loop`, `tests/integration/test_core_c_loops.py::test_list_loop_works_through_the_copy_it_made_at_the_start`, `tests/integration/test_core_c_loops.py::test_parse_loop`, `tests/ahk/element_loops.test.ahk`, `tests/integration/test_loop_files.py::test_files_only_are_passed_and_not_the_folders_of_the_pattern`, `tests/integration/test_loop_files.py::test_recursion_passes_the_files_of_the_subfolders`, `tests/integration/test_loop_files.py::test_folders_and_files_and_folders_only`, `tests/integration/test_loop_files.py::test_loop_variables_of_the_file_are_set_in_every_pass`, `tests/integration/test_loop_files.py::test_break_leaves_the_loop_at_the_chosen_pass`, `tests/integration/test_loop_files.py::test_files_created_in_the_body_do_not_change_the_passes`, `tests/integration/test_worker.py::test_worker_loop_gets_the_entry_point_of_the_connection`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
@@ -830,7 +830,7 @@ The differences from v1 that the list elements bring are in MIGRATION M-0057, M-
 | `Loop_Condition` | yes | done | S0002 (WI-0054) |
 | `Loop_Parse_A_String` | yes | done | S0002 (WI-0054) |
 | `Loop_Work_through_a_list` | yes | done | S0002 (WI-0054) |
-| `Loop_Loop_Through_Files` | yes | open | S0008 |
+| `Loop_Loop_Through_Files` | yes | done (WI-0121; a worker loop, one job per pass) | S0008 (WI-0121) |
 
 Connection points and loop variables: REQ-EXE-030. The differences from v1 are in MIGRATION M-0059 to M-0061. A pass of a loop costs about 0.3 ms in the engine (MEASUREMENTS MS-0034); a loop of 100,000 passes does not block the engine, other flows and requests are served meanwhile.
 
@@ -923,11 +923,11 @@ Dialogs run separately from the flows (MIGRATION M-0002) and can be answered by 
 ### REQ-ELM-300 Files and folders
 
 - **v1:** yes
-- **v2:** partial (WI-0120: read, write, copy, move, rename, delete, folders, exists, split path; WI-0121 open)
+- **v2:** done (WI-0120: read, write, copy, move, rename, delete, folders, exists, split path; WI-0121: attributes, sizes, times, shortcuts, recycle bin)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0008 (WI-0120, WI-0121)
-- **Evidence:** `tests/integration/test_file_elements.py::test_read_utf8_replaces_crlf_by_linefeed`, `tests/integration/test_file_elements.py::test_write_appends_and_overwrites`, `tests/integration/test_file_elements.py::test_copy_one_file_into_a_folder_and_with_a_new_name`, `tests/integration/test_file_elements.py::test_move_one_file_and_refuse_an_existing_target`, `tests/integration/test_file_elements.py::test_rename_a_file_keeps_its_folder`, `tests/integration/test_file_elements.py::test_delete_a_file_and_send_one_to_the_recycle_bin_through_the_seam`, `tests/integration/test_file_elements.py::test_split_path_writes_the_parts_and_skips_empty_names`, `tests/integration/test_file_elements.py::test_file_exists_takes_yes_or_no`, `tests/integration/test_folder_elements.py::test_create_folder_makes_the_folders_above_too`, `tests/integration/test_folder_elements.py::test_copy_folder_copies_subfolders_and_refuses_an_existing_destination`, `tests/integration/test_folder_elements.py::test_move_folder_moves_it_with_its_contents`, `tests/integration/test_folder_elements.py::test_rename_folder_keeps_its_parent`, `tests/integration/test_folder_elements.py::test_delete_folder_only_if_empty_keeps_a_folder_with_contents`
+- **Evidence:** `tests/integration/test_file_info_elements.py::test_get_file_attributes_stores_the_read_only_letter`, `tests/integration/test_file_info_elements.py::test_set_file_attributes_sets_the_read_only_flag`, `tests/integration/test_file_info_elements.py::test_condition_file_has_attribute_yes_no_and_missing`, `tests/integration/test_file_info_elements.py::test_get_file_size_in_bytes_kilobytes_and_megabytes`, `tests/integration/test_file_info_elements.py::test_get_file_time_is_the_time_that_set_file_time_wrote`, `tests/integration/test_file_info_elements.py::test_set_file_time_changes_the_modification_time`, `tests/integration/test_file_info_elements.py::test_create_shortcut_and_read_it_back_in_a_folder_of_the_test`, `tests/integration/test_file_info_elements.py::test_empty_recycle_bin_of_all_drives_calls_the_seam_without_a_drive`, `tests/integration/test_file_elements.py::test_read_utf8_replaces_crlf_by_linefeed", `tests/integration/test_file_elements.py::test_write_appends_and_overwrites`, `tests/integration/test_file_elements.py::test_copy_one_file_into_a_folder_and_with_a_new_name`, `tests/integration/test_file_elements.py::test_move_one_file_and_refuse_an_existing_target`, `tests/integration/test_file_elements.py::test_rename_a_file_keeps_its_folder`, `tests/integration/test_file_elements.py::test_delete_a_file_and_send_one_to_the_recycle_bin_through_the_seam`, `tests/integration/test_file_elements.py::test_split_path_writes_the_parts_and_skips_empty_names`, `tests/integration/test_file_elements.py::test_file_exists_takes_yes_or_no`, `tests/integration/test_folder_elements.py::test_create_folder_makes_the_folders_above_too`, `tests/integration/test_folder_elements.py::test_copy_folder_copies_subfolders_and_refuses_an_existing_destination`, `tests/integration/test_folder_elements.py::test_move_folder_moves_it_with_its_contents`, `tests/integration/test_folder_elements.py::test_rename_folder_keeps_its_parent`, `tests/integration/test_folder_elements.py::test_delete_folder_only_if_empty_keeps_a_folder_with_contents`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
@@ -942,33 +942,34 @@ Dialogs run separately from the flows (MIGRATION M-0002) and can be answered by 
 | `Action_Move_Folder` | yes | done (WI-0120) | S0008 (WI-0120) |
 | `Action_Rename_Folder` | yes | done (WI-0120) | S0008 (WI-0120) |
 | `Action_Delete_Folder` | yes | done (WI-0120) | S0008 (WI-0120) |
-| `Action_Empty_Recycle_bin` | yes | open | S0008 (WI-0121) |
-| `Action_Get_file_attributes` | yes | open | S0008 (WI-0121) |
-| `Action_Get_file_size` | yes | open | S0008 (WI-0121) |
-| `Action_Get_file_time` | yes | open | S0008 (WI-0121) |
-| `Action_Set_file_attributes` | yes | open | S0008 (WI-0121) |
-| `Action_Set_file_time` | yes | open | S0008 (WI-0121) |
-| `Action_Get_shortcut_information` | yes | open | S0008 (WI-0121) |
-| `Action_Create_Shortcut` | yes | open | S0008 (WI-0121) |
+| `Action_Empty_Recycle_bin` | yes | done (WI-0121) | S0008 (WI-0121) |
+| `Action_Get_file_attributes` | yes | done (WI-0121) | S0008 (WI-0121) |
+| `Action_Get_file_size` | yes | done (WI-0121) | S0008 (WI-0121) |
+| `Action_Get_file_time` | yes | done (WI-0121) | S0008 (WI-0121) |
+| `Action_Set_file_attributes` | yes | done (WI-0121) | S0008 (WI-0121) |
+| `Action_Set_file_time` | yes | done (WI-0121) | S0008 (WI-0121) |
+| `Action_Get_shortcut_information` | yes | done (WI-0121) | S0008 (WI-0121) |
+| `Action_Create_Shortcut` | yes | done (WI-0121) | S0008 (WI-0121) |
 | `Action_Split_path` | yes | done (WI-0120) | S0008 (WI-0120) |
 | `Condition_File_Exists` | yes | done (WI-0120) | S0008 (WI-0120) |
-| `Condition_File_Has_Attribute` | yes | open | S0008 (WI-0121) |
+| `Condition_File_Has_Attribute` | yes | done (WI-0121) | S0008 (WI-0121) |
 
 The loop over files is in REQ-ELM-240.
 
 ### REQ-ELM-310 Structured data files
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (WI-0121: the ini elements; JSON, YAML and XML are later)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0121)
+- **Evidence:** `tests/integration/test_ini_elements.py::test_write_creates_a_utf16_file_with_a_byte_order_mark`, `tests/integration/test_ini_elements.py::test_read_a_key_of_a_file_that_v1_style_writes`, `tests/integration/test_ini_elements.py::test_a_missing_key_gives_the_default_or_an_exception`, `tests/integration/test_ini_elements.py::test_delete_a_key_and_a_section`, `tests/integration/test_corpus.py::test_v1_ini_file_test_runs_green_in_a_test_folder`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Read_From_Ini` | yes | open | S0008 |
-| `Action_Write_to_ini` | yes | open | S0008 |
-| `Action_Delete_From_Ini` | yes | open | S0008 |
+| `Action_Read_From_Ini` | yes | done (WI-0121) | S0008 (WI-0121) |
+| `Action_Write_to_ini` | yes | done (WI-0121) | S0008 (WI-0121) |
+| `Action_Delete_From_Ini` | yes | done (WI-0121) | S0008 (WI-0121) |
 | JSON: read a file or text into an object, write an object as JSON | no | open | later |
 | YAML: read and write | no | open | later |
 | XML: read, query (XPath) and write | no | open | later |
