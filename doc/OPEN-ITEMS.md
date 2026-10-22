@@ -24,6 +24,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0185 | Text fields with the content type String are not checked as expressions (WI-0108): a `%name%` or a `{` in a text is not a warning | decision needed: the owner confirms that the content String is no expression | S0007 |
 | F-0186 | The WebView2 loader DLL hashes (WI-0115) come from one download; a second download was not compared | open, not checked; the hashes are checked again when the loader is updated (S0009) | S0007 |
 | F-0187 | A flow with its own working directory (flow settings, DefaultWorkingDir off) is not run end to end: `BuiltInVars.WorkingDirOf` is tested as a function (`tests/ahk/vars_model.test.ahk`) and the global working directory is tested in a run (`tests/integration/test_settings.py`) | open, not checked end to end (WI-0114) | S0007 |
+| F-0188 | The path guards of the file and folder elements (WI-0120, M-0119) miss the extended-length prefix and UNC share roots as roots, check only the raw parameter for an empty path (a `%var%` that expands to empty reaches the working directory; only Delete_Folder refuses the working directory), and allow Move_Folder and Rename_Folder on the working directory itself | open, found in the review of WI-0120; read in code, not tested | WI-0120 |
 | F-0175 | REQ-USE-080 names REQ-USE-070 for the switch of the notices, but REQ-USE-070 is the requirement of hints (WI-0109; PROTOCOL 4.7 follows the same wrong reference) | decision needed (correct the reference, or give the switch its own requirement); the owner decides | WI-0109 |
 | F-0178 | The help request of the supervisor for a role that is still starting (the page sent at its hello) and the requests of the manager and the editors are not tested end to end: the tests can only send as an observer, which the supervisor refuses (WI-0111) | open, not checked | WI-0111 |
 | F-0179 | The WebView2 help viewer does not handle a new-window request (`target=_blank`): the runtime would open its own unfiltered window; the handlers of the viewer are kept for the process (WI-0115) | open, low: no help page has such a link | WI-0115 |
@@ -332,6 +333,11 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 **What:** `BuiltInVars.WorkingDirOf` is tested as a function (`tests/ahk/vars_model.test.ahk`), the global working directory in a run (`tests/integration/test_settings.py`). A flow whose own folder is set (flow settings, WI-0109) is not run and its `A_WorkingDir` read.
 **Status:** open, not checked end to end (WI-0114).
+
+### F-0188: Gaps in the path guards of the file and folder elements
+
+**What:** `FileOps.Guard` (WI-0120, M-0119) does not treat a path with the extended-length prefix and a UNC share root (server and share only) as roots. The empty-path check looks at the raw parameter only: a `%var%` that expands to empty reaches the flow working directory, which only Delete_Folder refuses. Move_Folder and Rename_Folder on the working directory itself are allowed.
+**Status:** open, found in the review of WI-0120; read in code, not tested. Fix: check the expanded path and the roots after normalisation.
 
 ### F-0175: REQ-USE-080 names the wrong requirement for the switch of the notices
 
