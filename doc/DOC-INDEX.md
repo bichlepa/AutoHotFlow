@@ -208,7 +208,7 @@ L67-73 The reason of a failed file call is the OSError number (verified) (partly
 L75-81 FileSetAttrib and FileSetTime do not throw when no file matches (verified) (verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (42.5 KB, 326 lines)
+## doc/howto/gui-and-hotkeys.md (45.2 KB, 350 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -251,6 +251,9 @@ L297-303 A menu state that depends on another program is read only when the menu
 L305-311 A one-shot timer that is set again restarts its delay: one `SetTimer` call per change is a debounce (verified) (verified)
 L312-318 A drop-down list of a Gui is AddDDL, not AddDropDown (verified) (verified)
 L320-326 Hotkey variants of a HotIf criterion are found by the criterion object (assumed) (assumed)
+L328-334 GetWindowTextW of another process's control can return text from before a change (verified) (verified)
+L336-342 The arguments of a shortcut are cut at 259 characters (verified) (verified)
+L344-350 `ControlGetHwnd` and `ControlGetText` take a window handle as the control (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)

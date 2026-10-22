@@ -5,10 +5,12 @@
 ; The files that the classes include come first, outside the class body; inside it AutoHotkey skips them.
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
+#Include lib\WindowIdent.ahk
 #Include lib\TextOps.ahk
 #Include lib\DialogOps.ahk
 #Include lib\FileOps.ahk
 #Include lib\IniOps.ahk
+#Include lib\ControlIdent.ahk
 #Include lib\ProcessOps.ahk
 #Include lib\SoundOps.ahk
 #Include lib\DebugOps.ahk
@@ -16,7 +18,9 @@
 
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Default {
+    #Include Actions\Action_Activate_Window.ahk
     #Include Actions\Action_Beep.ahk
+    #Include Actions\Action_Close_Window.ahk
     #Include Actions\Action_Copy_File.ahk
     #Include Actions\Action_Copy_Folder.ahk
     #Include Actions\Action_Create_Folder.ahk
@@ -26,18 +30,22 @@ class Default {
     #Include Actions\Action_Delete_From_Ini.ahk
     #Include Actions\Action_Empty_Recycle_Bin.ahk
     #Include Actions\Action_Get_Clipboard.ahk
+    #Include Actions\Action_Get_Control_Text.ahk
     #Include Actions\Action_Get_File_Attributes.ahk
     #Include Actions\Action_Get_File_Size.ahk
     #Include Actions\Action_Get_File_Time.ahk
     #Include Actions\Action_Get_shortcut_information.ahk
     #Include Actions\Action_Get_Volume.ahk
     #Include Actions\Action_Hibernate_Computer.ahk
+    #Include Actions\Action_Hide_Window.ahk
     #Include Actions\Action_Kill_Process.ahk
     #Include Actions\Action_Lock_Computer.ahk
     #Include Actions\Action_Log_Off.ahk
     #Include Actions\Action_Message_Box.ahk
+    #Include Actions\Action_Minimize_all_windows.ahk
     #Include Actions\Action_Move_File.ahk
     #Include Actions\Action_Move_Folder.ahk
+    #Include Actions\Action_Move_Window.ahk
     #Include Actions\Action_Play_Sound.ahk
     #Include Actions\Action_Read_From_File.ahk
     #Include Actions\Action_Read_From_Ini.ahk
@@ -46,10 +54,12 @@ class Default {
     #Include Actions\Action_Rename_Folder.ahk
     #Include Actions\Action_Run.ahk
     #Include Actions\Action_Set_Clipboard.ahk
+    #Include Actions\Action_Set_control_text.ahk
     #Include Actions\Action_Set_file_attributes.ahk
     #Include Actions\Action_Set_file_time.ahk
     #Include Actions\Action_Set_Process_Priority.ahk
     #Include Actions\Action_Set_Volume.ahk
+    #Include Actions\Action_Show_Window.ahk
     #Include Actions\Action_Shutdown.ahk
     #Include Actions\Action_Speech_output.ahk
     #Include Actions\Action_Stop_Sound.ahk
@@ -62,11 +72,15 @@ class Default {
     #Include Conditions\Condition_File_Exists.ahk
     #Include Conditions\Condition_File_Has_Attribute.ahk
     #Include Conditions\Condition_Process_Is_Running.ahk
+    #Include Conditions\Condition_Window_Active.ahk
+    #Include Conditions\Condition_Window_Exists.ahk
     #Include Loops\Loop_Loop_Through_Files.ahk
 }
 
 ElementRegistry.RegisterPackage("Default", "1.2.1")
+ElementRegistry.Register(Default.Action_Activate_Window)
 ElementRegistry.Register(Default.Action_Beep)
+ElementRegistry.Register(Default.Action_Close_Window)
 ElementRegistry.Register(Default.Action_Copy_File)
 ElementRegistry.Register(Default.Action_Copy_Folder)
 ElementRegistry.Register(Default.Action_Create_Folder)
@@ -76,18 +90,22 @@ ElementRegistry.Register(Default.Action_Delete_Folder)
 ElementRegistry.Register(Default.Action_Delete_From_Ini)
 ElementRegistry.Register(Default.Action_Empty_Recycle_Bin)
 ElementRegistry.Register(Default.Action_Get_Clipboard)
+ElementRegistry.Register(Default.Action_Get_Control_Text)
 ElementRegistry.Register(Default.Action_Get_File_Attributes)
 ElementRegistry.Register(Default.Action_Get_File_Size)
 ElementRegistry.Register(Default.Action_Get_File_Time)
 ElementRegistry.Register(Default.Action_Get_shortcut_information)
 ElementRegistry.Register(Default.Action_Get_Volume)
 ElementRegistry.Register(Default.Action_Hibernate_Computer)
+ElementRegistry.Register(Default.Action_Hide_Window)
 ElementRegistry.Register(Default.Action_Kill_Process)
 ElementRegistry.Register(Default.Action_Lock_Computer)
 ElementRegistry.Register(Default.Action_Log_Off)
 ElementRegistry.Register(Default.Action_Message_Box)
+ElementRegistry.Register(Default.Action_Minimize_all_windows)
 ElementRegistry.Register(Default.Action_Move_File)
 ElementRegistry.Register(Default.Action_Move_Folder)
+ElementRegistry.Register(Default.Action_Move_Window)
 ElementRegistry.Register(Default.Action_Play_Sound)
 ElementRegistry.Register(Default.Action_Read_From_File)
 ElementRegistry.Register(Default.Action_Read_From_Ini)
@@ -96,10 +114,12 @@ ElementRegistry.Register(Default.Action_Rename_File)
 ElementRegistry.Register(Default.Action_Rename_Folder)
 ElementRegistry.Register(Default.Action_Run)
 ElementRegistry.Register(Default.Action_Set_Clipboard)
+ElementRegistry.Register(Default.Action_Set_control_text)
 ElementRegistry.Register(Default.Action_Set_file_attributes)
 ElementRegistry.Register(Default.Action_Set_file_time)
 ElementRegistry.Register(Default.Action_Set_Process_Priority)
 ElementRegistry.Register(Default.Action_Set_Volume)
+ElementRegistry.Register(Default.Action_Show_Window)
 ElementRegistry.Register(Default.Action_Shutdown)
 ElementRegistry.Register(Default.Action_Speech_output)
 ElementRegistry.Register(Default.Action_Stop_Sound)
@@ -112,4 +132,6 @@ ElementRegistry.Register(Default.Condition_Debug_Dialog)
 ElementRegistry.Register(Default.Condition_File_Exists)
 ElementRegistry.Register(Default.Condition_File_Has_Attribute)
 ElementRegistry.Register(Default.Condition_Process_Is_Running)
+ElementRegistry.Register(Default.Condition_Window_Active)
+ElementRegistry.Register(Default.Condition_Window_Exists)
 ElementRegistry.Register(Default.Loop_Loop_Through_Files)

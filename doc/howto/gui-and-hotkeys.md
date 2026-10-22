@@ -324,3 +324,27 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** One function object for the criterion (`this.activeFn := (*) => ...` in `__New`), `HotIf(criterion)` before each `Hotkey` call, and `HotIf()` without a parameter afterwards, which resets the context of the thread (HotIf help page).
 - **Status:** assumed (the rule is from the HotIf help page; no run switched a hotkey off with a criterion; the owner's gui test covers the window assistant only)
 - **Source:** `src/editor/assist/MouseAssistant.ahk` (`_Nudging`)
+
+### GetWindowTextW of another process's control can return text from before a change (verified)
+
+- **Problem:** A test read the text of an edit control of its own test window after a worker had set it with `ControlSetText`. The AutoHotkey read in another process showed the new text, and `GetWindowTextW` in the Python test process still showed the old one, with the same handle.
+- **Wrong:** `user32.GetWindowTextW(hwnd, buffer, n)` to read the text of a control of another process.
+- **Right:** Send `WM_GETTEXTLENGTH` and `WM_GETTEXT` with `SendMessageW` (the length first), as the test helper `text_of` in `tests/integration/test_window_elements.py` does. Or read it with `ControlGetText` from AutoHotkey.
+- **Status:** verified (the failing assertion read the old text in the same run in which `WM_GETTEXT` read the new one; `tests/integration/test_window_elements.py`, WI-0125)
+- **Source:** `tests/integration/test_window_elements.py` (`OwnWindow.text_of`)
+
+### The arguments of a shortcut are cut at 259 characters (verified)
+
+- **Problem:** A shortcut created with a long argument string (a command line with three paths of about 100 characters) read back with a different argument string: `FileGetShortcut` returned the first 259 characters.
+- **Wrong:** `FileCreateShortcut(target, lnk, dir, longArgs)` and a later check of the arguments against the same text.
+- **Right:** Keep the arguments of a shortcut short (name the files relatively, in the working folder of the shortcut), or store the long part in a file and pass its name. Do not compare a long argument text as a whole.
+- **Status:** verified (`FileCreateShortcut` and `FileGetShortcut` on this machine, WI-0125; the corpus flow "file test" uses short relative arguments)
+- **Source:** `tests/integration/test_corpus.py` (`test_v1_file_test_runs_green_with_an_own_window`)
+
+### `ControlGetHwnd` and `ControlGetText` take a window handle as the control (verified)
+
+- **Problem:** A control found by its class in one call and then passed to another call with the window title again.
+- **Wrong:** `ControlGetText("ahk_id " hwnd)` where `hwnd` is the handle of a control, or `ControlSetText(text, "ahk_id " ctl)`: the window of the title is not found, and the call throws `Target window not found`.
+- **Right:** Pass the handle of the control as the control parameter: `ControlGetText(ctl)`, `ControlSetText(text, ctl)`. The handle of a control works without a window title (the HWND identifier of the control identifiers help page).
+- **Status:** verified (`ControlGetText(h)` and `ControlSetText(text, h)` with a control handle in a standalone probe, WI-0125)
+- **Source:** `src/elements/Default/lib/ControlIdent.ahk`

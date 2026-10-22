@@ -1038,23 +1038,24 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 ### REQ-ELM-360 Windows and controls
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (WI-0125; the minimize of all windows on the real desktop and the monitor scaling are the owner's manual check)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0125)
+- **Evidence:** `tests/integration/test_window_elements.py` (the window and control elements, headless, with own test windows; the test of Minimize all windows records the call of the provider), `tests/schema/test_v1_schema.py` (the parameters against v1, M-0133), `tests/integration/test_corpus.py::test_v1_file_test_runs_green_with_an_own_window`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_activate_Window` | yes | open | S0008 |
-| `Action_Show_window` | yes | open | S0008 |
-| `Action_Hide_window` | yes | open | S0008 |
-| `Action_Close_Window` | yes | open | S0008 |
-| `Action_Move_window` | yes | open | S0008 |
-| `Action_Minimize_All_Windows` | yes | open | S0008 |
-| `Action_Get_control_text` | yes | open | S0008 |
-| `Action_Set_control_text` | yes | open | S0008 |
-| `Condition_Window_Active` | yes | open | S0008 |
-| `Condition_Window_Exists` | yes | open | S0008 |
+| `Action_Activate_Window` | yes | done (WI-0125) | S0008 (WI-0125) |
+| `Action_Show_Window` | yes | done (WI-0125) | S0008 (WI-0125) |
+| `Action_Hide_Window` | yes | done (WI-0125) | S0008 (WI-0125) |
+| `Action_Close_Window` | yes | done (WI-0125) | S0008 (WI-0125) |
+| `Action_Move_Window` | yes | done (WI-0125; the monitor DPI is not checked here) | S0008 (WI-0125) |
+| `Action_Minimize_all_windows` | yes | done (WI-0125; the real desktop is not checked here) | S0008 (WI-0125) |
+| `Action_Get_Control_Text` | yes | done (WI-0125) | S0008 (WI-0125) |
+| `Action_Set_control_text` | yes | done (WI-0125) | S0008 (WI-0125) |
+| `Condition_Window_Active` | yes | done (WI-0125) | S0008 (WI-0125) |
+| `Condition_Window_Exists` | yes | done (WI-0125) | S0008 (WI-0125) |
 
 ### REQ-ELM-370 Mouse and keyboard
 

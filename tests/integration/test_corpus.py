@@ -13,6 +13,7 @@ the step that brings them (S0003 and S0008); a test keeps the table equal to the
 import glob
 import json
 import os
+import uuid
 from pathlib import Path
 
 import pytest
@@ -20,6 +21,7 @@ import pytest
 from support.coreflows import run_all, setvar
 from support.dialogs import DialogScript, answer
 from support.flowbuilder import FlowBuilder
+from support.ahk import find_ahk_exe
 from support.flowrun import FlowRunner, flows, var_value  # noqa: F401  (flows: fixture)
 from support.system import SystemScript, value
 from support.timing import scaled
@@ -43,12 +45,9 @@ PENDING = {
     "Flow 100439537": dict(name="HTTP Request", missing={
         "Action_HTTP_Request": "S0008"}),
     "Flow 130786371": dict(name="Dialog test", missing={
-        "Action_Close_Window": "S0008", "Action_Get_Control_Text": "S0008",
-        "Action_Input_Box": "S0008", "Action_Send_Keystrokes_to_Control": "S0008", "Condition_Window_Exists": "S0008"}),
+        "Action_Input_Box": "S0008", "Action_Send_Keystrokes_to_Control": "S0008"}),
     "Flow 1333431302": dict(name="User idle test", missing={
         "Trigger_User_Idle_Time": "S0008"}),
-    "Flow 1384439262": dict(name="file test", missing={
-        "Action_Close_Window": "S0008", "Condition_Window_Exists": "S0008"}),
     "Flow 1849072261": dict(name="external script test", missing={
         "Action_AutoHotkey_Script": "S0008 (E0039: v1 code is kept as text, M-0049)"}),
     "Flow 2133155705": dict(name="Hotkey test", missing={
@@ -191,6 +190,55 @@ def test_v1_ini_file_test_runs_green_in_a_test_folder(flows, tmp_path):
     assert (tmp_path / "testIni.ini").read_bytes()[:2] == BOM_UTF16
     pair = flows.wait_var("global_testResults")
     assert pair is not None and json.loads(pair[1]) == ["ini file test"], pair
+
+
+WINDOW_HELPER = ROOT / "tests" / "integration" / "helpers" / "own_window.ahk"
+
+
+def test_v1_file_test_runs_green_with_an_own_window(flows, tmp_path):
+    """"file test" (Flow 1384439262), as saved except its window (WI-0125, M-0134). The flow creates a shortcut to Notepad
+    and runs it, and checks the shortcut and the window with the window elements. The test runs the flow in a temporary
+    folder (as the ini test). The shortcut starts an own test window instead (helpers/own_window.ahk, a copy in the
+    folder, run by the AutoHotkey interpreter), with a title of its own, so the window elements never see a Notepad window
+    of the user. The arguments of a shortcut are cut at 259 characters, so the script and its files are named relatively
+    (found in the working folder of the shortcut). The flow closes the window (method close) and its program ends with it.
+    """
+    interpreter, reason = find_ahk_exe()
+    if interpreter is None:
+        pytest.skip(reason)
+    data = json.loads((V1 / "Flow 1384439262.json").read_text(encoding="utf-8-sig"))
+    data.setdefault("flowSettings", {}).update({"DefaultWorkingDir": 0, "WorkingDir": str(tmp_path)})
+    title = "AhfFileTest-" + uuid.uuid4().hex
+    (tmp_path / "own_window.ahk").write_bytes(WINDOW_HELPER.read_bytes())
+    arguments = "own_window.ahk %s ready.txt stop.txt" % title
+    for element in data["allElements"].values():
+        pars = element.get("pars", {})
+        if element["class"] == "Action_Create_Shortcut":
+            # the shortcut starts the test program instead of Notepad (its target and its arguments)
+            pars["file"] = interpreter
+            pars["runArguments"] = arguments
+        if element["class"] == "Condition_Expression" and pars["Expression"].startswith("shortcutTarget = "):
+            pars["Expression"] = 'shortcutTarget = "%s"' % interpreter
+        if element["class"] == "Condition_Expression" and pars["Expression"].startswith("shortcutArgs = "):
+            pars["Expression"] = 'shortcutArgs = "%s"' % arguments
+        if element["class"] == "Action_Delete_File" and pars.get("deleteFileMethod") == "Recycle":
+            # the recycle bin of the user is not touched by a test: the copy deletes the file (WI-0117, the seam)
+            pars["deleteFileMethod"] = "Delete"
+        if element["class"] in ("Action_Close_Window", "Condition_Window_Exists"):
+            # the window of the test: its title, the class and the process of the helper (AutoHotkey GUI)
+            assert pars["Wintitle"] == "anyTestText.txt" and pars["ahk_class"] == "Notepad", pars
+            pars.update({"Wintitle": title, "ahk_class": "AutoHotkeyGUI", "ahk_exe": "AutoHotkey64.exe"})
+    source = tmp_path / "src" / "Flow 1384439262.json"
+    source.parent.mkdir()
+    source.write_text(json.dumps(data), encoding="utf-8")
+    flow_id = flows.add_file(source)
+    flows.start()
+    flows.enable(flow_id)       # the flow calls its own triggers with Action_Execute_Flow (F-0099, as the other flows)
+    run = flows.run(flow_id, trigger="element0000000487", timeout=scaled(120))
+    assert run.reason == "finished", (run.reason, run.exceptions)
+    # the one exception of the flow is taken by its exception connection (the copy over an existing file, as saved)
+    assert len(run.exceptions) == 1 and "already exists" in run.exceptions[0], run.exceptions
+    assert {"element0000000884", "element0000000889", "element0000000890"} <= set(run.path), run.path
 
 
 def test_v1_maths_test_runs_green(flows):

@@ -5,6 +5,7 @@
 ; The files that the classes include come first, outside the class body; inside it AutoHotkey skips them.
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
+#Include lib\WindowIdent.ahk
 #Include lib\ListOps.ahk
 #Include lib\TextOps.ahk
 #Include lib\ListFormats.ahk
@@ -12,20 +13,22 @@
 #Include lib\FileOps.ahk
 #Include lib\IniOps.ahk
 #Include lib\FlowChoices.ahk
+#Include lib\ControlIdent.ahk
 #Include lib\ProcessOps.ahk
 #Include lib\SoundOps.ahk
 #Include lib\FlowSwitchOps.ahk
 #Include lib\TimeOps.ahk
 #Include lib\DebugOps.ahk
 #Include lib\LoopOps.ahk
-#Include lib\WindowIdent.ahk
 
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Default {
     #Include Actions\Action_Absolute_number.ahk
+    #Include Actions\Action_Activate_Window.ahk
     #Include Actions\Action_Add_To_List.ahk
     #Include Actions\Action_Beep.ahk
     #Include Actions\Action_Change_character_case.ahk
+    #Include Actions\Action_Close_Window.ahk
     #Include Actions\Action_Convert_list_to_string.ahk
     #Include Actions\Action_Convert_string_to_list.ahk
     #Include Actions\Action_Copy_File.ahk
@@ -42,6 +45,7 @@ class Default {
     #Include Actions\Action_Execute_Flow.ahk
     #Include Actions\Action_Exponentiation.ahk
     #Include Actions\Action_Get_Clipboard.ahk
+    #Include Actions\Action_Get_Control_Text.ahk
     #Include Actions\Action_Get_File_Attributes.ahk
     #Include Actions\Action_Get_File_Size.ahk
     #Include Actions\Action_Get_File_Time.ahk
@@ -52,12 +56,15 @@ class Default {
     #Include Actions\Action_Get_String_Length.ahk
     #Include Actions\Action_Get_Volume.ahk
     #Include Actions\Action_Hibernate_Computer.ahk
+    #Include Actions\Action_Hide_Window.ahk
     #Include Actions\Action_Kill_Process.ahk
     #Include Actions\Action_Lock_Computer.ahk
     #Include Actions\Action_Log_Off.ahk
     #Include Actions\Action_Message_Box.ahk
+    #Include Actions\Action_Minimize_all_windows.ahk
     #Include Actions\Action_Move_File.ahk
     #Include Actions\Action_Move_Folder.ahk
+    #Include Actions\Action_Move_Window.ahk
     #Include Actions\Action_New_List.ahk
     #Include Actions\Action_New_Time.ahk
     #Include Actions\Action_New_variable.ahk
@@ -74,11 +81,13 @@ class Default {
     #Include Actions\Action_Script.ahk
     #Include Actions\Action_Search_in_a_string.ahk
     #Include Actions\Action_Set_Clipboard.ahk
+    #Include Actions\Action_Set_control_text.ahk
     #Include Actions\Action_Set_file_attributes.ahk
     #Include Actions\Action_Set_file_time.ahk
     #Include Actions\Action_Set_Flow_Status.ahk
     #Include Actions\Action_Set_Process_Priority.ahk
     #Include Actions\Action_Set_Volume.ahk
+    #Include Actions\Action_Show_Window.ahk
     #Include Actions\Action_Shuffle_list.ahk
     #Include Actions\Action_Shutdown.ahk
     #Include Actions\Action_Sleep.ahk
@@ -114,6 +123,8 @@ class Default {
     #Include Conditions\Condition_String_Contains_Text.ahk
     #Include Conditions\Condition_Variable_content_is.ahk
     #Include Conditions\Condition_Variable_Is_Empty.ahk
+    #Include Conditions\Condition_Window_Active.ahk
+    #Include Conditions\Condition_Window_Exists.ahk
     #Include Loops\Loop_Condition.ahk
     #Include Loops\Loop_Loop_Through_Files.ahk
     #Include Loops\Loop_Parse_A_String.ahk
@@ -127,9 +138,11 @@ class Default {
 
 ElementRegistry.RegisterPackage("Default", "1.2.1")
 ElementRegistry.Register(Default.Action_Absolute_number)
+ElementRegistry.Register(Default.Action_Activate_Window)
 ElementRegistry.Register(Default.Action_Add_To_List)
 ElementRegistry.Register(Default.Action_Beep)
 ElementRegistry.Register(Default.Action_Change_character_case)
+ElementRegistry.Register(Default.Action_Close_Window)
 ElementRegistry.Register(Default.Action_Convert_list_to_string)
 ElementRegistry.Register(Default.Action_Convert_string_to_list)
 ElementRegistry.Register(Default.Action_Copy_File)
@@ -146,6 +159,7 @@ ElementRegistry.Register(Default.Action_Encode_string)
 ElementRegistry.Register(Default.Action_Execute_Flow)
 ElementRegistry.Register(Default.Action_Exponentiation)
 ElementRegistry.Register(Default.Action_Get_Clipboard)
+ElementRegistry.Register(Default.Action_Get_Control_Text)
 ElementRegistry.Register(Default.Action_Get_File_Attributes)
 ElementRegistry.Register(Default.Action_Get_File_Size)
 ElementRegistry.Register(Default.Action_Get_File_Time)
@@ -156,12 +170,15 @@ ElementRegistry.Register(Default.Action_Get_shortcut_information)
 ElementRegistry.Register(Default.Action_Get_String_Length)
 ElementRegistry.Register(Default.Action_Get_Volume)
 ElementRegistry.Register(Default.Action_Hibernate_Computer)
+ElementRegistry.Register(Default.Action_Hide_Window)
 ElementRegistry.Register(Default.Action_Kill_Process)
 ElementRegistry.Register(Default.Action_Lock_Computer)
 ElementRegistry.Register(Default.Action_Log_Off)
 ElementRegistry.Register(Default.Action_Message_Box)
+ElementRegistry.Register(Default.Action_Minimize_all_windows)
 ElementRegistry.Register(Default.Action_Move_File)
 ElementRegistry.Register(Default.Action_Move_Folder)
+ElementRegistry.Register(Default.Action_Move_Window)
 ElementRegistry.Register(Default.Action_New_List)
 ElementRegistry.Register(Default.Action_New_Time)
 ElementRegistry.Register(Default.Action_New_variable)
@@ -178,11 +195,13 @@ ElementRegistry.Register(Default.Action_Run)
 ElementRegistry.Register(Default.Action_Script)
 ElementRegistry.Register(Default.Action_Search_in_a_string)
 ElementRegistry.Register(Default.Action_Set_Clipboard)
+ElementRegistry.Register(Default.Action_Set_control_text)
 ElementRegistry.Register(Default.Action_Set_file_attributes)
 ElementRegistry.Register(Default.Action_Set_file_time)
 ElementRegistry.Register(Default.Action_Set_Flow_Status)
 ElementRegistry.Register(Default.Action_Set_Process_Priority)
 ElementRegistry.Register(Default.Action_Set_Volume)
+ElementRegistry.Register(Default.Action_Show_Window)
 ElementRegistry.Register(Default.Action_Shuffle_list)
 ElementRegistry.Register(Default.Action_Shutdown)
 ElementRegistry.Register(Default.Action_Sleep)
@@ -218,6 +237,8 @@ ElementRegistry.Register(Default.Condition_Process_Is_Running)
 ElementRegistry.Register(Default.Condition_String_Contains_Text)
 ElementRegistry.Register(Default.Condition_Variable_content_is)
 ElementRegistry.Register(Default.Condition_Variable_Is_Empty)
+ElementRegistry.Register(Default.Condition_Window_Active)
+ElementRegistry.Register(Default.Condition_Window_Exists)
 ElementRegistry.Register(Default.Loop_Condition)
 ElementRegistry.Register(Default.Loop_Loop_Through_Files)
 ElementRegistry.Register(Default.Loop_Parse_A_String)
