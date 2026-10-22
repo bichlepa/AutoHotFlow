@@ -51,7 +51,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0117 | Seam `SystemOps` (E0103) | done | haiku | see git log (up to bdd9d5d5) | 2026-10-22 | review fix: system-seam also flags the command style; engine/editor test entries register no system provider (a future inline element would call the real function there; consider a provider or test-mode guard); SoundGet* stay outside the seam |
 | WI-0118 | Calculations, script, date and time | done | haiku | see git log (up to 7977e8a9) | 2026-10-22 | M-0104 to M-0107, M-0099 extended; owner to confirm: undefined maths results are empty text + f1 (as v1), sqrt of exact integer is Integer, default Unit Minutes (old flow with numeric 2 untested), odd-length time stamps invalid; fast-tier flake test_worker_lifecycle cold start seen once under load in the author's run; German texts and help in the viewer not checked |
 | WI-0119 | Strings and list conversions | done | haiku | see git log (up to e15ad21b) | 2026-10-22 | 13 classes; M-0108 to M-0112; REQ-ELM-220 done, REQ-ELM-230 partial (YAML later); owner: M-0111 v1 claims partly assumed, Title case via StrTitle, YAML throws, JSON keys sorted; split code duplicated with Loop_Parse_A_String; typo `caracters` is v1 text |
-| WI-0120 | Files and folders I | done (verification pending) | haiku | see git log (up to 6fd6a7cd) | 2026-10-22 | 13 classes, SystemOps.FileRecycle, M-0113 to M-0119; review fix: path guards (empty path, drive root, working directory, wildcard with overwrite); F-0188 gaps; owner: ActsOnSystem for readers, empty path now an error (v1: working directory), Delete_Folder honours only-if-empty |
+| WI-0120 | Files and folders I | done | haiku | see git log (up to 6fd6a7cd) | 2026-10-22 | 13 classes, SystemOps.FileRecycle, M-0113 to M-0119; review fix: path guards (empty path, drive root, working directory, wildcard with overwrite); F-0188 gaps; owner: ActsOnSystem for readers, empty path now an error (v1: working directory), Delete_Folder honours only-if-empty |
 | WI-0121 | Files and folders II, file loop, ini | open | | | |  |
 | WI-0122 | Archives, drives, internet | open | | | |  |
 | WI-0123 | Programs and processes, clipboard, power and session | open | | | |  |
@@ -77,6 +77,8 @@ None.
 None.
 
 ## Last verified state
+
+Commit `c38d7d67` (WI-0120 integrated; all tiers): fast 2364 passed, 2 failed under load (`test_editor_flow_ctx` and `test_editor_tray`, the force question of an unreadable state; both green in recheck 20261022-213224-recheck; the fast run took 24 minutes), foundation 471, slow 208 (runs 20261022-210344-c38d7d67-3, -2, and 20261022-210344-c38d7d67). VERDICT red only by those load flakes; the force-question tests have now failed under load three times.
 
 Commit `e15ad21b` (WI-0118 and WI-0119 integrated; all tiers): fast 2326 passed, 3 failed under load, foundation 471 passed, slow 208 passed (runs 20261022-195720-e15ad21b, -3, -2). The 3 red (`test_editor_tray` force question, `test_worker_lifecycle` cold start, `test_worker` not busy after a cancel) were green in recheck 20261022-201051-recheck: load flakes. VERDICT red only by those.
 
