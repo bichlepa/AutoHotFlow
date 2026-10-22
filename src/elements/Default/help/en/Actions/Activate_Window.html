@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Generated from src/elements/Default/help/en/Actions/Activate_Window.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Activate window</title>
+<style>
+/* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
+   page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
+   or custom properties. Colors are fixed (no dark mode) because the classic viewer ignores media queries. */
+body {
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #000000;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: block;
+    margin: 0 16px;
+    padding: 8px 0 24px 0;
+}
+h1 {
+    font-size: 22px;
+    margin: 12px 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #cccccc;
+}
+h2 {
+    font-size: 17px;
+    margin: 18px 0 8px 0;
+}
+h3 {
+    font-size: 14px;
+    margin: 14px 0 4px 0;
+}
+p {
+    margin: 6px 0;
+}
+a {
+    color: #0645ad;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    padding: 0 2px;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    background-color: #f2f2f2;
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    margin: 8px 0;
+    white-space: pre-wrap;
+}
+pre code {
+    background-color: transparent;
+    padding: 0;
+}
+ul, ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+li {
+    margin: 2px 0;
+}
+blockquote {
+    margin: 10px 0;
+    padding: 6px 12px;
+    border-left: 6px solid #cccccc;
+    background-color: #fff5f5;
+    border-color: #d33b3b;
+}
+table {
+    border-collapse: collapse;
+    margin: 8px 0;
+    border: 1px solid #808080;
+}
+th, td {
+    border: 1px solid #808080;
+    padding: 3px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #e8e8e8;
+}
+img {
+    border: 0;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Activate window</h1>
+<p>The action <strong>Activate window</strong> brings a window to the front and makes it the active window. The action waits up to two seconds for the window to become active, then it goes on in any case. A window that Windows does not let come to the front stays inactive, and that is not an exception.</p>
+<p>If no window matches the identification, the action ends with the exception "Error! Seeked window does not exist".</p>
+<h2>Settings</h2>
+<h3>Window identification</h3>
+<p><strong>Title of window</strong>: The title of the window, compared in the way chosen with the next setting: <strong>Starts with</strong>, <strong>Contains anywhere</strong> or <strong>Exactly</strong>.</p>
+<p><strong>Exclude title</strong>: Windows whose titles include this value are not considered.</p>
+<p><strong>Text of a control in window</strong>: If present, a text of a control of the window (a substring of one text element, compared in the same way as the title). <strong>Detect hidden text</strong> also finds text of hidden controls.</p>
+<p><strong>Exclude text of a control in window</strong>: Windows that have a control with this text are not considered.</p>
+<p><strong>Window class</strong>: The window class that Windows uses to create the window. It tells what type of window it is.</p>
+<p><strong>Process name</strong>: The name of the program that created the window, for example <code>notepad.exe</code>.</p>
+<p><strong>Unique window ID</strong>: The handle of the window (HWND). It identifies the window even when its title changes.</p>
+<p><strong>Unique process ID</strong>: The process ID. It identifies the windows of one running program.</p>
+<p><strong>Detect hidden window</strong>: A window that exists but is not visible is found as well.</p>
+<p><strong>Import window identification</strong>: The assistant takes the window under the mouse (click <strong>Import window identification</strong>, then move the mouse over the window and press <strong>OK</strong>). The title, class and process name are filled in; the unique IDs only when the box asks for them.</p>
+<p>At least <strong>Title of window</strong>, <strong>Window class</strong>, <strong>Process name</strong>, <strong>Unique window ID</strong> or <strong>Unique process ID</strong> must be set. Without one of them the action ends with an exception.</p>
+<h2>Supplied variables</h2>
+<h3><code>A_WindowID</code></h3>
+<p>The unique ID of the found window.</p>
+</main>
+</body>
+</html>
