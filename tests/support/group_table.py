@@ -666,6 +666,8 @@ COVERS = {
     ],
     "src/elements/Default/Actions/Action_Set_file_attributes.ahk": [
         "integration/test_file_info_elements.py::test_set_file_attributes_sets_the_read_only_flag",
+        "integration/test_file_info_elements.py::test_set_file_attributes_with_an_empty_path_refuses_and_keeps_the_folder",
+        "integration/test_file_info_elements.py::test_set_file_attributes_on_the_working_folder_is_refused",
         "integration/test_file_info_elements.py::test_set_file_attributes_clears_the_read_only_flag",
         "integration/test_file_info_elements.py::test_set_file_attributes_with_no_choice_changes_nothing",
         "integration/test_file_info_elements.py::test_set_file_attributes_of_a_missing_file_is_an_exception",
@@ -682,6 +684,7 @@ COVERS = {
     ],
     "src/elements/Default/Actions/Action_Set_file_time.ahk": [
         "integration/test_file_info_elements.py::test_set_file_time_changes_the_modification_time",
+        "integration/test_file_info_elements.py::test_set_file_time_with_an_empty_path_refuses_and_keeps_the_folder",
         "integration/test_file_info_elements.py::test_set_file_time_of_a_missing_file_is_an_exception",
         "integration/test_file_info_elements.py::test_set_file_time_refuses_a_text_that_is_not_a_time",
     ],

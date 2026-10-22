@@ -268,3 +268,45 @@ def test_empty_recycle_bin_that_fails_is_an_exception(flows):
     system.script({"FileRecycleEmpty": [error("the bin is busy")]})
     runs = run_all(flows, [element_flow("recycle_fail", "Action_Empty_Recycle_Bin", AllDrives="All")])
     assert message_of(runs[0]).startswith("Recycle bin could not be emptied.")
+
+
+# --- path guards (WI-0121 hardening): an empty path or the working folder must not change a whole folder -----------------
+def guard_flow(name, wd, cls, **pars):
+    """A flow whose working folder is `wd` (a test folder), so an empty or a relative path names only test files."""
+    fb = FlowBuilder(name, flow_settings={"DefaultWorkingDir": 0, "WorkingDir": str(wd)})
+    fb.chain(fb.trigger(), fb.action(cls, **pars))
+    return fb
+
+
+def make_work_folder(tmp_path):
+    wd = tmp_path / "work"
+    (wd / "sub").mkdir(parents=True)
+    for p in (wd / "a.txt", wd / "sub" / "b.txt"):
+        p.write_bytes(b"x")
+    return wd
+
+
+def test_set_file_attributes_with_an_empty_path_refuses_and_keeps_the_folder(flows, tmp_path):
+    """Without the guard, an empty path is the working folder: a recursive read-only would change every file below it."""
+    wd = make_work_folder(tmp_path)
+    runs = run_all(flows, [guard_flow("attr_empty", wd, "Action_Set_file_attributes", file="", ReadOnly=1,
+                                      OperateOnWhat="FilesAndFolders", Recurse=1)])
+    assert "is empty" in message_of(runs[0]), runs[0].exceptions
+    assert os.access(wd / "a.txt", os.W_OK) and os.access(wd / "sub" / "b.txt", os.W_OK)
+
+
+def test_set_file_attributes_on_the_working_folder_is_refused(flows, tmp_path):
+    wd = make_work_folder(tmp_path)
+    runs = run_all(flows, [guard_flow("attr_wd", wd, "Action_Set_file_attributes", file=str(wd), ReadOnly=1,
+                                      OperateOnWhat="FilesAndFolders", Recurse=1)])
+    assert "working directory of the flow" in message_of(runs[0]), runs[0].exceptions
+    assert os.access(wd / "a.txt", os.W_OK) and os.access(wd / "sub" / "b.txt", os.W_OK)
+
+
+def test_set_file_time_with_an_empty_path_refuses_and_keeps_the_folder(flows, tmp_path):
+    wd = make_work_folder(tmp_path)
+    before = os.path.getmtime(wd / "a.txt")
+    runs = run_all(flows, [guard_flow("time_empty", wd, "Action_Set_file_time", file="", time="20200101000000",
+                                      OperateOnWhat="FilesAndFolders", Recurse=1)])
+    assert "is empty" in message_of(runs[0]), runs[0].exceptions
+    assert os.path.getmtime(wd / "a.txt") == before

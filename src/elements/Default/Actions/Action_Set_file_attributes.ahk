@@ -40,6 +40,8 @@ class Action_Set_file_attributes extends AhfElement {
 
     static Run(ctx, params) {
         p := ctx.EvalParams(params)
+        FileOps.Guard(Lang("File path"), TextOps.Par(params, "file"), p.file)     ; a drive or the whole drive is refused
+        FileOps.GuardWorkingDir(p.file, ctx.GetVar("A_WorkingDir"))
         changes := this._Change("R", p.ReadOnly) this._Change("A", p.Archive)
         changes .= this._Change("S", p.System) this._Change("H", p.Hidden)
         changes .= this._Change("O", p.Offline) this._Change("T", p.Temporary)

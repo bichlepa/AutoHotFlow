@@ -35,6 +35,8 @@ class Action_Set_file_time extends AhfElement {
 
     static Run(ctx, params) {
         p := ctx.EvalParams(params)
+        FileOps.Guard(Lang("File path"), TextOps.Par(params, "file"), p.file)     ; a drive or the whole drive is refused
+        FileOps.GuardWorkingDir(p.file, ctx.GetVar("A_WorkingDir"))
         if (!IsTime(p.time))
             throw ElementError(Lang("Timestamp '%1%' is not valid.", p.time))
         ; FileSetTime throws only when a file it found could not be changed: a path without a match is checked here (v1 text)
