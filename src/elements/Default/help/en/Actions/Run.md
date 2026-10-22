@@ -1,32 +1,34 @@
 # Run
 
-The action **Run** runs an external program.
+The action **Run** starts a program, opens a document or opens a web address with the program that Windows uses for it.
 
 ## Settings
 
 ### Command
 
-The name of a single file, document, URL that will be opened.
-
-If an absolute path isn't specified, the file path is assumed to be in the working directory.
+The program, document or URL to start, for example `notepad`, `%A_MyDocuments%\exampleDocument.odt` or `https://www.autohotkey.com`. A relative path is taken from the working directory that you select below.
 
 ### Working directory
 
-The working directory of the executed application.
+- **Working directory of the flow**: the working directory of the flow (see the flow settings).
+- **Following working directory**: the folder that you select. It must exist, otherwise the action ends with an exception.
 
-If an absolute path isn't specified, the file path is assumed to be in the working directory.
-
-In many cases this parameter does not make a difference.
+In many cases the working directory makes no difference.
 
 ### Run mode
 
-Some applications can be started in a specific mode. This can be selected here.
+- **Run normally**: the usual window.
+- **Run maximized**: the window is opened maximized.
+- **Run minimized**: the window is opened minimized.
+- **Run hidden**: no window is shown. A program that has no hidden mode shows its window anyway.
 
-## Supplied Variables
+If the command cannot be started, the action ends with an exception that names the command.
 
-### `A_PID`
+## Supplied variables
 
-Process ID of the launched process.
+### `A_Pid`
+
+The process ID of the started program. For a document or a web address that Windows opens in a program that is already running, no new process starts and the value is 0.
 
 ## Examples
 
@@ -36,20 +38,15 @@ Run Notepad.
 | --- | --- |
 | Command | `notepad` |
 
-Run VLC media player.
-
-| Parameter | Value |
-| --- | --- |
-| Command | `C:\Program Files\VideoLAN\VLC\vlc.exe (The VLC Media player may be installed in an other location)` |
-
-Open a document.
+Open a document in the documents folder, maximized.
 
 | Parameter | Value |
 | --- | --- |
 | Command | `%A_MyDocuments%\exampleDocument.odt` |
+| Run mode | Run maximized |
 
 Open a website.
 
 | Parameter | Value |
 | --- | --- |
-| Command | `http://www.autohotkey.com` |
+| Command | `https://www.autohotkey.com` |

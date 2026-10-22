@@ -6,6 +6,6 @@ The action **Shutdown** shuts down the computer.
 
 ### Force
 
-If **Force** is selected, all open applications will be forced to close.
+If **Force** is selected, all open applications are closed without asking, which can cause loss of data.
 
 > **Warning:** Be careful using that option. It may cause loss of data.

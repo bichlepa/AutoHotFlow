@@ -1,11 +1,11 @@
 # Get clipboard
 
-The action **Get clipboard** copies the containing text of the clipboard to a variable.
+The action **Get clipboard** copies the text of the clipboard into a variable.
 
-> **Note:** Only text will be imported. If clipboard contains binary data, the variable will contain an empty string.
+> **Note:** Only text is read. If the clipboard holds other data (an image, for example), the variable gets an empty text.
 
 ## Settings
 
 ### Variable name
 
-Name of the variable which will contain the clipboard text.
+The name of the variable that receives the clipboard text. The name must be valid (no digit at the start, no forbidden character); otherwise the action ends with an exception.

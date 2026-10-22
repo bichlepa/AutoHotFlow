@@ -99,18 +99,38 @@ img {
 <body>
 <main>
 <h1>Set process priority</h1>
-<p>The action <strong>Set process priority</strong> sets the priority level of a process.</p>
+<p>The action <strong>Set process priority</strong> sets the priority class of a process. The priority decides how much processor time Windows gives the process compared with others.</p>
 <h2>Settings</h2>
-<h3>Process name <em>or</em> ID</h3>
-<p>Name or ID of the process.</p>
+<h3>Process name or ID</h3>
+<p>The name of the process, for example <code>notepad.exe</code>, or its process ID (a number). With a name, the first process of that name is changed. An empty field is an exception.</p>
 <h3>Priority</h3>
-<p>Specify the priority to set.</p>
+<p>The priority to set: Low, Below normal, Normal, Above normal, High or Realtime.</p>
 <blockquote>
-<p><strong>Warning:</strong> Any process not designed to run at Realtime priority might reduce system stability if set to that level.</p>
+<p><strong>Warning:</strong> A process that is not designed for Realtime priority may reduce the stability of the system if it is set to that level. Realtime needs rights that a normal user may not have; the action then ends with an exception.</p>
 </blockquote>
-<h2>Supplied Variables</h2>
-<h3><code>A_PID</code></h3>
-<p>Process ID of the found process</p>
+<h2>Supplied variables</h2>
+<h3><code>A_Pid</code></h3>
+<p>The process ID of the process.</p>
+<h2>Examples</h2>
+<p>Give the process with a known ID a higher priority.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Process name or ID</td>
+<td><code>1234</code></td>
+</tr>
+<tr>
+<td>Priority</td>
+<td>High</td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

@@ -99,13 +99,13 @@ img {
 <body>
 <main>
 <h1>Get clipboard</h1>
-<p>The action <strong>Get clipboard</strong> copies the containing text of the clipboard to a variable.</p>
+<p>The action <strong>Get clipboard</strong> copies the text of the clipboard into a variable.</p>
 <blockquote>
-<p><strong>Note:</strong> Only text will be imported. If clipboard contains binary data, the variable will contain an empty string.</p>
+<p><strong>Note:</strong> Only text is read. If the clipboard holds other data (an image, for example), the variable gets an empty text.</p>
 </blockquote>
 <h2>Settings</h2>
 <h3>Variable name</h3>
-<p>Name of the variable which will contain the clipboard text.</p>
+<p>The name of the variable that receives the clipboard text. The name must be valid (no digit at the start, no forbidden character); otherwise the action ends with an exception.</p>
 </main>
 </body>
 </html>

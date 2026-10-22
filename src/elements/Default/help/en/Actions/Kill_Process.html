@@ -99,16 +99,34 @@ img {
 <body>
 <main>
 <h1>Kill process</h1>
-<p>The action <strong>Kill process</strong> terminates a process.</p>
+<p>The action <strong>Kill process</strong> ends a process at once. The process does not get the chance to save its data.</p>
 <blockquote>
 <p><strong>Warning:</strong> Be careful using that action. It may cause loss of data.</p>
 </blockquote>
 <h2>Settings</h2>
 <h3>Process name or ID</h3>
-<p>Name or ID of the process.</p>
-<h2>Supplied Variables</h2>
-<h3><code>A_PID</code></h3>
-<p>Former Process ID of the terminated process</p>
+<p>The name of the process, for example <code>notepad.exe</code>, or its process ID (a number). With a name, the first process of that name is ended. The name is not case-sensitive.</p>
+<p>An empty field is an exception: the action does not end any process.</p>
+<p>If the process still runs after the action (for example because Windows denies access), the action ends with an exception.</p>
+<h2>Supplied variables</h2>
+<h3><code>A_Pid</code></h3>
+<p>The process ID of the ended process.</p>
+<h2>Examples</h2>
+<p>End the process with the ID that an earlier Run action stored in <code>A_Pid</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Process name or ID</td>
+<td><code>%A_Pid%</code></td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

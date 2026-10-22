@@ -1,11 +1,11 @@
 # Reboot computer
 
-The action **Reboot computer** reboots the computer.
+The action **Reboot computer** restarts the computer.
 
 ## Settings
 
 ### Force
 
-If **Force** is selected, all open applications will be forced to close.
+If **Force** is selected, all open applications are closed without asking, which can cause loss of data.
 
 > **Warning:** Be careful using that option. It may cause loss of data.

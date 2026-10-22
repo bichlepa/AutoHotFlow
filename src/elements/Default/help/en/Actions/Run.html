@@ -99,20 +99,27 @@ img {
 <body>
 <main>
 <h1>Run</h1>
-<p>The action <strong>Run</strong> runs an external program.</p>
+<p>The action <strong>Run</strong> starts a program, opens a document or opens a web address with the program that Windows uses for it.</p>
 <h2>Settings</h2>
 <h3>Command</h3>
-<p>The name of a single file, document, URL that will be opened.</p>
-<p>If an absolute path isn't specified, the file path is assumed to be in the working directory.</p>
+<p>The program, document or URL to start, for example <code>notepad</code>, <code>%A_MyDocuments%\exampleDocument.odt</code> or <code>https://www.autohotkey.com</code>. A relative path is taken from the working directory that you select below.</p>
 <h3>Working directory</h3>
-<p>The working directory of the executed application.</p>
-<p>If an absolute path isn't specified, the file path is assumed to be in the working directory.</p>
-<p>In many cases this parameter does not make a difference.</p>
+<ul>
+<li><strong>Working directory of the flow</strong>: the working directory of the flow (see the flow settings).</li>
+<li><strong>Following working directory</strong>: the folder that you select. It must exist, otherwise the action ends with an exception.</li>
+</ul>
+<p>In many cases the working directory makes no difference.</p>
 <h3>Run mode</h3>
-<p>Some applications can be started in a specific mode. This can be selected here.</p>
-<h2>Supplied Variables</h2>
-<h3><code>A_PID</code></h3>
-<p>Process ID of the launched process.</p>
+<ul>
+<li><strong>Run normally</strong>: the usual window.</li>
+<li><strong>Run maximized</strong>: the window is opened maximized.</li>
+<li><strong>Run minimized</strong>: the window is opened minimized.</li>
+<li><strong>Run hidden</strong>: no window is shown. A program that has no hidden mode shows its window anyway.</li>
+</ul>
+<p>If the command cannot be started, the action ends with an exception that names the command.</p>
+<h2>Supplied variables</h2>
+<h3><code>A_Pid</code></h3>
+<p>The process ID of the started program. For a document or a web address that Windows opens in a program that is already running, no new process starts and the value is 0.</p>
 <h2>Examples</h2>
 <p>Run Notepad.</p>
 <table>
@@ -129,22 +136,7 @@ img {
 </tr>
 </tbody>
 </table>
-<p>Run VLC media player.</p>
-<table>
-<thead>
-<tr>
-<th>Parameter</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Command</td>
-<td><code>C:\Program Files\VideoLAN\VLC\vlc.exe (The VLC Media player may be installed in an other location)</code></td>
-</tr>
-</tbody>
-</table>
-<p>Open a document.</p>
+<p>Open a document in the documents folder, maximized.</p>
 <table>
 <thead>
 <tr>
@@ -156,6 +148,10 @@ img {
 <tr>
 <td>Command</td>
 <td><code>%A_MyDocuments%\exampleDocument.odt</code></td>
+</tr>
+<tr>
+<td>Run mode</td>
+<td>Run maximized</td>
 </tr>
 </tbody>
 </table>
@@ -170,7 +166,7 @@ img {
 <tbody>
 <tr>
 <td>Command</td>
-<td><code>http://www.autohotkey.com</code></td>
+<td><code>https://www.autohotkey.com</code></td>
 </tr>
 </tbody>
 </table>
