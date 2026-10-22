@@ -110,6 +110,28 @@ def test_the_name_with_umlauts_survives_a_zip_round_trip(flows, tmp_path, tree):
     assert (back / "source" / "Gr\u00f6\u00dfe \u00fc.txt").read_bytes() == b"umlauts\n"
 
 
+def test_a_name_with_a_leading_dash_is_a_file_not_an_option(flows, tmp_path):
+    """Review fix: the name after -C is passed after '--', so '-v' or '--use-compress-program=...' is a file name."""
+    source = tmp_path / "-v"
+    source.write_bytes(b"dash")
+    archive = tmp_path / "dash.zip"
+    back = tmp_path / "dash_back"
+    back.mkdir()
+    runs = run_all(flows, [compress_flow("dash_c", source, archive, "zip"), extract_flow("dash_x", archive, back)])
+    assert not runs[0].exceptions and not runs[1].exceptions, (runs[0].steps, runs[1].steps)
+    assert (back / "-v").read_bytes() == b"dash"
+
+
+def test_a_destination_folder_with_a_trailing_backslash_is_extracted(flows, tmp_path, tree):
+    """Review fix: a trailing backslash before the closing quote would escape it for tar.exe."""
+    archive = tmp_path / "bs.zip"
+    back = tmp_path / "bs_back"
+    back.mkdir()
+    runs = run_all(flows, [compress_flow("bs_c", tree / "one.txt", archive, "zip"), extract_flow("bs_x", archive, str(back) + "\\")])
+    assert not runs[0].exceptions and not runs[1].exceptions, (runs[0].steps, runs[1].steps)
+    assert (back / "one.txt").read_bytes() == b"first file\n"
+
+
 # --- Errors of the compress side ----------------------------------------------------------------------------------------
 def test_a_missing_source_is_an_exception(flows, tmp_path):
     runs = run_all(flows, [compress_flow("missing_src", tmp_path / "nothing", tmp_path / "x.zip", "zip")])

@@ -37,6 +37,9 @@ class TarOps {
     static Quote(text, label) {
         if (InStr(text, "%") || InStr(text, '"') || InStr(text, "`n") || InStr(text, "`r"))
             throw ElementError(Lang("The path of '%1%' has a percent sign, a quote or a line break, which cannot be passed to tar.exe.", label))
+        ; backslashes before the closing quote would escape it for tar.exe ("C:\dest\"): they are doubled
+        if (RegExMatch(text, "(\\+)$", &m))
+            text .= m[1]
         return '"' text '"'
     }
 
@@ -137,7 +140,7 @@ class TarOps {
     static Create(archive, format, parent, name) {
         opts := TarOps.WriteOptions(format)
         args := (opts = "" ? "" : opts " ") "-cf " TarOps.Quote(archive, Lang("Destination archive"))
-            . " -C " TarOps.Quote(parent, Lang("Source file")) " " TarOps.Quote(name, Lang("Source file"))
+            . " -C " TarOps.Quote(parent, Lang("Source file")) " -- " TarOps.Quote(name, Lang("Source file"))
         TarOps.Exec(args, Lang("Compressing the files"))
     }
 }
