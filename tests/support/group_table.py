@@ -142,6 +142,7 @@ TEST_GROUPS = {
     "integration/test_process_elements.py": ["elements-e2e"],
     "integration/test_power_elements.py": ["elements-e2e"],
     "integration/test_clipboard_elements.py": ["elements-e2e"],
+    "integration/test_sound_elements.py": ["elements-e2e"],
     "integration/test_path_guards.py": ["elements-e2e"],
     "integration/test_core_d_flows.py": ["engine"],
     "integration/test_core_e_dialogs.py": ["ui", "elements-e2e"],
@@ -771,6 +772,42 @@ COVERS = {
     ],
     "src/elements/Default/Actions/Action_Hibernate_Computer.ahk": ["integration/test_power_elements.py"],
     "src/elements/Default/Actions/Action_Suspend_Computer.ahk": ["integration/test_power_elements.py"],
+
+    # WI-0124: sound and speech (the seam SystemOps; no sound is played and nothing is spoken in a test)
+    "src/elements/Default/Actions/Action_Play_Sound.ahk": [
+        "integration/test_sound_elements.py::test_play_a_sound_file_without_waiting",
+        "integration/test_sound_elements.py::test_play_a_sound_file_and_wait_until_it_has_finished",
+        "integration/test_sound_elements.py::test_play_a_system_sound_uses_the_media_folder_of_windows",
+        "integration/test_sound_elements.py::test_play_a_missing_sound_file_is_an_exception",
+        "integration/test_sound_elements.py::test_a_failing_sound_call_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Stop_Sound.ahk": [
+        "integration/test_sound_elements.py::test_stop_sound_calls_the_seam",
+        "integration/test_sound_elements.py::test_a_failing_stop_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Beep.ahk": [
+        "integration/test_sound_elements.py::test_beep_sends_frequency_and_duration",
+        "integration/test_sound_elements.py::test_beep_with_a_frequency_out_of_range_is_an_exception",
+        "integration/test_sound_elements.py::test_beep_with_an_expression_that_is_no_number_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Get_Volume.ahk": [
+        "integration/test_sound_elements.py::test_get_volume_stores_the_master_volume_in_the_variable",
+    ],
+    "src/elements/Default/Actions/Action_Set_Volume.ahk": [
+        "integration/test_sound_elements.py::test_set_volume_mute_states",
+        "integration/test_sound_elements.py::test_set_volume_absolute_sets_the_volume",
+        "integration/test_sound_elements.py::test_set_volume_relative_up_sends_a_plus_sign",
+        "integration/test_sound_elements.py::test_set_volume_relative_down_sends_the_negative_amount",
+        "integration/test_sound_elements.py::test_a_failing_volume_call_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Speech_output.ahk": [
+        "integration/test_sound_elements.py::test_speech_output_passes_the_text_voice_and_options",
+        "integration/test_sound_elements.py::test_speech_output_waits_for_the_previous_speech_when_asked",
+        "integration/test_sound_elements.py::test_speech_output_without_waiting_speaks_asynchronously",
+        "integration/test_sound_elements.py::test_speech_output_with_a_voice_that_is_not_installed_is_an_exception",
+        "integration/test_sound_elements.py::test_a_failing_speech_call_is_an_exception",
+    ],
+    "src/elements/Default/lib/SoundOps.ahk": ["integration/test_sound_elements.py"],
 }
 
 # Test functions whose group differs from the group of their file (`file::function`). The generic loop logic

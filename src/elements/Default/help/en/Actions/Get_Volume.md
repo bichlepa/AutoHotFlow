@@ -1,6 +1,6 @@
 # Get volume
 
-The action **Get volume** gets the master volume of the first sound device.
+The action **Get volume** gets the master volume of the first sound device, a number from 0 to 100.
 
 ## Settings
 

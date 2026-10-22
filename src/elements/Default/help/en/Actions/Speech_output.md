@@ -1,6 +1,6 @@
 # Speech output
 
-The action **Speech output** uses an installed text to speech engine to read some text.
+The action **Speech output** uses an installed text to speech voice to read some text.
 
 ## Settings
 
@@ -10,15 +10,13 @@ Text that should be spoken.
 
 ### Wait options
 
-If Wait until previous speech output has finished is selected, the flow will pause if the text to speech is currently used by an other element. Otherwise either the current speech output will be interrupted and a new one will be started.
+**Wait until previous speech output has finished:** if selected, the flow waits until the speech of the background process of AutoHotFlow has finished before this text is spoken. Otherwise the current speech of that process is interrupted and this text is spoken at once.
 
-If Wait until current speech output finishes is selected, the flow will pause until the speech output will finish.
+**Wait until this speech output finishes:** if selected, the flow waits until this text has been spoken. Otherwise the flow goes on while the text is spoken.
 
 ### Speech engine
 
-This list contains all installed speech engines of your computer. Select one of them.
-
-AutoHotFlow tries to preselect a speech engine that has the same language as the OS language.
+This list contains all voices installed on your computer. Select one of them. An empty entry uses the default voice of the system.
 
 ### Volume
 
@@ -28,8 +26,14 @@ A volume of 100 % means that it will be spoken with the current sound volume.
 
 ### Speed
 
-Specify the speed of the speech.
+Specify the speed of the speech, a whole number from -10 (slowest) to 10 (fastest). 0 is the normal speed.
 
 ### Pitch
 
-Specify the pitch of the speech.
+Specify the pitch of the speech, a whole number from -10 (lowest) to 10 (highest). 0 is the normal pitch.
+
+## Remarks
+
+A voice that is not installed ends the action with an exception.
+
+The speech of another flow or action that runs in another background process is neither waited for nor interrupted.

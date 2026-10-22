@@ -13,6 +13,7 @@
 #Include lib\IniOps.ahk
 #Include lib\FlowChoices.ahk
 #Include lib\ProcessOps.ahk
+#Include lib\SoundOps.ahk
 #Include lib\FlowSwitchOps.ahk
 #Include lib\TimeOps.ahk
 #Include lib\DebugOps.ahk
@@ -23,6 +24,7 @@
 class Default {
     #Include Actions\Action_Absolute_number.ahk
     #Include Actions\Action_Add_To_List.ahk
+    #Include Actions\Action_Beep.ahk
     #Include Actions\Action_Change_character_case.ahk
     #Include Actions\Action_Convert_list_to_string.ahk
     #Include Actions\Action_Convert_string_to_list.ahk
@@ -48,6 +50,7 @@ class Default {
     #Include Actions\Action_Get_List_Info.ahk
     #Include Actions\Action_Get_shortcut_information.ahk
     #Include Actions\Action_Get_String_Length.ahk
+    #Include Actions\Action_Get_Volume.ahk
     #Include Actions\Action_Hibernate_Computer.ahk
     #Include Actions\Action_Kill_Process.ahk
     #Include Actions\Action_Lock_Computer.ahk
@@ -58,6 +61,7 @@ class Default {
     #Include Actions\Action_New_List.ahk
     #Include Actions\Action_New_Time.ahk
     #Include Actions\Action_New_variable.ahk
+    #Include Actions\Action_Play_Sound.ahk
     #Include Actions\Action_Random_number.ahk
     #Include Actions\Action_Read_From_File.ahk
     #Include Actions\Action_Read_From_Ini.ahk
@@ -74,13 +78,16 @@ class Default {
     #Include Actions\Action_Set_file_time.ahk
     #Include Actions\Action_Set_Flow_Status.ahk
     #Include Actions\Action_Set_Process_Priority.ahk
+    #Include Actions\Action_Set_Volume.ahk
     #Include Actions\Action_Shuffle_list.ahk
     #Include Actions\Action_Shutdown.ahk
     #Include Actions\Action_Sleep.ahk
+    #Include Actions\Action_Speech_output.ahk
     #Include Actions\Action_Split_a_string.ahk
     #Include Actions\Action_Split_path.ahk
     #Include Actions\Action_Square_Root.ahk
     #Include Actions\Action_Stop_Flow.ahk
+    #Include Actions\Action_Stop_Sound.ahk
     #Include Actions\Action_Substring.ahk
     #Include Actions\Action_Substring2.ahk
     #Include Actions\Action_Suspend_Computer.ahk
@@ -121,6 +128,7 @@ class Default {
 ElementRegistry.RegisterPackage("Default", "1.2.1")
 ElementRegistry.Register(Default.Action_Absolute_number)
 ElementRegistry.Register(Default.Action_Add_To_List)
+ElementRegistry.Register(Default.Action_Beep)
 ElementRegistry.Register(Default.Action_Change_character_case)
 ElementRegistry.Register(Default.Action_Convert_list_to_string)
 ElementRegistry.Register(Default.Action_Convert_string_to_list)
@@ -146,6 +154,7 @@ ElementRegistry.Register(Default.Action_Get_index_of_element_in_list)
 ElementRegistry.Register(Default.Action_Get_List_Info)
 ElementRegistry.Register(Default.Action_Get_shortcut_information)
 ElementRegistry.Register(Default.Action_Get_String_Length)
+ElementRegistry.Register(Default.Action_Get_Volume)
 ElementRegistry.Register(Default.Action_Hibernate_Computer)
 ElementRegistry.Register(Default.Action_Kill_Process)
 ElementRegistry.Register(Default.Action_Lock_Computer)
@@ -156,6 +165,7 @@ ElementRegistry.Register(Default.Action_Move_Folder)
 ElementRegistry.Register(Default.Action_New_List)
 ElementRegistry.Register(Default.Action_New_Time)
 ElementRegistry.Register(Default.Action_New_variable)
+ElementRegistry.Register(Default.Action_Play_Sound)
 ElementRegistry.Register(Default.Action_Random_number)
 ElementRegistry.Register(Default.Action_Read_From_File)
 ElementRegistry.Register(Default.Action_Read_From_Ini)
@@ -172,13 +182,16 @@ ElementRegistry.Register(Default.Action_Set_file_attributes)
 ElementRegistry.Register(Default.Action_Set_file_time)
 ElementRegistry.Register(Default.Action_Set_Flow_Status)
 ElementRegistry.Register(Default.Action_Set_Process_Priority)
+ElementRegistry.Register(Default.Action_Set_Volume)
 ElementRegistry.Register(Default.Action_Shuffle_list)
 ElementRegistry.Register(Default.Action_Shutdown)
 ElementRegistry.Register(Default.Action_Sleep)
+ElementRegistry.Register(Default.Action_Speech_output)
 ElementRegistry.Register(Default.Action_Split_a_string)
 ElementRegistry.Register(Default.Action_Split_path)
 ElementRegistry.Register(Default.Action_Square_Root)
 ElementRegistry.Register(Default.Action_Stop_Flow)
+ElementRegistry.Register(Default.Action_Stop_Sound)
 ElementRegistry.Register(Default.Action_Substring)
 ElementRegistry.Register(Default.Action_Substring2)
 ElementRegistry.Register(Default.Action_Suspend_Computer)
