@@ -52,7 +52,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0118 | Calculations, script, date and time | done | haiku | see git log (up to 7977e8a9) | 2026-10-22 | M-0104 to M-0107, M-0099 extended; owner to confirm: undefined maths results are empty text + f1 (as v1), sqrt of exact integer is Integer, default Unit Minutes (old flow with numeric 2 untested), odd-length time stamps invalid; fast-tier flake test_worker_lifecycle cold start seen once under load in the author's run; German texts and help in the viewer not checked |
 | WI-0119 | Strings and list conversions | done | haiku | see git log (up to e15ad21b) | 2026-10-22 | 13 classes; M-0108 to M-0112; REQ-ELM-220 done, REQ-ELM-230 partial (YAML later); owner: M-0111 v1 claims partly assumed, Title case via StrTitle, YAML throws, JSON keys sorted; split code duplicated with Loop_Parse_A_String; typo `caracters` is v1 text |
 | WI-0120 | Files and folders I | done | haiku | see git log (up to 6fd6a7cd) | 2026-10-22 | 13 classes, SystemOps.FileRecycle, M-0113 to M-0119; review fix: path guards (empty path, drive root, working directory, wildcard with overwrite); F-0188 gaps; owner: ActsOnSystem for readers, empty path now an error (v1: working directory), Delete_Folder honours only-if-empty |
-| WI-0121 | Files and folders II, file loop, ini | open | | | |  |
+| WI-0121 | Files and folders II, file loop, ini | done | haiku | see git log (up to b07e249f) | 2026-10-22 | 13 classes, PROTOCOL 4.5 env.entryPoint, M-0124 to M-0129, REQ-ELM-240/300/310; review fix: Guard in Set attributes/time; owner: M-0128 ini empty default, M-0125 no attribute = no-op, Empty_Recycle_Bin.Parameters queries drives at editor time, file loop snapshots the whole list (huge folders unmeasured), help pages renamed (check old links), corpus ini flow runs with own working dir; no test stops a flow during a file loop; Delete From Ini unknown action ends silently |
 | WI-0122 | Archives, drives, internet | open | | | |  |
 | WI-0123 | Programs and processes, clipboard, power and session | done | haiku | see git log (up to 4c164df5) | 2026-10-22 | 12 classes, M-0120 to M-0123, REQ-ELM-290/400 done, REQ-ELM-390 partial; owner: Kill_Process has no guard for AHF's own processes, ActsOnSystem on all 12 incl. readers, real power/clipboard behaviour is the owner's manual check; priority test misses BelowNormal |
 | WI-0124 | Sound and speech | open | | | |  |
@@ -77,6 +77,8 @@ None.
 None.
 
 ## Last verified state
+
+Commit `b07e249f` (WI-0121 integrated, WI-0123 included; all tiers): fast 2434 passed (2 skipped), foundation 471 passed, slow 209 passed, VERDICT green (runs 20261022-232325-b07e249f, -3, -2).
 
 Commit `4c164df5` (WI-0123 integrated; selection of the groups element-units, help, packages, triggers, workers): 764 passed, 2 skipped, 1 failed under load (`test_worker::test_worker_reports_not_busy_after_a_cancel_too`, green alone in recheck 20261022-222717-recheck; third load failure of this test); run 20261022-221646-4c164df5. Partial run: the last full tiers are of `c38d7d67`.
 
