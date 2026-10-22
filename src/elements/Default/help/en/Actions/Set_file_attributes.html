@@ -99,14 +99,20 @@ img {
 <body>
 <main>
 <h1>Set file attributes</h1>
-<p>The action <strong>Set file attributes</strong> sets a timestamp of a file or folder.</p>
+<p>The action <strong>Set file attributes</strong> changes the attributes of a file, of several files (a wildcard pattern), or of folders.</p>
 <h2>Settings</h2>
 <h3>File path</h3>
-<p>Name and path of the file. The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
+<p>The path of the file or folder, or a wildcard pattern such as <code>%A_MyDocuments%\exampleFolder\*</code>. A relative path is taken from the working directory of the flow.</p>
 <h3>Attributes</h3>
-<p>The attributes to change.</p>
+<p>Each attribute can be set (checked), cleared (unchecked), or left as it is (grey). Only the attributes that are set or cleared are changed. When no attribute is set or cleared, nothing is changed.</p>
 <h3>Options</h3>
-<p>This action can perform on files, forlder or both. It can also iterate in the subfolders.</p>
+<ul>
+<li><strong>Operate on files</strong>: only files are changed.</li>
+<li><strong>Operate on files and folders</strong>: files and folders are changed.</li>
+<li><strong>Operate on folders</strong>: only folders are changed.</li>
+<li><strong>Recurse into subfolders</strong>: the subfolders are changed as well.</li>
+</ul>
+<p>If an attribute cannot be changed, the element ends with an exception. A file that does not exist is reported as such.</p>
 <h2>Examples</h2>
 <p>Hide all files in a folder.</p>
 <table>
@@ -123,11 +129,11 @@ img {
 </tr>
 <tr>
 <td>Attributes</td>
-<td><code>☑ Hidden▣ all others</code></td>
+<td>Hidden: set, all others: grey</td>
 </tr>
 <tr>
 <td>Options</td>
-<td><code>◉ Operate on files☐ Recurse into subfolders</code></td>
+<td>Operate on files, not recursive</td>
 </tr>
 </tbody>
 </table>

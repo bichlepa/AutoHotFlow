@@ -1,20 +1,25 @@
 # Set file attributes
 
-The action **Set file attributes** sets a timestamp of a file or folder.
+The action **Set file attributes** changes the attributes of a file, of several files (a wildcard pattern), or of folders.
 
 ## Settings
 
 ### File path
 
-Name and path of the file. The file path is assumed to be in the working directory if an absolute path isn't specified.
+The path of the file or folder, or a wildcard pattern such as `%A_MyDocuments%\exampleFolder\*`. A relative path is taken from the working directory of the flow.
 
 ### Attributes
 
-The attributes to change.
+Each attribute can be set (checked), cleared (unchecked), or left as it is (grey). Only the attributes that are set or cleared are changed. When no attribute is set or cleared, nothing is changed.
 
 ### Options
 
-This action can perform on files, forlder or both. It can also iterate in the subfolders.
+- **Operate on files**: only files are changed.
+- **Operate on files and folders**: files and folders are changed.
+- **Operate on folders**: only folders are changed.
+- **Recurse into subfolders**: the subfolders are changed as well.
+
+If an attribute cannot be changed, the element ends with an exception. A file that does not exist is reported as such.
 
 ## Examples
 
@@ -23,5 +28,5 @@ Hide all files in a folder.
 | Parameter | Value |
 | --- | --- |
 | File path | `%A_MyDocuments%\exampleFolder\*` |
-| Attributes | `☑ Hidden▣ all others` |
-| Options | `◉ Operate on files☐ Recurse into subfolders` |
+| Attributes | Hidden: set, all others: grey |
+| Options | Operate on files, not recursive |

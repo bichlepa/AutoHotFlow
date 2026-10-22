@@ -136,6 +136,9 @@ TEST_GROUPS = {
     "integration/test_list_conversions.py": ["elements-e2e"],
     "integration/test_file_elements.py": ["elements-e2e"],
     "integration/test_folder_elements.py": ["elements-e2e"],
+    "integration/test_file_info_elements.py": ["elements-e2e"],
+    "integration/test_loop_files.py": ["elements-e2e"],
+    "integration/test_ini_elements.py": ["elements-e2e"],
     "integration/test_process_elements.py": ["elements-e2e"],
     "integration/test_power_elements.py": ["elements-e2e"],
     "integration/test_clipboard_elements.py": ["elements-e2e"],
@@ -652,6 +655,74 @@ COVERS = {
         "integration/test_path_guards.py",
         "integration/test_file_elements.py",
         "integration/test_folder_elements.py",
+        "integration/test_file_info_elements.py",
+        "integration/test_loop_files.py",
+    ],
+
+    # WI-0121: file details, shortcuts, recycle bin, the file loop and ini files
+    "src/elements/Default/Actions/Action_Get_File_Attributes.ahk": [
+        "integration/test_file_info_elements.py::test_get_file_attributes_stores_the_read_only_letter",
+        "integration/test_file_info_elements.py::test_get_file_attributes_of_a_missing_file_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Set_file_attributes.ahk": [
+        "integration/test_file_info_elements.py::test_set_file_attributes_sets_the_read_only_flag",
+        "integration/test_file_info_elements.py::test_set_file_attributes_clears_the_read_only_flag",
+        "integration/test_file_info_elements.py::test_set_file_attributes_with_no_choice_changes_nothing",
+        "integration/test_file_info_elements.py::test_set_file_attributes_of_a_missing_file_is_an_exception",
+    ],
+    "src/elements/Default/Conditions/Condition_File_Has_Attribute.ahk": [
+        "integration/test_file_info_elements.py::test_condition_file_has_attribute_yes_no_and_missing",
+    ],
+    "src/elements/Default/Actions/Action_Get_File_Size.ahk": [
+        "integration/test_file_info_elements.py::test_get_file_size_in_bytes_kilobytes_and_megabytes",
+        "integration/test_file_info_elements.py::test_get_file_size_of_a_folder_and_a_missing_file_are_exceptions",
+    ],
+    "src/elements/Default/Actions/Action_Get_File_Time.ahk": [
+        "integration/test_file_info_elements.py::test_get_file_time_is_the_time_that_set_file_time_wrote",
+    ],
+    "src/elements/Default/Actions/Action_Set_file_time.ahk": [
+        "integration/test_file_info_elements.py::test_set_file_time_changes_the_modification_time",
+        "integration/test_file_info_elements.py::test_set_file_time_of_a_missing_file_is_an_exception",
+        "integration/test_file_info_elements.py::test_set_file_time_refuses_a_text_that_is_not_a_time",
+    ],
+    "src/elements/Default/Actions/Action_Create_Shortcut.ahk": [
+        "integration/test_file_info_elements.py::test_create_shortcut_and_read_it_back_in_a_folder_of_the_test",
+        "integration/test_file_info_elements.py::test_create_shortcut_in_a_missing_folder_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Get_shortcut_information.ahk": [
+        "integration/test_file_info_elements.py::test_create_shortcut_and_read_it_back_in_a_folder_of_the_test",
+        "integration/test_file_info_elements.py::test_get_shortcut_information_of_a_file_that_is_not_a_shortcut",
+    ],
+    "src/elements/Default/Actions/Action_Empty_Recycle_Bin.ahk": [
+        "integration/test_file_info_elements.py::test_empty_recycle_bin_of_all_drives_calls_the_seam_without_a_drive",
+        "integration/test_file_info_elements.py::test_empty_recycle_bin_of_one_drive_passes_the_drive",
+        "integration/test_file_info_elements.py::test_empty_recycle_bin_of_a_drive_that_is_not_given_is_an_exception",
+        "integration/test_file_info_elements.py::test_empty_recycle_bin_that_fails_is_an_exception",
+    ],
+    "src/elements/Default/Loops/Loop_Loop_Through_Files.ahk": [
+        "integration/test_loop_files.py",
+        "integration/test_worker.py::test_worker_loop_gets_the_entry_point_of_the_connection",
+    ],
+    "src/elements/Default/lib/IniOps.ahk": [
+        "integration/test_ini_elements.py",
+    ],
+    "src/elements/Default/Actions/Action_Read_From_Ini.ahk": [
+        "integration/test_ini_elements.py::test_read_a_key_of_a_file_that_v1_style_writes",
+        "integration/test_ini_elements.py::test_a_missing_key_gives_the_default_or_an_exception",
+        "integration/test_ini_elements.py::test_read_the_entire_section_gives_a_map_of_keys_and_values",
+        "integration/test_ini_elements.py::test_read_the_section_names_gives_all_of_them",
+        "integration/test_ini_elements.py::test_read_from_a_missing_file_is_an_exception",
+        "integration/test_ini_elements.py::test_read_refuses_an_empty_section_for_a_key",
+    ],
+    "src/elements/Default/Actions/Action_Write_to_ini.ahk": [
+        "integration/test_ini_elements.py::test_write_creates_a_utf16_file_with_a_byte_order_mark",
+        "integration/test_ini_elements.py::test_write_keeps_the_encoding_of_an_existing_file_and_replaces_a_key",
+        "integration/test_ini_elements.py::test_write_refuses_a_folder_and_empty_names",
+    ],
+    "src/elements/Default/Actions/Action_Delete_From_Ini.ahk": [
+        "integration/test_ini_elements.py::test_delete_a_key_and_a_section",
+        "integration/test_ini_elements.py::test_delete_a_key_needs_a_key_and_a_section",
+        "integration/test_ini_elements.py::test_delete_from_a_missing_file_is_an_exception",
     ],
 
     # WI-0123: programs, processes, clipboard and power

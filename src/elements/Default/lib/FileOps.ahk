@@ -74,6 +74,33 @@ class FileOps {
     ; The exception for a wildcard in a path that does not allow one (the rename of one file).
     static NoWildcard(path) => ElementError(Lang("Wildcards are not allowed in '%1%'.", path))
 
+    ; The Mode text of the v2 file functions (FileSetAttrib, FileSetTime, Loop Files) for the v1 choice of the operation
+    ; ("Files", "FilesAndFolders" or "Folders") and the recursion: "F", "FD" or "D", with "R" added when recursing.
+    static Mode(choice, recurse := false) {
+        mode := (choice = "Folders") ? "D" : (choice = "FilesAndFolders") ? "FD" : "F"
+        return recurse ? mode "R" : mode
+    }
+
+    ; The letter of FileGetTime and FileSetTime for the v1 choice of the time: "M" (modification, the default), "C" or "A".
+    static TimeLetter(choice) => (choice = "Creation") ? "C" : (choice = "Access") ? "A" : "M"
+
+    ; The part of the element name that tells the time (" - " and the v1 text), "" for an unknown choice.
+    static TimeName(choice) {
+        switch choice {
+            case "Modification": return " - " Lang("Modification time")
+            case "Creation": return " - " Lang("Creation time")
+            case "Access": return " - " Lang("Last access time")
+        }
+        return ""
+    }
+
+    ; Sets an output variable of the element. The variable model refuses a name (it logs why); the element then ends with
+    ; an exception, as the other output checks of the package do.
+    static SetOutput(ctx, name, value, scope := "") {
+        if (!ctx.SetVar(name, value, scope))
+            throw ElementError("The variable '" name "' could not be set (the reason is in the log).")
+    }
+
     ; The full path of a path (GetFullPathNameW): "." and ".." are resolved. Used to compare paths, never to act on them.
     static _Full(path) {
         buf := Buffer(2048)

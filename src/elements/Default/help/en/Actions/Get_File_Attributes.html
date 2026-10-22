@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Actions/Get_file_size.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Get file size</title>
+<!-- Generated from src/elements/Default/help/en/Actions/Get_File_Attributes.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Get file attributes</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,15 +98,38 @@ img {
 </head>
 <body>
 <main>
-<h1>Get file size</h1>
-<p>The action <strong>Get file size</strong> retrieves the size of a file.</p>
+<h1>Get file attributes</h1>
+<p>The action <strong>Get file attributes</strong> stores the attributes of a file or folder in a variable. The attributes are a text of letters: <code>R</code> read only, <code>A</code> archive, <code>S</code> system, <code>H</code> hidden, <code>D</code> folder, <code>O</code> offline, <code>T</code> temporary, <code>C</code> compressed. A file without attributes gives <code>X</code>.</p>
 <h2>Settings</h2>
-<h3>Output variable name</h3>
-<p>Name of the variable which will contain the result.</p>
+<h3>Output Variable name</h3>
+<p>The name of the variable that gets the attribute text.</p>
 <h3>File path</h3>
-<p>Name and path of the file. The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
-<h3>Unit</h3>
-<p>Specify the unit of the file size.</p>
+<p>The path of the file or folder. A relative path is taken from the working directory of the flow.</p>
+<h2>Behavior</h2>
+<ul>
+<li>A file or folder that does not exist ends the element with an exception.</li>
+<li>Wildcard patterns are not checked by this action: the first match is used.</li>
+</ul>
+<h2>Examples</h2>
+<p>Read the attributes of a document into the variable <code>attr</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Output Variable name</td>
+<td><code>attr</code></td>
+</tr>
+<tr>
+<td>File path</td>
+<td><code>%A_MyDocuments%\example.txt</code></td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

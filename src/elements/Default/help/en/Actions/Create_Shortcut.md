@@ -1,39 +1,53 @@
 # Create shortcut
 
-The action **Create shortcut** creates a shortcut (.lnk) file.
+The action **Create shortcut** writes a shortcut file (`.lnk`) that starts a target file.
 
 ## Settings
 
 ### Shortcut path
 
-The path of the shortcut file. Be sure to include the `.lnk` extension.
-
-The destination directory must already exist. If the file already exists, it will be overwritten.
+The path of the shortcut file, including `.lnk`. A relative path is taken from the working directory of the flow. The folder must exist.
 
 ### Target path
 
-Name of the file that the shortcut refers to, which should include an absolute path unless the file is integrated with the system (e.g. Notepad.exe).
-
-The file does not have to exist at the time the shortcut is created; however, if it does not, some systems might alter the path in unexpected ways.
+The file that the shortcut starts.
 
 ### Target arguments
 
-Parameters that will be passed to target when it is launched. Separate parameters with spaces. If a parameter contains spaces, enclose it in double quotes.
+The arguments that are passed to the target. The text can be an expression or a raw string, as the field says.
 
 ### Working directory
 
-Directory that will become target's current working directory when the shortcut is launched. If blank or omitted, the shortcut will have a blank "Start in" field and the system will provide a default working directory when the shortcut is launched.
+The folder in which the target starts. It is left empty when not set.
 
 ### Description
 
-Comments that describe the shortcut (used by the OS to display a tooltip, etc.)
+The text that Windows shows as the description of the shortcut.
 
 ### Icon path
 
-The full path and name of the icon to be displayed for LinkFile. It must either be an ico file, an EXE or DLL.
+A file with icons (`.ico`, `.exe` or `.dll`).
 
-To use an icon in IconFile other than the first, check **Set icon number** and specify that number. For example, 2 is the second icon.
+### Set icon number
+
+Only with an icon path: the number of the icon in the file, counted from 1. Without it, the first icon is used.
 
 ### Run mode
 
-Launch Target may be launched minimized or maximized.
+- **Run normally**: the window opens as usual.
+- **Run maximized**: the window opens maximized.
+- **Run minimized**: the window opens minimized.
+
+## Behavior
+
+If the shortcut cannot be written, the element ends with an exception that names the shortcut.
+
+## Examples
+
+Write a shortcut to a document, which opens maximized.
+
+| Parameter | Value |
+| --- | --- |
+| Shortcut path | `%A_MyDocuments%\example.lnk` |
+| Target path | `%A_MyDocuments%\example.txt` |
+| Run mode | Run maximized |

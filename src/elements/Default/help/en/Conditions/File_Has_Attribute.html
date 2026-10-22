@@ -99,14 +99,35 @@ img {
 <body>
 <main>
 <h1>File has attribute</h1>
-<p>The condition <strong>File has attribute</strong> checks whether a file or folder has an attribute.</p>
+<p>The condition <strong>File has attribute</strong> checks whether a file or folder has one attribute. The result is <strong>yes</strong> when it has the attribute and <strong>no</strong> when it has not.</p>
 <h2>Settings</h2>
 <h3>File path</h3>
-<p>The name of a single file or folder, or a wildcard pattern.</p>
-<p>Both asterisks and question marks are supported as wildcards. A match occurs when the pattern appears in either the file's long/normal name or its 8.3 short name.</p>
-<p>The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
+<p>The path of the file or folder. A relative path is taken from the working directory of the flow.</p>
 <h3>Which attribute</h3>
-<p>Select which attribute will be checked.</p>
+<p>The attribute to look for: normal, read only, archive, system, hidden, directory, offline, compressed or temporary.</p>
+<h2>Behavior</h2>
+<p>A file or folder that does not exist ends the element with an exception.</p>
+<h2>Examples</h2>
+<p>Continue only when a file is read only.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>File path</td>
+<td><code>%A_MyDocuments%\example.txt</code></td>
+</tr>
+<tr>
+<td>Which attribute</td>
+<td>Read only</td>
+</tr>
+</tbody>
+</table>
+<p>Connect the <strong>yes</strong> result to the steps for a read-only file, and the <strong>no</strong> result to the others.</p>
 </main>
 </body>
 </html>

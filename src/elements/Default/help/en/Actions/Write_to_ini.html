@@ -99,20 +99,46 @@ img {
 <body>
 <main>
 <h1>Write to ini</h1>
-<p>The action <strong>Write to ini</strong> writes a value to a standard format .ini file.</p>
+<p>The action <strong>Write to ini</strong> writes a value to a key of a section of an ini file. A file that does not exist is created. The value replaces an existing value of the same key.</p>
 <h2>Settings</h2>
 <h3>Value</h3>
-<p>Value that will be written in the .ini file.</p>
+<p>The text to write. It can contain variables as text fields do.</p>
 <h3>Path of .ini file</h3>
-<p>Path of the file, including extension.</p>
-<p>The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
-<h3>Section <em>and</em> Key</h3>
-<p>The section and the key that will contain the value.</p>
-<h2>Remarks</h2>
-<p>A standard ini file looks like this:</p>
-<pre><code>[SectionName]
-Key=Value
-</code></pre>
+<p>The ini file. A relative path is taken from the working directory of the flow. The path must not be a folder.</p>
+<h3>Section</h3>
+<p>The section in which the key is written. An empty name ends the element with an exception.</p>
+<h3>Key</h3>
+<p>The key that gets the value. An empty name ends the element with an exception.</p>
+<h2>Behavior</h2>
+<p>A new file is written as UTF-16 with a byte order mark, as Windows writes ini files. An existing file keeps its encoding. If the file cannot be written, the element ends with an exception.</p>
+<h2>Examples</h2>
+<p>Write the value <code>Paul</code> to the key <code>name</code> of the section <code>user</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Value</td>
+<td><code>Paul</code></td>
+</tr>
+<tr>
+<td>Path of .ini file</td>
+<td><code>%A_MyDocuments%\settings.ini</code></td>
+</tr>
+<tr>
+<td>Section</td>
+<td><code>user</code></td>
+</tr>
+<tr>
+<td>Key</td>
+<td><code>name</code></td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

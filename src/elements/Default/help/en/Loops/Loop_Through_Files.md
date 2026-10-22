@@ -1,89 +1,47 @@
 # Loop through files
 
-The loop **Loop through files** retrieves the specified files or folders, one at a time.
+The loop **Loop through files** runs its body once for each file, folder or both that a path or wildcard pattern finds. In every pass the variables of the file are set, so the body can use them.
 
 ## Settings
 
 ### File path
 
-The path of a single file or folder, or a wildcard pattern.
-
-Both asterisks and question marks are supported as wildcards. A match occurs when the pattern appears in either the file's long/normal name or its 8.3 short name.
-
-The file path is assumed to be in the working directory if an absolute path isn't specified.
+The path or wildcard pattern, such as `%A_MyDocuments%\exampleFolder\*.txt`. A relative path is taken from the working directory of the flow.
 
 ### Options
 
-This action can perform on files, forlder or both. It can also iterate in the subfolders.
+- **Operate on files**: only files are passed.
+- **Operate on files and folders**: files and folders are passed.
+- **Operate on folders**: only folders are passed.
+- **Recurse into subfolders**: the subfolders are searched as well.
 
-## Supplied Variables
+## Variables in the body
 
-### `A_Index`
+| Variable | Content |
+| --- | --- |
+| `A_LoopFileName` | the name of the file or folder |
+| `A_LoopFileNameNoExt` | the name without the extension |
+| `A_LoopFileExt` | the extension, without the dot |
+| `A_LoopFilePath` | the path as the pattern gives it |
+| `A_LoopFileLongPath` | the full path |
+| `A_LoopFileShortPath`, `A_LoopFileShortName` | the 8.3 path and name (may be empty) |
+| `A_LoopFileDir` | the folder that contains the file |
+| `A_LoopFileTimeModified`, `A_LoopFileTimeCreated`, `A_LoopFileTimeAccessed` | the times (`YYYYMMDDHHMISS`) |
+| `A_LoopFileAttrib` | the attributes |
+| `A_LoopFileSize`, `A_LoopFileSizeKB`, `A_LoopFileSizeMB` | the size in bytes, kilobytes and megabytes |
+| `A_Index` | the number of the pass, from 1 |
 
-Index of the current iteration. It starts with the value 1 and increases on every loop.
+## Behavior
 
-### `A_LoopFileName`
+The list of files is made once, at the start of the loop. A file that the body creates or deletes does not change the passes. A pattern without a match gives no pass at all.
 
-The name of the file or folder currently retrieved (without the path).
+## Examples
 
-### `A_LoopFileNameNoExt`
+Write the name of every text file of a folder to a list, one pass per file.
 
->The name of the file or folder without extension.
+| Parameter | Value |
+| --- | --- |
+| File path | `%A_MyDocuments%\exampleFolder\*.txt` |
+| Options | Operate on files |
 
-### `A_LoopFileExt`
-
-The file's extension (e.g. TXT, DOC, or EXE). The period (.) is not included.
-
-### `A_LoopFilePath`
-
-The path and name of the file/folder currently retrieved. If **File path** contains a relative path rather than an absolute path, the path here will also be relative. In addition, any short (8.3) folder names in **File path** will still be short (see next item to get the long version).
-
-### `A_LoopFileLongPath`
-
-This is different than A_LoopFileFullPath in the following ways: 1) It always contains the absolute/complete path of the file even if **File path** contains a relative path; 2) Any short (8.3) folder names in **File path** itself are converted to their long names; 3) Characters in **File path** are converted to uppercase or lowercase to match the case stored in the file system. This is useful for converting file names -- such as those passed into a script as command line parameters -- to their exact path names as shown by Explorer.
-
-### `A_LoopFileShortPath`
-
-The 8.3 short path and name of the file/folder currently retrieved. For example: C:\\MYDOCU~1\\ADDRES~1.txt. If File path contains a relative path rather than an absolute path, the path here will also be relative.
-
-> **Note:** This variable will be blank if the file does not have a short name, which can happen on systems where NtfsDisable8dot3NameCreation has been set in the registry. It will also be blank if File path contains a relative path and the body of the loop uses SetWorkingDir to switch away from the working directory in effect for the loop itself.
-
-### `A_LoopFileShortName`
-
-The 8.3 short name, or alternate name of the file. If the file doesn't have one (due to the long name being shorter than 8.3 or perhaps because short-name generation is disabled on an NTFS file system), A_LoopFileName will be retrieved instead.
-
-### `A_LoopFileDir`
-
-The path of the directory in which A_LoopFileName resides. If File path contains a relative path rather than an absolute path, the path here will also be relative. A root directory will not contain a trailing backslash. For example: C:
-
-### `A_LoopFileTimeModified`
-
-The time the file was last modified. Format YYYYMMDDHH24MISS.
-
-### `A_LoopFileTimeCreated`
-
-The time the file was created. Format YYYYMMDDHH24MISS.
-
-### `A_LoopFileTimeAccessed`
-
-The time the file was last accessed. Format YYYYMMDDHH24MISS.
-
-### `A_LoopFileAttrib`
-
-The attributes of the file currently retrieved.
-
-### `A_LoopFileSize`
-
-The size in bytes of the file currently retrieved. Files larger than 4 gigabytes are also supported.
-
-### `A_LoopFileSizeKB`
-
-The size in Kbytes of the file currently retrieved, rounded down to the nearest integer.
-
-### `A_LoopFileSizeMB`
-
-The size in Mbytes of the file currently retrieved, rounded down to the nearest integer.
-
-## Remarks
-
-All supplied variables will be removed after last iteration.
+The body of the loop adds `%A_LoopFileName%` to a list.

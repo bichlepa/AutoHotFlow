@@ -99,25 +99,54 @@ img {
 <body>
 <main>
 <h1>Create shortcut</h1>
-<p>The action <strong>Create shortcut</strong> creates a shortcut (.lnk) file.</p>
+<p>The action <strong>Create shortcut</strong> writes a shortcut file (<code>.lnk</code>) that starts a target file.</p>
 <h2>Settings</h2>
 <h3>Shortcut path</h3>
-<p>The path of the shortcut file. Be sure to include the <code>.lnk</code> extension.</p>
-<p>The destination directory must already exist. If the file already exists, it will be overwritten.</p>
+<p>The path of the shortcut file, including <code>.lnk</code>. A relative path is taken from the working directory of the flow. The folder must exist.</p>
 <h3>Target path</h3>
-<p>Name of the file that the shortcut refers to, which should include an absolute path unless the file is integrated with the system (e.g. Notepad.exe).</p>
-<p>The file does not have to exist at the time the shortcut is created; however, if it does not, some systems might alter the path in unexpected ways.</p>
+<p>The file that the shortcut starts.</p>
 <h3>Target arguments</h3>
-<p>Parameters that will be passed to target when it is launched. Separate parameters with spaces. If a parameter contains spaces, enclose it in double quotes.</p>
+<p>The arguments that are passed to the target. The text can be an expression or a raw string, as the field says.</p>
 <h3>Working directory</h3>
-<p>Directory that will become target's current working directory when the shortcut is launched. If blank or omitted, the shortcut will have a blank "Start in" field and the system will provide a default working directory when the shortcut is launched.</p>
+<p>The folder in which the target starts. It is left empty when not set.</p>
 <h3>Description</h3>
-<p>Comments that describe the shortcut (used by the OS to display a tooltip, etc.)</p>
+<p>The text that Windows shows as the description of the shortcut.</p>
 <h3>Icon path</h3>
-<p>The full path and name of the icon to be displayed for LinkFile. It must either be an ico file, an EXE or DLL.</p>
-<p>To use an icon in IconFile other than the first, check <strong>Set icon number</strong> and specify that number. For example, 2 is the second icon.</p>
+<p>A file with icons (<code>.ico</code>, <code>.exe</code> or <code>.dll</code>).</p>
+<h3>Set icon number</h3>
+<p>Only with an icon path: the number of the icon in the file, counted from 1. Without it, the first icon is used.</p>
 <h3>Run mode</h3>
-<p>Launch Target may be launched minimized or maximized.</p>
+<ul>
+<li><strong>Run normally</strong>: the window opens as usual.</li>
+<li><strong>Run maximized</strong>: the window opens maximized.</li>
+<li><strong>Run minimized</strong>: the window opens minimized.</li>
+</ul>
+<h2>Behavior</h2>
+<p>If the shortcut cannot be written, the element ends with an exception that names the shortcut.</p>
+<h2>Examples</h2>
+<p>Write a shortcut to a document, which opens maximized.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shortcut path</td>
+<td><code>%A_MyDocuments%\example.lnk</code></td>
+</tr>
+<tr>
+<td>Target path</td>
+<td><code>%A_MyDocuments%\example.txt</code></td>
+</tr>
+<tr>
+<td>Run mode</td>
+<td>Run maximized</td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

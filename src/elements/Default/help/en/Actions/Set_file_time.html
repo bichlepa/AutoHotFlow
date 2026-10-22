@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Generated from src/elements/Default/help/en/Actions/Set_file_time.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Get file attributes</title>
+<title>Set file time</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,17 +98,49 @@ img {
 </head>
 <body>
 <main>
-<h1>Get file attributes</h1>
-<p>The action <strong>Get file attributes</strong> retrieves the attributes (read-only, hidden, etc) of a file.</p>
+<h1>Set file time</h1>
+<p>The action <strong>Set file time</strong> sets the modification, creation or last access time of a file, of several files (a wildcard pattern), or of folders.</p>
 <h2>Settings</h2>
 <h3>File path</h3>
-<p>Name and path of the file. The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
-<h3>New time</h3>
-<p>The timestamp to set. The timestamp has the format <code>YYYYMMDDHH24MISS</code>.</p>
-<h3>Which time.</h3>
-<p>Which time to change.</p>
+<p>The path of the file or folder, or a wildcard pattern. A relative path is taken from the working directory of the flow.</p>
+<h3>New Time</h3>
+<p>The new time as a text <code>YYYYMMDDHHMISS</code> in local time, for example <code>20210304050607</code>. A text that the AutoHotkey time check (IsTime) does not accept ends the element with an exception before any file is changed.</p>
+<h3>Which time</h3>
+<p>The time to set: modification, creation or last access time.</p>
 <h3>Options</h3>
-<p>This action can perform on files, forlder or both. It can also iterate in the subfolders.</p>
+<ul>
+<li><strong>Operate on files</strong>, <strong>Operate on files and folders</strong>, <strong>Operate on folders</strong>: what is changed.</li>
+<li><strong>Recurse into subfolders</strong>: the subfolders are changed as well.</li>
+</ul>
+<p>If a file cannot be changed, the element ends with an exception.</p>
+<h2>Examples</h2>
+<p>Set the modification time of all text files of a folder.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>File path</td>
+<td><code>%A_MyDocuments%\exampleFolder\*.txt</code></td>
+</tr>
+<tr>
+<td>New Time</td>
+<td><code>20210304050607</code></td>
+</tr>
+<tr>
+<td>Which time</td>
+<td>Modification time</td>
+</tr>
+<tr>
+<td>Options</td>
+<td>Operate on files</td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

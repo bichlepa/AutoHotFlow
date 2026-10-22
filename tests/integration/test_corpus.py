@@ -51,12 +51,7 @@ PENDING = {
     "Flow 1333431302": dict(name="User idle test", missing={
         "Trigger_User_Idle_Time": "S0008"}),
     "Flow 1384439262": dict(name="file test", missing={
-        "Action_Close_Window": "S0008", "Action_Create_Shortcut": "S0008", "Action_Get_File_Size": "S0008",
-        "Action_Get_File_Time": "S0008", "Action_Get_Shortcut_Information": "S0008",
-        "Action_Set_File_Time": "S0008", "Condition_File_Has_Attribute": "S0008",
-        "Condition_Window_Exists": "S0008"}),
-    "Flow 1587447767": dict(name="ini file test", missing={
-        "Action_Read_from_INI": "S0008", "Action_Write_to_INI": "S0008"}),
+        "Action_Close_Window": "S0008", "Condition_Window_Exists": "S0008"}),
     "Flow 1849072261": dict(name="external script test", missing={
         "Action_AutoHotkey_Script": "S0008 (E0039: v1 code is kept as text, M-0049)"}),
     "Flow 2133155705": dict(name="Hotkey test", missing={
@@ -173,6 +168,32 @@ def test_v1_loop_test_runs_green(flows):
     assert run.state_of("element0000000012") == ["finished"] and run.path[-1] == "element0000000030"
     pair = flows.wait_var("global_testResults")
     assert pair is not None and json.loads(pair[1]) == ["Loop test"], pair
+
+
+BOM_UTF16 = bytes([0xFF, 0xFE])        # the byte order mark of a UTF-16 (little endian) file, as IniWrite writes it
+
+
+def test_v1_ini_file_test_runs_green_in_a_test_folder(flows, tmp_path):
+    """"ini file test" (Flow 1587447767), as saved except its working folder (WI-0121). The flow writes testIni.ini next to
+    itself, and as saved that is the folder of the user's documents: the test runs the flow with the working folder of the
+    test (flowSettings, DefaultWorkingDir 0), and nothing else changes. The flow writes two keys (a new file, UTF-16 with a
+    byte order mark), reads one back, reads a missing key (the exception connection goes on), reads it again with the
+    default text and adds its name to the global list."""
+    data = json.loads((V1 / "Flow 1587447767.json").read_text(encoding="utf-8-sig"))
+    data.setdefault("flowSettings", {}).update({"DefaultWorkingDir": 0, "WorkingDir": str(tmp_path)})
+    source = tmp_path / "src" / "Flow 1587447767.json"
+    source.parent.mkdir()
+    source.write_text(json.dumps(data), encoding="utf-8")
+    flow_id = flows.add_file(source)
+    flows.start()
+    run = flows.run(flow_id, trigger="element0000000002", timeout=scaled(60))
+    assert run.reason == "finished", (run.reason, run.exceptions)
+    assert run.exceptions == ["Section 'mySection' and key 'wrongKey' not found."], run.exceptions
+    assert {"element0000000005", "element0000000007", "element0000000008", "element0000000010",
+            "element0000000019"} <= set(run.path), run.path
+    assert (tmp_path / "testIni.ini").read_bytes()[:2] == BOM_UTF16
+    pair = flows.wait_var("global_testResults")
+    assert pair is not None and json.loads(pair[1]) == ["ini file test"], pair
 
 
 def test_v1_maths_test_runs_green(flows):

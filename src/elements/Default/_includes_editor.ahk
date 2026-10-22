@@ -10,6 +10,7 @@
 #Include lib\ListFormats.ahk
 #Include lib\DialogOps.ahk
 #Include lib\FileOps.ahk
+#Include lib\IniOps.ahk
 #Include lib\FlowChoices.ahk
 #Include lib\ProcessOps.ahk
 #Include lib\FlowSwitchOps.ahk
@@ -28,17 +29,24 @@ class Default {
     #Include Actions\Action_Copy_File.ahk
     #Include Actions\Action_Copy_Folder.ahk
     #Include Actions\Action_Create_Folder.ahk
+    #Include Actions\Action_Create_Shortcut.ahk
     #Include Actions\Action_Delete_File.ahk
     #Include Actions\Action_Delete_Folder.ahk
+    #Include Actions\Action_Delete_From_Ini.ahk
     #Include Actions\Action_Delete_from_list.ahk
     #Include Actions\Action_Do_nothing.ahk
+    #Include Actions\Action_Empty_Recycle_Bin.ahk
     #Include Actions\Action_Encode_string.ahk
     #Include Actions\Action_Execute_Flow.ahk
     #Include Actions\Action_Exponentiation.ahk
     #Include Actions\Action_Get_Clipboard.ahk
+    #Include Actions\Action_Get_File_Attributes.ahk
+    #Include Actions\Action_Get_File_Size.ahk
+    #Include Actions\Action_Get_File_Time.ahk
     #Include Actions\Action_Get_From_List.ahk
     #Include Actions\Action_Get_index_of_element_in_list.ahk
     #Include Actions\Action_Get_List_Info.ahk
+    #Include Actions\Action_Get_shortcut_information.ahk
     #Include Actions\Action_Get_String_Length.ahk
     #Include Actions\Action_Hibernate_Computer.ahk
     #Include Actions\Action_Kill_Process.ahk
@@ -52,6 +60,7 @@ class Default {
     #Include Actions\Action_New_variable.ahk
     #Include Actions\Action_Random_number.ahk
     #Include Actions\Action_Read_From_File.ahk
+    #Include Actions\Action_Read_From_Ini.ahk
     #Include Actions\Action_Reboot_Computer.ahk
     #Include Actions\Action_Rename_File.ahk
     #Include Actions\Action_Rename_Folder.ahk
@@ -61,6 +70,8 @@ class Default {
     #Include Actions\Action_Script.ahk
     #Include Actions\Action_Search_in_a_string.ahk
     #Include Actions\Action_Set_Clipboard.ahk
+    #Include Actions\Action_Set_file_attributes.ahk
+    #Include Actions\Action_Set_file_time.ahk
     #Include Actions\Action_Set_Flow_Status.ahk
     #Include Actions\Action_Set_Process_Priority.ahk
     #Include Actions\Action_Shuffle_list.ahk
@@ -81,11 +92,13 @@ class Default {
     #Include Actions\Action_Trigonometry.ahk
     #Include Actions\Action_Trim_a_string.ahk
     #Include Actions\Action_Write_To_File.ahk
+    #Include Actions\Action_Write_to_ini.ahk
     #Include Conditions\Condition_Confirmation_Dialog.ahk
     #Include Conditions\Condition_Debug_Dialog.ahk
     #Include Conditions\Condition_Do_nothing.ahk
     #Include Conditions\Condition_Expression.ahk
     #Include Conditions\Condition_File_Exists.ahk
+    #Include Conditions\Condition_File_Has_Attribute.ahk
     #Include Conditions\Condition_Flow_Enabled.ahk
     #Include Conditions\Condition_Flow_Running.ahk
     #Include Conditions\Condition_List_Contains_Element.ahk
@@ -95,6 +108,7 @@ class Default {
     #Include Conditions\Condition_Variable_content_is.ahk
     #Include Conditions\Condition_Variable_Is_Empty.ahk
     #Include Loops\Loop_Condition.ahk
+    #Include Loops\Loop_Loop_Through_Files.ahk
     #Include Loops\Loop_Parse_A_String.ahk
     #Include Loops\Loop_SimpleLoop.ahk
     #Include Loops\Loop_Work_through_a_list.ahk
@@ -113,17 +127,24 @@ ElementRegistry.Register(Default.Action_Convert_string_to_list)
 ElementRegistry.Register(Default.Action_Copy_File)
 ElementRegistry.Register(Default.Action_Copy_Folder)
 ElementRegistry.Register(Default.Action_Create_Folder)
+ElementRegistry.Register(Default.Action_Create_Shortcut)
 ElementRegistry.Register(Default.Action_Delete_File)
 ElementRegistry.Register(Default.Action_Delete_Folder)
+ElementRegistry.Register(Default.Action_Delete_From_Ini)
 ElementRegistry.Register(Default.Action_Delete_from_list)
 ElementRegistry.Register(Default.Action_Do_nothing)
+ElementRegistry.Register(Default.Action_Empty_Recycle_Bin)
 ElementRegistry.Register(Default.Action_Encode_string)
 ElementRegistry.Register(Default.Action_Execute_Flow)
 ElementRegistry.Register(Default.Action_Exponentiation)
 ElementRegistry.Register(Default.Action_Get_Clipboard)
+ElementRegistry.Register(Default.Action_Get_File_Attributes)
+ElementRegistry.Register(Default.Action_Get_File_Size)
+ElementRegistry.Register(Default.Action_Get_File_Time)
 ElementRegistry.Register(Default.Action_Get_From_List)
 ElementRegistry.Register(Default.Action_Get_index_of_element_in_list)
 ElementRegistry.Register(Default.Action_Get_List_Info)
+ElementRegistry.Register(Default.Action_Get_shortcut_information)
 ElementRegistry.Register(Default.Action_Get_String_Length)
 ElementRegistry.Register(Default.Action_Hibernate_Computer)
 ElementRegistry.Register(Default.Action_Kill_Process)
@@ -137,6 +158,7 @@ ElementRegistry.Register(Default.Action_New_Time)
 ElementRegistry.Register(Default.Action_New_variable)
 ElementRegistry.Register(Default.Action_Random_number)
 ElementRegistry.Register(Default.Action_Read_From_File)
+ElementRegistry.Register(Default.Action_Read_From_Ini)
 ElementRegistry.Register(Default.Action_Reboot_Computer)
 ElementRegistry.Register(Default.Action_Rename_File)
 ElementRegistry.Register(Default.Action_Rename_Folder)
@@ -146,6 +168,8 @@ ElementRegistry.Register(Default.Action_Run)
 ElementRegistry.Register(Default.Action_Script)
 ElementRegistry.Register(Default.Action_Search_in_a_string)
 ElementRegistry.Register(Default.Action_Set_Clipboard)
+ElementRegistry.Register(Default.Action_Set_file_attributes)
+ElementRegistry.Register(Default.Action_Set_file_time)
 ElementRegistry.Register(Default.Action_Set_Flow_Status)
 ElementRegistry.Register(Default.Action_Set_Process_Priority)
 ElementRegistry.Register(Default.Action_Shuffle_list)
@@ -166,11 +190,13 @@ ElementRegistry.Register(Default.Action_Trace_Point_Check)
 ElementRegistry.Register(Default.Action_Trigonometry)
 ElementRegistry.Register(Default.Action_Trim_a_string)
 ElementRegistry.Register(Default.Action_Write_To_File)
+ElementRegistry.Register(Default.Action_Write_to_ini)
 ElementRegistry.Register(Default.Condition_Confirmation_Dialog)
 ElementRegistry.Register(Default.Condition_Debug_Dialog)
 ElementRegistry.Register(Default.Condition_Do_nothing)
 ElementRegistry.Register(Default.Condition_Expression)
 ElementRegistry.Register(Default.Condition_File_Exists)
+ElementRegistry.Register(Default.Condition_File_Has_Attribute)
 ElementRegistry.Register(Default.Condition_Flow_Enabled)
 ElementRegistry.Register(Default.Condition_Flow_Running)
 ElementRegistry.Register(Default.Condition_List_Contains_Element)
@@ -180,6 +206,7 @@ ElementRegistry.Register(Default.Condition_String_Contains_Text)
 ElementRegistry.Register(Default.Condition_Variable_content_is)
 ElementRegistry.Register(Default.Condition_Variable_Is_Empty)
 ElementRegistry.Register(Default.Loop_Condition)
+ElementRegistry.Register(Default.Loop_Loop_Through_Files)
 ElementRegistry.Register(Default.Loop_Parse_A_String)
 ElementRegistry.Register(Default.Loop_SimpleLoop)
 ElementRegistry.Register(Default.Loop_Work_through_a_list)

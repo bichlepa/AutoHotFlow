@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Actions/Get_file_attributes.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Get file attributes</title>
+<!-- Generated from src/elements/Default/help/en/Actions/Get_File_Size.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Get file size</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,26 +98,45 @@ img {
 </head>
 <body>
 <main>
-<h1>Get file attributes</h1>
-<p>The action <strong>Get file attributes</strong> retrieves the attributes (read-only, hidden, etc) of a file.</p>
+<h1>Get file size</h1>
+<p>The action <strong>Get file size</strong> stores the size of a file in a variable: in bytes, kilobytes or megabytes. Kilobytes and megabytes are rounded down to whole units.</p>
 <h2>Settings</h2>
-<h3>Output variable name</h3>
-<p>Name of the variable which will contain the result.</p>
+<h3>Output Variable name</h3>
+<p>The name of the variable that gets the size.</p>
 <h3>File path</h3>
-<p>Name and path of the file. The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
-<h2>Remarks</h2>
-<p>The result string will contain a subset of the letters in the string RASHNDOCT:</p>
+<p>The path of the file. A relative path is taken from the working directory of the flow.</p>
+<h3>Unit</h3>
 <ul>
-<li><code>R</code> = READONLY</li>
-<li><code>A</code> = ARCHIVE</li>
-<li><code>S</code> = SYSTEM</li>
-<li><code>H</code> = HIDDEN</li>
-<li><code>N</code> = NORMAL</li>
-<li><code>D</code> = DIRECTORY</li>
-<li><code>O</code> = OFFLINE</li>
-<li><code>C</code> = COMPRESSED</li>
-<li><code>T</code> = TEMPORARY</li>
+<li><strong>Bytes</strong>: the size in bytes.</li>
+<li><strong>Kilobytes</strong>: the size in kilobytes (1024 bytes), rounded down.</li>
+<li><strong>Megabytes</strong>: the size in megabytes (1024 kilobytes), rounded down.</li>
 </ul>
+<h2>Behavior</h2>
+<p>A file that does not exist, and a folder, end the element with an exception.</p>
+<h2>Examples</h2>
+<p>Store the size of a file in megabytes in the variable <code>size</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Output Variable name</td>
+<td><code>size</code></td>
+</tr>
+<tr>
+<td>File path</td>
+<td><code>%A_MyDocuments%\example.zip</code></td>
+</tr>
+<tr>
+<td>Unit</td>
+<td>Megabytes</td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

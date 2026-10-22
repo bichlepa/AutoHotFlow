@@ -99,27 +99,72 @@ img {
 <body>
 <main>
 <h1>Read from ini</h1>
-<p>The action <strong>Read from ini</strong> reads a value from a standard format .ini file.</p>
+<p>The action <strong>Read from ini</strong> reads from an ini file (<code>[section]</code> and <code>key=value</code> lines) into a variable. It can read one key, a whole section or the names of all sections.</p>
 <h2>Settings</h2>
-<h3>Output variable name</h3>
-<p>Name of the variable which will contain the result.</p>
+<h3>Output Variable name</h3>
+<p>The variable that gets the result.</p>
 <h3>Path of .ini file</h3>
-<p>Path of the file.</p>
-<p>The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
+<p>The ini file. The file must exist. A relative path is taken from the working directory of the flow.</p>
 <h3>Action</h3>
-<p>If <strong>Read a key</strong> is checked, only one key will be read and its value will be stored to the output variable.</p>
-<p>If <strong>Read the entire section</strong> is checked, the entire section will be stored to the output variable. Comments and empty lines are omitted. Only the first 65,533 characters of the section are retrieved.</p>
-<p>If <strong>Read the section names</strong> is checked, a list of all section names will be stored to the output variable.</p>
-<h3>Section <em>and</em> Key</h3>
-<p>The section and the key that contain the value.</p>
-<p>One or both of the options may be disabled, depending on the choice in Action.</p>
+<ul>
+<li><strong>Read a key</strong>: the value of one key of a section, as text.</li>
+<li><strong>Read the entire section</strong>: the keys and values of a section, as a map of key to value. The keys are not case sensitive.</li>
+<li><strong>Read the section names</strong>: the names of all sections, as a list.</li>
+</ul>
+<h3>Section and Key</h3>
+<p>The section and the key that the action reads. Both are required for a key; the section is required for a whole section. An empty name ends the element with an exception.</p>
 <h3>Behavior on error</h3>
-<p>This option is only available if <strong>Read a key</strong> is checked. If the file, section or key won't be found, the action could throw an exception or write a default value in the variable.</p>
-<h2>Remarks</h2>
-<p>A standard ini file looks like this:</p>
-<pre><code>[SectionName]
-Key=Value
-</code></pre>
+<ul>
+<li><strong>Insert default value in the variable</strong>: a missing key gives the default value below.</li>
+<li><strong>Throw exception</strong>: a missing key ends the element with an exception.</li>
+</ul>
+<h3>Default value on failure</h3>
+<p>The text that is stored when the key is missing and the behavior is the default value. An empty text stores an empty text.</p>
+<h2>Behavior</h2>
+<ul>
+<li>A section that does not exist gives an empty map when the whole section is read.</li>
+<li>The ini files of Windows can be UTF-16 (with a byte order mark, as written by the action Write to ini) or ANSI.</li>
+</ul>
+<h2>Examples</h2>
+<p>Read the key <code>name</code> of the section <code>user</code>. If the key is missing, the variable gets <code>unknown</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Output Variable name</td>
+<td><code>name</code></td>
+</tr>
+<tr>
+<td>Path of .ini file</td>
+<td><code>%A_MyDocuments%\settings.ini</code></td>
+</tr>
+<tr>
+<td>Action</td>
+<td>Read a key</td>
+</tr>
+<tr>
+<td>Section</td>
+<td><code>user</code></td>
+</tr>
+<tr>
+<td>Key</td>
+<td><code>name</code></td>
+</tr>
+<tr>
+<td>Behavior on error</td>
+<td>Insert default value in the variable</td>
+</tr>
+<tr>
+<td>Default value on failure</td>
+<td><code>unknown</code></td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

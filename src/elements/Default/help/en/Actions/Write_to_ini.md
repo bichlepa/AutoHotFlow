@@ -1,28 +1,36 @@
 # Write to ini
 
-The action **Write to ini** writes a value to a standard format .ini file.
+The action **Write to ini** writes a value to a key of a section of an ini file. A file that does not exist is created. The value replaces an existing value of the same key.
 
 ## Settings
 
 ### Value
 
-Value that will be written in the .ini file.
+The text to write. It can contain variables as text fields do.
 
 ### Path of .ini file
 
-Path of the file, including extension.
+The ini file. A relative path is taken from the working directory of the flow. The path must not be a folder.
 
-The file path is assumed to be in the working directory if an absolute path isn't specified.
+### Section
 
-### Section *and* Key
+The section in which the key is written. An empty name ends the element with an exception.
 
-The section and the key that will contain the value.
+### Key
 
-## Remarks
+The key that gets the value. An empty name ends the element with an exception.
 
-A standard ini file looks like this:
+## Behavior
 
-```
-[SectionName]
-Key=Value
-```
+A new file is written as UTF-16 with a byte order mark, as Windows writes ini files. An existing file keeps its encoding. If the file cannot be written, the element ends with an exception.
+
+## Examples
+
+Write the value `Paul` to the key `name` of the section `user`.
+
+| Parameter | Value |
+| --- | --- |
+| Value | `Paul` |
+| Path of .ini file | `%A_MyDocuments%\settings.ini` |
+| Section | `user` |
+| Key | `name` |

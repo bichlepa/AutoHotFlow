@@ -1,27 +1,30 @@
 # Get shortcut information
 
-The action **Get shortcut information** retrieves information about a shortcut (.lnk) file, such as its target file.
+The action **Get shortcut information** reads a shortcut file (`.lnk`) and stores its parts in variables: the target, the arguments, the working folder, the description, the icon, the icon number and the run mode.
 
 ## Settings
 
 ### Shortcut path
 
-The path of the shortcut file to be analyzed. Be sure to include the `.lnk` extension.
+The path of the shortcut file. A relative path is taken from the working directory of the flow.
 
 ### Output variables
 
-Names of the variables that will contain the retrieved informations. The fields may be empty, if those informations are not required.
+One variable name for each part. A part whose name is empty is not stored.
 
-Target path: The shortcut's target (not including any arguments it might have)
+- **Target path**: the file that the shortcut starts (without the arguments).
+- **Target arguments**, **Working directory**, **Description**, **Icon path**, **Icon number**.
+- **Run mode**: the text `Normal`, `Maximized` or `Minimized`; another value is shown as `Unknown (n)`.
 
-Target arguments: The shortcut's parameters (blank if none).
+## Behavior
 
-Working directory: The shortcut's working directory.
+A shortcut that cannot be read, or a file that is not a shortcut, ends the element with an exception.
 
-Description: The shortcut's comments (blank if none).
+## Examples
 
-Icon path: The filename of the shortcut's icon (blank if none).
+Read the target of a shortcut into the variable `target`.
 
-Icon number: The the shortcut's icon number within the icon file (blank if none). This value is most often 1, which means the first icon.
-
-**Run mode**: The shortcut's initial launch state, which is one of the following strings: `Normal`, `Maximized`, `Minimized`.
+| Parameter | Value |
+| --- | --- |
+| Shortcut path | `%A_MyDocuments%\example.lnk` |
+| Target path | `target` |

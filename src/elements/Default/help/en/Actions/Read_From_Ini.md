@@ -1,42 +1,51 @@
 # Read from ini
 
-The action **Read from ini** reads a value from a standard format .ini file.
+The action **Read from ini** reads from an ini file (`[section]` and `key=value` lines) into a variable. It can read one key, a whole section or the names of all sections.
 
 ## Settings
 
-### Output variable name
+### Output Variable name
 
-Name of the variable which will contain the result.
+The variable that gets the result.
 
 ### Path of .ini file
 
-Path of the file.
-
-The file path is assumed to be in the working directory if an absolute path isn't specified.
+The ini file. The file must exist. A relative path is taken from the working directory of the flow.
 
 ### Action
 
-If **Read a key** is checked, only one key will be read and its value will be stored to the output variable.
+- **Read a key**: the value of one key of a section, as text.
+- **Read the entire section**: the keys and values of a section, as a map of key to value. The keys are not case sensitive.
+- **Read the section names**: the names of all sections, as a list.
 
-If **Read the entire section** is checked, the entire section will be stored to the output variable. Comments and empty lines are omitted. Only the first 65,533 characters of the section are retrieved.
+### Section and Key
 
-If **Read the section names** is checked, a list of all section names will be stored to the output variable.
-
-### Section *and* Key
-
-The section and the key that contain the value.
-
-One or both of the options may be disabled, depending on the choice in Action.
+The section and the key that the action reads. Both are required for a key; the section is required for a whole section. An empty name ends the element with an exception.
 
 ### Behavior on error
 
-This option is only available if **Read a key** is checked. If the file, section or key won't be found, the action could throw an exception or write a default value in the variable.
+- **Insert default value in the variable**: a missing key gives the default value below.
+- **Throw exception**: a missing key ends the element with an exception.
 
-## Remarks
+### Default value on failure
 
-A standard ini file looks like this:
+The text that is stored when the key is missing and the behavior is the default value. An empty text stores an empty text.
 
-```
-[SectionName]
-Key=Value
-```
+## Behavior
+
+- A section that does not exist gives an empty map when the whole section is read.
+- The ini files of Windows can be UTF-16 (with a byte order mark, as written by the action Write to ini) or ANSI.
+
+## Examples
+
+Read the key `name` of the section `user`. If the key is missing, the variable gets `unknown`.
+
+| Parameter | Value |
+| --- | --- |
+| Output Variable name | `name` |
+| Path of .ini file | `%A_MyDocuments%\settings.ini` |
+| Action | Read a key |
+| Section | `user` |
+| Key | `name` |
+| Behavior on error | Insert default value in the variable |
+| Default value on failure | `unknown` |

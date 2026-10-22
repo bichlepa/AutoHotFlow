@@ -99,21 +99,49 @@ img {
 <body>
 <main>
 <h1>Delete from ini</h1>
-<p>The action <strong>Delete from ini</strong> deletes a value from a standard format .ini file.</p>
+<p>The action <strong>Delete from ini</strong> removes a key or a whole section from an ini file.</p>
 <h2>Settings</h2>
 <h3>Path of an .ini file</h3>
-<p>Name and path of the file.</p>
-<p>The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
+<p>The ini file. The file must exist. A relative path is taken from the working directory of the flow.</p>
 <h3>Action</h3>
-<p>If <strong>Delete a key</strong> is checked, only one key will be deleted.</p>
-<p>If <strong>Delete a section</strong> is checked, the entire section with all its keys will be deleted.</p>
-<h3>Section <em>and</em> Key</h3>
-<p>The section and the key which content will be deleted.</p>
-<h2>Remarks</h2>
-<p>A standard ini file looks like this:</p>
-<pre><code>[SectionName]
-Key=Value
-</code></pre>
+<ul>
+<li><strong>Delete a key</strong>: the key is removed from the section. An empty key ends the element with an exception.</li>
+<li><strong>Delete a section</strong>: the section, with all its keys, is removed.</li>
+</ul>
+<h3>Section</h3>
+<p>The section. An empty name ends the element with an exception.</p>
+<h3>Key</h3>
+<p>The key to remove (only for <strong>Delete a key</strong>).</p>
+<h2>Behavior</h2>
+<p>A key or section that does not exist is not an error for Windows. If the file cannot be changed, the element ends with an exception.</p>
+<h2>Examples</h2>
+<p>Remove the key <code>name</code> from the section <code>user</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Path of an .ini file</td>
+<td><code>%A_MyDocuments%\settings.ini</code></td>
+</tr>
+<tr>
+<td>Action</td>
+<td>Delete a key</td>
+</tr>
+<tr>
+<td>Section</td>
+<td><code>user</code></td>
+</tr>
+<tr>
+<td>Key</td>
+<td><code>name</code></td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>
