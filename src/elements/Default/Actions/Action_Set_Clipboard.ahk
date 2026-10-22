@@ -30,7 +30,7 @@ class Action_Set_Clipboard extends AhfElement {
         try
             A_Clipboard := p.text
         catch
-            throw ElementError(Lang("The clipboard could not be used"))
+            throw ElementError(Lang("Clipboard failed"))
         ctx.Finish("normal")
     }
 }
