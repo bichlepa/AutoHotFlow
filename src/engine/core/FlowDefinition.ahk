@@ -193,6 +193,14 @@ class FlowDefinition {
         return this._connections.Get(connectionId, "")
     }
 
+    ; The IDs of all elements, in the order of the Map (sorted by ID). WI-0129 (cmd.flow.elements).
+    ElementIds() {
+        idList := []
+        for id in this._elements
+            idList.Push(id)
+        return idList
+    }
+
     ; The IDs of the elements whose class is qualifiedId ("<package>.<class>", any case; a missing package is Default,
     ; E0045), in the order of the Map (sorted by ID). v1 x_getAllElementIDsOfClass (WI-0052).
     ElementIdsOfClass(qualifiedId) {

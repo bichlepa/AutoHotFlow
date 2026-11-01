@@ -246,6 +246,21 @@ class ExecContext {
         }
     }
 
+    ; True if the flow has an element with this ID (v1 x_elementExists, WI-0129). Inline only.
+    HasElement(flowId, elementId) => this._Host().HasElement(String(flowId), String(elementId)) ? true : false
+
+    ; Sets a parameter of an element of a loaded flow, the own one included (v1 x_setElementPar, WI-0129, E0001): the
+    ; change is an edit of the flow. It is saved automatically, a changed trigger is re-armed, an open editor sees it.
+    ; A running instance keeps the value it started with; the next start sees the new one. Throws ElementError: the flow
+    ; is not loaded, has no such element, or has no such parameter. Inline only.
+    SetElementPar(flowId, elementId, parameterId, value) {
+        try {
+            this._Host().SetElementPar(String(flowId), String(elementId), String(parameterId), value)
+        } catch AhfError as e {
+            throw ElementError(e.Message)
+        }
+    }
+
     ; Starts an instance of a flow at a trigger ("" = the first trigger of the flow), with the instance variables vars (a
     ; Map name -> value, copied; "" = none). Without onEnd the element does not wait. With onEnd the element waits:
     ; onEnd(outcome) is called once when the instance has ended, later, on a thread of its own (never from inside this

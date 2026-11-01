@@ -19,6 +19,7 @@
 #Include core\FlowNotify.ahk
 #Include TriggerArms.ahk
 #Include TriggerChanges.ahk
+#Include ElementNameContext.ahk
 #Include WorkerBridge.ahk
 #Include VarRequests.ahk
 #Include ImportV1Vars.ahk
@@ -113,6 +114,7 @@ class Engine extends Role {
         this.On("cmd.engine.snapshot", (msg) => this._CmdSnapshot(msg))
         this.On("cmd.flow.get", (msg) => this._CmdFlowGet(msg))
         this.On("cmd.flow.triggers", (msg) => this._CmdFlowTriggers(msg))
+        this.On("cmd.flow.elements", (msg) => this._CmdFlowElements(msg))
         this.On("cmd.flow.error.get", (msg) => this._CmdFlowErrorGet(msg))
         this.On("cmd.flow.runstate", (msg) => this._CmdFlowRunstate(msg))
         this.On("cmd.flow.start", (msg) => this._CmdFlowStart(msg))
@@ -683,6 +685,20 @@ class Engine extends Role {
         return Map("flowId", rec.FlowId, "triggers", list)
     }
 
+    ; cmd.flow.elements { flowId } (WI-0129, PROTOCOL 4.2): every element of the flow sorted by ID, with its name (""
+    ; if none) and its qualified class ID ("Default.Action_Sleep"). The editor asks it for the choices of the element
+    ; settings of another flow. not_found for a flow that is not loaded.
+    _CmdFlowElements(msg) {
+        rec := this.flows.Require(Engine.Text(msg, "flowId"))
+        list := []
+        for id in rec.Def.ElementIds() {
+            name := rec.Def.Element(id).Get("name", "")
+            qid := ElementRegistry.QualifiedId(rec.Def.ElementPackage(id), rec.Def.ElementClass(id))
+            list.Push(Map("elementId", id, "name", IsObject(name) ? "" : String(name), "class", qid))
+        }
+        return Map("flowId", rec.FlowId, "elements", list)
+    }
+
     ; cmd.flow.error.get { flowId, errorId } (WI-0113, PROTOCOL 4.2, 4.7a): the copy of the variables of an unhandled error.
     ; not_found for a flow that is not loaded (a deleted flow keeps no error) and for an errorId that is not kept.
     _CmdFlowErrorGet(msg) {
@@ -904,6 +920,17 @@ class Engine extends Role {
                 , "rev", rec.Rev, "definition", rec.Def.WireDefinition())
         if (ops.Length = 0)
             return Map("rev", rec.Rev)
+        session := msg.payload.Get("session", "")
+        this._CommitPatch(rec, ops, IsObject(session) ? "" : String(session))
+        return Map("rev", rec.Rev)
+    }
+
+    ; Applies the operations to the newest revision and commits the result (WI-0093, WI-0094, WI-0129): the one path of the
+    ; editor (cmd.flow.patch) and of an element (ctx.SetElementPar). A refused list throws before anything changes. The
+    ; triggers that changed are armed, disarmed or re-armed (WI-0094). The revision is written soon (FlowSaver); session ""
+    ; asks for no backup, a session that is given asks for one at its first write (WI-0095, WI-0096).
+    _CommitPatch(rec, ops, session) {
+        flowId := rec.FlowId
         raw := FlowPatch.Apply(rec.Def.Raw, ops)
         def := FlowDefinition(flowId, raw, rec.Rev + 1)
         ; the elements that wait for their class keep waiting (FlowDefinition.Pending), those that are gone are dropped
@@ -916,9 +943,72 @@ class Engine extends Role {
         this.Emit("topic:flow:" flowId, "evt.flow.committed", Map("flowId", flowId, "rev", rec.Rev, "byMeta", Json.False))
         this._ApplyTriggerChanges(rec, changes)
         ; WI-0095: the revision is written soon (FlowSaver). A view change only never asks for a backup.
-        session := msg.payload.Get("session", "")
-        this.saver.NoteCommit(flowId, IsObject(session) ? "" : String(session), FlowSaver.IsViewPatch(ops))
-        return Map("rev", rec.Rev)
+        this.saver.NoteCommit(flowId, session, FlowSaver.IsViewPatch(ops))
+    }
+
+    ; A parameter set by an element (WI-0129, ctx.SetElementPar, PROTOCOL 4.2 "Element origin"): a patch of the newest
+    ; revision with one element.update (the parameter, and the name when the element has its standard name). It is
+    ; committed and saved like an edit, without a backup (session ""), and a changed trigger is re-armed (WI-0094). Nothing
+    ; happens when the value is the stored one already. Running instances keep the value they started with (their
+    ; parameters are evaluated at the start). Throws AhfError: the flow is not loaded or being deleted, no such element,
+    ; or no such parameter (neither a parameter of the class nor stored in the element).
+    SetElementParFromElement(flowId, elementId, parameterId, value) {
+        rec := this.flows.Get(flowId)
+        if (!IsObject(rec))
+            throw AhfError("flow '" flowId "' is not loaded", ErrCode.NOT_FOUND)
+        if (this.IsDeleting(flowId))
+            throw AhfError("flow '" flowId "' is being deleted", ErrCode.BUSY)
+        def := rec.Def
+        if (!def.HasElement(elementId))
+            throw AhfError("flow '" flowId "' does not have the element with ID '" elementId "'", ErrCode.NOT_FOUND)
+        if (parameterId = "")
+            throw AhfError("parameter ID is empty", ErrCode.BAD_PAYLOAD)
+        el := def.Element(elementId)
+        stored := el.Get("pars", "")
+        if (!(stored is Map))
+            stored := Map()
+        cls := ElementRegistry.Lookup(def.ElementPackage(elementId), def.ElementClass(elementId))
+        if (!stored.Has(parameterId) && !Engine._HasParameter(cls, parameterId))
+            throw AhfError("parameter '" parameterId "' is invalid", ErrCode.BAD_PAYLOAD)
+        fields := Map("pars", Map(parameterId, FlowDefinition.CopyValue(value)))
+        if (Engine._Flag(el.Get("StandardName", 0)) && IsObject(cls)) {
+            newPars := stored.Clone()
+            newPars[parameterId] := FlowDefinition.CopyValue(value)
+            try {
+                name := cls.GenerateName(ElementNameContext(flowId, elementId, this.flows), Engine._ParamsOf(newPars))
+                if (!IsObject(name) && name != "")
+                    fields["name"] := String(name)
+            } catch as e {
+                this._Log("a0", "engine", "the name of element '" elementId "' of flow '" flowId "' was not generated: "
+                    . e.Message)
+            }
+        }
+        ops := [Map("op", "element.update", "id", elementId, "fields", fields)]
+        if (FlowPatch.Diff(def.Raw, FlowPatch.Apply(def.Raw, ops)).Length = 0)
+            return
+        this._CommitPatch(rec, ops, "")
+    }
+
+    static _HasParameter(cls, parameterId) {
+        if (!IsObject(cls))
+            return false
+        try {
+            for item in ParamEvaluator.List(cls, "") {
+                if (item["id"] = parameterId)
+                    return true
+            }
+        } catch as e {
+            Log.Write("a0", "engine", "parameters of the class are not readable: " e.Message)
+        }
+        return false
+    }
+
+    ; An object whose properties are the parameters (the form the element classes read in GenerateName).
+    static _ParamsOf(pars) {
+        o := {}
+        for name, value in pars
+            o.%name% := value
+        return o
     }
 
     ; The triggers that a patch added, removed or changed (WI-0094, PROTOCOL 4.2 "Triggers", E0092). A removed one is

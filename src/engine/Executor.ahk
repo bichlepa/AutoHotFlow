@@ -230,6 +230,18 @@ class Executor {
         return this._owner.SwitchFromElement(String(flowId), String(scope), enabled ? true : false, String(triggerId))
     }
 
+    ; ctx.SetElementPar (WI-0129): a parameter of an element of any loaded flow, committed as a patch (Engine.SetElementParFromElement).
+    ; Throws AhfError (the caller turns it into an exception of the element).
+    SetElementPar(flowId, elementId, parameterId, value) {
+        this._owner.SetElementParFromElement(String(flowId), String(elementId), String(parameterId), value)
+    }
+
+    ; True if the newest revision of the flow has the element (WI-0129, ctx.HasElement).
+    HasElement(flowId, elementId) {
+        rec := this._owner.flows.Get(String(flowId))
+        return IsObject(rec) && elementId != "" && rec.Def.HasElement(String(elementId))
+    }
+
     _LoadedFlow(flowId) {
         rec := this._owner.flows.Get(flowId)
         if (!IsObject(rec))
