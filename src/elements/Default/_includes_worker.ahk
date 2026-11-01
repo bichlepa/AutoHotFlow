@@ -6,6 +6,7 @@
 #Include ..\base\AhfElement.ahk
 #Include ..\base\ElementRegistry.ahk
 #Include lib\WindowIdent.ahk
+#Include lib\ScriptHost.ahk
 #Include lib\TextOps.ahk
 #Include lib\DriveOps.ahk
 #Include ..\..\core\ElementError.ahk
@@ -24,6 +25,7 @@
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Default {
     #Include Actions\Action_Activate_Window.ahk
+    #Include Actions\Action_AutoHotkey_script.ahk
     #Include Actions\Action_Beep.ahk
     #Include Actions\Action_Block_User_Input.ahk
     #Include Actions\Action_Change_Drive_Label.ahk
@@ -102,6 +104,7 @@ class Default {
 
 ElementRegistry.RegisterPackage("Default", "1.2.1")
 ElementRegistry.Register(Default.Action_Activate_Window)
+ElementRegistry.Register(Default.Action_AutoHotkey_script)
 ElementRegistry.Register(Default.Action_Beep)
 ElementRegistry.Register(Default.Action_Block_User_Input)
 ElementRegistry.Register(Default.Action_Change_Drive_Label)

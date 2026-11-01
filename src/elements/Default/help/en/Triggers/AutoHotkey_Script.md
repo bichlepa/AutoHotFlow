@@ -1,49 +1,33 @@
 # AutoHotkey script
 
-The trigger **AutoHotkey script** executes an AutoHotkey script in a new AutoHotkey thread. If the funciton x_trigger() will be called in the AutoHotkey script, it will trigger the trigger.
+The trigger **AutoHotkey script** runs an AutoHotkey v2 script in a process of its own while the trigger is armed. Each call of `x_trigger()` in the script fires the trigger.
 
-> **Warning:** Don't use that action if you don't master the AutoHotkey scripting language.
+> **Warning:** Don't use that trigger if you don't master the AutoHotkey scripting language.
 
-> **Warning:** If the AutoHotkey script crashes, AHF may crash too.
+> **Warning:** The script runs with the rights of AutoHotFlow. It can change files, start programs and send keys.
 
 ## Settings
 
 ### AutoHotkey script
 
-Script that will be executed.
+The AutoHotkey v2 code that is run while the trigger is armed. The default code calls `x_trigger()` every 10 seconds.
 
 ### Variables that should be imported to script prior to execution
 
-Specify a list of variables that should be imported to the AutoHotkey script prior to execution.
+A list of flow variables. They are read when the trigger is armed and the script gets them as global variables, with their values.
 
-The list can be separated either by a space, linefeed, comma or tab.
-
-The variables will be available in global scope.
+The list can be separated by a space, a line break, a comma or a vertical bar.
 
 ### Variables that should be exported from script after execution
 
-Specify a list of variables that should be exported from the AutoHotkey script after execution.
+A list of global variables of the script. Each `x_trigger()` sets them as variables of the flow instance that the trigger starts.
 
-The list can be separated either by a space, linefeed, comma or tab.
-
-The variables must be available in global scope and will be accessible in the flow with same.
-
-> **Note:** The variables must not start with `A_`.
-
-## Supplied Variables
-
-### `A_ManualTriggerID`
-
-The **ID** of the manual trigger.
+The list can be separated by a space, a line break, a comma or a vertical bar. The names must not start with `A_`.
 
 ## Remarks
 
-If the script reaches the bottom, it will end and won't be able to trigger, even if it is persistent.
+If the script ends by itself, the trigger reports an error and stays armed without effect. Disarming the trigger ends the script at once.
 
-The script may be stopped with `exitapp`.
+An error in the script (a syntax error, or an error while the script runs) is reported as an error of the trigger; the trigger stays armed.
 
-Do not use command `onexit`.
-
-Do not use functions `EnterCriticalSection()` and `LeaveCriticalSection()` as well as other AHK_H specific functions.
-
-Do not use variable, function and label names which start with `ahf_`.
+Do not use names that start with `ahf`: the element uses them.

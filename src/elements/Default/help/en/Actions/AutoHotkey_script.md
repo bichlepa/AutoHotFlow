@@ -1,49 +1,44 @@
 # AutoHotkey script
 
-The action **AutoHotkey script** executes an AutoHotkey script in a new AutoHotkey thread.
+The action **AutoHotkey script** runs an AutoHotkey v2 script in a process of its own and waits until the script ends.
 
 > **Warning:** Don't use that action if you don't master the AutoHotkey scripting language.
 
-> **Warning:** If the AutoHotkey script crashes, AHF may crash too.
-
-> **Note:** This action has low performance, since a new AutoHotkey thread must be started.
+> **Warning:** The script runs with the rights of AutoHotFlow. It can change files, start programs and send keys.
 
 ## Settings
 
 ### AutoHotkey script
 
-Script that will be executed. Use the function x_trigger() to trigger the trigger.
+The AutoHotkey v2 code that is run. The code does not need `#Requires AutoHotkey v2.0`.
 
-### Variables that should be imported to script before enabling
+### Variables that should be imported to script prior to execution
 
-Specify a list of variables that should be imported to the AutoHotkey script before it gets enabled.
+A list of flow variables. The script gets them as global variables when it starts, with their values (texts, numbers, lists and objects).
 
-The list can be separated either by a space, linefeed, comma or tab.
+The list can be separated by a space, a line break, a comma or a vertical bar.
 
-The variables will be available in global scope.
+### Variables that should be exported from script after execution
 
-### Variables that should be exported from script on trigger
+A list of global variables of the script. When the script ends, their values are set as variables of the flow.
 
-Specify a list of variables that should be exported from the AutoHotkey when it calls x_trigger().
-
-The list can be separated either by a space, linefeed, comma or tab.
-
-The variables must be available in global scope and will be accessible in the flow with same..
-
-> **Note:** The variables must not start with `A_`.
+The list can be separated by a space, a line break, a comma or a vertical bar. The names must not start with `A_`.
 
 ## Remarks
 
-The script may reach the bottom, there will be a `return` statement. It already contains the command `#persistent`.
+The script sets the result with the variables `result` and `resultmessage`, as in v1: `result := "exception"` ends the element with the text of `resultmessage`. Without a result the element ends normally.
 
-The script may be stopped with `exitapp`. If it stops, nothing will happen and the trigger will still appear as active.
+An error in the script (a syntax error, or an error while the script runs) ends the element with an exception. The line number of the error is the line of your code.
 
-Do not use command `onexit`.
+Stopping the flow ends the script at once.
 
-Do not use functions `EnterCriticalSection()` and `LeaveCriticalSection()` as well as other AHK_H specific functions.
+Do not use names that start with `ahf`: the element uses them.
 
-Do not use variable, function and label names which start with `ahf_`.
+## Examples
 
-Do not use the working directory (variable `a_workingDir` or relative paths). The working directory cannot be set per AHK thread and if AHF or an other AHK script changes it, it will be changed for this script, too. However (even if not userful), since AHF does not use the working directory, it is safe to change the working directory using command `SetWorkingDir`.
+Set the variable `Greeting` in the flow.
 
-The variable `A_FlowWorkingDir` will contain the working directory of the flow.
+| Parameter | Value |
+| --- | --- |
+| AutoHotkey script | `Greeting := "Hello from AutoHotkey"` |
+| Variables that should be exported from script after execution | `Greeting` |

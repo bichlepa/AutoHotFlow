@@ -99,34 +99,45 @@ img {
 <body>
 <main>
 <h1>AutoHotkey script</h1>
-<p>The action <strong>AutoHotkey script</strong> executes an AutoHotkey script in a new AutoHotkey thread.</p>
+<p>The action <strong>AutoHotkey script</strong> runs an AutoHotkey v2 script in a process of its own and waits until the script ends.</p>
 <blockquote>
 <p><strong>Warning:</strong> Don't use that action if you don't master the AutoHotkey scripting language.</p>
-<p><strong>Warning:</strong> If the AutoHotkey script crashes, AHF may crash too.</p>
-<p><strong>Note:</strong> This action has low performance, since a new AutoHotkey thread must be started.</p>
+<p><strong>Warning:</strong> The script runs with the rights of AutoHotFlow. It can change files, start programs and send keys.</p>
 </blockquote>
 <h2>Settings</h2>
 <h3>AutoHotkey script</h3>
-<p>Script that will be executed. Use the function x_trigger() to trigger the trigger.</p>
-<h3>Variables that should be imported to script before enabling</h3>
-<p>Specify a list of variables that should be imported to the AutoHotkey script before it gets enabled.</p>
-<p>The list can be separated either by a space, linefeed, comma or tab.</p>
-<p>The variables will be available in global scope.</p>
-<h3>Variables that should be exported from script on trigger</h3>
-<p>Specify a list of variables that should be exported from the AutoHotkey when it calls x_trigger().</p>
-<p>The list can be separated either by a space, linefeed, comma or tab.</p>
-<p>The variables must be available in global scope and will be accessible in the flow with same..</p>
-<blockquote>
-<p><strong>Note:</strong> The variables must not start with <code>A_</code>.</p>
-</blockquote>
+<p>The AutoHotkey v2 code that is run. The code does not need <code>#Requires AutoHotkey v2.0</code>.</p>
+<h3>Variables that should be imported to script prior to execution</h3>
+<p>A list of flow variables. The script gets them as global variables when it starts, with their values (texts, numbers, lists and objects).</p>
+<p>The list can be separated by a space, a line break, a comma or a vertical bar.</p>
+<h3>Variables that should be exported from script after execution</h3>
+<p>A list of global variables of the script. When the script ends, their values are set as variables of the flow.</p>
+<p>The list can be separated by a space, a line break, a comma or a vertical bar. The names must not start with <code>A_</code>.</p>
 <h2>Remarks</h2>
-<p>The script may reach the bottom, there will be a <code>return</code> statement. It already contains the command <code>#persistent</code>.</p>
-<p>The script may be stopped with <code>exitapp</code>. If it stops, nothing will happen and the trigger will still appear as active.</p>
-<p>Do not use command <code>onexit</code>.</p>
-<p>Do not use functions <code>EnterCriticalSection()</code> and <code>LeaveCriticalSection()</code> as well as other AHK_H specific functions.</p>
-<p>Do not use variable, function and label names which start with <code>ahf_</code>.</p>
-<p>Do not use the working directory (variable <code>a_workingDir</code> or relative paths). The working directory cannot be set per AHK thread and if AHF or an other AHK script changes it, it will be changed for this script, too. However (even if not userful), since AHF does not use the working directory, it is safe to change the working directory using command <code>SetWorkingDir</code>.</p>
-<p>The variable <code>A_FlowWorkingDir</code> will contain the working directory of the flow.</p>
+<p>The script sets the result with the variables <code>result</code> and <code>resultmessage</code>, as in v1: <code>result := "exception"</code> ends the element with the text of <code>resultmessage</code>. Without a result the element ends normally.</p>
+<p>An error in the script (a syntax error, or an error while the script runs) ends the element with an exception. The line number of the error is the line of your code.</p>
+<p>Stopping the flow ends the script at once.</p>
+<p>Do not use names that start with <code>ahf</code>: the element uses them.</p>
+<h2>Examples</h2>
+<p>Set the variable <code>Greeting</code> in the flow.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AutoHotkey script</td>
+<td><code>Greeting := "Hello from AutoHotkey"</code></td>
+</tr>
+<tr>
+<td>Variables that should be exported from script after execution</td>
+<td><code>Greeting</code></td>
+</tr>
+</tbody>
+</table>
 </main>
 </body>
 </html>

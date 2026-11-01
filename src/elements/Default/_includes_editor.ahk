@@ -7,6 +7,7 @@
 #Include ..\base\ElementRegistry.ahk
 #Include lib\WindowIdent.ahk
 #Include lib\ListOps.ahk
+#Include lib\ScriptHost.ahk
 #Include lib\TextOps.ahk
 #Include lib\DriveOps.ahk
 #Include ..\..\core\ElementError.ahk
@@ -31,6 +32,7 @@ class Default {
     #Include Actions\Action_Absolute_number.ahk
     #Include Actions\Action_Activate_Window.ahk
     #Include Actions\Action_Add_To_List.ahk
+    #Include Actions\Action_AutoHotkey_script.ahk
     #Include Actions\Action_Beep.ahk
     #Include Actions\Action_Block_User_Input.ahk
     #Include Actions\Action_Change_character_case.ahk
@@ -153,6 +155,7 @@ class Default {
     #Include Loops\Loop_Parse_A_String.ahk
     #Include Loops\Loop_SimpleLoop.ahk
     #Include Loops\Loop_Work_through_a_list.ahk
+    #Include Triggers\Trigger_AutoHotkey_Script.ahk
     #Include Triggers\Trigger_Hotkey.ahk
     #Include Triggers\Trigger_Manual.ahk
     #Include Triggers\Trigger_Periodic_Timer.ahk
@@ -163,6 +166,7 @@ ElementRegistry.RegisterPackage("Default", "1.2.1")
 ElementRegistry.Register(Default.Action_Absolute_number)
 ElementRegistry.Register(Default.Action_Activate_Window)
 ElementRegistry.Register(Default.Action_Add_To_List)
+ElementRegistry.Register(Default.Action_AutoHotkey_script)
 ElementRegistry.Register(Default.Action_Beep)
 ElementRegistry.Register(Default.Action_Block_User_Input)
 ElementRegistry.Register(Default.Action_Change_character_case)
@@ -285,6 +289,7 @@ ElementRegistry.Register(Default.Loop_Loop_Through_Files)
 ElementRegistry.Register(Default.Loop_Parse_A_String)
 ElementRegistry.Register(Default.Loop_SimpleLoop)
 ElementRegistry.Register(Default.Loop_Work_through_a_list)
+ElementRegistry.Register(Default.Trigger_AutoHotkey_Script)
 ElementRegistry.Register(Default.Trigger_Hotkey)
 ElementRegistry.Register(Default.Trigger_Manual)
 ElementRegistry.Register(Default.Trigger_Periodic_Timer)
