@@ -47,7 +47,7 @@ Status: the nine classes are ported; the acceptance criteria of the element pack
 - **Seam** (`SystemOps`): `BlockInput(state)` remembers the block of the process, `ReleaseInput()` ends it; `MouseGetPos(flag)` (a read, so a test gets a fixed position). The worker calls `ReleaseInput` in its orderly shutdown (`src/worker/Worker.ahk`). ELEMENT-API-V2 3.3a updated.
 - **Hotkey test (task 2) not done:** the corpus flow `Flow 2133155705` stays in PENDING with no missing elements. Decision needed (below).
 - **gui tests (task 1, owner) not written:** decision needed (below).
-- **Open:** a blocked input after a killed worker (OPEN-ITEMS F-9001*, M-0156). Logical key state across processes (HOW-TO, gui-and-hotkeys).
+- **Open:** a blocked input after a killed worker (OPEN-ITEMS F-0192, M-0156). Logical key state across processes (HOW-TO, gui-and-hotkeys).
 
 Tests (run IDs at the commit of the work before the commits are made):
 - `tests/integration/test_mouse_keyboard_elements.py`: 28 passed (run 20261101-210425-23064, serial, after the fixes).

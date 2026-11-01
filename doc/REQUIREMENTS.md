@@ -1063,7 +1063,7 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 ### REQ-ELM-370 Mouse and keyboard
 
 - **v1:** yes
-- **v2:** done (WI-0126; the real mouse and the real keys on the desktop are the owner's manual check; the block of the input after a killed worker is open, F-9001*)
+- **v2:** done (WI-0126; the real mouse and the real keys on the desktop are the owner's manual check; the block of the input after a killed worker is open, F-0192)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0008 (WI-0126)
@@ -1078,7 +1078,7 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 | `Action_Send_Keystrokes` | yes | done (WI-0126) | S0008 (WI-0126) |
 | `Action_Send_Keystrokes_To_Control` | yes | done (WI-0126) | S0008 (WI-0126) |
 | `Action_Set_Lock_Key` | yes | done (WI-0126) | S0008 (WI-0126) |
-| `Action_Block_User_Input` | yes | done (WI-0126; a killed worker keeps the block, F-9001*) | S0008 (WI-0126) |
+| `Action_Block_User_Input` | yes | done (WI-0126; a killed worker keeps the block, F-0192) | S0008 (WI-0126) |
 | `Condition_Key_Is_Down` | yes | done (WI-0126; the logical state of a key sent by another process is not seen, see the HOW-TO) | S0008 (WI-0126) |
 
 ### REQ-ELM-380 Sound and speech
