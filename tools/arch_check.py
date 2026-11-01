@@ -38,6 +38,8 @@ EXCEPTIONS = [
      "Role.Console writes to stderr ('**') with FileAppend, not to a file; documented in Role.ahk (F-0004)."),
     ("AhfBoot.ahk", "file-io", r"FileAppend",
      "AhfConsole writes to stderr ('**') with FileAppend before Role.Console is loaded (WI-0022), not to a file."),
+    ("elements/Default/lib/ScriptHost.ahk", "file-io", r"FileAppend",
+     "The text of the prologue of a user's script (WI-0130) writes to stdout and stderr of that script's process, not to a file."),
 ]
 
 # Built-in AutoHotkey v2 classes that must not be redefined.

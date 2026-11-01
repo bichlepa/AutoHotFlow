@@ -1,10 +1,10 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/supervisor/ChildLauncher.ahk and ChildPipe.ahk (WI-0023): a process started with its
+; Unit tests for src/core/ChildLauncher.ahk and ChildPipe.ahk (WI-0023): a process started with its
 ; stdout/stderr in an anonymous pipe, the non-blocking line reader, and the handles that must not leak.
 ; Report a local that hides a class or a built-in function (F-0078). Must stand before the first include.
 #Warn All, StdOut
 #Include lib\Assert.ahk
-#Include ..\..\src\supervisor\ChildLauncher.ahk
+#Include ..\..\src\core\ChildLauncher.ahk
 
 ; Waits (up to ms) until the process handle is signalled. Returns true when it has ended.
 EndedWithin(handle, ms) => DllCall("WaitForSingleObject", "ptr", handle, "uint", ms, "uint") = 0

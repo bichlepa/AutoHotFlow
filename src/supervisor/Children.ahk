@@ -4,7 +4,7 @@
 #Include ..\core\Time.ahk
 #Include ..\core\Role.ahk
 #Include ..\core\Json.ahk
-#Include ChildLauncher.ahk
+#Include ..\core\ChildLauncher.ahk
 
 ; The role processes started by the supervisor (doc/ARCHITECTURE.md 3, 5.3, 6.2).
 ; One record per child, keyed by its name ("echo" or "echo:a", as the role sees itself).
