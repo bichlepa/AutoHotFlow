@@ -295,7 +295,8 @@ class TriggerArms {
         }
         entry["params"] := ev["params"]
         payload := Map("triggerKey", key, "gen", gen, "flowId", flowId, "elementId", triggerId
-            , "class", ev["classId"], "params", TriggerArms._Wire(ev["params"]), "context", context)
+            , "class", ev["classId"], "params", TriggerArms._Wire(ev["params"]), "context", context
+            , "imports", this._Imports(rec, triggerId, ev))
         this._open += 1
         entry["sent"] := true
         try {
@@ -397,6 +398,29 @@ class TriggerArms {
     }
 
     ; --- evaluation and entries ------------------------------------------------------------------------------------
+
+    ; The variables that the trigger class names for import (ImportNames, PROTOCOL 4.4), read with the global, static and
+    ; built-in variables (a trigger has no instance). A Map name -> value in the wire form; empty when no name is given.
+    ; A variable that cannot be read is "" (WI-0130).
+    _Imports(rec, triggerId, ev) {
+        m := Map()
+        cls := ElementRegistry.Get(ev["classId"])
+        if (!IsObject(cls))
+            return m
+        names := cls.ImportNames(ev["params"])
+        if (names.Length = 0)
+            return m
+        env := Map("flowId", rec.FlowId, "elementId", triggerId, "flowName", rec.Def.Name
+            , "elementName", "", "workingDir", BuiltInVars.WorkingDirOf(rec.Def.Raw.Get("flowSettings", ""), this._owner.settings.Value("workingDir")))
+        access := VarAccess(this._owner.vars, "", "", env)
+        for name in names {
+            try value := access.GetVar(name, "")
+            catch
+                value := ""
+            m[name] := Executor.ToWire(value)
+        }
+        return m
+    }
 
     ; The parameters of a trigger of rec, evaluated with the global, static and built-in variables. Returns Map(ok, params,
     ; classId) or Map(ok false, error). Errors are the texts of v1 (ParamEvaluator, ElementRegistry.MissingText).

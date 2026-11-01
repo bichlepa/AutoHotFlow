@@ -56,6 +56,7 @@ class TriggerHost extends Role {
         elementId := TriggerHost._Text(msg, "elementId")
         classId := TriggerHost._Text(msg, "class")
         params := TriggerHost._Map(msg, "params")
+        imports := TriggerHost._Map(msg, "imports")      ; the import variables of the arming (PROTOCOL 4.4, WI-0130)
         context := msg.payload.Get("context", "")
         if (IsObject(context))
             throw AhfError("payload field 'context' must be a text", ErrCode.BAD_PAYLOAD)
@@ -66,6 +67,7 @@ class TriggerHost extends Role {
             return Map("ok", false, "message", "element " classId " is not a trigger (mode " cls.Mode ")")
         this._Disarm(key)
         ctx := TriggerContext(this, key, flowId, elementId, Integer(gen), String(context))
+        ctx.imports := imports
         this._armed[key] := Map("ctx", ctx, "cls", cls, "class", classId, "gen", Integer(gen), "armedMs", Time.NowMs())
         SystemOps.Enter(flowId, elementId)     ; the test provider of SystemOps logs the element of a call (WI-0117)
         try {

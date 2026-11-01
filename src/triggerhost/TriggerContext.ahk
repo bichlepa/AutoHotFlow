@@ -22,6 +22,7 @@ class TriggerContext {
         this.gen := gen
         this.context := context
         this.State := {}
+        this.imports := Map()           ; the import variables of the arming (PROTOCOL 4.4, ImportNames)
         this._host := host
         this._open := true
         this._timers := Map()          ; seq -> Map("fn", userFn, "timer", boundTimer)

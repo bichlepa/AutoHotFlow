@@ -402,8 +402,14 @@ class Executor {
         try {
             vars := cls.TriggerVariables(fire["params"], fire.Get("data", ""))
             if (vars is Map) {
-                for name, value in vars
-                    trigger.Vars[name] := value
+                for name, value in vars {
+                    ; A_ names are thread variables; any other name is an instance variable (v1 x_ImportInstanceVars,
+                    ; WI-0130: the script trigger exports its variables that way)
+                    if (SubStr(name, 1, 2) = "A_")
+                        trigger.Vars[name] := value
+                    else
+                        Executor._SetInstanceVars(run["inst"], Map(name, value), run["flowId"])
+                }
             }
         } catch as e {
             Log.Write("f0", "engine", "trigger '" triggerId "' could not set its variables, the instance starts without "

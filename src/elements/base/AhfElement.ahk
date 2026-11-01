@@ -25,6 +25,9 @@ class AhfElement {
     ; x_EvaluateScript on a RawString), as Map("ParameterId", "expression" | "script"). The loader of flows converts
     ; their texts from v1 syntax (WI-0039). Parameters with an expression content type in Parameters() are found there.
     static V1Syntax := Map()
+    ; The variables that a trigger reads at its arming (WI-0130, PROTOCOL 4.4): the names of the imports, from the evaluated
+    ; parameters. The engine reads them (global, static and built-in variables) and sends them as the imports of the arm.
+    static ImportNames(params) => []
 
     ; Runtime entry point of inline and worker elements. The base class has no behavior: a class
     ; that runs without its own Run is a bug and ends the execution with "exception".
