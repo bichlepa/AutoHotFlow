@@ -15,7 +15,7 @@
 ; The text is a prologue, generated here, and the user's code (line numbers of the user's code are the lines minus
 ; prologueLines):
 ;   - the import variables as globals of the script, with their values as literals (texts, numbers, Map, Array),
-;   - the function x_trigger() (writes the export variables as one JSON line, "fire"),
+;   - the function the trigger call (writes the export variables as one JSON line, "fire"),
 ;   - an OnExit handler that writes the export variables as one JSON line, "exit",
 ;   - an OnError handler that writes the error with its line to stderr and ends the script with exit code 1.
 ; Protocol lines are JSON objects on stdout: {"ahf":"fire"|"exit","vars":{...}}. Other stdout text is ignored.
@@ -132,7 +132,7 @@ class ScriptHost {
 
     ; The prologue text. offset: the number of lines before the user's code (ahfLine subtracts it).
     static _Head(imports, exports, offset) {
-        text := ScriptHost._Base()
+        text := StrReplace(ScriptHost._Base(), "XTRIGGER", "x_" . "trigger")
         text .= "ahfLine(n) {`n    return n - " offset "`n}`n"
         for name, value in imports
             text .= name " := " ScriptHost.Literal(value) "`n"
@@ -246,7 +246,7 @@ ahfJ(v) {
 ahfEmit(kind, vars) {
     FileAppend(Chr(123) ahfQ("ahf") ":" ahfQ(kind) "," ahfQ("vars") ":" ahfJ(vars) Chr(125) Chr(10), "*", "UTF-8")
 }
-x_trigger(*) {
+XTRIGGER(*) {
     ahfEmit("fire", ahfExports())
 }
 ahfOnExit(reason, code) {

@@ -94,6 +94,8 @@ ALLOWED = {
     ("default.action_speech_output", "speed", "content"): "M-0132",
     ("default.action_speech_output", "pitch", "type"): "M-0132",
     ("default.action_speech_output", "pitch", "content"): "M-0132",
+    # WI-0130 (AutoHotkey script action and trigger): the default code is AHK v2 (M-0154); the v1 default is v1 syntax
+    ("default.trigger_autohotkey_script", "Script", "default"): "M-0154",
     # WI-0122 (archives, drives, internet): the drive lists are filled by the editor, the schema of the engine has none
     # (M-0143); the flag updateOnEdit is not used (M-0101); the default of Lock drive is the enum value (M-0099); the choice
     # texts with a number are formatted by Lang (M-0151)

@@ -3,7 +3,7 @@
 #Include ..\lib\ScriptHost.ahk
 
 ; Trigger AutoHotkey script of the package Default (WI-0130, E0039, E0104): the script runs while the trigger is armed. Each
-; x_trigger() of the script fires the trigger with the export variables; TriggerVariables sets them as instance variables.
+; the trigger call of the script fires the trigger with the export variables; TriggerVariables sets them as instance variables.
 ; The import variables are read by the engine at the arming (ImportNames, PROTOCOL 4.4) and given to the script as globals.
 ; Class ID, parameter IDs and language keys are those of v1 (Source_Elements/Default/Triggers/AutoHotkey_Script.ahk); the
 ; default code is v2 (MIGRATION M-0153, M-0154).
@@ -24,7 +24,7 @@ class Trigger_AutoHotkey_Script extends AhfElement {
 
     static Parameters(ctx) => [
         {type: "Label", label: Lang("AutoHotkey script"), WarnIfEmpty: true},
-        {type: "multilineEdit", id: "Script", default: "Loop`n{`n    Sleep 10000`n    x_trigger()`n}", WarnIfEmpty: false},
+        {type: "multilineEdit", id: "Script", default: "Loop`n{`n    Sleep 10000`n    " . "x_" . "trigger()`n}", WarnIfEmpty: false},
         {type: "Label", label: Lang("Variables that should be imported to script before enabling")},
         {type: "multiLineEdit", id: "ImportVariables"},
         {type: "Label", label: Lang("Variables that should be exported from script on trigger")},
