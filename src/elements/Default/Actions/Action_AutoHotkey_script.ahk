@@ -68,7 +68,7 @@ class Action_AutoHotkey_script extends AhfElement {
         out := this._Collect(info["stdout"], out, true)
         errText .= this._Text(info["stderr"].Drain())
         code := ScriptHost.ExitCode(info)
-        ScriptHost.Close(info)
+        ScriptHost.Close(info, true)
         if (errText != "")
             throw ElementError(Trim(errText, "`r`n"))
         if (!IsObject(out))

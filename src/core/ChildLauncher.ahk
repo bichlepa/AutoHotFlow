@@ -159,6 +159,16 @@ class ChildLauncher {
             , "stdout", ChildPipe(hOutRead), "stderr", ChildPipe(hErrRead))
     }
 
+    ; Closes the job of a process that ended by itself (WI-0130): the kill-on-close flag is cleared first, so the processes
+    ; that the script started keep running, as in v1. A job that is still needed is closed by the caller with CloseHandle.
+    static ReleaseJob(job) {
+        if (job = 0)
+            return
+        limits := Buffer(144, 0)                    ; LimitFlags 0: no kill on close
+        DllCall("SetInformationJobObject", "ptr", job, "int", 9, "ptr", limits, "uint", limits.Size)
+        DllCall("CloseHandle", "ptr", job)
+    }
+
     ; Writes all bytes of input to a pipe. The pipe buffer holds them (INPUT_MAX), so the call does not wait for the reader.
     static _WriteAll(handle, input) {
         written := 0

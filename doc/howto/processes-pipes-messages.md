@@ -469,8 +469,8 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Source:** src/core/ChildLauncher.ahk (`StartWithInput`), src/elements/Default/lib/ScriptHost.ahk (`_Input`), WI-0130
 
 - **Problem:** A script process must not outlive AHF or the worker that started it.
-- **Right:** `CreateProcessW` with `CREATE_SUSPENDED`, `AssignProcessToJobObject` on the job created with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE` (`SetInformationJobObject`, class 9, `LimitFlags` at offset 16 of the 144-byte structure), then `ResumeThread`. The host closes the job handle to end the tree; `TerminateProcess` is the normal stop.
-- **Status:** not checked (the stop by TerminateProcess is in the tests; the kill when the owner of the job dies is not tested yet)
+- **Right:** `CreateProcessW` with `CREATE_SUSPENDED`, `AssignProcessToJobObject` on the job created with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE` (a normal end clears the flag first, `ChildLauncher.ReleaseJob`) (`SetInformationJobObject`, class 9, `LimitFlags` at offset 16 of the 144-byte structure), then `ResumeThread`. The host closes the job handle to end the tree; `TerminateProcess` is the normal stop.
+- **Status:** verified for the stop: `test_stop_of_the_flow_ends_the_running_script_process` and `test_disarming_the_trigger_ends_the_script_process` check that the process is gone. Verified for the owner: the reviewer ended the host process with ProcessClose and found the script process gone 1 s later (review run, not a pytest). A normal end keeps the processes the script started (`test_a_script_that_ends_keeps_the_process_it_started`, `ChildLauncher.ReleaseJob`).
 - **Source:** src/core/ChildLauncher.ahk (`StartWithInput`), WI-0130
 
 - **Problem:** A wait loop of the worker that reads a child's output must keep the cancel working and must not block on a full pipe.

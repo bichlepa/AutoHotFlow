@@ -116,7 +116,7 @@ img {
 <h2>Remarks</h2>
 <p>The script sets the result with the variables <code>result</code> and <code>resultmessage</code>, as in v1: <code>result := "exception"</code> ends the element with the text of <code>resultmessage</code>. Without a result the element ends normally.</p>
 <p>An error in the script (a syntax error, or an error while the script runs) ends the element with an exception. The line number of the error is the line of your code.</p>
-<p>Stopping the flow ends the script at once.</p>
+<p>Stopping the flow ends the script at once, and the processes that the script started with it. When the script ends by itself, the processes it started keep running, as in v1.</p>
 <p>Do not use names that start with <code>ahf</code>: the element uses them.</p>
 <h2>Examples</h2>
 <p>Set the variable <code>Greeting</code> in the flow.</p>

@@ -98,7 +98,8 @@ class ScriptHost {
         return (code = 0x103) ? -1 : code     ; STILL_ACTIVE
     }
 
-    ; Ends the process at once (TerminateProcess) and releases every handle of the script.
+    ; Ends the process at once (TerminateProcess) and releases every handle of the script. The job kills the processes
+    ; that the script started as well.
     static Stop(info) {
         if (!IsObject(info))
             return
@@ -107,15 +108,21 @@ class ScriptHost {
         ScriptHost.Close(info)
     }
 
-    ; Releases the handles (the process, the job and the two pipes). Safe to call twice.
-    static Close(info) {
+    ; Releases the handles (the process, the job and the two pipes). Safe to call twice. keepChildren: the script ended by
+    ; itself, so the processes it started keep running (WI-0130, as v1); a stop passes false and the job kills them.
+    static Close(info, keepChildren := false) {
         if (!IsObject(info))
             return
-        for key in ["process", "job"] {
-            if (info.Get(key, 0) != 0) {
-                DllCall("CloseHandle", "ptr", info[key])
-                info[key] := 0
-            }
+        if (info.Get("job", 0) != 0) {
+            if (keepChildren)
+                ChildLauncher.ReleaseJob(info["job"])
+            else
+                DllCall("CloseHandle", "ptr", info["job"])
+            info["job"] := 0
+        }
+        if (info.Get("process", 0) != 0) {
+            DllCall("CloseHandle", "ptr", info["process"])
+            info["process"] := 0
         }
         for key in ["stdout", "stderr"] {
             if (info.Has(key) && IsObject(info[key]))

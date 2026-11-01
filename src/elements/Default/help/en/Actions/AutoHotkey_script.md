@@ -30,7 +30,7 @@ The script sets the result with the variables `result` and `resultmessage`, as i
 
 An error in the script (a syntax error, or an error while the script runs) ends the element with an exception. The line number of the error is the line of your code.
 
-Stopping the flow ends the script at once.
+Stopping the flow ends the script at once, and the processes that the script started with it. When the script ends by itself, the processes it started keep running, as in v1.
 
 Do not use names that start with `ahf`: the element uses them.
 

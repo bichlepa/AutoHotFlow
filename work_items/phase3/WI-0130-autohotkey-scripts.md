@@ -44,8 +44,16 @@ Running v1 code (E0039); porting the user's v1 scripts automatically (REQ-AI-040
 - `ctx.RunScript` is not a context member; the library `lib/ScriptHost.ahk` is used directly (ELEMENT-API 3 says so). Decision made by me; alternative was a context member.
 - Trigger imports: a class names its import variables with `ImportNames(params)` (default `[]` in AhfElement); the engine reads them at the arming and sends `imports` in `cmd.trigger.arm` (PROTOCOL 4.4). Decision made by me.
 - Trigger export names that do not start with `A_` are instance variables (v1 `x_ImportInstanceVars`); the engine applied them as thread variables before, where the flow could not see them. Engine change in `Executor._SetTriggerVars`; PROTOCOL 4.5 wording updated.
-- Script error texts ("Variable name ... is not valid") are English, not in `Lang()`: decision needed (owner).
+- **Owner decision (recorded from review, 2026-11-01):** the script error texts ("Variable name 'x' is not valid for an AutoHotkey script.") are English and not in `Lang()`; the language files are not extended for them. Still to be confirmed by the owner.
+- **Owner decision needed (review item 4):** a process the script started survives a normal end of the script (kill flag cleared, as v1), and is ended by a stop. Recorded as M-0158 and in the help page; the owner decides whether this stays.
 
 **Not done:** the mark of imported v1 scripts (M-0049, the "port it to v2" exception) - OPEN-ITEMS F-0193; the cancel during a running action and the job-object kill when the worker dies are not tested (HOW-TO marked not checked); corpus flow "external script test" not moved from PENDING; line numbers of load (syntax) errors are not corrected for the prologue (not checked).
 
 **Files:** `src/elements/Default/{Actions/Action_AutoHotkey_script.ahk,Triggers/Trigger_AutoHotkey_Script.ahk,lib/ScriptHost.ahk}`, `src/core/ChildLauncher.ahk` (moved and extended), `src/engine/{Executor,TriggerArms}.ahk`, `src/triggerhost/{TriggerContext,TriggerHost}.ahk`, `src/elements/base/AhfElement.ahk`, help pages, en/de language keys, `tests/integration/test_script_elements.py`, `tests/support/group_table.py`, `tools/arch_check.py` (exception for the prologue text), docs (REQUIREMENTS REQ-ELM-110 partial, MIGRATION M-0158/M-0159, PROTOCOL 4.4/4.5, ELEMENT-API-V2, HOW-TO, OPEN-ITEMS F-0193).
+
+### Review follow-up (2026-11-01)
+
+- Corpus: "external script test" moved from PENDING to the corpus on a v2 copy (`tests/data/flows/v2_adapted/`, FIX_LIST, M-0158).
+- Tests added: stop of the flow ends the process, disarm ends the process, three fires with imports (`ctx.imports`), a finished script keeps its child process.
+- HOW-TO status of the owner-death cleanup: verified by the reviewer (not a pytest).
+- IDs now: migration M-0158 and M-0159, finding F-0193.

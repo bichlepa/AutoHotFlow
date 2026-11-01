@@ -41,6 +41,9 @@ FIX_LIST = [
     # M-0152: "HTTP Request" (Flow 100439537) calls https://httpbin.org; the test rewrites its URLs to the local server, and
     # the User-Agent of its second request is "myuseagent" while its check expects "myuseragent" (the test copy is corrected)
     ("Flow 100439537", "URLs of httpbin.org replaced by the local test server (127.0.0.1); User-Agent myuseagent corrected"),
+    # WI-0130 (M-0158): the scripts of the two "sleep, msgbox" elements are v2 code (Sleep 10000); the MsgBox is removed,
+    # because a MsgBox in a script process is a real dialog that no test answers (the flow stops before it anyway)
+    ("Flow 1849072261", "v1 scripts of elements 15 and 17 ported to v2 (Sleep 10000, MsgBox removed)"),
 ]
 
 # --- the flows that are not in the corpus yet ---------------------------------------------------------------------
@@ -51,8 +54,6 @@ PENDING = {
         "Action_Input_Box": "S0008"}),
     "Flow 1333431302": dict(name="User idle test", missing={
         "Trigger_User_Idle_Time": "S0008"}),
-    "Flow 1849072261": dict(name="external script test", missing={
-        "Action_AutoHotkey_Script": "S0008 (E0039: v1 code is kept as text, M-0049)"}),
     # its elements are all registered since WI-0126 (Action_Send_Keystrokes); the flow is not in the corpus yet (the
     # Ctrl+F7 part is a gui part, and the test copy with unassigned keys is an open decision, see WI-0126)
     "Flow 2133155705": dict(name="Hotkey test", missing={}),
@@ -327,6 +328,17 @@ def test_v1_http_request_runs_green_against_the_local_server(flows, local_server
     pair = flows.wait_var("global_testResults")
     assert pair is not None and json.loads(pair[1]) == [data["name"]], pair
     assert [r["method"] for r in local_server.requests()] == ["GET", "POST", "POST"], local_server.requests()
+
+
+# --- "external script test" (WI-0130) ---------------------------------------------------------------------------------
+def test_v1_external_script_test_runs_green_on_the_v2_copy(flows):
+    """"external script test" (Flow 1849072261), the copy in v2_adapted/ (FIX_LIST, M-0158): the script action counts with
+    the imported counter and exports it; the flow stops itself (element 14) before the scripts that sleep."""
+    flow_id = flows.add_file(V2 / "Flow 1849072261.json")
+    flows.start()
+    run = flows.run(flow_id, trigger="element0000000001", timeout=scaled(60))
+    assert not run.exceptions, (run.reason, run.exceptions, run.names[-5:])
+    assert "element0000000014" in run.path, run.path
 
 
 # --- the synthetic flows -----------------------------------------------------------------------------------------------

@@ -97,7 +97,7 @@ class Trigger_AutoHotkey_Script extends AhfElement {
         }
         ctx.State.errText .= this._Text(info["stderr"].Drain())
         code := ScriptHost.ExitCode(info)
-        ScriptHost.Close(info)
+        ScriptHost.Close(info, true)
         text := Trim(ctx.State.errText, "`r`n")
         if (text = "")
             text := Lang("AutoHotkey script ended (exit code %1%).", code)
