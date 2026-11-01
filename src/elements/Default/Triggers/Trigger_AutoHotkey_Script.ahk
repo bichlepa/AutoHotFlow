@@ -6,7 +6,7 @@
 ; the trigger call of the script fires the trigger with the export variables; TriggerVariables sets them as instance variables.
 ; The import variables are read by the engine at the arming (ImportNames, PROTOCOL 4.4) and given to the script as globals.
 ; Class ID, parameter IDs and language keys are those of v1 (Source_Elements/Default/Triggers/AutoHotkey_Script.ahk); the
-; default code is v2 (MIGRATION M-0153, M-0154).
+; default code is v2 (MIGRATION M-0158, M-0159).
 ;
 ; Mode trigger: the process is read by a timer every 50 ms (never blocking). A process that ends by itself is reported as
 ; evt.trigger.error (its stderr text or its exit code) and the trigger stays armed without effect (REQ-TRG-010). Disable

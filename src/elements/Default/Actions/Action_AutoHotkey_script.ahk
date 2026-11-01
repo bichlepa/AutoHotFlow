@@ -5,7 +5,7 @@
 ; Action AutoHotkey script of the package Default (WI-0130, E0039, E0104): runs AutoHotkey v2 code of the user in a process
 ; of its own and waits for its end. The import variables are globals of the script at its start; the export variables
 ; (and result and resultmessage, as in v1) are set when the script ends. Class ID, parameter IDs and language keys are
-; those of v1 (Source_Elements/Default/Actions/AutoHotkey_script.ahk), the code is v2 (MIGRATION M-0153, M-0154).
+; those of v1 (Source_Elements/Default/Actions/AutoHotkey_script.ahk), the code is v2 (MIGRATION M-0158, M-0159).
 ;
 ; Mode worker: the wait is a loop of Sleep(50) (the messages of the worker, the cancel among them, run during the Sleep),
 ; and the stdout of the script is read in the loop, so a script that writes much does not block. Stop (cancel) ends
