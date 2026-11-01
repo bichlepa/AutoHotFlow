@@ -1286,16 +1286,16 @@ Creates a shortcut file (default on the desktop) that starts the flow through th
 ### REQ-TRG-250 User activity triggers
 
 - **v1:** yes
-- **v2:** partial (the user idle time, WI-0131; the clipboard trigger is open)
+- **v2:** partial (the user idle time and the clipboard changes, WI-0131; the session lock is later)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0008 (WI-0131)
-- **Evidence:** `tests/integration/test_time_triggers.py` (WI-0131: the idle trigger fires once per idle period, the physical method asks the physical idle time, a bad interval is refused with the v1 text; the idle time answered by the test provider, WI-0117)
+- **Evidence:** `tests/integration/test_time_triggers.py` (WI-0131: the idle trigger fires once per idle period, the physical method asks the physical idle time, a bad interval is refused with the v1 text; the idle time answered by the test provider, WI-0117; `tests/integration/test_clipboard_trigger.py` (WI-0131: every change of the real clipboard fires the trigger, a disabled one does not)
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
 | `Trigger_User_Idle_Time` | yes | done (WI-0131) | S0008 (WI-0131 done) |
-| `Trigger_Clipboard_Changes` | yes | open | S0008 |
+| `Trigger_Clipboard_Changes` | yes | done (WI-0131) | S0008 (WI-0131 done) |
 | The session is locked or unlocked | no | open | later |
 
 ### REQ-TRG-260 Window triggers

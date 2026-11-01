@@ -158,6 +158,7 @@ class Default {
     #Include Loops\Loop_SimpleLoop.ahk
     #Include Loops\Loop_Work_through_a_list.ahk
     #Include Triggers\Trigger_AutoHotkey_Script.ahk
+    #Include Triggers\Trigger_Clipboard_Changes.ahk
     #Include Triggers\Trigger_Hotkey.ahk
     #Include Triggers\Trigger_Manual.ahk
     #Include Triggers\Trigger_Periodic_Timer.ahk
@@ -295,6 +296,7 @@ ElementRegistry.Register(Default.Loop_Parse_A_String)
 ElementRegistry.Register(Default.Loop_SimpleLoop)
 ElementRegistry.Register(Default.Loop_Work_through_a_list)
 ElementRegistry.Register(Default.Trigger_AutoHotkey_Script)
+ElementRegistry.Register(Default.Trigger_Clipboard_Changes)
 ElementRegistry.Register(Default.Trigger_Hotkey)
 ElementRegistry.Register(Default.Trigger_Manual)
 ElementRegistry.Register(Default.Trigger_Periodic_Timer)

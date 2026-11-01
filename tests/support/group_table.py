@@ -143,6 +143,7 @@ TEST_GROUPS = {
     "integration/test_process_elements.py": ["elements-e2e"],
     "integration/test_power_elements.py": ["elements-e2e"],
     "integration/test_clipboard_elements.py": ["elements-e2e"],
+    "integration/test_clipboard_trigger.py": ["triggers"],
     "integration/test_sound_elements.py": ["elements-e2e"],
     "integration/test_archive_elements.py": ["elements-e2e"],
     "integration/test_drive_elements.py": ["elements-e2e"],
@@ -565,6 +566,11 @@ COVERS = {
         "integration/test_time_triggers.py::test_the_user_idle_trigger_fires_once_per_idle_period",
         "integration/test_time_triggers.py::test_the_physical_method_asks_the_physical_idle_time",
         "integration/test_time_triggers.py::test_a_bad_interval_of_the_user_idle_trigger_is_not_armed_and_gives_the_v1_text",
+    ],
+    # WI-0131: clipboard changes (the trigger host's OnClipboardChange; the real clipboard, xdist group clipboard)
+    "src/elements/Default/Triggers/Trigger_Clipboard_Changes.ahk": [
+        "integration/test_clipboard_trigger.py::test_every_change_of_the_clipboard_fires_the_trigger",
+        "integration/test_clipboard_trigger.py::test_a_disabled_clipboard_trigger_does_not_fire",
     ],
     "src/elements/Default/Triggers/Trigger_Start_up.ahk": [
         "integration/test_time_triggers.py::test_a_startup_trigger_enabled_later_does_not_fire",
