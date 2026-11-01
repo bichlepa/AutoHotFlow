@@ -60,7 +60,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0126 | Mouse and keyboard | done | haiku | see git log (up to fb344433) | 2026-11-01 | 9 classes, M-0153 to M-0157, REQ-ELM-370, F-0192; review approved; open: gui tests of real clicks/keys unwritten, corpus Hotkey test flow stays PENDING (owner: real keys with unassigned copy, or Ctrl+F7 part gui); Block/Unblock in different pool workers leaves the block (add to F-0192); Click speed only in Event mode; M-0154 rounding untested |
 | WI-0127 | Screen and images | open | | | |  |
 | WI-0128 | Input box, file and folder selection | open | | | |  |
-| WI-0129 | `Action_Set_element_parameter` | open | | | | after WI-0107 |
+| WI-0129 | `Action_Set_element_parameter` | done | haiku | see git log (up to e6ba92a9) | 2026-11-02 | engine ctx.SetElementPar (one patch, same commit path), cmd.flow.elements, PROTOCOL 4.2, M-0160 to M-0162, REQ-ELM-250 partial, F-0194; review: tests fixed (unscaled lower bounds); owner: v1 content choice 'Type of parameter' not ported (M-0161), name regeneration only knows flow and trigger names (failure only logged), hotkey parameter is a text field; open editor display unchecked (manual) |
 | WI-0130 | AutoHotkey script action and trigger (E0104) | done | haiku | see git log (up to 31c4125c) | 2026-11-01 | M-0158, M-0159, REQ-ELM-110 partial, F-0193 (imported v1 scripts not marked); review approved after one round; owner: descendants of a script survive a normal end (as v1; a stop kills them), script error texts English not Lang(); open: line numbers of load errors off by the prologue, cancel during a running action; ChildLauncher/ChildPipe moved to src/core |
 | WI-0131 | Triggers: time of day, user idle time, clipboard, hotstring | open | | | |  |
 | WI-0132 | Triggers: windows and processes | open | | | |  |
@@ -74,7 +74,7 @@ None.
 
 ## Running agents
 
-None.
+- WI-0131 (haiku, workspace wi0131): review approved, author fixes a test claim and runs the full selection; M-0160 to M-0163 and F-9000*/F-9001* to renumber at integration.
 
 ## Last verified state
 
