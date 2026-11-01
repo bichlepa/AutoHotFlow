@@ -156,7 +156,7 @@ def test_a_running_element_keeps_its_value_and_the_next_start_sees_the_new_one(f
     flows.wait(target_run)
     elapsed = time.monotonic() - started
     assert target_run.reason == "finished", (target_run.reason, target_run.exceptions)
-    assert elapsed >= scaled(1.2), "the running sleep kept its old duration of 1.5 s, the run took %.2f s" % elapsed
+    assert elapsed >= 1.2, "the running sleep kept its old duration of 1.5 s, the run took %.2f s" % elapsed
     assert flows.wait_var("global_Probe", lambda pair: pair[1] == "new value") is not None
 
 
@@ -186,7 +186,7 @@ def test_a_changed_timer_trigger_fires_with_the_new_interval(host_flows, datadir
     started = time.monotonic()
     slow = flows.ended(timer_id, since=mark, count=2, timeout=20)
     assert len(slow) >= 2, slow
-    assert time.monotonic() - started >= scaled(1.5), "the changed trigger did not fire at 1000 ms intervals"
+    assert time.monotonic() - started >= 1.5, "the changed trigger did not fire at 1000 ms intervals"
     wait_file(datadir, timer_id, trigger.id, lambda el: el["pars"].get("Interval") == "1000")
 
 
