@@ -52,8 +52,6 @@ FIX_LIST = [
 PENDING = {
     "Flow 130786371": dict(name="Dialog test", missing={
         "Action_Input_Box": "S0008"}),
-    "Flow 1333431302": dict(name="User idle test", missing={
-        "Trigger_User_Idle_Time": "S0008"}),
     # its elements are all registered since WI-0126 (Action_Send_Keystrokes); the flow is not in the corpus yet (the
     # Ctrl+F7 part is a gui part, and the test copy with unassigned keys is an open decision, see WI-0126)
     "Flow 2133155705": dict(name="Hotkey test", missing={}),
@@ -299,6 +297,19 @@ def test_v1_trigger_test_runs_green_on_the_adapted_copy(host_flows):
     assert run.path[-1] == "element0000000130", run.names[-5:]
     pair = host_flows.wait_var("static_testSuccess", lambda p: var_value(p) == "1", flow_id=flow_id)
     assert pair is not None, (run.names[-5:], dialogs.requests())
+
+
+# --- "User idle test" (WI-0131) ---------------------------------------------------------------------------------------
+def test_v1_user_idle_test_runs_green_with_the_idle_time_of_the_test_provider(host_flows):
+    """"User idle test" (Flow 1333431302) as saved: the manual trigger enables four idle triggers of the flow (5 s, 10 s,
+    10 min, 10 h of idle time, all TimeIdlePhysical). The idle time is answered by the test provider (WI-0117): it counts
+    from the start of the trigger host, so every trigger fires once during the run (no real user is waited for)."""
+    flow_id = host_flows.add_file(V1 / "Flow 1333431302.json")
+    SystemScript(host_flows.datadir).script({}, idle_base_ms=0)
+    host_flows.start()
+    run = host_flows.run(flow_id, trigger="element0000000001", timeout=scaled(240))
+    assert run.reason == "finished", (run.reason, run.names[-5:], host_flows.stderr_text()[-800:])
+    assert not run.exceptions, (run.exceptions, run.names[-5:])
 
 
 # --- "HTTP Request" (WI-0122) ---------------------------------------------------------------------------------------
