@@ -250,7 +250,7 @@ def test_a_real_v1_export_imports_both_flows_disabled_and_the_warning_lists_thei
     assert all(not v2_flows(obs)[i]["enabled"] for i in ids)
     text = [q for q in questions(obs) if q["kind"] == "importWarning"][0]["args"][0]
     assert "Default.action_Run (unknown element)" not in text, text     # Action_Run is registered since WI-0123
-    assert "Default.action_Send_Keystrokes (unknown element)" in text, text
+    assert "Default.action_Send_Keystrokes (unknown element)" not in text, text  # registered since WI-0126
 
 
 def test_a_second_import_of_the_real_v1_export_asks_the_name_conflict_for_each_flow(started, tmp_path):
