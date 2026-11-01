@@ -112,13 +112,18 @@ ALLOWED = {
     ("default.action_lock_or_unlock_drive", "", "updateOnEdit"): "M-0101",
     ("default.action_lock_or_unlock_drive", "WhatDo", "default"): "M-0099",
 }
-# M-0139: the window identification of the window and control elements (WI-0125), as M-0102 for Trigger_Hotkey
+# M-0139: the window identification of the window and control elements (WI-0125, WI-0126), as M-0102 for Trigger_Hotkey
 for _cls in ("action_activate_window", "action_show_window", "action_hide_window", "action_close_window",
              "action_move_window", "action_get_control_text", "action_set_control_text",
-             "condition_window_active", "condition_window_exists"):
+             "action_send_keystrokes_to_control", "condition_window_active", "condition_window_exists"):
     ALLOWED[("default." + _cls, "GetWindowInformation", "id")] = "M-0139"
     ALLOWED[("default." + _cls, "TitleMatchMode", "enum")] = "M-0139"
     ALLOWED[("default." + _cls, "TitleMatchMode", "result")] = "M-0139"
+# M-0155: the radios with result enum of the mouse elements have the number 1 as default in v1 (the position of the
+# first choice), the enum value in v2 (the same rule as M-0099)
+ALLOWED[("default.action_move_mouse", "CoordMode", "default")] = "M-0155"
+ALLOWED[("default.action_move_mouse", "SendMode", "default")] = "M-0155"
+ALLOWED[("default.action_drag_with_mouse", "SendMode", "default")] = "M-0155"
 
 
 def load_v1():

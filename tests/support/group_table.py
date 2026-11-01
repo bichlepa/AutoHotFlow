@@ -154,6 +154,7 @@ TEST_GROUPS = {
     "integration/test_dialogs.py": ["ui"],
     "integration/test_system_seam.py": ["element-units", "triggers", "workers"],
     "integration/test_window_elements.py": ["elements-e2e", "workers"],
+    "integration/test_mouse_keyboard_elements.py": ["elements-e2e", "workers"],
     "integration/test_engine.py": ["engine"],
     "integration/test_flow_patch.py": ["engine"],
     "integration/test_flow_patch_triggers.py": ["triggers", "engine"],
@@ -855,6 +856,57 @@ COVERS = {
         "integration/test_window_elements.py::test_get_control_text_finds_the_control_by_class_text_and_handle",
         "integration/test_window_elements.py::test_the_text_of_a_control_uses_the_match_mode_of_the_setting",
         "integration/test_window_elements.py::test_control_errors_are_the_v1_texts",
+    ],
+    # WI-0126: mouse and keyboard (the seam SystemOps records the calls; the own window for ControlSend; the key holder)
+    "src/elements/Default/Actions/Action_Click.ahk": [
+        "integration/test_mouse_keyboard_elements.py::test_click_without_moving_clicks_at_the_mouse",
+        "integration/test_mouse_keyboard_elements.py::test_click_at_coordinates_with_button_count_and_hold",
+        "integration/test_mouse_keyboard_elements.py::test_click_relative_to_the_current_mouse_position_adds_the_option_r",
+        "integration/test_mouse_keyboard_elements.py::test_click_wheel_up_with_a_count_and_release_only",
+        "integration/test_mouse_keyboard_elements.py::test_click_with_a_count_that_is_no_number_is_an_exception",
+        "integration/test_mouse_keyboard_elements.py::test_a_failing_click_call_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Move_Mouse.ahk": [
+        "integration/test_mouse_keyboard_elements.py::test_move_mouse_moves_to_the_absolute_coordinates_with_the_speed",
+        "integration/test_mouse_keyboard_elements.py::test_move_mouse_relative_adds_the_option_r",
+        "integration/test_mouse_keyboard_elements.py::test_move_mouse_with_a_coordinate_that_is_no_number_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Drag_With_Mouse.ahk": [
+        "integration/test_mouse_keyboard_elements.py::test_drag_with_mouse_passes_the_start_and_the_end",
+        "integration/test_mouse_keyboard_elements.py::test_drag_relative_adds_the_option_r",
+    ],
+    "src/elements/Default/Actions/Action_Get_Mouse_Position.ahk": [
+        "integration/test_mouse_keyboard_elements.py::test_get_mouse_position_stores_the_window_and_the_control_of_the_fixed_position",
+        "integration/test_mouse_keyboard_elements.py::test_get_mouse_position_without_ids_asks_for_the_position_only",
+    ],
+    "src/elements/Default/Actions/Action_Send_Keystrokes.ahk": [
+        "integration/test_mouse_keyboard_elements.py::test_send_keystrokes_sends_the_text_with_the_send_mode",
+        "integration/test_mouse_keyboard_elements.py::test_send_keystrokes_in_raw_mode_prefixes_the_raw_mode_key",
+        "integration/test_mouse_keyboard_elements.py::test_a_failing_send_call_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Send_Keystrokes_To_Control.ahk": [
+        "integration/test_mouse_keyboard_elements.py::test_send_keystrokes_to_control_types_into_the_control_of_the_own_window",
+        "integration/test_mouse_keyboard_elements.py::test_send_keystrokes_to_control_in_raw_mode_sends_the_text_as_it_is",
+        "integration/test_mouse_keyboard_elements.py::test_send_keystrokes_to_a_missing_control_is_the_v1_exception",
+    ],
+    "src/elements/Default/Actions/Action_Set_Lock_Key.ahk": [
+        "integration/test_mouse_keyboard_elements.py::test_set_caps_lock_on_calls_the_seam_with_the_state",
+        "integration/test_mouse_keyboard_elements.py::test_set_num_lock_always_off_passes_the_forced_state",
+        "integration/test_mouse_keyboard_elements.py::test_toggle_scroll_lock_passes_the_opposite_of_the_current_state",
+    ],
+    "src/elements/Default/Actions/Action_Block_User_Input.ahk": [
+        "integration/test_mouse_keyboard_elements.py::test_block_user_input_blocks_and_unblocks_through_the_seam",
+        "integration/test_mouse_keyboard_elements.py::test_the_block_is_released_when_the_worker_shuts_down",
+    ],
+    "src/elements/Default/Conditions/Condition_Key_Is_Down.ahk": [
+        "integration/test_mouse_keyboard_elements.py::test_key_is_down_is_no_for_a_key_that_is_up",
+        "integration/test_mouse_keyboard_elements.py::test_key_is_down_physical_is_no_for_a_key_that_is_up",
+        "integration/test_mouse_keyboard_elements.py::test_key_is_down_physical_is_yes_while_another_process_holds_the_key",
+        "integration/test_mouse_keyboard_elements.py::test_a_key_name_that_does_not_exist_is_an_exception",
+    ],
+    "src/elements/Default/lib/MouseOps.ahk": [
+        "integration/test_mouse_keyboard_elements.py::test_click_relative_to_the_current_mouse_position_adds_the_option_r",
+        "integration/test_mouse_keyboard_elements.py::test_move_mouse_relative_adds_the_option_r",
     ],
 
     # WI-0122: archives (tar.exe, the zip-slip and link checks), drives (the reading elements run for real, the changing ones

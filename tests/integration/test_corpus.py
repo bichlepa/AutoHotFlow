@@ -48,13 +48,14 @@ FIX_LIST = [
 # (WI-0057 task 3). The test below keeps this table equal to the element registry.
 PENDING = {
     "Flow 130786371": dict(name="Dialog test", missing={
-        "Action_Input_Box": "S0008", "Action_Send_Keystrokes_to_Control": "S0008"}),
+        "Action_Input_Box": "S0008"}),
     "Flow 1333431302": dict(name="User idle test", missing={
         "Trigger_User_Idle_Time": "S0008"}),
     "Flow 1849072261": dict(name="external script test", missing={
         "Action_AutoHotkey_Script": "S0008 (E0039: v1 code is kept as text, M-0049)"}),
-    "Flow 2133155705": dict(name="Hotkey test", missing={
-        "Action_Send_Keystrokes": "S0008"}),
+    # its elements are all registered since WI-0126 (Action_Send_Keystrokes); the flow is not in the corpus yet (the
+    # Ctrl+F7 part is a gui part, and the test copy with unassigned keys is an open decision, see WI-0126)
+    "Flow 2133155705": dict(name="Hotkey test", missing={}),
     "Flow 561135904": dict(name="Process Test", missing={
         "Trigger_Process_closes": "S0008",
         "Trigger_Process_starts": "S0008"}),

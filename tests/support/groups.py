@@ -91,6 +91,7 @@ OTHER_RULES = [
     ("tests/integration/helpers/TestSystemProvider.ahk", ["element-units", "triggers", "workers"]),
     ("tests/integration/helpers/hotkey_window.ahk", ["triggers"]),
     ("tests/integration/helpers/own_window.ahk", ["elements-e2e"]),   # the own test window of the window elements (WI-0125)
+    ("tests/integration/helpers/key_holder.ahk", ["elements-e2e"]),   # the held key of the Key is down test (WI-0126)
     ("tests/integration/helpers/key_observer.ahk", ["triggers"]),
     ("tests/fault/faultkit.py", FAULT_GROUPS),
     ("tests/fault/faultfixtures.py", FAULT_GROUPS),
