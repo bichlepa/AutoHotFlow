@@ -35,3 +35,17 @@ Those of every element package (README S0008).
 ## Not part of this
 
 The session lock trigger and the other `later` rows of REQ-TRG-220 and REQ-TRG-250.
+
+## Result
+
+Status: done (agent part, 2026-11-01). Commits `c9a7a56f` to `47a47dec` on `wip/wi0131`.
+
+- **Trigger_Time_Of_Day** (REQ-TRG-210): week days and time, one timer checked against `A_Now` when it fires; a missed time in standby is not repeated (M-0160). Verified: unit test `tests/ahk/element_time_of_day.test.ahk` (7 cases), three integration tests in `tests/integration/test_time_triggers.py`.
+- **Trigger_User_Idle_Time** (REQ-TRG-250): the v1 state machine, idle time through `SystemOps` (E0103). Verified: three integration tests (once per idle period, physical method, bad interval). Choice texts recorded as M-0161 (schema allow list).
+- **Trigger_Clipboard_Changes** (REQ-TRG-250): `OnClipboardChange` in the trigger host; the clipboard helpers moved to `tests/support/clipboard.py`. Verified: `tests/integration/test_clipboard_trigger.py` (real clipboard, xdist group `clipboard`).
+- **Trigger_Hotstring** (REQ-TRG-230): callback hotstring; the replacement goes through `SystemOps.Send` (M-0162); shared registrations (M-0163). Verified: `tests/ahk/element_hotstring.test.ahk` (6 cases), four input tests in `tests/integration/test_hotkey_input.py` (letters typed into `helpers/active_window.ahk` under the input lock; replacement checked in the seam log).
+- **Corpus**: "User idle test" (Flow 1333431302) runs green as saved with the idle time of the test provider; it left `PENDING`.
+- Help pages corrected for v2 (Time of day, Hotstring); HTML regenerated.
+- Open findings: F-9000* (shared window code of Trigger_Hotkey and Trigger_Hotstring belongs in `lib/`), F-9001* (typo in the hotstring option key).
+
+Not checked: the real replacement output of the hotstring in an editor (gui, owner); the time trigger across a real standby or a changed clock; the idle trigger with the real idle time of the user; the help texts in the viewer.

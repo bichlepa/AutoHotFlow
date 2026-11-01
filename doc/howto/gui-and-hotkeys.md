@@ -356,3 +356,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** The logical state is the state the calling thread's input queue reports (the mechanism is assumed, not read in the source); a key sent by another process does not show there in the test. `GetKeyState(key, "P")` (the physical state) showed the held key. A test that holds a key therefore reads the physical state; the logical state while another process holds a key is not checked.
 - **Status:** verified (the test `test_key_is_down_physical_is_yes_while_another_process_holds_the_key` passes with "P"; the logical variant returned "no" in the same setup, WI-0126)
 - **Source:** `tests/integration/test_mouse_keyboard_elements.py`, `tests/integration/helpers/key_holder.ahk`
+
+### Hotstring callbacks take the name, not a replacement; options name the trigger only (verified)
+
+- **Problem:** A hotstring that calls a function and sends its own text.
+- **Wrong:** Expecting the `X`, `O`, `S`, `SI`, `SE` or `SP` options to send or omit the text of a callback hotstring.
+- **Right:** `Hotstring(text, callback, "On")` calls the callback with the hotstring name; the callback sends its text itself. Automatic backspacing (`B0` turns it off) still erases the typed text for a callback.
+- **Status:** verified (against the local AutoHotkey docs and `tests/integration/test_hotkey_input.py`, WI-0131)
+- **Source:** `src/elements/Default/Triggers/Trigger_Hotstring.ahk`
+
+### `Hotstring(text, , "Off")` needs the omitted middle argument (verified)
+
+- **Problem:** Turning a hotstring off without changing its replacement.
+- **Wrong:** `Hotstring(text, "", "Off")`: an empty replacement is set as the replacement.
+- **Right:** `Hotstring(text, , "Off")`, with the same `HotIf` criterion as when it was set.
+- **Status:** verified by the call form of the docs (WI-0131), the disable path is covered by `tests/ahk/element_hotstring.test.ahk`
+- **Source:** `src/elements/Default/Triggers/Trigger_Hotstring.ahk`

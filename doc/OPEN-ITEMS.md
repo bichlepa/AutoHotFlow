@@ -80,6 +80,8 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0194 | The element list of another flow in the settings of `Action_Set_element_parameter` is kept until the settings window opens again (`EditorFlowCatalog.Refresh`): a change of the other flow while the window is open is not shown in its list until then. The value and the parameter list follow the list of the flow at the next check. | open, found by WI-0129 |
 | F-0161 | Order inside a batch of element states: entries inside one 33 ms batch are in the order of the first change; a fast repeating failing element shows only its last state | postponed by the owner (2026-10-20), a note, no requirement | WI-0089 |
 | F-0153 | The tint of a running element is drawn after all elements, so where a running element overlaps a later element of the scene, the tint lies over that element; v1 draws the tint with its element, so the later element covers it | open, low; the sample flows show no such overlap, not checked on a larger flow | WI-0085 |
+| F-9000* | Trigger_Hotkey and Trigger_Hotstring carry the same window condition and registration code (ModeOf, Condition, the registration map, _SpecKey); the shared part belongs in `lib/` (WI-0131, ELEMENT-API-V2 shared code rule) | open, not changed in WI-0131 (the hotkey element is verified and was not touched) | S0008 |
+| F-9001* | The language key "Omit the ending character after replacemenet" in en.ini and de.ini has the v1 typo; the label shows it (WI-0131, Trigger_Hotstring) | open, a text change in both language files; not a behaviour | S0009 |
 
 ## Findings
 
@@ -498,3 +500,15 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 **What:** a `Slider` field of an element takes its range from the parameter's options in v1 (`options: "Range-10-10 TickInterval1"`). In v2 the settings window (`src/editor/ElementSettingsWindow.ahk`, `AddSlider("Range0-100")`) draws every slider from 0 to 100 and ignores the range. The sound elements of WI-0124 avoid the problem: relative volume, speed and pitch are number fields (M-0132). Another element with a negative or a larger range would show the wrong range.
 **Options:** (a) the window reads the range of the field (a `range` key in the description, or the `options` text of v1) and draws it; (b) keep number fields for every range that is not 0 to 100.
 **Status:** open, low. Found in WI-0124; the fix belongs to the editor (E0076 settings window). Not checked: how the window looks with a negative range (no window test runs here).
+
+### F-9000*: Window scope and registration code of the two hotkey-like triggers
+
+**What:** `Trigger_Hotkey` and `Trigger_Hotstring` (WI-0131) hold the same window-condition and registration code. The rule for shared code says it goes into `lib/` of the package.
+**Options:** (a) move it to `src/elements/Default/lib/` in a later change with its own tests; (b) keep both copies.
+**Status:** open. Not changed in WI-0131 to keep the verified hotkey element untouched.
+
+### F-9001*: Typo in the language key of the hotstring option
+
+**What:** the key "Omit the ending character after replacemenet" (v1 text) has a typo, kept as the key so that the translation lookup works.
+**Options:** (a) correct the key in en.ini, de.ini (ko and ru in S0009); the key changes everywhere it is used.
+**Status:** open, not checked in the product view.

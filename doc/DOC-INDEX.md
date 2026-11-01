@@ -210,7 +210,7 @@ L67-73 The reason of a failed file call is the OSError number (verified) (partly
 L75-81 FileSetAttrib and FileSetTime do not throw when no file matches (verified) (verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (46.2 KB, 358 lines)
+## doc/howto/gui-and-hotkeys.md (47.4 KB, 374 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -257,6 +257,8 @@ L328-334 GetWindowTextW of another process's control can return text from before
 L336-342 The arguments of a shortcut are cut at 259 characters (verified) (verified)
 L344-350 `ControlGetHwnd` and `ControlGetText` take a window handle as the control (verified) (verified)
 L352-358 `GetKeyState` without "P" does not see a key that another process sends (verified) (verified)
+L360-366 Hotstring callbacks take the name, not a replacement; options name the trigger only (verified) (verified)
+L368-374 `Hotstring(text, , "Off")` needs the omitted middle argument (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)
