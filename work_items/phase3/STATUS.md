@@ -74,11 +74,13 @@ None.
 
 ## Running agents
 
-- WI-0126 follow-up (haiku, workspace wi0126fix): stale import-warning test in test_manager_archive.py.
+None.
 
 ## Last verified state
 
-Commit `d4f9382d` (WI-0126 integrated; all tiers): foundation 471, slow 211 green; fast 2578 passed, 6 failed (runs 20261101-211554-d4f9382d, -2, -3): `test_manager_archive` import warning (real, stale expectation after WI-0126, fix in progress); `test_hotkey_input` window-active @input (not rechecked, recheck cannot take @input); `test_engine` start event order, `Action_Message_Box` in test_core_settings, two `test_worker` tests (green in the serial rerun 20261101-214411-d4f9382d, load flakes, F-0191 for the worker ones).
+Commit `f200ee0b` (WI-0126 and WI-0130 integrated; all tiers): foundation 471, slow 212 green; fast 2594 passed, 1 failed (runs 20261101-215118-f200ee0b, -2, -3): `test_hotkey_input::test_window_active_conditions_against_the_active_window@input`, which fails only in full fast runs at 100 % CPU (92 s timeout; also in the run of `d4f9382d`) and passes in every selection and alone (run 20261101-221806-f200ee0b: green): a load flake, not rechecked with `recheck.py` (cannot take `@input`). VERDICT red only by that.
+
+Commit `d4f9382d` (WI-0126 only; superseded): the stale import-warning expectation was fixed in `f200ee0b`.
 
 Commit `919d5b5a` (final state of the session: WI-0116 to WI-0125 integrated; all tiers): fast 2554 passed (2 skipped), 2 failed under load (`test_worker` busy/shutdown tests, green in recheck 20261023-013138-recheck), foundation 471, slow 211 (runs 20261023-011736-919d5b5a, -3, -2). VERDICT red only by those load flakes (F-0191).
 
