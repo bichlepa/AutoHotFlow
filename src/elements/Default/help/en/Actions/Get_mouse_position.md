@@ -1,17 +1,21 @@
 # Get mouse position
 
-The action **Get mouse position** retrieves the mouse position.
-
-It can also retrieve information about the window ID and control ID beneath the mouse.
+The action **Get mouse position** stores the position of the mouse in two variables. It can also store the window and the control under the mouse.
 
 ## Settings
 
 ### Output variables
 
-Names of the variables which will contain the result.
+**Coordinates**: the names of the variables for the x and the y coordinate.
 
-You can choose the reference point of the coordinates.
+**Mouse position**: the reference point of the coordinates: the screen, the active window (its position) or the client area of the active window.
 
 ### Additional information
 
-Choose whether the window ID and control ID beneath the mouse should be retrieved as well.
+**Get window ID beneath the mouse**: the handle of the window under the mouse is stored in the variable of the next field.
+
+**Get control ID beneath the mouse**: the handle of the control under the mouse is stored in the variable of the next field. The handle is a number; it can be used with the actions for controls of a window.
+
+## Remarks
+
+The action reads the position only. It does not move the mouse.

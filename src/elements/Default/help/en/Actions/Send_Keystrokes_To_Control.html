@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Generated from src/elements/Default/help/en/Actions/Send_Keystrokes_To_Control.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Send keystrokes to a control</title>
+<title>Send keystrokes to control</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,38 +98,24 @@ img {
 </head>
 <body>
 <main>
-<h1>Send keystrokes to a control</h1>
-<p>The action <strong>Send keystrokes to a control</strong> sends simulated keystrokes and mouse clicks to a window.</p>
+<h1>Send keystrokes to control</h1>
+<p>The action <strong>Send keystrokes to control</strong> sends keys and text to one control of a window. The window does not need the keyboard focus, and the mouse is not moved.</p>
 <h2>Settings</h2>
 <h3>Keys or text to send</h3>
-<p>Specify the keys that will be sent.</p>
-<p>If <strong>Raw mode</strong> is selected, the entered string will be sent as is.</p>
-<p>If <strong>Raw mode</strong> is not selected, some keys can be declared as described in the section Remarks.</p>
-<h3>Control identification</h3>
-<p>You can choose a <strong>method for control identification</strong>:</p>
-<p>If <strong>Text in control</strong> is selected, a control will be identified by its text, which must contain the entered string.</p>
-<p>If <strong>Classname and instance number of the control</strong> is selected, the control will be identified by its unique classname and instance number. Usually this identifier is always the same in every instance of the window.</p>
-<p>If <strong>Unique control ID</strong> is selected, the control will be identified by it unique ID. This ID is different in every instance of the window. So, if a window is closed and opened again, the ID of the same control is different.</p>
-<p>Choose whether the <strong>control identification</strong> start with, contain anywhere oder be exactly the specified value.</p>
+<p>The keys and the text to send. The key names are those of <strong>Send keystrokes</strong> (the key list of AutoHotkey v2).</p>
+<p><strong>Raw mode</strong>: the text is sent as it is. The characters <code>^ + ! # { }</code> are then sent as text and not as keys.</p>
 <h3>Window identification</h3>
-<p><strong>Title of window</strong>: Name of the window title. It can be chosen whether the title starts, contains or ends with the specified string.</p>
-<p><strong>Exclude title</strong>: Windows whose titles include this value will not be considered.</p>
-<p><strong>Text of a control in window</strong>: If present, this parameter must be a substring from a single text element of the target window. It can be specified whether hidden text will be found</p>
-<p><strong>Exclude text of a control in window</strong>: Windows whose text include this value will not be considered</p>
-<p><strong>Window class</strong>: A window class is a set of attributes that the system uses as a template to create a window. In other words, the class name of the window identifies what type of window it is.</p>
-<p><strong>Process name</strong>: The name or path of the executable that created that window.</p>
-<p><strong>Unique window ID</strong>: Each window or control has a unique ID, also known as a HWND (short for handle to window). This ID can be used to identify the window or control even if its title changes.</p>
-<p><strong>Unique process ID</strong>: Use the unique process id to identify a window belonging to a specific process. Each process has its unique ID, even if it has the same executable.</p>
-<p><strong>Hidden window</strong>: If detect hidden window is selected, a window that exists but is not visible will be found.</p>
-<p><strong>Import window identification</strong>: Use a wizard to get parameters of a window.</p>
-<p>At least <strong>Title of window</strong>, <strong>Window class</strong>, <strong>Process name</strong>, <strong>Unique window ID</strong> or <strong>Unique process ID</strong> must be set.</p>
-<h2>Supplied Variables</h2>
-<h3><code>A_WindowID</code></h3>
-<p>The unique ID of the found window.</p>
-<h3><code>A_ControlID</code></h3>
-<p>The unique ID of the found control.</p>
+<p>The window that holds the control: its title (<strong>Title of window</strong> with <strong>Starts with</strong>, <strong>Contains anywhere</strong> or <strong>Exactly</strong>), its class, its process name, or its unique ID. <strong>Detect hidden window</strong> also finds hidden windows. The fields and their meaning are the same as in the other window actions. <strong>Import window identification</strong> takes the window under the mouse.</p>
+<h3>Method for control identification</h3>
+<p><strong>Text in control</strong>: the control whose text matches (<strong>Start with</strong>, <strong>Contain anywhere</strong> or <strong>Exactly</strong>).</p>
+<p><strong>Classname and instance number of the control</strong>: the class name of the control, with its number, for example <code>Edit1</code>.</p>
+<p><strong>Unique control ID</strong>: the handle of the control. The window fields are not needed then.</p>
+<p><strong>Import control and window identification</strong> (the control assistant) takes the window and the control under the mouse.</p>
+<h2>Supplied variables</h2>
+<h3><code>A_WindowID</code> and <code>A_ControlID</code></h3>
+<p>The unique IDs of the window and of the control, set when the action has found the control.</p>
 <h2>Remarks</h2>
-<p>The available keys are listed in the <a href="../../../../../../assets/help/en/Key_list.html">key list</a>.</p>
+<p>If the window or the control is not found, the action ends with an error and sends nothing.</p>
 </main>
 </body>
 </html>

@@ -99,15 +99,15 @@ img {
 <body>
 <main>
 <h1>Key is down</h1>
-<p>The condition <strong>Key is down</strong> checks whether a key is being held down.</p>
+<p>The condition <strong>Key is down</strong> is <strong>yes</strong> while the key is held down, otherwise <strong>no</strong>.</p>
 <h2>Settings</h2>
 <h3>Key name</h3>
-<p>Name of the key which will be checked.</p>
+<p>The name of the key, in the key names of AutoHotkey v2 (for example <code>a</code>, <code>Space</code>, <code>F6</code>, <code>LButton</code> for the left mouse button; the list is in the <a href="../../../../../../assets/help/en/Key_list.html">key list</a>).</p>
 <h3>Which key state</h3>
-<p>If <strong>Logical</strong> is selected, the result will be <strong>yes</strong> if the key is physically held down and if any other flow holds the key.</p>
-<p>If <strong>Physical</strong> is selected, the result will be <strong>yes</strong> only if the key is physically held down.</p>
+<p><strong>Logical</strong>: the state that the system and the active window see. It is the normal choice.</p>
+<p><strong>Physical</strong>: the state of the key on the keyboard. It differs from the logical state when a key is sent by a flow.</p>
 <h2>Remarks</h2>
-<p>The available keys are listed in the <a href="../../../../../../assets/help/en/Key_list.html">key list</a>.</p>
+<p>The condition reads the keys of the user. A key name that AutoHotkey does not know ends the flow with an error.</p>
 </main>
 </body>
 </html>

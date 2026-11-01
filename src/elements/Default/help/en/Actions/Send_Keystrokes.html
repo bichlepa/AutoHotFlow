@@ -99,20 +99,20 @@ img {
 <body>
 <main>
 <h1>Send keystrokes</h1>
-<p>The action <strong>Send keystrokes</strong> sends simulated keystrokes and mouse clicks to the active window.</p>
+<p>The action <strong>Send keystrokes</strong> sends keys and text to the active window, as if the user typed them.</p>
+<blockquote>
+<p><strong>Warning:</strong> The keys go to the window that has the keyboard focus, whatever flow or window the user works in. Check that the right window is active before the flow sends keys.</p>
+</blockquote>
 <h2>Settings</h2>
 <h3>Keys or text to send</h3>
-<p>Specify the keys that will be sent.</p>
-<p>If <strong>Raw mode</strong> is selected, the entered string will be sent as is.</p>
-<p>If <strong>Raw mode</strong> is not selected, some keys can be declared as described in the section Remarks.</p>
-<h3>Method</h3>
-<p>There are different methods to simulate keyboard events. If the sent keys are not recognized by the application using the default method, you may try to change it.</p>
-<p><strong>Input mode</strong> has best performance and is the recommended one in most cases.</p>
-<p><strong>Event mode</strong> has lower performance.</p>
-<p><strong>Play mode</strong> may require to disable the UAC to work. It may work better in games.</p>
-<p><strong>Input mode</strong> can only be used in one AutoHotFlow instance. If you run multiple AutoHotFlow instances simultanously, the second instance will not be able to use it. Also other applications and AutoHotkey scripts may block the input mode. If <strong>Input mode</strong> is blocked, it will automatically fall back to <strong>Event mode</strong>.</p>
+<p>The keys and the text to send. Special keys are written in braces, for example <code>{Enter}</code>, <code>{Tab}</code> or <code>{F5}</code>. The modifiers are <code>^</code> (Ctrl), <code>+</code> (Shift), <code>!</code> (Alt) and <code>#</code> (Win). The names are those of AutoHotkey v2, listed in the <a href="../../../../../../assets/help/en/Key_list.html">key list</a>.</p>
+<p><strong>Raw mode</strong>: the text is sent as it is. The characters <code>^ + ! # { }</code> are then sent as text and not as keys.</p>
+<h3>Send mode</h3>
+<p><strong>Input mode</strong>: the fastest and the most reliable method. It is the default.</p>
+<p><strong>Event mode</strong>: slower, but some applications accept only this method.</p>
+<p><strong>Play mode</strong>: can work in games and in applications that do not accept the other two.</p>
 <h2>Remarks</h2>
-<p>The available keys are listed in the <a href="../../../../../../assets/help/en/Key_list.html">key list</a>.</p>
+<p>Only the send mode is set for this action; the next action is not affected. The key names are those of AutoHotkey v2; the key names of the earlier AutoHotFlow version are not translated.</p>
 </main>
 </body>
 </html>

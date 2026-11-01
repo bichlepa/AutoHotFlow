@@ -1,33 +1,27 @@
 # Move mouse
 
-The action **Move mouse** simulates a mouse movement. The coordinates can be specified.
+The action **Move mouse** moves the mouse to the given coordinates. The mouse is moved on the desktop, whatever window is active.
 
 ## Settings
 
 ### Mouse position
 
-The mouse will be moved to the specified position.
+**Relative to screen**, **Relative to active window position**, **Relative to active window client position**: the reference point of the coordinates.
+
+**Relative to current mouse position**: the coordinates are an offset from the current position of the mouse.
+
+### Coordinates (x,y)
+
+The position. **Get coordinates** opens the mouse tracker: move the mouse to the place, and press OK.
 
 ### Method
 
-There are different methods to simulate mouse events. If the mouse movement is not recognized by the application using the default method, you may try to change it.
+**Input mode** is the fastest and the most reliable method. **Event mode** and **Play mode** obey the delay below.
 
-**Input mode** has best performance and is the recommended one in most cases. It does not allow to set mouse movement speed.
+### Speed
 
-**Event mode** has lower performance.
-
-**Play mode** may require to disable the UAC to work. It may work better in games. It does not allow to set mouse movement speed.
-
-**Input mode** can only be used in one AutoHotFlow instance. If you run multiple AutoHotFlow instances simultanously, the second instance will not be able to use it. Also other applications and AutoHotkey scripts may block the input mode. If **Input mode** is blocked, it will automatically fall back to **Event mode**.
-
-### Mouse movement speed
-
-The mouse movement speed can be changed here.
-
-If **Input mode** or **Play mode** is selected, the mouse will always move instantly.
+How fast the mouse moves: 0 moves it at once, 100 is the slowest. The speed has an effect in **Event mode** only.
 
 ### Delay in ms
 
-Specify the delay between each mouse action. It will be effective between every mouse click and between mouse movements.
-
-If **Input mode** is selected, the delay will always be 0 and this option will have no effect.
+The delay between the steps of the movement in **Event mode** and **Play mode**.

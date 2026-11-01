@@ -1,17 +1,13 @@
-# Block input
+# Block user input
 
-The action **Block input** disables or enables the user's ability to interact with the computer via keyboard and mouse.
+The action **Block user input** stops the keyboard and the mouse of the user from having any effect. The action **Unblock user input** lets them work again.
 
-> **Note:** This action might have no effect if UAC is enabled or AutoHotFlow has not been run as administrator.
+> **Warning:** While the input is blocked, the user cannot use the computer. Unblock it in a later step of the flow. AutoHotFlow also unblocks the input when its worker process ends normally. If the process is killed (for example after a hang), AutoHotFlow does not release the input; this is not checked yet.
 
 ## Settings
 
 ### New block state
 
-If **Block user input** is selected, the user input will be blocked.
+**Block user input**: the keyboard and the mouse of the user are blocked.
 
-If **Unblock user input** is selected, a previously enabled block will be removed.
-
-## Remarks
-
-When BlockInput is in effect, user input is blocked but AutoHotkey can simulate keystrokes and mouse clicks. However, pressing `Ctrl+Alt+Del` will re-enable input due to a Windows API feature.
+**Unblock user input**: the keyboard and the mouse of the user work again.

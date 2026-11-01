@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Actions/Get_mouse_position.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<!-- Generated from src/elements/Default/help/en/Actions/Get_Mouse_Position.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
 <title>Get mouse position</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
@@ -99,14 +99,16 @@ img {
 <body>
 <main>
 <h1>Get mouse position</h1>
-<p>The action <strong>Get mouse position</strong> retrieves the mouse position.</p>
-<p>It can also retrieve information about the window ID and control ID beneath the mouse.</p>
+<p>The action <strong>Get mouse position</strong> stores the position of the mouse in two variables. It can also store the window and the control under the mouse.</p>
 <h2>Settings</h2>
 <h3>Output variables</h3>
-<p>Names of the variables which will contain the result.</p>
-<p>You can choose the reference point of the coordinates.</p>
+<p><strong>Coordinates</strong>: the names of the variables for the x and the y coordinate.</p>
+<p><strong>Mouse position</strong>: the reference point of the coordinates: the screen, the active window (its position) or the client area of the active window.</p>
 <h3>Additional information</h3>
-<p>Choose whether the window ID and control ID beneath the mouse should be retrieved as well.</p>
+<p><strong>Get window ID beneath the mouse</strong>: the handle of the window under the mouse is stored in the variable of the next field.</p>
+<p><strong>Get control ID beneath the mouse</strong>: the handle of the control under the mouse is stored in the variable of the next field. The handle is a number; it can be used with the actions for controls of a window.</p>
+<h2>Remarks</h2>
+<p>The action reads the position only. It does not move the mouse.</p>
 </main>
 </body>
 </html>

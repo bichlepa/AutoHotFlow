@@ -1,51 +1,47 @@
 # Click
 
-The action **Click** simulates a click with any mouse button. The coordinates can be specified.
+The action **Click** clicks a mouse button, holds it down, releases it or turns the mouse wheel. It clicks at the current position of the mouse, or it moves the mouse to the given coordinates first.
 
 ## Settings
 
 ### Which button
 
-Specify the button to click.
+The button to click: left, right, middle, the wheel (up, down, left or right), or the fourth and fifth button (back and forward).
 
 ### Click count
 
-The number of times to click the mouse. To simulate a double click, set this value to 2.
+How often the button is clicked. For the wheel, the number of notches. **0** only moves the mouse (with **Move mouse before clicking**).
 
 ### Event
 
-If Click is selected, each click will consist of a "down" event followed by an "up" event.
+**Click (Down and up)**: the button is pressed and released.
 
-The mouse can be kept down or released by selection of one of the other options.
+**Hold down**: the button is pressed and stays down until a **Release only** action.
+
+**Release only**: the button is released.
 
 ### Mouse position
 
-If **Move mouse before clicking** is checked, the mouse will be moved to the specified position.
+**Move mouse before clicking**: the mouse is moved to the coordinates before the click.
 
-Since this field is an expression, it is possible to do some calculation here. Such as defining an offset after searching for an image using action Search image. For example: ImagePosX + 10.
+**Coordinates (x,y)**: the position. **Get coordinates** opens the mouse tracker: move the mouse to the place, and press OK.
 
-You can use the wizard to get the coordinates.
+**Relative to screen**, **Relative to active window position**, **Relative to active window client position**: the reference point of the coordinates.
+
+**Relative to current mouse position**: the coordinates are an offset from the current position of the mouse.
 
 ### Method
 
-There are different methods to simulate mouse events. If the mouse click is not recognized by the application using the default method, you may try to change it.
-
-**Input mode** has best performance and is the recommended one in most cases. It does not allow to set mouse movement speed.
-
-**Event mode** has lower performance.
-
-**Play mode** may require to disable the UAC to work. It may work better in games. It does not allow to set mouse movement speed.
-
-**Input mode** can only be used in one AutoHotFlow instance. If you run multiple AutoHotFlow instances simultanously, the second instance will not be able to use it. Also other applications and AutoHotkey scripts may block the input mode. If **Input mode** is blocked, it will automatically fall back to **Event mode**.
+**Input mode** is the fastest and the most reliable method. **Event mode** is slower and obeys the delay below. **Play mode** can work in games and in applications that do not accept the other two.
 
 ### Mouse movement speed
 
-If **Move mouse before clicking** is selected, the mouse movement speed can be changed here.
-
-If **Input mode** or **Play mode** is selected, the mouse will always move instantly.
+How fast the mouse moves to the coordinates before the click: 0 is the fastest, 100 the slowest. The speed is set for this click only, and it has an effect only in **Event mode**.
 
 ### Delay in ms
 
-Specify the delay between each mouse action. It will be effective between every mouse click and between mouse movements.
+The delay between the parts of the click in **Event mode** and **Play mode**.
 
-If **Input mode** is selected, the delay will always be 0 and this option will have no effect.
+## Remarks
+
+The click acts on the whole desktop: the window under the mouse receives it, whatever flow or window is active. Use **Move mouse** and **Click** only where the user expects it.
