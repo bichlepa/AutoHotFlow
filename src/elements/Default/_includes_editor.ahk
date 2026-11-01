@@ -23,6 +23,7 @@
 #Include lib\ProcessOps.ahk
 #Include lib\SoundOps.ahk
 #Include lib\FlowSwitchOps.ahk
+#Include lib\ElementParOps.ahk
 #Include lib\TimeOps.ahk
 #Include lib\DebugOps.ahk
 #Include lib\LoopOps.ahk
@@ -105,6 +106,7 @@ class Default {
     #Include Actions\Action_Send_Keystrokes_To_Control.ahk
     #Include Actions\Action_Set_Clipboard.ahk
     #Include Actions\Action_Set_control_text.ahk
+    #Include Actions\Action_Set_element_parameter.ahk
     #Include Actions\Action_Set_file_attributes.ahk
     #Include Actions\Action_Set_file_time.ahk
     #Include Actions\Action_Set_Flow_Status.ahk
@@ -239,6 +241,7 @@ ElementRegistry.Register(Default.Action_Send_Keystrokes)
 ElementRegistry.Register(Default.Action_Send_Keystrokes_To_Control)
 ElementRegistry.Register(Default.Action_Set_Clipboard)
 ElementRegistry.Register(Default.Action_Set_control_text)
+ElementRegistry.Register(Default.Action_Set_element_parameter)
 ElementRegistry.Register(Default.Action_Set_file_attributes)
 ElementRegistry.Register(Default.Action_Set_file_time)
 ElementRegistry.Register(Default.Action_Set_Flow_Status)

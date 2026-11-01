@@ -77,6 +77,50 @@ class EditorElementCtx {
         return ""
     }
 
+    ; The elements of a flow (WI-0129): an Array of Maps "elementId", "name" and "class" (the qualified class ID, a missing
+    ; package is Default), sorted by ID. Empty while the list of another flow is not known.
+    Elements(flowId) {
+        out := []
+        if (flowId = "")
+            return out
+        if (flowId = this.flowId)
+            return this._OwnElements()
+        list := this.catalog.Elements(flowId)
+        return (list is Array) ? list : out
+    }
+
+    ; The name of an element of a flow, "" when it is not known.
+    ElementName(flowId, elementId) {
+        for el in this.Elements(flowId) {
+            if (el["elementId"] = elementId)
+                return el["name"]
+        }
+        return ""
+    }
+
+    ; The elements of the draft (the own flow), sorted by ID.
+    _OwnElements() {
+        out := []
+        root := this.model.draft.root
+        if (!(root is Map) || !(root.Get("allElements", "") is Map))
+            return out
+        for id, el in root["allElements"] {
+            if (!(el is Map))
+                continue
+            qid := ElementRegistry.QualifiedId(SceneBuilder.TextOf(el, "package"), SceneBuilder.TextOf(el, "class"))
+            entry := Map("elementId", id, "name", SceneBuilder.TextOf(el, "name"), "class", qid)
+            at := out.Length + 1                    ; insert in ID order (Array has no Sort in AHK v2)
+            loop out.Length {
+                if (StrCompare(out[A_Index]["elementId"], id) > 0) {
+                    at := A_Index
+                    break
+                }
+            }
+            out.InsertAt(at, entry)
+        }
+        return out
+    }
+
     _OwnName(fallback) {
         name := this.model.name
         return (name = "") ? fallback : name

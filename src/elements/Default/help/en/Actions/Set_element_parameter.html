@@ -99,18 +99,25 @@ img {
 <body>
 <main>
 <h1>Set element parameter</h1>
-<p>The action <strong>Set element parameter</strong> changes a parameter of an element</p>
+<p>The action <strong>Set element parameter</strong> changes one parameter of an element while the flow runs. The element can belong to the flow of this action or to another flow.</p>
 <h2>Settings</h2>
 <h3>Which flow</h3>
-<p>Choose a flow.</p>
-<h3>Which trigger</h3>
-<p>Choose an element.</p>
+<p>Tick <strong>This flow</strong> to change an element of the flow that contains this action. Untick it to choose another flow.</p>
+<h3>Which element</h3>
+<p>Choose the element whose parameter should change. Every element of the flow is listed with its ID and its name.</p>
 <h3>Which parameter</h3>
-<p>Choose an element parameter.</p>
+<p>Choose the parameter of that element. The list shows the parameters of the element's class.</p>
 <h3>New value</h3>
-<p>Definde the new value. After selection of a parameter, one of the controls will be enabled where the new value can be set.</p>
+<p>After the parameter is chosen, the one control of the new value that fits the parameter is enabled. The value is evaluated the same way as the value of any other parameter, and then stored.</p>
 <h2>Remarks</h2>
-<p>If a parameter of a trigger is changed, the trigger will be disabled and reenabled. This will activate the new parameter.</p>
+<ul>
+<li>The change is an edit of the flow. It is saved automatically, and an open editor of that flow shows it.</li>
+<li>The new value takes effect the next time the changed element starts. An instance that is running keeps the value it started with.</li>
+<li>If a trigger is changed, it is armed again with the new parameter, as far as it was enabled.</li>
+<li>If the element has its standard name, its name is generated again.</li>
+<li>The action ends with an exception when the flow, the element or the parameter does not exist.</li>
+<li>Differences from AutoHotFlow v1 are listed in <code>doc/MIGRATION.md</code> (M-0160 to M-0162).</li>
+</ul>
 </main>
 </body>
 </html>

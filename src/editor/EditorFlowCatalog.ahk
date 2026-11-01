@@ -17,11 +17,15 @@ class EditorFlowCatalog {
         this.loaded := false        ; true once an answer of cmd.engine.snapshot was kept (until Drop)
         this.triggerLists := Map()      ; flowId -> Array of Map("elementId", "name", "manual"), kept until Drop
         this.inFlight := Map()      ; flowId -> true while cmd.flow.triggers of the flow is on its way
+        this.elementLists := Map()  ; flowId -> Array of Map("elementId", "name", "class"), kept until the next Refresh (WI-0129)
+        this.elementInFlight := Map()   ; flowId -> true while cmd.flow.elements of the flow is on its way
         this.onChange := ""         ; fn(): called after an answer was kept
     }
 
-    ; Asks the engine for the flow list. The answer is kept and onChange is called.
+    ; Asks the engine for the flow list. The answer is kept and onChange is called. The element lists of the other flows are
+    ; forgotten: they are asked again when they are needed (the settings window opens, WI-0129).
     Refresh() {
+        this.elementLists := Map()
         try {
             this.peer.Request("engine", "cmd.engine.snapshot", Map(), (ans) => this._Snapshot(ans)
                 , EditorFlowCatalog.COMMAND_MS)
@@ -53,6 +57,39 @@ class EditorFlowCatalog {
             this.inFlight.Delete(flowId)
         }
         return ""
+    }
+
+    ; The elements of another flow (WI-0129): the kept list, or "" while it is not known (then the engine is asked, and
+    ; onChange follows the answer). The own flow is not asked for (EditorElementCtx reads its draft).
+    Elements(flowId) {
+        if (this.elementLists.Has(flowId))
+            return this.elementLists[flowId]
+        if (this.elementInFlight.Has(flowId))
+            return ""
+        this.elementInFlight[flowId] := true
+        try {
+            this.peer.Request("engine", "cmd.flow.elements", Map("flowId", flowId)
+                , (ans) => this._Elements(flowId, ans), EditorFlowCatalog.COMMAND_MS)
+        } catch {
+            this.elementInFlight.Delete(flowId)
+        }
+        return ""
+    }
+
+    _Elements(flowId, ans) {
+        this.elementInFlight.Delete(flowId)
+        p := ans.payload
+        if (!p.Get("ok", 0) || !(p.Get("elements", "") is Array))
+            return
+        list := []
+        for el in p["elements"] {
+            if (!(el is Map))
+                continue
+            list.Push(Map("elementId", EditorFlowCatalog._Text(el.Get("elementId", "")), "name", EditorFlowCatalog._Text(el.Get("name", ""))
+                , "class", EditorFlowCatalog._Text(el.Get("class", ""))))
+        }
+        this.elementLists[flowId] := list
+        this._Changed()
     }
 
     _Snapshot(ans) {
