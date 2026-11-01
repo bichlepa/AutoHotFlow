@@ -146,6 +146,7 @@ TEST_GROUPS = {
     "integration/test_archive_elements.py": ["elements-e2e"],
     "integration/test_drive_elements.py": ["elements-e2e"],
     "integration/test_internet_elements.py": ["elements-e2e"],
+    "integration/test_script_elements.py": ["elements-e2e", "triggers"],
     "integration/test_path_guards.py": ["elements-e2e"],
     "integration/test_core_d_flows.py": ["engine"],
     "integration/test_core_e_dialogs.py": ["ui", "elements-e2e"],
@@ -923,6 +924,10 @@ COVERS = {
     "src/elements/Default/Actions/Action_Download_File.ahk": ["integration/test_internet_elements.py"],
     "src/elements/Default/Actions/Action_HTTP_Request.ahk": ["integration/test_internet_elements.py"],
     "src/elements/Default/lib/HttpOps.ahk": ["integration/test_internet_elements.py"],
+    # WI-0130: the AutoHotkey script action (worker) and trigger, and the process host they share (stdin, stdout, job object)
+    "src/elements/Default/Actions/Action_AutoHotkey_script.ahk": ["integration/test_script_elements.py"],
+    "src/elements/Default/Triggers/Trigger_AutoHotkey_Script.ahk": ["integration/test_script_elements.py"],
+    "src/elements/Default/lib/ScriptHost.ahk": ["integration/test_script_elements.py"],
 }
 
 # Test functions whose group differs from the group of their file (`file::function`). The generic loop logic
@@ -957,7 +962,7 @@ SOURCE_AREAS = [
     ("diagnosis", ["src/supervisor/DiagLog.ahk", "src/supervisor/DiagReport.ahk", "src/supervisor/ReportText.ahk",
                    "src/core/Snapshot.ahk", "src/core/ProcInfo.ahk", "src/core/Debug.ahk", "src/debugview/*",
                    "src/entry/debug.ahk"]),
-    ("supervisor", ["src/supervisor/*"]),
+    ("supervisor", ["src/supervisor/*", "src/core/ChildLauncher.ahk", "src/core/ChildPipe.ahk"]),   # WI-0130: moved here, used by the script host too
     ("workers", ["src/worker/*", "src/entry/worker.ahk", "src/engine/WorkerBridge.ahk"]),
     ("variables", ["src/engine/vars/*", "src/engine/VarRequests.ahk", "src/engine/ImportV1Vars.ahk"]),
     ("expr", ["src/expr/*", "src/engine/core/FlowExprConvert.ahk"]),

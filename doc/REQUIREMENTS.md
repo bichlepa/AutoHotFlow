@@ -719,17 +719,18 @@ Every element has a help page that says what it does and what its parameters mea
 ### REQ-ELM-110 AutoHotkey scripts in flows
 
 - **v1:** yes (AutoHotkey v1 code in a new AutoHotkey_H thread)
-- **v2:** open
+- **v2:** partial (the code runs, the exchange of variables, the errors and the stop work; the marking of imported v1 scripts is not built yet)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0008
+- **Evidence:** `tests/integration/test_script_elements.py`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_AutoHotkey_script` | yes | open | S0008 |
-| `Trigger_AutoHotkey_Script` | yes | open | S0008 |
+| `Action_AutoHotkey_script` | yes | partial | S0008 |
+| `Trigger_AutoHotkey_Script` | yes | partial | S0008 |
 
-The action and the trigger run AutoHotkey v2 code, separately from the flows (E0039). An imported v1 script is kept as text and marked; it does not run until it is ported, by hand or with the help of an AI (REQ-AI-040, MIGRATION M-0049).
+The action and the trigger run AutoHotkey v2 code, separately from the flows (E0039). An imported v1 script is kept as text and marked; it does not run until it is ported, by hand or with the help of an AI (REQ-AI-040, MIGRATION M-0049). Not built yet: the mark of an imported v1 script (M-0049 says it ends with an exception until it is ported); a v1 script that is not valid v2 code ends with an exception from the interpreter.
 
 The variables are exchanged as in v1 (E0104): the variables the user names for import are global variables of the script when it starts; the variables named for export are read when the script ends (the action) or when the script calls `x_trigger()` (the trigger), and set in the flow. Texts, numbers, lists and objects can be exchanged. Stopping the flow ends the script.
 

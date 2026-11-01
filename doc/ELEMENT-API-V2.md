@@ -54,9 +54,10 @@ class Action_Example extends AhfElement {
     static Enable(ctx, params)  ; arm. Return: optional message. throw on error.
     static Disable(ctx)         ; disarm
     static TriggerVariables(params, data) => Map()   ; pure function, runs in the engine
+    static ImportNames(params) => []                 ; optional (base class: []): the variables the engine reads at the arming and gives to the trigger as ctx.imports (WI-0130)
 ```
 
-`TriggerVariables` replaces `Element_postTrigger_*`: it returns the thread variables (name → value) that are set after the event, and it must not have side effects (it runs in the engine, no I/O). The engine calls it at **every start** of an instance of the trigger (WI-0062, M-0069): at an event of the trigger host with the evaluated parameters of the arming and the data of the event (a Map, see PROTOCOL 4.4); at `cmd.flow.start` and at `ctx.CallFlow` with the parameters evaluated at that start and `data` empty (`""`). Names of thread variables carry the prefix `A_`. An error is logged (`f0`) and the instance starts without them; a class without the method sets nothing.
+`TriggerVariables` replaces `Element_postTrigger_*`: it returns the variables (name → value) that are set after the event: a name with the prefix `A_` is a thread variable, any other name an instance variable (WI-0130, v1 `x_ImportInstanceVars`), and it must not have side effects (it runs in the engine, no I/O). The engine calls it at **every start** of an instance of the trigger (WI-0062, M-0069): at an event of the trigger host with the evaluated parameters of the arming and the data of the event (a Map, see PROTOCOL 4.4); at `cmd.flow.start` and at `ctx.CallFlow` with the parameters evaluated at that start and `data` empty (`""`). Names of thread variables carry the prefix `A_`. An error is logged (`f0`) and the instance starts without them; a class without the method sets nothing.
 
 **Worker elements and blocking (WI-0027, ARCHITECTURE 6.4):** A worker element may block for any length of time within a single call (download, COM, `DllCall`, dialog). A worker with a job is never pinged and never ended as hanging. Two consequences: an abort (stop of the instance) does not reach an element that is blocked in a single call. After 2 s without an acknowledgement, the engine has the whole process terminated (only one job runs per worker, so nothing else is lost); `Stop(ctx, params)` of the element then no longer runs, so cleanup in the element is not possible there. And: without `JobTimeoutMs` the job has no deadline (v1 had none). If a class sets `JobTimeoutMs` > 0, the thread ends after this time with the result `exception` and the message "worker timeout", and the element is terminated as on an abort. The deadline is a class value, not a parameter; a flow parameter (e.g. "Timeout" for a download) remains the responsibility of the element.
 
@@ -147,7 +148,7 @@ The checks of the form model (warnings, as in v1; they run after every change): 
 | `ctx.Log(level, text)` | `x_log` | levels `f0` to `f3` |
 | `ctx.GetImport(name, default := "")`, `ctx.Export(name, value)` | `p_VarsToImport`, `p_VarsToExport` of `x_ExecuteInNewAHKThread` | worker only: an explicit import list (empty from the engine since WI-0050, for `ctx.RunScript`, S0008) and values that the engine sets where their name says when the job ends (texts and numbers) |
 | `ctx.Request(type, payload, callback, timeoutMs := 5000)` | – (new) | A `cmd.*` request to the engine with callback, `execId` added to the payload (WI-0050). Returns at once; `callback(answerPayload)` runs later on a thread of its own (it may call the variable functions), not at all when the element has ended or was stopped. An exception in the callback ends the element with `exception`. Workers only (triggers: when a trigger needs it); inline it throws. |
-| `ctx.RunScript(code, imports, exports)` | `x_ExecuteInNewAHKThread` | for AHK code elements. Always runs as a worker. |
+| `ctx.RunScript(code, imports, exports)` | `x_ExecuteInNewAHKThread` | not built as a context member (WI-0130): the AHK script elements use the library `src/elements/Default/lib/ScriptHost.ahk` (`ScriptHost.Start`, `ParseLine`, `Stop`), which needs no context. The imports are read with `ctx.GetVar`, the exports set with `ctx.SetVar` (worker), or passed in the arm (`ctx.imports`, trigger). |
 | `Lang(key, args*)` | `x_lang` | global function, language files unchanged |
 | `form.Disable(id, cond := true)`, `form.Enable(id, cond := true)` | `x_Par_Disable`/`x_Par_Enable` | enable or disable the field of `id` (a label id too). Also used by the window, not only in `CheckSettings` |
 | `form.SetValue(id, v)`, `form.GetValue(id)` | `x_Par_SetValue`, `x_Par_GetValue` | the value of a parameter (or of a content ID, section 2.1). `SetValue` runs `CheckSettings` again unless a check is running (then it only sets the value). The content type of an edit field is `form.GetValue(contentID)` |
@@ -259,6 +260,7 @@ Static and global variables change the permanent store through the variable mode
 | `ctx.After(ms, fn)` | one-shot timer, cancelled at the disarm. Returns 0 when the trigger is not armed. A repeating trigger calls `After` again in its callback |
 | `ctx.Guard(fn)` | a function object that calls `fn` with the arguments it gets, under try/catch. For callbacks that the OS calls (hotkeys) |
 | `ctx.IsOpen` | false once the trigger is disarmed |
+| `ctx.imports` | a Map name → value: the variables that the class names with `ImportNames(params)` (WI-0130, PROTOCOL 4.4), read by the engine at the arming; `Map()` if none |
 
 Errors (ARCHITECTURE 6.2, REQ-TRG-010):
 

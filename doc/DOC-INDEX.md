@@ -31,7 +31,7 @@ L411-422 9. Performance budgets (targets, measured in Phase 2)
 L424-434 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (186.1 KB, 785 lines)
+## doc/PROTOCOL.md (186.5 KB, 785 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
@@ -76,25 +76,25 @@ L329-347 9b. System action tests (E0103, WI-0117)
 L349-369 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (65.8 KB, 543 lines)
+## doc/ELEMENT-API-V2.md (66.5 KB, 545 lines)
 ```text
 L8-18 1. Guidelines
-L20-112 2. Class contract
-L91-112   2.1 Parameter fields of the settings form (WI-0105)
-L114-289 3. Context `ctx`
-L163-180   3.1 Parameter evaluation (WI-0042)
-L182-192   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
-L194-200   3.3 Dialogs (E0038, WI-0051)
-L202-228   3.3a System actions (E0103, WI-0117)
-L230-245   3.4 Debug view (WI-0056, REQ-DBG-060)
-L247-268   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
-L270-289   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
-L291-373 4. Example 1: `Action_Sleep` (inline, with timer)
-L375-468 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L470-510 6. Mechanical conversion rules
-L512-533 7. What stays
-L519-533   7.1 Loop elements (WI-0054)
-L535-543 8. Still to be clarified (Phase 3)
+L20-113 2. Class contract
+L92-113   2.1 Parameter fields of the settings form (WI-0105)
+L115-291 3. Context `ctx`
+L164-181   3.1 Parameter evaluation (WI-0042)
+L183-193   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
+L195-201   3.3 Dialogs (E0038, WI-0051)
+L203-229   3.3a System actions (E0103, WI-0117)
+L231-246   3.4 Debug view (WI-0056, REQ-DBG-060)
+L248-270   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+L272-291   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
+L293-375 4. Example 1: `Action_Sleep` (inline, with timer)
+L377-470 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L472-512 6. Mechanical conversion rules
+L514-535 7. What stays
+L521-535   7.1 Loop elements (WI-0054)
+L537-545 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
@@ -282,7 +282,7 @@ L145-150 Copy on write: clone a shared map before its first write, and remember 
 L152-158 A field and a method with the same name clash (case-insensitive names) (verified)
 ```
 
-## doc/howto/processes-pipes-messages.md (52.2 KB, 461 lines)
+## doc/howto/processes-pipes-messages.md (54.3 KB, 479 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L13-17 `PostMessageW` with a NULL handle reports success (verified)
@@ -337,6 +337,7 @@ L431-437 Assigning A_Clipboard throws while another program holds the clipboard 
 L439-445 tar.exe writes its output in the ANSI code page (verified) (verified)
 L447-453 tar.exe reads and writes archives only, not a single compressed file (verified) (verified)
 L455-461 ProcessWaitClose with a deadline: 0 when the process ended, its PID when the deadline passed (verified) (verified)
+L463-479 A script on stdin of an AutoHotkey child: no byte order mark, the job object, the stdin pipe (WI-0130) (verified)
 ```
 
 ## doc/howto/syntax-and-language.md (62.1 KB, 626 lines)

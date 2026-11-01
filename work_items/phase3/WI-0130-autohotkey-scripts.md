@@ -35,3 +35,17 @@ Those of every element package (README S0008); `ctx.RunScript` is documented in 
 ## Not part of this
 
 Running v1 code (E0039); porting the user's v1 scripts automatically (REQ-AI-040, later); the compiled program (S0009).
+
+## Result (agent, 2026-11-01)
+
+**Built (verified by test run, see below):** the action and the trigger run AHK v2 code in an `AutoHotkey64.exe *` process; imports as globals (texts, numbers, lists, objects as literals); exports as JSON lines, set with `ctx.SetVar` (action) or as variables of the instance (trigger, through `TriggerVariables`); `result`/`resultmessage` as in v1; runtime and load errors as exceptions with the user's line numbers; Stop and disarm end the process; a process that ends by itself is reported as `evt.trigger.error`. The stdin pipe and the job object are in `src/core/ChildLauncher.ahk` (moved from supervisor, which the trigger host and the worker may use).
+
+**Deviations and decisions:**
+- `ctx.RunScript` is not a context member; the library `lib/ScriptHost.ahk` is used directly (ELEMENT-API 3 says so). Decision made by me; alternative was a context member.
+- Trigger imports: a class names its import variables with `ImportNames(params)` (default `[]` in AhfElement); the engine reads them at the arming and sends `imports` in `cmd.trigger.arm` (PROTOCOL 4.4). Decision made by me.
+- Trigger export names that do not start with `A_` are instance variables (v1 `x_ImportInstanceVars`); the engine applied them as thread variables before, where the flow could not see them. Engine change in `Executor._SetTriggerVars`; PROTOCOL 4.5 wording updated.
+- Script error texts ("Variable name ... is not valid") are English, not in `Lang()`: decision needed (owner).
+
+**Not done:** the mark of imported v1 scripts (M-0049, the "port it to v2" exception) - OPEN-ITEMS F-9000*; the cancel during a running action and the job-object kill when the worker dies are not tested (HOW-TO marked not checked); corpus flow "external script test" not moved from PENDING; line numbers of load (syntax) errors are not corrected for the prologue (not checked).
+
+**Files:** `src/elements/Default/{Actions/Action_AutoHotkey_script.ahk,Triggers/Trigger_AutoHotkey_Script.ahk,lib/ScriptHost.ahk}`, `src/core/ChildLauncher.ahk` (moved and extended), `src/engine/{Executor,TriggerArms}.ahk`, `src/triggerhost/{TriggerContext,TriggerHost}.ahk`, `src/elements/base/AhfElement.ahk`, help pages, en/de language keys, `tests/integration/test_script_elements.py`, `tests/support/group_table.py`, `tools/arch_check.py` (exception for the prologue text), docs (REQUIREMENTS REQ-ELM-110 partial, MIGRATION M-0153/M-0154, PROTOCOL 4.4/4.5, ELEMENT-API-V2, HOW-TO, OPEN-ITEMS F-9000*).

@@ -459,3 +459,21 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `Run(cmd, , "Hide", &pid)` and `if (ProcessWaitClose(pid, seconds))` (a PID comes back at the deadline). Then `taskkill /T /F /PID pid` ends the process tree. The answer of the command goes into a file ("ok" or "fail"), because `Run` gives no exit code.
 - **Status:** verified (the normal runs return 0; the deadline path is not run by a test)
 - **Source:** src/elements/Default/lib/TarOps.ahk (WI-0122)
+
+### A script on stdin of an AutoHotkey child: no byte order mark, the job object, the stdin pipe (WI-0130)
+
+- **Problem:** The script of an AutoHotkey script element is written to the stdin of a new `AutoHotkey64.exe *`. With a UTF-8 byte order mark in front, the interpreter takes it for text: line 1 (`#Requires AutoHotkey v2.0`) fails with "does not contain a recognized action".
+- **Wrong:** `Buffer` with `EF BB BF` followed by the UTF-8 text.
+- **Right:** the UTF-8 text without a byte order mark (`ScriptHost._Input`). The stdin pipe is created with the size of the input plus 4 KB and the input is written before the caller returns; `ChildLauncher.StartWithInput` refuses an input above `INPUT_MAX` (256 KB).
+- **Status:** verified (`tests/integration/test_script_elements.py`: the script runs, its exports arrive, a syntax error is an exception)
+- **Source:** src/core/ChildLauncher.ahk (`StartWithInput`), src/elements/Default/lib/ScriptHost.ahk (`_Input`), WI-0130
+
+- **Problem:** A script process must not outlive AHF or the worker that started it.
+- **Right:** `CreateProcessW` with `CREATE_SUSPENDED`, `AssignProcessToJobObject` on the job created with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE` (`SetInformationJobObject`, class 9, `LimitFlags` at offset 16 of the 144-byte structure), then `ResumeThread`. The host closes the job handle to end the tree; `TerminateProcess` is the normal stop.
+- **Status:** not checked (the stop by TerminateProcess is in the tests; the kill when the owner of the job dies is not tested yet)
+- **Source:** src/core/ChildLauncher.ahk (`StartWithInput`), WI-0130
+
+- **Problem:** A wait loop of the worker that reads a child's output must keep the cancel working and must not block on a full pipe.
+- **Right:** `Sleep(50)` in the loop (AHK runs the cancel message during Sleep, `WaitForSingleObject` does not pump), and the stdout is read in every round as well, so a script that writes much is never blocked by the pipe.
+- **Status:** verified (the test runs of the action; the cancel during the wait is not tested yet)
+- **Source:** src/elements/Default/Actions/Action_AutoHotkey_script.ahk (WI-0130)
