@@ -165,6 +165,7 @@ TEST_GROUPS = {
     "integration/test_flow_lifecycle.py": ["storage"],
     "integration/test_flow_lifecycle_engine.py": ["engine"],
     "integration/test_flow_status_elements.py": ["elements-e2e", "triggers"],
+    "integration/test_set_element_parameter.py": ["elements-e2e", "triggers", "engine"],   # WI-0129: an edit by an element
     "integration/test_flowrun.py": ["engine"],
     "integration/test_flow_autosave.py": ["engine"],
     "integration/test_hotkey_arming.py": ["triggers"],
@@ -562,6 +563,14 @@ COVERS = {
     ],
     "src/elements/Default/lib/DialogOps.ahk": [
         "integration/test_core_e_dialogs.py",
+    ],
+    "src/elements/Default/Actions/Action_Set_element_parameter.ahk": [
+        "e2e/test_editor_flow_ctx.py::test_set_element_parameter_lists_the_elements_and_the_parameters_of_another_flow",
+        "integration/test_set_element_parameter.py",
+    ],
+    "src/elements/Default/lib/ElementParOps.ahk": [
+        "e2e/test_editor_flow_ctx.py::test_set_element_parameter_lists_the_elements_and_the_parameters_of_another_flow",
+        "integration/test_set_element_parameter.py",
     ],
     "src/elements/Default/lib/FlowChoices.ahk": [
         "e2e/test_editor_flow_ctx.py",

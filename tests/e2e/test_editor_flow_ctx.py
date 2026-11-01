@@ -46,6 +46,12 @@ CASES = {
                 [OTHER_MANUAL, OTHER_START], []),
 }
 
+# WI-0129: the element and parameter lists of Action_Set_element_parameter (not in CASES: its name shows the flow ID, as v1)
+SET_PARAMETER = ("Action_Set_element_parameter", "action",
+                 {"ThisFlow": 0, "flowID": OTHER, "elementID": OTHER_MANUAL, "parameterID": "newParameterValueEdit/ID"},
+                 [], [])
+ALL_CASES = dict(CASES, set_parameter=SET_PARAMETER)
+
 
 def write_other_flow(datadir):
     """The flow "other": a default manual trigger, a second manual trigger and a start-up trigger, nothing else."""
@@ -69,7 +75,7 @@ def write_other_flow(datadir):
 
 def prepare_class(kind, datadir):
     """The skeleton with the action ACTION of the class under test, and the flow "other"."""
-    cls, package_type, stored, _, _ = CASES[kind]
+    cls, package_type, stored, _, _ = ALL_CASES[kind]
     data = json.loads(SKELETON_SRC.read_text(encoding="utf-8"))
     data["allElements"][ACTION] = {"class": cls, "package": "Default", "packageVersion": "1.2.0", "ID": ACTION,
                                    "name": "The element", "type": package_type, "pars": dict(stored),
@@ -119,6 +125,22 @@ def test_the_settings_list_the_flows_and_the_triggers_of_another_flow_with_their
             assert "%s: Start the other" % OTHER_MANUAL in trigger_field["choices"], trigger_field
         # the standard name carries the name of the other flow (v1 showed the name, not the ID)
         assert OTHER_NAME in form_state(obs)["name"], form_state(obs)
+    finally:
+        finish(sup, obs)
+
+
+def test_set_element_parameter_lists_the_elements_and_the_parameters_of_another_flow(procs, datadir, session_id):
+    """WI-0129: the element list of the other flow comes from the engine (cmd.flow.elements); the parameter list is the one of
+    the class of the chosen element (here the manual trigger of the other flow: its ID parameter)."""
+    sup, obs = start_manager(procs, datadir, session_id, prepare=lambda d: prepare_class("set_parameter", d))
+    try:
+        op(obs, "select", flowId=FLOW)
+        open_editor(obs)
+        assert form(obs, "open", id=ACTION)["ok"]
+        wait_choices(obs, "elementID", [OTHER_MANUAL, OTHER_SECOND, OTHER_START])
+        assert "%s: Start the other" % OTHER_MANUAL in field_of(obs, "elementID")["choices"], field_of(obs, "elementID")
+        wait_choices(obs, "parameterID", ["newParameterValueEdit/ID"])
+        assert "ID - ID" in field_of(obs, "parameterID")["choices"], field_of(obs, "parameterID")
     finally:
         finish(sup, obs)
 
