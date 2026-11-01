@@ -62,6 +62,10 @@ class Trigger_User_Idle_Time extends AhfElement {
         return ""
     }
 
+    ; The timers are cancelled with the context (CancelTimers); nothing else to release.
+    static Disable(ctx) {
+    }
+
     ; The thread variables: none (v1 Element_postTrigger_Trigger_User_Idle_Time sets nothing).
     static TriggerVariables(params, data) => Map()
 
