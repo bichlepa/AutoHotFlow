@@ -57,7 +57,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0123 | Programs and processes, clipboard, power and session | done | haiku | see git log (up to 4c164df5) | 2026-10-22 | 12 classes, M-0120 to M-0123, REQ-ELM-290/400 done, REQ-ELM-390 partial; owner: Kill_Process has no guard for AHF's own processes, ActsOnSystem on all 12 incl. readers, real power/clipboard behaviour is the owner's manual check; priority test misses BelowNormal |
 | WI-0124 | Sound and speech | done | haiku | see git log (up to 5a9b1a93) | 2026-10-23 | 6 classes, seam extended (SoundStop, SpeechWait, SpeakText, SpeechVoices), M-0130 to M-0135, REQ-ELM-380 partial, F-0189, F-0190; owner: async sound lives in the starting worker only (M-0131), unbounded waits (F-0190), SAPI and real sound unchecked (manual), Preview buttons and OS-language voice dropped |
 | WI-0125 | Windows and controls | done | haiku | see git log (up to 638f2349) | 2026-10-23 | 10 classes, M-0136 to M-0140, REQ-ELM-360 done, corpus file test green; owner: Activate waits 2 s then continues without error (M-0136), control text uses ControlTextMatchMode (M-0137, old flows may match differently), unknown close method closes, Close/Kill do not wait for the window to go, corpus copy deletes permanently; real desktop (minimize all, DPI, assistant pick, focus) is the owner's manual check |
-| WI-0126 | Mouse and keyboard | open | | | |  |
+| WI-0126 | Mouse and keyboard | done | haiku | see git log (up to fb344433) | 2026-11-01 | 9 classes, M-0153 to M-0157, REQ-ELM-370, F-0192; review approved; open: gui tests of real clicks/keys unwritten, corpus Hotkey test flow stays PENDING (owner: real keys with unassigned copy, or Ctrl+F7 part gui); Block/Unblock in different pool workers leaves the block (add to F-0192); Click speed only in Event mode; M-0154 rounding untested |
 | WI-0127 | Screen and images | open | | | |  |
 | WI-0128 | Input box, file and folder selection | open | | | |  |
 | WI-0129 | `Action_Set_element_parameter` | open | | | | after WI-0107 |
@@ -74,7 +74,7 @@ None.
 
 ## Running agents
 
-None.
+- WI-0130 (haiku, workspace wi0130, implementer), report pending.
 
 ## Last verified state
 
