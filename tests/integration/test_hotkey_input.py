@@ -1,4 +1,6 @@
 """WI-0064: Trigger_Hotkey with real input (E0059) in a real session (storage, engine, triggerhost; ELEMENT-API-V2 5).
+WI-0131: Trigger_Hotstring with real typing at the end of this file (the hotstring tests type letters into an own window
+without controls, which must be in front; the replacement goes to the test provider of SystemOps).
 
 The keys are unassigned virtual keys (vk88 to vk8F, vkE8) without modifiers, sent with SendInput. Every input test holds the
 machine-wide input lock (tests/support/inputlock.py), so two runs never send keys at the same time. A test is skipped
@@ -8,6 +10,7 @@ holds a modifier, and skips when it stays held.
 The gui tier (marker gui, run by the project owner only, never by an agent) sends key combinations with modifiers.
 """
 
+import ctypes
 import subprocess
 import sys
 import time
@@ -18,6 +21,7 @@ import pytest
 from support import inputlock
 from support.flowbuilder import FlowBuilder
 from support.flowrun import FlowRunner
+from support.system import SystemScript
 from support.timing import scaled
 from support.triggerwait import trigger_state, wait_armed
 
@@ -317,3 +321,101 @@ def test_a_real_key_a_user_may_press_fires(input_session):
     input_session.enable(fid)
     assert wait_armed(input_session, fid, trigger.id), input_session.stderr_text()
     expect_fires(input_session, fid, vk)
+
+
+# --- Trigger_Hotstring (WI-0131, REQ-TRG-230): letters typed into an own window without controls ----------------------
+# A letter key (its virtual key is the upper-case ASCII code) types a letter that does nothing in that window; the
+# hotstring recognizer sees it. The replacement of a hotstring goes to the test provider (SystemOps.Send, recorded).
+
+HOTSTRING = "zqxw"          # no word and no key of the other input tests
+SPACE_VK = 0x20
+
+
+@pytest.fixture
+def active_window(tmp_path):
+    """An own window without controls, activated; the test is skipped when it does not come to the front."""
+    title = "AhfHotstringTestWindow-%d" % time.time_ns()
+    ready, stop = tmp_path / "active_ready.txt", tmp_path / "active_stop.txt"
+    proc = subprocess.Popen([sys.executable, str(AHKRUN), "--timeout", "120",
+                             str(HELPERS / "active_window.ahk"), title, str(ready), str(stop)],
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    try:
+        deadline = time.monotonic() + scaled(10.0)
+        while not ready.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert ready.exists(), "the test window did not start: %s" % proc.stderr.read()
+        user32 = ctypes.WinDLL("user32")
+        mine = user32.FindWindowW(None, title)
+        deadline = time.monotonic() + scaled(5.0)
+        while user32.GetForegroundWindow() != mine and time.monotonic() < deadline:
+            user32.SetForegroundWindow(mine)
+            time.sleep(0.1)
+        if user32.GetForegroundWindow() != mine:
+            pytest.skip("the test window does not come to the front: the keys would go to another window")
+        yield title
+    finally:
+        stop.write_text("stop", encoding="ascii")
+        try:
+            proc.wait(timeout=scaled(10.0))
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+def hotstring_flow(name, hotstring=HOTSTRING, keys="", **pars):
+    fb = FlowBuilder(name)
+    trigger = fb.trigger("Trigger_Hotstring", hotstring=hotstring, KeysToSend=keys, **pars)
+    done = fb.action("Action_Do_nothing")
+    fb.chain(trigger, done)
+    return fb, trigger
+
+
+def type_letters(text, ending=None):
+    """Types the letters (and the ending key) one by one with SendInput; skips while the user holds a modifier."""
+    keys = [ord(c) for c in text.upper()] + ([ending] if ending is not None else [])
+    for vk in keys:
+        assert press(vk) > 0, "SendInput refused the key %X" % vk
+
+
+def test_hotstring_fires_when_typed_with_an_ending_character(input_session, active_window):
+    fb, trigger = hotstring_flow("Hotstring space")
+    fid = input_session.add(fb)
+    input_session.enable(fid)
+    assert wait_armed(input_session, fid, trigger.id), input_session.stderr_text()
+    since = input_session.mark()
+    type_letters(HOTSTRING, SPACE_VK)
+    assert input_session.ended(fid, since=since, count=1, timeout=scaled(WAIT_S)), input_session.stderr_text()
+
+
+def test_hotstring_with_an_asterisk_fires_without_an_ending_character(input_session, active_window):
+    fb, trigger = hotstring_flow("Hotstring asterisk", RequireEndingCharacter=0)
+    fid = input_session.add(fb)
+    input_session.enable(fid)
+    assert wait_armed(input_session, fid, trigger.id), input_session.stderr_text()
+    since = input_session.mark()
+    type_letters(HOTSTRING)
+    assert input_session.ended(fid, since=since, count=1, timeout=scaled(WAIT_S)), input_session.stderr_text()
+
+
+def test_the_replacement_goes_to_send_with_the_ending_character_and_the_send_mode(input_session, active_window):
+    system = SystemScript(input_session.datadir)
+    fb, trigger = hotstring_flow("Hotstring replacement", keys="ahf-replacement", SendMode="Event")
+    fid = input_session.add(fb)
+    input_session.enable(fid)
+    assert wait_armed(input_session, fid, trigger.id), input_session.stderr_text()
+    since = input_session.mark()
+    type_letters(HOTSTRING, SPACE_VK)
+    assert input_session.ended(fid, since=since, count=1, timeout=scaled(WAIT_S)), input_session.stderr_text()
+    sends = [r for r in system.requests() if r["function"] == "Send"]
+    assert sends and sends[-1]["args"] == ["ahf-replacement ", "Event"], sends
+
+
+def test_a_window_condition_that_does_not_match_the_active_window_does_not_fire(input_session, active_window):
+    fb, trigger = hotstring_flow("Hotstring other window", UseWindow="WindowIsActive", TitleMatchMode=3,
+                                 Wintitle="AhfNoSuchWindow")
+    fid = input_session.add(fb)
+    input_session.enable(fid)
+    assert wait_armed(input_session, fid, trigger.id), input_session.stderr_text()
+    since = input_session.mark()
+    type_letters(HOTSTRING, SPACE_VK)
+    time.sleep(scaled(QUIET_S))
+    assert input_session.ended(fid, since=since, count=0, timeout=0) == [], "fired in another window"

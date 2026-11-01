@@ -12,7 +12,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Script language (SCR)](#script-language-scr) | 15 | 0 | 0 | 3 | 12 | 0 | 1 |
 | [Element packages (PKG)](#element-packages-pkg) | 6 | 1 | 0 | 1 | 4 | 0 | 0 |
 | [Elements (ELM)](#elements-elm) | 24 | 14 | 0 | 9 | 1 | 0 | 0 |
-| [Triggers (TRG)](#triggers-trg) | 14 | 2 | 0 | 7 | 5 | 0 | 0 |
+| [Triggers (TRG)](#triggers-trg) | 14 | 3 | 0 | 6 | 5 | 0 | 0 |
 | [Manager (MGR)](#manager-mgr) | 15 | 2 | 0 | 8 | 5 | 0 | 0 |
 | [Editor (EDT)](#editor-edt) | 23 | 5 | 0 | 12 | 6 | 0 | 0 |
 | [Settings (SET)](#settings-set) | 8 | 4 | 0 | 3 | 1 | 0 | 0 |
@@ -28,7 +28,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [Testability (TST)](#testability-tst) | 6 | 3 | 0 | 3 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 4 | 4 | 0 | 0 | 0 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 2 | 0 | 4 | 4 | 0 | 0 |
-| **All** | **220** | **88** | **1** | **69** | **61** | **1** | **5** |
+| **All** | **220** | **89** | **1** | **68** | **61** | **1** | **5** |
 
 ## Flows and execution (EXE)
 
@@ -144,7 +144,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-TRG-200](REQUIREMENTS.md#req-trg-200-manual-trigger) | L1207-1221 | Manual trigger | yes | partial | must | port | S0002 (WI-0047) |
 | [REQ-TRG-210](REQUIREMENTS.md#req-trg-210-time-triggers) | L1223-1235 | Time triggers | yes | done | must | port | S0003 (WI-0063 done), S0008 (WI-0131 done) |
 | [REQ-TRG-220](REQUIREMENTS.md#req-trg-220-start-up-and-system-triggers) | L1237-1254 | Start-up and system triggers | yes | partial | must | port | S0003 (WI-0063 done), later |
-| [REQ-TRG-230](REQUIREMENTS.md#req-trg-230-keyboard-triggers) | L1256-1270 | Keyboard triggers | yes | partial | must | port | S0003, S0008 |
+| [REQ-TRG-230](REQUIREMENTS.md#req-trg-230-keyboard-triggers) | L1256-1270 | Keyboard triggers | yes | done | must | port | S0003, S0008 (WI-0131 done) |
 | [REQ-TRG-240](REQUIREMENTS.md#req-trg-240-shortcut-trigger) | L1272-1284 | Shortcut trigger | yes | open | should | port | S0008 |
 | [REQ-TRG-250](REQUIREMENTS.md#req-trg-250-user-activity-triggers) | L1286-1299 | User activity triggers | yes | partial | should | port | S0008 (WI-0131) |
 | [REQ-TRG-260](REQUIREMENTS.md#req-trg-260-window-triggers) | L1301-1314 | Window triggers | yes | open | must | port | S0008 |

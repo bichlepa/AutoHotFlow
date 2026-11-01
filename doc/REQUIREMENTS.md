@@ -1256,16 +1256,16 @@ Fires when AutoHotFlow starts; it can tell a start with Windows (REQ-SET-030) fr
 ### REQ-TRG-230 Keyboard triggers
 
 - **v1:** yes
-- **v2:** partial
+- **v2:** done
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003, S0008
-- **Evidence:** `tests/ahk/element_hotkey.test.ahk` (WI-0064: the hotkey text of every option, the window condition of each UseWindow value, two triggers on one hotkey share it), `tests/ahk/element_window_ident.test.ahk` (the window identification), `tests/integration/test_hotkey_input.py` (WI-0064: real keys with `SendInput` on unassigned keys: plain, `~`, release, the window conditions, two flows on one key, disabling one of them, an error of one trigger; the combinations with modifiers are `gui` tests for the project owner)
+- **Plan:** S0003, S0008 (WI-0131 done)
+- **Evidence:** `tests/ahk/element_hotstring.test.ahk` (WI-0131: the options of the hotstring text, the raw mode, the send mode, the window values), `tests/integration/test_hotkey_input.py` (WI-0131: letters typed under the input lock fire the hotstring with and without an ending character, the replacement goes to Send with the ending character and the send mode, a window condition that does not match does not fire), `tests/ahk/element_hotkey.test.ahk` (WI-0064: the hotkey text of every option, the window condition of each UseWindow value, two triggers on one hotkey share it), `tests/ahk/element_window_ident.test.ahk` (the window identification), `tests/integration/test_hotkey_input.py` (WI-0064: real keys with `SendInput` on unassigned keys: plain, `~`, release, the window conditions, two flows on one key, disabling one of them, an error of one trigger; the combinations with modifiers are `gui` tests for the project owner)
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
 | `Trigger_Hotkey` | yes | done | S0003 |
-| `Trigger_Hotstring` | yes | open | S0008 |
+| `Trigger_Hotstring` | yes | done (WI-0131) | S0008 (WI-0131 done) |
 
 A hotkey can be limited to a given window; it is disabled in the same context (MIGRATION M-0003).
 

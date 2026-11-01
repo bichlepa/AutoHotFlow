@@ -31,6 +31,7 @@ TEST_GROUPS = {
     "ahk/element_runner.test.ahk": ["element-units"],
     "ahk/element_sleep.test.ahk": ["element-units"],
     "ahk/element_time_of_day.test.ahk": ["element-units", "triggers"],
+    "ahk/element_hotstring.test.ahk": ["element-units", "triggers"],
     "ahk/element_smoke.test.ahk": ["element-units"],
     "ahk/element_window_ident.test.ahk": ["element-units"],
     "ahk/engine_call_flow.test.ahk": ["engine"],
@@ -566,6 +567,14 @@ COVERS = {
         "integration/test_time_triggers.py::test_the_user_idle_trigger_fires_once_per_idle_period",
         "integration/test_time_triggers.py::test_the_physical_method_asks_the_physical_idle_time",
         "integration/test_time_triggers.py::test_a_bad_interval_of_the_user_idle_trigger_is_not_armed_and_gives_the_v1_text",
+    ],
+    # WI-0131: hotstring (callback, replacement through the seam, shared registrations); the typed tests are input tests
+    "src/elements/Default/Triggers/Trigger_Hotstring.ahk": [
+        "ahk/element_hotstring.test.ahk",
+        "integration/test_hotkey_input.py::test_hotstring_fires_when_typed_with_an_ending_character",
+        "integration/test_hotkey_input.py::test_hotstring_with_an_asterisk_fires_without_an_ending_character",
+        "integration/test_hotkey_input.py::test_the_replacement_goes_to_send_with_the_ending_character_and_the_send_mode",
+        "integration/test_hotkey_input.py::test_a_window_condition_that_does_not_match_the_active_window_does_not_fire",
     ],
     # WI-0131: clipboard changes (the trigger host's OnClipboardChange; the real clipboard, xdist group clipboard)
     "src/elements/Default/Triggers/Trigger_Clipboard_Changes.ahk": [

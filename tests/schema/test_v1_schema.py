@@ -121,9 +121,11 @@ ALLOWED = {
     ("default.action_lock_or_unlock_drive", "WhatDo", "default"): "M-0099",
 }
 # M-0139: the window identification of the window and control elements (WI-0125, WI-0126), as M-0102 for Trigger_Hotkey
+# and Trigger_Hotstring (WI-0131)
 for _cls in ("action_activate_window", "action_show_window", "action_hide_window", "action_close_window",
              "action_move_window", "action_get_control_text", "action_set_control_text",
-             "action_send_keystrokes_to_control", "condition_window_active", "condition_window_exists"):
+             "action_send_keystrokes_to_control", "condition_window_active", "condition_window_exists",
+             "trigger_hotstring"):
     ALLOWED[("default." + _cls, "GetWindowInformation", "id")] = "M-0139"
     ALLOWED[("default." + _cls, "TitleMatchMode", "enum")] = "M-0139"
     ALLOWED[("default." + _cls, "TitleMatchMode", "result")] = "M-0139"

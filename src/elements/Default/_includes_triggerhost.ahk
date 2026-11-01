@@ -13,6 +13,7 @@ class Default {
     #Include Triggers\Trigger_AutoHotkey_Script.ahk
     #Include Triggers\Trigger_Clipboard_Changes.ahk
     #Include Triggers\Trigger_Hotkey.ahk
+    #Include Triggers\Trigger_Hotstring.ahk
     #Include Triggers\Trigger_Manual.ahk
     #Include Triggers\Trigger_Periodic_Timer.ahk
     #Include Triggers\Trigger_Start_up.ahk
@@ -24,6 +25,7 @@ ElementRegistry.RegisterPackage("Default", "1.2.1")
 ElementRegistry.Register(Default.Trigger_AutoHotkey_Script)
 ElementRegistry.Register(Default.Trigger_Clipboard_Changes)
 ElementRegistry.Register(Default.Trigger_Hotkey)
+ElementRegistry.Register(Default.Trigger_Hotstring)
 ElementRegistry.Register(Default.Trigger_Manual)
 ElementRegistry.Register(Default.Trigger_Periodic_Timer)
 ElementRegistry.Register(Default.Trigger_Start_up)
