@@ -9,10 +9,12 @@
 #Include lib\ListOps.ahk
 #Include lib\TextOps.ahk
 #Include lib\DriveOps.ahk
+#Include ..\..\core\ElementError.ahk
+#Include lib\DialogOps.ahk
+#Include lib\MouseOps.ahk
 #Include lib\FileOps.ahk
 #Include lib\TarOps.ahk
 #Include lib\ListFormats.ahk
-#Include lib\DialogOps.ahk
 #Include lib\IniOps.ahk
 #Include lib\FlowChoices.ahk
 #Include lib\ControlIdent.ahk
@@ -30,8 +32,10 @@ class Default {
     #Include Actions\Action_Activate_Window.ahk
     #Include Actions\Action_Add_To_List.ahk
     #Include Actions\Action_Beep.ahk
+    #Include Actions\Action_Block_User_Input.ahk
     #Include Actions\Action_Change_character_case.ahk
     #Include Actions\Action_Change_Drive_Label.ahk
+    #Include Actions\Action_Click.ahk
     #Include Actions\Action_Close_Window.ahk
     #Include Actions\Action_Compress_files.ahk
     #Include Actions\Action_Convert_list_to_string.ahk
@@ -46,6 +50,7 @@ class Default {
     #Include Actions\Action_Delete_from_list.ahk
     #Include Actions\Action_Do_nothing.ahk
     #Include Actions\Action_Download_File.ahk
+    #Include Actions\Action_Drag_With_Mouse.ahk
     #Include Actions\Action_Eject_Drive.ahk
     #Include Actions\Action_Empty_Recycle_Bin.ahk
     #Include Actions\Action_Encode_string.ahk
@@ -61,6 +66,7 @@ class Default {
     #Include Actions\Action_Get_From_List.ahk
     #Include Actions\Action_Get_index_of_element_in_list.ahk
     #Include Actions\Action_Get_List_Info.ahk
+    #Include Actions\Action_Get_Mouse_Position.ahk
     #Include Actions\Action_Get_shortcut_information.ahk
     #Include Actions\Action_Get_String_Length.ahk
     #Include Actions\Action_Get_Volume.ahk
@@ -76,6 +82,7 @@ class Default {
     #Include Actions\Action_Minimize_all_windows.ahk
     #Include Actions\Action_Move_File.ahk
     #Include Actions\Action_Move_Folder.ahk
+    #Include Actions\Action_Move_Mouse.ahk
     #Include Actions\Action_Move_Window.ahk
     #Include Actions\Action_New_List.ahk
     #Include Actions\Action_New_Time.ahk
@@ -92,11 +99,14 @@ class Default {
     #Include Actions\Action_Run.ahk
     #Include Actions\Action_Script.ahk
     #Include Actions\Action_Search_in_a_string.ahk
+    #Include Actions\Action_Send_Keystrokes.ahk
+    #Include Actions\Action_Send_Keystrokes_To_Control.ahk
     #Include Actions\Action_Set_Clipboard.ahk
     #Include Actions\Action_Set_control_text.ahk
     #Include Actions\Action_Set_file_attributes.ahk
     #Include Actions\Action_Set_file_time.ahk
     #Include Actions\Action_Set_Flow_Status.ahk
+    #Include Actions\Action_Set_Lock_Key.ahk
     #Include Actions\Action_Set_Process_Priority.ahk
     #Include Actions\Action_Set_Volume.ahk
     #Include Actions\Action_Show_Window.ahk
@@ -129,6 +139,7 @@ class Default {
     #Include Conditions\Condition_File_Has_Attribute.ahk
     #Include Conditions\Condition_Flow_Enabled.ahk
     #Include Conditions\Condition_Flow_Running.ahk
+    #Include Conditions\Condition_Key_Is_Down.ahk
     #Include Conditions\Condition_List_Contains_Element.ahk
     #Include Conditions\Condition_NumberIs.ahk
     #Include Conditions\Condition_Process_Is_Running.ahk
@@ -153,8 +164,10 @@ ElementRegistry.Register(Default.Action_Absolute_number)
 ElementRegistry.Register(Default.Action_Activate_Window)
 ElementRegistry.Register(Default.Action_Add_To_List)
 ElementRegistry.Register(Default.Action_Beep)
+ElementRegistry.Register(Default.Action_Block_User_Input)
 ElementRegistry.Register(Default.Action_Change_character_case)
 ElementRegistry.Register(Default.Action_Change_Drive_Label)
+ElementRegistry.Register(Default.Action_Click)
 ElementRegistry.Register(Default.Action_Close_Window)
 ElementRegistry.Register(Default.Action_Compress_files)
 ElementRegistry.Register(Default.Action_Convert_list_to_string)
@@ -169,6 +182,7 @@ ElementRegistry.Register(Default.Action_Delete_From_Ini)
 ElementRegistry.Register(Default.Action_Delete_from_list)
 ElementRegistry.Register(Default.Action_Do_nothing)
 ElementRegistry.Register(Default.Action_Download_File)
+ElementRegistry.Register(Default.Action_Drag_With_Mouse)
 ElementRegistry.Register(Default.Action_Eject_Drive)
 ElementRegistry.Register(Default.Action_Empty_Recycle_Bin)
 ElementRegistry.Register(Default.Action_Encode_string)
@@ -184,6 +198,7 @@ ElementRegistry.Register(Default.Action_Get_File_Time)
 ElementRegistry.Register(Default.Action_Get_From_List)
 ElementRegistry.Register(Default.Action_Get_index_of_element_in_list)
 ElementRegistry.Register(Default.Action_Get_List_Info)
+ElementRegistry.Register(Default.Action_Get_Mouse_Position)
 ElementRegistry.Register(Default.Action_Get_shortcut_information)
 ElementRegistry.Register(Default.Action_Get_String_Length)
 ElementRegistry.Register(Default.Action_Get_Volume)
@@ -199,6 +214,7 @@ ElementRegistry.Register(Default.Action_Message_Box)
 ElementRegistry.Register(Default.Action_Minimize_all_windows)
 ElementRegistry.Register(Default.Action_Move_File)
 ElementRegistry.Register(Default.Action_Move_Folder)
+ElementRegistry.Register(Default.Action_Move_Mouse)
 ElementRegistry.Register(Default.Action_Move_Window)
 ElementRegistry.Register(Default.Action_New_List)
 ElementRegistry.Register(Default.Action_New_Time)
@@ -215,11 +231,14 @@ ElementRegistry.Register(Default.Action_Rounding_A_Number)
 ElementRegistry.Register(Default.Action_Run)
 ElementRegistry.Register(Default.Action_Script)
 ElementRegistry.Register(Default.Action_Search_in_a_string)
+ElementRegistry.Register(Default.Action_Send_Keystrokes)
+ElementRegistry.Register(Default.Action_Send_Keystrokes_To_Control)
 ElementRegistry.Register(Default.Action_Set_Clipboard)
 ElementRegistry.Register(Default.Action_Set_control_text)
 ElementRegistry.Register(Default.Action_Set_file_attributes)
 ElementRegistry.Register(Default.Action_Set_file_time)
 ElementRegistry.Register(Default.Action_Set_Flow_Status)
+ElementRegistry.Register(Default.Action_Set_Lock_Key)
 ElementRegistry.Register(Default.Action_Set_Process_Priority)
 ElementRegistry.Register(Default.Action_Set_Volume)
 ElementRegistry.Register(Default.Action_Show_Window)
@@ -252,6 +271,7 @@ ElementRegistry.Register(Default.Condition_File_Exists)
 ElementRegistry.Register(Default.Condition_File_Has_Attribute)
 ElementRegistry.Register(Default.Condition_Flow_Enabled)
 ElementRegistry.Register(Default.Condition_Flow_Running)
+ElementRegistry.Register(Default.Condition_Key_Is_Down)
 ElementRegistry.Register(Default.Condition_List_Contains_Element)
 ElementRegistry.Register(Default.Condition_NumberIs)
 ElementRegistry.Register(Default.Condition_Process_Is_Running)

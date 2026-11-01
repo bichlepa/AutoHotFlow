@@ -8,9 +8,11 @@
 #Include lib\WindowIdent.ahk
 #Include lib\TextOps.ahk
 #Include lib\DriveOps.ahk
+#Include ..\..\core\ElementError.ahk
+#Include lib\DialogOps.ahk
+#Include lib\MouseOps.ahk
 #Include lib\FileOps.ahk
 #Include lib\TarOps.ahk
-#Include lib\DialogOps.ahk
 #Include lib\IniOps.ahk
 #Include lib\ControlIdent.ahk
 #Include lib\HttpOps.ahk
@@ -23,7 +25,9 @@
 class Default {
     #Include Actions\Action_Activate_Window.ahk
     #Include Actions\Action_Beep.ahk
+    #Include Actions\Action_Block_User_Input.ahk
     #Include Actions\Action_Change_Drive_Label.ahk
+    #Include Actions\Action_Click.ahk
     #Include Actions\Action_Close_Window.ahk
     #Include Actions\Action_Compress_files.ahk
     #Include Actions\Action_Copy_File.ahk
@@ -34,6 +38,7 @@ class Default {
     #Include Actions\Action_Delete_Folder.ahk
     #Include Actions\Action_Delete_From_Ini.ahk
     #Include Actions\Action_Download_File.ahk
+    #Include Actions\Action_Drag_With_Mouse.ahk
     #Include Actions\Action_Eject_Drive.ahk
     #Include Actions\Action_Empty_Recycle_Bin.ahk
     #Include Actions\Action_Extract_files.ahk
@@ -43,6 +48,7 @@ class Default {
     #Include Actions\Action_Get_File_Attributes.ahk
     #Include Actions\Action_Get_File_Size.ahk
     #Include Actions\Action_Get_File_Time.ahk
+    #Include Actions\Action_Get_Mouse_Position.ahk
     #Include Actions\Action_Get_shortcut_information.ahk
     #Include Actions\Action_Get_Volume.ahk
     #Include Actions\Action_Hibernate_Computer.ahk
@@ -57,6 +63,7 @@ class Default {
     #Include Actions\Action_Minimize_all_windows.ahk
     #Include Actions\Action_Move_File.ahk
     #Include Actions\Action_Move_Folder.ahk
+    #Include Actions\Action_Move_Mouse.ahk
     #Include Actions\Action_Move_Window.ahk
     #Include Actions\Action_Play_Sound.ahk
     #Include Actions\Action_Read_From_File.ahk
@@ -65,10 +72,13 @@ class Default {
     #Include Actions\Action_Rename_File.ahk
     #Include Actions\Action_Rename_Folder.ahk
     #Include Actions\Action_Run.ahk
+    #Include Actions\Action_Send_Keystrokes.ahk
+    #Include Actions\Action_Send_Keystrokes_To_Control.ahk
     #Include Actions\Action_Set_Clipboard.ahk
     #Include Actions\Action_Set_control_text.ahk
     #Include Actions\Action_Set_file_attributes.ahk
     #Include Actions\Action_Set_file_time.ahk
+    #Include Actions\Action_Set_Lock_Key.ahk
     #Include Actions\Action_Set_Process_Priority.ahk
     #Include Actions\Action_Set_Volume.ahk
     #Include Actions\Action_Show_Window.ahk
@@ -83,6 +93,7 @@ class Default {
     #Include Conditions\Condition_Debug_Dialog.ahk
     #Include Conditions\Condition_File_Exists.ahk
     #Include Conditions\Condition_File_Has_Attribute.ahk
+    #Include Conditions\Condition_Key_Is_Down.ahk
     #Include Conditions\Condition_Process_Is_Running.ahk
     #Include Conditions\Condition_Window_Active.ahk
     #Include Conditions\Condition_Window_Exists.ahk
@@ -92,7 +103,9 @@ class Default {
 ElementRegistry.RegisterPackage("Default", "1.2.1")
 ElementRegistry.Register(Default.Action_Activate_Window)
 ElementRegistry.Register(Default.Action_Beep)
+ElementRegistry.Register(Default.Action_Block_User_Input)
 ElementRegistry.Register(Default.Action_Change_Drive_Label)
+ElementRegistry.Register(Default.Action_Click)
 ElementRegistry.Register(Default.Action_Close_Window)
 ElementRegistry.Register(Default.Action_Compress_files)
 ElementRegistry.Register(Default.Action_Copy_File)
@@ -103,6 +116,7 @@ ElementRegistry.Register(Default.Action_Delete_File)
 ElementRegistry.Register(Default.Action_Delete_Folder)
 ElementRegistry.Register(Default.Action_Delete_From_Ini)
 ElementRegistry.Register(Default.Action_Download_File)
+ElementRegistry.Register(Default.Action_Drag_With_Mouse)
 ElementRegistry.Register(Default.Action_Eject_Drive)
 ElementRegistry.Register(Default.Action_Empty_Recycle_Bin)
 ElementRegistry.Register(Default.Action_Extract_files)
@@ -112,6 +126,7 @@ ElementRegistry.Register(Default.Action_Get_Drive_Information)
 ElementRegistry.Register(Default.Action_Get_File_Attributes)
 ElementRegistry.Register(Default.Action_Get_File_Size)
 ElementRegistry.Register(Default.Action_Get_File_Time)
+ElementRegistry.Register(Default.Action_Get_Mouse_Position)
 ElementRegistry.Register(Default.Action_Get_shortcut_information)
 ElementRegistry.Register(Default.Action_Get_Volume)
 ElementRegistry.Register(Default.Action_Hibernate_Computer)
@@ -126,6 +141,7 @@ ElementRegistry.Register(Default.Action_Message_Box)
 ElementRegistry.Register(Default.Action_Minimize_all_windows)
 ElementRegistry.Register(Default.Action_Move_File)
 ElementRegistry.Register(Default.Action_Move_Folder)
+ElementRegistry.Register(Default.Action_Move_Mouse)
 ElementRegistry.Register(Default.Action_Move_Window)
 ElementRegistry.Register(Default.Action_Play_Sound)
 ElementRegistry.Register(Default.Action_Read_From_File)
@@ -134,10 +150,13 @@ ElementRegistry.Register(Default.Action_Reboot_Computer)
 ElementRegistry.Register(Default.Action_Rename_File)
 ElementRegistry.Register(Default.Action_Rename_Folder)
 ElementRegistry.Register(Default.Action_Run)
+ElementRegistry.Register(Default.Action_Send_Keystrokes)
+ElementRegistry.Register(Default.Action_Send_Keystrokes_To_Control)
 ElementRegistry.Register(Default.Action_Set_Clipboard)
 ElementRegistry.Register(Default.Action_Set_control_text)
 ElementRegistry.Register(Default.Action_Set_file_attributes)
 ElementRegistry.Register(Default.Action_Set_file_time)
+ElementRegistry.Register(Default.Action_Set_Lock_Key)
 ElementRegistry.Register(Default.Action_Set_Process_Priority)
 ElementRegistry.Register(Default.Action_Set_Volume)
 ElementRegistry.Register(Default.Action_Show_Window)
@@ -152,6 +171,7 @@ ElementRegistry.Register(Default.Condition_Confirmation_Dialog)
 ElementRegistry.Register(Default.Condition_Debug_Dialog)
 ElementRegistry.Register(Default.Condition_File_Exists)
 ElementRegistry.Register(Default.Condition_File_Has_Attribute)
+ElementRegistry.Register(Default.Condition_Key_Is_Down)
 ElementRegistry.Register(Default.Condition_Process_Is_Running)
 ElementRegistry.Register(Default.Condition_Window_Active)
 ElementRegistry.Register(Default.Condition_Window_Exists)
