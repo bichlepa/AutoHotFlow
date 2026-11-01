@@ -348,3 +348,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Pass the handle of the control as the control parameter: `ControlGetText(ctl)`, `ControlSetText(text, ctl)`. The handle of a control works without a window title (the HWND identifier of the control identifiers help page).
 - **Status:** verified (`ControlGetText(h)` and `ControlSetText(text, h)` with a control handle in a standalone probe, WI-0125)
 - **Source:** `src/elements/Default/lib/ControlIdent.ahk`
+
+### `GetKeyState` without "P" does not see a key that another process sends (verified)
+
+- **Problem:** A test helper process held a key down with `Send "{vk88 down}"` and the element `Condition_Key_Is_Down` (a worker process) read the key as up with the logical state.
+- **Wrong:** `GetKeyState("vk88")` in a process other than the sender, expecting the key to be down while the other process holds it.
+- **Right:** The logical state is the state the calling thread's input queue reports (the mechanism is assumed, not read in the source); a key sent by another process does not show there in the test. `GetKeyState(key, "P")` (the physical state) showed the held key. A test that holds a key therefore reads the physical state; the logical state while another process holds a key is not checked.
+- **Status:** verified (the test `test_key_is_down_physical_is_yes_while_another_process_holds_the_key` passes with "P"; the logical variant returned "no" in the same setup, WI-0126)
+- **Source:** `tests/integration/test_mouse_keyboard_elements.py`, `tests/integration/helpers/key_holder.ahk`

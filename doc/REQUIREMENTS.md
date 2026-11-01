@@ -1063,22 +1063,23 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 ### REQ-ELM-370 Mouse and keyboard
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (WI-0126; the real mouse and the real keys on the desktop are the owner's manual check; the block of the input after a killed worker is open, F-9001*)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0126)
+- **Evidence:** `tests/integration/test_mouse_keyboard_elements.py` (the nine elements, headless: the recorded calls of the seam with their arguments; the own window for Send keystrokes to control; the key holder for Key is down; the release of the block at the orderly end of the worker), `tests/schema/test_v1_schema.py` (the parameters against v1, M-0155) (the corpus flow "Hotkey test" is not run yet: an open decision of WI-0126)
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Click` | yes | open | S0008 |
-| `Action_Move_Mouse` | yes | open | S0008 |
-| `Action_Drag_with_mouse` | yes | open | S0008 |
-| `Action_Get_mouse_position` | yes | open | S0008 |
-| `Action_Send_Keystrokes` | yes | open | S0008 |
-| `Action_Send_Keystrokes_To_Control` | yes | open | S0008 |
-| `Action_Set_Lock_Key` | yes | open | S0008 |
-| `Action_Block_User_Input` | yes | open | S0008 |
-| `Condition_Key_Is_Down` | yes | open | S0008 |
+| `Action_Click` | yes | done (WI-0126) | S0008 (WI-0126) |
+| `Action_Move_Mouse` | yes | done (WI-0126) | S0008 (WI-0126) |
+| `Action_Drag_With_Mouse` | yes | done (WI-0126) | S0008 (WI-0126) |
+| `Action_Get_Mouse_Position` | yes | done (WI-0126) | S0008 (WI-0126) |
+| `Action_Send_Keystrokes` | yes | done (WI-0126) | S0008 (WI-0126) |
+| `Action_Send_Keystrokes_To_Control` | yes | done (WI-0126) | S0008 (WI-0126) |
+| `Action_Set_Lock_Key` | yes | done (WI-0126) | S0008 (WI-0126) |
+| `Action_Block_User_Input` | yes | done (WI-0126; a killed worker keeps the block, F-9001*) | S0008 (WI-0126) |
+| `Condition_Key_Is_Down` | yes | done (WI-0126; the logical state of a key sent by another process is not seen, see the HOW-TO) | S0008 (WI-0126) |
 
 ### REQ-ELM-380 Sound and speech
 

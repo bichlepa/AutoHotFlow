@@ -76,25 +76,25 @@ L329-347 9b. System action tests (E0103, WI-0117)
 L349-369 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (65.2 KB, 541 lines)
+## doc/ELEMENT-API-V2.md (65.8 KB, 543 lines)
 ```text
 L8-18 1. Guidelines
 L20-112 2. Class contract
 L91-112   2.1 Parameter fields of the settings form (WI-0105)
-L114-287 3. Context `ctx`
+L114-289 3. Context `ctx`
 L163-180   3.1 Parameter evaluation (WI-0042)
 L182-192   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
 L194-200   3.3 Dialogs (E0038, WI-0051)
-L202-226   3.3a System actions (E0103, WI-0117)
-L228-243   3.4 Debug view (WI-0056, REQ-DBG-060)
-L245-266   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
-L268-287   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
-L289-371 4. Example 1: `Action_Sleep` (inline, with timer)
-L373-466 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L468-508 6. Mechanical conversion rules
-L510-531 7. What stays
-L517-531   7.1 Loop elements (WI-0054)
-L533-541 8. Still to be clarified (Phase 3)
+L202-228   3.3a System actions (E0103, WI-0117)
+L230-245   3.4 Debug view (WI-0056, REQ-DBG-060)
+L247-268   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+L270-289   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
+L291-373 4. Example 1: `Action_Sleep` (inline, with timer)
+L375-468 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L470-510 6. Mechanical conversion rules
+L512-533 7. What stays
+L519-533   7.1 Loop elements (WI-0054)
+L535-543 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
@@ -210,7 +210,7 @@ L67-73 The reason of a failed file call is the OSError number (verified) (partly
 L75-81 FileSetAttrib and FileSetTime do not throw when no file matches (verified) (verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (45.2 KB, 350 lines)
+## doc/howto/gui-and-hotkeys.md (46.2 KB, 358 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -256,6 +256,7 @@ L320-326 Hotkey variants of a HotIf criterion are found by the criterion object 
 L328-334 GetWindowTextW of another process's control can return text from before a change (verified) (verified)
 L336-342 The arguments of a shortcut are cut at 259 characters (verified) (verified)
 L344-350 `ControlGetHwnd` and `ControlGetText` take a window handle as the control (verified) (verified)
+L352-358 `GetKeyState` without "P" does not see a key that another process sends (verified) (verified)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)
