@@ -51,4 +51,4 @@ Changing the connections or adding elements from a flow.
 
 **Not checked:** the open editor showing the change (display, owner's manual check; the engine side emits `evt.flow.committed` and the editor handles it as before, read only); the full v1 element schema beyond the core set; `Array.Clone` in ElementParOps assumed to exist (exercised by the e2e list test only for the drop-down path).
 
-**Open:** F-9000* (element list of another flow kept while the window is open).
+**Open:** F-0194 (element list of another flow kept while the window is open).
