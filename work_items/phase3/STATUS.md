@@ -61,7 +61,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0127 | Screen and images | open | | | |  |
 | WI-0128 | Input box, file and folder selection | open | | | |  |
 | WI-0129 | `Action_Set_element_parameter` | open | | | | after WI-0107 |
-| WI-0130 | AutoHotkey script action and trigger (E0104) | open | | | |  |
+| WI-0130 | AutoHotkey script action and trigger (E0104) | done | haiku | see git log (up to 31c4125c) | 2026-11-01 | M-0158, M-0159, REQ-ELM-110 partial, F-0193 (imported v1 scripts not marked); review approved after one round; owner: descendants of a script survive a normal end (as v1; a stop kills them), script error texts English not Lang(); open: line numbers of load errors off by the prologue, cancel during a running action; ChildLauncher/ChildPipe moved to src/core |
 | WI-0131 | Triggers: time of day, user idle time, clipboard, hotstring | open | | | |  |
 | WI-0132 | Triggers: windows and processes | open | | | |  |
 | WI-0133 | Shortcut trigger and the flow commands | open | | | |  |
@@ -74,9 +74,11 @@ None.
 
 ## Running agents
 
-- WI-0130 (haiku, workspace wi0130, implementer), report pending.
+- WI-0126 follow-up (haiku, workspace wi0126fix): stale import-warning test in test_manager_archive.py.
 
 ## Last verified state
+
+Commit `d4f9382d` (WI-0126 integrated; all tiers): foundation 471, slow 211 green; fast 2578 passed, 6 failed (runs 20261101-211554-d4f9382d, -2, -3): `test_manager_archive` import warning (real, stale expectation after WI-0126, fix in progress); `test_hotkey_input` window-active @input (not rechecked, recheck cannot take @input); `test_engine` start event order, `Action_Message_Box` in test_core_settings, two `test_worker` tests (green in the serial rerun 20261101-214411-d4f9382d, load flakes, F-0191 for the worker ones).
 
 Commit `919d5b5a` (final state of the session: WI-0116 to WI-0125 integrated; all tiers): fast 2554 passed (2 skipped), 2 failed under load (`test_worker` busy/shutdown tests, green in recheck 20261023-013138-recheck), foundation 471, slow 211 (runs 20261023-011736-919d5b5a, -3, -2). VERDICT red only by those load flakes (F-0191).
 
