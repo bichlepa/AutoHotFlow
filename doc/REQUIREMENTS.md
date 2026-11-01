@@ -1286,14 +1286,15 @@ Creates a shortcut file (default on the desktop) that starts the flow through th
 ### REQ-TRG-250 User activity triggers
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the user idle time, WI-0131; the clipboard trigger is open)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0131)
+- **Evidence:** `tests/integration/test_time_triggers.py` (WI-0131: the idle trigger fires once per idle period, the physical method asks the physical idle time, a bad interval is refused with the v1 text; the idle time answered by the test provider, WI-0117)
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
-| `Trigger_User_Idle_Time` | yes | open | S0008 |
+| `Trigger_User_Idle_Time` | yes | done (WI-0131) | S0008 (WI-0131 done) |
 | `Trigger_Clipboard_Changes` | yes | open | S0008 |
 | The session is locked or unlocked | no | open | later |
 

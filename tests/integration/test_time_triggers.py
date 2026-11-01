@@ -18,6 +18,7 @@ import pytest
 
 from support.flowbuilder import FlowBuilder
 from support.flowrun import FlowRunner
+from support.system import SystemScript, value
 from support.timing import scaled
 
 HOST_ROLES = "storage,engine,triggerhost"
@@ -239,6 +240,51 @@ def test_the_startup_trigger_does_not_fire_after_a_restart_of_the_trigger_host(h
     assert wait_state(host_flows, fid, trigger.id, lambda s: s["armed"] is True) is not None, host_flows.stderr_text()
     time.sleep(scaled(0.5))
     assert len(started(host_flows, fid)) == 1, "the start-up trigger fired again after a restart of the host"
+
+
+# --- Trigger_User_Idle_Time (WI-0131, REQ-TRG-250): the idle time is answered by the test provider (WI-0117) ----------
+
+def idle_flow(name, interval, unit, method):
+    fb = FlowBuilder(name)
+    trigger = fb.trigger("Trigger_User_Idle_Time", Interval=interval, Unit=unit, Method=method)
+    done = fb.action("Action_Do_nothing")
+    fb.chain(trigger, done)
+    return fb, trigger
+
+
+def test_the_user_idle_trigger_fires_once_per_idle_period(host_flows):
+    # Ticks: 0 ms (active, waits 1000), 1500 (idle: fires, checks again after 500), 2000 (still idle), 0 (active again,
+    # waits 1000), 1500 (the second idle period: fires). After the script the idle time is 0 and nothing fires.
+    system = SystemScript(host_flows.datadir)
+    system.script({"TimeIdle": [value(0), value(1500), value(2000), value(0), value(1500)]})
+    fb, trigger = idle_flow("Idle periods", "1000", "MilliSeconds", "TimeIdle")
+    fid = host_flows.add(fb)
+    host_flows.start()
+    host_flows.enable(fid)
+    assert len(host_flows.ended(fid, count=2, timeout=scaled(WAIT_S))) >= 2, host_flows.stderr_text()
+    time.sleep(scaled(1.5))
+    assert len(started(host_flows, fid)) == 2, "the trigger fires once per idle period"
+
+
+def test_the_physical_method_asks_the_physical_idle_time(host_flows):
+    system = SystemScript(host_flows.datadir)
+    system.script({"TimeIdlePhysical": [value(1500)]})
+    fb, trigger = idle_flow("Physical", "1000", "MilliSeconds", "TimeIdlePhysical")
+    fid = host_flows.add(fb)
+    host_flows.start()
+    host_flows.enable(fid)
+    assert len(host_flows.ended(fid, count=1, timeout=scaled(WAIT_S))) >= 1, host_flows.stderr_text()
+    functions = {r["function"] for r in system.requests()}
+    assert "TimeIdlePhysical" in functions and "TimeIdle" not in functions, functions
+
+
+def test_a_bad_interval_of_the_user_idle_trigger_is_not_armed_and_gives_the_v1_text(host_flows):
+    fb, trigger = idle_flow("Bad idle", "0", "Seconds", "TimeIdle")
+    fid = host_flows.add(fb)
+    host_flows.start()
+    host_flows.enable(fid)
+    state = wait_state(host_flows, fid, trigger.id, lambda s: s["message"] == "Parameter 'interval' has invalid value: 0")
+    assert state is not None and state["armed"] is False, state
 
 
 # --- Trigger_Time_Of_Day (WI-0131, REQ-TRG-210): a time a few seconds ahead, never minutes -------------------------

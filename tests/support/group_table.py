@@ -560,6 +560,12 @@ COVERS = {
         "integration/test_time_triggers.py::test_time_of_day_does_not_fire_on_another_week_day",
         "integration/test_time_triggers.py::test_a_time_of_day_without_week_days_is_not_armed_and_says_the_parameter_is_empty",
     ],
+    # WI-0131: user idle time through the seam (the test provider answers the idle time from a script)
+    "src/elements/Default/Triggers/Trigger_User_Idle_Time.ahk": [
+        "integration/test_time_triggers.py::test_the_user_idle_trigger_fires_once_per_idle_period",
+        "integration/test_time_triggers.py::test_the_physical_method_asks_the_physical_idle_time",
+        "integration/test_time_triggers.py::test_a_bad_interval_of_the_user_idle_trigger_is_not_armed_and_gives_the_v1_text",
+    ],
     "src/elements/Default/Triggers/Trigger_Start_up.ahk": [
         "integration/test_time_triggers.py::test_a_startup_trigger_enabled_later_does_not_fire",
         "integration/test_time_triggers.py::test_the_autohotflow_startup_trigger_fires_once_at_the_start",
