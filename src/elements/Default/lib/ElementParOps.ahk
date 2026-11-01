@@ -5,9 +5,9 @@
 ; parameter IDs of v1 flows ("newParameterValueEdit/Text") keep their meaning. Pure functions: no context, no engine.
 ;
 ; A parameter choice is "<control>/<parameter ID>" (the enum value of the drop-down parameterID). A parameter of another
-; element with a type that has no control of its own (v1: "not supported") is not in the list. v2 differences (M-0160):
-; hotkey parameters get the text control (v1 offered a file picker), listbox parameters a drop-down, and the content type
-; of a parameter (v1 "Type of parameter") is not offered: the value is stored with the content of its own control.
+; element with a type that has no control of its own (v1: "not supported") is not in the list. v2 differences (M-0161):
+; hotkey parameters get the text control (v1 offered a file picker), and the content type of a parameter (v1 "Type of
+; parameter") is not offered: the value is stored with the content of its own control.
 class ElementParOps {
     static CONTROLS := ["newParameterValueEdit", "newParameterValueCheckbox", "newParameterValueCheckboxGray"
         , "newParameterValueDropDown", "newParameterValueComboBox", "newParameterValueMultilineEdit"
