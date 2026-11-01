@@ -77,6 +77,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0157 | `tests/integration/test_pipe.py::test_abrupt_end_of_client_process_is_seen_within_500_ms[2]` is red under load: 1819 ms measured (budget 1500 ms) while the machine ran at 99 % CPU. A wall-clock latency assertion that is not covered by the admission of the test runs; not checked alone | open, verified (one red run under load); the owner decides whether it is a gui-tier or idle-tier test | WI-0090 |
 | F-0160 | `tests/ahk/helpers/renderer_bench.ahk` under `#Warn All` warns about a local variable `type` (same name as a global) in `src/elements/Default/Triggers/Trigger_Start_up.ahk` line 47; the product does not run under `#Warn All`, so it is not checked whether the product shows it | open, low, verified by the bench output | WI-0092 |
 | F-0193 | The imported v1 scripts of `Action_AutoHotkey_script` and `Trigger_AutoHotkey_Script` are not marked (MIGRATION M-0049): a v1 script of a migrated flow runs as v2 code and ends with an exception only when v2 cannot load it. Needed: the loader marks the script parameter, the element ends with "port it to v2" until the user changes it (WI-0093). | open, found by WI-0130 |
+| F-9000* | The element list of another flow in the settings of `Action_Set_element_parameter` is kept until the settings window opens again (`EditorFlowCatalog.Refresh`): a change of the other flow while the window is open is not shown in its list until then. The value and the parameter list follow the list of the flow at the next check. | open, found by WI-0129 |
 | F-0161 | Order inside a batch of element states: entries inside one 33 ms batch are in the order of the first change; a fast repeating failing element shows only its last state | postponed by the owner (2026-10-20), a note, no requirement | WI-0089 |
 | F-0153 | The tint of a running element is drawn after all elements, so where a running element overlaps a later element of the scene, the tint lies over that element; v1 draws the tint with its element, so the later element covers it | open, low; the sample flows show no such overlap, not checked on a larger flow | WI-0085 |
 
@@ -471,6 +472,11 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 
 **What:** `Action_Block_User_Input` blocks the input in the worker process and keeps it blocked after the element has finished (as v1). The worker releases the block when it shuts down in an orderly way (`SystemOps.ReleaseInput`, WI-0126, M-0156, tested with the provider). A worker that is killed after the deadline of its shutdown releases nothing. Not checked: whether AutoHotkey or Windows release a block of a process that has ended.
 **Status:** open, not checked on the real desktop. Next step (owner's manual check): a flow blocks the input and then hangs (or the worker is killed), and the keyboard and the mouse are used afterwards. Fallback if the block stays: the warning of the help page (already there, "not checked"); a release from another process is assumed not to be possible.
+
+### F-9000*: The element list of another flow is kept while the settings window is open
+
+**What:** WI-0129 (`Action_Set_element_parameter`) asks the engine for the elements of another flow (`cmd.flow.elements`) and keeps the answer until the next opening of a settings window (`EditorFlowCatalog.Refresh`). Like the trigger lists (WI-0107), the lists do not follow a change of that flow that another editor makes while this window is open.
+**Status:** open, found by WI-0129 (read, not run). Next step: refresh the element lists on `evt.flow.committed` of the other flow, as the flow list follows `evt.flow.list.changed`.
 
 ### F-0193: Imported v1 AutoHotkey scripts are not marked and not held back
 

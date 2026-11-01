@@ -838,11 +838,11 @@ Connection points and loop variables: REQ-EXE-030. The differences from v1 are i
 ### REQ-ELM-250 Flow control
 
 - **v1:** yes
-- **v2:** partial (`Action_Sleep`, `Action_Do_nothing`, `Condition_Do_nothing`, `Action_Execute_Flow`, `Action_Stop_Flow` and `Condition_Flow_Running` exist; `Action_Set_Flow_Status` and `Condition_Flow_Enabled` (WI-0065) exist; `Action_Set_element_parameter` is open)
+- **v2:** partial (`Action_Sleep`, `Action_Do_nothing`, `Condition_Do_nothing`, `Action_Execute_Flow`, `Action_Stop_Flow` and `Condition_Flow_Running` exist; `Action_Set_Flow_Status` and `Condition_Flow_Enabled` (WI-0065) exist; `Action_Set_element_parameter` (WI-0129) exists, its change in the editor's display is open)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0047, WI-0052, WI-0055), S0003, S0008
-- **Evidence:** `tests/ahk/element_sleep.test.ahk`, `tests/integration/test_core_a_elements.py::test_action_do_nothing_finishes_with_normal_or_exception`, `tests/integration/test_core_a_elements.py::test_condition_do_nothing_finishes_with_the_chosen_result`, `tests/integration/test_core_d_flows.py::test_stop_flow_stops_running_and_queued_instances_and_its_own_flow`, `tests/integration/test_core_d_flows.py::test_flow_running_sees_running_and_queued_instances`, `tests/ahk/engine_call_flow.test.ahk`, `tests/integration/test_flow_status_elements.py::test_set_flow_status_every_choice_for_another_flow`, `tests/integration/test_flow_status_elements.py::test_condition_flow_enabled_every_choice`
+- **Plan:** S0002 (WI-0047, WI-0052, WI-0055), S0003, S0008 (WI-0129)
+- **Evidence:** `tests/integration/test_set_element_parameter.py::test_set_element_parameter_changes_an_element_of_the_own_flow_and_saves_it`, `tests/integration/test_set_element_parameter.py::test_set_element_parameter_changes_an_element_of_another_flow`, `tests/integration/test_set_element_parameter.py::test_a_running_element_keeps_its_value_and_the_next_start_sees_the_new_one`, `tests/integration/test_set_element_parameter.py::test_a_changed_timer_trigger_fires_with_the_new_interval`, `tests/e2e/test_editor_flow_ctx.py::test_set_element_parameter_lists_the_elements_and_the_parameters_of_another_flow`, `tests/ahk/element_sleep.test.ahk`, `tests/integration/test_core_a_elements.py::test_action_do_nothing_finishes_with_normal_or_exception`, `tests/integration/test_core_a_elements.py::test_condition_do_nothing_finishes_with_the_chosen_result`, `tests/integration/test_core_d_flows.py::test_stop_flow_stops_running_and_queued_instances_and_its_own_flow`, `tests/integration/test_core_d_flows.py::test_flow_running_sees_running_and_queued_instances`, `tests/ahk/engine_call_flow.test.ahk`, `tests/integration/test_flow_status_elements.py::test_set_flow_status_every_choice_for_another_flow`, `tests/integration/test_flow_status_elements.py::test_condition_flow_enabled_every_choice`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
@@ -854,7 +854,7 @@ Connection points and loop variables: REQ-EXE-030. The differences from v1 are i
 | `Condition_Flow_Running` | yes | done | S0002 (WI-0055) |
 | `Action_Set_Flow_Status` | yes | done | S0003 (WI-0065) |
 | `Condition_Flow_Enabled` | yes | done | S0003 (WI-0065) |
-| `Action_Set_element_parameter` | yes | open | S0008 |
+| `Action_Set_element_parameter` | yes | partial (WI-0129: the change, the lists and the errors are tested; the display of the change in an open editor is the owner's manual check) | S0008 (WI-0129) |
 
 ### REQ-ELM-260 Trace points
 

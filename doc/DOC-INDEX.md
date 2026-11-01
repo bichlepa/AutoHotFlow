@@ -31,31 +31,31 @@ L411-422 9. Performance budgets (targets, measured in Phase 2)
 L424-434 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (186.5 KB, 785 lines)
+## doc/PROTOCOL.md (187.9 KB, 787 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-758 4. Message Catalog
+L95-760 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
 L165-173   4.1c Unhandled errors (`evt.diag.error`, WI-0023)
-L175-259   4.2 Engine commands (clients → `engine`)
-L261-310   4.3 Engine events (`evt.*`, engine → topics)
-L312-345   4.4 Engine ↔ trigger host
-L347-412   4.5 Engine ↔ worker
-L414-486   4.6 Engine ↔ storage and log
-L488-507   4.7 Dialogs
-L509-515   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2, E0072)
-L517-554   4.8 Manager (WI-0073, `src/manager/`)
-L556-618   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
-L620-639   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L641-739   4.11 Role `editor` (WI-0088, `src/editor/`)
-L741-758   4.12 Role `help`: the help window (WI-0111, E0098, E0099, E0100)
-L760-779 5. Connection setup, reconnection, resync
-L770-779   5a Events before subscription (design question, WI-0007)
-L781-785 6. Versioning and extension
+L175-260   4.2 Engine commands (clients → `engine`)
+L262-312   4.3 Engine events (`evt.*`, engine → topics)
+L314-347   4.4 Engine ↔ trigger host
+L349-414   4.5 Engine ↔ worker
+L416-488   4.6 Engine ↔ storage and log
+L490-509   4.7 Dialogs
+L511-517   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2, E0072)
+L519-556   4.8 Manager (WI-0073, `src/manager/`)
+L558-620   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
+L622-641   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
+L643-741   4.11 Role `editor` (WI-0088, `src/editor/`)
+L743-760   4.12 Role `help`: the help window (WI-0111, E0098, E0099, E0100)
+L762-781 5. Connection setup, reconnection, resync
+L772-781   5a Events before subscription (design question, WI-0007)
+L783-787 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (60.7 KB, 369 lines)
@@ -76,25 +76,25 @@ L329-347 9b. System action tests (E0103, WI-0117)
 L349-369 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (66.5 KB, 545 lines)
+## doc/ELEMENT-API-V2.md (67.8 KB, 549 lines)
 ```text
 L8-18 1. Guidelines
 L20-113 2. Class contract
 L92-113   2.1 Parameter fields of the settings form (WI-0105)
-L115-291 3. Context `ctx`
-L164-181   3.1 Parameter evaluation (WI-0042)
-L183-193   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
-L195-201   3.3 Dialogs (E0038, WI-0051)
-L203-229   3.3a System actions (E0103, WI-0117)
-L231-246   3.4 Debug view (WI-0056, REQ-DBG-060)
-L248-270   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
-L272-291   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
-L293-375 4. Example 1: `Action_Sleep` (inline, with timer)
-L377-470 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L472-512 6. Mechanical conversion rules
-L514-535 7. What stays
-L521-535   7.1 Loop elements (WI-0054)
-L537-545 8. Still to be clarified (Phase 3)
+L115-295 3. Context `ctx`
+L166-183   3.1 Parameter evaluation (WI-0042)
+L185-195   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
+L197-203   3.3 Dialogs (E0038, WI-0051)
+L205-231   3.3a System actions (E0103, WI-0117)
+L233-248   3.4 Debug view (WI-0056, REQ-DBG-060)
+L250-272   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+L274-295   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
+L297-379 4. Example 1: `Action_Sleep` (inline, with timer)
+L381-474 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L476-516 6. Mechanical conversion rules
+L518-539 7. What stays
+L525-539   7.1 Loop elements (WI-0054)
+L541-549 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
