@@ -9,6 +9,7 @@ FlowStates/<flowId>.json; with the type Windows only when the supervisor was sta
 it is enabled later, and (foundation marker) not after a restart of the trigger host.
 """
 
+import datetime
 import json
 import time
 
@@ -46,6 +47,19 @@ def startup_flow(name, startup_type="AutoHotFlow"):
     done = fb.action("Action_Do_nothing")
     fb.chain(trigger, done)
     return fb, trigger
+
+
+def time_of_day_flow(name, stamp, week_days="1234567"):
+    fb = FlowBuilder(name)
+    trigger = fb.trigger("Trigger_Time_Of_Day", WeekDays=week_days, Time=stamp)
+    done = fb.action("Action_Do_nothing")
+    fb.chain(trigger, done)
+    return fb, trigger
+
+
+def ahk_week_day(when):
+    """The week day as AutoHotkey counts it (A_WDay): 1 is Sunday, 7 is Saturday."""
+    return when.isoweekday() % 7 + 1
 
 
 def write_flow_state(datadir, enabled):
@@ -225,3 +239,48 @@ def test_the_startup_trigger_does_not_fire_after_a_restart_of_the_trigger_host(h
     assert wait_state(host_flows, fid, trigger.id, lambda s: s["armed"] is True) is not None, host_flows.stderr_text()
     time.sleep(scaled(0.5))
     assert len(started(host_flows, fid)) == 1, "the start-up trigger fired again after a restart of the host"
+
+
+# --- Trigger_Time_Of_Day (WI-0131, REQ-TRG-210): a time a few seconds ahead, never minutes -------------------------
+
+def test_time_of_day_fires_at_its_time_and_not_again_that_day(host_flows):
+    now = datetime.datetime.now()
+    when = now + datetime.timedelta(seconds=3)
+    if when.date() != now.date():
+        pytest.skip("the test time crosses midnight: the next time would be on the next day")
+    fb, trigger = time_of_day_flow("Time of day", when.strftime("%Y%m%d%H%M%S"))
+    fid = host_flows.add(fb)
+    host_flows.start()
+    host_flows.enable(fid)
+    assert wait_state(host_flows, fid, trigger.id, lambda s: s["armed"] is True) is not None, host_flows.stderr_text()
+    assert len(host_flows.ended(fid, count=1, timeout=scaled(WAIT_S))) >= 1, host_flows.stderr_text()
+    assert datetime.datetime.now() >= when.replace(microsecond=0) - datetime.timedelta(seconds=0.5), "fired before its time"
+    since = host_flows.mark()
+    time.sleep(scaled(1.0))
+    assert started(host_flows, fid, since) == [], "the time fires once: the next one is on another day"
+
+
+def test_time_of_day_does_not_fire_on_another_week_day(host_flows):
+    now = datetime.datetime.now()
+    when = now + datetime.timedelta(seconds=2)
+    if when.date() != now.date():
+        pytest.skip("the test time crosses midnight")
+    other_days = "".join(str(d) for d in range(1, 8) if d != ahk_week_day(now))
+    fb, trigger = time_of_day_flow("Other week day", when.strftime("%Y%m%d%H%M%S"), week_days=other_days)
+    fid = host_flows.add(fb)
+    host_flows.start()
+    host_flows.enable(fid)
+    assert wait_state(host_flows, fid, trigger.id, lambda s: s["armed"] is True) is not None, host_flows.stderr_text()
+    time.sleep(scaled(3.0))
+    assert started(host_flows, fid) == [], "the trigger fired on a week day that is not selected"
+
+
+def test_a_time_of_day_without_week_days_is_not_armed_and_says_the_parameter_is_empty(host_flows):
+    # WarnIfEmpty: the engine refuses an empty week day list before the element runs (the element's own text, "Can't
+    # calculate next trigger time", is checked by the unit test element_time_of_day.test.ahk).
+    fb, trigger = time_of_day_flow("No week day", "20261101100000", week_days="")
+    fid = host_flows.add(fb)
+    host_flows.start()
+    host_flows.enable(fid)
+    state = wait_state(host_flows, fid, trigger.id, lambda s: s["message"] == "Parameter 'WeekDays' is empty")
+    assert state is not None and state["armed"] is False, state

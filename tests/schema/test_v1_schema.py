@@ -54,6 +54,8 @@ ALLOWED = {
     ("default.action_time_difference", "Unit", "default"): "M-0099",
     # M-0107: the default time of New time is the time of the element's creation (v1 writes the marker <A_Now>)
     ("default.action_new_time", "Time", "default"): "M-0107",
+    # M-0160: the default time of Time of day is the time of the element's creation (v1 writes the marker <A_Now>)
+    ("default.trigger_time_of_day", "Time", "default"): "M-0160",
     # M-0103: the spelling of an enum value (v1 example flows contain both)
     ("default.action_execute_flow", "WhichTrigger", "enum"): "M-0103",
     # M-0072, M-0073: the choices of the trigger selection of the flow status elements (WI-0065)

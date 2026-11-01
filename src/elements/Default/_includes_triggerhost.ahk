@@ -15,6 +15,7 @@ class Default {
     #Include Triggers\Trigger_Manual.ahk
     #Include Triggers\Trigger_Periodic_Timer.ahk
     #Include Triggers\Trigger_Start_up.ahk
+    #Include Triggers\Trigger_Time_Of_Day.ahk
 }
 
 ElementRegistry.RegisterPackage("Default", "1.2.1")
@@ -23,3 +24,4 @@ ElementRegistry.Register(Default.Trigger_Hotkey)
 ElementRegistry.Register(Default.Trigger_Manual)
 ElementRegistry.Register(Default.Trigger_Periodic_Timer)
 ElementRegistry.Register(Default.Trigger_Start_up)
+ElementRegistry.Register(Default.Trigger_Time_Of_Day)

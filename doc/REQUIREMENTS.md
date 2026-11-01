@@ -1223,16 +1223,16 @@ Started by the user, by another flow (REQ-EXE-120) or through the command line (
 ### REQ-TRG-210 Time triggers
 
 - **v1:** yes
-- **v2:** partial (the periodic timer; the time of day is missing)
+- **v2:** done (the periodic timer, WI-0063; the time of day with week days, WI-0131)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0003 (WI-0063 done), S0008
-- **Evidence:** `tests/integration/test_time_triggers.py` (WI-0063: the periodic timer fires about every interval, never faster, stops on disable, and refuses a bad interval or unit with the v1 text)
+- **Plan:** S0003 (WI-0063 done), S0008 (WI-0131 done)
+- **Evidence:** `tests/integration/test_time_triggers.py` (WI-0063: the periodic timer fires about every interval, never faster, stops on disable, and refuses a bad interval or unit with the v1 text; WI-0131: the time of day fires at its time a few seconds ahead and once per day, not on a week day that is not selected, and refuses an empty week day list), `tests/ahk/element_time_of_day.test.ahk` (WI-0131: the next time on the week days, the timer checked against the clock)
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
 | `Trigger_Periodic_Timer` | yes | done (WI-0063) | S0003 (WI-0063 done) |
-| `Trigger_Time_of_Day` (with week days) | yes | open | S0008 |
+| `Trigger_Time_of_Day` (with week days) | yes | done (WI-0131) | S0008 (WI-0131 done) |
 
 ### REQ-TRG-220 Start-up and system triggers
 

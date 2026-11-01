@@ -30,6 +30,7 @@ TEST_GROUPS = {
     "ahk/element_registry.test.ahk": ["element-units"],
     "ahk/element_runner.test.ahk": ["element-units"],
     "ahk/element_sleep.test.ahk": ["element-units"],
+    "ahk/element_time_of_day.test.ahk": ["element-units", "triggers"],
     "ahk/element_smoke.test.ahk": ["element-units"],
     "ahk/element_window_ident.test.ahk": ["element-units"],
     "ahk/engine_call_flow.test.ahk": ["engine"],
@@ -551,6 +552,13 @@ COVERS = {
         "integration/test_time_triggers.py::test_the_periodic_timer_fires_about_every_interval",
         "integration/test_time_triggers.py::test_disabling_the_flow_stops_the_periodic_timer",
         "integration/test_time_triggers.py::test_a_bad_parameter_of_a_time_trigger_is_not_armed_and_gives_the_v1_text",
+    ],
+    # WI-0131: time of day (week days, the timer checked against the clock), in the time trigger tests
+    "src/elements/Default/Triggers/Trigger_Time_Of_Day.ahk": [
+        "ahk/element_time_of_day.test.ahk",
+        "integration/test_time_triggers.py::test_time_of_day_fires_at_its_time_and_not_again_that_day",
+        "integration/test_time_triggers.py::test_time_of_day_does_not_fire_on_another_week_day",
+        "integration/test_time_triggers.py::test_a_time_of_day_without_week_days_is_not_armed_and_says_the_parameter_is_empty",
     ],
     "src/elements/Default/Triggers/Trigger_Start_up.ahk": [
         "integration/test_time_triggers.py::test_a_startup_trigger_enabled_later_does_not_fire",

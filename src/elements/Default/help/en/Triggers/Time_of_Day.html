@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Triggers/Time_of_Day.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<!-- Generated from src/elements/Default/help/en/Triggers/Time_Of_Day.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
 <title>Time of day</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
@@ -99,12 +99,14 @@ img {
 <body>
 <main>
 <h1>Time of day</h1>
-<p>The trigger <strong>Time of day</strong> triggers on specifed time of day.</p>
+<p>The trigger <strong>Time of day</strong> triggers at a specified time of day, on the selected week days.</p>
 <h2>Settings</h2>
 <h3>Weekdays</h3>
-<p>Weekdays on which the flow will start.</p>
+<p>Weekdays on which the flow will start. If no week day is selected, the trigger is not enabled: the setting says that the parameter is empty.</p>
 <h3>Time of day</h3>
-<p>Time when the flow will start.</p>
+<p>Time when the flow will start. Only the time is used; the date of the value is ignored.</p>
+<h2>Remarks</h2>
+<p>The next time is computed when the trigger is enabled and after every start. A change of the clock of the computer is taken into account when the time comes: a time that is reached early (the clock was set back) waits for the rest, and a time that is reached late (the clock was set forward, or the computer was in standby) still starts the flow. A time that was missed in standby is not started afterwards (MIGRATION M-0160).</p>
 </main>
 </body>
 </html>
