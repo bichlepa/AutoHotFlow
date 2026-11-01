@@ -70,10 +70,27 @@ Case5() {
     Assert.Equal(Trigger_Hotstring._regs.Count, 0, "nothing registered")
 }
 
+Case6() {
+    ; Two triggers with the same hotstring share one registration; the last Disable turns it off.
+    a := FakeHotCtx()
+    b := FakeHotCtx()
+    p := Prm({hotstring: "ahfsharetest", KeysToSend: "one"})
+    Trigger_Hotstring.Enable(a, p)
+    Trigger_Hotstring.Enable(b, Prm({hotstring: "ahfsharetest", KeysToSend: "two"}))
+    key := a.State.regKey
+    Assert.Equal(Trigger_Hotstring._regs.Count, 1, "one registration")
+    Assert.Equal(Trigger_Hotstring._regs[key]["entries"].Length, 2, "both triggers armed on it")
+    Trigger_Hotstring.Disable(a)
+    Assert.Equal(Trigger_Hotstring._regs[key]["entries"].Length, 1, "the other one stays")
+    Trigger_Hotstring.Disable(b)
+    Assert.Equal(Trigger_Hotstring._regs.Has(key), false, "the last Disable removes the registration")
+}
+
 TestRun.Case("FullText: the options in the order of v1; an empty text is refused", Case1)
 TestRun.Case("KeysOf, SendModeOf: the raw prefix and the send modes", Case2)
 TestRun.Case("ModeOf: the window values", Case3)
 TestRun.Case("TriggerVariables and GenerateName", Case4)
 TestRun.Case("Enable: an unknown window value is refused and nothing is registered", Case5)
+TestRun.Case("Registration: two triggers on one hotstring share it; the last Disable removes it", Case6)
 
 TestRun.Finish()
