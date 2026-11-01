@@ -17,6 +17,7 @@ class SystemOps {
     static provider := ""
     static _realOps := ""
     static speaker := ""                ; the SAPI voice of this process (SpeakText), created on the first speech
+    static inputBlocked := false        ; this process has blocked the input and not released it (WI-0126, ReleaseInput)
     static flowId := ""
     static elementId := ""
 
@@ -63,9 +64,22 @@ class SystemOps {
     static SpeechWait() => SystemOps._Provider().SpeechWait()
 
     ; --- input (the whole desktop) -----------------------------------------------------------------------------------
-    static BlockInput(args*) => SystemOps._Provider().BlockInput(args*)
+    ; "On" or "Off" (the element passes only these). The state is remembered, so ReleaseInput can undo a block of this process.
+    static BlockInput(state) {
+        SystemOps._Provider().BlockInput(state)
+        SystemOps.inputBlocked := (state = "On")
+    }
+
+    ; Ends a block of this process (WI-0126): the worker calls it when it shuts down, so that no input stays blocked after
+    ; the worker has ended. A process that has not blocked the input does nothing.
+    static ReleaseInput() {
+        if (SystemOps.inputBlocked)
+            SystemOps.BlockInput("Off")
+    }
+
     static Click(args*) => SystemOps._Provider().Click(args*)
     static MouseClickDrag(args*) => SystemOps._Provider().MouseClickDrag(args*)
+    static MouseGetPos(flag := 0) => SystemOps._Provider().MouseGetPos(flag)
     static MouseMove(args*) => SystemOps._Provider().MouseMove(args*)
     static Send(keys, mode := "") => SystemOps._Provider().Send(keys, mode)
     static SetCapsLockState(args*) => SystemOps._Provider().SetCapsLockState(args*)
@@ -219,6 +233,13 @@ class SystemOps {
 
         MouseClickDrag(args*) {
             return MouseClickDrag(args*)
+        }
+
+        ; The mouse position and the window and control under it: [x, y, window, control]. flag 2 gives the handle of the
+        ; control (as v1 Get mouse position), 0 its ClassNN. The position is read only (no change of the desktop).
+        MouseGetPos(flag := 0) {
+            MouseGetPos(&x, &y, &win, &ctrl, flag)
+            return [x, y, win, ctrl]
         }
 
         MouseMove(args*) {

@@ -60,6 +60,11 @@ class Worker extends Role {
     ; sys.shutdown: a running element is stopped and reported before sys.bye (ARCHITECTURE 6.3).
     OnShutdown(deadlineMs) {
         this._StopCurrent(true)
+        ; WI-0126: a block of the input (Block user input) ends with the worker, so that the user is not locked out
+        ; after the worker has gone. A worker that is killed does not get here (ELEMENT-API-V2 3.3a, WI-0126).
+        try SystemOps.ReleaseInput()
+        catch as err
+            Log.Write("f0", "worker", "the input could not be released: " err.Message)
     }
 
     ; --- commands ------------------------------------------------------------------------------

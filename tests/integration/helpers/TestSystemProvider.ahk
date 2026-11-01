@@ -64,6 +64,7 @@ class TestSystemProvider {
     BlockInput(args*) => this._Call("BlockInput", args, 0)
     Click(args*) => this._Call("Click", args, 0)
     MouseClickDrag(args*) => this._Call("MouseClickDrag", args, 0)
+    MouseGetPos(flag := 0) => this._Call("MouseGetPos", [flag], [0, 0, 0, 0])
     MouseMove(args*) => this._Call("MouseMove", args, 0)
     Send(keys, mode := "") => this._Call("Send", [keys, mode], 0)
     SetCapsLockState(args*) => this._Call("SetCapsLockState", args, 0)

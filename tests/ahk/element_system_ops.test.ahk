@@ -59,7 +59,7 @@ TestRun.Case("every group passes its arguments on and returns the answer of the 
     Assert.Equal(SystemOps.FileRecycleEmpty("C:\"), "FileRecycleEmpty"),
     Assert.Equal(SystemOps.SoundBeep(800, 100), "SoundBeep"),
     Assert.Equal(SystemOps.SpeakText("hi", "", 1, 50, 0, 0, 0), "SpeakText"),
-    Assert.Equal(SystemOps.BlockInput("On"), "BlockInput"),
+    SystemOps.BlockInput("On"),
     Assert.Equal(SystemOps.Send("{Enter}", "Input"), "Send"),
     Assert.Equal(SystemOps.MouseMove(10, 20, 0), "MouseMove"),
     Assert.Equal(SystemOps.SetCapsLockState("AlwaysOff"), "SetCapsLockState"),
@@ -70,6 +70,7 @@ TestRun.Case("every group passes its arguments on and returns the answer of the 
     Assert.Equal(p.calls[9][2][2], "Input", "Send passes its mode"),
     Assert.Equal(p.calls[10][2].Length, 3),
     Assert.Equal(p.calls[11][2][1], "AlwaysOff"),
+    Assert.Equal(p.calls[8][2][1], "On", "BlockInput passes its state (WI-0126)"),
     Assert.Equal(p.calls.Length, 13),
     SystemOps.UseProvider("")
 ))
