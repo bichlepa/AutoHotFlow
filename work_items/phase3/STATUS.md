@@ -78,6 +78,8 @@ None.
 
 ## Last verified state
 
+Commit `bfc7eb31` (WI-0132, WI-0133, the test-selection and window-focus test changes, the F-0207 fix integrated; all tiers, the first complete fast run since `4ab84f75`): fast 2706 passed, 5 failed (57 min); foundation 469 passed, 2 failed; slow 215 passed, 1 failed (runs 20261102-170002-bfc7eb31-2, -3, and 20261102-170002-bfc7eb31). All 8 reds green when rerun serially (recheck, 3 runs): load flakes. The corpus File link test (WI-0133) failed under load once; it waits 2 s for the shortcut that storage writes after the enable answer (F-0208), so it can become flaky by design.
+
 Commit `69c2cadd` (WI-0132, test selection integrated): foundation 471 and slow 215 green; fast stalled in `test_window_triggers::test_gets_inactive...` (setup took 107 s waiting for the input lock, worker down, stall guard killed the run: exit 76, no summary; F-0210). The owner's commit `eeb87467` marks the focus tests gui. Run 20261102-152456-69c2cadd (-2 slow, 20261102-152455 foundation).
 
 Commit `4ab84f75` (WI-0127 and WI-0128 integrated; all tiers, run while other agents ran tests): fast 2662 passed, 7 failed; foundation 468 passed, 3 failed; slow 212 passed, 2 failed (runs 20261102-131359-4ab84f75, -2, -3). All 12 reds green when rerun serially (recheck 20261102-141406-recheck for foundation, the rechecks of -2 and the direct serial run of the editor, clipboard and core settings files, 47 passed): load flakes. `test_time_triggers` time of day fails also alone on v2-port (WI-0131 code, not investigated). WI-0132 (tip `16130a29`) and the test-selection change `e8dbb491` are not yet verified on the integrated state.
