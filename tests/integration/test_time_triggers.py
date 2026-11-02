@@ -23,6 +23,9 @@ from support.timing import scaled
 
 HOST_ROLES = "storage,engine,triggerhost"
 WAIT_S = 10.0
+# The time of a test is written into the flow file before the session starts, so it must lie this far ahead: a start
+# took about 5 s in the failed run of F-0207 (the trigger arms at enable, after the start).
+FIRE_MARGIN_S = 12.0
 INTERVAL_MS = 200
 
 
@@ -291,15 +294,19 @@ def test_a_bad_interval_of_the_user_idle_trigger_is_not_armed_and_gives_the_v1_t
 
 def test_time_of_day_fires_at_its_time_and_not_again_that_day(host_flows):
     now = datetime.datetime.now()
-    when = now + datetime.timedelta(seconds=3)
+    when = now + datetime.timedelta(seconds=FIRE_MARGIN_S)
     if when.date() != now.date():
         pytest.skip("the test time crosses midnight: the next time would be on the next day")
     fb, trigger = time_of_day_flow("Time of day", when.strftime("%Y%m%d%H%M%S"))
     fid = host_flows.add(fb)
     host_flows.start()
+    # The time is in the flow file before the session starts, so the session must be ready before it (F-0207).
+    if datetime.datetime.now() >= when - datetime.timedelta(seconds=1):
+        pytest.fail("the session was ready at %s, after the test time %s: the start took more than %s s"
+                    % (datetime.datetime.now().time(), when.time(), FIRE_MARGIN_S))
     host_flows.enable(fid)
     assert wait_state(host_flows, fid, trigger.id, lambda s: s["armed"] is True) is not None, host_flows.stderr_text()
-    assert len(host_flows.ended(fid, count=1, timeout=scaled(WAIT_S))) >= 1, host_flows.stderr_text()
+    assert len(host_flows.ended(fid, count=1, timeout=scaled(FIRE_MARGIN_S + WAIT_S))) >= 1, host_flows.stderr_text()
     assert datetime.datetime.now() >= when.replace(microsecond=0) - datetime.timedelta(seconds=0.5), "fired before its time"
     since = host_flows.mark()
     time.sleep(scaled(1.0))
