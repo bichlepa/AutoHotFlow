@@ -1405,10 +1405,11 @@ Export selected flows to an `.ahf` file (a ZIP archive); import from such a file
 ### REQ-MGR-060 Demonstration flows
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (the flows load read only, start disabled, refuse every change and can be hidden, tested headless; the group, the question of a delete and the hint of the editor are shown by the window, not checked; manual check 12)
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0008
+- **Evidence:** `tests/integration/test_demo_flows.py`, `tests/e2e/test_manager_demo.py`, `tests/e2e/test_editor_demo.py`
 
 AutoHotFlow ships demo flows in their own category "Demonstration". They cannot be deleted, renamed or changed: the editor shows them read only and says that a duplicate can be edited. The user can hide them (setting "Hide demonstration flows"). They are disabled until the user enables them. v2 ships three of the four v1 demos; the "Update checker" is left out, because a check for updates is a feature of its own that is off until the user switches it on (REQ-SEC-050, E0105).
 
@@ -2558,7 +2559,7 @@ Open points:
 - **Scope:** port
 - **Plan:** S0010 (check)
 
-AutoHotFlow sends nothing anywhere by itself: no telemetry, no usage statistics, no crash reports to the outside (crash reports stay on the computer, REQ-DIA-030). Only elements use the network, because the user put them into a flow. A later feature that contacts a server (for example a check for updates) is off until the user switches it on.
+AutoHotFlow sends nothing anywhere by itself: no telemetry, no usage statistics, no crash reports to the outside (crash reports stay on the computer, REQ-DIA-030). Only elements use the network, because the user put them into a flow. A later feature that contacts a server (for example a check for updates) is off until the user switches it on. The demonstration flows (REQ-MGR-060) start nothing by themselves: they are disabled at the first start, and the Joke teller fetches its web page only when the user runs its flow (WI-0134).
 
 ### REQ-SEC-060 Imported flows are disabled and come with a warning
 

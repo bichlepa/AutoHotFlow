@@ -92,6 +92,8 @@ TEST_GROUPS = {
     "ahk/vars_model.test.ahk": ["variables", "expr"],
     "e2e/test_manager.py": ["manager"],
     "e2e/test_manager_flows.py": ["manager"],
+    "e2e/test_manager_demo.py": ["manager"],     # WI-0134: the demonstration flows in the manager (headless)
+    "e2e/test_editor_demo.py": ["editor"],       # WI-0134: a demonstration flow opens read only
     "e2e/test_manager_archive.py": ["manager", "storage"],
     "e2e/test_manager_import.py": ["manager"],
     "e2e/test_manager_import_settings.py": ["settings", "manager"],
@@ -175,6 +177,7 @@ TEST_GROUPS = {
     "integration/test_flow_convert.py": ["expr", "engine"],
     "integration/test_flow_lifecycle.py": ["storage"],
     "integration/test_flow_lifecycle_engine.py": ["engine"],
+    "integration/test_demo_flows.py": ["engine", "storage"],     # WI-0134: the demonstration flows (REQ-MGR-060)
     "integration/test_flow_status_elements.py": ["elements-e2e", "triggers"],
     "integration/test_set_element_parameter.py": ["elements-e2e", "triggers", "engine"],   # WI-0129: an edit by an element
     "integration/test_flowrun.py": ["engine"],
