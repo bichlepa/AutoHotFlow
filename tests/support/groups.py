@@ -63,6 +63,7 @@ OTHER_RULES = [
     ("tests/ahk/helpers/modal_spike.ahk", ["ui"]),
     ("tests/ahk/helpers/tray_menu_probe.ahk", ["tray"]),
     ("tests/ahk/helpers/ui_dialog_text.ahk", ["manager", "ui"]),  # used by tests/fault/test_manager_window.py
+    ("tests/integration/helpers/screen_window.ahk", ["elements-e2e", "workers"]),   # the test window of tests/integration/test_screen_elements.py (WI-0127)
     ("tests/integration/helpers/AutoHotFlowTest.ahk", None),      # the test entry of every role
     ("tests/integration/helpers/entry/generated/*", ["element-units"]),
     ("tests/integration/helpers/entry/test/*", ROLE_TESTS),       # echo, crasher, hanger, slow_shutdown
