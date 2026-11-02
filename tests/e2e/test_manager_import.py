@@ -25,6 +25,9 @@ from support.timing import scaled
 
 EXAMPLES = Path(__file__).resolve().parents[1] / "data" / "flows" / "v1_examples"
 EXAMPLE_COUNT = len(list(EXAMPLES.glob("*.json")))
+DEMO_IDS = {p.stem for p in (Path(__file__).resolve().parents[2] / "assets" / "demo_flows").glob("*.json")}
+# A flow with the ID of a demonstration flow is skipped by the import (WI-0134, F-0212): the others are created.
+CREATED_COUNT = len([p for p in EXAMPLES.glob("*.json") if p.stem not in DEMO_IDS])
 DEMO_NAME = "Demo flow from v1"
 BROKEN_NAME = "Broken flow"
 ONE_EXAMPLE = "Flow 369404488"      # a v1 example flow (its name is the flow ID)
@@ -143,11 +146,11 @@ def test_every_flow_of_the_folder_is_imported_with_its_id_and_disabled(started, 
     assert DEMO_NAME not in flows
     assert flows[BROKEN_NAME]["state"] == "failed", flows[BROKEN_NAME]
     created = [f for f in result["flows"] if f["state"] == "created"]
-    assert len(created) == EXAMPLE_COUNT, [(f["name"], f["state"], f["message"]) for f in result["flows"] if f["state"] != "created"][:4]
+    assert len(created) == CREATED_COUNT, [(f["name"], f["state"], f["message"]) for f in result["flows"] if f["state"] != "created"][:4]
     for f in created:
         assert f["flowId"] == f["name"], f                     # the v1 file name is the ID
 
-    assert wait_until(lambda: len(v2_flows(obs)) == EXAMPLE_COUNT + 1, scaled(20)), sorted(v2_flows(obs))
+    assert wait_until(lambda: len(v2_flows(obs)) == CREATED_COUNT + 1, scaled(20)), sorted(v2_flows(obs))
     for f in created:
         rec = v2_flows(obs)[f["name"]]
         assert not rec["enabled"], rec                         # imported flows are disabled (E0058, REQ-SEC-060)
