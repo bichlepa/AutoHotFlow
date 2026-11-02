@@ -114,6 +114,19 @@ class WindowIdent {
         return WinActive(spec["winString"], spec["winText"], spec["excludeTitle"], spec["ExcludeText"]) != 0
     }
 
+    ; The IDs of every window that the spec identifies (WinGetList with the same arguments), as an Array. Used by the
+    ; window triggers (WI-0132) to compare two polls.
+    static List(spec) {
+        WindowIdent._SetMatch(spec)
+        return WinGetList(spec["winString"], spec["winText"], spec["excludeTitle"], spec["ExcludeText"])
+    }
+
+    ; The ID of the active window when it is one the spec identifies, 0 otherwise (WinActive with the same arguments).
+    static ActiveId(spec) {
+        WindowIdent._SetMatch(spec)
+        return WinActive(spec["winString"], spec["winText"], spec["excludeTitle"], spec["ExcludeText"])
+    }
+
     static _SetMatch(spec) {
         SetTitleMatchMode(spec["TitleMatchMode"])
         DetectHiddenText(spec["FindHiddenText"])

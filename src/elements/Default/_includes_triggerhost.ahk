@@ -7,6 +7,8 @@
 #Include ..\base\ElementRegistry.ahk
 #Include lib\ScriptHost.ahk
 #Include lib\WindowIdent.ahk
+#Include lib\ProcessWatch.ahk
+#Include lib\WindowWatch.ahk
 
 ; arch-ok: one-class the generated package class is named after the package, not after this file
 class Default {
@@ -16,9 +18,15 @@ class Default {
     #Include Triggers\Trigger_Hotstring.ahk
     #Include Triggers\Trigger_Manual.ahk
     #Include Triggers\Trigger_Periodic_Timer.ahk
+    #Include Triggers\Trigger_Process_Closes.ahk
+    #Include Triggers\Trigger_Process_starts.ahk
     #Include Triggers\Trigger_Start_up.ahk
     #Include Triggers\Trigger_Time_Of_Day.ahk
     #Include Triggers\Trigger_User_Idle_Time.ahk
+    #Include Triggers\Trigger_Window_Closes.ahk
+    #Include Triggers\Trigger_Window_Gets_Active.ahk
+    #Include Triggers\Trigger_Window_Gets_Inactive.ahk
+    #Include Triggers\Trigger_Window_Opens.ahk
 }
 
 ElementRegistry.RegisterPackage("Default", "1.2.1")
@@ -28,6 +36,12 @@ ElementRegistry.Register(Default.Trigger_Hotkey)
 ElementRegistry.Register(Default.Trigger_Hotstring)
 ElementRegistry.Register(Default.Trigger_Manual)
 ElementRegistry.Register(Default.Trigger_Periodic_Timer)
+ElementRegistry.Register(Default.Trigger_Process_Closes)
+ElementRegistry.Register(Default.Trigger_Process_starts)
 ElementRegistry.Register(Default.Trigger_Start_up)
 ElementRegistry.Register(Default.Trigger_Time_Of_Day)
 ElementRegistry.Register(Default.Trigger_User_Idle_Time)
+ElementRegistry.Register(Default.Trigger_Window_Closes)
+ElementRegistry.Register(Default.Trigger_Window_Gets_Active)
+ElementRegistry.Register(Default.Trigger_Window_Gets_Inactive)
+ElementRegistry.Register(Default.Trigger_Window_Opens)
