@@ -214,6 +214,7 @@ TEST_GROUPS = {
     "stress/test_start_stop_storm.py": ["engine"],
     "stress/test_trigger_host_busy.py": ["triggers"],
     "stress/test_trigger_host_memory.py": ["triggers"],
+    "stress/test_window_trigger_cost.py": ["triggers"],
     "support/test_client_hub.py": ["transport"],
     "support/test_dialogwatch.py": ["test-support"],
     "support/test_flowbuilder.py": ["test-support"],

@@ -131,29 +131,29 @@ L503-520   19.1 The subset that is compared
 L522-539   19.2 Deliberate deviations from native AutoHotkey v2
 ```
 
-## doc/MEASUREMENTS.md (74.9 KB, 372 lines)
+## doc/MEASUREMENTS.md (76.2 KB, 373 lines)
 ```text
 L11-21 Important: one machine, not an idle machine
-L23-76 Overview
-L78-102 Method
-L104-123 Open menus in a running process (WI-0072, E0064)
-L125-156 Frame of the editor renderer (WI-0083, R0002, MS-0044)
-L158-174 Frame and layer rebuild of the real renderer (WI-0085, E0090, MS-0046)
-L176-195 Not measured
-L197-214 Editor under the event load and the state scene (WI-0089, REQ-PRF-060, MS-0047)
-L216-266 Editor with the real renderer, five editors, batch of 300 (WI-0092, MS-0048 to MS-0050)
-L220-233   MS-0048: frame of the real renderer, 300 elements, headless (task 2 of WI-0092, R0002, REQ-PRF-060)
-L235-250   MS-0049: memory of five open editors (task 3 of WI-0092, E0040, MS-0006)
-L252-266   MS-0050: element states of a flow of 300 elements that all change in one interval; latency of the editor (F-0156, REQ-PRF-060)
-L268-281 Editing: frame of a drag and the layer rebuilds (WI-0097, MS-0051)
-L282-324 Patches of the engine on a flow of 300 elements (WI-0093, MS-0053, MS-0054)
-L284-294   MS-0053: engine time of one patch on a flow of 300 elements (WI-0093, task 6)
-L296-309   MS-0054: steps of a running flow during 100 patches in a row, and a patch of 30 operations on the biggest flow (WI-0093)
-L311-324   MS-0055: patch round trip of the editor, running and idle, against a plain request (WI-0096)
-L326-371 Editing, measured again at the end of S0006 (WI-0104, task 4)
-L330-344   MS-0056: frame of a drag and the rebuilds of the editor renderer, 300 elements (WI-0104, MS-0051 again)
-L346-356   MS-0057: engine time of a patch on a flow of 300 elements (WI-0104, MS-0053 again)
-L358-371   MS-0058: round trip of a patch during a run, 100 patches, 300 steps (WI-0104, MS-0054 again)
+L23-77 Overview
+L79-103 Method
+L105-124 Open menus in a running process (WI-0072, E0064)
+L126-157 Frame of the editor renderer (WI-0083, R0002, MS-0044)
+L159-175 Frame and layer rebuild of the real renderer (WI-0085, E0090, MS-0046)
+L177-196 Not measured
+L198-215 Editor under the event load and the state scene (WI-0089, REQ-PRF-060, MS-0047)
+L217-267 Editor with the real renderer, five editors, batch of 300 (WI-0092, MS-0048 to MS-0050)
+L221-234   MS-0048: frame of the real renderer, 300 elements, headless (task 2 of WI-0092, R0002, REQ-PRF-060)
+L236-251   MS-0049: memory of five open editors (task 3 of WI-0092, E0040, MS-0006)
+L253-267   MS-0050: element states of a flow of 300 elements that all change in one interval; latency of the editor (F-0156, REQ-PRF-060)
+L269-282 Editing: frame of a drag and the layer rebuilds (WI-0097, MS-0051)
+L283-325 Patches of the engine on a flow of 300 elements (WI-0093, MS-0053, MS-0054)
+L285-295   MS-0053: engine time of one patch on a flow of 300 elements (WI-0093, task 6)
+L297-310   MS-0054: steps of a running flow during 100 patches in a row, and a patch of 30 operations on the biggest flow (WI-0093)
+L312-325   MS-0055: patch round trip of the editor, running and idle, against a plain request (WI-0096)
+L327-372 Editing, measured again at the end of S0006 (WI-0104, task 4)
+L331-345   MS-0056: frame of a drag and the rebuilds of the editor renderer, 300 elements (WI-0104, MS-0051 again)
+L347-357   MS-0057: engine time of a patch on a flow of 300 elements (WI-0104, MS-0053 again)
+L359-372   MS-0058: round trip of a patch during a run, 100 patches, 300 steps (WI-0104, MS-0054 again)
 ```
 
 ## doc/CONVENTIONS.md (9.4 KB, 64 lines)
