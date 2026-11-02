@@ -5,7 +5,7 @@ Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits 
 ## Manual checks
 
 - **Manual check 10 (S0006, editing at 100 % and 225 %)** and **manual check 11 (S0007, settings, assistants, help in the three viewers, flow settings, error window).** The gui tests are written and not run (VS Code tasks `Test: ... (gui ...)` and `Start: manual check ...`). Until then REQ-EDT-050/060/070/080/090/120/130/140/200 and REQ-LNG-040 stay `partial`; S0007 is not accepted.
-- **Manual check 12 (planned for WI-0135, S0008):** real shutdown/lock/hibernate, clipboard, sound, speech, eject/lock of a drive, Minimize all windows, DPI of other monitors, the recycle bin, a real shortcut, real mouse and keyboard input.
+- **Manual check 12 (S0008, written in `doc/MANUAL-CHECKS.md`, 39 steps, VS Code tasks `Start: manual check 12 ...`):** sound, speech, volume, mouse and keys into a test window, screenshot, screen settings read, input block, dialogs of WI-0128 and the Dialog test flow, the demonstration flows (look of the group, Loop tutorial run, element settings dialog F-0211), a shortcut of `Trigger_Shortcut` on the desktop, the S0008 gui tests. Power and session elements are not in the list. S0008 is accepted when you close it.
 - **WI-0097 screenshots (REQ-EDT-020):** the look of selection, buttons and drag waits for your acceptance; re-create them with the screenshot tool of the editor if `temp/editor-screenshots/` is gone.
 - Not covered by the S0004 record: whether v1 or 7-Zip opens an `.ahf` file written by v2 (F-0129), and the German manager texts (`assets/language/manager/de.ini`).
 
@@ -31,6 +31,9 @@ Open:
   - **Set element parameter (WI-0129):** the v1 choice "Type of parameter" is not ported (M-0161); the hotkey parameter is a text field; a failed name regeneration of the target is only logged.
   - **Triggers (WI-0131):** a time missed in standby is not repeated; the hotstring replacement is sent by the trigger host.
   - **Input tests:** `@input` tests send real keys; typing during a verification run can make them fail.
+
+- **WI-0134 demonstration flows:** a demo keeps its ID and wins over a user flow with the same ID (M-0187); `HideDemoFlows` hides only in the manager, the engine still loads them (M-0186); import of a flow with a demo ID is skipped (alternative: import as copy; reviewer recommends skip); group "Demonstration" first as in v1.
+- **WI-0135:** the corpus starter, Dialog test and Hotkey test do not run headless (real keys/windows; F-0214): decide on reduced test copies or `gui`. F-0215: package Default has ko 115 and ru 72 of 1,054 keys. F-0216: 8 workers would be about 131 MB (extrapolated), above the E0040 budget of 100 MB; 1 worker + editor is 80 MB.
 
 Decisions the S0008 agents took for you (say so if you want it differently; details in `doc/MIGRATION.md` and the STATUS notes):
 

@@ -66,7 +66,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0132 | Triggers: windows and processes | done | haiku | see git log (up to 16130a29) | 2026-11-02 | 6 triggers, shared WatchPoll (one timer per interval), polling kept (no shell hook), MS-0044, M-0176 to M-0178, REQ-TRG-260/270 done, F-0203 to F-0206; review approved with a fix; owner: F-0203 process triggers cost 8.7 % of a core at 100 ms (default 1000 ms not measured), F-0204 protected processes invisible, NotTriggerOnEnable 0 fires existing matches at the first poll, a window that opens and closes between two polls is not seen; real desktop unchecked |
 | WI-0133 | Shortcut trigger and the flow commands | done | haiku | see git log (up to ab6f3cd9) | 2026-11-02 | `Trigger_Shortcut`, command `Trigger\|flow\|element` (PROTOCOL 4.1/4.2/4.6/5a), storage writes the `.lnk`, M-0179 to M-0182, REQ-TRG-200/240, REQ-DST-040, corpus File link test green, F-0208, F-0209; review approved with 3 fixes (ids with quotes/pipes refused, role-entry test, schema allow list); owner: F-0208 the file comes after the enable answer, absolute path required (v1 allowed relative), `--app-script` accepted from a user command line, removal only on disarm/rearm with the option; real desktop shortcut unchecked |
 | WI-0134 | Demonstration flows (E0105) | done | haiku | see git log (up to 5e928a22) | 2026-11-02 | assets/demo_flows/, mark `demo` (read only, storage path refused), manager group "Demonstration", `HideDemoFlows`, M-0183 to M-0189, REQ-MGR-060, F-0211 to F-0213; review approved with 2 test fixes (core_settings unit test, manager import test); owner: demo keeps its ID and wins over a user file with the same ID (M-0187), `HideDemoFlows` hides only in the manager (M-0186), import of a flow with a demo ID is skipped (reviewer agrees; alternative: import as copy), group first as in v1; Update checker left out in the Joke teller; look of the group, Loop tutorial run and F-0211 unchecked |
-| WI-0135 | Acceptance S0008 | open | | | | manual check 12 |
+| WI-0135 | Acceptance S0008 | agent part done | sonnet | see git log (up to 85cff9fc) | 2026-11-02 | class test (152 = 152, ActsOnSystem on purpose), corpus 13 of 16 flows headless (starter, Dialog test, Hotkey test stay PENDING with reasons, F-0214), MS-0059/0060: 61 MB background with 1 worker, 80 MB with one editor (E0040 budget < 100 MB met), worker start 216 ms, 8 workers ~131 MB extrapolated (F-0216), ko/ru language keys missing (F-0215), manual check 12 written (39 steps, 3 tasks); S0008 not accepted until the owner closes manual check 12; result `WI-0135-result-s8.md`; fix by orchestrator: class test no longer reads `v1/` |
 
 ## Pending integrations
 
@@ -74,9 +74,11 @@ None.
 
 ## Running agents
 
-None.
+- hunt3 (sonnet): corpus File link test red alone (F-0208), workspace `hunt3`.
 
 ## Last verified state
+
+Commit `a45631b0` (WI-0134 integrated; fast/foundation/slow while two agents ran tests): fast 8 failed, foundation green, slow stalled at exit (exit 76, no summary). The 7 fast reds green on recheck (load); `test_a_window_that_opens_and_closes_between_two_polls` too. After WI-0135 (`b92b8826`): slow 2 failed, both red alone: the corpus File link test (F-0208, reproducible, hunter running) and `test_run_in_a_worktree_...` (WI-0135's class test read `v1/`; fixed in `85cff9fc`).
 
 Commit `bfc7eb31` (WI-0132, WI-0133, the test-selection and window-focus test changes, the F-0207 fix integrated; all tiers, the first complete fast run since `4ab84f75`): fast 2706 passed, 5 failed (57 min); foundation 469 passed, 2 failed; slow 215 passed, 1 failed (runs 20261102-170002-bfc7eb31-2, -3, and 20261102-170002-bfc7eb31). All 8 reds green when rerun serially (recheck, 3 runs): load flakes. The corpus File link test (WI-0133) failed under load once; it waits 2 s for the shortcut that storage writes after the enable answer (F-0208), so it can become flaky by design.
 
