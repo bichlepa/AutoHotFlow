@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\core\Errors.ahk
 #Include ..\core\Time.ahk
+#Include ..\core\Lang.ahk
 #Include SceneBuilder.ahk
 #Include FlowStatus.ahk
 #Include EditorDraft.ahk
@@ -52,6 +53,7 @@ class EditorModel {
         this.sceneVersion := 0
         this.view := EditorView()
         this.viewLoaded := false     ; the view was read from the flow settings (the first definition, F-0166)
+        this.readOnly := false       ; a demonstration flow (WI-0134): the draft refuses every change, the view is not saved
         this.drag := ""              ; the drag of the pointer (SetDrag): Map("ids", Map, "dx", n, "dy", n, "heights", Map) or ""
         this.dragCache := ""         ; Map("base", Scene, "version", n, "scene", Scene): the last drag scene (CurrentScene)
         this.epoch := 0
@@ -206,6 +208,7 @@ class EditorModel {
         if (!(definition is Map))
             definition := Map()
         this.name := EditorModel.TextOf(definition, "name")
+        this.readOnly := p.Get("demo", 0) ? true : false
         if (!this.viewLoaded) {
             ; The view is read once, from the first definition: a later definition (a foreign change, an answer after a
             ; refusal) must not take back a zoom the user made and that is not saved yet (WI-0098, F-0166).
@@ -664,10 +667,16 @@ class EditorModel {
     ; The text of the status bar: the view, the number of elements, and the last refusal of the draft (if any).
     StatusText() {
         text := FlowStatus.Text(this.view, this.ElementCount(), this.draft.selection)
+        if (this.readOnly)
+            text .= FlowStatus.SEPARATOR EditorModel.ReadOnlyHint()
         if (this.draft.message != "")
             text .= FlowStatus.SEPARATOR this.draft.message
         return text
     }
+
+    ; The text of a demonstration flow that opens read only: it cannot be changed, a duplicate can be (WI-0134, REQ-MGR-060).
+    static ReadOnlyHint() => Lang("Please be aware that a demonstration flow cannot be changed.") " "
+        . Lang("You may duplicate this flow first and then you can edit it.")
 
     ; The scene to draw now (Scene, "" before the definition arrived). Events only mark the scene as changed: it is built
     ; here, once for all the events since the last frame (the event load, WI-0089).

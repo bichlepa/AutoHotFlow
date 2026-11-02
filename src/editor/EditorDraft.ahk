@@ -97,6 +97,8 @@ class EditorDraft {
     Commit(ops, undoable := true, done := "") {
         if (!(this.root is Map))
             return Map("ok", false, "code", ErrCode.BUSY, "message", "the flow is not loaded yet")
+        if (this.model.readOnly)        ; a demonstration flow (WI-0134): the engine would refuse it too
+            return Map("ok", false, "code", ErrCode.DEMO_READ_ONLY, "message", EditorModel.ReadOnlyHint())
         try {
             root := FlowPatch.Apply(this.root, ops)
         } catch as e {
@@ -141,6 +143,10 @@ class EditorDraft {
     ; The view (zoom, offset) is written as flowSettings (E0086, PROTOCOL 4.2 flow.settings with view). It is not an undo
     ; step. Nothing is sent when the flow settings already have this view. done(ok) is called at once or when answered.
     SaveView(view, done := "") {
+        if (this.model.readOnly) {      ; nothing is written to a demonstration flow, not even the view (WI-0134)
+            EditorDraft._Call(done, true)
+            return
+        }
         if (!(this.root is Map)) {
             EditorDraft._Call(done, false)
             return

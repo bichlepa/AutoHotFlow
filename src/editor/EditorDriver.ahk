@@ -447,6 +447,8 @@ class EditorDriver {
         for id, t in m["triggers"]
             triggers[id] := Map("enabled", Json.Bool(t["enabled"]), "armed", Json.Bool(t["armed"]), "message", t["message"])
         st["triggers"] := triggers
+        st["readOnly"] := Json.Bool(this.model.readOnly)           ; a demonstration flow (WI-0134)
+        st["status"] := this.model.StatusText()
         fs := m["flowState"]
         st["flowState"] := Map("enabled", Json.Bool(fs["enabled"]), "independentActive", fs["independentActive"]
             , "executing", Json.Bool(fs["executing"]), "instances", fs["instances"], "stateError", fs["stateError"])
