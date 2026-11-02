@@ -43,8 +43,40 @@ class FlowFiles {
         return sorted
     }
 
-    ; Text of a flow file. Throws not_found when the file does not exist.
+    ; The demonstration flows of the program folder (WI-0134, E0105): the same entries as List, path "Demo/<name>.json",
+    ; demo true, sorted by name. Read only; a missing folder gives none.
+    static DemoList() {
+        dirPath := StoragePaths.DemoDir()
+        found := []
+        if (!DirExist(dirPath))
+            return found
+        loop files, dirPath "\*.json" {
+            found.Push(Map("path", "Demo/" A_LoopFileName, "name", SubStr(A_LoopFileName, 1, -5)
+                , "mtime", DateDiff(A_LoopFileTimeModified, FlowFiles.EPOCH, "Seconds"), "demo", Json.True))
+        }
+        names := []
+        for entry in found
+            names.Push(entry["name"])
+        sorted := []
+        for name in StoragePaths.SortStrings(names) {
+            for entry in found {
+                if (entry["name"] = name) {
+                    sorted.Push(entry)
+                    break
+                }
+            }
+        }
+        return sorted
+    }
+
+    ; Text of a flow file. Throws not_found when the file does not exist. "Demo/<name>.json" reads a demonstration flow.
     static Read(dataDir, flowPath) {
+        if (StoragePaths.IsDemoPath(flowPath)) {
+            demoPath := StoragePaths.DemoFile(flowPath)
+            if (FileExist(demoPath) = "")
+                throw AhfError("flow file '" flowPath "' not found", ErrCode.NOT_FOUND)
+            return AtomicFile.ReadText(demoPath)
+        }
         filePath := StoragePaths.Flow(dataDir, flowPath)
         if (FileExist(filePath) = "")
             throw AhfError("flow file '" flowPath "' not found", ErrCode.NOT_FOUND)

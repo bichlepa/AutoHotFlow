@@ -55,7 +55,8 @@ class FlowTable {
 
     ; Parses the text of a flow file, converts the expression texts of v1 (FlowExprConvert) and adds it as
     ; revision 1. Throws AhfError for invalid JSON, a wrong structure or a flow ID that is loaded already.
-    Load(flowId, text) {
+    ; demo: the file is a demonstration flow of the program folder (WI-0134), loaded read only.
+    Load(flowId, text, demo := false) {
         if (this._records.Has(flowId))
             throw AhfError("flow '" flowId "' is loaded already", ErrCode.CONFLICT)
         def := FlowDefinition.FromText(flowId, text, 1)
@@ -66,6 +67,8 @@ class FlowTable {
             Log.Write("f1", "flow load", "converting the expression texts failed (" Type(e) ": " e.Message "); "
                 . "the flow is loaded unconverted", flowId)
         }
-        this._records[flowId] := FlowRecord(flowId, def, 1)
+        rec := FlowRecord(flowId, def, 1)
+        rec.Demo := demo
+        this._records[flowId] := rec
     }
 }

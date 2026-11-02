@@ -8,17 +8,33 @@ class StoragePaths {
     static MAX_NAME := 200
     ; "Flows/<name>.json", relative to the data directory. Names may contain spaces and umlauts (v1 names).
     static FLOW_PATH := '^Flows/[^/\\:*?"<>|\x00-\x1F]+\.json$'
+    ; "Demo/<name>.json": a demonstration flow of the program folder (WI-0134, E0105). Read only: storage never writes it.
+    static DEMO_PATH := '^Demo/[^/\\:*?"<>|\x00-\x1F]+\.json$'
 
     static FlowsDir(dataDir) => dataDir "\Flows"
+    ; The folder of the demonstration flows: assets\demo_flows of the program (the folder above src\storage).
+    static DemoDir() => RegExReplace(A_LineFile, "\\src\\storage\\[^\\]+$") "\assets\demo_flows"
     static VarsDir(dataDir) => dataDir "\Variables"
     static LogDir(dataDir) => dataDir "\Log"
     static StatesDir(dataDir) => dataDir "\FlowStates"
     ; Job folders of the .ahf archives (WI-0081): made here, removed after each operation and at the start of storage.
     static ArchiveDir(dataDir) => dataDir "\Archive"
 
-    ; Absolute path of a flow file given as "Flows/<name>.json".
+    static IsDemoPath(flowPath) => SubStr(String(flowPath), 1, 5) = "Demo/"
+
+    ; Absolute path of a demonstration flow given as "Demo/<name>.json" (read only, WI-0134).
+    static DemoFile(flowPath) {
+        text := String(flowPath)
+        if (!RegExMatch(text, StoragePaths.DEMO_PATH) || InStr(text, ".."))
+            throw AhfError("bad demonstration flow path '" text "'", ErrCode.BAD_PAYLOAD)
+        return StoragePaths.DemoDir() "\" SubStr(text, 6)
+    }
+
+    ; Absolute path of a flow file given as "Flows/<name>.json". A demonstration flow is not writable (WI-0134).
     static Flow(dataDir, flowPath) {
         text := String(flowPath)
+        if (StoragePaths.IsDemoPath(text))
+            throw AhfError("the demonstration flow '" text "' is read only: duplicate it to change it", ErrCode.DEMO_READ_ONLY)
         if (!RegExMatch(text, StoragePaths.FLOW_PATH) || InStr(text, ".."))
             throw AhfError("bad flow path '" text "'", ErrCode.BAD_PAYLOAD)
         return dataDir "\" StrReplace(text, "/", "\")

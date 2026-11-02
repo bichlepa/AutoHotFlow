@@ -1,4 +1,5 @@
 #Requires AutoHotkey v2.0
+#Include ..\core\Errors.ahk
 
 ; One loaded flow in the engine (WI-0010, ARCHITECTURE 4.2): the committed definition, its revision and the
 ; target state of its triggers (E0056, WI-0060). Owned by the engine only; other roles get copies through messages.
@@ -13,6 +14,14 @@ class FlowRecord {
         this.Def := def          ; FlowDefinition (engine/core), read only
         this.Rev := rev
         this._enabled := FlowDefinition.NewIndex()   ; trigger ID -> true; a trigger not in the map is disabled
+        this.Demo := false       ; true for a demonstration flow of the program folder (WI-0134): read only
+    }
+
+    ; Throws AhfError (code demo_read_only) for a demonstration flow: every change of its definition goes through here
+    ; (the patch, the save, the meta update, the delete and the category change; not the trigger switches, not a duplicate).
+    RequireChangeable() {
+        if (this.Demo)
+            throw AhfError("the demonstration flow '" this.Def.Name "' is read only: duplicate it to change it", ErrCode.DEMO_READ_ONLY)
     }
 
     ; Commits a new definition as the next revision. The Executor reads Def at every step (E0001), so the

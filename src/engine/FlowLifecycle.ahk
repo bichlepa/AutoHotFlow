@@ -96,6 +96,7 @@ class FlowLifecycle {
     CmdMetaUpdate(msg) {
         flowId := Engine.Text(msg, "flowId")
         rec := this._engine.flows.Require(flowId)
+        rec.RequireChangeable()
         this._RequireIdle(flowId)
         name := rec.Def.Name
         category := rec.Def.Category
@@ -127,7 +128,7 @@ class FlowLifecycle {
     ; and the static variables; the table entry goes when storage has answered.
     CmdDelete(msg) {
         flowId := Engine.Text(msg, "flowId")
-        this._engine.flows.Require(flowId)
+        this._engine.flows.Require(flowId).RequireChangeable()
         this._RequireIdle(flowId)
         this._deleting[flowId] := true
         this._engine.saver.Forget(flowId)      ; WI-0095: no automatic write may re-create the file (E0066)
@@ -408,6 +409,7 @@ class FlowLifecycle {
     ; leave throws.
     SetCategory(flowId, category, done) {
         rec := this._engine.flows.Require(flowId)
+        rec.RequireChangeable()
         this._RequireIdle(flowId)
         raw := FlowDefinition.CopyValue(rec.Def.Raw)
         raw["category"] := category

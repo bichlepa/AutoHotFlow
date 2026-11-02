@@ -153,8 +153,10 @@ class FlowCategories {
 
     _Members() {
         members := []
-        for rec in this._engine.flows.All()
-            members.Push(Map("flowId", rec.FlowId, "category", rec.Def.Category))
+        for rec in this._engine.flows.All() {
+            if (!rec.Demo)          ; the demonstration flows are not in the order (WI-0134): their group is the manager's
+                members.Push(Map("flowId", rec.FlowId, "category", rec.Def.Category))
+        }
         return members
     }
 
@@ -386,6 +388,8 @@ class FlowCategories {
             throw AhfError("the name of a category must not contain '|'", ErrCode.BAD_PAYLOAD)
         if (StrLower(name) = StrLower(Lang(FlowCategories.UNCATEGORIZED_NAME)))
             throw AhfError("the name '" name "' is reserved for the uncategorized group", ErrCode.BAD_PAYLOAD)
+        if (StrLower(name) = StrLower(Lang("Demonstration")))          ; the group of the demonstration flows (WI-0134)
+            throw AhfError("the name '" name "' is reserved for the demonstration flows", ErrCode.BAD_PAYLOAD)
         for existing in this._order.Names() {
             if (existing != "" && existing != ownName && StrLower(existing) = StrLower(name))
                 throw AhfError("a category with name '" name "' already exists.", ErrCode.BAD_PAYLOAD)

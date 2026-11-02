@@ -140,7 +140,15 @@ class Storage extends Role {
     ; --- requests ----------------------------------------------------------------------------
 
     _CmdFlowsList(msg) {
-        return this._Defer(msg, "flows.list", "", () => Map("files", FlowFiles.List(this.dataDir)))
+        return this._Defer(msg, "flows.list", "", () => Storage._FlowList(this.dataDir))
+    }
+
+    ; The user flows, then the demonstration flows (WI-0134, PROTOCOL 4.6): read only, path Demo/<name>.json, demo true.
+    static _FlowList(dataDir) {
+        files := FlowFiles.List(dataDir)
+        for entry in FlowFiles.DemoList()
+            files.Push(entry)
+        return Map("files", files)
     }
 
     _CmdFlowRead(msg) {

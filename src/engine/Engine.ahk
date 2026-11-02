@@ -395,9 +395,16 @@ class Engine extends Role {
         }
         this._loadTries := 0
         files := []
+        demoIds := this._DemoIds(res)
         for f in res.payload.Get("files", []) {
             if (f is Map && this._doneFiles.Has(f.Get("path", "")))
                 continue            ; read by an earlier round: stays loaded
+            if (f is Map && !Engine._IsDemo(f) && demoIds.Has(f.Get("name", ""))) {
+                ; The demonstration flow keeps the ID (WI-0134, M-0187): its trigger states and static variables are kept by ID.
+                this._Log("f1", "engine", "flow file '" f.Get("path", "") "' is not loaded: the demonstration flow '"
+                    . f.Get("name", "") "' has this flow ID")
+                continue
+            }
             files.Push(f)
         }
         if (files.Length = 0) {
@@ -423,13 +430,14 @@ class Engine extends Role {
             }
             name := f.Get("name", "")
             path := f.Get("path", "")
+            demo := Engine._IsDemo(f)
             if (st["storageDown"] != "") {
                 st["pending"] -= 1          ; not asked, no result: the next round reads it
                 continue
             }
             try {
                 this.peer.Request(Engine.STORAGE, "cmd.storage.flow.read", Map("path", path)
-                    , ObjBindMethod(this, "_OnFlowRead", st, name, path), Engine.READ_TIMEOUT_MS)
+                    , ObjBindMethod(this, "_OnFlowRead", st, name, path, demo), Engine.READ_TIMEOUT_MS)
                 st["inflight"] += 1
             } catch as e {
                 st["pending"] -= 1
@@ -444,11 +452,25 @@ class Engine extends Role {
         }
     }
 
-    _OnFlowRead(st, name, path, res) {
+    ; The IDs (file names without .json) of the demonstration flows in a flows.list answer (WI-0134).
+    _DemoIds(res) {
+        ids := Map()
+        ids.CaseSense := "Off"
+        for f in res.payload.Get("files", []) {
+            if (f is Map && Engine._IsDemo(f))
+                ids[f.Get("name", "")] := true
+        }
+        return ids
+    }
+
+    ; True for an entry of flows.list that is a demonstration flow (the storage sends the mark as a JSON boolean).
+    static _IsDemo(entry) => entry is Map && entry.Get("demo", 0) ? true : false
+
+    _OnFlowRead(st, name, path, demo, res) {
         if (res.payload.Get("ok", false)) {
             this._doneFiles[path] := true
             try {
-                this.flows.Load(name, res.payload.Get("text", ""))
+                this.flows.Load(name, res.payload.Get("text", ""), demo)
             } catch as e {
                 this._StorageError("flow.parse", path, e.Message)
             }
@@ -649,6 +671,8 @@ class Engine extends Role {
                 , "enabled", Json.Bool(rec.IsFlowEnabled()), "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))
                 , "instances", this.executor.RunningCount(rec.FlowId), "missingPackages", this._MissingPackages(rec.Def)
                 , "rev", rec.Rev, "independentActive", rec.IndependentActiveCount(), "triggers", this.arms.Snapshot(rec))
+            if (rec.Demo)
+                entry["demo"] := Json.True          ; WI-0134: the manager shows it in the group "Demonstration"
             stateError := this.flowState.ErrorOf(rec.FlowId)
             if (stateError != "")
                 entry["stateError"] := stateError       ; as in evt.flow.state: the state is unknown (E0063)
@@ -662,7 +686,7 @@ class Engine extends Role {
 
     _CmdFlowGet(msg) {
         rec := this.flows.Require(Engine.Text(msg, "flowId"))
-        return Map("rev", rec.Rev, "definition", rec.Def.WireDefinition())
+        return Map("rev", rec.Rev, "definition", rec.Def.WireDefinition(), "demo", Json.Bool(rec.Demo))
     }
 
     ; cmd.flow.triggers {flowId} (WI-0107, PROTOCOL 4.2): the triggers of a flow with their names, sorted by ID. manual: the
@@ -952,6 +976,7 @@ class Engine extends Role {
     _CmdFlowPatch(msg) {
         flowId := Engine.Text(msg, "flowId")
         rec := this.flows.Require(flowId)
+        rec.RequireChangeable()
         base := msg.payload.Get("baseRev", "")
         if (!IsInteger(base))
             throw AhfError("payload field 'baseRev' must be an integer", ErrCode.BAD_PAYLOAD)
@@ -1100,6 +1125,7 @@ class Engine extends Role {
     _CmdFlowSave(msg) {
         flowId := Engine.Text(msg, "flowId")
         rec := this.flows.Require(flowId)
+        rec.RequireChangeable()
         ; A write queued behind a pending delete in storage would re-create the deleted file (WI-0070, E0066).
         if (this.IsDeleting(flowId))
             throw AhfError("flow '" flowId "' is being deleted", ErrCode.BUSY)
