@@ -227,13 +227,14 @@ CheckFromV1() {
     Assert.Equal(s["logLevelThread"], 0)
     Assert.True(!s.Has("runAsAdmin"), "run as administrator is not taken over (E0068)")
     Assert.True(!s.Has("startWithWindows"))
-    Assert.Equal(r["taken"].Length, 7)
+    Assert.Equal(s["HideDemoFlows"], 1, "hide demonstration flows is taken over (WI-0134)")
+    Assert.Equal(r["taken"].Length, 8)
     reasons := Map()
     for item in r["skipped"]
         reasons[item["v1"]] := item["reason"]
     Assert.Equal(reasons["runAsAdmin"], "not_taken")
     Assert.Equal(reasons["LogToFile"], "dropped", "E0069")
-    Assert.Equal(reasons["HideDemoFlows"], "later")
+    Assert.True(!reasons.Has("HideDemoFlows"))
 }
 
 CheckFromV1DoesNotTakeTheDefaultLanguage() {
