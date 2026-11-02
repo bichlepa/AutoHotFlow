@@ -708,7 +708,7 @@ An element is a class with: name, category, user level, stability (stable or exp
 ### REQ-ELM-020 Every element is documented by its help text
 
 - **v1:** yes (an HTML help page per element in `Help/en/`)
-- **v2:** partial (the 29 core elements have their page, checked by reading against the v2 elements; the other 120 pages are converted from v1 and not yet checked, S0008; the Help button of the element settings opens the page, WI-0111, the gui check is the owner's)
+- **v2:** partial (every one of the 152 elements has a generated help page, `tests/test_help.py`; the 29 core elements are checked by reading against the v2 elements, the pages of the other elements were corrected by their work items WI-0118 to WI-0134 and are not read again as a whole; the Help button of the element settings opens the page, WI-0111, the gui check is the owner's)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0007 (the core set, WI-0112, E0097; manual check 11, part D, steps 23 and 27), S0008 (the other elements, with their element)
@@ -878,7 +878,8 @@ They record the path through a flow and check it; automatic test flows use them 
 - **v2:** partial (seven of seven elements; the input box, the file and folder selection are headless tests, the real windows are checked by gui tests of the owner)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0051, WI-0056), S0008 (WI-0128)
+- **Plan:** S0002 (WI-0051, WI-0056), S0008 (WI-0128; the real windows: manual check 12, part C, and the gui tests, part G)
+- **Evidence:** `tests/integration/test_dialog_elements.py`, `tests/integration/test_dialogs.py`, `tests/integration/test_core_e_dialogs.py`
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
@@ -1208,15 +1209,15 @@ The trigger groups below follow the same rule as the element groups in ELM: one 
 ### REQ-TRG-200 Manual trigger
 
 - **v1:** yes
-- **v2:** partial (a skeleton `Trigger_Manual` exists, and a flow can be started through it)
+- **v2:** done (the manual trigger starts a flow from the manager and the editor, from another flow, and through the command line of the shortcut trigger, WI-0133)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0047)
-- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`
+- **Plan:** S0002 (WI-0047), S0008 (WI-0133)
+- **Evidence:** `tests/integration/test_engine.py::test_start_emits_the_documented_event_order`, `tests/integration/test_shortcut_trigger.py`, `tests/integration/test_corpus.py`
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
-| `Trigger_Manual` | yes | partial (skeleton) | S0002 (WI-0047) |
+| `Trigger_Manual` | yes | done | S0002 (WI-0047), S0008 (WI-0133) |
 | Function call: declares parameters, gets the arguments and returns a result (REQ-SCR-040) | no | open | later |
 
 Started by the user, by another flow (REQ-EXE-120) or through the command line (REQ-DST-040).
@@ -1273,14 +1274,15 @@ A hotkey can be limited to a given window; it is disabled in the same context (M
 ### REQ-TRG-240 Shortcut trigger
 
 - **v1:** yes
-- **v2:** open
+- **v2:** partial (WI-0133: the shortcut file is written at the arming and removed with the option, a double click starts the flow through the command line, headless tests; the shortcut on the real desktop is the owner's manual check 12, part E; F-0208: the file comes a moment after the enable answer)
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0133; manual check 12, part E)
+- **Evidence:** `tests/integration/test_shortcut_trigger.py`, `tests/integration/test_corpus.py` ("File link test")
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
-| `Trigger_Shortcut` | yes | open | S0008 |
+| `Trigger_Shortcut` | yes | partial (headless tests; real desktop by hand) | S0008 (WI-0133) |
 
 Creates a shortcut file (default on the desktop) that starts the flow through the command line of AutoHotFlow (REQ-DST-040); the shortcut is removed when the trigger is disabled (option).
 
@@ -1996,7 +1998,7 @@ The language is the setting, or the language of Windows when nothing is set.
 ### REQ-LNG-030 Translated element texts
 
 - **v1:** yes (language files per package)
-- **v2:** partial (the language files of the package Default are those of v1 and load in every role; the elements use them as they are ported)
+- **v2:** partial (the language files of the package Default are those of v1 and load in every role; all 152 elements use them. English and German have 1,054 keys each; Korean has 115 and Russian 72, so 939 and 983 keys fall back to English, WI-0135)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002 (WI-0047), S0008
@@ -2041,7 +2043,7 @@ All processes log through the storage, the only writer of the files: a common lo
 ### REQ-DIA-020 Elements log what they do
 
 - **v1:** yes (changelog 0.02.12: "All elements are logging now")
-- **v2:** partial (the element API logs; the real elements are missing)
+- **v2:** partial (the element API logs, and all 152 classes use it; that every element writes what it did and why it failed is not checked class by class)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0002, S0008
@@ -2242,11 +2244,11 @@ A 32-bit interpreter is rejected at the start with exit code 2 (E0004).
 ### REQ-DST-040 Single instance and command line
 
 - **v1:** partial (a second start replaces the running instance; commands through a hidden window)
-- **v2:** partial (a second start shows the running manager; command forwarding exists; the commands for flows are missing)
+- **v2:** partial (a second start shows the running manager; command forwarding exists; the command `Trigger|<flow>|<element>` of the shortcut trigger starts a flow at a trigger, WI-0133; v1 commands other than the shortcut are not ported; F-0209: a first start with `--command=debug` is ignored)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008 (commands of the shortcut trigger)
-- **Evidence:** `tests/fault/test_second_start.py`
+- **Plan:** S0008 (WI-0133, done; the real shortcut: manual check 12, part E)
+- **Evidence:** `tests/fault/test_second_start.py`, `tests/integration/test_shortcut_trigger.py`
 
 A second start of AutoHotFlow does not start a second application: it passes its command line to the running one and ends (MIGRATION M-0023). Commands start a flow through a trigger (REQ-TRG-200, REQ-TRG-240).
 
@@ -2612,21 +2614,21 @@ Processes are killed, frozen and cut off on purpose; the system stays usable and
 ### REQ-TST-030 Every element is tested headless
 
 - **v1:** no
-- **v2:** partial (the flow builder, the headless flow runner and the smoke test of every registered element and the dialog test provider exist; e2e tests exist for the core set (A to E, WI-0052 to WI-0056) and the test corpus (WI-0057); the other elements are still missing)
+- **v2:** done (the flow builder, the headless flow runner, the smoke test of every registered element, the dialog test provider and the test provider of the seam `SystemOps` exist; each of the 152 element classes is named by a test that builds or runs flows (checked by `tests/test_element_classes.py`; a heuristic: that each class is run in a meaningful way is read from the tests of WI-0052 to WI-0134, not proved class by class); the real behaviour behind the seam is the owner's manual check 12)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0051, WI-0056, WI-0057), S0008 (the other elements)
-- **Evidence:** `tests/support/test_flowbuilder.py`, `tests/integration/test_flowrun.py`, `tests/ahk/element_smoke.test.ahk`, `tests/integration/test_dialogs.py`, `tests/integration/test_core_a_elements.py`, `tests/integration/test_core_b_lists.py`, `tests/integration/test_core_c_loops.py`, `tests/integration/test_core_d_flows.py`, `tests/integration/test_core_e_dialogs.py`, `tests/integration/test_corpus.py`
+- **Plan:** S0002 (WI-0051, WI-0056, WI-0057), S0008 (WI-0116 to WI-0134, WI-0135)
+- **Evidence:** `tests/test_element_classes.py`, `tests/support/test_flowbuilder.py`, `tests/integration/test_flowrun.py`, `tests/ahk/element_smoke.test.ahk`, `tests/integration/test_dialogs.py`, `tests/integration/test_core_a_elements.py`, `tests/integration/test_core_b_lists.py`, `tests/integration/test_core_c_loops.py`, `tests/integration/test_core_d_flows.py`, `tests/integration/test_core_e_dialogs.py`, `tests/integration/test_corpus.py`
 
 A smoke test covers every registered element; each element has end-to-end tests built with the flow builder and run by the headless flow runner; dialog elements are answered by a test provider (E0038).
 
 ### REQ-TST-040 The v1 test flows run green
 
 - **v1:** yes (the "Automatic tests" flows)
-- **v2:** partial (four of the 16 "Automatic tests" flows run headless and green: "variable test" (as saved, M-0069 is done, WI-0062), "List test" and "Loop test" (as saved), and "Trigger test" on a copy without its speech output (M-0077, S0003, WI-0067); the other 12 wait for S0008, see the table PENDING)
+- **v2:** partial (13 of the 16 "Automatic tests" flows run headless and green, as saved or on a copy with a fix list (`FIX_LIST` in `tests/integration/test_corpus.py`, MIGRATION IDs); the 3 in the table PENDING do not: "Dialog test" (reads the controls of real windows) and "Hotkey test" (sends real keys) wait for the owner's run, and "_AutomaticTest starter" starts all other flows at once, among them those two; WI-0135, F-9000*)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008 (the 12 flows of PENDING in `tests/integration/test_corpus.py`)
+- **Plan:** S0008 (the 13 flows run; the 3 of PENDING in `tests/integration/test_corpus.py` wait for the owner, manual check 12, steps 20, 34 and 35)
 - **Evidence:** `tests/integration/test_corpus.py::test_v1_trigger_test_runs_green_on_the_adapted_copy`, `tests/integration/test_corpus.py::test_v1_variable_test_runs_green_as_saved`, `tests/integration/test_corpus.py::test_v1_list_test_runs_green`, `tests/integration/test_corpus.py::test_v1_loop_test_runs_green`
 
 The "Automatic tests" flows of v1, adapted to v2 where needed, run headless and green.

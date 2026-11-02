@@ -304,6 +304,13 @@ A ported class keeps the parameter ids, types, defaults, content types, choices 
 - **Core set:** the 34 classes of the first port (`CORE_SET` in the test) must all be compared; a class that v2 does not have yet is skipped, a v2 class that throws in `Parameters("")` fails.
 - **Not checked here:** `Run` against v1 (E0035), `WarnIfEmpty`, the texts of the labels and choices (both sides give the keys, so the texts are not compared), and whether the settings form needs more than the description.
 
+## 8d. Acceptance of S0008: the class list, the corpus, memory and the real system (WI-0135)
+
+- **Class list (REQ-TST-030):** `tests/test_element_classes.py` compares the 152 classes of v1 (`tests/data/v1_schema.json`, per kind the count of the files of `v1/Source_Elements/Default/`) with the element files of `src/elements/Default/`, without regard to case. Every class sets `static ActsOnSystem` itself, and every class is named by a test that builds or runs flows (a heuristic: it finds a class that no end-to-end test mentions, it does not prove that the class is run well). The smoke test (8a) and the schema check (8c) cover all registered classes.
+- **Corpus (REQ-TST-040):** 13 of the 16 "Automatic tests" flows of v1 run headless and green (`tests/integration/test_corpus.py`, fix list with MIGRATION IDs). The table `PENDING` keeps the other 3 with a reason each: the "Dialog test" (real windows and their controls) and the "Hotkey test" (real keys) are the owner's run, and the "_AutomaticTest starter" starts all flows at once, among them those two; a headless run of the starter would press keys on the desktop of the user.
+- **Memory and start (REQ-PRF-030, R0003):** `tests/stress/test_all_classes_start.py` (stress tier, alone): the sum of the background processes with a warm worker and, after that, one real editor process, and the start of a worker through `tools/measure_r3.py`. The numbers are MS-0059 and MS-0060 in `doc/MEASUREMENTS.md`.
+- **The real system (manual check 12):** the generated flows `tests/data/manual/check12_*.json` (sound, speech, volume, screen, screenshot, input block, dialogs, shortcut, keys and mouse) are only loaded by `tests/integration/test_manual_flows.py`; the owner runs them (`doc/MANUAL-CHECKS.md` section 12). Power and session elements are not in the check.
+
 ## 9a. Dialog tests (E0038, WI-0051)
 
 Dialog elements run headless: the elements call `Dialogs.*` (`doc/ELEMENT-API-V2.md` section 3.3), the test entries (`tests/integration/helpers/AutoHotFlowTest.ahk`, `helpers/entry/engine.ahk`, `helpers/entry/worker.ahk`) register `TestDialogProvider`, which answers from a script. No window opens, so these tests belong to the fast or slow tier, not to `gui`.

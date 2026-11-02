@@ -66,3 +66,19 @@ def test_every_element_class_sets_acts_on_system_on_purpose():
         if not pattern.search(path.read_text(encoding="utf-8")):
             without.append(name)
     assert not without, "no `static ActsOnSystem` in: %s" % ", ".join(without)
+
+
+def test_every_element_class_is_named_by_a_test_that_builds_or_runs_flows():
+    """REQ-TST-030: a heuristic, not a proof that the class is run. A class that no test file with a flow builder or a flow
+    run names at all has no end-to-end test (the file test_element_classes.py, the schema and the help tests do not count)."""
+    skip = ("test_element_classes", "test_v1_schema", "test_help")
+    texts = []
+    for path in (REPO / "tests").rglob("*.py"):
+        rel = path.relative_to(REPO).as_posix()
+        if rel.startswith("tests/data") or any(name in rel for name in skip):
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        if re.search(r"FlowBuilder|flows\.run|host_flows|run_all|\.run\(", text):
+            texts.append(text.lower())
+    unnamed = sorted(name for name in v2_element_files() if not any(name in text for text in texts))
+    assert not unnamed, "no test that builds or runs flows names: %s" % ", ".join(unnamed)

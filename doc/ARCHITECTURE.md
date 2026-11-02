@@ -375,6 +375,7 @@ AutoHotFlow/
 │  │  └─ generated/         # Elements_<role>.ahk: the element classes of a role, written by tools/gen_element_includes.py (E0041)
 │  ├─ core/                 # cross-process building blocks; no GUI except GuiLayout.ahk (window layout and DPI, WI-0069)
 │  │  ├─ Json.ahk  Ids.ahk  Errors.ahk  Log.ahk  Args.ahk
+│  │  ├─ ChildLauncher.ahk  ChildPipe.ahk   # start of a child process with its stdout pipe (the supervisor, the script elements of the worker and the trigger host, WI-0130)
 │  │  ├─ FlowPatch.ahk      # the operations of cmd.flow.patch (WI-0093, PROTOCOL 4.2): Apply, Inverse, Diff; used by the engine and the editor
 │  │  └─ ipc/               # Pipe, Frame, Wake, Message, Dispatcher, Peer
 │  ├─ supervisor/  storage/  triggerhost/  worker/  tray/  help/   # help/: the help role (WI-0111, PROTOCOL 4.12): Help*.ahk, viewers Viewer*.ahk
