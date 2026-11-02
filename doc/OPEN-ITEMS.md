@@ -88,10 +88,10 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0200 | Per-monitor DPI in the screen elements only: `ScreenOps.EnterPhysical` makes the coordinates of the screen elements device pixels; Click, Move mouse, Drag and the mouse tracker of the editor do not. Multi-monitor scales are not checked. | not checked | S0008 |
 | F-0201 | The xdist INTERNALERROR of the selected run: the worker of `tests/test_ahk_runner.py::test_ahk_file_completes[json.test.ahk]` dies in full selected runs (WI-0127 runs 2 and 3, `--deselect` did not help); the test passes alone. Not reproduced in the verification run 20261102-123314-825e716a (2076 selected tests, no INTERNALERROR): probably a load or file-locking effect of parallel runs. | open | S0008 |
 | F-0202 | Search pixel, Search image and Screenshot: the owner's manual check on a real desktop with several monitors and scales is open; the Search pixel mouse tracker sets the upper left corner only (the lower right corner is typed). | open | S0008 |
-| F-9000* | The process triggers cost 8.7 % of one core with ten armed triggers at 100 ms (one process list per tick, MS-0044); the window triggers 2.3 %. The default interval of 1000 ms should cost about a tenth (assumed, not measured). Options: cache the base name per process ID (a reused ID must be checked, for example by the creation time) | open, decision for the owner: the default interval, and whether the cache is worth its risk | WI-0132 |
-| F-9001* | Process triggers do not see processes that cannot be opened without the debug privilege (protected processes, a higher integrity level): their start and end are not seen (M-0176). v1 enabled `SeDebugPrivilege` and saw more | open, decision for the owner: whether the privilege is wanted (it needs the elevated program) | WI-0132 |
-| F-9002* | The own-window helper of the window tests exists twice: `tests/integration/test_window_elements.py` (WI-0125) and `tests/support/ownwindow.py` (WI-0132); the process helper of `test_process_elements.py` (WI-0123) is the same kind of copy | open, low; move both into `tests/support/` when the next window or process test changes | WI-0132 |
-| F-9003* | The label of the option of `Process starts` ("Do not trigger if a matching window exists when enabling the trigger") is the v1 text and says window; the help page explains it | open, low; a new language key for "process" needs the owner's decision on the text (en.ini and de.ini) | WI-0132 |
+| F-0203 | The process triggers cost 8.7 % of one core with ten armed triggers at 100 ms (one process list per tick, MS-0044); the window triggers 2.3 %. The default interval of 1000 ms should cost about a tenth (assumed, not measured). Options: cache the base name per process ID (a reused ID must be checked, for example by the creation time) | open, decision for the owner: the default interval, and whether the cache is worth its risk | WI-0132 |
+| F-0204 | Process triggers do not see processes that cannot be opened without the debug privilege (protected processes, a higher integrity level): their start and end are not seen (M-0176). v1 enabled `SeDebugPrivilege` and saw more | open, decision for the owner: whether the privilege is wanted (it needs the elevated program) | WI-0132 |
+| F-0205 | The own-window helper of the window tests exists twice: `tests/integration/test_window_elements.py` (WI-0125) and `tests/support/ownwindow.py` (WI-0132); the process helper of `test_process_elements.py` (WI-0123) is the same kind of copy | open, low; move both into `tests/support/` when the next window or process test changes | WI-0132 |
+| F-0206 | The label of the option of `Process starts` ("Do not trigger if a matching window exists when enabling the trigger") is the v1 text and says window; the help page explains it | open, low; a new language key for "process" needs the owner's decision on the text (en.ini and de.ini) | WI-0132 |
 
 
 ## Findings
@@ -559,25 +559,25 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 **What:** the search and screenshot elements are tested on an own window at one scale. The real desktop with several monitors and scales is not checked; the Search pixel mouse tracker sets the upper left corner only.
 **Status:** open, not checked. Next step: the owner's check of Search pixel, Search image and Screenshot on the real desktop.
 
-### F-9000*: The process triggers cost CPU in proportion to the ticks
+### F-0203: The process triggers cost CPU in proportion to the ticks
 
 - **Found:** WI-0132 (measured, MS-0044, run 20261102-115353-6700): ten `Trigger_Process_starts` at 100 ms take 8.65 % of one core in the trigger host (baseline 0.83 %, ten window triggers 2.29 %). The test timer kept its schedule in every variant (median 109 ms, max 110 ms).
 - **Open:** the owner decides the default interval (1000 ms now) and whether the base name of a process is cached per process ID. A cache must check that the ID is still the same process (PID reuse), for example with the creation time.
 - **Status:** verified (one run, one machine, the machine was not idle); the 1000 ms cost is assumed.
 
-### F-9001*: Protected processes are not seen by the process triggers
+### F-0204: Protected processes are not seen by the process triggers
 
 - **Found:** WI-0132 (read, `src/elements/Default/lib/ProcessSnapshot.ahk`): the process list opens every process with `PROCESS_QUERY_LIMITED_INFORMATION` and does not enable the debug privilege, which v1 did. A process that cannot be opened is not in the list.
 - **Open:** whether the process triggers must see such processes; the elevated start of AutoHotFlow would be needed. Recorded in MIGRATION M-0169.
 - **Status:** verified (read); not checked on a protected process (no such process was used in a test).
 
-### F-9002*: Own-window and own-process helpers exist twice
+### F-0205: Own-window and own-process helpers exist twice
 
 - **Found:** WI-0132 (read): `tests/integration/test_window_elements.py` (WI-0125) and `tests/integration/test_process_elements.py` (WI-0123) keep their own helpers; `tests/support/ownwindow.py` and `tests/support/ownprocess.py` are the copies of WI-0132 (the same kind of helper, simpler).
 - **Open:** move the helpers into `tests/support/` and let the tests import them, one change at a time.
 - **Status:** verified (read).
 
-### F-9003*: The option label of Process starts says "window"
+### F-0206: The option label of Process starts says "window"
 
 - **Found:** WI-0132 (read, `src/elements/Default/Triggers/Trigger_Process_starts.ahk`): the v1 label of NotTriggerOnEnable reads "Do not trigger if a matching window exists when enabling the trigger". The v1 help text describes a process.
 - **Open:** a language key with "process" in en.ini and de.ini, decided by the owner. The help page explains the label until then.
