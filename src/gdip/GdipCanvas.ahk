@@ -237,17 +237,52 @@ class GdipCanvas {
     }
 
     ; Writes the canvas as a PNG file. The file is replaced if it exists.
-    SavePng(path) {
+    SavePng(path) => this._Save(path, "image/png")
+
+    ; Writes the canvas in the format of the file extension (BMP, JPEG, GIF, TIFF or PNG, see Gdip.MimeOfFile). An
+    ; extension of another kind throws AhfError before anything is written. The file is replaced if it exists.
+    SaveFile(path) {
+        mime := Gdip.MimeOfFile(path)
+        if (mime = "")
+            throw AhfError("no image format for the extension of '" path "'", ErrCode.BAD_ARGS)
+        this._Save(path, mime)
+    }
+
+    _Save(path, mime) {
         bmp := 0
         Gdip.Check(DllCall("gdiplus\GdipCreateBitmapFromHBITMAP", "Ptr", this.hbm, "Ptr", 0, "Ptr*", &bmp, "Int")
             , "GdipCreateBitmapFromHBITMAP")
         try {
-            clsid := Gdip.EncoderClsid("image/png")
+            clsid := Gdip.EncoderClsid(mime)
             Gdip.Check(DllCall("gdiplus\GdipSaveImageToFile", "Ptr", bmp, "WStr", path, "Ptr", clsid, "Ptr", 0
                 , "Int"), "GdipSaveImageToFile")
         } finally {
             DllCall("gdiplus\GdipDisposeImage", "Ptr", bmp, "Int")
         }
+    }
+
+    ; Fills the canvas with the pixels of the screen that start at sx, sy (device pixels, the top left of the virtual
+    ; screen is 0, 0 or negative on other monitors). CAPTUREBLT (0x40000000) includes the layered windows. Throws when the
+    ; screen cannot be read.
+    CaptureScreen(sx, sy) {
+        hdcScreen := DllCall("user32\GetDC", "Ptr", 0, "Ptr")
+        if (!hdcScreen)
+            throw AhfError("GetDC of the screen failed, Windows error " A_LastError, ErrCode.INTERNAL)
+        try {
+            ok := DllCall("gdi32\BitBlt", "Ptr", this.hdc, "Int", 0, "Int", 0, "Int", this.width, "Int", this.height
+                , "Ptr", hdcScreen, "Int", sx, "Int", sy, "UInt", 0x00CC0020 | 0x40000000, "Int")
+            if (!ok)
+                throw AhfError("BitBlt of the screen failed, Windows error " A_LastError, ErrCode.INTERNAL)
+        } finally {
+            DllCall("user32\ReleaseDC", "Ptr", 0, "Ptr", hdcScreen, "Int")
+        }
+    }
+
+    ; Fills the canvas with the content of a window (PrintWindow with PW_RENDERFULLCONTENT, 2): the window need not be
+    ; on the screen. The canvas must have the size of the window (the caller reads it with WinGetClientPos or the rect).
+    CaptureWindow(hwnd) {
+        if (!DllCall("user32\PrintWindow", "Ptr", hwnd, "Ptr", this.hdc, "UInt", 2, "Int"))
+            throw AhfError("PrintWindow failed, Windows error " A_LastError, ErrCode.INTERNAL)
     }
 
     ; Copies the canvas into the client area of a window at x, y.

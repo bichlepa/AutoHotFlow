@@ -78,6 +78,20 @@ class Gdip {
         throw AhfError("GDI+ has no encoder for " mime, ErrCode.INTERNAL)
     }
 
+    ; The MIME type of an image file by its extension, as the v1 screenshot saves them (BMP, JPEG, GIF, TIFF, PNG), or
+    ; "" for any other extension. Only the name is checked; the file is not read.
+    static MimeOfFile(path) {
+        SplitPath(path, , , &ext)
+        switch StrLower(ext) {
+            case "bmp", "dib", "rle": return "image/bmp"
+            case "jpg", "jpeg", "jpe", "jfif": return "image/jpeg"
+            case "gif": return "image/gif"
+            case "tif", "tiff": return "image/tiff"
+            case "png": return "image/png"
+        }
+        return ""
+    }
+
     ; A point list for the polygon and line calls: an array of [x, y] pairs to a buffer of PointF.
     static Points(pts) {
         buf := Buffer(8 * pts.Length)

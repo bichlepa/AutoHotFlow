@@ -369,6 +369,54 @@ CheckSavePngWritesAPngFile() {
     }
 }
 
+; WI-0127: SaveFile writes the format of the extension (the v1 screenshot formats); another extension throws before
+; anything is written. The names are checked, not the bytes of each format (the signature of the PNG only).
+CheckSaveFileWritesEachFormat() {
+    c := NewCanvas(20, 10)
+    dir := A_Temp "\ahf_gdip_save_" A_TickCount
+    DirCreate(dir)
+    try {
+        for ext in ["bmp", "jpg", "jpeg", "gif", "tif", "png", "PNG"] {
+            path := dir "\shot." ext
+            c.SaveFile(path)
+            Assert.True(FileGetSize(path) > 20, "a file of ." ext " has content")
+        }
+        Assert.Equal(Gdip.MimeOfFile("a.dib"), "image/bmp", "dib is a BMP")
+        Assert.Equal(Gdip.MimeOfFile("a.JFIF"), "image/jpeg", "the extension is case-insensitive")
+        Assert.Equal(Gdip.MimeOfFile("a.txt"), "", "txt has no image format")
+        Assert.Equal(Gdip.MimeOfFile("a"), "", "no extension has no image format")
+        refused := false
+        try {
+            c.SaveFile(dir "\shot.txt")
+        } catch AhfError {
+            refused := true
+        }
+        Assert.True(refused, "a text extension throws AhfError")
+        Assert.True(!FileExist(dir "\shot.txt"), "nothing is written for a refused extension")
+    } finally {
+        c.Destroy()
+        try DirDelete(dir, true)
+    }
+}
+
+; WI-0127: CaptureWindow paints a window with a known colour into the canvas (PrintWindow of an own window).
+CheckCaptureWindowOfAnOwnGuiPaintsItsClientArea() {
+    g := Gui("-Caption +AlwaysOnTop")
+    g.BackColor := "336699"
+    g.Show("w120 h60 NoActivate")
+    c := 0
+    try {
+        Sleep(200)
+        c := NewCanvas(120, 60)
+        c.CaptureWindow(g.Hwnd)
+        Assert.Equal(c.Pixel(60, 30) & 0xFFFFFF, 0x336699, "the centre of the window has its background colour")
+    } finally {
+        if (IsObject(c))
+            c.Destroy()
+        g.Destroy()
+    }
+}
+
 Gdip.Startup()
 TestRun.Init()
 
@@ -378,6 +426,8 @@ TestRun.Case("an ellipse is filled inside its box only", CheckEllipseIsFilled)
 TestRun.Case("CopyRegionTo copies the part at the source offset", CheckRegionCopyUsesTheOffset)
 TestRun.Case("a scaled copy of an icon has the new size and is drawn", CheckScaledImageHasTheSizeAndIsDrawn)
 TestRun.Case("SavePng writes a PNG file", CheckSavePngWritesAPngFile)
+TestRun.Case("SaveFile writes the format of each extension and refuses others", CheckSaveFileWritesEachFormat)
+TestRun.Case("CaptureWindow paints the client area of an own window", CheckCaptureWindowOfAnOwnGuiPaintsItsClientArea)
 TestRun.Case("a filled rectangle has its color inside and white outside", CheckFilledRectangle)
 TestRun.Case("a rounded rectangle is filled and its corner is cut", CheckRoundedCornersAreCut)
 TestRun.Case("a line is drawn where it is, nowhere else", CheckLineIsDrawn)
