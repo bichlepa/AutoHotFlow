@@ -1,7 +1,7 @@
 """WI-0135 task 2: every element class of v1 is registered in v2, and every class says on purpose whether it acts on the system.
 
-The v1 side is the class list of tests/data/v1_schema.json (written from the unchanged v1 code, 152 classes) and the files of
-v1/Source_Elements/Default/. The v2 side is the element files of src/elements/Default/. Class names are compared without case,
+The v1 side is the class list of tests/data/v1_schema.json (written from the unchanged v1 code, 152 classes; the test does
+not read the v1 folder, which goes away after the port). The v2 side is the element files of src/elements/Default/. Class names are compared without case,
 because v1 compares them without case, too. The files of src/elements/Default/ that are not element classes (the helpers
 of the shared code: *Ops, *Ident, ...) have no `static Mode` and no `ActsOnSystem` and are not counted.
 """
@@ -12,7 +12,6 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 V1_SCHEMA = REPO / "tests" / "data" / "v1_schema.json"
-V1_FOLDER = REPO / "v1" / "Source_Elements" / "Default"
 V2_FOLDER = REPO / "src" / "elements" / "Default"
 KINDS = ("Actions", "Conditions", "Loops", "Triggers")
 PREFIX = {"Actions": "Action_", "Conditions": "Condition_", "Loops": "Loop_", "Triggers": "Trigger_"}
@@ -40,16 +39,6 @@ def test_the_schema_file_lists_152_v1_classes():
 def test_every_v1_class_is_registered_in_v2_without_regard_to_case():
     missing = sorted(v1_classes() - set(v2_element_files()))
     assert not missing, "v1 classes without a v2 file: %s" % ", ".join(missing)
-
-
-def test_the_schema_file_equals_the_v1_source_folder():
-    """The class list of the schema file is the list of the files in v1/Source_Elements/Default/ (no class was added to v1
-    after the schema file was written). v1 file names differ from the class names (Absolute_Number.ahk is
-    Action_Absolute_number), so the classes are counted per kind, and each class name is found in a file of its kind."""
-    for kind in KINDS:
-        files = list((V1_FOLDER / kind).glob("*.ahk"))
-        schema = [c for c in v1_classes() if c.startswith(PREFIX[kind].lower())]
-        assert len(files) == len(schema), (kind, len(files), len(schema))
 
 
 def test_every_element_class_of_v2_has_a_v1_class_or_is_new_on_purpose():
