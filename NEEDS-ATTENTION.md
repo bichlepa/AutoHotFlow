@@ -1,6 +1,6 @@
 # Needs attention (project owner)
 
-Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits for the project owner: a decision, a manual check, or a fact the owner must know. Last update: 2026-11-01. Full texts of findings are in `doc/OPEN-ITEMS.md`; the state of the work is in `work_items/phase3/STATUS.md`.
+Kept by the orchestrator, see `doc/ORCHESTRATOR.md` section 11. Only what waits for the project owner: a decision, a manual check, or a fact the owner must know. Last update: 2026-11-02. Full texts of findings are in `doc/OPEN-ITEMS.md`; the state of the work is in `work_items/phase3/STATUS.md`.
 
 ## Manual checks
 
@@ -24,6 +24,13 @@ Open:
 - **F-0181** field types no core element uses (for S0008); **F-0182/F-0183** tracker window mode, extend E0076 to the colour dialog?
 - **S0007 proposals:** `work_items/phase3/WI-0114-result-s7.md` sections 6 and 7.
 - **M-0099** (S0008) the numeric radio defaults of v1 (`default: 1`) become the enum value in v2. Please confirm.
+
+- **S0008, WI-0126 to WI-0131 (2026-11-02):**
+  - **Hotkey test flow** (corpus, `Flow 2133155705`) stays in PENDING: decide between real keys with an unassigned-key copy, or mark the Ctrl+F7 part `gui`. The gui tests for real clicks and keys of WI-0126 are not written. F-0192: a blocked input stays blocked when the worker is killed or when Unblock runs in another pool worker.
+  - **Script elements (WI-0130):** the children of a script survive a normal end (as v1), a stop kills them; script error texts are English, not `Lang()`; imported v1 scripts are not marked (F-0193).
+  - **Set element parameter (WI-0129):** the v1 choice "Type of parameter" is not ported (M-0161); the hotkey parameter is a text field; a failed name regeneration of the target is only logged.
+  - **Triggers (WI-0131):** a time missed in standby is not repeated; the hotstring replacement is sent by the trigger host.
+  - **Input tests:** `@input` tests send real keys; typing during a verification run can make them fail.
 
 Decisions the S0008 agents took for you (say so if you want it differently; details in `doc/MIGRATION.md` and the STATUS notes):
 
