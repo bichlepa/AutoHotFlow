@@ -613,6 +613,7 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 - **Found:** WI-0133 author (corpus "File link test", run 20261102-155032-13536): the flow enables its Shortcut trigger and runs the shortcut at once; the trigger host answers the arming before storage has written the file, so `Run` fails with "Can't run ...lnk".
 - **Open:** the arming could wait for storage (the answer of cmd.flow.enable would then wait too), or the shortcut could be written at the save of the flow. The corpus copy waits 2 s instead.
 - **Status:** open, the design decision is the owner's (a flow that runs the shortcut right after enabling it is rare).
+- **Test race (hunt3, 2026-11-02):** the corpus test `test_v1_file_link_test_runs_green_with_shortcuts_in_a_test_folder` failed reproducibly (element 24 not reached). Cause (verified by the step list of the failing run): the flow's own `Sleep: 2 s` (element 30) waits for the two shortcut runs, but a shortcut run needs a process start plus the 2 s that the test copy inserts after the disable (element 51); element 32 then saw unset flags. Not a product defect. Fix: the test copy sets element 30 to 12 s (3 of 3 green alone). Why it was green at WI-0133 integration is not analysed (timing; assumed: a faster second start). The design decision above stays open.
 
 ### F-0209: The debug command on a first start is ignored
 

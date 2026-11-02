@@ -405,6 +405,9 @@ def test_v1_file_link_test_runs_green_with_shortcuts_in_a_test_folder(host_flows
     # F-0208: the shortcut file is written after the answer of the enable; the copy waits 2 s after each switch
     _insert_sleep_after(data, "element0000000034", "element0000000039", "element0000000050")
     _insert_sleep_after(data, "element0000000004", "element0000000005", "element0000000051")
+    # The flow's own Sleep (element 30) waits 2 s for the two shortcut runs; a shortcut run needs a process start plus
+    # the 2 s above, so the flow's sleep ended first and the check (element 32) saw unset flags. Wait longer (F-0208).
+    data["allElements"]["element0000000030"]["pars"]["Duration"] = 12
     source.write_text(json.dumps(data), encoding="utf-8")
     flow_id = host_flows.add_file(source)
     host_flows.start()
