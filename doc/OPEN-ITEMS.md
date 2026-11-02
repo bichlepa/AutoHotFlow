@@ -95,7 +95,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0207 | `test_time_of_day_fires_at_its_time_and_not_again_that_day` fails when run alone: the test's fire time was 3 s ahead, but the session became ready about 5 s later (closed in 2ff5337d, see `doc/CLOSED-ITEMS.md`) | closed, verified | S0008 |
 | F-0208 | The shortcut of a Shortcut trigger is written after the answer of its enable: a `Run` of the shortcut right after the enable finds no file ("Can't run" in the corpus flow, fixed in the test copy with a 2 s sleep) | open | S0008 (WI-0133) |
 | F-0209 | A first start with `--command=debug` (not a trigger command) is ignored silently; only the second start opens the debug window | open, low | S0008 (WI-0133) |
-| F-9000* | The window trigger tests: a hung focus test stalls a full run (focus tests marked gui in eeb87467, cause of the stall not proven) and the session start of two serial tests exceeded 20 s | open | S0008 |
+| F-0210 | The window trigger tests: a hung focus test stalls a full run (focus tests marked gui in eeb87467, cause of the stall not proven) and the session start of two serial tests exceeded 20 s | open | S0008 |
 
 
 ## Findings
@@ -598,7 +598,7 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 - **Found:** WI-0133 author (code reading, `src/supervisor/Supervisor.ahk` `Start()`): `--command=debug` works only for a second start; a first start with it starts the normal roles.
 - **Open:** let a first start with `debug` open the debug window like a second start (or drop the option).
 - **Status:** not checked on the desktop; no test.
-### F-9000*: The window trigger tests can stall a full run; two session starts exceeded 20 s in a serial run
+### F-0210: The window trigger tests can stall a full run; two session starts exceeded 20 s in a serial run
 
 - **Found:** the fast tier of run 20261102-152456-69c2cadd (commit 69c2cadd) stalled: the call of `test_gets_inactive_fires_with_the_id_of_the_window_that_lost_the_focus` started at 16:36:13 and never ended (the only call of the run without an end in `live.log`); the setup of that test had taken 107 s (waiting for the machine-wide input lock held by another worker, `inputlock.input_lock`). The worker died ("node down: Not properly terminated"), no further test reported and the stall guard ended the run (exit 76). The per-test limit of 120 s (`pytest.mark.timeout`, `conftest.py`) did not end the call in the log, so the cause of the stall is not proven.
 - **Serial run** of `tests/integration/test_window_triggers.py` (run 20261102-164746-19532, commit 00fb6e7b): 7 passed, 2 failed, 229 s. Both focus tests passed (gets active 54.5 s, gets inactive 36.5 s). The two failures were session starts: `test_a_new_window_fires_once_and_gives_its_id` (hub pipe not up after the 20 s start limit) and `test_a_window_that_opens_and_closes_between_two_polls_is_not_seen` (trigger not armed in 10 s). Their cause is not analysed.
