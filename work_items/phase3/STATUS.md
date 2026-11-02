@@ -63,7 +63,7 @@ S0006 and S0007 are detailed (plan: `work_items/phase3/README.md`). Order: WI-00
 | WI-0129 | `Action_Set_element_parameter` | done | haiku | see git log (up to e6ba92a9) | 2026-11-02 | engine ctx.SetElementPar (one patch, same commit path), cmd.flow.elements, PROTOCOL 4.2, M-0160 to M-0162, REQ-ELM-250 partial, F-0194; review: tests fixed (unscaled lower bounds); owner: v1 content choice 'Type of parameter' not ported (M-0161), name regeneration only knows flow and trigger names (failure only logged), hotkey parameter is a text field; open editor display unchecked (manual) |
 | WI-0130 | AutoHotkey script action and trigger (E0104) | done | haiku | see git log (up to 31c4125c) | 2026-11-01 | M-0158, M-0159, REQ-ELM-110 partial, F-0193 (imported v1 scripts not marked); review approved after one round; owner: descendants of a script survive a normal end (as v1; a stop kills them), script error texts English not Lang(); open: line numbers of load errors off by the prologue, cancel during a running action; ChildLauncher/ChildPipe moved to src/core |
 | WI-0131 | Triggers: time of day, user idle time, clipboard, hotstring | done | haiku | see git log (up to the help regeneration after f9c7ed1e) | 2026-11-02 | 4 triggers, M-0164 to M-0167, REQ-TRG-210/230 done, REQ-TRG-250 partial (session lock later), F-0195 (hotkey/hotstring code duplicated), F-0196 (typo key); review approved; corpus User idle test runs as saved (left in PENDING); owner: a time missed during standby is not repeated, the hotstring replacement is sent by the trigger host; real output, standby/clock change and real idle time unchecked |
-| WI-0132 | Triggers: windows and processes | open | | | |  |
+| WI-0132 | Triggers: windows and processes | done | haiku | see git log (up to 16130a29) | 2026-11-02 | 6 triggers, shared WatchPoll (one timer per interval), polling kept (no shell hook), MS-0044, M-0176 to M-0178, REQ-TRG-260/270 done, F-0203 to F-0206; review approved with a fix; owner: F-0203 process triggers cost 8.7 % of a core at 100 ms (default 1000 ms not measured), F-0204 protected processes invisible, NotTriggerOnEnable 0 fires existing matches at the first poll, a window that opens and closes between two polls is not seen; real desktop unchecked |
 | WI-0133 | Shortcut trigger and the flow commands | open | | | |  |
 | WI-0134 | Demonstration flows (E0105) | open | | | |  |
 | WI-0135 | Acceptance S0008 | open | | | | manual check 12 |
@@ -74,9 +74,11 @@ None.
 
 ## Running agents
 
-- WI-0132, haiku, workspace wi0132 (branch wip/wi0132).
+None.
 
 ## Last verified state
+
+Commit `4ab84f75` (WI-0127 and WI-0128 integrated; all tiers, run while other agents ran tests): fast 2662 passed, 7 failed; foundation 468 passed, 3 failed; slow 212 passed, 2 failed (runs 20261102-131359-4ab84f75, -2, -3). All 12 reds green when rerun serially (recheck 20261102-141406-recheck for foundation, the rechecks of -2 and the direct serial run of the editor, clipboard and core settings files, 47 passed): load flakes. `test_time_triggers` time of day fails also alone on v2-port (WI-0131 code, not investigated). WI-0132 (tip `16130a29`) and the test-selection change `e8dbb491` are not yet verified on the integrated state.
 
 Commit `f9c7ed1e` (WI-0129 and WI-0131 integrated; all tiers; the owner worked on the machine during the run): fast 2626 passed, 3 failed; foundation 470 passed, 1 failed; slow 212 passed, 1 failed (runs 20261102-091508-f9c7ed1e, 20261102-091509-f9c7ed1e, 20261102-091509-f9c7ed1e-2). Rechecks: `test_editor_draft`, `test_time_triggers` time of day, `test_pipe` abrupt end and `test_supervisor` frozen child green alone (load flakes); `test_help` generated pages was a real defect (the migration renumbering changed Markdown without regenerating the HTML), fixed in the next commit (39 passed). No full run on that fix.
 
