@@ -19,13 +19,13 @@
 ;
 ; Usage: python tools/ahkrun.py --timeout 600 tests/ahk/helpers/render_bench.ahk <result file> 1920 1080 whole on
 #Include ..\..\..\src\core\AhfError.ahk
-#Include ..\..\..\src\editor\render\Gdip.ahk
-#Include ..\..\..\src\editor\render\GdipBrush.ahk
-#Include ..\..\..\src\editor\render\GdipPen.ahk
-#Include ..\..\..\src\editor\render\GdipFont.ahk
-#Include ..\..\..\src\editor\render\GdipFormat.ahk
-#Include ..\..\..\src\editor\render\GdipImage.ahk
-#Include ..\..\..\src\editor\render\GdipCanvas.ahk
+#Include ..\..\..\src\gdip\Gdip.ahk
+#Include ..\..\..\src\gdip\GdipBrush.ahk
+#Include ..\..\..\src\gdip\GdipPen.ahk
+#Include ..\..\..\src\gdip\GdipFont.ahk
+#Include ..\..\..\src\gdip\GdipFormat.ahk
+#Include ..\..\..\src\gdip\GdipImage.ahk
+#Include ..\..\..\src\gdip\GdipCanvas.ahk
 
 ; Deterministic pseudo random numbers, so that every run draws the same scene.
 Lcg(&seed, n) {

@@ -28,9 +28,11 @@ RULES = ("requires", "one-class", "include-core", "include-roles", "include-test
          "system-seam")
 
 # Folders under src/ that are libraries, not process roles.
-LIB_DIRS = {"core", "elements", "ui_common", "expr"}
+LIB_DIRS = {"core", "elements", "ui_common", "expr", "gdip"}
+# Libraries that every role may include (WI-0127: gdip for the editor and the worker elements of the screen).
+PLAIN_LIBS = {"expr", "gdip"}
 # Roles that must never show a dialog (see "dialog" rule). Elements are checked via their Mode.
-NO_DIALOG_ROLES = {"core", "expr", "engine", "supervisor", "storage", "triggerhost"}
+NO_DIALOG_ROLES = {"core", "expr", "gdip", "engine", "supervisor", "storage", "triggerhost"}
 
 # Known, justified exceptions: (path relative to src/, rule, regex the offending line must match or None, reason).
 EXCEPTIONS = [
@@ -263,8 +265,8 @@ def check_text(relpath, text):
             continue
         if troot == role or troot == "core":
             continue
-        if troot == "expr":
-            continue  # library for every role; it includes only core/ itself (checked above as role "expr")
+        if troot in PLAIN_LIBS:
+            continue  # library for every role; it includes only core/ itself (checked above as role "expr" or "gdip")
         if troot == "elements":
             if role in LIB_DIRS:
                 add(m.start(), "include-roles", f"#Include {target} ({role}/ must not include {troot}/)")

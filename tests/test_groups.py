@@ -241,9 +241,9 @@ def test_a_range_with_a_deletion_is_selected_from_git_not_refused(tmp_path):
 
 
 def test_the_editor_files_have_their_own_areas_render_and_editor_geometry():
-    assert groups.area_of("src/editor/render/GdipFont.ahk") == "render"
+    assert groups.area_of("src/gdip/GdipFont.ahk") == "render"
     assert groups.area_of("src/editor/Scene.ahk") == "editor-geometry"
-    sel = groups.select(["src/editor/render/GdipFont.ahk"])
+    sel = groups.select(["src/gdip/GdipFont.ahk"])
     assert not sel.everything and "render" in sel.groups
     assert not sel.accepts("integration/test_supervisor.py", "test_required_roles_are_ready_within_3_seconds")
 

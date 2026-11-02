@@ -1,12 +1,12 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\core\AhfError.ahk
-#Include Gdip.ahk
-#Include GdipBrush.ahk
-#Include GdipPen.ahk
-#Include GdipFont.ahk
-#Include GdipFormat.ahk
-#Include GdipImage.ahk
-#Include GdipCanvas.ahk
+#Include ..\..\gdip\Gdip.ahk
+#Include ..\..\gdip\GdipBrush.ahk
+#Include ..\..\gdip\GdipPen.ahk
+#Include ..\..\gdip\GdipFont.ahk
+#Include ..\..\gdip\GdipFormat.ahk
+#Include ..\..\gdip\GdipImage.ahk
+#Include ..\..\gdip\GdipCanvas.ahk
 #Include EditorStyle.ahk
 #Include ..\..\core\Lang.ahk
 #Include ..\FlowRect.ahk

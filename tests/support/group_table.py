@@ -1023,7 +1023,7 @@ SOURCE_AREAS = [
                        "src/elements/base/ParamEvaluator.ahk", "src/elements/base/SystemOps.ahk"]),
     ("ui", ["src/ui_common/*", "src/core/GuiLayout.ahk", "src/elements/base/DialogWindow.ahk",
             "src/elements/base/Dialogs.ahk"]),
-    ("render", ["src/editor/render/*"]),
+    ("render", ["src/editor/render/*", "src/gdip/*"]),   # the GDI+ wrapper (src/gdip/, WI-0127) is tested with the renderer
     ("help", ["src/elements/Default/help/*",            # the help pages of the elements and their generated HTML (WI-0112)
               "src/help/*", "src/entry/help.ahk", "src/core/HelpPageId.ahk"]),   # the help role and its page IDs (WI-0111)
     ("element", ["src/elements/Default/Actions/*", "src/elements/Default/Conditions/*", "src/elements/Default/Loops/*",

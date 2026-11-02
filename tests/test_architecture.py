@@ -165,6 +165,18 @@ def test_expr_library_rules():
     assert "include-roles" in rules("expr/A.ahk", "#Include ..\\elements\\base\\X.ahk\n")
     assert "dialog" in rules("expr/A.ahk", "class A {\n    M() {\n        MsgBox(\"x\")\n    }\n}\n")
     assert "file-io" in rules("expr/A.ahk", "class A {\n    M() {\n        FileRead(\"x\")\n    }\n}\n")
+
+
+def test_gdip_library_rules():
+    # gdip/ (WI-0127) is a library like expr/: every role, the element workers included, may include it; it includes
+    # only core/; no dialogs and no file access in it
+    assert "include-roles" not in rules("editor/render/Renderer.ahk", "#Include ..\\..\\gdip\\Gdip.ahk\n")
+    assert "include-roles" not in rules("elements/Default/Actions/A.ahk", "#Include ..\\..\\..\\gdip\\Gdip.ahk\n")
+    assert "include-core" in rules("core/A.ahk", "#Include ..\\gdip\\Gdip.ahk\n")
+    assert "include-roles" not in rules("gdip/A.ahk", "#Include ..\\core\\AhfError.ahk\n")
+    assert "include-roles" in rules("gdip/A.ahk", "#Include ..\\editor\\X.ahk\n")
+    assert "dialog" in rules("gdip/A.ahk", "class A {\n    M() {\n        MsgBox(\"x\")\n    }\n}\n")
+    assert "file-io" in rules("gdip/A.ahk", "class A {\n    M() {\n        FileRead(\"x\")\n    }\n}\n")
     assert "blocking" in rules("expr/A.ahk", "class A {\n    M() {\n        Sleep(100)\n    }\n}\n")
 
 

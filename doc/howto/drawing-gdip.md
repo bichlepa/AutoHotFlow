@@ -1,6 +1,6 @@
 # Drawing with GDI+ (editor)
 
-Entries for the drawing of the editor (`src/editor/render/`, `src/editor/Scene*.ahk`). Numbers are from `doc/MEASUREMENTS.md` (MS-0044, MS-0046 to MS-0048).
+Entries for the drawing of the editor (`src/editor/render/`, `src/editor/Scene*.ahk`; the GDI+ wrapper is in `src/gdip/`). Numbers are from `doc/MEASUREMENTS.md` (MS-0044, MS-0046 to MS-0048).
 
 ### A big icon file is scaled down on every draw
 
