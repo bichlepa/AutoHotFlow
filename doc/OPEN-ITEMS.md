@@ -96,9 +96,9 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0208 | The shortcut of a Shortcut trigger is written after the answer of its enable: a `Run` of the shortcut right after the enable finds no file ("Can't run" in the corpus flow, fixed in the test copy with a 2 s sleep) | open | S0008 (WI-0133) |
 | F-0209 | A first start with `--command=debug` (not a trigger command) is ignored silently; only the second start opens the debug window | open, low | S0008 (WI-0133) |
 | F-0210 | The window trigger tests: a hung focus test stalls a full run (focus tests marked gui in eeb87467, cause of the stall not proven) and the session start of two serial tests exceeded 20 s | open | S0008 |
-| F-9000* | The element settings dialog of a demonstration flow: the draft refuses its save (`demo_read_only`, WI-0134), whether the dialog shows the refusal to the user is not checked | not checked | S0008 |
-| F-9001* | Import of a flow whose ID is the ID of a demonstration flow (a `.ahf` file or a v1 flow of the same ID): the conflict path is not tested for a demo ID | not checked | S0008 |
-| F-9002* | The Joke teller (WI-0134) runs on a copy with the local server as its URL: the flow ends without an exception, but the local server records no request (the element runs, its condition on the response is false); the cause is not found | open, not checked | S0008 |
+| F-0211 | The element settings dialog of a demonstration flow: the draft refuses its save (`demo_read_only`, WI-0134), whether the dialog shows the refusal to the user is not checked | not checked | S0008 |
+| F-0212 | Import of a flow whose ID is the ID of a demonstration flow (a `.ahf` file or a v1 flow of the same ID): the conflict path is not tested for a demo ID | not checked | S0008 |
+| F-0213 | The Joke teller (WI-0134) runs on a copy with the local server as its URL: the flow ends without an exception, but the local server records no request (the element runs, its condition on the response is false); the cause is not found | open, not checked | S0008 |
 
 
 ## Findings
@@ -395,17 +395,17 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 **Options:** (a) a test that starts the headless manager and asks it to show a help page (the manager trace, as tests/fault/test_tray_role.py does for the tray); (b) a test entry that lets the observer send as manager.
 **Status:** open, not checked.
 
-### F-9000*: The element settings dialog of a demonstration flow
+### F-0211: The element settings dialog of a demonstration flow
 
 **What:** A demonstration flow opens read only (WI-0134). The engine and the editor draft refuse every change of it with `demo_read_only`. The element settings dialog (`ElementSettingsWindow`) saves through the draft, so its save is refused; the code that shows that refusal in the dialog was not read for this case.
 **Status:** not checked. Next step: the owner opens the Joke teller in the editor (manual check 12), opens the settings of an element, changes a value and presses Save; the dialog should say that the flow is read only.
 
-### F-9001*: Import of a flow with the ID of a demonstration flow
+### F-0212: Import of a flow with the ID of a demonstration flow
 
 **What:** A demonstration flow keeps its ID (`Flow 806132298`, WI-0134, M-0187). An imported flow with the same ID (a `.ahf` archive, or a v1 flow of the same ID in the import from v1) meets the table entry of the demo. The conflict path of the create (`_FixedId`, `conflict`) and the question of the import are not tested for this case.
 **Status:** not checked. Next step: a test that imports a `.ahf` archive holding `Flow 806132298.json` and checks that the import gives it another ID or asks, and that the demo is unchanged.
 
-### F-9002*: The Joke teller sends no request to the local server in the test
+### F-0213: The Joke teller sends no request to the local server in the test
 
 **What:** `tests/integration/test_demo_flows_run.py` runs the Joke teller on a copy whose `Action_HTTP_Request` URL is the local test server (WI-0122). The flow ends with `finished` and without an exception, the path passes the HTTP element, but the server records no request. The same element with the same server records the GET of the corpus test (`test_corpus.py`, httpbin copy). Removing `OutputFile` changed nothing. The cause is not found; the test asserts only the end of the run.
 **Status:** open, not checked. Next step: trace the element's fetch with the URL of the copy (for example a log line of the request in the element or a run with the local server's log), then decide whether the element, the copy or the test is at fault.

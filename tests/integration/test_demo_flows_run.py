@@ -31,7 +31,7 @@ def test_pet_guesser_runs_to_its_end_with_its_dialogs_answered(flows):
 
 
 def test_joke_teller_runs_on_a_copy_that_asks_the_local_server(flows, local_server, tmp_path):
-    """The Joke teller ends without an exception when its URL is the local server (a copy). Open point F-9002*: the local
+    """The Joke teller ends without an exception when its URL is the local server (a copy). Open point F-0213: the local
     server records no request, although the element runs and the flow ends normally; the cause is not found yet, so the
     request is not asserted here."""
     data = json.loads((DEMO_DIR / (JOKE_TELLER + ".json")).read_text(encoding="utf-8-sig"))
