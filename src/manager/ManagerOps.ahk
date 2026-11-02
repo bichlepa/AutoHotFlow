@@ -39,6 +39,8 @@ class ManagerOps {
     static CategoryProblem(name, taken) {
         if (StrLower(name) = "uncategorized")
             return Lang("Name_reserved")
+        if (StrLower(name) = StrLower(Lang("Demonstration")))       ; the group of the demonstration flows (WI-0134)
+            return Lang("Name_reserved")
         return ManagerOps.NameProblem(name, taken)
     }
 
@@ -125,6 +127,10 @@ class ManagerOps {
             this._DeleteNext(ids, i + 1, last, done)
             return
         }
+        if (this.m.Flow(id)["demo"]) {       ; a demonstration flow cannot be deleted; v1 offers to hide them all (WI-0134)
+            this._Confirm("hideDemosDelete", [], (yes) => this._HideDemosThen(yes, () => this._DeleteNext(ids, i + 1, last, done)))
+            return
+        }
         this._Confirm("delete", [this.m.Flow(id)["name"]], (yes) => (yes
             ? this.m.Command("cmd.flow.delete", Map("flowId", id), (ans) => this._DeleteNext(ids, i + 1, ans, done))
             : this._DeleteNext(ids, i + 1, last, done)))
@@ -134,6 +140,11 @@ class ManagerOps {
     Rename(flowId, done := "") {
         rec := this.m.Flow(flowId)
         if (rec = "") {
+            ManagerOps._Done(done, "")
+            return
+        }
+        if (rec["demo"]) {                   ; read only (WI-0134): the question offers to hide them all
+            this._Confirm("hideDemosRename", [], (yes) => this._HideDemosThen(yes, () => 0))
             ManagerOps._Done(done, "")
             return
         }
@@ -153,7 +164,7 @@ class ManagerOps {
     Move(flowIds, target, beforeId := "", done := "") {
         ids := []
         for id in this._Known(flowIds) {
-            if (id != beforeId)
+            if (id != beforeId && !this.m.Flow(id)["demo"])     ; the demonstration flows stay where they are (WI-0134)
                 ids.Push(id)
         }
         if (ids.Length = 0) {
@@ -218,6 +229,10 @@ class ManagerOps {
     }
 
     CategoryRename(name, done := "") {
+        if (name = ManagerModel.DEMO_CATEGORY) {       ; the group cannot be renamed (WI-0134)
+            ManagerOps._Done(done, "")
+            return
+        }
         taken := []
         for c in this.m.CategoryNames() {
             if (c != name)
@@ -230,8 +245,19 @@ class ManagerOps {
 
     ; Deletes a category after a confirmation. Its flows move to the category the user chooses first (cmd.category.delete).
     CategoryDelete(name, done := "") {
+        if (name = ManagerModel.DEMO_CATEGORY) {       ; the group cannot be deleted; v1 offers to hide its flows (WI-0134)
+            this._Confirm("hideDemosCategory", [], (yes) => this._HideDemosThen(yes, () => ManagerOps._Done(done, "")))
+            return
+        }
         this._Confirm("categoryDelete", [name], (yes) => (yes ? this._CategoryDeleteMove(name, done)
             : ManagerOps._Done(done, "")))
+    }
+
+    ; The answer "yes" of a question that offers to hide the demonstration flows: the setting is saved at once, then next runs.
+    _HideDemosThen(yes, next) {
+        if (yes)
+            this.m.SetSettings(Map("HideDemoFlows", Json.True))
+        next()
     }
 
     _CategoryDeleteMove(name, done) {
@@ -259,6 +285,10 @@ class ManagerOps {
 
     ; Puts the category before the category beforeName ("" = at the end, after the last category).
     CategoryMove(name, beforeName := "", done := "") {
+        if (name = ManagerModel.DEMO_CATEGORY) {       ; the group keeps its place (WI-0134)
+            ManagerOps._Done(done, "")
+            return
+        }
         if (name = beforeName) {
             ManagerOps._Done(done, "")
             return

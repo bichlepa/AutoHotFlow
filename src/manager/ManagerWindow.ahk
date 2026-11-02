@@ -66,7 +66,10 @@ class ManagerWindow {
         , "importConflict", ["Import_conflict_title", "Archive_conflict_text"]
         , "importName", ["Import_name_title", "Archive_name_text"]
         , "importExport", ["Import_and_export", "Archive_choose_text"]
-        , "elevation", ["Ask_elevation_title", "Ask_elevation_text"])
+        , "elevation", ["Ask_elevation_title", "Ask_elevation_text"]
+        , "hideDemosDelete", ["Demonstration", "Ask_hide_demos_delete_text"]         ; WI-0134 (v1: "hide demo flows")
+        , "hideDemosRename", ["Rename_flow", "Ask_hide_demos_rename_text"]
+        , "hideDemosCategory", ["Delete_category", "Ask_hide_demos_category_text"])
 
     __New(model, role := "") {
         this.model := model
@@ -416,7 +419,7 @@ class ManagerWindow {
     _CategoryHere() {
         m := this.model
         if (m.catSelected)
-            return m.selectedCat
+            return m.selectedCat = ManagerModel.DEMO_CATEGORY ? "" : m.selectedCat    ; the group of demos: Uncategorized (WI-0134)
         if (m.selectedFlow != "" && m.flows.Has(m.selectedFlow))
             return m.flows[m.selectedFlow]["category"]
         return ""
@@ -676,6 +679,13 @@ class ManagerWindow {
             this.catItems := Map()
             this.itemOfCat := Map()
             shown := Map()
+            ; The group of the demonstration flows comes first, as in v1 (WI-0134), unless the setting hides them.
+            demoIds := m.HideDemos() ? [] : m.DemoFlowIds()
+            if (demoIds.Length > 0) {
+                for id in demoIds
+                    shown[id] := true
+                this._AddCategory(ManagerModel.DEMO_CATEGORY, demoIds)
+            }
             for c in m.categories {
                 ids := []
                 for id in c["flows"] {
@@ -690,7 +700,7 @@ class ManagerWindow {
             }
             rest := []
             for id in m.flowIds {
-                if (!shown.Has(id))
+                if (!shown.Has(id) && !m.flows[id]["demo"])
                     rest.Push(id)
             }
             if (rest.Length > 0)
@@ -710,7 +720,8 @@ class ManagerWindow {
     }
 
     _AddCategory(name, ids) {
-        parent := this.tree.Add(name = "" ? Lang("Uncategorized") : name, 0, "Expand")
+        label := name = "" ? Lang("Uncategorized") : (name = ManagerModel.DEMO_CATEGORY ? Lang("Demonstration") : name)
+        parent := this.tree.Add(label, 0, "Expand")
         this.catItems[parent] := name
         this.itemOfCat[name] := parent
         for id in ids

@@ -42,6 +42,9 @@ class ManagerModel {
     ; WI-0075: notices kept in the list of the manager (the oldest go).
     static NOTICE_KEEP := 50
     ; The values of EngineState.
+    ; The group of the demonstration flows in the tree (WI-0134). Not a category name: a category name cannot contain "|".
+    static DEMO_CATEGORY := "|demo"
+
     static ENGINE_WAITING := "waiting"   ; no snapshot yet
     static ENGINE_LOADING := "loading"   ; the engine answers but has not loaded all flows (snapshot ready false)
     static ENGINE_READY := "ready"
@@ -230,7 +233,8 @@ class ManagerModel {
                 , "enabled", f.Get("enabled", 0), "executing", f.Get("executing", 0), "instances", f.Get("instances", 0)
                 , "rev", f.Get("rev", 0)
                 , "independentActive", f.Get("independentActive", 0), "stateError", f.Get("stateError", "")
-                , "triggers", f.Get("triggers", []), "limit", "", "limitValue", 0, "unseen", false, "missingPackages", f.Get("missingPackages", []))
+                , "triggers", f.Get("triggers", []), "limit", "", "limitValue", 0, "unseen", false, "missingPackages", f.Get("missingPackages", [])
+                , "demo", f.Get("demo", 0) ? true : false)
             ; A flow stopped by its runaway guard keeps the mark until it is enabled again (the snapshot does not carry it).
             if (this.flows.Has(id) && this.flows[id]["limit"] != "" && !recs[id]["enabled"]) {
                 recs[id]["limit"] := this.flows[id]["limit"]
@@ -700,7 +704,8 @@ class ManagerModel {
     Flow(flowId) => this.flows.Has(flowId) ? this.flows[flowId] : ""
 
     ; The flow IDs in the order of the categories (the uncategorized group last), as the tree shows them. A flow that no
-    ; category lists (an event came before the order) follows at the end.
+    ; category lists (an event came before the order) follows at the end. The demonstration flows (WI-0134) come after the
+    ; categories, in the order of the snapshot; they are in no category.
     OrderedFlowIds() {
         out := []
         seen := Map()
@@ -712,12 +717,29 @@ class ManagerModel {
                 }
             }
         }
+        for id in this.DemoFlowIds() {
+            seen[id] := true
+            out.Push(id)
+        }
         for id in this.flowIds {
             if (!seen.Has(id))
                 out.Push(id)
         }
         return out
     }
+
+    ; The IDs of the demonstration flows, in the order of the snapshot (WI-0134).
+    DemoFlowIds() {
+        out := []
+        for id in this.flowIds {
+            if (this.flows.Has(id) && this.flows[id]["demo"])
+                out.Push(id)
+        }
+        return out
+    }
+
+    ; True when the setting HideDemoFlows hides the group "Demonstration" (WI-0134, REQ-MGR-060).
+    HideDemos() => this.settings.Get("HideDemoFlows", 0) ? true : false
 
     ; The state of the buttons from the selection: Map(name -> true/false). Operations of later packages are false until
     ; their package exists.
@@ -762,7 +784,8 @@ class ManagerModel {
                 , "rev", rec["rev"]
                 , "independentActive", rec["independentActive"], "stateError", rec["stateError"], "limit", rec["limit"]
                 , "limitValue", rec["limitValue"], "unseen", Json.Bool(rec["unseen"])
-                , "triggerMessages", ManagerModel._TriggerMessages(rec), "missingPackages", rec["missingPackages"]))
+                , "triggerMessages", ManagerModel._TriggerMessages(rec), "missingPackages", rec["missingPackages"]
+                , "demo", Json.Bool(rec["demo"])))
         }
         cats := []
         for c in this.categories
@@ -771,7 +794,8 @@ class ManagerModel {
         for name, on in this.ButtonStates()
             buttons[name] := Json.Bool(on)
         return Map("engine", this.engineState, "epoch", this.epoch, "seq", this.lastSeq, "flows", flows
-            , "categories", cats, "settings", this.settings, "selectedFlow", this.selectedFlow
+            , "categories", cats, "settings", this.settings, "hideDemos", Json.Bool(this.HideDemos())
+            , "selectedFlow", this.selectedFlow
             , "selectedFlows", this.SelectedFlows(), "categorySelected", Json.Bool(this.catSelected)
             , "selectedCategory", this.selectedCat, "enableIsDisable", Json.Bool(this.EnableIsDisable())
             , "buttons", buttons
@@ -857,6 +881,8 @@ class ManagerModel {
     CategoryOrderMap() {
         out := Map()
         for id in this.OrderedFlowIds() {
+            if (this.flows[id]["demo"])
+                continue            ; the demonstration flows are in no category (WI-0134)
             cat := this.flows[id]["category"]
             if (!out.Has(cat))
                 out[cat] := []

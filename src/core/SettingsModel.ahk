@@ -23,6 +23,7 @@
 ;   notifyUnhandledErrors     boolean  true                          (REQ-USE-070, WI-0075)
 ;   startWithWindows          boolean  false                         (WI-0079)
 ;   runAsAdmin                boolean  false                         (WI-0079)
+;   HideDemoFlows             boolean  false                         the group "Demonstration" is not shown (WI-0134, REQ-MGR-060)
 ;   windowPositions           object   {}                            window name -> {x, y, w, h} (UI state, WI-0073)
 class SettingsModel {
     static FORMAT_VERSION := 1
@@ -194,7 +195,7 @@ class SettingsModel {
     ; The settings of v1 (the parsed settings.json of its data folder) as v2 settings (E0068, MIGRATION): the working
     ; directory, the language, the execution policy, the user level and the three log levels are taken over; start with
     ; Windows and run as administrator are not (otherwise v1 and v2 would both start with Windows), "Log to file" does not
-    ; exist in v2 (E0069) and "hide demo flows" comes with the demonstration flows (REQ-MGR-060). A value that v2 refuses is not taken over (the v2 value stays).
+    ; exist in v2 (E0069); "hide demo flows" is taken over (WI-0134, REQ-MGR-060). A value that v2 refuses is not taken over (the v2 value stays).
     ; Returns Map(settings: Map of v2 keys, taken: [Map(v1, key)], skipped: [Map(v1, reason)]). reason is a Lang key
     ; suffix: "not_taken" (deliberately), "dropped" (no such setting in v2), "later" (the setting comes later), "default_language" (v1 default en), "invalid" (the value is
     ; refused).
@@ -204,7 +205,7 @@ class SettingsModel {
             return out
         pairs := [["UILanguage", "language"], ["FlowWorkingDir", "workingDir"], ["FlowExecutionPolicy", "executionPolicy"]
             , ["ShowElementsLevel", "userLevel"], ["LogLevelApp", "logLevelApp"], ["LogLevelFlow", "logLevelFlow"]
-            , ["LogLevelThread", "logLevelThread"]]
+            , ["LogLevelThread", "logLevelThread"], ["HideDemoFlows", "HideDemoFlows"]]
         for pair in pairs {
             v1Key := pair[1]
             key := pair[2]
@@ -230,8 +231,6 @@ class SettingsModel {
                 out["skipped"].Push(Map("v1", v1Key, "reason", "not_taken", "text", ""))
         if (v1.Has("LogToFile"))
             out["skipped"].Push(Map("v1", "LogToFile", "reason", "dropped", "text", ""))
-        if (v1.Has("HideDemoFlows"))                       ; the setting comes with the demonstration flows (REQ-MGR-060)
-            out["skipped"].Push(Map("v1", "HideDemoFlows", "reason", "later", "text", ""))
         return out
     }
 
@@ -255,6 +254,7 @@ class SettingsModel {
         s.Push(Map("key", "notifyUnhandledErrors", "type", "bool", "default", 1))
         s.Push(Map("key", "startWithWindows", "type", "bool", "default", 0))
         s.Push(Map("key", "runAsAdmin", "type", "bool", "default", 0))
+        s.Push(Map("key", "HideDemoFlows", "type", "bool", "default", 0))
         s.Push(Map("key", "helpViewer", "type", "enum", "default", "auto", "values", SettingsModel.HELP_VIEWERS))
         s.Push(Map("key", "windowPositions", "type", "positions", "default", ""))
         SettingsModel._table := s
