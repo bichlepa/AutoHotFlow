@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Generated from src/elements/Default/help/en/Triggers/Window_opens.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
-<title>Window opens</title>
+<!-- Generated from src/elements/Default/help/en/Triggers/Window_Gets_Active.md by tools/gen_help.py. Do not edit: change the Markdown and run the tool. -->
+<title>Window gets active</title>
 <style>
 /* Shared stylesheet of the help pages (WI-0112, E0100). tools/gen_help.py copies it into every generated page, so a
    page is complete on its own. Plain CSS 2.1 only: the classic viewer (Shell.Explorer, Trident) knows no flexbox, grid
@@ -98,9 +98,9 @@ img {
 </head>
 <body>
 <main>
-<h1>Window opens</h1>
-<p>The trigger <strong>Window opens</strong> triggers whenever a window that matches the window identification appears.</p>
-<p>The windows are checked at a fixed interval (see <strong>Check interval</strong>). A window that opens and closes again between two checks is not seen: the trigger watches the list of windows, it does not receive a message from Windows for each new window.</p>
+<h1>Window gets active</h1>
+<p>The trigger <strong>Window gets active</strong> triggers whenever a window that matches the window identification becomes the active window.</p>
+<p>The active window is checked at a fixed interval (see <strong>Check interval</strong>). If the matching window is activated and deactivated between two checks, it is not seen.</p>
 <h2>Settings</h2>
 <h3>Window identification</h3>
 <p><strong>Title of window</strong>: The window title, compared as chosen next to it: it starts with, contains or is exactly the specified text.</p>
@@ -115,11 +115,11 @@ img {
 <p><strong>Import window identification</strong>: Uses a wizard to take the parameters of a window.</p>
 <p>At least the <strong>Title of window</strong>, the <strong>Window class</strong>, the <strong>Process name</strong>, the <strong>Unique window ID</strong> or the <strong>Unique process ID</strong> must be set. Otherwise the trigger is not armed and says that no window is specified.</p>
 <h3>Options</h3>
-<p><strong>Do not trigger if a matching window exists when enabling the trigger</strong>: When set (the default), the windows that exist when the flow is enabled do not trigger it. When not set, every matching window fires at the first check.</p>
+<p><strong>Do not trigger if a matching window is active when enabling the trigger</strong>: When set (the default), the window that is active when the flow is enabled does not trigger it. When not set, the matching window fires at the first check if it is active then.</p>
 <p><strong>Check interval (ms)</strong>: The time between two checks in milliseconds (default 500). An interval that is not above 0 is refused, and the trigger is not armed.</p>
 <h2>Supplied Variables</h2>
 <h3><code>A_WindowID</code></h3>
-<p>The unique ID of the window that opened.</p>
+<p>The unique ID of the window that became active.</p>
 </main>
 </body>
 </html>
