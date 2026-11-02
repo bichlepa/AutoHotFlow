@@ -58,7 +58,7 @@ L772-781   5a Events before subscription (design question, WI-0007)
 L783-787 6. Versioning and extension
 ```
 
-## doc/TEST-STRATEGY.md (60.7 KB, 369 lines)
+## doc/TEST-STRATEGY.md (61.4 KB, 370 lines)
 ```text
 L5-11 1. Principles
 L13-22 2. Levels
@@ -71,30 +71,30 @@ L263-284 8. Oracle of the expression language: native AHK v2 (E0035, WI-0044)
 L286-288 8a. Smoke test of every element (WI-0048)
 L290-294 8b. Test triggers (WI-0061)
 L296-305 8c. Parameter schema against v1 (WI-0116)
-L307-327 9a. Dialog tests (E0038, WI-0051)
-L329-347 9b. System action tests (E0103, WI-0117)
-L349-369 9. Flow builder and headless runner (WI-0049)
+L307-328 9a. Dialog tests (E0038, WI-0051)
+L330-348 9b. System action tests (E0103, WI-0117)
+L350-370 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (67.8 KB, 549 lines)
+## doc/ELEMENT-API-V2.md (68.9 KB, 553 lines)
 ```text
 L8-18 1. Guidelines
 L20-113 2. Class contract
 L92-113   2.1 Parameter fields of the settings form (WI-0105)
-L115-295 3. Context `ctx`
+L115-299 3. Context `ctx`
 L166-183   3.1 Parameter evaluation (WI-0042)
 L185-195   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
-L197-203   3.3 Dialogs (E0038, WI-0051)
-L205-231   3.3a System actions (E0103, WI-0117)
-L233-248   3.4 Debug view (WI-0056, REQ-DBG-060)
-L250-272   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
-L274-295   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
-L297-379 4. Example 1: `Action_Sleep` (inline, with timer)
-L381-474 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L476-516 6. Mechanical conversion rules
-L518-539 7. What stays
-L525-539   7.1 Loop elements (WI-0054)
-L541-549 8. Still to be clarified (Phase 3)
+L197-207   3.3 Dialogs (E0038, WI-0051)
+L209-235   3.3a System actions (E0103, WI-0117)
+L237-252   3.4 Debug view (WI-0056, REQ-DBG-060)
+L254-276   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+L278-299   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
+L301-383 4. Example 1: `Action_Sleep` (inline, with timer)
+L385-478 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L480-520 6. Mechanical conversion rules
+L522-543 7. What stays
+L529-543   7.1 Loop elements (WI-0054)
+L545-553 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)

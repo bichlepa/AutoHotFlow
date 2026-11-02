@@ -82,6 +82,22 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0153 | The tint of a running element is drawn after all elements, so where a running element overlaps a later element of the scene, the tint lies over that element; v1 draws the tint with its element, so the later element covers it | open, low; the sample flows show no such overlap, not checked on a larger flow | WI-0085 |
 | F-0195 | Trigger_Hotkey and Trigger_Hotstring carry the same window condition and registration code (ModeOf, Condition, the registration map, _SpecKey); the shared part belongs in `lib/` (WI-0131, ELEMENT-API-V2 shared code rule) | open, not changed in WI-0131 (the hotkey element is verified and was not touched) | S0008 |
 | F-0196 | The language key "Omit the ending character after replacemenet" in en.ini and de.ini has the v1 typo; the label shows it (WI-0131, Trigger_Hotstring) | open, a text change in both language files; not a behaviour | S0009 |
+| F-9000* | The "Dialog test" flow (Flow 130786371) has no gui part yet: the real input box is read by control and window title, its keys are sent to it, and the process name of the flow is `AutoHotFlow.exe` (WI-0128) | open, the owner's gui part with its fix list; the headless trigger runs (WI-0128) | S0008 (WI-0135) |
+| F-9001* | MIGRATION has two rows with the ID M-0167 (the hotstring entry of WI-0131 and its registration case): WI-0128 uses M-0168 for the input box timeout | open, one of the two rows needs its own ID; the owner of WI-0131 decides which | S0008 |
+
+## Findings
+
+### F-9000*: The "Dialog test" flow has no gui part yet
+
+- **Found:** WI-0128 (read, the flow file): the trigger "Input Normal" (element 206) runs headless with the test provider; the other triggers (Confirmation Normal, Message Normal, Input Normal's checks, the debug dialogs) read `Get control text` of the windows `Dialog Test Title` (window class `AutoHotkeyGUI`, process `AutoHotFlow.exe`) and press buttons with `Send keystrokes to control` (`Button1` to `Button3`). Until S0009 the process is `AutoHotkey64.exe`, so the names of the flow do not find the window.
+- **Open:** the copy in `tests/data/flows/v2_adapted/` with the process name and the control names of the v2 windows (`Edit1`, `Button1`...), and a gui test of the whole flow (the owner runs it, `-m gui`). The fix list gets an entry with a MIGRATION ID for each change. The keystrokes of the flow go to the real window: a gui test only.
+- **Status:** not checked (the control names of the v2 windows were not read on a live window).
+
+### F-9001*: MIGRATION has two rows with the ID M-0167
+
+- **Found:** WI-0128 (read, `doc/MIGRATION.md`): two rows of the end of the table are both "Hotstring: two triggers on one hotstring (WI-0131)" with the ID M-0167 in `v2-port` (the one row cites `tests/integration/test_hotkey_input.py`, the other `tests/ahk/element_hotstring.test.ahk`, registration case). The row before them is M-0166.
+- **Open:** one of the two needs the next free ID. WI-0128 takes M-0168 for its entry; a later entry must take M-0169 or higher.
+- **Status:** verified (read); the cause is not checked.
 
 ## Findings
 

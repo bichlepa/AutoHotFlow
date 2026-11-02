@@ -117,7 +117,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [REQ-ELM-240](REQUIREMENTS.md#req-elm-240-loops) | L819-836 | Loops | yes | done | must | port | S0002 (WI-0054), S0008 (WI-0121) |
 | [REQ-ELM-250](REQUIREMENTS.md#req-elm-250-flow-control) | L838-857 | Flow control | yes | partial | must | port | S0002 (WI-0047, WI-0052, WI-0055), S0003, S0008 (WI-0129) |
 | [REQ-ELM-260](REQUIREMENTS.md#req-elm-260-trace-points) | L859-873 | Trace points | yes | done | must | port | S0002 (WI-0052) |
-| [REQ-ELM-270](REQUIREMENTS.md#req-elm-270-dialogs-and-notifications) | L875-893 | Dialogs and notifications | yes | partial | must | port | S0002 (WI-0051, WI-0056), S0008 |
+| [REQ-ELM-270](REQUIREMENTS.md#req-elm-270-dialogs-and-notifications) | L875-893 | Dialogs and notifications | yes | partial | must | port | S0002 (WI-0051, WI-0056), S0008 (WI-0128) |
 | [REQ-ELM-280](REQUIREMENTS.md#req-elm-280-date-and-time) | L895-908 | Date and time | yes | done | must | port | S0008 (WI-0118) |
 | [REQ-ELM-290](REQUIREMENTS.md#req-elm-290-clipboard) | L910-922 | Clipboard | yes | done | must | port | S0008 (WI-0123) |
 | [REQ-ELM-300](REQUIREMENTS.md#req-elm-300-files-and-folders) | L924-958 | Files and folders | yes | done | must | port | S0008 (WI-0120, WI-0121) |

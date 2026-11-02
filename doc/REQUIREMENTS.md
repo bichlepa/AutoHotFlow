@@ -875,10 +875,10 @@ They record the path through a flow and check it; automatic test flows use them 
 ### REQ-ELM-270 Dialogs and notifications
 
 - **v1:** yes
-- **v2:** partial (four of seven elements; the input box, the file and folder selection are S0008)
+- **v2:** partial (seven of seven elements; the input box, the file and folder selection are headless tests, the real windows are checked by gui tests of the owner)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0002 (WI-0051, WI-0056), S0008
+- **Plan:** S0002 (WI-0051, WI-0056), S0008 (WI-0128)
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
@@ -886,9 +886,9 @@ They record the path through a flow and check it; automatic test flows use them 
 | `Action_Tooltip` | yes | partial (worker, headless tests; real tooltip by gui test) | S0002 (WI-0056) |
 | `Condition_Confirmation_Dialog` | yes | partial (headless tests; real window by gui test) | S0002 (WI-0056) |
 | `Condition_Debug_Dialog` (REQ-DBG-060) | yes | partial (headless tests; real window by gui test) | S0002 (WI-0056) |
-| `Action_Input_Box` | yes | open | S0008 |
-| `Action_Select_file` | yes | open | S0008 |
-| `Action_Select_folder` | yes | open | S0008 |
+| `Action_Input_Box` | yes | partial (headless tests of its own window, `Dialogs.InputWindow`; real window in the "Dialog test" flow by gui test) | S0008 (WI-0128) |
+| `Action_Select_file` | yes | partial (headless tests of the dialog options; real dialog by hand) | S0008 (WI-0128) |
+| `Action_Select_Folder` | yes | partial (headless tests of the dialog options; real dialog by hand) | S0008 (WI-0128) |
 
 Dialogs run separately from the flows (MIGRATION M-0002) and can be answered by a test provider (E0038).
 
