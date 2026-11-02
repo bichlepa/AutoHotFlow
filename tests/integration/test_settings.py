@@ -22,7 +22,7 @@ LIMIT_S = scaled(60.0)
 SHOWN_ROLES = "storage,engine,tray"
 KEYS = {"language", "executionPolicy", "workingDir", "workers", "logLevelApp", "logLevelFlow", "logLevelThread",
         "maxExecutionsPerMinute", "maxWaitingInstances", "maxParallelInstances", "userLevel", "notifyUnhandledErrors",
-        "startWithWindows", "runAsAdmin", "windowPositions", "helpViewer"}
+        "startWithWindows", "runAsAdmin", "windowPositions", "helpViewer", "HideDemoFlows"}
 
 
 def wait_for(predicate, timeout=WAIT_S):

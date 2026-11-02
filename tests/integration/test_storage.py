@@ -128,6 +128,7 @@ def storage(procs, flowdir, runs, pipe, session_id, hub):
 def test_storage_lists_and_reads_flows_and_reports_missing_files(storage, flowdir, pipe):
     run, pid, client = storage
     listed = ask_ok(client, "cmd.storage.flows.list")
+    listed["files"] = [f for f in listed["files"] if not f.get("demo")]     # the demonstration flows come last (WI-0134)
     names = [f["name"] for f in listed["files"]]
     assert names == ["skeleton"]
     assert listed["files"][0]["path"] == "Flows/skeleton.json"
@@ -186,7 +187,7 @@ def test_v1_flows_round_trip_through_storage_with_same_structure_and_types(procs
     client = AhfClient(pipe, "tester")
     try:
         listed = ask_ok(client, "cmd.storage.flows.list")
-        assert sorted(f["name"] for f in listed["files"]) == sorted(p.stem for p in flows)
+        assert sorted(f["name"] for f in listed["files"] if not f.get("demo")) == sorted(p.stem for p in flows)
         for src in flows:
             path = "Flows/" + src.name
             text = ask_ok(client, "cmd.storage.flow.read", {"path": path})["text"]
@@ -821,11 +822,11 @@ def test_engine_starts_with_the_real_storage_and_its_log_arrives(procs, datadir,
         ready = obs.wait_event("evt.engine.ready", timeout=15)
         assert ready["payload"]["seq"] >= 1
         snap = obs.request("engine", "cmd.engine.snapshot", {}, timeout=5)["payload"]
-        assert [f["flowId"] for f in snap["flows"]] == ["skeleton"]
+        assert [f["flowId"] for f in snap["flows"] if not f.get("demo")] == ["skeleton"]   # demos not counted (WI-0134)
     finally:
         obs.close()
     deadline = time.time() + 5
     engine_log = datadir / "Log" / "Log_engine.txt"
     while time.time() < deadline and not (engine_log.exists() and "ready with" in engine_log.read_text("utf-8")):
         time.sleep(0.05)
-    assert "ready with 1 flow(s)" in engine_log.read_text("utf-8")
+    assert "ready with 4 flow(s)" in engine_log.read_text("utf-8")      # the skeleton and the three demonstration flows (WI-0134)

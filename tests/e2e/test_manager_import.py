@@ -103,7 +103,7 @@ def flows_by_name(result):
 
 
 def v2_flows(obs):
-    return {f["flowId"]: f for f in state(obs)["flows"]}
+    return {f["flowId"]: f for f in state(obs)["flows"] if not f.get("demo")}     # the demonstration flows are not counted (WI-0134)
 
 
 @pytest.fixture

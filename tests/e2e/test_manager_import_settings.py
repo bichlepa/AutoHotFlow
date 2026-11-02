@@ -44,8 +44,8 @@ def test_the_settings_of_v1_are_taken_over_as_e0068_says(started, tmp_path):
     for name in ("UILanguage", "FlowExecutionPolicy", "FlowWorkingDir", "ShowElementsLevel", "LogLevelFlow", "LogLevelApp",
                  "LogLevelThread"):
         assert lines[name]["state"] == "taken", lines[name]
-    for name in ("runAsAdmin", "LogToFile", "HideDemoFlows"):
-        assert lines[name]["state"] == "skipped", lines[name]
+    assert lines["runAsAdmin"]["state"] == "skipped" and lines["LogToFile"]["state"] == "skipped", lines
+    assert lines["HideDemoFlows"]["state"] == "taken", lines["HideDemoFlows"]     # WI-0134: taken over
     s = engine_settings(obs)
     assert s["language"] == "de" and s["executionPolicy"] == "skip" and s["workingDir"] == str(work), s
     assert s["userLevel"] == "Advanced"
