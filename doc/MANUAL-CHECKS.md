@@ -2,7 +2,7 @@
 
 The automated tests do not cover the checks in this document. The project owner runs them by hand. Each step states the expected result. A step passes only if the expected result is seen. A dialog box (window class `#32770`) at any point is a failure.
 
-The checks cover the manager (section 1), the debug window (section 2), the dialog windows at other scaling (section 3), triggers (sections 4 and 5), start with Windows and run as administrator (section 7), the settings dialog (section 8), the editor window (section 9) and the editing of the flows in the editor (section 10). The numbers are kept as they were: section 6 ("Checks that wait for a decision of the project owner", empty) was removed, and other documents refer to sections 7 and 8. Use the "Result" template at the end to record a run.
+The checks cover the manager (section 1), the debug window (section 2), the dialog windows at other scaling (section 3), triggers (sections 4 and 5), start with Windows and run as administrator (section 7), the settings dialog (section 8), the editor window (section 9) the editing of the flows in the editor (section 10), the settings dialogs, help and the error window (section 11) and the elements of S0008 on the real system (section 12). The numbers are kept as they were: section 6 ("Checks that wait for a decision of the project owner", empty) was removed, and other documents refer to sections 7 and 8. Use the "Result" template at the end to record a run.
 
 Where a step starts the application, the VS Code task is named by its label in `.vscode/tasks.json`, followed by the same call for a terminal.
 
@@ -486,6 +486,98 @@ The gui tests open real windows and send real mouse and keyboard input. Run them
 
 Not in the gui tests: the look of the windows (steps 20, 21, 32) and the real window assistant with a window of the owner's choice (step 22). They are checked by hand.
 
+## 12. Acceptance S0008: the elements on the real system, dialogs, shortcut, demonstration flows (WI-0135; WI-0116 to WI-0134)
+
+Test by hand on the real desktop. The project owner closes this section; the agent does not run it and does not claim it closed. Until the owner writes the result, the requirements that name this check stay `partial` (REQ-ELM-270, REQ-ELM-350, REQ-ELM-370, REQ-ELM-380, REQ-ELM-390, REQ-MGR-060, REQ-TRG-240). The headless part is automated: every element runs against the test provider of the seam `SystemOps` (E0103), and the corpus runs the "Automatic tests" flows of v1 (`tests/integration/test_corpus.py`). This check shows that the real behaviour behind the seam matches.
+
+**Start.** VS Code task "Start: manual check 12, elements on the real system, dialogs, shortcut and demo flows (manual_check.py)", or `python tools/manual_check.py start --fresh --flow check12_system,check12_dialogs,check12_shortcut,check12_input -- --start=storage,engine,triggerhost,manager`. The data folder is fresh. It holds the flows `check12_system`, `check12_dialogs`, `check12_shortcut` (its trigger is enabled at the start) and `check12_input`, all in the category "Manual check", and the skeleton flow. The three demonstration flows come with the program. Close other programs that react to keys and mouse clicks. Turn the volume of the speakers down before step 9.
+
+**Not part of this check.** The elements for power and session (`Shutdown`, `Reboot`, `Hibernate`, `Suspend`, `Log off`, `Lock computer`) and `Kill process` of a program of the owner. The owner may try them by his own choice with a flow he makes himself; this document lists no step for them, because a wrong click ends the session.
+
+### Steps, part A (demonstration flows, WI-0134, REQ-MGR-060)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 1 | Look at the manager list. | A group "Demonstration" lists "Loop tutorial", "Pet guesser" and "Joke teller", all disabled. The group stands first, as in v1. The skeleton flow and the group "Manual check" are listed too. | |
+| 2 | Try to rename a demonstration flow, drag it to another group and delete it. | Each is refused. The delete asks whether all demonstration flows should be hidden instead (as v1); answer No. | |
+| 3 | Open "Loop tutorial" in the editor. | The editor shows the flow without editing actions and says that a duplicate can be edited. The view (zoom, offset) is not saved. | |
+| 4 | Open the settings window of one element of a demonstration flow (double click) and press OK after a change (F-0211). | Nothing is saved. The window or the status line tells the user that the flow is read only. Write down what you see: F-0211 asks whether the refusal is shown at all. | |
+| 5 | Enable "Loop tutorial" and run it by its manual trigger. | It runs to its end without an exception. Disable it again. | |
+| 6 | Duplicate "Pet guesser". Edit the copy and change an element. | The copy is a normal flow in the data folder and can be edited. | |
+| 7 | Settings, "Hide demonstration flows" on, then off. | The group disappears from the manager and comes back. | |
+| 8 | Optional: enable and run "Joke teller" (needs the internet). | It shows a joke or ends without an exception. F-0213: the test could not show why the local server sees no request; write down what you see. | |
+
+### Steps, part B (sound, speech, volume, screen, screenshot, input block: flow `check12_system`)
+
+Select `check12_system`, press Run. It beeps, plays the system sound "tada.wav", speaks a sentence, reads the volume, reads the screen settings of monitor 1, takes a screenshot of the whole screen into `ahf_check12_screenshot.png` (a relative path: it lands in the working directory of the flow, see the log), blocks keyboard and mouse for 3 seconds, unblocks them and shows a tooltip with the volume. Ctrl+Alt+Del always ends a block.
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 9 | Run the flow and listen. | First a beep of 880 Hz for 0.3 s, then the sound "tada", then the spoken sentence "Manual check twelve. This is the speech output." (the default voice of Windows). The next element starts after the sentence has ended. | |
+| 10 | While the 3 s block runs, move the mouse and press a key. | The mouse does not move and the key does nothing for about 3 seconds, then both work again. | |
+| 11 | Read the tooltip at the end. | "Check 12 done. Volume: " and the current master volume (0 to 100). It disappears after 8 seconds. | |
+| 12 | Open the screenshot file. | It shows the whole screen (all monitors) at the time of the step. | |
+| 13 | Look at the log of the flow (Show log). | No error and no warning of the elements. The screen settings are set as variables, or the element says clearly that the monitor does not support them (F-0199: v2 reads the screen settings by DDC/CI only, as v1). | |
+| 14 | In the editor change the element "Get volume" into "Set volume" (absolute, a value of your choice) and run the flow. Restore the volume afterwards. | The volume of the system changes to that value. | |
+
+### Steps, part C (dialogs: flow `check12_dialogs`, WI-0128, REQ-ELM-270)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 15 | Run `check12_dialogs`. The input window opens. Look at it at 100 % and at 225 %. | A window "Check 12 input" with the text, an input field that contains "hello", and the buttons OK and Cancel. Sharp at both scales, no overlap, the field has the focus. | |
+| 16 | Type a text and press OK. | The file dialog opens ("Check 12: select any file"). | |
+| 17 | Choose a file. | The folder dialog opens ("Check 12: select any folder"). | |
+| 18 | Choose a folder. | A message box "Check 12 result" shows the three values: the text, the full file path and the folder. | |
+| 19 | Run the flow again and press Cancel in the input window. | The flow ends with the exception that the element defines for a dismissed window (IfDismiss: exception). No window stays open. | |
+| 20 | Import the v1 flows (section 9, part B) and run the flow "Dialog test" by its triggers one after the other. | The flow reads the controls of the real windows and presses their buttons; its own checks report no failure. If it fails, write down which trigger and what was shown: this is F-0197 (control names and process name of the v2 windows). | |
+
+### Steps, part D (keys and mouse into a test window: flow `check12_input`)
+
+Open the Windows Notepad with an empty document and put it in the middle of the screen, so that the screen position (300, 300) lies inside its text area.
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 21 | Run `check12_input` and click into the Notepad window while the tooltip counts down (6 s). | The text "Hello from check twelve" and a new line appear in the Notepad window. | |
+| 22 | Watch the mouse. | The mouse moves to the screen position (300, 300), clicks the left button once, and the text "after the click" is written at that place. | |
+| 23 | Change the mode of "Send keystrokes" to Event mode and to Play mode, and run the flow again. | The text appears in both modes. Event mode is slower than Input mode. | |
+| 24 | Try "Get mouse position", "Drag with mouse" and "Click" with the right button and with a double click in the Notepad window (build them in the editor). | Each does what its name says. | |
+
+### Steps, part E (Shortcut trigger: flow `check12_shortcut`, WI-0133, REQ-TRG-240, REQ-DST-040)
+
+The trigger of `check12_shortcut` is enabled at the start. Its shortcut path is `%A_Desktop%\AutoHotFlow check 12.lnk`.
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 25 | Look at the desktop. | The shortcut "AutoHotFlow check 12" exists (F-0208: it may appear a moment after the start). Copy the file to another place for step 29. | |
+| 26 | Double click the shortcut. | No manager window opens (a start by a shortcut opens none). The tooltip "Check 12: started by the shortcut" appears for 8 seconds, and the log shows the flow run. | |
+| 27 | Disable the flow `check12_shortcut`. | The shortcut disappears from the desktop (the option "Remove shortcut when disabling" is on). | |
+| 28 | Enable the flow, close the application, start it again with the task. | The shortcut is on the desktop after the start and works. At a normal end of the application the file is not removed (M-0181). | |
+| 29 | Disable the flow and double click the copy of step 25. | Nothing starts. The log of the engine says that the trigger is off (M-0182). | |
+
+### Steps, part F (corpus flows on the real system)
+
+| # | Step | Expected result | Result |
+|---|---|---|---|
+| 30 | Import the v1 flows (section 9, part B first) and run "string test", "maths test" and "ini file test" by their manual triggers. Read each flow first: they act on files of the working folder. | Each flow ends without an exception and adds its name to the list of results. | |
+| 31 | Run "File link test". | It writes two shortcuts to the desktop and removes them (M-0179). | |
+| 32 | Run "Process Test" only after you changed the process name to a program that you do not use (M-0178: the original flow starts and ends `cttune.exe` and `notepad.exe`). | The flow starts the program, notices that it runs, ends it and notices that it ended. | |
+| 33 | Run "User idle test" and leave the PC alone for the time named in the flow. | The trigger fires after the idle time (F-0195: real idle time unchecked). | |
+| 34 | Run "Hotkey test" only if you do not use the keys named in it (Ctrl+F7 and others). Press the keys. | The flow reacts to the real keys. If you do not want to test it, write "not run". | |
+| 35 | Optional: run the flow "_AutomaticTest starter" after you removed the elements of the flows you do not want to start (it starts all 15 flows at once, among them the Hotkey test and the Dialog test). | It waits until all tests have added their name to the list and then plays "tada". Write down what is left red. | |
+
+### Steps, part G (gui tests of S0008; the PC is not used during them)
+
+The gui tests open real windows and send real mouse and keyboard input. Run them alone, one after the other, and do not move the mouse or press keys while they run. Expected result: all pass. The agent does not run them (`doc/TEST-STRATEGY.md` section 6).
+
+| # | VS Code task (label) | Test file | Tests |
+|---|---|---|---|
+| 36 | "Test: dialog windows (gui, the real windows of the dialog elements appear for a moment; do not use the PC)" | `tests/integration/test_dialog_windows_gui.py`, `tests/integration/test_dialogs.py` | the message box, the debug window, the tooltip and the input window show their fields and end by their timeout; the product path opens the real dialog |
+| 37 | "Test: window triggers (gui, own windows get the focus; do not use the PC)" | `tests/integration/test_window_triggers.py` | the triggers of windows fire when a window of the test gets the focus |
+| 38 | "Test: hotkey input with key combinations (gui, keys are sent, do not use the PC)" | `tests/integration/test_hotkey_input.py` | the real keys reach the trigger host |
+| 39 | "Test: gui (--all -m gui, windows and dialogs appear, do not use the PC)" | all gui tests | everything above and of the earlier sections in one run (optional, it takes longest) |
+
+Not in the gui tests: the look of the windows (steps 1 and 15), the real DDC/CI writes of the screen settings on several monitors, a screen at 225 % for the three image searches (F-0202), and the power and session elements.
+
 ## Result
 
 Record one result per run. Copy the template.
@@ -502,6 +594,7 @@ Settings dialog (section 8): steps 44 to 59 pass / fail (list failed steps)
 Editor (section 9): steps 1 to 25 pass / fail (list failed steps); look accepted yes / no (step 3)
 Editing (section 10): steps 1 to 29 pass / fail (list failed steps) at 100 % and 225 %; gui tests 30 to 32 pass / fail; closed by the owner yes / no
 Settings, help, flow settings and error window (section 11): steps 1 to 19 at 100 %, 20 to 21 at 225 %, 22 to 36 pass / fail (list failed steps); gui tests 37 to 42 pass / fail; closed by the owner yes / no
+Elements on the real system (section 12): parts A to F, steps 1 to 35 pass / fail / not run (list failed steps; write down what you saw for F-0197, F-0211, F-0213); gui tests 36 to 39 pass / fail; closed by the owner yes / no
 Notes:
 ```
 
