@@ -49,6 +49,88 @@ class DialogWindow {
         return this._Wait(res, g, timer, lay)
     }
 
+    ; The window of Dialogs.InputWindow (WI-0128, v1 Input box): a read-only message, one input field (single or multi-line,
+    ; digits only or masked), an OK button, an optional cancel button and an optional timeout. spec is a Map: title,
+    ; text (the message), default (the text of the field), mask ("" | "Number" | "Password"), rows (1 = single line),
+    ; buttonLabel, cancelLabel ("" = no cancel button), width, height, timeoutMs (0 = none).
+    ; Returns a Map: result ("OK", "Cancel", "Close" (close button or Escape) or "Timeout") and value (the text of the
+    ; field when the answer is OK; "" otherwise).
+    static Input(spec) {
+        GuiLayout.EnableDpi()   ; before the first Gui of the thread
+        m := this.MARGIN
+        width := Max(spec.Get("width", 300), 200)
+        height := Max(spec.Get("height", 250), 150)
+        rows := Max(spec.Get("rows", 1), 1)
+        multi := rows > 1
+        timeoutMs := spec.Get("timeoutMs", 0)
+        textW := width - 2 * m
+        editH := multi ? 18 * rows + 10 : 24
+        timeH := timeoutMs > 0 ? 20 : 0
+        msgH := Max(height - this.BUTTON_H - editH - timeH - 5 * m, 20)
+        res := Map("value", "", "text", "")
+        g := Gui("-DPIScale", spec.Get("title", ""))
+        lay := GuiLayout.Create(g, width, height)
+        GuiLayout.Place(lay, g.AddEdit("ReadOnly", spec.Get("text", "")), m, m, textW, msgH)
+        opts := multi ? "Multi WantReturn" : ""
+        mask := spec.Get("mask", "")
+        if (mask = "Number")
+            opts .= " Number"
+        else if (mask = "Password")
+            opts .= " Password"
+        edit := GuiLayout.Place(lay, g.AddEdit(opts, spec.Get("default", "")), m, 2 * m + msgH, textW, editH)
+        timeText := ""
+        if (timeoutMs > 0)
+            timeText := GuiLayout.Place(lay, g.AddText(, ""), m, 2 * m + msgH + editH + m, textW, 20)
+        y := height - m - this.BUTTON_H
+        cancelLabel := spec.Get("cancelLabel", "")
+        half := (textW - m) // 2
+        okBtn := GuiLayout.Place(lay, g.AddButton("Default", spec.Get("buttonLabel", "")), m, y,
+            cancelLabel = "" ? textW : half, this.BUTTON_H)
+        okBtn.OnEvent("Click", this._PickText(res, edit, "OK"))
+        if (cancelLabel != "") {
+            cancelBtn := GuiLayout.Place(lay, g.AddButton(, cancelLabel), m + half + m, y, textW - half - m,
+                this.BUTTON_H)
+            cancelBtn.OnEvent("Click", this._Pick(res, "Cancel"))
+        }
+        g.OnEvent("Close", this._Pick(res, "Close"))
+        g.OnEvent("Escape", this._Pick(res, "Close"))
+        timer := this._Pick(res, "Timeout")
+        refresh := ""
+        if (timeoutMs > 0) {
+            endTime := A_TickCount + timeoutMs
+            SetTimer(timer, -timeoutMs)
+            refresh := () => DialogWindow._Countdown(res, timeText, endTime)
+            SetTimer(refresh, 250)
+        }
+        GuiLayout.Show(lay)
+        okBtn.Focus()
+        try {
+            answer := this._Wait(res, g, timer, lay)
+        } finally {
+            if (IsObject(refresh))
+                SetTimer(refresh, 0)
+        }
+        return Map("result", answer, "value", answer = "OK" ? res["text"] : "")
+    }
+
+    ; The countdown of the input window: the seconds left are shown in its label, until the answer is set.
+    static _Countdown(res, label, endTime) {
+        if (res["value"] != "")
+            return
+        left := endTime - A_TickCount
+        label.Text := (left > 0 ? Ceil(left / 1000) : 0) " " Lang("Seconds")
+    }
+
+    ; Returns a function that sets the answer OK and keeps the text of the field (the first answer wins, as _Pick).
+    static _PickText(res, edit, value) => (*) => DialogWindow._SetText(res, edit, value)
+
+    static _SetText(res, edit, value) {
+        if (res["value"] = "") {
+            res["text"] := edit.Value
+            res["value"] := value
+        }
+    }
+
     ; The debug window of REQ-DBG-060. view: Rows(), Text(name, convert), Type(name), Write(name, text, asObject, convert),
     ; Delete(name) and ReadOnly (lib/DebugOps.ahk of the package Default). Returns "yes", "no" or "close". In the read-only
     ; mode (REQ-USE-080) the variables are only shown: the change and delete buttons are off, the Yes button is "Close".

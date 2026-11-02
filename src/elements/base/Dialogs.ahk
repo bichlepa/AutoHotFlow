@@ -9,8 +9,8 @@
 ; Only a worker element may show a dialog (ELEMENT-API-V2 section 3, ARCHITECTURE 6.4): the engine never blocks on a
 ; dialog. This file is only the seam; where an element may call it is decided by the Mode of the element, as before.
 ;
-; A provider is any object with the methods MsgBox, InputBox, ToolTip, FileSelect and DirSelect (same parameters as the
-; Dialogs methods). src/ never registers a provider: arch_check.py (rule dialog-seam) forbids Dialogs.UseProvider outside
+; A provider is any object with the methods MsgBox, InputBox, ToolTip, FileSelect, DirSelect, Window, DebugWindow and
+; InputWindow (same parameters as the Dialogs methods). src/ never registers a provider: arch_check.py (rule dialog-seam) forbids Dialogs.UseProvider outside
 ; this file, so only the test entries can do it.
 class Dialogs {
     static provider := ""
@@ -19,6 +19,14 @@ class Dialogs {
     ; Registers the provider of the process. "" restores the real dialogs. Called by test entries only (rule dialog-seam).
     static UseProvider(provider) {
         Dialogs.provider := provider
+    }
+
+    ; The input window of the v1 Input box (WI-0128): spec is a Map (title, text, default, mask, rows, buttonLabel,
+    ; cancelLabel, width, height, timeoutMs; DialogWindow.Input). Returns an object with Result ("OK", "Cancel", "Close" or
+    ; "Timeout") and Value (the text of the field for OK, "" otherwise), as InputBox does.
+    static InputWindow(spec) {
+        answer := Dialogs._Provider().InputWindow(spec)
+        return {Result: answer["result"], Value: answer["value"]}
     }
 
     ; Returns the string result of MsgBox: "OK", "Cancel", "Yes", "No", "Timeout", ...
@@ -93,6 +101,10 @@ class Dialogs {
 
         Window(spec) {
             return DialogWindow.Message(spec)
+        }
+
+        InputWindow(spec) {
+            return DialogWindow.Input(spec)
         }
 
         DebugWindow(view) {

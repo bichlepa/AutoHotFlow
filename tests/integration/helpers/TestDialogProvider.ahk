@@ -11,7 +11,7 @@
 ; The script and the log are files in <data>\TestDialogs\, so every process of the session (engine, every worker) reaches
 ; the same ones without a message route (a pooled worker cannot be addressed by a test):
 ;   script.json    {"answers": [ {...}, {...} ]}. The test writes it before the dialog is requested (support/dialogs.py).
-;                  The n-th answered dialog (MsgBox, InputBox, FileSelect, DirSelect) takes the n-th entry, in any process.
+;                  The n-th answered dialog (MsgBox, InputBox, InputWindow, FileSelect, DirSelect) takes the n-th entry, in any process.
 ;     "answer"       the return value: a String (MsgBox: "Yes"; FileSelect, DirSelect: the path, "" = cancelled),
 ;                    an Array (FileSelect with multi-select), or for InputBox an object {"result": "OK", "value": "text"}.
 ;     "delayMs"      optional, wait this long before the answer (the dialog is "open" meanwhile).
@@ -50,6 +50,21 @@ class TestDialogProvider {
         if (answer is Map)
             return {Value: answer.Get("value", ""), Result: answer.Get("result", "OK")}
         return {Value: String(answer), Result: "OK"}
+    }
+
+    ; The input window of the v1 Input box (WI-0128): the answer is {"result": "OK" | "Cancel" | "Close" | "Timeout",
+    ; "value": "text"} (a plain text is an OK with that text). A window that nobody answers returns "Timeout" after its
+    ; timeoutMs, as the real window; without a timeout it waits for ever.
+    InputWindow(spec) {
+        timeoutMs := spec.Get("timeoutMs", 0)
+        args := Map("title", spec.Get("title", ""), "text", spec.Get("text", ""), "default", spec.Get("default", "")
+            , "mask", spec.Get("mask", ""), "rows", spec.Get("rows", 1), "buttonLabel", spec.Get("buttonLabel", "")
+            , "cancelLabel", spec.Get("cancelLabel", ""), "width", spec.Get("width", 0), "height", spec.Get("height", 0)
+            , "timeoutMs", timeoutMs)
+        answer := this._Dialog("InputWindow", args, "", timeoutMs)
+        if (answer is Map)
+            return Map("result", answer.Get("result", "OK"), "value", answer.Get("value", ""))
+        return Map("result", "OK", "value", String(answer))
     }
 
     ToolTip(text, x?, y?, which := 1) {
@@ -163,7 +178,7 @@ class TestDialogProvider {
         if (entry.Get("noAnswer", 0)) {
             if (timeoutMs > 0) {
                 Sleep(timeoutMs)
-                return "timeout"
+                return kind = "InputWindow" ? Map("result", "Timeout", "value", "") : "timeout"
             }
             if (RegExMatch(options, "i)(?:^|\s)T(\d+(?:\.\d+)?)", &m)) {
                 Sleep(Integer(Float(m[1]) * 1000))
