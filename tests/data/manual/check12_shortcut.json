@@ -1,0 +1,60 @@
+{
+  "name": "Check 12 shortcut",
+  "category": "Manual check",
+  "ElementIDCounter": "3",
+  "formatVersion": 2,
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "0.000000",
+    "Offsety": "0.000000",
+    "WorkingDir": "",
+    "zoomFactor": "1.000000"
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Shortcut",
+      "ID": "element0000000001",
+      "name": "Trigger_Shortcut",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ShortCutPath": "%A_Desktop%\\AutoHotFlow check 12.lnk",
+        "RemoveShortcutOnDisabling": 1,
+        "ID": "Check 12 shortcut"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "0",
+      "y": "0",
+      "enabled": "0",
+      "DefaultTrigger": "1"
+    },
+    "element0000000002": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000002",
+      "name": "Action_Tooltip",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "text": "Check 12: started by the shortcut",
+        "duration": 8,
+        "Unit": "Seconds",
+        "follow_mouse": 0
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "140"
+    }
+  },
+  "allConnections": {
+    "connection0000000003": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000003",
+      "to": "element0000000002",
+      "type": "Connection"
+    }
+  }
+}

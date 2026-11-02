@@ -114,3 +114,12 @@ def test_copy_v1_refuses_a_missing_source_and_a_target_it_did_not_make(tmp_path)
     source.mkdir()
     assert mc.main(["copy-v1", "--v1-source", str(source), "--v1-dir", str(target)]) == 1
     assert (target / "keep.txt").read_text(encoding="utf-8") == "keep"
+
+
+def test_prepare_copies_several_flows_given_as_a_comma_list_and_the_state_file(tmp_path):
+    folder = tmp_path / "manual"
+    mc.prepare(str(folder), "check12_system,check12_shortcut")
+    assert (folder / "Flows" / "check12_system.json").is_file()
+    assert (folder / "Flows" / "check12_shortcut.json").is_file()
+    assert (folder / "FlowStates" / "check12_shortcut.json").is_file()       # its companion state file
+    assert not (folder / "Flows" / "check12_input.json").exists()

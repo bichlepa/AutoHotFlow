@@ -208,6 +208,7 @@ TEST_GROUPS = {
     "integration/test_worker_pool.py": ["workers"],
     "integration/test_worker_vars.py": ["workers", "variables"],
     "oracle/test_expr_oracle.py": ["expr"],
+    "stress/test_all_classes_start.py": ["supervisor", "manager"],
     "stress/test_background_memory.py": ["supervisor", "manager"],
     "stress/test_big_flows.py": ["storage", "engine"],
     "stress/test_clients_churn.py": ["transport"],

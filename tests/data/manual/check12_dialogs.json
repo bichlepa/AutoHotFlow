@@ -1,0 +1,125 @@
+{
+  "name": "Check 12 dialogs",
+  "category": "Manual check",
+  "ElementIDCounter": "9",
+  "formatVersion": 2,
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "0.000000",
+    "Offsety": "0.000000",
+    "WorkingDir": "",
+    "zoomFactor": "1.000000"
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "ID": "element0000000001",
+      "name": "Trigger_Manual",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "Check 12 dialogs"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "0",
+      "y": "0",
+      "enabled": "0",
+      "DefaultTrigger": "1"
+    },
+    "element0000000002": {
+      "class": "Action_Input_Box",
+      "ID": "element0000000002",
+      "name": "Action_Input_Box",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Varname": "UserInput",
+        "title": "Check 12 input",
+        "message": "Type some text and press OK",
+        "defaultText": "hello",
+        "ShowCancelButton": 1
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "140"
+    },
+    "element0000000003": {
+      "class": "Action_Select_file",
+      "ID": "element0000000003",
+      "name": "Action_Select_file",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Varname": "selectedFiles",
+        "title": "Check 12: select any file"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "280"
+    },
+    "element0000000004": {
+      "class": "Action_Select_Folder",
+      "ID": "element0000000004",
+      "name": "Action_Select_Folder",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Varname": "selectedFolder",
+        "title": "Check 12: select any folder"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "420"
+    },
+    "element0000000005": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000005",
+      "name": "Action_Message_Box",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "title": "Check 12 result",
+        "message": "Input: %UserInput%\nFile: %selectedFiles%\nFolder: %selectedFolder%"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "560"
+    }
+  },
+  "allConnections": {
+    "connection0000000006": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000006",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000007": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000007",
+      "to": "element0000000003",
+      "type": "Connection"
+    },
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "element0000000003",
+      "ID": "connection0000000008",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000009": {
+      "ConnectionType": "normal",
+      "from": "element0000000004",
+      "ID": "connection0000000009",
+      "to": "element0000000005",
+      "type": "Connection"
+    }
+  }
+}

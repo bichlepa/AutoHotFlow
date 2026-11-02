@@ -1,0 +1,174 @@
+{
+  "name": "Check 12 input",
+  "category": "Manual check",
+  "ElementIDCounter": "13",
+  "formatVersion": 2,
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "0.000000",
+    "Offsety": "0.000000",
+    "WorkingDir": "",
+    "zoomFactor": "1.000000"
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "ID": "element0000000001",
+      "name": "Trigger_Manual",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "Check 12 input"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "0",
+      "y": "0",
+      "enabled": "0",
+      "DefaultTrigger": "1"
+    },
+    "element0000000002": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000002",
+      "name": "Action_Tooltip",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "text": "Click into the open Notepad window now (6 s)",
+        "duration": 5,
+        "Unit": "Seconds",
+        "follow_mouse": 0
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "140"
+    },
+    "element0000000003": {
+      "class": "Action_Sleep",
+      "ID": "element0000000003",
+      "name": "Action_Sleep",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Duration": 6,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "280"
+    },
+    "element0000000004": {
+      "class": "Action_Send_Keystrokes",
+      "ID": "element0000000004",
+      "name": "Action_Send_Keystrokes",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "KeysToSend": "Hello from check twelve{Enter}",
+        "RawMode": 0
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "420"
+    },
+    "element0000000005": {
+      "class": "Action_Move_Mouse",
+      "ID": "element0000000005",
+      "name": "Action_Move_Mouse",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "CoordMode": "Screen",
+        "Xpos": 300,
+        "Ypos": 300
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "560"
+    },
+    "element0000000006": {
+      "class": "Action_Click",
+      "ID": "element0000000006",
+      "name": "Action_Click",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Button": "Left",
+        "ClickCount": 1,
+        "DownUp": "Click",
+        "changePosition": 1,
+        "CoordMode": "Screen",
+        "Xpos": 300,
+        "Ypos": 300
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "700"
+    },
+    "element0000000007": {
+      "class": "Action_Send_Keystrokes",
+      "ID": "element0000000007",
+      "name": "Action_Send_Keystrokes",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "KeysToSend": "after the click",
+        "RawMode": 0
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "840"
+    }
+  },
+  "allConnections": {
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000008",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000009": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000009",
+      "to": "element0000000003",
+      "type": "Connection"
+    },
+    "connection0000000010": {
+      "ConnectionType": "normal",
+      "from": "element0000000003",
+      "ID": "connection0000000010",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000011": {
+      "ConnectionType": "normal",
+      "from": "element0000000004",
+      "ID": "connection0000000011",
+      "to": "element0000000005",
+      "type": "Connection"
+    },
+    "connection0000000012": {
+      "ConnectionType": "normal",
+      "from": "element0000000005",
+      "ID": "connection0000000012",
+      "to": "element0000000006",
+      "type": "Connection"
+    },
+    "connection0000000013": {
+      "ConnectionType": "normal",
+      "from": "element0000000006",
+      "ID": "connection0000000013",
+      "to": "element0000000007",
+      "type": "Connection"
+    }
+  }
+}

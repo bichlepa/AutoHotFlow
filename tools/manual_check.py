@@ -70,7 +70,8 @@ def flow_source(name):
 def prepare(folder, flow=None):
     """Empties the folder (only one of ours or an empty one) and puts the skeleton flow into Flows\\skeleton.json, and
     the flow `flow` (a name, see flow_source) into Flows\\<flow>.json."""
-    source = flow_source(flow) if flow else None
+    names = [n for n in (flow or "").split(",") if n]            # several flows: "a,b,c" (manual check 12)
+    sources = {n: flow_source(n) for n in names}
     if os.path.isdir(folder) and os.listdir(folder):
         if not os.path.isfile(os.path.join(folder, MARKER)):
             raise Refused("%s is not empty and was not made by this tool (no %s); not deleted" % (folder, MARKER))
@@ -81,14 +82,14 @@ def prepare(folder, flow=None):
     with open(os.path.join(folder, MARKER), "w", encoding="utf-8") as f:
         f.write("Data folder of the manual checks (tools/manual_check.py). It is deleted by 'prepare'.\n")
     shutil.copyfile(SKELETON, os.path.join(folder, "Flows", "skeleton.json"))
-    if source:
-        shutil.copyfile(source, os.path.join(folder, "Flows", flow + ".json"))
+    for name, source in sources.items():
+        shutil.copyfile(source, os.path.join(folder, "Flows", name + ".json"))
         # An optional companion <name>.state.json holds the enabled triggers of the flow (FlowStates, E0063), so that
         # the flow is enabled at the start without a click.
-        state = os.path.join(FLOWS_DIR, flow + ".state.json")
+        state = os.path.join(FLOWS_DIR, name + ".state.json")
         if os.path.isfile(state):
             os.makedirs(os.path.join(folder, "FlowStates"), exist_ok=True)
-            shutil.copyfile(state, os.path.join(folder, "FlowStates", flow + ".json"))
+            shutil.copyfile(state, os.path.join(folder, "FlowStates", name + ".json"))
 
 
 def copy_v1(source, target):

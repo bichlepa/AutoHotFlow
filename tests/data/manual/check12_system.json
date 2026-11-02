@@ -1,0 +1,254 @@
+{
+  "name": "Check 12 system",
+  "category": "Manual check",
+  "ElementIDCounter": "21",
+  "formatVersion": 2,
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "0.000000",
+    "Offsety": "0.000000",
+    "WorkingDir": "",
+    "zoomFactor": "1.000000"
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "ID": "element0000000001",
+      "name": "Trigger_Manual",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "Check 12 system"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "0",
+      "y": "0",
+      "enabled": "0",
+      "DefaultTrigger": "1"
+    },
+    "element0000000002": {
+      "class": "Action_Beep",
+      "ID": "element0000000002",
+      "name": "Action_Beep",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "frequency": 880,
+        "duration": 300
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "140"
+    },
+    "element0000000003": {
+      "class": "Action_Play_Sound",
+      "ID": "element0000000003",
+      "name": "Action_Play_Sound",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "WhichSound": "SystemSound",
+        "systemSound": "tada.wav",
+        "WaitUntilFinished": 1
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "280"
+    },
+    "element0000000004": {
+      "class": "Action_Speech_output",
+      "ID": "element0000000004",
+      "name": "Action_Speech_output",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "text": "Manual check twelve. This is the speech output.",
+        "WaitUntilCurrentFinishes": 1
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "420"
+    },
+    "element0000000005": {
+      "class": "Action_Get_Volume",
+      "ID": "element0000000005",
+      "name": "Action_Get_Volume",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Varname": "Volume"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "560"
+    },
+    "element0000000006": {
+      "class": "Action_Get_Screen_Settings",
+      "ID": "element0000000006",
+      "name": "Action_Get_Screen_Settings",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "MonitorNumber": 1
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "700"
+    },
+    "element0000000007": {
+      "class": "Action_Screenshot",
+      "ID": "element0000000007",
+      "name": "Action_Screenshot",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "file": "ahf_check12_screenshot.png",
+        "WhichRegion": "Screen",
+        "AllScreens": 1
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "840"
+    },
+    "element0000000008": {
+      "class": "Action_Block_User_Input",
+      "ID": "element0000000008",
+      "name": "Action_Block_User_Input",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "blockState": "Block"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "980"
+    },
+    "element0000000009": {
+      "class": "Action_Sleep",
+      "ID": "element0000000009",
+      "name": "Action_Sleep",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Duration": 3,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "1120"
+    },
+    "element0000000010": {
+      "class": "Action_Block_User_Input",
+      "ID": "element0000000010",
+      "name": "Action_Block_User_Input",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "blockState": "Unblock"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "1260"
+    },
+    "element0000000011": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000011",
+      "name": "Action_Tooltip",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "text": "Check 12 done. Volume: %Volume%",
+        "duration": 8,
+        "Unit": "Seconds",
+        "follow_mouse": 0
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "1400"
+    }
+  },
+  "allConnections": {
+    "connection0000000012": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000012",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000013": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000013",
+      "to": "element0000000003",
+      "type": "Connection"
+    },
+    "connection0000000014": {
+      "ConnectionType": "normal",
+      "from": "element0000000003",
+      "ID": "connection0000000014",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000015": {
+      "ConnectionType": "normal",
+      "from": "element0000000004",
+      "ID": "connection0000000015",
+      "to": "element0000000005",
+      "type": "Connection"
+    },
+    "connection0000000016": {
+      "ConnectionType": "normal",
+      "from": "element0000000005",
+      "ID": "connection0000000016",
+      "to": "element0000000006",
+      "type": "Connection"
+    },
+    "connection0000000017": {
+      "ConnectionType": "normal",
+      "from": "element0000000006",
+      "ID": "connection0000000017",
+      "to": "element0000000007",
+      "type": "Connection"
+    },
+    "connection0000000018": {
+      "ConnectionType": "normal",
+      "from": "element0000000007",
+      "ID": "connection0000000018",
+      "to": "element0000000008",
+      "type": "Connection"
+    },
+    "connection0000000019": {
+      "ConnectionType": "normal",
+      "from": "element0000000008",
+      "ID": "connection0000000019",
+      "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000020": {
+      "ConnectionType": "normal",
+      "from": "element0000000009",
+      "ID": "connection0000000020",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000021": {
+      "ConnectionType": "normal",
+      "from": "element0000000010",
+      "ID": "connection0000000021",
+      "to": "element0000000011",
+      "type": "Connection"
+    }
+  }
+}
