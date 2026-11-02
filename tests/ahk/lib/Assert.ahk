@@ -42,7 +42,7 @@ class Assert {
             fn()
         } catch as e {
             if (errorClass != "" && !(e is errorClass))
-                throw AssertFailed(Assert.Join(msg, "expected " errorClass.Name " but got " Type(e) ": " e.Message))
+                throw AssertFailed(Assert.Join(msg, "expected " errorClass.Prototype.__Class " but got " Type(e) ": " e.Message))
             return e
         }
         throw AssertFailed(Assert.Join(msg, "expected an exception but none was thrown"))
