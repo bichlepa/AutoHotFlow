@@ -20,4 +20,14 @@ class DialogOps {
             throw ElementError("Timeout: the amount must be a number of 0 or more, not '" (IsObject(amount) ? Type(amount) : amount) "'")
         return Integer(amount * this.UNIT_MS[key])
     }
+
+    ; Ends a dialog element that gives its answer by A_UserAction (WI-0128: Input box, file and folder selection): sets the
+    ; thread variable to the way the dialog was ended (a lower case text), then ends with "exception" and the message
+    ; (ElementError) or with "normal".
+    static End(ctx, action, result, message := "") {
+        ctx.SetVar("A_UserAction", action, "thread")
+        if (result = "exception")
+            throw ElementError(message)
+        ctx.Finish("normal")
+    }
 }

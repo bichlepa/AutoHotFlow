@@ -153,6 +153,7 @@ TEST_GROUPS = {
     "integration/test_path_guards.py": ["elements-e2e"],
     "integration/test_core_d_flows.py": ["engine"],
     "integration/test_core_e_dialogs.py": ["ui", "elements-e2e"],
+    "integration/test_dialog_elements.py": ["ui", "elements-e2e"],
     "integration/test_corpus.py": ["expr", "engine"],
     "integration/test_dialog_windows_gui.py": ["ui"],
     "integration/test_dialogs.py": ["ui"],
@@ -398,6 +399,15 @@ COVERS = {
     "src/elements/Default/Actions/Action_Message_Box.ahk": [
         "integration/test_core_e_dialogs.py",
     ],
+    "src/elements/Default/Actions/Action_Input_Box.ahk": [
+        "integration/test_dialog_elements.py",
+    ],
+    "src/elements/Default/Actions/Action_Select_file.ahk": [
+        "integration/test_dialog_elements.py",
+    ],
+    "src/elements/Default/Actions/Action_Select_Folder.ahk": [
+        "integration/test_dialog_elements.py",
+    ],
     "src/elements/Default/Actions/Action_New_List.ahk": [
         "integration/test_core_b_lists.py::test_a_list_built_edited_and_searched_with_the_elements",
         "integration/test_core_b_lists.py::test_new_list_creates_empty_and_filled_lists",
@@ -592,6 +602,7 @@ COVERS = {
     ],
     "src/elements/Default/lib/DialogOps.ahk": [
         "integration/test_core_e_dialogs.py",
+        "integration/test_dialog_elements.py",
     ],
     "src/elements/Default/Actions/Action_Set_element_parameter.ahk": [
         "e2e/test_editor_flow_ctx.py::test_set_element_parameter_lists_the_elements_and_the_parameters_of_another_flow",

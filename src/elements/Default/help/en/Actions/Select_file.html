@@ -99,28 +99,32 @@ img {
 <body>
 <main>
 <h1>Select file</h1>
-<p>The action <strong>Select file</strong> displays a standard dialog that allows the user to select one or multiple file.</p>
+<p>The action <strong>Select file</strong> shows the standard file dialog. The user chooses one file, or several files when <strong>Allow to select multiple files</strong> is checked. The chosen path goes into the output variable.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
-<p>Name of the variable which will contain the result.</p>
-<p>If <strong>Options -&gt; Allow to select multiple files</strong> is selected, the result will be a list instead of a string.</p>
+<p>The name of the variable that receives the result: the full path of the file. With <strong>Allow to select multiple files</strong> the result is a list of the full paths.</p>
 <h3>Prompt</h3>
-<p>Text displayed in the window to instruct the user what to do.</p>
+<p>The text of the window title.</p>
 <h3>Root directory</h3>
-<p>The name of a single file or folder. This file or folder will be the preselected file or folder when the dialog appars.</p>
-<p>The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
+<p>The file or folder that is preselected when the dialog appears. A relative path is taken from the working directory of AutoHotFlow.</p>
 <h3>Filter</h3>
-<p>Indicates which types of files are shown by the dialog.</p>
+<p>The types of files the dialog shows, for example <code>Documents (*.txt)</code>. The default shows all files.</p>
 <h3>Options</h3>
-<p>Some further options can be set here.</p>
-<p><em>Examples:</em></p>
 <ul>
-<li><code>All Files (*.*)</code></li>
-<li><code>Documents (*.txt)</code></li>
-<li><code>Audio (*.wav; *.mp2; *.mp3)</code></li>
+<li><strong>Allow to select multiple files</strong>: the user can choose several files. The result is a list. A Save button is then not possible, so <strong>'Save' button</strong> is disabled.</li>
+<li><strong>'Save' button instead of an 'Open' button</strong>: the dialog offers Save instead of Open.</li>
+<li><strong>File must exist</strong>: the chosen file must exist. Disabled together with the Save button.</li>
+<li><strong>Path must exist</strong>: the folder of the chosen file must exist.</li>
+<li><strong>Prompt to create new file</strong>: the user is asked when a file that does not exist is chosen.</li>
+<li><strong>Prompt to overwrite file</strong>: the user is asked before an existing file is replaced.</li>
+<li><strong>Don't resolve shortcuts to their targets</strong>: a shortcut file is returned as it is, not as its target.</li>
 </ul>
-<h3>Options</h3>
-<p>Some further options can be set here.</p>
+<h2>Results</h2>
+<ul>
+<li>The user chooses a file: the output variable holds its path, and the action ends normally.</li>
+<li>The user cancels the dialog: the action ends with the exception "User dismissed the dialog without selecting a file or system refused to show the dialog."</li>
+</ul>
+<p>The output variable is not changed in that case.</p>
 </main>
 </body>
 </html>

@@ -56,6 +56,7 @@ class Default {
     #Include Actions\Action_Hibernate_Computer.ahk
     #Include Actions\Action_Hide_Window.ahk
     #Include Actions\Action_HTTP_Request.ahk
+    #Include Actions\Action_Input_Box.ahk
     #Include Actions\Action_Kill_Process.ahk
     #Include Actions\Action_List_drives.ahk
     #Include Actions\Action_Lock_Computer.ahk
@@ -74,6 +75,8 @@ class Default {
     #Include Actions\Action_Rename_File.ahk
     #Include Actions\Action_Rename_Folder.ahk
     #Include Actions\Action_Run.ahk
+    #Include Actions\Action_Select_file.ahk
+    #Include Actions\Action_Select_Folder.ahk
     #Include Actions\Action_Send_Keystrokes.ahk
     #Include Actions\Action_Send_Keystrokes_To_Control.ahk
     #Include Actions\Action_Set_Clipboard.ahk
@@ -135,6 +138,7 @@ ElementRegistry.Register(Default.Action_Get_Volume)
 ElementRegistry.Register(Default.Action_Hibernate_Computer)
 ElementRegistry.Register(Default.Action_Hide_Window)
 ElementRegistry.Register(Default.Action_HTTP_Request)
+ElementRegistry.Register(Default.Action_Input_Box)
 ElementRegistry.Register(Default.Action_Kill_Process)
 ElementRegistry.Register(Default.Action_List_drives)
 ElementRegistry.Register(Default.Action_Lock_Computer)
@@ -153,6 +157,8 @@ ElementRegistry.Register(Default.Action_Reboot_Computer)
 ElementRegistry.Register(Default.Action_Rename_File)
 ElementRegistry.Register(Default.Action_Rename_Folder)
 ElementRegistry.Register(Default.Action_Run)
+ElementRegistry.Register(Default.Action_Select_file)
+ElementRegistry.Register(Default.Action_Select_Folder)
 ElementRegistry.Register(Default.Action_Send_Keystrokes)
 ElementRegistry.Register(Default.Action_Send_Keystrokes_To_Control)
 ElementRegistry.Register(Default.Action_Set_Clipboard)

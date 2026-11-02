@@ -99,33 +99,46 @@ img {
 <body>
 <main>
 <h1>Input box</h1>
-<p>The action <strong>Input box</strong> displays an input box to ask the user to enter a string or number.</p>
+<p>The action <strong>Input box</strong> shows a window that asks the user for a text or a number. The text goes into the output variable. The action ends when the user has pressed a button, has closed the window, or when the timeout has run out.</p>
 <h2>Settings</h2>
 <h3>Output variable name</h3>
-<p>Name of the variable which will contain the user input.</p>
-<h3>Title <em>and</em> Message</h3>
-<p>Message shown to the user.</p>
+<p>The name of the variable that receives the text the user typed. It is empty when the user did not press OK (see Results below).</p>
+<h3>Title and message</h3>
+<p>The title of the window and the text above the input field. The message may be an object, which is shown as JSON.</p>
 <h3>Edit field</h3>
-<p>If <strong>Only allow numbers</strong> is selected, it will prevent the user from typing anything other than digits into the field (however, it is still possible to paste non-digits into it).</p>
-<p>If <strong>Mask user's input</strong> is selected, it will hide the user's input (such as for password entry) by substituting masking characters for what the user types</p>
-<p>If <strong>Use a multiline edit field</strong> is selected, the edit field will have multiple lines. The count of lines may be specified.</p>
-<p>If <strong>Default value</strong> contains some text, the edit field will contain that text when the dialog first appears.</p>
+<ul>
+<li><strong>Only allow numbers</strong>: the user can type digits only. Pasting other characters is still possible.</li>
+<li><strong>Mask user's input</strong>: the typed characters are hidden, for example for a password. This does not work together with <strong>Only allow numbers</strong> or <strong>Use a multiline edit field</strong>; the settings disable the one that does not apply.</li>
+<li><strong>Use a multiline edit field</strong>: the field has several lines. <strong>Count of lines</strong> sets how many lines the field has.</li>
+<li><strong>Default value</strong>: the text the field contains when the window opens.</li>
+</ul>
 <h3>Button Text</h3>
-<p>Enter the text which will be shown as the <strong>OK</strong> button.</p>
+<p>The text of the <strong>OK</strong> button.</p>
 <h3>Timeout</h3>
-<p>If <strong>Define timeout</strong> is selected, the dialog will automatically close after the specified amount of time.</p>
-<p><strong>Result on timeout</strong>: If timeout reaches zero, the action will end with the specified result.</p>
+<ul>
+<li><strong>No timeout</strong>: the window stays open until the user closes it.</li>
+<li><strong>Define timeout</strong>: the window closes after the given time (in seconds, minutes or hours). The window shows the seconds that are left. The result for a timeout is set under <strong>Result on timeout</strong>: <strong>Normal</strong> or <strong>Throw exception</strong> (exception: "Timeout reached").</li>
+</ul>
 <h3>Width and height</h3>
-<p>Specify the size of the window that will be shown. Make sure, that the window is not too small.</p>
+<p>The size of the window, in pixels (default 300 by 250). Make sure that the window is not too small for its text.</p>
 <h3>Cancelling</h3>
-<p>If <strong>Show cancel button</strong> is selected, a second button near to the OK button will be shown. The text can be specified.</p>
-<p><strong>Result if cancelled</strong>: If uses either closes the window or clicks on the cancel button, the action will end with the specified result.</p>
+<p>If <strong>Show cancel button</strong> is checked, a second button is shown; its text is set under <strong>Button text</strong>. <strong>Result if cancelled</strong> sets what happens when it is pressed: <strong>Normal</strong>, or <strong>Throw exception</strong> (exception: "User cancelled the dialog").</p>
+<p>Closing the window with its close button or with Esc is set by <strong>Result if closed</strong>: <strong>Normal</strong> or <strong>Throw exception</strong> (exception: "User closed the dialog").</p>
+<h2>Results</h2>
+<ul>
+<li><strong>OK</strong>: the output variable holds the text of the field, and the action ends normally.</li>
+<li><strong>Cancel button, close button or Esc, timeout</strong>: the output variable is empty. The action ends normally or with an exception, as set above.</li>
+</ul>
 <h2>Supplied Variables</h2>
 <h3><code>A_UserAction</code></h3>
-<p>The operation used to close the dialog. Can be one of:</p>
-<p><strong>ok</strong>: when the user pressed the OK-button</p>
-<p><strong>timeout</strong>: when the dialog was closed by a timeout</p>
-<p><strong>cancel</strong>: when the user pressed the back key and the appropriate option is set</p>
+<p>The way the window was ended, as a text in lower case:</p>
+<ul>
+<li><strong>ok</strong>: the user pressed the OK button</li>
+<li><strong>timeout</strong>: the timeout has run out</li>
+<li><strong>cancel</strong>: the user pressed the cancel button</li>
+<li><strong>close</strong>: the user closed the window or pressed Esc</li>
+</ul>
+<p>Compare it with <code>=</code>, which ignores the case. The comparison with <code>==</code> is case sensitive: <code>A_UserAction == "OK"</code> is never true.</p>
 </main>
 </body>
 </html>

@@ -1,23 +1,30 @@
 # Select folder
 
-The action **Select folder** displays a standard dialog that allows the user to select a folder.
+The action **Select folder** shows the standard folder dialog. The user chooses a folder, and its path goes into the output variable.
 
 ## Settings
 
 ### Output variable name
 
-Name of the variable which will contain the result.
+The name of the variable that receives the full path of the chosen folder.
 
 ### Prompt
 
-Text displayed in the window to instruct the user what to do.
+The text the dialog shows to tell the user what to choose.
 
 ### Root directory
 
-The name of a single file or folder. This file or folder will be the preselected file or folder when the dialog appars.
-
-The file path is assumed to be in the working directory if an absolute path isn't specified.
+The folder that is preselected when the dialog appears. A relative path is taken from the working directory of AutoHotFlow.
 
 ### Options
 
-Some further options can be set here.
+- **Permit to navigate upward**: the user may go up from the root folder to its parent folders. When it is not checked, the user can only choose the root folder or a folder inside it.
+- **Show a button to create a new folder**: the dialog has a button that creates a folder.
+- **Show an edit field to type in the folder name**: the dialog has an edit field in which the user can type a folder name.
+
+## Results
+
+- The user chooses a folder: the output variable holds its path, and the action ends normally.
+- The user cancels the dialog: the action ends with the exception "User dismissed the dialog without selecting a folder or system refused to show the dialog."
+
+The output variable is not changed in that case.

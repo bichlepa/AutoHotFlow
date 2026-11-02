@@ -1,39 +1,38 @@
 # Select file
 
-The action **Select file** displays a standard dialog that allows the user to select one or multiple file.
+The action **Select file** shows the standard file dialog. The user chooses one file, or several files when **Allow to select multiple files** is checked. The chosen path goes into the output variable.
 
 ## Settings
 
 ### Output variable name
 
-Name of the variable which will contain the result.
-
-If **Options -> Allow to select multiple files** is selected, the result will be a list instead of a string.
+The name of the variable that receives the result: the full path of the file. With **Allow to select multiple files** the result is a list of the full paths.
 
 ### Prompt
 
-Text displayed in the window to instruct the user what to do.
+The text of the window title.
 
 ### Root directory
 
-The name of a single file or folder. This file or folder will be the preselected file or folder when the dialog appars.
-
-The file path is assumed to be in the working directory if an absolute path isn't specified.
+The file or folder that is preselected when the dialog appears. A relative path is taken from the working directory of AutoHotFlow.
 
 ### Filter
 
-Indicates which types of files are shown by the dialog.
+The types of files the dialog shows, for example `Documents (*.txt)`. The default shows all files.
 
 ### Options
 
-Some further options can be set here.
+- **Allow to select multiple files**: the user can choose several files. The result is a list. A Save button is then not possible, so **'Save' button** is disabled.
+- **'Save' button instead of an 'Open' button**: the dialog offers Save instead of Open.
+- **File must exist**: the chosen file must exist. Disabled together with the Save button.
+- **Path must exist**: the folder of the chosen file must exist.
+- **Prompt to create new file**: the user is asked when a file that does not exist is chosen.
+- **Prompt to overwrite file**: the user is asked before an existing file is replaced.
+- **Don't resolve shortcuts to their targets**: a shortcut file is returned as it is, not as its target.
 
-*Examples:*
+## Results
 
-- `All Files (*.*)`
-- `Documents (*.txt)`
-- `Audio (*.wav; *.mp2; *.mp3)`
+- The user chooses a file: the output variable holds its path, and the action ends normally.
+- The user cancels the dialog: the action ends with the exception "User dismissed the dialog without selecting a file or system refused to show the dialog."
 
-### Options
-
-Some further options can be set here.
+The output variable is not changed in that case.
