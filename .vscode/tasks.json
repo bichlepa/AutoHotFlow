@@ -1168,6 +1168,63 @@
             "problemMatcher": []
         },
         {
+            "label": "Start: manual check 12, elements on the real system, dialogs, shortcut and demo flows (manual_check.py)",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/manual_check.py",
+                "start",
+                "--fresh",
+                "--flow",
+                "check12_system,check12_dialogs,check12_shortcut,check12_input",
+                "--",
+                "--start=storage,engine,triggerhost,manager"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: dialog windows (gui, the real windows of the dialog elements appear for a moment; do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/integration/test_dialog_windows_gui.py",
+                "tests/integration/test_dialogs.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0",
+                "-v"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: window triggers (gui, own windows get the focus; do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/integration/test_window_triggers.py",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0",
+                "-v"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Test: editor mouse input and status bar (gui, a real editor window; wheel and drag are sent; do not use the PC)",
             "type": "shell",
             "command": "python",
