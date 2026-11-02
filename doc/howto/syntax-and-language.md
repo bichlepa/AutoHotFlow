@@ -624,3 +624,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Check a new `Lang()` key with a script against the language file (the key with `_` read as a space, exact case), and test the text of the element's parameters.
 - **Status:** verified (WI-0121 check of the used keys against `en.ini` and `de.ini`)
 - **Source:** `src/core/LangTable.ahk`
+
+### Outputs with an empty name are skipped (WI-0127)
+
+- **Problem:** `ctx.SetVar("", value)` would write to a variable without a name; the screen settings element has outputs for minimum and maximum that the user may leave empty.
+- **Wrong:** storing every output without a check on its name.
+- **Right:** the element checks the name first (`if (p.%id% != "")`) and sets only the outputs that have one (M-0172).
+- **Status:** verified by the test `test_get_screen_settings_stores_the_values_of_the_monitor` (the outputs with names are set).

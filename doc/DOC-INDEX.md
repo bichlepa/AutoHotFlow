@@ -184,7 +184,7 @@ L103-109 WinHTTP does not send a loopback request through a proxy (verified) (ve
 L111-117 The body of a WinHTTP answer is a SAFEARRAY that the element copies (verified) (verified)
 ```
 
-## doc/howto/drawing-gdip.md (5.9 KB, 59 lines)
+## doc/howto/drawing-gdip.md (7.6 KB, 73 lines)
 ```text
 L5-10 A big icon file is scaled down on every draw (verified)
 L12-17 Every draw of a changing flow rebuilds the static layer only when needed (verified)
@@ -194,6 +194,8 @@ L33-38 Text in a fixed box is cut off when the format does not wrap (verified)
 L40-45 Pixel probes of the flow break when an overlay covers the top left of the canvas (verified)
 L47-52 A drag keeps the static layer when the key leaves the dragged items out (verified)
 L54-59 A drag of 30 elements draws live at 25 ms per frame (partly verified)
+L61-66 A parameter named like a built-in function hides the function (WI-0127) (verified)
+L68-73 Screenshot of the screen and of a window (WI-0127) (partly verified)
 ```
 
 ## doc/howto/error-handling.md (7.5 KB, 81 lines)
@@ -210,7 +212,7 @@ L67-73 The reason of a failed file call is the OSError number (verified) (partly
 L75-81 FileSetAttrib and FileSetTime do not throw when no file matches (verified) (verified)
 ```
 
-## doc/howto/gui-and-hotkeys.md (47.4 KB, 374 lines)
+## doc/howto/gui-and-hotkeys.md (48.7 KB, 388 lines)
 ```text
 L5-10 ListView: row clicks and selection after a rebuild (assumed)
 L12-17 Closing a Gui window does not end a role (`Persistent`) (verified)
@@ -259,6 +261,8 @@ L344-350 `ControlGetHwnd` and `ControlGetText` take a window handle as the contr
 L352-358 `GetKeyState` without "P" does not see a key that another process sends (verified) (verified)
 L360-366 Hotstring callbacks take the name, not a replacement; options name the trigger only (verified) (verified)
 L368-374 `Hotstring(text, , "Off")` needs the omitted middle argument (verified) (verified)
+L376-381 PixelSearch and ImageSearch search row by row in AutoHotkey v2 (WI-0127) (partly verified)
+L383-388 Screen coordinates of a worker: device pixels for the screen elements (WI-0127) (assumed)
 ```
 
 ## doc/howto/objects-maps-arrays.md (14.2 KB, 158 lines)
@@ -342,7 +346,7 @@ L455-461 ProcessWaitClose with a deadline: 0 when the process ended, its PID whe
 L463-479 A script on stdin of an AutoHotkey child: no byte order mark, the job object, the stdin pipe (WI-0130) (verified)
 ```
 
-## doc/howto/syntax-and-language.md (62.1 KB, 626 lines)
+## doc/howto/syntax-and-language.md (62.6 KB, 633 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -422,6 +426,7 @@ L596-602 WarnIfEmpty refuses an empty value at run time in v2 (verified)
 L604-610 IniRead returns the empty text for an empty default (verified) (verified)
 L612-618 Loop variable of the full path is A_LoopFileFullPath in v2 (verified) (verified)
 L620-626 Language keys are case-sensitive (verified) (verified)
+L628-633 Outputs with an empty name are skipped (WI-0127) (verified)
 ```
 
 ## doc/howto/tests-and-tools.md (57.6 KB, 569 lines)

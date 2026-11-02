@@ -1025,19 +1025,20 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 ### REQ-ELM-350 Screen and images
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done (WI-0127; the real monitor settings are not changed in the tests, the owner's manual check is open; the screenshot and the searches are not checked on several monitors with different scales)
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0127)
+- **Evidence:** `tests/integration/test_screen_elements.py` (18 tests: pixel, search pixel and search image on an own window with a known picture; screenshot of a region and of a window, read back as BMP; the monitor settings through the system provider), `tests/schema/test_v1_schema.py` (the parameters against v1, M-0168 to M-0174)
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|
-| `Action_Screenshot` | yes | open | S0008 |
-| `Action_Get_pixel_color` | yes | open | S0008 |
-| `Action_Search_pixel` | yes | open | S0008 |
-| `Action_Search_Image` | yes | open | S0008 |
-| `Action_Get_Screen_Settings` | yes | open | S0008 |
-| `Action_Set_Screen_Settings` | yes | open | S0008 |
+| `Action_Screenshot` | yes | done (WI-0127) | S0008 (WI-0127) |
+| `Action_Get_pixel_color` | yes | done (WI-0127) | S0008 (WI-0127) |
+| `Action_Search_pixel` | yes | done (WI-0127) | S0008 (WI-0127) |
+| `Action_Search_Image` | yes | done (WI-0127) | S0008 (WI-0127) |
+| `Action_Get_Screen_Settings` | yes | done (WI-0127; DDC/CI settings only, resolution not in v1) | S0008 (WI-0127) |
+| `Action_Set_Screen_Settings` | yes | done (WI-0127; DDC/CI settings only) | S0008 (WI-0127) |
 
 ### REQ-ELM-360 Windows and controls
 

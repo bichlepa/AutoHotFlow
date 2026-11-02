@@ -57,3 +57,17 @@ Entries for the drawing of the editor (`src/editor/render/`, `src/editor/Scene*.
 - **Wrong:** Assuming a live draw of a moving group is cheap because the layer is cached.
 - **Right:** Not decided. Options are in `doc/OPEN-ITEMS.md` (F-0162): a group layer for the dragged elements, or accepting it for big drags.
 - **Status:** verified (MS-0051, one run); the split between elements and connections not checked.
+
+### A parameter named like a built-in function hides the function (WI-0127)
+
+- **Problem:** `ScreenOps.SetPixelMode(coordMode)` called `CoordMode("Pixel", coordMode)`. AutoHotkey v2 names are case-insensitive, so the parameter `coordMode` is the local `CoordMode`, and the call failed with "This value of type "String" has no method named "Call"". The load warning only says "same name as a global variable" for some cases.
+- **Wrong:** a parameter or local named `coordMode`, `winTitle` or any other built-in name in a function that also calls the built-in.
+- **Right:** a different name (`mode`). The rule is in `doc/CONVENTIONS.md` section 5.
+- **Status:** verified (WI-0127, the probe with `ahkrun.py` and the screen element tests, 2026-11-02).
+
+### Screenshot of the screen and of a window (WI-0127)
+
+- **Problem:** the screenshot element needs pixels from two sources: the screen (BitBlt from the screen DC) and a window that may be behind others (PrintWindow).
+- **Wrong:** using `GdipCreateBitmapFromScreen` or the capture of the editor for the screen elements (the editor's wrapper may not be included by a worker, rule `include-roles`).
+- **Right:** `GdipCanvas.CaptureScreen(x, y)` (BitBlt with SRCCOPY and CAPTUREBLT, 0x40000000, so layered windows are included) and `GdipCanvas.CaptureWindow(hwnd)` (PrintWindow with PW_RENDERFULLCONTENT, 2). `SaveFile(path)` picks the encoder from the extension (`Gdip.MimeOfFile`).
+- **Status:** verified for `CaptureWindow` (the unit test paints an own window with a known colour, `tests/ahk/gdip.test.ahk`) and for the screenshot of a region (`tests/integration/test_screen_elements.py`). The layered-window flag is assumed (not checked with a window on top of the picture).

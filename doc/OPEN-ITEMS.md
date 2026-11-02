@@ -84,6 +84,10 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0196 | The language key "Omit the ending character after replacemenet" in en.ini and de.ini has the v1 typo; the label shows it (WI-0131, Trigger_Hotstring) | open, a text change in both language files; not a behaviour | S0009 |
 | F-0197 | The "Dialog test" flow (Flow 130786371) has no gui part yet: the real input box is read by control and window title, its keys are sent to it, and the process name of the flow is `AutoHotFlow.exe` (WI-0128) | open, the owner's gui part with its fix list; the headless trigger runs (WI-0128) | S0008 (WI-0135) |
 | F-0198 | MIGRATION has two rows with the ID M-0167 (the hotstring entry of WI-0131 and its registration case): WI-0128 uses M-0168 for the input box timeout | open, one of the two rows needs its own ID; the owner of WI-0131 decides which | S0008 |
+| F-9000* | The DDC question: the WI-0127 description names resolution, colour depth, frequency and orientation, but v1 only changes the DDC/CI settings (brightness, contrast, gains, drives, colour temperature). Decision needed (owner): keep DDC only (as built), or add a DEVMODE function to the seam (`ChangeDisplaySettings`, not implemented). | decision needed |
+| F-9001* | Per-monitor DPI in the screen elements only: `ScreenOps.EnterPhysical` makes the coordinates of the screen elements device pixels; Click, Move mouse, Drag and the mouse tracker of the editor do not. Multi-monitor scales are not checked. | not checked |
+| F-9002* | The xdist INTERNALERROR of the selected run: the worker of `tests/test_ahk_runner.py::test_ahk_file_completes[json.test.ahk]` dies in full selected runs (WI-0127 runs 2 and 3, `--deselect` did not help); the test passes alone. Classified in the report of WI-0127 (see the run IDs there). | open |
+| F-9003* | Search pixel, Search image and Screenshot: the owner's manual check on a real desktop with several monitors and scales is open; the Search pixel mouse tracker sets the upper left corner only (the lower right corner is typed). | open |
 
 ## Findings
 
@@ -528,3 +532,25 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 **What:** the key "Omit the ending character after replacemenet" (v1 text) has a typo, kept as the key so that the translation lookup works.
 **Options:** (a) correct the key in en.ini, de.ini (ko and ru in S0009); the key changes everywhere it is used.
 **Status:** open, not checked in the product view.
+
+### F-9000*: The DDC question of the screen settings (decision needed)
+
+**What:** WI-0127 names "monitors, resolution, colour depth, frequency, orientation" for the screen elements. v1 `Action_Get_Screen_Settings` and `Action_Set_Screen_Settings` only read and set the DDC/CI settings of a monitor (brightness, contrast, gains, drives, colour temperature, `Class_Monitor` on dxva2). Resolution, colour depth, frequency and orientation are not in v1. The v2 seam function `ChangeDisplaySettings` was reserved for them and is replaced by the monitor functions (commit 43d35956).
+**Options:** (a) keep the DDC settings only (as built, E0035: v1 is the reference); (b) add a DEVMODE function to the seam for the four values (new elements or new parameters, MIGRATION if v1 flows change).
+**Status:** decision needed (owner). The DDC reads were probed on the development machine (verified: brightness 70, contrast 75, gains 50 on one monitor); the writes are not run on a real monitor.
+
+### F-9001*: Per-monitor DPI awareness only in the screen elements
+
+**What:** `ScreenOps.EnterPhysical()` sets per-monitor DPI awareness for the screen elements (pixel, image, screenshot). Click, Move mouse, Drag with mouse and the mouse tracker of the editor do not, so on a monitor whose scale is above 100 % the two kinds of coordinates may not agree.
+**Options:** (a) the same call in the mouse elements; (b) the editor's mouse tracker reads the same coordinates as the worker.
+**Status:** not checked (one scale on the development machine). Found in WI-0127.
+
+### F-9002*: The xdist INTERNALERROR of the selected run
+
+**What:** `python -m pytest tests -q --changed-from v2-port` aborts with an INTERNALERROR: the xdist worker that runs `tests/test_ahk_runner.py::test_ahk_file_completes[json.test.ahk]` dies, so the run reports no tests. Reproduced in three runs of WI-0127 (`--deselect` of that id did not help); the test passes alone (`-n 0`, 81 passed).
+**Status:** open. Classification (v2-port tip, `run_suite.py --ref v2-port`) is in the report of WI-0127.
+
+### F-9003*: Manual checks of the screen elements are open
+
+**What:** the search and screenshot elements are tested on an own window at one scale. The real desktop with several monitors and scales is not checked; the Search pixel mouse tracker sets the upper left corner only.
+**Status:** open, not checked. Next step: the owner's check of Search pixel, Search image and Screenshot on the real desktop.

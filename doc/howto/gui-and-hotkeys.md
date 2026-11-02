@@ -372,3 +372,17 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `Hotstring(text, , "Off")`, with the same `HotIf` criterion as when it was set.
 - **Status:** verified by the call form of the docs (WI-0131), the disable path is covered by `tests/ahk/element_hotstring.test.ahk`
 - **Source:** `src/elements/Default/Triggers/Trigger_Hotstring.ahk`
+
+### PixelSearch and ImageSearch search row by row in AutoHotkey v2 (WI-0127)
+
+- **Problem:** v1's slow PixelSearch searched column by column; a v1 flow that depends on which of several matching pixels is found gets another one.
+- **Wrong:** assuming the v1 order in a migrated flow.
+- **Right:** the v2 order is row by row from the upper left corner (the AutoHotkey v2 docs of `PixelSearch` and `ImageSearch`). The search element documents it in its help page; MIGRATION M-0169 records the difference.
+- **Status:** verified in the AutoHotkey v2 docs (checked 2026-11-02); the effect on a real flow is not checked.
+
+### Screen coordinates of a worker: device pixels for the screen elements (WI-0127)
+
+- **Problem:** a thread that is not DPI aware gets coordinates and images that Windows virtualises, so the pixels of a monitor with a scale above 100 % do not match the screen.
+- **Wrong:** using pixel and image coordinates of a DPI unaware thread.
+- **Right:** `ScreenOps.EnterPhysical()` sets per-monitor DPI awareness (V2, `SetThreadDpiAwarenessContext(-4)`) for the job, `LeavePhysical` restores the previous context. The click and mouse elements do not do this yet (open item, see OPEN-ITEMS).
+- **Status:** assumed. The screen tests run on the development machine at one scale, where the own window and the worker agree. Several monitors with different scales are not checked.
