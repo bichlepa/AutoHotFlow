@@ -48,7 +48,7 @@ Branch `wip/wi0128`, commits (on top of `v2-port` at the start): `976b3eca` (Dia
 - REQ-ELM-270 rows updated, MIGRATION M-0168 (input box timeout value), ELEMENT-API-V2 3.3 and TEST-STRATEGY 9a updated, group table entries, indexes regenerated.
 
 **Not done**
-- The "Dialog test" flow as a whole (gui part: process name, control names of the v2 window, keystrokes). Stays in `PENDING`. OPEN-ITEMS F-9000*.
+- The "Dialog test" flow as a whole (gui part: process name, control names of the v2 window, keystrokes). Stays in `PENDING`. OPEN-ITEMS F-0197.
 
 **Tests (run, commit as noted)**
 - `20261102-110303-8168` (on the uncommitted seam and element code): `test_dialog_elements.py` 18 passed.
@@ -60,10 +60,10 @@ Branch `wip/wi0128`, commits (on top of `v2-port` at the start): `976b3eca` (Dia
 - New seam function `Dialogs.InputWindow` instead of extending `Dialogs.Window`: the input window needs a field, masks, lines and a countdown. Alternative: one generic window; rejected for size.
 - A_UserAction "timeout" on timeout (help of v1) instead of v1 code "Cancel": MIGRATION M-0168.
 - Category "User interaction" only (v2 has one category; v1 had two for the file elements).
-- MIGRATION ID M-0168 chosen because M-0167 is used twice in `v2-port` (F-9001*).
+- MIGRATION ID M-0168 chosen because M-0167 is used twice in `v2-port` (F-0198).
 
 **Findings**
-- F-9000*, F-9001* in `doc/OPEN-ITEMS.md`.
+- F-0197, F-0198 in `doc/OPEN-ITEMS.md`.
 - `Button text` vs `Button Text` lookups are case insensitive (LangTable `CaseSense := "Off"`), so no fix needed.
 
 **Verified / assumed / not checked**
