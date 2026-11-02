@@ -1,20 +1,22 @@
 # Process closes
 
-The trigger **Process closes** triggers whenever a process closes.
+The trigger **Process closes** triggers whenever a process closes whose name or ID matches the setting.
 
 ## Settings
 
 ### Process name or ID
 
-Name or ID of the process.
+The name of the process (for example `notepad.exe`; not case-sensitive) or its process ID. The name is the base name of the program, without its folder.
 
-This field can be left empty, it will trigger whenever any process closes.
+This field can be left empty: then the trigger fires for every process that closes.
+
+The processes that the trigger can see are those that AutoHotFlow can open for reading. A process that is protected by Windows is not in the list, so it is neither seen starting nor closing.
 
 ### Options
 
-Specify the check interval in ms.
+**Check interval (ms)**: The time between two checks in milliseconds (default 1000). An interval that is not above 0 is refused, and the trigger is not armed.
 
-> **Note:** Be careful if you specify a period smaller than 1000 ms. It might sometimes trigger multiple times when a process closes.
+> **Note:** The checks run at the interval below. A process that starts and ends between two checks is not seen.
 
 ## Supplied Variables
 

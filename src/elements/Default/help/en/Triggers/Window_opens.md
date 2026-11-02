@@ -1,41 +1,43 @@
 # Window opens
 
-The trigger **Window opens** triggers whenever the specified window opens.
+The trigger **Window opens** triggers whenever a window that matches the window identification appears.
+
+The windows are checked at a fixed interval (see **Check interval**). A window that opens and closes again between two checks is not seen: the trigger watches the list of windows, it does not receive a message from Windows for each new window.
 
 ## Settings
 
 ### Window identification
 
-**Title of window**: Name of the window title. It can be chosen whether the title starts, contains or ends with the specified string.
+**Title of window**: The window title, compared as chosen next to it: it starts with, contains or is exactly the specified text.
 
-**Exclude title**: Windows whose titles include this value will not be considered.
+**Exclude title**: Windows whose titles include this text are not considered.
 
-**Text of a control in window**: If present, this parameter must be a substring from a single text element of the target window. It can be specified whether hidden text will be found
+**Text of a control in window**: A text of one control of the window. It can be chosen whether hidden text is found.
 
-**Exclude text of a control in window**: Windows whose text include this value will not be considered
+**Exclude text of a control in window**: Windows whose controls include this text are not considered.
 
-**Window class**: A window class is a set of attributes that the system uses as a template to create a window. In other words, the class name of the window identifies what type of window it is.
+**Window class**: The class name of the window. It tells what kind of window it is.
 
-**Process name**: The name or path of the executable that created that window.
+**Process name**: The name of the executable that created the window.
 
-**Unique window ID**: Each window or control has a unique ID, also known as a HWND (short for handle to window). This ID can be used to identify the window or control even if its title changes.
+**Unique window ID**: The handle of the window. It stays the same when the title changes.
 
-**Unique process ID**: Use the unique process id to identify a window belonging to a specific process. Each process has its unique ID, even if it has the same executable.
+**Unique process ID**: The ID of the process that owns the window.
 
-**Hidden window**: If detect hidden window is selected, a window that exists but is not visible will be found.
+**Hidden window**: If detect hidden window is selected, a window that exists but is not visible is found too.
 
-**Import window identification**: Use a wizard to get parameters of a window.
+**Import window identification**: Uses a wizard to take the parameters of a window.
 
-At least **Title of window**, **Window class**, **Process name**, **Unique window ID** or **Unique process ID** must be set.
+At least the **Title of window**, the **Window class**, the **Process name**, the **Unique window ID** or the **Unique process ID** must be set. Otherwise the trigger is not armed and says that no window is specified.
 
 ### Options
 
-Decide whether the trigger should trigger when it is enabled if a matching window exists.
+**Do not trigger if a matching window exists when enabling the trigger**: When set (the default), the windows that exist when the flow is enabled do not trigger it. When not set, every matching window fires at the first check.
 
-Define the **Check interval** in ms.
+**Check interval (ms)**: The time between two checks in milliseconds (default 500). An interval that is not above 0 is refused, and the trigger is not armed.
 
 ## Supplied Variables
 
 ### `A_WindowID`
 
-The unique ID of the found window.
+The unique ID of the window that opened.
