@@ -84,10 +84,10 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0196 | The language key "Omit the ending character after replacemenet" in en.ini and de.ini has the v1 typo; the label shows it (WI-0131, Trigger_Hotstring) | open, a text change in both language files; not a behaviour | S0009 |
 | F-0197 | The "Dialog test" flow (Flow 130786371) has no gui part yet: the real input box is read by control and window title, its keys are sent to it, and the process name of the flow is `AutoHotFlow.exe` (WI-0128) | open, the owner's gui part with its fix list; the headless trigger runs (WI-0128) | S0008 (WI-0135) |
 | F-0198 | MIGRATION has two rows with the ID M-0167 (the hotstring entry of WI-0131 and its registration case): WI-0128 uses M-0168 for the input box timeout | open, one of the two rows needs its own ID; the owner of WI-0131 decides which | S0008 |
-| F-0199 | The DDC question: the WI-0127 description names resolution, colour depth, frequency and orientation, but v1 only changes the DDC/CI settings (brightness, contrast, gains, drives, colour temperature). Decision needed (owner): keep DDC only (as built), or add a DEVMODE function to the seam (`ChangeDisplaySettings`, not implemented). | decision needed |
-| F-0200 | Per-monitor DPI in the screen elements only: `ScreenOps.EnterPhysical` makes the coordinates of the screen elements device pixels; Click, Move mouse, Drag and the mouse tracker of the editor do not. Multi-monitor scales are not checked. | not checked |
-| F-0201 | The xdist INTERNALERROR of the selected run: the worker of `tests/test_ahk_runner.py::test_ahk_file_completes[json.test.ahk]` dies in full selected runs (WI-0127 runs 2 and 3, `--deselect` did not help); the test passes alone. Classified in the report of WI-0127 (see the run IDs there). | open |
-| F-0202 | Search pixel, Search image and Screenshot: the owner's manual check on a real desktop with several monitors and scales is open; the Search pixel mouse tracker sets the upper left corner only (the lower right corner is typed). | open |
+| F-0199 | The DDC question: the WI-0127 description names resolution, colour depth, frequency and orientation, but v1 only changes the DDC/CI settings (brightness, contrast, gains, drives, colour temperature). Decision needed (owner): keep DDC only (as built), or add a DEVMODE function to the seam (`ChangeDisplaySettings`, not implemented). | decision needed | S0008 |
+| F-0200 | Per-monitor DPI in the screen elements only: `ScreenOps.EnterPhysical` makes the coordinates of the screen elements device pixels; Click, Move mouse, Drag and the mouse tracker of the editor do not. Multi-monitor scales are not checked. | not checked | S0008 |
+| F-0201 | The xdist INTERNALERROR of the selected run: the worker of `tests/test_ahk_runner.py::test_ahk_file_completes[json.test.ahk]` dies in full selected runs (WI-0127 runs 2 and 3, `--deselect` did not help); the test passes alone. Not reproduced in the verification run 20261102-123314-825e716a (2076 selected tests, no INTERNALERROR): probably a load or file-locking effect of parallel runs. | open | S0008 |
+| F-0202 | Search pixel, Search image and Screenshot: the owner's manual check on a real desktop with several monitors and scales is open; the Search pixel mouse tracker sets the upper left corner only (the lower right corner is typed). | open | S0008 |
 
 ## Findings
 
@@ -547,7 +547,7 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 ### F-0201: The xdist INTERNALERROR of the selected run
 
 **What:** `python -m pytest tests -q --changed-from v2-port` aborts with an INTERNALERROR: the xdist worker that runs `tests/test_ahk_runner.py::test_ahk_file_completes[json.test.ahk]` dies, so the run reports no tests. Reproduced in three runs of WI-0127 (`--deselect` of that id did not help); the test passes alone (`-n 0`, 81 passed).
-**Status:** open. Classification (v2-port tip, `run_suite.py --ref v2-port`) is in the report of WI-0127.
+**Status:** open, not reproduced: the verification run 20261102-123314-825e716a (2076 selected tests on the branch) had no INTERNALERROR and `test_ahk_file_completes[json.test.ahk]` was green; probably load or file locking of parallel runs. Use `tools/verify.py` for selected runs.
 
 ### F-0202: Manual checks of the screen elements are open
 
