@@ -567,3 +567,11 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Check a file time as a round trip through the elements (`Set file time`, then `Get file time`, both AutoHotkey), or compare with a date whose offset equals today's offset. Do not rely on the one-hour difference being absent.
 - **Status:** verified (run on this machine, 2026-10-22, the time zone of Central Europe; not checked on other machines)
 - **Source:** `tests/integration/test_file_info_elements.py` (the comment above the time tests)
+
+### A file name that differs only in case is not renamed by a copy on Windows
+
+- **Problem:** The help pages `Window_opens.md` and `Window_Opens.md` are one file on Windows. Writing the generated `Window_Opens.html` kept the old name in git (`Window_opens.html` stayed tracked), and `test_help` (exact spelling) failed.
+- **Wrong:** Writing the new name over the old one, or `git mv` from `X.html` to `Y.html` where only the case differs (git may refuse or keep the old case).
+- **Right:** Rename in two steps: `git mv X.html X.tmp.html` and `git mv X.tmp.html Y.html`, then regenerate the pages. `git ls-files` shows the names that git tracks.
+- **Status:** verified (WI-0132, commit of the renamed help pages)
+- **Source:** `src/elements/Default/help/en/Triggers/`

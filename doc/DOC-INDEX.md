@@ -288,7 +288,7 @@ L145-150 Copy on write: clone a shared map before its first write, and remember 
 L152-158 A field and a method with the same name clash (case-insensitive names) (verified)
 ```
 
-## doc/howto/processes-pipes-messages.md (54.7 KB, 479 lines)
+## doc/howto/processes-pipes-messages.md (55.5 KB, 486 lines)
 ```text
 L5-10 Pipe reads and writes in parallel only with overlapped I/O (partly verified)
 L13-17 `PostMessageW` with a NULL handle reports success (verified)
@@ -344,9 +344,10 @@ L439-445 tar.exe writes its output in the ANSI code page (verified) (verified)
 L447-453 tar.exe reads and writes archives only, not a single compressed file (verified) (verified)
 L455-461 ProcessWaitClose with a deadline: 0 when the process ended, its PID when the deadline passed (verified) (verified)
 L463-479 A script on stdin of an AutoHotkey child: no byte order mark, the job object, the stdin pipe (WI-0130) (verified)
+L481-486 The process list without WMI: EnumProcesses and QueryFullProcessImageNameW (verified)
 ```
 
-## doc/howto/syntax-and-language.md (62.6 KB, 633 lines)
+## doc/howto/syntax-and-language.md (63.2 KB, 640 lines)
 ```text
 L5-10 A lambda cannot contain `throw` (verified)
 L13-19 FileAppend writes a BOM for a new file; strip the BOM when reading (partly verified)
@@ -427,9 +428,10 @@ L604-610 IniRead returns the empty text for an empty default (verified) (verifie
 L612-618 Loop variable of the full path is A_LoopFileFullPath in v2 (verified) (verified)
 L620-626 Language keys are case-sensitive (verified) (verified)
 L628-633 Outputs with an empty name are skipped (WI-0127) (verified)
+L634-640 A class object has no Name property in AHK v2 (verified)
 ```
 
-## doc/howto/tests-and-tools.md (57.6 KB, 569 lines)
+## doc/howto/tests-and-tools.md (58.3 KB, 577 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -500,6 +502,7 @@ L539-545 A generated block includes a lib file only if the element file includes
 L547-553 A file held open by a test is a file in use for FileDelete (verified) (verified)
 L555-561 One run_all per test: a second start of the session fails (verified) (verified)
 L563-569 Local times in file functions: compare file times through the elements (verified) (partly verified)
+L571-577 A file name that differs only in case is not renamed by a copy on Windows (verified)
 ```
 
 ## doc/REQUIREMENTS.md

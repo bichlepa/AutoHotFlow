@@ -477,3 +477,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** `Sleep(50)` in the loop (AHK runs the cancel message during Sleep, `WaitForSingleObject` does not pump), and the stdout is read in every round as well, so a script that writes much is never blocked by the pipe.
 - **Status:** verified (the test runs of the action; the cancel during the wait is not tested yet)
 - **Source:** src/elements/Default/Actions/Action_AutoHotkey_script.ahk (WI-0130)
+
+### The process list without WMI: EnumProcesses and QueryFullProcessImageNameW
+
+- **Problem:** A trigger needs the base names of all processes, several times per second, without WMI (slow) and without the debug privilege of v1.
+- **Right:** `Psapi.dll\EnumProcesses` into a `Buffer` (4096 DWORDs), then per process `OpenProcess(0x1000, 0, pid)` (PROCESS_QUERY_LIMITED_INFORMATION), `Kernel32\QueryFullProcessImageNameW` with the size in and out (`"UInt*", &size`, in characters), `StrGet(buf, size, "UTF-16")` and `SplitPath`. Close the handle in a `finally`. A process that cannot be opened returns no name, so it is missing from the list. The cost is about 8.7 % of one core for ten triggers at 100 ms (MS-0044).
+- **Status:** verified (`tests/ahk/element_window_watch.test.ahk` finds this process; `tests/integration/test_process_triggers.py`)
+- **Source:** `src/elements/Default/lib/ProcessSnapshot.ahk`

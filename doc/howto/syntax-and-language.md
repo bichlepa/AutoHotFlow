@@ -631,3 +631,10 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Wrong:** storing every output without a check on its name.
 - **Right:** the element checks the name first (`if (p.%id% != "")`) and sets only the outputs that have one (M-0173).
 - **Status:** verified by the test `test_get_screen_settings_stores_the_values_of_the_monitor` (the outputs with names are set).
+### A class object has no Name property in AHK v2
+
+- **Problem:** A failed `Assert.Throws` built its message from `errorClass.Name`; instead of the message the test showed a `PropertyError: This value of type "Class" has no property named "Name"`.
+- **Wrong:** `SomeClass.Name` (it exists for the built-in `Error` objects only; a class object does not have it).
+- **Right:** `SomeClass.Prototype.__Class` gives the class name as a text (`ElementError`).
+- **Status:** verified (script run under AutoHotkey64; the fix is in `tests/ahk/lib/Assert.ahk`)
+- **Source:** `tests/ahk/lib/Assert.ahk`
