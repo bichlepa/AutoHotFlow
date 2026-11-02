@@ -93,6 +93,8 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0205 | The own-window helper of the window tests exists twice: `tests/integration/test_window_elements.py` (WI-0125) and `tests/support/ownwindow.py` (WI-0132); the process helper of `test_process_elements.py` (WI-0123) is the same kind of copy | open, low; move both into `tests/support/` when the next window or process test changes | WI-0132 |
 | F-0206 | The label of the option of `Process starts` ("Do not trigger if a matching window exists when enabling the trigger") is the v1 text and says window; the help page explains it | open, low; a new language key for "process" needs the owner's decision on the text (en.ini and de.ini) | WI-0132 |
 | F-0207 | `test_time_of_day_fires_at_its_time_and_not_again_that_day` fails when run alone: the test's fire time was 3 s ahead, but the session became ready about 5 s later (closed in 2ff5337d, see `doc/CLOSED-ITEMS.md`) | closed, verified | S0008 |
+| F-9000* | The shortcut of a Shortcut trigger is written after the answer of its enable: a `Run` of the shortcut right after the enable finds no file ("Can't run" in the corpus flow, fixed in the test copy with a 2 s sleep) | open | S0008 (WI-0133) |
+| F-9001* | A first start with `--command=debug` (not a trigger command) is ignored silently; only the second start opens the debug window | open, low | S0008 (WI-0133) |
 
 
 ## Findings
@@ -584,3 +586,14 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 - **Open:** a language key with "process" in en.ini and de.ini, decided by the owner. The help page explains the label until then.
 - **Status:** verified (read).
 
+### F-9000*: The shortcut file comes after the answer of the enable
+
+- **Found:** WI-0133 author (corpus "File link test", run 20261102-155032-13536): the flow enables its Shortcut trigger and runs the shortcut at once; the trigger host answers the arming before storage has written the file, so `Run` fails with "Can't run ...lnk".
+- **Open:** the arming could wait for storage (the answer of cmd.flow.enable would then wait too), or the shortcut could be written at the save of the flow. The corpus copy waits 2 s instead.
+- **Status:** open, the design decision is the owner's (a flow that runs the shortcut right after enabling it is rare).
+
+### F-9001*: The debug command on a first start is ignored
+
+- **Found:** WI-0133 author (code reading, `src/supervisor/Supervisor.ahk` `Start()`): `--command=debug` works only for a second start; a first start with it starts the normal roles.
+- **Open:** let a first start with `debug` open the debug window like a second start (or drop the option).
+- **Status:** not checked on the desktop; no test.
