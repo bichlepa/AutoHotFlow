@@ -235,6 +235,7 @@ TEST_GROUPS = {
     "test_architecture.py": ["architecture"],
     "test_collect_diagnosis.py": ["tools"],
     "test_doc_index.py": ["docs"],
+    "test_element_classes.py": ["element-units"],
     "test_element_includes.py": ["element-units"],
     "test_help.py": ["help"],
     "ahk/help_pages.test.ahk": ["help"],
