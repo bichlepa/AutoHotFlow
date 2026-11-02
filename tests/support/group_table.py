@@ -31,6 +31,7 @@ TEST_GROUPS = {
     "ahk/element_runner.test.ahk": ["element-units"],
     "ahk/element_sleep.test.ahk": ["element-units"],
     "ahk/element_time_of_day.test.ahk": ["element-units", "triggers"],
+    "ahk/element_window_watch.test.ahk": ["element-units", "triggers"],
     "ahk/element_hotstring.test.ahk": ["element-units", "triggers"],
     "ahk/element_smoke.test.ahk": ["element-units"],
     "ahk/element_window_ident.test.ahk": ["element-units"],
@@ -145,6 +146,8 @@ TEST_GROUPS = {
     "integration/test_power_elements.py": ["elements-e2e"],
     "integration/test_clipboard_elements.py": ["elements-e2e"],
     "integration/test_clipboard_trigger.py": ["triggers"],
+    "integration/test_process_triggers.py": ["triggers"],
+    "integration/test_window_triggers.py": ["triggers"],
     "integration/test_sound_elements.py": ["elements-e2e"],
     "integration/test_archive_elements.py": ["elements-e2e"],
     "integration/test_drive_elements.py": ["elements-e2e"],
@@ -626,6 +629,55 @@ COVERS = {
     "src/elements/Default/Triggers/Trigger_Clipboard_Changes.ahk": [
         "integration/test_clipboard_trigger.py::test_every_change_of_the_clipboard_fires_the_trigger",
         "integration/test_clipboard_trigger.py::test_a_disabled_clipboard_trigger_does_not_fire",
+    ],
+    # WI-0132: window and process triggers (the trigger host; own windows and own processes, the unit test of the poll)
+    "src/elements/Default/Triggers/Trigger_Window_Opens.ahk": [
+        "ahk/element_window_watch.test.ahk",
+        "integration/test_window_triggers.py::test_a_new_window_fires_once_and_gives_its_id",
+        "integration/test_window_triggers.py::test_a_window_that_exists_at_the_arming_does_not_fire_with_not_trigger_on_enable",
+        "integration/test_window_triggers.py::test_without_not_trigger_on_enable_a_window_that_exists_fires_at_the_first_poll",
+        "integration/test_window_triggers.py::test_a_window_without_identification_is_not_armed_and_says_so",
+    ],
+    "src/elements/Default/Triggers/Trigger_Window_Closes.ahk": [
+        "ahk/element_window_watch.test.ahk",
+        "integration/test_window_triggers.py::test_a_closed_window_fires_closes_with_its_id",
+    ],
+    "src/elements/Default/Triggers/Trigger_Window_Gets_Active.ahk": [
+        "ahk/element_window_watch.test.ahk",
+        "integration/test_window_triggers.py::test_gets_active_fires_when_the_matching_window_becomes_the_active_one",
+        "integration/test_window_triggers.py::test_a_bad_interval_of_a_window_trigger_is_not_armed_and_gives_the_v1_text",
+    ],
+    "src/elements/Default/Triggers/Trigger_Window_Gets_Inactive.ahk": [
+        "ahk/element_window_watch.test.ahk",
+        "integration/test_window_triggers.py::test_gets_inactive_fires_with_the_id_of_the_window_that_lost_the_focus",
+        "integration/test_window_triggers.py::test_a_window_that_opens_and_closes_between_two_polls_is_not_seen",
+    ],
+    "src/elements/Default/Triggers/Trigger_Process_starts.ahk": [
+        "ahk/element_window_watch.test.ahk",
+        "integration/test_process_triggers.py::test_a_started_process_fires_starts_with_its_id_and_name",
+        "integration/test_process_triggers.py::test_a_process_that_runs_at_the_arming_does_not_fire_starts_with_not_trigger_on_enable",
+    ],
+    "src/elements/Default/Triggers/Trigger_Process_Closes.ahk": [
+        "ahk/element_window_watch.test.ahk",
+        "integration/test_process_triggers.py::test_a_closed_process_fires_closes_with_its_id_and_name",
+        "integration/test_process_triggers.py::test_the_filter_by_process_id_watches_only_that_process",
+    ],
+    "src/elements/Default/lib/WatchPoll.ahk": [
+        "ahk/element_window_watch.test.ahk",
+        "integration/test_window_triggers.py",
+        "integration/test_process_triggers.py",
+    ],
+    "src/elements/Default/lib/WindowWatch.ahk": [
+        "ahk/element_window_watch.test.ahk",
+        "integration/test_window_triggers.py",
+    ],
+    "src/elements/Default/lib/ProcessWatch.ahk": [
+        "ahk/element_window_watch.test.ahk",
+        "integration/test_process_triggers.py",
+    ],
+    "src/elements/Default/lib/ProcessSnapshot.ahk": [
+        "ahk/element_window_watch.test.ahk",
+        "integration/test_process_triggers.py",
     ],
     "src/elements/Default/Triggers/Trigger_Start_up.ahk": [
         "integration/test_time_triggers.py::test_a_startup_trigger_enabled_later_does_not_fire",
