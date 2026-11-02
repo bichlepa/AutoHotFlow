@@ -377,7 +377,7 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 
 - **Problem:** v1's slow PixelSearch searched column by column; a v1 flow that depends on which of several matching pixels is found gets another one.
 - **Wrong:** assuming the v1 order in a migrated flow.
-- **Right:** the v2 order is row by row from the upper left corner (the AutoHotkey v2 docs of `PixelSearch` and `ImageSearch`). The search element documents it in its help page; MIGRATION M-0169 records the difference.
+- **Right:** the v2 order is row by row from the upper left corner (the AutoHotkey v2 docs of `PixelSearch` and `ImageSearch`). The search element documents it in its help page; MIGRATION M-0170 records the difference.
 - **Status:** verified in the AutoHotkey v2 docs (checked 2026-11-02); the effect on a real flow is not checked.
 
 ### Screen coordinates of a worker: device pixels for the screen elements (WI-0127)

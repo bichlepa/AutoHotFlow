@@ -11,7 +11,7 @@
 ;
 ; Worker element: it reads the screen, which the windows of the user share, and the coordinates are device pixels (see
 ; ScreenOps). The method names are the v1 enum values (Default, Alt, Slow). The default names of the green and blue
-; output (v1: ColorBlue and ColorGreen, swapped) are corrected (MIGRATION M-0171).
+; output (v1: ColorBlue and ColorGreen, swapped) are corrected (MIGRATION M-0172).
 class Action_Get_Pixel_Color extends AhfElement {
     static Mode := "worker"
     static ActsOnSystem := false

@@ -10,9 +10,9 @@
 ; parameter IDs and language keys are those of v1 (Source_Elements/Default/Actions/Search_pixel.ahk).
 ;
 ; Worker element: it reads the screen (see ScreenOps). Differences to v1 (MIGRATION): the "Fast method" checkbox is kept
-; for the flows, but PixelSearch of AutoHotkey v2 has no fast mode, so it changes nothing (M-0169); the whole-screen
+; for the flows, but PixelSearch of AutoHotkey v2 has no fast mode, so it changes nothing (M-0170); the whole-screen
 ; region of v1 used the size of the screen as its lower right corner, which is wrong for a virtual screen that does not
-; start at 0, 0 and one pixel too far, here the last pixel is included (M-0170).
+; start at 0, 0 and one pixel too far, here the last pixel is included (M-0171).
 class Action_Search_pixel extends AhfElement {
     static Mode := "worker"
     static ActsOnSystem := false

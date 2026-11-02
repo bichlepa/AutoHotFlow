@@ -103,7 +103,6 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 - **Open:** one of the two needs the next free ID. WI-0128 takes M-0168 for its entry; a later entry must take M-0169 or higher.
 - **Status:** verified (read); the cause is not checked.
 
-## Findings
 
 ### F-0163: A rename writes the file from the revision of its request
 

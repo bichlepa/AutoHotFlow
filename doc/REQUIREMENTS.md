@@ -1029,7 +1029,7 @@ JSON text can also be converted in an expression (REQ-SCR-010).
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0008 (WI-0127)
-- **Evidence:** `tests/integration/test_screen_elements.py` (18 tests: pixel, search pixel and search image on an own window with a known picture; screenshot of a region and of a window, read back as BMP; the monitor settings through the system provider), `tests/schema/test_v1_schema.py` (the parameters against v1, M-0168 to M-0174)
+- **Evidence:** `tests/integration/test_screen_elements.py` (18 tests: pixel, search pixel and search image on an own window with a known picture; screenshot of a region and of a window, read back as BMP; the monitor settings through the system provider), `tests/schema/test_v1_schema.py` (the parameters against v1, M-0169 to M-0175)
 
 | Element | v1 | v2 | Plan |
 |---|---|---|---|

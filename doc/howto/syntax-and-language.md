@@ -629,5 +629,5 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 
 - **Problem:** `ctx.SetVar("", value)` would write to a variable without a name; the screen settings element has outputs for minimum and maximum that the user may leave empty.
 - **Wrong:** storing every output without a check on its name.
-- **Right:** the element checks the name first (`if (p.%id% != "")`) and sets only the outputs that have one (M-0172).
+- **Right:** the element checks the name first (`if (p.%id% != "")`) and sets only the outputs that have one (M-0173).
 - **Status:** verified by the test `test_get_screen_settings_stores_the_values_of_the_monitor` (the outputs with names are set).

@@ -30,7 +30,7 @@ If you specify 255 shades of variation, all colors will match. The default is 0 
 
 ### Method
 
-**Fast method** has no effect in AutoHotFlow v2: AutoHotkey v2 has no fast mode. The checkbox is kept so that flows keep their setting (MIGRATION M-0169).
+**Fast method** has no effect in AutoHotFlow v2: AutoHotkey v2 has no fast mode. The checkbox is kept so that flows keep their setting (MIGRATION M-0170).
 
 The search starts at the upper left corner of the region and goes row by row, from left to right, down to the lower right corner (AutoHotkey v2). If there are several matching pixels, the first one in this order is found. The v1 slow mode searched column by column, so with several matches a different pixel may be found than in v1.
 

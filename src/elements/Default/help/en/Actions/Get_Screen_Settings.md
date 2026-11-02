@@ -20,4 +20,4 @@ The settings are the brightness, the contrast, the gain and the drive of the red
 
 Not every monitor supports DDC/CI and these settings. For such a monitor the action ends with an exception that names the setting. The resolution, the colour depth and the orientation are not read.
 
-An output variable whose name is empty is not set (MIGRATION M-0172).
+An output variable whose name is empty is not set (MIGRATION M-0173).

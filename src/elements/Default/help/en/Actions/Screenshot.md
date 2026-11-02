@@ -52,7 +52,7 @@ When making a screenshot of a window, there are three different methods. If a me
 
 **Method 1** and **Method 2** can make a screenshot of them even if they are behind an other window.
 
-**Method 3** captures the screen region where the window currently is. Windows which are in front of the specified one will be visible in the screenshot. In AutoHotFlow v2 method 3 makes the same picture as method 1 (MIGRATION M-0174).
+**Method 3** captures the screen region where the window currently is. Windows which are in front of the specified one will be visible in the screenshot. In AutoHotFlow v2 method 3 makes the same picture as method 1 (MIGRATION M-0175).
 
 ## Supplied Variables
 

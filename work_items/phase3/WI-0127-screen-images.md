@@ -41,7 +41,7 @@ Text recognition (OCR).
 
 Status 2026-11-02: the six classes are ported; the selected full run is not green (xdist crash, see below).
 
-**Commits (branch wip/wi0127):** 51ca7283 (GDI+ wrapper to `src/gdip/`), a8a1376d (SaveFile, CaptureScreen, CaptureWindow), 43d35956 (seam: MonitorCount, MonitorGetSetting, MonitorSetSetting; MonitorDdc), c0c530b3 (six elements, ScreenOps, help, MIGRATION M-0168 to M-0174, tests), 38c66894 (REQ-ELM-350, HOW-TO, OPEN-ITEMS F-9000* to F-9003*).
+**Commits (branch wip/wi0127):** 51ca7283 (GDI+ wrapper to `src/gdip/`), a8a1376d (SaveFile, CaptureScreen, CaptureWindow), 43d35956 (seam: MonitorCount, MonitorGetSetting, MonitorSetSetting; MonitorDdc), c0c530b3 (six elements, ScreenOps, help, MIGRATION M-0169 to M-0175, tests), 38c66894 (REQ-ELM-350, HOW-TO, OPEN-ITEMS F-9000* to F-9003*).
 
 **Tests:**
 - `tests/integration/test_screen_elements.py`: 18 passed (run 20261102-113550-3840, commit before c0c530b3, same code).

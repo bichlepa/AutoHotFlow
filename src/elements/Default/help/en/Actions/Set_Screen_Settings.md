@@ -38,4 +38,4 @@ If **Change color temperature** is checked, the color temperature will be set to
 
 The settings are changed through DDC/CI, the same way as the settings of the action Get screen settings. Not every monitor supports them; for such a monitor the action ends with an exception that names the setting. The monitors are changed one after the other.
 
-The choice "11500 K." is written "115000 K." in v1 (MIGRATION M-0173).
+The choice "11500 K." is written "115000 K." in v1 (MIGRATION M-0174).

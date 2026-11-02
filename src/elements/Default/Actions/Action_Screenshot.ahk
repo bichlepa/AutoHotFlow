@@ -15,8 +15,8 @@
 ;
 ; Worker element: it writes a file and reads the screen (GDI+ through the shared wrapper src/gdip/, GdipCanvas.CaptureScreen
 ; and CaptureWindow). The region of v1 keeps its size as the difference of its corners (the lower right corner is not part
-; of it, M-0170 does not apply here). The method "from screen coordinates" is the same capture as "from screen" in v2
-; (v1 passed the window size in the same way; MIGRATION M-0174). The window ID is set as A_WindowID (thread variable).
+; of it, M-0171 does not apply here). The method "from screen coordinates" is the same capture as "from screen" in v2
+; (v1 passed the window size in the same way; MIGRATION M-0175). The window ID is set as A_WindowID (thread variable).
 class Action_Screenshot extends AhfElement {
     static Mode := "worker"
     static ActsOnSystem := true

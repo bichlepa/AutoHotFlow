@@ -52,13 +52,13 @@ ALLOWED = {
     ("default.condition_flow_enabled", "WhichTrigger", "default"): "M-0099",
     ("default.action_time_calculation", "Unit", "default"): "M-0099",
     ("default.action_time_difference", "Unit", "default"): "M-0099",
-    # WI-0127 (screen and images): the enum radios of Get pixel color have the enum value of the first choice (M-0168);
-    # the default names of the green and blue output of v1 are swapped (M-0171)
-    ("default.action_get_pixel_color", "CoordMode", "default"): "M-0168",
-    ("default.action_get_pixel_color", "Method", "default"): "M-0168",
-    ("default.action_get_pixel_color", "Method", "result"): "M-0168",
-    ("default.action_get_pixel_color", "varnameG", "default"): "M-0171",
-    ("default.action_get_pixel_color", "varnameB", "default"): "M-0171",
+    # WI-0127 (screen and images): the enum radios of Get pixel color have the enum value of the first choice (M-0169);
+    # the default names of the green and blue output of v1 are swapped (M-0172)
+    ("default.action_get_pixel_color", "CoordMode", "default"): "M-0169",
+    ("default.action_get_pixel_color", "Method", "default"): "M-0169",
+    ("default.action_get_pixel_color", "Method", "result"): "M-0169",
+    ("default.action_get_pixel_color", "varnameG", "default"): "M-0172",
+    ("default.action_get_pixel_color", "varnameB", "default"): "M-0172",
     # WI-0127: the window identification of Action_Screenshot is the one of the window elements (M-0102); its method
     # texts are formatted by Lang (M-0151); the flag updateOnEdit is not used (M-0101)
     ("default.action_screenshot", "TitleMatchMode", "enum"): "M-0102",
@@ -67,8 +67,8 @@ ALLOWED = {
     ("default.action_screenshot", "Method", "default"): "M-0099",
     ("default.action_screenshot", "GetWindowInformation", "id"): "M-0102",
     ("default.action_get_screen_settings", "", "updateOnEdit"): "M-0101",
-    # M-0173: the choice 11500 K. of the colour temperature is written 115000 K. by v1 (WI-0127)
-    ("default.action_set_screen_settings", "ColorTemperature", "choices"): "M-0173",
+    # M-0174: the choice 11500 K. of the colour temperature is written 115000 K. by v1 (WI-0127)
+    ("default.action_set_screen_settings", "ColorTemperature", "choices"): "M-0174",
     # M-0107: the default time of New time is the time of the element's creation (v1 writes the marker <A_Now>)
     ("default.action_new_time", "Time", "default"): "M-0107",
     # M-0164: the default time of Time of day is the time of the element's creation (v1 writes the marker <A_Now>)

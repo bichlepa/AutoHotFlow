@@ -12,7 +12,7 @@
 ; Worker element: it reads the screen (see ScreenOps). The options of v1 (the icon number, the variation, the transparent
 ; colour, the scaling) are the options of ImageSearch of AutoHotkey v2, which has them as v1 has (*Icon, *n, *Trans,
 ; *w and *h). The image file must exist (v1 text); a file that cannot be loaded ends the element with the v1 text
-; (ImageSearch throws ValueError for it). The whole-screen region of v1 is corrected as in Search pixel (M-0170).
+; (ImageSearch throws ValueError for it). The whole-screen region of v1 is corrected as in Search pixel (M-0171).
 class Action_Search_Image extends AhfElement {
     static Mode := "worker"
     static ActsOnSystem := false

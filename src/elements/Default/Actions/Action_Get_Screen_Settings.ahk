@@ -12,7 +12,7 @@
 ; The settings are the DDC/CI settings of the monitor (dxva2, SystemOps.MonitorGetSetting, E0103), as in v1; the resolution,
 ; the colour depth and the orientation are not settings of v1 and are not read here. A monitor without DDC/CI ends the
 ; element with an exception that names the setting (v1 text). The name of an output variable that is empty is not set
-; (MIGRATION M-0172). The element is experimental, as in v1.
+; (MIGRATION M-0173). The element is experimental, as in v1.
 class Action_Get_Screen_Settings extends AhfElement {
     static Mode := "worker"
     static ActsOnSystem := false

@@ -8,7 +8,7 @@
 ; Action Set screen settings of the package Default (WI-0127): changes the brightness, the contrast, the gains and drives
 ; of the red, green and blue channel, and the colour temperature of one monitor or of all monitors. Specification: the help
 ; text of v1 (help/en/Actions/Set_Screen_Settings.md). Class ID, parameter IDs, defaults and language keys are those of v1
-; (Source_Elements/Default/Actions/Set_Screen_Settings.ahk), except the name of the colour temperature 11500 K (M-0173).
+; (Source_Elements/Default/Actions/Set_Screen_Settings.ahk), except the name of the colour temperature 11500 K (M-0174).
 ;
 ; Worker element that changes the monitor, so it goes through SystemOps (E0103): MonitorSetSetting is the DDC/CI call of
 ; the monitor (MonitorDdc.ahk). A monitor without DDC/CI, or a value that the monitor refuses, ends the element with an
