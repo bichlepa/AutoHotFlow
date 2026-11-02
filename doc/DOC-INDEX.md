@@ -31,12 +31,12 @@ L412-423 9. Performance budgets (targets, measured in Phase 2)
 L425-435 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (187.9 KB, 787 lines)
+## doc/PROTOCOL.md (188.8 KB, 789 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-760 4. Message Catalog
+L95-762 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
@@ -45,17 +45,17 @@ L175-260   4.2 Engine commands (clients → `engine`)
 L262-312   4.3 Engine events (`evt.*`, engine → topics)
 L314-347   4.4 Engine ↔ trigger host
 L349-414   4.5 Engine ↔ worker
-L416-488   4.6 Engine ↔ storage and log
-L490-509   4.7 Dialogs
-L511-517   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2, E0072)
-L519-556   4.8 Manager (WI-0073, `src/manager/`)
-L558-620   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
-L622-641   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L643-741   4.11 Role `editor` (WI-0088, `src/editor/`)
-L743-760   4.12 Role `help`: the help window (WI-0111, E0098, E0099, E0100)
-L762-781 5. Connection setup, reconnection, resync
-L772-781   5a Events before subscription (design question, WI-0007)
-L783-787 6. Versioning and extension
+L416-490   4.6 Engine ↔ storage and log
+L492-511   4.7 Dialogs
+L513-519   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2, E0072)
+L521-558   4.8 Manager (WI-0073, `src/manager/`)
+L560-622   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
+L624-643   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
+L645-743   4.11 Role `editor` (WI-0088, `src/editor/`)
+L745-762   4.12 Role `help`: the help window (WI-0111, E0098, E0099, E0100)
+L764-783 5. Connection setup, reconnection, resync
+L774-783   5a Events before subscription (design question, WI-0007)
+L785-789 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (61.4 KB, 370 lines)

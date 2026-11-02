@@ -82,6 +82,7 @@ TEST_GROUPS = {
     "ahk/selfcheck.test.ahk": ["test-support"],
     "ahk/storage_logbuf.test.ahk": ["storage"],
     "ahk/storage_queue.test.ahk": ["storage"],
+    "ahk/storage_shortcut.test.ahk": ["storage"],     # WI-0133: the shortcut files of the trigger Shortcut
     "ahk/supervisor_elevation.test.ahk": ["supervisor"],
     "ahk/supervisor_tick.test.ahk": ["supervisor"],
     "ahk/ui_common_dialogs.test.ahk": ["ui"],

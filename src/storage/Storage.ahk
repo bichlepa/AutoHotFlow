@@ -17,6 +17,7 @@
 #Include SettingsFile.ahk
 #Include V1Source.ahk
 #Include StartupEntry.ahk
+#Include ShortcutFile.ahk
 #Include ArchivePack.ahk
 #Include ArchiveUnpack.ahk
 
@@ -102,6 +103,8 @@ class Storage extends Role {
         this.On("cmd.storage.autostart.remove", (msg) => this._CmdAutostartRemove(msg))
         this.On("cmd.storage.startup.check", (msg) => this._CmdStartupCheck(msg))
         this.On("cmd.storage.startup.sync", (msg) => this._CmdStartupSync(msg))
+        this.On("cmd.storage.shortcut.write", (msg) => this._CmdShortcutWrite(msg))
+        this.On("cmd.storage.shortcut.remove", (msg) => this._CmdShortcutRemove(msg))
         this.On("cmd.storage.ahf.pack", (msg) => this._CmdAhfPack(msg))
         this.On("cmd.storage.ahf.unpack", (msg) => this._CmdAhfUnpack(msg))
         this.On("cmd.storage.log.tail", (msg) => this._CmdLogTail(msg))
@@ -305,6 +308,22 @@ class Storage extends Role {
         args := p.Get("args", "")
         workDir := p.Get("workDir", "")
         return this._Defer(msg, "startup.sync", startupDir, () => StartupEntry.Sync(startupDir, enabled, target, args, workDir))
+    }
+
+    ; cmd.storage.shortcut.write / remove (WI-0133, REQ-TRG-240, PROTOCOL 4.6): the shortcut of the trigger "Shortcut". The
+    ; path is checked in ShortcutFile (absolute, .lnk); the requests run in the queue like the other file operations.
+    _CmdShortcutWrite(msg) {
+        p := msg.payload
+        path := p.Get("path", "")
+        target := p.Get("target", "")
+        args := p.Get("args", "")
+        workDir := p.Get("workDir", "")
+        return this._Defer(msg, "shortcut.write", path, () => ShortcutFile.Write(path, target, args, workDir))
+    }
+
+    _CmdShortcutRemove(msg) {
+        path := msg.payload.Get("path", "")
+        return this._Defer(msg, "shortcut.remove", path, () => ShortcutFile.Remove(path))
     }
 
     ; cmd.storage.ahf.pack / unpack (WI-0081, PROTOCOL 4.6): the .ahf archives. The job runs in the background queue (AddLow),
