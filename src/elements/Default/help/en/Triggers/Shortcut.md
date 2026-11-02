@@ -1,19 +1,23 @@
 # Shortcut
 
-The trigger **Shortcut** reates a shortcut file which can be launched to trigger the flow.
+The trigger **Shortcut** creates a shortcut file. Started, the shortcut starts AutoHotFlow and runs this flow at this trigger.
 
 ## Settings
 
 ### Path of the shortcut
 
-Path of the shortcut file. The file path is assumed to be in the working directory if an absolute path isn't specified. The shortcut must have the extension `.lnk`
+The path of the shortcut file. It must be an absolute path (for example `C:\Users\you\Desktop\Start my flow.lnk`) and end with `.lnk`. The folder must exist. The default is a file on the desktop.
 
 ### Options
 
-If Remove shortcut when disabling is selected, the shortcut will be deleted, when the trigger is disabled.
+If "Remove shortcut when disabling" is selected, the shortcut file is deleted when you switch the trigger off or change its path. It is kept when AutoHotFlow closes.
 
 ## Remarks
 
-The shortcut will not trigger the flow if it is disabled.
+The shortcut file is written when the trigger is enabled. If the file cannot be written, the trigger shows the error and stays enabled.
 
-If AutoHotFlow is not running, the shortcut will start it. After start, it will trigger the flow, if the trigger is enabled.
+A shortcut does nothing while its trigger is switched off. AutoHotFlow then logs the reason.
+
+If AutoHotFlow is not running, the shortcut starts it. The flow starts as soon as AutoHotFlow is ready. The manager window does not open in this case.
+
+If AutoHotFlow is already running, the shortcut passes its command to the running instance, and that instance starts the flow.

@@ -179,6 +179,7 @@ class Default {
     #Include Triggers\Trigger_Periodic_Timer.ahk
     #Include Triggers\Trigger_Process_Closes.ahk
     #Include Triggers\Trigger_Process_starts.ahk
+    #Include Triggers\Trigger_Shortcut.ahk
     #Include Triggers\Trigger_Start_up.ahk
     #Include Triggers\Trigger_Time_Of_Day.ahk
     #Include Triggers\Trigger_User_Idle_Time.ahk
@@ -333,6 +334,7 @@ ElementRegistry.Register(Default.Trigger_Manual)
 ElementRegistry.Register(Default.Trigger_Periodic_Timer)
 ElementRegistry.Register(Default.Trigger_Process_Closes)
 ElementRegistry.Register(Default.Trigger_Process_starts)
+ElementRegistry.Register(Default.Trigger_Shortcut)
 ElementRegistry.Register(Default.Trigger_Start_up)
 ElementRegistry.Register(Default.Trigger_Time_Of_Day)
 ElementRegistry.Register(Default.Trigger_User_Idle_Time)

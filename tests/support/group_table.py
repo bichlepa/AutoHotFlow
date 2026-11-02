@@ -33,6 +33,7 @@ TEST_GROUPS = {
     "ahk/element_time_of_day.test.ahk": ["element-units", "triggers"],
     "ahk/element_window_watch.test.ahk": ["element-units", "triggers"],
     "ahk/element_hotstring.test.ahk": ["element-units", "triggers"],
+    "ahk/element_shortcut.test.ahk": ["element-units", "triggers", "storage"],   # WI-0133: the trigger Shortcut
     "ahk/element_smoke.test.ahk": ["element-units"],
     "ahk/element_window_ident.test.ahk": ["element-units"],
     "ahk/engine_call_flow.test.ahk": ["engine"],
@@ -147,6 +148,7 @@ TEST_GROUPS = {
     "integration/test_power_elements.py": ["elements-e2e"],
     "integration/test_clipboard_elements.py": ["elements-e2e"],
     "integration/test_clipboard_trigger.py": ["triggers"],
+    "integration/test_shortcut_trigger.py": ["triggers", "storage", "supervisor"],   # WI-0133: the trigger Shortcut, the commands
     "integration/test_process_triggers.py": ["triggers"],
     "integration/test_window_triggers.py": ["triggers"],
     "integration/test_sound_elements.py": ["elements-e2e"],
@@ -631,6 +633,18 @@ COVERS = {
     "src/elements/Default/Triggers/Trigger_Clipboard_Changes.ahk": [
         "integration/test_clipboard_trigger.py::test_every_change_of_the_clipboard_fires_the_trigger",
         "integration/test_clipboard_trigger.py::test_a_disabled_clipboard_trigger_does_not_fire",
+    ],
+    # WI-0133: the trigger Shortcut (writes the shortcut through storage; its command runs as a second instance)
+    "src/elements/Default/Triggers/Trigger_Shortcut.ahk": [
+        "ahk/element_shortcut.test.ahk",
+        "integration/test_shortcut_trigger.py::test_enabling_the_trigger_writes_the_shortcut_with_its_command",
+        "integration/test_shortcut_trigger.py::test_running_the_shortcut_starts_the_flow_at_its_trigger",
+        "integration/test_shortcut_trigger.py::test_a_shortcut_of_a_switched_off_trigger_starts_nothing",
+        "integration/test_shortcut_trigger.py::test_switching_the_trigger_off_removes_the_shortcut_with_the_option",
+        "integration/test_shortcut_trigger.py::test_switching_the_trigger_off_keeps_the_shortcut_without_the_option",
+        "integration/test_shortcut_trigger.py::test_a_shutdown_keeps_the_shortcut_even_with_the_option",
+        "integration/test_shortcut_trigger.py::test_the_first_start_by_a_shortcut_runs_the_flow_when_the_engine_is_ready",
+        "integration/test_shortcut_trigger.py::test_a_command_for_a_missing_flow_is_refused_and_the_session_runs",
     ],
     # WI-0132: window and process triggers (the trigger host; own windows and own processes, the unit test of the poll)
     "src/elements/Default/Triggers/Trigger_Window_Opens.ahk": [

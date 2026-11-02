@@ -31,31 +31,31 @@ L412-423 9. Performance budgets (targets, measured in Phase 2)
 L425-435 10. Risks and open points
 ```
 
-## doc/PROTOCOL.md (188.8 KB, 789 lines)
+## doc/PROTOCOL.md (190.7 KB, 791 lines)
 ```text
 L7-15 1. Transport
 L17-69 2. Envelope
 L71-93 3. Addresses and Topics
-L95-762 4. Message Catalog
+L95-764 4. Message Catalog
 L103-133   4.1 Lifecycle (`sys.*`)
 L135-152   4.1a Process events (topic `process`, supervisor → subscribers)
 L154-163   4.1b Test roles (only with `--test-roles`)
 L165-173   4.1c Unhandled errors (`evt.diag.error`, WI-0023)
-L175-260   4.2 Engine commands (clients → `engine`)
-L262-312   4.3 Engine events (`evt.*`, engine → topics)
-L314-347   4.4 Engine ↔ trigger host
-L349-414   4.5 Engine ↔ worker
-L416-490   4.6 Engine ↔ storage and log
-L492-511   4.7 Dialogs
-L513-519   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2, E0072)
-L521-558   4.8 Manager (WI-0073, `src/manager/`)
-L560-622   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
-L624-643   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
-L645-743   4.11 Role `editor` (WI-0088, `src/editor/`)
-L745-762   4.12 Role `help`: the help window (WI-0111, E0098, E0099, E0100)
-L764-783 5. Connection setup, reconnection, resync
-L774-783   5a Events before subscription (design question, WI-0007)
-L785-789 6. Versioning and extension
+L175-261   4.2 Engine commands (clients → `engine`)
+L263-313   4.3 Engine events (`evt.*`, engine → topics)
+L315-349   4.4 Engine ↔ trigger host
+L351-416   4.5 Engine ↔ worker
+L418-492   4.6 Engine ↔ storage and log
+L494-513   4.7 Dialogs
+L515-521   4.7a Variables of an unhandled exception (WI-0113, REQ-USE-080 part 2, E0072)
+L523-560   4.8 Manager (WI-0073, `src/manager/`)
+L562-624   4.9 Diagnostics II: snapshot, crash report, debug window (WI-0028)
+L626-645   4.10 Role `tray`: the tray icon and the tray menu (WI-0072, E0075)
+L647-745   4.11 Role `editor` (WI-0088, `src/editor/`)
+L747-764   4.12 Role `help`: the help window (WI-0111, E0098, E0099, E0100)
+L766-785 5. Connection setup, reconnection, resync
+L776-785   5a Events before subscription (design question, WI-0007)
+L787-791 6. Versioning and extension
 ```
 
 ## doc/TEST-STRATEGY.md (61.4 KB, 370 lines)
@@ -76,25 +76,25 @@ L330-348 9b. System action tests (E0103, WI-0117)
 L350-370 9. Flow builder and headless runner (WI-0049)
 ```
 
-## doc/ELEMENT-API-V2.md (69.4 KB, 553 lines)
+## doc/ELEMENT-API-V2.md (70.4 KB, 556 lines)
 ```text
 L8-18 1. Guidelines
 L20-113 2. Class contract
 L92-113   2.1 Parameter fields of the settings form (WI-0105)
-L115-299 3. Context `ctx`
+L115-302 3. Context `ctx`
 L166-183   3.1 Parameter evaluation (WI-0042)
 L185-195   3.2 Variables in a worker element (WI-0050, ARCHITECTURE R0004)
 L197-207   3.3 Dialogs (E0038, WI-0051)
 L209-235   3.3a System actions (E0103, WI-0117)
 L237-252   3.4 Debug view (WI-0056, REQ-DBG-060)
-L254-276   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
-L278-299   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
-L301-383 4. Example 1: `Action_Sleep` (inline, with timer)
-L385-478 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
-L480-520 6. Mechanical conversion rules
-L522-543 7. What stays
-L529-543   7.1 Loop elements (WI-0054)
-L545-553 8. Still to be clarified (Phase 3)
+L254-279   3.5 Trigger context (WI-0061, PROTOCOL 4.4)
+L281-302   3.6 Editor context (WI-0107, PROTOCOL 4.2 `cmd.flow.triggers`)
+L304-386 4. Example 1: `Action_Sleep` (inline, with timer)
+L388-481 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
+L483-523 6. Mechanical conversion rules
+L525-546 7. What stays
+L532-546   7.1 Loop elements (WI-0054)
+L548-556 8. Still to be clarified (Phase 3)
 ```
 
 ## doc/EXPRESSION-LANGUAGE.md (58.4 KB, 539 lines)
