@@ -6,6 +6,8 @@ it too. A test that the table does not list is always accepted (a forgotten entr
 """
 
 import fnmatch
+import functools
+import re
 import subprocess
 from pathlib import Path
 
@@ -35,7 +37,19 @@ OTHER_RULES = [
     ("tests/schema/v2_schema.ahk", ["element-units"]),    # the v2 side of the parameter schema check (WI-0116)
     ("tests/data/v1_schema.json", ["element-units"]),     # the v1 side of it, written by tools/v1_schema.py
     ("tests/conftest.py", None),                         # fixtures, options and the run record of every test
-    ("tests/support/*", None),                           # process kit, admission, history, dialogs: any test may use them
+    # tests/support/: the tests that import a module are its users (found by reading the imports, importing_tests).
+    # Only what every test runs through stays "everything": the process tracker, the AHK locator and the wire flag.
+    ("tests/support/ahk.py", None),
+    ("tests/support/procs.py", None),
+    ("tests/support/wirebool.py", None),
+    # the plumbing of the run record: conftest imports it, the tools tests verify it
+    ("tests/support/admission.py", ("imports", ["tools", "test-support"])),
+    ("tests/support/runrecord.py", ("imports", ["tools", "test-support"])),
+    ("tests/support/history.py", ("imports", ["tools", "test-support"])),
+    ("tests/support/loadsampler.py", ("imports", ["tools", "test-support"])),
+    ("tests/support/innerpytest.py", ("imports", ["tools", "test-support"])),
+    ("tests/support/inputlock.py", ("imports", ["tools", "test-support"])),
+    ("tests/support/*", ("imports", ["test-support"])),   # every other kit: process kit, flow builder, dialogs, timing, ...
     ("tests/requirements.txt", None),                    # pinned test dependencies: a new version may break any test
     ("tests/ahk/lib/Assert.ahk", None),                  # the assertions of every AHK unit test
     ("tests/ahk/lib/ElementSmoke.ahk", ["element-units"]),
@@ -87,19 +101,23 @@ OTHER_RULES = [
     ("tests/integration/helpers/peer_probe.ahk", ["transport"]),
     ("tests/integration/helpers/pipe_client.ahk", ["transport"]),
     ("tests/integration/helpers/pipe_echo_server.ahk", ["transport"]),
-    ("tests/integration/helpers/rawpipe.py", ["transport"]),
-    ("tests/integration/helpers/TestDialogProvider.ahk", ["element-units", "elements-e2e", "engine", "ui", "workers"]),
-    ("tests/integration/helpers/TestSystemProvider.ahk", ["element-units", "triggers", "workers"]),
+    ("tests/integration/helpers/rawpipe.py", ("imports", [])),
+    ("tests/integration/helpers/TestDialogProvider.ahk", ("mentions", ["element-units"])),
+    ("tests/integration/helpers/TestSystemProvider.ahk", ("mentions", ["element-units"])),
     ("tests/integration/helpers/hotkey_window.ahk", ["triggers"]),
     ("tests/integration/helpers/active_window.ahk", ["triggers"]),   # the own active window of the hotstring tests (WI-0131)
     ("tests/integration/helpers/own_window.ahk", ["elements-e2e"]),   # the own test window of the window elements (WI-0125)
     ("tests/integration/helpers/key_holder.ahk", ["elements-e2e"]),   # the held key of the Key is down test (WI-0126)
     ("tests/integration/helpers/key_observer.ahk", ["triggers"]),
-    ("tests/fault/faultkit.py", FAULT_GROUPS),
-    ("tests/fault/faultfixtures.py", FAULT_GROUPS),
+    ("tests/fault/faultkit.py", ("imports", [])),
+    ("tests/fault/faultfixtures.py", ("imports", [])),
     ("tests/stress/stresskit.py", []),                   # read by the stress tests only, which the selection never runs
     ("tests/elements/TestTwin/*", ["element-units", "packages"]),
-    ("tests/elements/Test/*", ["element-units", "elements-e2e", "engine", "expr", "packages", "triggers", "ui", "workers"]),
+    # the test package: what registers an element loads in every test role (the units and the loading tests show a
+    # broken include); one element or kit runs the tests that name it, directly or through a kit or a provider
+    ("tests/elements/Test/_includes_*", ["element-units", "packages"]),
+    ("tests/elements/Test/package.json", ["element-units", "packages"]),
+    ("tests/elements/Test/*", ("mentions", ["element-units"])),
     ("tests/data/README.md", ["docs"]),
     ("tests/data/skeleton_flow.json", ["engine", "manager", "recovery", "storage", "tools", "triggers"]),
     ("tests/data/flows/v1_examples/*", ["base", "elements-e2e", "engine", "expr", "manager", "storage"]),
@@ -251,13 +269,94 @@ def other_rule(path):
     return None
 
 
+def _import_pattern(stem):
+    """Matches an import of the module `stem` in any of the usual spellings (support.x, a sibling, a package)."""
+    s = re.escape(stem)
+    return re.compile(
+        r"^[ \t]*(?:from[ \t]+(?:\w+\.)*%s[ \t]+import\b|import[ \t]+(?:\w+\.)*%s\b"
+        r"|from[ \t]+[\w.]+[ \t]+import[ \t]+(?:\([^)]*\b%s\b|[^\n(]*\b%s\b))" % (s, s, s, s), re.M)
+
+
+@functools.lru_cache(maxsize=None)
+def _python_sources(repo):
+    out = {}
+    for path in sorted(Path(repo, "tests").rglob("*.py")):
+        if "__pycache__" not in path.parts:
+            out[path.relative_to(repo).as_posix()] = path.read_text(encoding="utf-8", errors="replace")
+    return out
+
+
+def importing_tests(path, repo=REPO):
+    """The test files (keys relative to tests/) that import the Python helper at `path`, directly or through another
+    helper. conftest.py is not a user here: what it imports at module level has an explicit rule ("everything"), the
+    rest it imports inside a fixture, and the tests that use the fixture import the module themselves or are in the
+    groups the rule names. Reading the imports replaces a table that would go stale with every new test."""
+    sources = _python_sources(str(repo))
+    files, seen, todo = set(), {path}, [path]
+    while todo:
+        current = todo.pop()
+        pattern = _import_pattern(Path(current).stem)
+        for user, text in sources.items():
+            if user in seen or user == "tests/conftest.py" or not pattern.search(text):
+                continue
+            seen.add(user)
+            key = user[len("tests/"):]
+            if is_test_file(user):
+                files.add(key)
+            else:       # another helper: its users are users of this one as well
+                todo.append(user)
+    return files
+
+
+# Files that name every element or every role (the entries, the include lists): following them would select everything.
+_MENTION_HUBS = ("tests/integration/helpers/AutoHotFlowTest.ahk", "tests/integration/helpers/entry/", "_includes_")
+
+
+@functools.lru_cache(maxsize=None)
+def _mention_sources(repo):
+    out = {}
+    for path in sorted(Path(repo, "tests").rglob("*")):
+        if path.suffix in (".py", ".ahk") and "__pycache__" not in path.parts:
+            out[path.relative_to(repo).as_posix()] = path.read_text(encoding="utf-8", errors="replace")
+    return out
+
+
+def mentioning_tests(path, repo=REPO):
+    """The test files (keys relative to tests/) that name the file at `path` by its name without extension, directly or
+    through the test elements, kits and providers that name it (a kit is named by its elements, an element by its
+    tests). For the test elements and the providers of the test sessions, which no import statement links to their
+    tests. The chain goes through tests/elements/ and tests/integration/helpers/ only: the shared kits would link every
+    test to every other."""
+    sources = _mention_sources(str(repo))
+    files, seen, todo = set(), {path}, [path]
+    while todo:
+        word = re.compile(r"\b%s\b" % re.escape(Path(todo.pop()).stem))
+        for user, text in sources.items():
+            if user in seen or not word.search(text):
+                continue
+            seen.add(user)
+            if is_test_file(user):
+                files.add(user[len("tests/"):])
+            elif (user.startswith(("tests/elements/", "tests/integration/helpers/"))
+                  and not any(hub in user for hub in _MENTION_HUBS)):
+                todo.append(user)
+    return files
+
+
 def _add_other(sel, path, removed=()):
     rule = other_rule(path)
     if rule is None:
         _unknown(sel, path, removed)
         return
     pattern, rule_groups = rule
-    if rule_groups is None:
+    if isinstance(rule_groups, tuple):      # ("imports" or "mentions", groups): the tests that use it, plus the groups named
+        users = importing_tests(path) if rule_groups[0] == "imports" else mentioning_tests(path)
+        sel.files.update(users)
+        sel.groups.update(rule_groups[1])
+        sel.reasons.append((path, "%d %s test files%s (%s)" % (
+            len(users), "importing" if rule_groups[0] == "imports" else "naming", "".join(", " + g for g in rule_groups[1]),
+            pattern)))
+    elif rule_groups is None:
         sel.everything = True
         sel.reasons.append((path, "everything (%s)" % pattern))
     else:

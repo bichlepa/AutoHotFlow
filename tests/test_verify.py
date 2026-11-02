@@ -38,7 +38,7 @@ ALL = ["fast", "foundation", "slow"]
     (["tools/ahkrun.py"], ALL),
     (["tests/conftest.py"], ALL),
     (["tests/support/procs.py"], ALL),
-    (["tests/support/x.py"], ALL),                        # shared test infrastructure (explicit rule)
+    (["tests/support/ahk.py"], ALL),                      # shared test infrastructure (explicit rule)
     (["pytest.ini"], ALL),
 ])
 def test_tiers_follow_the_changed_paths(changed, expected):

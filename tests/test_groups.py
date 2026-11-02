@@ -308,3 +308,58 @@ def test_a_trigger_element_runs_its_own_tests_and_the_arming_smoke_test():
     action = groups.select(["src/elements/Default/Actions/Action_Sleep.ahk"])
     assert not action.accepts("integration/test_trigger_arming.py",
                               "test_an_enabled_trigger_is_armed_and_its_events_start_instances_with_their_variables")
+
+
+def test_a_support_module_selects_the_tests_that_import_it_not_everything():
+    """The kits of tests/support/ are found by their imports (groups.importing_tests): a change of the clipboard kit
+    runs the two clipboard test files, not the whole suite."""
+    sel = groups.select(["tests/support/clipboard.py"])
+    assert not sel.everything
+    assert {"integration/test_clipboard_elements.py", "integration/test_clipboard_trigger.py"} <= sel.files
+    assert not sel.accepts("integration/test_supervisor.py", "test_required_roles_are_ready_within_3_seconds")
+    sel = groups.select(["tests/support/flowbuilder.py"])      # a kit of 60 test files reaches them through the imports
+    assert "integration/test_core_b_lists.py" in sel.files
+
+
+def test_a_test_element_selects_the_tests_that_name_it():
+    """The elements, kits and providers of the test package are found by the tests that name them
+    (groups.mentioning_tests), through a kit to its elements."""
+    sel = groups.select(["tests/elements/Test/lib/TestSystemKit.ahk"])
+    assert not sel.everything
+    assert "integration/test_system_seam.py" in sel.files
+    sel = groups.select(["tests/elements/Test/Loops/Loop_TestWorkerLoop.ahk"])
+    assert "integration/test_worker.py" in sel.files
+    assert not sel.accepts("integration/test_supervisor.py", "test_required_roles_are_ready_within_3_seconds")
+
+
+# The rules whose paths may select more than WIDE_RULE_FILES test files (an explicit decision each; the comment of the
+# rule in tests/support/groups.py says why). A new rule that selects this much is a catch-all: split it by the tests that
+# read the file. Found in the analysis of 2026-11-02: one pattern (tests/elements/Test/*) selected 8 groups and turned
+# 9 commits of the screen elements into a 38 minute run.
+WIDE_RULE_FILES = 150
+WIDE_RULE_PATTERNS = {
+    "tests/support/timing.py",          # the scaled() clock of almost every test
+    "tests/support/flowrun.py",         # the flow run kit of the e2e tests
+    "tests/support/ahfclient.py",
+}
+
+
+def test_no_rule_selects_a_large_part_of_the_suite_without_being_listed():
+    out = subprocess.run(["git", "ls-files"], cwd=str(REPO), capture_output=True, text=True).stdout
+    total = len(all_test_files())
+    wide = {}
+    for path in out.splitlines():
+        if not path or not groups.classified(path) or path.startswith(("src/", "doc/", "work_items/")):
+            continue
+        if path.startswith("tests/") and groups.is_test_file(path):
+            continue
+        rule = groups.other_rule(path)
+        if rule is None or rule[1] is None or not rule[1]:
+            continue                                  # "everything" is explicit in the rule; [] selects nothing
+        sel = groups.select([path])
+        selected = [k for k in all_test_files() if sel.accepts(k)]
+        if len(selected) > WIDE_RULE_FILES and path not in WIDE_RULE_PATTERNS:
+            wide[path] = len(selected)
+    assert not wide, ("%d test files exist; these paths select more than %d of them: %s. Split the rule by the tests "
+                      "that read the file (doc/TEST-GROUPS.md section 6) or list the path in WIDE_RULE_PATTERNS with "
+                      "a reason" % (total, WIDE_RULE_FILES, wide))
