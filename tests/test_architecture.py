@@ -112,7 +112,7 @@ def test_system_seam_details():
     body = "class A {\n    static Mode := \"%s\"\n    M() {\n        %s\n    }\n}\n"
     for call in ("Shutdown(1)", "LockWorkStation()", "DriveEject(\"E:\")", "FileRecycle(\"x\")", "FileRecycleEmpty()", "SoundBeep(800, 100)",
                  "BlockInput(\"On\")", "Send(\"{Enter}\")", "Click()", "MouseMove(1, 2)", "SetCapsLockState(\"On\")",
-                 "TimeIdle()", "TimeIdlePhysical()", "ChangeDisplaySettings()", "WinMinimizeAll()", "WinMinimizeAllUndo()"):
+                 "TimeIdle()", "TimeIdlePhysical()", "MonitorGetSetting(1, \"brightness\")", "WinMinimizeAll()", "WinMinimizeAllUndo()"):
         assert "system-seam" in rules("elements/Default/Actions/A.ahk", body % ("worker", call)), call
         assert "system-seam" in rules("elements/Default/Triggers/T.ahk", body % ("trigger", call)), call
         assert "system-seam" not in rules("elements/Default/Actions/A.ahk", body % ("worker", "SystemOps." + call)), call

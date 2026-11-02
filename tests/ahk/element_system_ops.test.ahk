@@ -26,7 +26,10 @@ class StubSystemProvider {
     DriveUnlock(args*) => this._Record("DriveUnlock", args)
     FileRecycle(args*) => this._Record("FileRecycle", args)
     FileRecycleEmpty(args*) => this._Record("FileRecycleEmpty", args)
-    ChangeDisplaySettings(args*) => this._Record("ChangeDisplaySettings", args)
+    MonitorCount() => this._Record("MonitorCount", [])
+    MonitorGetSetting(monitor, name, channel := 0) => this._Record("MonitorGetSetting", [monitor, name, channel])
+    MonitorSetSetting(monitor, name, value, channel := 0) =>
+        this._Record("MonitorSetSetting", [monitor, name, value, channel])
     SoundBeep(args*) => this._Record("SoundBeep", args)
     SoundPlay(args*) => this._Record("SoundPlay", args)
     SoundSetMute(args*) => this._Record("SoundSetMute", args)

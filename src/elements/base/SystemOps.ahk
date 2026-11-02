@@ -1,5 +1,6 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\core\Errors.ahk  ; AhfError of the screen function (also included by AhfElement.ahk; once per script)
+#Include MonitorDdc.ahk        ; the DDC/CI settings behind the screen functions (WI-0127)
 
 ; The indirection for the actions of elements that disturb the computer or cannot be undone (E0103, WI-0117): shutdown,
 ; locking, ejecting drives, emptying the recycle bin, the screen, sound and speech, blocking the input, the mouse and the
@@ -50,7 +51,11 @@ class SystemOps {
     static FileRecycleEmpty(args*) => SystemOps._Provider().FileRecycleEmpty(args*)
 
     ; --- screen ------------------------------------------------------------------------------------------------------
-    static ChangeDisplaySettings(args*) => SystemOps._Provider().ChangeDisplaySettings(args*)
+    static MonitorCount() => SystemOps._Provider().MonitorCount()
+    static MonitorGetSetting(monitor, name, channel := 0) =>
+        SystemOps._Provider().MonitorGetSetting(monitor, name, channel)
+    static MonitorSetSetting(monitor, name, value, channel := 0) =>
+        SystemOps._Provider().MonitorSetSetting(monitor, name, value, channel)
 
     ; --- sound and speech --------------------------------------------------------------------------------------------
     static SoundBeep(args*) => SystemOps._Provider().SoundBeep(args*)
@@ -158,10 +163,18 @@ class SystemOps {
             return FileRecycleEmpty(args*)
         }
 
-        ; Not implemented yet: the screen settings come with WI-0127 (DEVMODE handling). An element that calls it ends
-        ; with "exception" until then.
-        ChangeDisplaySettings(args*) {
-            throw AhfError("ChangeDisplaySettings is not implemented yet (WI-0127)", ErrCode.NOT_FOUND)
+        ; The number of monitors (GetSystemMetrics SM_CMONITORS).
+        MonitorCount() {
+            return DllCall("user32\GetSystemMetrics", "Int", 80, "Int")
+        }
+
+        ; The DDC/CI settings of a monitor (MonitorDdc.ahk): a Map with current, min and max.
+        MonitorGetSetting(monitor, name, channel := 0) {
+            return MonitorDdc.Get(monitor, name, channel)
+        }
+
+        MonitorSetSetting(monitor, name, value, channel := 0) {
+            MonitorDdc.Set(monitor, name, value, channel)
         }
 
         SoundBeep(args*) {

@@ -17,8 +17,8 @@ class TestSystemKit {
                 return String(SystemOps.DriveEject(arg1))
             case "FileRecycleEmpty":
                 return String(SystemOps.FileRecycleEmpty(arg1))
-            case "ChangeDisplaySettings":
-                return String(SystemOps.ChangeDisplaySettings())
+            case "MonitorCount":
+                return String(SystemOps.MonitorCount())
             case "SoundBeep":
                 return String(SystemOps.SoundBeep(800, 100))
             case "SpeakText":

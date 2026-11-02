@@ -20,7 +20,7 @@ GROUP_CALLS = [
     ("Shutdown", "1", ""),
     ("DriveEject", "E:", ""),
     ("FileRecycleEmpty", "C:\\", ""),
-    ("ChangeDisplaySettings", "", ""),
+    ("MonitorCount", "", ""),
     ("SoundBeep", "", ""),
     ("SpeakText", "hello", ""),
     ("Send", "{Enter}", "Input"),

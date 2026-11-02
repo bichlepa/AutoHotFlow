@@ -49,7 +49,10 @@ class TestSystemProvider {
     FileRecycle(args*) => this._Call("FileRecycle", args, 0)
     FileRecycleEmpty(args*) => this._Call("FileRecycleEmpty", args, 0)
 
-    ChangeDisplaySettings(args*) => this._Call("ChangeDisplaySettings", args, 0)
+    MonitorCount() => this._Call("MonitorCount", [], 1)
+    MonitorGetSetting(monitor, name, channel := 0) => this._Call("MonitorGetSetting", [monitor, name, channel], 0)
+    MonitorSetSetting(monitor, name, value, channel := 0) =>
+        this._Call("MonitorSetSetting", [monitor, name, value, channel], 0)
 
     SoundBeep(args*) => this._Call("SoundBeep", args, 0)
     SoundPlay(args*) => this._Call("SoundPlay", args, 0)
