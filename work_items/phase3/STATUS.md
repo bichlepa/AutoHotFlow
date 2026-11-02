@@ -74,11 +74,11 @@ None.
 
 ## Running agents
 
-- hunt3 (sonnet): corpus File link test red alone (F-0208), workspace `hunt3`.
+None.
 
 ## Last verified state
 
-Commit `a45631b0` (WI-0134 integrated; fast/foundation/slow while two agents ran tests): fast 8 failed, foundation green, slow stalled at exit (exit 76, no summary). The 7 fast reds green on recheck (load); `test_a_window_that_opens_and_closes_between_two_polls` too. After WI-0135 (`b92b8826`): slow 2 failed, both red alone: the corpus File link test (F-0208, reproducible, hunter running) and `test_run_in_a_worktree_...` (WI-0135's class test read `v1/`; fixed in `85cff9fc`).
+Commit `a45631b0` (WI-0134 integrated; fast/foundation/slow while two agents ran tests): fast 8 failed, foundation green, slow stalled at exit (exit 76, no summary). The 7 fast reds green on recheck (load); `test_a_window_that_opens_and_closes_between_two_polls` too. After WI-0135 (`b92b8826`): slow 2 failed, both red alone: the corpus File link test (F-0208, reproducible, hunter running) and `test_run_in_a_worktree_...` (WI-0135's class test read `v1/`; fixed in `85cff9fc`). The File link test was a race in the test copy (the flow's own 2 s sleep ended before the inserted sleep); hunter fix: that sleep is 12 s in the copy (F-0208 stays open for the product question). Selected run green (20261102-220429-c5a7ed7e); no full run after these two fixes.
 
 Commit `bfc7eb31` (WI-0132, WI-0133, the test-selection and window-focus test changes, the F-0207 fix integrated; all tiers, the first complete fast run since `4ab84f75`): fast 2706 passed, 5 failed (57 min); foundation 469 passed, 2 failed; slow 215 passed, 1 failed (runs 20261102-170002-bfc7eb31-2, -3, and 20261102-170002-bfc7eb31). All 8 reds green when rerun serially (recheck, 3 runs): load flakes. The corpus File link test (WI-0133) failed under load once; it waits 2 s for the shortcut that storage writes after the enable answer (F-0208), so it can become flaky by design.
 
