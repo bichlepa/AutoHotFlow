@@ -72,6 +72,9 @@ class Trigger_Shortcut extends AhfElement {
         script := launch.Get("script", "")
         if (script = "")
             throw ElementError("the program of AutoHotFlow is not known to this instance; the shortcut cannot be made")
+        ; The ids come from the flow file, which may be imported: a quote or a bar must not add words to the command line.
+        if (RegExMatch(ctx.flowId ctx.elementId, '["|`n`r]'))
+            throw ElementError("the ids of the flow or the trigger contain a quote or a bar; the shortcut cannot be made")
         args := '"' script '"'
         if (launch.Get("session", "") != "")
             args .= ' "--session=' launch["session"] '"'
