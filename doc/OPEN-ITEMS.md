@@ -95,7 +95,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0207 | `test_time_of_day_fires_at_its_time_and_not_again_that_day` fails when run alone: the test's fire time was 3 s ahead, but the session became ready about 5 s later (closed in 2ff5337d, see `doc/CLOSED-ITEMS.md`) | closed, verified | S0008 |
 | F-0208 | The shortcut of a Shortcut trigger is written after the answer of its enable: a `Run` of the shortcut right after the enable finds no file ("Can't run" in the corpus flow, fixed in the test copy with a 2 s sleep) | open | S0008 (WI-0133) |
 | F-0209 | A first start with `--command=debug` (not a trigger command) is ignored silently; only the second start opens the debug window | open, low | S0008 (WI-0133) |
-| F-9000* | The window trigger tests: a hung focus test stalls a full run (same symptom as F-0210; focus tests marked gui in eeb87467, cause of the stall not proven) and the session start of two serial tests exceeded 20 s | open | S0008 |
+| F-9000* | The window trigger tests: a hung focus test stalls a full run (focus tests marked gui in eeb87467, cause of the stall not proven) and the session start of two serial tests exceeded 20 s | open | S0008 |
 
 
 ## Findings
