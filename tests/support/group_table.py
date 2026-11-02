@@ -655,11 +655,13 @@ COVERS = {
     ],
     "src/elements/Default/Triggers/Trigger_Process_starts.ahk": [
         "ahk/element_window_watch.test.ahk",
+        "integration/test_corpus.py::test_v1_process_test_runs_green_with_an_own_process",
         "integration/test_process_triggers.py::test_a_started_process_fires_starts_with_its_id_and_name",
         "integration/test_process_triggers.py::test_a_process_that_runs_at_the_arming_does_not_fire_starts_with_not_trigger_on_enable",
     ],
     "src/elements/Default/Triggers/Trigger_Process_Closes.ahk": [
         "ahk/element_window_watch.test.ahk",
+        "integration/test_corpus.py::test_v1_process_test_runs_green_with_an_own_process",
         "integration/test_process_triggers.py::test_a_closed_process_fires_closes_with_its_id_and_name",
         "integration/test_process_triggers.py::test_the_filter_by_process_id_watches_only_that_process",
     ],

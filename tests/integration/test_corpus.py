@@ -13,6 +13,7 @@ the step that brings them (S0003 and S0008); a test keeps the table equal to the
 import glob
 import json
 import os
+import shutil
 import uuid
 from pathlib import Path
 
@@ -44,6 +45,9 @@ FIX_LIST = [
     # WI-0130 (M-0158): the scripts of the two "sleep, msgbox" elements are v2 code (Sleep 10000); the MsgBox is removed,
     # because a MsgBox in a script process is a real dialog that no test answers (the flow stops before it anyway)
     ("Flow 1849072261", "v1 scripts of elements 15 and 17 ported to v2 (Sleep 10000, MsgBox removed)"),
+    # M-0171: "Process Test" (Flow 561135904) starts and ends cttune.exe and notepad.exe of the user; the test copy uses
+    # a copy of cmd.exe named ahf_wi0132_process_test.exe (found through PATH by Run) and ends only that copy
+    ("Flow 561135904", "static_ProcessName is ahf_wi0132_process_test.exe (a copy of cmd.exe on PATH); the kill of notepad.exe ends the variable"),
 ]
 
 # --- the flows that are not in the corpus yet ---------------------------------------------------------------------
@@ -56,9 +60,6 @@ PENDING = {
     # its elements are all registered since WI-0126 (Action_Send_Keystrokes); the flow is not in the corpus yet (the
     # Ctrl+F7 part is a gui part, and the test copy with unassigned keys is an open decision, see WI-0126)
     "Flow 2133155705": dict(name="Hotkey test", missing={}),
-    "Flow 561135904": dict(name="Process Test", missing={
-        "Trigger_Process_closes": "S0008",
-        "Trigger_Process_starts": "S0008"}),
     # its elements are all registered since WI-0124 (Action_Play_Sound); the flow itself runs with the acceptance (WI-0135)
     "Flow 65341778": dict(name="_AutomaticTest starter", missing={}),
     "Flow 74366368": dict(name="File link test", missing={
@@ -311,6 +312,28 @@ def test_v1_user_idle_test_runs_green_with_the_idle_time_of_the_test_provider(ho
     run = host_flows.run(flow_id, trigger="element0000000001", timeout=scaled(240))
     assert run.reason == "finished", (run.reason, run.names[-5:], host_flows.stderr_text()[-800:])
     assert not run.exceptions, (run.exceptions, run.names[-5:])
+
+
+# --- "Process Test" (WI-0132) ---------------------------------------------------------------------------------------------
+def test_v1_process_test_runs_green_with_an_own_process(host_flows, tmp_path, monkeypatch):
+    """"Process Test" (Flow 561135904), the copy in v2_adapted/ (FIX_LIST, M-0171). The flow starts the process named in its
+    variable static_ProcessName, watches it with Process starts and Process closes, and kills it again. The test process is
+    a copy of cmd.exe under that name, in a folder first on PATH (Run finds it there, the flow's own Run starts it hidden);
+    no process of the user is started or ended. Nothing is answered: the confirmation dialog of the flow is shown only
+    when the process already runs, and it does not run at the start."""
+    folder = tmp_path / "bin"
+    folder.mkdir()
+    shutil.copyfile(os.path.join(os.environ["SystemRoot"], "System32", "cmd.exe"), folder / "ahf_wi0132_process_test.exe")
+    monkeypatch.setenv("PATH", str(folder) + os.pathsep + os.environ.get("PATH", ""))
+    source = V2 / "Flow 561135904.json"
+    name = json.loads(source.read_text(encoding="utf-8"))["name"]
+    flow_id = host_flows.add_file(source)
+    host_flows.start()
+    run = host_flows.run(flow_id, trigger="element0000000022", timeout=scaled(240))
+    assert run.reason == "finished" and not run.exceptions, (run.reason, run.exceptions, run.names[-5:],
+                                                            host_flows.stderr_text()[-800:])
+    pair = host_flows.wait_var("global_testResults")
+    assert pair is not None and json.loads(pair[1]) == [name], pair
 
 
 # --- "HTTP Request" (WI-0122) ---------------------------------------------------------------------------------------
