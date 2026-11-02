@@ -18,6 +18,9 @@ class TriggerHost extends Role {
     __New(args) {
         super.__New(args)
         this._armed := Map()         ; triggerKey -> Map("ctx", TriggerContext, "cls", class, "class", id, "gen", n, "armedMs", ms)
+        ; How a trigger can start AutoHotFlow again (WI-0133, ctx.launch): the program script of this session, the session
+        ; name and the data folder. The shortcut of the trigger "Shortcut" is built from them.
+        this.appLaunch := Map("script", args.Get("app-script", ""), "session", args.Get("session", ""), "data", this.dataDir)
     }
 
     RegisterHandlers() {
@@ -40,7 +43,7 @@ class TriggerHost extends Role {
 
     ; sys.shutdown: every trigger is disarmed, then sys.bye follows (ARCHITECTURE 6.3).
     OnShutdown(deadlineMs) {
-        this._DisarmAll()
+        this._DisarmAll("shutdown")
     }
 
     ; --- commands ------------------------------------------------------------------------------
@@ -65,7 +68,7 @@ class TriggerHost extends Role {
             throw AhfError("unknown element class '" classId "'", ErrCode.NOT_FOUND)
         if (cls.Mode != "trigger")
             return Map("ok", false, "message", "element " classId " is not a trigger (mode " cls.Mode ")")
-        this._Disarm(key)
+        this._Disarm(key, "rearm")
         ctx := TriggerContext(this, key, flowId, elementId, Integer(gen), String(context))
         ctx.imports := imports
         this._armed[key] := Map("ctx", ctx, "cls", cls, "class", classId, "gen", Integer(gen), "armedMs", Time.NowMs())
@@ -84,12 +87,12 @@ class TriggerHost extends Role {
 
     _CmdDisarm(msg) {
         key := TriggerHost._Text(msg, "triggerKey")
-        this._Disarm(key)
+        this._Disarm(key, "disarm")
         return Map("ok", true)
     }
 
     _CmdReset(msg) {
-        this._DisarmAll()
+        this._DisarmAll("reset")
         return Map("ok", true)
     }
 
@@ -97,12 +100,12 @@ class TriggerHost extends Role {
 
     ; Disarms one trigger: the context is closed (no more events or callbacks), then the element's Disable runs. An error
     ; of Disable is logged; the trigger is removed anyway. Returns false for an unknown key.
-    _Disarm(key) {
+    _Disarm(key, reason := "disarm") {
         if (!this._armed.Has(key))
             return false
         entry := this._armed[key]
         this._armed.Delete(key)
-        this._Release(entry["ctx"], entry["cls"], "Disable failed: ")
+        this._Release(entry["ctx"], entry["cls"], "Disable failed: ", reason)
         return true
     }
 
@@ -111,10 +114,14 @@ class TriggerHost extends Role {
     _Forget(key, ctx, cls, prefix) {
         if (this._armed.Has(key) && this._armed[key]["ctx"] == ctx)
             this._armed.Delete(key)
-        this._Release(ctx, cls, prefix)
+        this._Release(ctx, cls, prefix, "failed")
     }
 
-    _Release(ctx, cls, prefix) {
+    ; Closes the context and runs Disable. reason (ctx.DisarmReason, ELEMENT-API-V2 3.5) tells the element why: "disarm"
+    ; (the engine switched the trigger off), "rearm" (the same key is armed again), "reset" (the engine restarts its
+    ; arming), "shutdown" (the session ends) or "failed" (Enable failed).
+    _Release(ctx, cls, prefix, reason) {
+        ctx.DisarmReason := reason
         ctx.Close()
         try {
             cls.Disable(ctx)
@@ -123,12 +130,18 @@ class TriggerHost extends Role {
         }
     }
 
-    _DisarmAll() {
+    _DisarmAll(reason) {
         keys := []
         for key, entry in this._armed
             keys.Push(key)
         for key in keys
-            this._Disarm(key)
+            this._Disarm(key, reason)
+    }
+
+    ; ctx.Request (WI-0133): a request of a trigger to another role (storage writes the shortcut file). The callback gets the
+    ; payload of the answer and runs under the trigger's guard (an error goes to evt.trigger.error while the trigger is armed).
+    RequestFor(ctx, to, msgType, payload, callback, timeoutMs) {
+        return this.peer.Request(to, msgType, payload, (ans) => ctx._Answered(callback, ans), timeoutMs)
     }
 
     ; --- events of a trigger (called by TriggerContext) -----------------------------------------

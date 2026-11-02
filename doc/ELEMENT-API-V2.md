@@ -267,6 +267,9 @@ Static and global variables change the permanent store through the variable mode
 | `ctx.Guard(fn)` | a function object that calls `fn` with the arguments it gets, under try/catch. For callbacks that the OS calls (hotkeys) |
 | `ctx.IsOpen` | false once the trigger is disarmed |
 | `ctx.imports` | a Map name → value: the variables that the class names with `ImportNames(params)` (WI-0130, PROTOCOL 4.4), read by the engine at the arming; `Map()` if none |
+| `ctx.launch` | a Map `script`, `session`, `data`: the program script of this supervisor (`--app-script`, PROTOCOL 5a), the session name and the data folder of this instance; read only (WI-0133, the trigger `Shortcut` builds its command line from them) |
+| `ctx.DisarmReason` | why `Disable` runs, set by the host before it: `disarm` (the engine switched the trigger off, or its flow changed), `rearm` (the same trigger is armed again, e.g. with other parameters), `reset` (the engine restarts its arming), `shutdown` (the session ends) or `failed` (`Enable` failed). An element that keeps something across a restart checks it (WI-0133) |
+| `ctx.Request(to, msgType, payload, callback, timeoutMs := 5000)` | a `cmd.*` request of the trigger to another role, e.g. `storage` for a file (the trigger host does no file I/O). It returns at once; `callback(answerPayload)` runs later under the guard of the trigger: an error in it goes to `evt.trigger.error` while the trigger is armed, else to the log. Also sent after the disarm (`Disable` removes a file that way). Every request has a timeout (WI-0133) |
 
 Errors (ARCHITECTURE 6.2, REQ-TRG-010):
 
@@ -549,5 +552,5 @@ The package Default has `Loop_SimpleLoop` (A_Index), `Loop_Condition` (A_Index),
 - Element packages (`package`, `packageVersion`): decided (E0037, E0045), built in WI-0047: files and include block per package (section 2), in phase 3 only `Default` (and the test packages); the package information in flows stays; the package is part of the identity of an element; an element of an unknown package loads, is marked and ends with `exception` when it runs.
 - Dialogs: decided (E0038), built in WI-0051, see section 3.3.
 - AHK code elements: decided (E0039). They run AHK v2 code; an imported v1 script is kept as text and marked (MIGRATION M-0049, S0008).
-- Triggers of S0003 (built in WI-0060 to WI-0066, WI-0067 accepted): what is still open for the later steps: `ctx.Request` for triggers (only when a trigger of S0008 needs it), the window identification of `Trigger_Hotkey` as a shared library for S0008 (WI-0064), and the checkbox "Switch with the flow" in the trigger dialogs (`followsFlow`, S0007).
+- Triggers of S0003 (built in WI-0060 to WI-0066, WI-0067 accepted): what is still open for the later steps: `ctx.Request` for triggers (built in WI-0133, section 3.5), the window identification of `Trigger_Hotkey` as a shared library for S0008 (WI-0064), and the checkbox "Switch with the flow" in the trigger dialogs (`followsFlow`, S0007).
 - Specification of a ported element (E0035): the v1 help text (`v1/Source_Elements/Default/help/en/`) and the AHK v2 behaviour, not the v1 code. A deliberate difference to v1 goes into MIGRATION.

@@ -11,6 +11,9 @@
 ;   Log(level, text)                              a log line of the trigger
 ;   After(ms, fn)                                 one-shot timer; cancelled at disarm; errors are reported (see below)
 ;   Guard(fn)                                     a function object that calls fn under try/catch (for hotkey callbacks)
+;   launch                                        Map(script, session, data): how to start this AutoHotFlow again (WI-0133)
+;   DisarmReason                                  why Disable runs: disarm, rearm, reset, shutdown or failed (WI-0133)
+;   Request(to, msgType, payload, callback, timeoutMs)  a cmd.* request to another role; callback(answerPayload) (WI-0133)
 ;
 ; A callback of the trigger (a timer of After, a function of Guard) runs under try/catch. An error goes to the log and to
 ; evt.trigger.error; the trigger stays armed (REQ-TRG-010). A disarmed context runs no callback and sends nothing.
@@ -27,6 +30,8 @@ class TriggerContext {
         this._open := true
         this._timers := Map()          ; seq -> Map("fn", userFn, "timer", boundTimer)
         this._timerSeq := 0
+        this.launch := host.appLaunch   ; Map(script, session, data), read only for the element
+        this.DisarmReason := ""         ; set by the host before Disable (see TriggerHost._Release)
     }
 
     ; True until the trigger is disarmed.
@@ -67,6 +72,23 @@ class TriggerContext {
         if (!IsObject(fn))
             throw ElementError("Guard: callback is not a function object")
         return (args*) => this._Guarded(fn, args*)
+    }
+
+    ; A cmd.* request of the trigger to another role (WI-0133: storage writes the shortcut file, so the trigger host does no
+    ; file I/O). It returns at once; callback(answerPayload) runs later under the guard of the trigger: an error in it goes
+    ; to evt.trigger.error while the trigger is armed, else to the log only. The request is also sent after the disarm
+    ; (Disable removes a shortcut that way). Every request has a timeout (default 5000 ms).
+    Request(to, msgType, payload, callback, timeoutMs := 5000) {
+        if (!IsObject(callback))
+            throw ElementError("Request: callback is not a function object")
+        return this._host.RequestFor(this, to, msgType, payload, callback, timeoutMs)
+    }
+
+    ; The answer of a Request, handed to the callback under the guard. A missing payload is an error answer.
+    _Answered(callback, ans) {
+        payload := IsObject(ans) && ans.HasProp("payload") ? ans.payload : Map("ok", false
+            , "error", Map("code", "peer_gone", "message", "no answer"))
+        this._Guarded(callback, payload)
     }
 
     ; Removes the pending timers. Called by the host when the trigger is disarmed.
