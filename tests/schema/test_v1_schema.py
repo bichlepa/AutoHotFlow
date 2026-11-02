@@ -152,6 +152,8 @@ for _cls in ("action_activate_window", "action_show_window", "action_hide_window
 ALLOWED[("default.action_move_mouse", "CoordMode", "default")] = "M-0155"
 ALLOWED[("default.action_move_mouse", "SendMode", "default")] = "M-0155"
 ALLOWED[("default.action_drag_with_mouse", "SendMode", "default")] = "M-0155"
+# M-0179: the default path of the shortcut has no flow name
+ALLOWED[("default.trigger_shortcut", "ShortCutPath", "default")] = "M-0179"
 
 
 def load_v1():

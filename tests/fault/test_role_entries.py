@@ -41,10 +41,11 @@ def test_every_role_of_the_product_starts_from_its_own_entry_and_reports_ready(c
         if name != "supervisor":
             assert snap["peer"]["status"] == "ready", (name, snap["peer"])
             cmdline = psutil.Process(snap["pid"]).cmdline()
-            script = [part for part in cmdline if part.lower().endswith(".ahk")]
+            script = [part for part in cmdline if part.lower().endswith(".ahk") and not part.startswith("--")]
             assert [Path(s).resolve() for s in script] == [(ENTRY_DIR / (role + ".ahk")).resolve()], (name, cmdline)
         else:
-            assert [Path(s).resolve() for s in psutil.Process(snap["pid"]).cmdline() if s.lower().endswith(".ahk")] \
+            assert [Path(s).resolve() for s in psutil.Process(snap["pid"]).cmdline()
+                    if s.lower().endswith(".ahk") and not s.startswith("--")] \
                 == [PRODUCT_ENTRY.resolve()]
 
 
