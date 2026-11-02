@@ -50,8 +50,10 @@ class OwnWindow:
             self.proc.wait(timeout=scaled(10))
 
 
-def start(tmp_path, noactivate=False, title=None):
-    """Starts an own window and waits until it is shown (the ready file). noactivate shows it without the focus."""
+def start(tmp_path, noactivate=True, title=None):
+    """Starts an own window and waits until it is shown (the ready file). By default it is shown without the focus, so
+    it does not take the focus from the user; noactivate=False (the tests of the active window, under the focus fixture)
+    gives it the focus."""
     title = title or "AhfTriggerWindow-" + uuid.uuid4().hex
     ready, stop = tmp_path / ("ready-%s.txt" % uuid.uuid4().hex), tmp_path / ("stop-%s.txt" % uuid.uuid4().hex)
     args = [sys.executable, str(AHKRUN), "--timeout", "120", str(HELPERS / "own_window.ahk"), title, str(ready), str(stop)]

@@ -115,8 +115,9 @@ def start_window(tmp_path, noactivate=False):
 
 @pytest.fixture
 def window(tmp_path):
-    """One own window, shown and active as the system gives it; ended at the end of the test."""
-    own = start_window(tmp_path)
+    """One own window, shown without the focus (it does not take the focus from the user); ended at the end of the test.
+    Only test_activate_brings_the_own_window_to_the_front needs the focus, and takes it under the input lock."""
+    own = start_window(tmp_path, noactivate=True)
     yield own
     own.end()
 

@@ -149,9 +149,10 @@ def test_a_closed_window_fires_closes_with_its_id(host_flows, tmp_path):
     assert int(host_flows.read_probe("A_WindowID").text) == hwnd
 
 
+@pytest.mark.gui      # needs the real foreground: Windows refuses the focus while the user works in another window
 def test_gets_active_fires_when_the_matching_window_becomes_the_active_one(host_flows, tmp_path, focus):
     title, other = title_of(), title_of("AhfOtherWindow")
-    matching = ownwindow.start(tmp_path, title=title)                  # active when it is started
+    matching = ownwindow.start(tmp_path, noactivate=False, title=title)                  # active when it is started
     second = ownwindow.start(tmp_path, noactivate=True, title=other)
     try:
         assert matching.is_active(), "the own window did not get the focus"
@@ -172,9 +173,10 @@ def test_gets_active_fires_when_the_matching_window_becomes_the_active_one(host_
         matching.end()
 
 
+@pytest.mark.gui      # needs the real foreground: Windows refuses the focus while the user works in another window
 def test_gets_inactive_fires_with_the_id_of_the_window_that_lost_the_focus(host_flows, tmp_path, focus):
     title, other = title_of(), title_of("AhfOtherWindow")
-    matching = ownwindow.start(tmp_path, title=title)                  # active at the arming: the baseline
+    matching = ownwindow.start(tmp_path, noactivate=False, title=title)                  # active at the arming: the baseline
     second = ownwindow.start(tmp_path, noactivate=True, title=other)
     try:
         assert matching.is_active(), "the own window did not get the focus"
