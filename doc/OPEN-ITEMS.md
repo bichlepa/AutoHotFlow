@@ -568,7 +568,7 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 ### F-0204: Protected processes are not seen by the process triggers
 
 - **Found:** WI-0132 (read, `src/elements/Default/lib/ProcessSnapshot.ahk`): the process list opens every process with `PROCESS_QUERY_LIMITED_INFORMATION` and does not enable the debug privilege, which v1 did. A process that cannot be opened is not in the list.
-- **Open:** whether the process triggers must see such processes; the elevated start of AutoHotFlow would be needed. Recorded in MIGRATION M-0169.
+- **Open:** whether the process triggers must see such processes; the elevated start of AutoHotFlow would be needed. Recorded in MIGRATION M-0176.
 - **Status:** verified (read); not checked on a protected process (no such process was used in a test).
 
 ### F-0205: Own-window and own-process helpers exist twice
