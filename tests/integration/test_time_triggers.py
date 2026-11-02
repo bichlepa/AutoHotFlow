@@ -315,7 +315,7 @@ def test_time_of_day_fires_at_its_time_and_not_again_that_day(host_flows):
 
 def test_time_of_day_does_not_fire_on_another_week_day(host_flows):
     now = datetime.datetime.now()
-    when = now + datetime.timedelta(seconds=2)
+    when = now + datetime.timedelta(seconds=FIRE_MARGIN_S)     # the same margin as the session start (F-0207)
     if when.date() != now.date():
         pytest.skip("the test time crosses midnight")
     other_days = "".join(str(d) for d in range(1, 8) if d != ahk_week_day(now))
@@ -324,7 +324,9 @@ def test_time_of_day_does_not_fire_on_another_week_day(host_flows):
     host_flows.start()
     host_flows.enable(fid)
     assert wait_state(host_flows, fid, trigger.id, lambda s: s["armed"] is True) is not None, host_flows.stderr_text()
-    time.sleep(scaled(3.0))
+    # Wait past the fire time itself (not scaled: a lower bound), so the test covers the moment the trigger would fire.
+    while datetime.datetime.now() < when + datetime.timedelta(seconds=1):
+        time.sleep(0.05)
     assert started(host_flows, fid) == [], "the trigger fired on a week day that is not selected"
 
 
