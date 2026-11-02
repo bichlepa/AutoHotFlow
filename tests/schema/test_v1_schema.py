@@ -54,12 +54,12 @@ ALLOWED = {
     ("default.action_time_difference", "Unit", "default"): "M-0099",
     # M-0107: the default time of New time is the time of the element's creation (v1 writes the marker <A_Now>)
     ("default.action_new_time", "Time", "default"): "M-0107",
-    # M-0160: the default time of Time of day is the time of the element's creation (v1 writes the marker <A_Now>)
-    ("default.trigger_time_of_day", "Time", "default"): "M-0160",
-    # M-0161: the texts of the choices of User idle time are the translations of the v1 keys (the v1 "MilliSeconds" key
+    # M-0164: the default time of Time of day is the time of the element's creation (v1 writes the marker <A_Now>)
+    ("default.trigger_time_of_day", "Time", "default"): "M-0164",
+    # M-0165: the texts of the choices of User idle time are the translations of the v1 keys (the v1 "MilliSeconds" key
     # is shown as "Milliseconds", the method choices are "Method: <text>" with the argument filled in)
-    ("default.trigger_user_idle_time", "Unit", "choices"): "M-0161",
-    ("default.trigger_user_idle_time", "Method", "choices"): "M-0161",
+    ("default.trigger_user_idle_time", "Unit", "choices"): "M-0165",
+    ("default.trigger_user_idle_time", "Method", "choices"): "M-0165",
     # M-0103: the spelling of an enum value (v1 example flows contain both)
     ("default.action_execute_flow", "WhichTrigger", "enum"): "M-0103",
     # M-0072, M-0073: the choices of the trigger selection of the flow status elements (WI-0065)

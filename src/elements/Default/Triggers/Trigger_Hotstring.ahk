@@ -2,17 +2,17 @@
 #Include ..\..\base\AhfElement.ahk
 #Include ..\lib\WindowIdent.ahk
 
-; Trigger Hotstring of the package Default (WI-0131, REQ-TRG-230, M-0162, M-0163): fires when the user types the text,
+; Trigger Hotstring of the package Default (WI-0131, REQ-TRG-230, M-0166, M-0167): fires when the user types the text,
 ; and optionally types a replacement for it. Parameters, GenerateName and language keys are those of v1
 ; (Source_Elements/Default/Triggers/Hotstring.ahk). Runs in the trigger host (Mode trigger).
 ;
 ; The hotstring is a callback (Hotstring with a function object). The replacement is not a hotstring option: the trigger
-; sends it itself, through SystemOps.Send with the send mode of the element (M-0162), before it fires. With automatic
+; sends it itself, through SystemOps.Send with the send mode of the element (M-0166), before it fires. With automatic
 ; backspacing the ending character is sent again after the replacement, unless it is omitted, as in v1.
 ;
 ; The registrations are shared as the hotkeys are (Trigger_Hotkey): the hotstring text with its options, the window
 ; condition and the window identification name one registration with the armed triggers on it. A press runs every armed
-; trigger, each sends its own replacement; the last Disable turns the hotstring off (M-0163).
+; trigger, each sends its own replacement; the last Disable turns the hotstring off (M-0167).
 class Trigger_Hotstring extends AhfElement {
     static Mode := "trigger"
     static ActsOnSystem := true

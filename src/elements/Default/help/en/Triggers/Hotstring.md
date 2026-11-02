@@ -76,7 +76,7 @@ At least **Title of window**, **Window class**, **Process name**, **Unique windo
 
 ### `A_Hotstring`
 
-The pressed hotstring as defined in **Hotstring** (the v1 help named it `A_ThisHotstring`; the variable is `A_Hotstring`, as in v1, MIGRATION M-0162).
+The pressed hotstring as defined in **Hotstring** (the v1 help named it `A_ThisHotstring`; the variable is `A_Hotstring`, as in v1, MIGRATION M-0166).
 
 ### `A_EndChar`
 

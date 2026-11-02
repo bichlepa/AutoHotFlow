@@ -14,4 +14,4 @@ Time when the flow will start. Only the time is used; the date of the value is i
 
 ## Remarks
 
-The next time is computed when the trigger is enabled and after every start. A change of the clock of the computer is taken into account when the time comes: a time that is reached early (the clock was set back) waits for the rest, and a time that is reached late (the clock was set forward, or the computer was in standby) still starts the flow. A time that was missed in standby is not started afterwards (MIGRATION M-0160).
+The next time is computed when the trigger is enabled and after every start. A change of the clock of the computer is taken into account when the time comes: a time that is reached early (the clock was set back) waits for the rest, and a time that is reached late (the clock was set forward, or the computer was in standby) still starts the flow. A time that was missed in standby is not started afterwards (MIGRATION M-0164).
