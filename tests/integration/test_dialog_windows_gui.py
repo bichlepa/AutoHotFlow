@@ -65,3 +65,15 @@ def test_tooltip_is_shown_and_removed(tmp_path):
             'FileAppend("removed", "*", "UTF-8")\n')
     code, out, err, dialogs = _run(tmp_path, body, timeout=20)
     assert code == 0 and "removed" in out, (code, out, err)
+
+
+@pytest.mark.gui
+def test_input_window_shows_its_field_and_times_out(tmp_path):
+    """WI-0128, Action_Input_Box: the window with a message, a field with a default text, a countdown and a cancel button
+    ends by its timeout (answer "Timeout"). Check by eye: the layout, the countdown and the sharpness above 100 %."""
+    body = ('spec := Map("title", "WI-0128 gui check", "text", "This window closes by itself after 3 seconds. The field '
+            'has the default text.", "default", "Default text", "rows", 3, "buttonLabel", "OK", "cancelLabel", "Cancel", '
+            '"width", 360, "height", 250, "timeoutMs", 3000)\n'
+            'FileAppend(Dialogs.InputWindow(spec).Result, "*", "UTF-8")\n')
+    code, out, err, dialogs = _run(tmp_path, body, timeout=20)
+    assert code == 0 and "Timeout" in out, (code, out, err)

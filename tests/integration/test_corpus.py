@@ -50,8 +50,9 @@ FIX_LIST = [
 # The v1 flow "Automatic tests" flows that are not in this corpus yet: the elements they lack and the step that brings them
 # (WI-0057 task 3). The test below keeps this table equal to the element registry.
 PENDING = {
-    "Flow 130786371": dict(name="Dialog test", missing={
-        "Action_Input_Box": "S0008"}),
+    # its elements are all registered since WI-0128; the trigger "Input Normal" runs headless (the test below), the other
+    # parts read the controls of the real windows and send keys to them (the gui part, the owner's test; open in WI-0128)
+    "Flow 130786371": dict(name="Dialog test", missing={}),
     # its elements are all registered since WI-0126 (Action_Send_Keystrokes); the flow is not in the corpus yet (the
     # Ctrl+F7 part is a gui part, and the test copy with unassigned keys is an open decision, see WI-0126)
     "Flow 2133155705": dict(name="Hotkey test", missing={}),
@@ -350,6 +351,27 @@ def test_v1_external_script_test_runs_green_on_the_v2_copy(flows):
     run = flows.run(flow_id, trigger="element0000000001", timeout=scaled(60))
     assert not run.exceptions, (run.reason, run.exceptions, run.names[-5:])
     assert "element0000000014" in run.path, run.path
+
+
+# --- "Dialog test" (WI-0128): the headless part ---------------------------------------------------------------------------
+def test_v1_dialog_test_input_normal_runs_headless_with_a_scripted_input_box(flows):
+    """"Dialog test" (Flow 130786371), trigger "Input Normal" as saved: the input box answers from the script, once with OK
+    (the variable and the static result are set) and once with the cancel button (the exception goes to element 212). The
+    other triggers of the flow read the controls of the real windows and send keys to them: the gui part, not run here."""
+    dialogs = DialogScript(flows.datadir)
+    dialogs.script(answer({"result": "OK", "value": "Dialog Test Value"}, kind="InputWindow"),
+                   answer({"result": "Cancel", "value": ""}, kind="InputWindow"))
+    flow_id = flows.add_file(V1 / "Flow 130786371.json")
+    flows.start()
+    ok = flows.run(flow_id, trigger="element0000000206", timeout=scaled(60))
+    assert ok.reason == "finished" and not ok.exceptions, (ok.reason, ok.exceptions, ok.names[-5:])
+    assert "element0000000211" in ok.path and "element0000000212" not in ok.path, ok.path
+    cancel = flows.run(flow_id, trigger="element0000000206", timeout=scaled(60))
+    assert cancel.reason == "finished" and "element0000000212" in cancel.path, (cancel.reason, cancel.path)
+    assert cancel.exceptions == ["User cancelled the dialog"], cancel.exceptions
+    first, second = dialogs.requests()
+    assert (first["args"]["title"], first["args"]["text"]) == ("Dialog Test Title", "Dialog Test Text")
+    assert second["args"]["title"] == "Dialog Test Title"
 
 
 # --- the synthetic flows -----------------------------------------------------------------------------------------------
