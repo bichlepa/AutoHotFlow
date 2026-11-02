@@ -41,16 +41,16 @@ Text recognition (OCR).
 
 Status 2026-11-02: the six classes are ported; the selected full run is not green (xdist crash, see below).
 
-**Commits (branch wip/wi0127):** 51ca7283 (GDI+ wrapper to `src/gdip/`), a8a1376d (SaveFile, CaptureScreen, CaptureWindow), 43d35956 (seam: MonitorCount, MonitorGetSetting, MonitorSetSetting; MonitorDdc), c0c530b3 (six elements, ScreenOps, help, MIGRATION M-0169 to M-0175, tests), 38c66894 (REQ-ELM-350, HOW-TO, OPEN-ITEMS F-9000* to F-9003*).
+**Commits (branch wip/wi0127):** 51ca7283 (GDI+ wrapper to `src/gdip/`), a8a1376d (SaveFile, CaptureScreen, CaptureWindow), 43d35956 (seam: MonitorCount, MonitorGetSetting, MonitorSetSetting; MonitorDdc), c0c530b3 (six elements, ScreenOps, help, MIGRATION M-0169 to M-0175, tests), 38c66894 (REQ-ELM-350, HOW-TO, OPEN-ITEMS F-0199 to F-0202).
 
 **Tests:**
 - `tests/integration/test_screen_elements.py`: 18 passed (run 20261102-113550-3840, commit before c0c530b3, same code).
 - `tests/ahk/gdip.test.ahk`: 21 passed; `tests/ahk/element_system_ops.test.ahk`: 4 passed.
 - Schema, help, group table, architecture, doc index: 93 passed (direct runs).
 - `tests/test_ahk_runner.py` at the v2-port tip in a fresh worktree (run 20261102-120311-1961b36f): 1170 passed, 1 skipped. On the branch: 1172 passed, 1 skipped (run without the rest of the selection).
-- Selected run `python -m pytest tests -q --changed-from v2-port` on 38c66894 and on earlier states (four attempts): aborts with an xdist INTERNALERROR; the worker that runs `test_ahk_file_completes[json.test.ahk]` dies, so no tests report. Cause not found; not a permission issue. The same file passes alone and in its own selection, and at the v2-port tip. Treated as a harness problem (OPEN-ITEMS F-9002*).
+- Selected run `python -m pytest tests -q --changed-from v2-port` on 38c66894 and on earlier states (four attempts): aborts with an xdist INTERNALERROR; the worker that runs `test_ahk_file_completes[json.test.ahk]` dies, so no tests report. Cause not found; not a permission issue. The same file passes alone and in its own selection, and at the v2-port tip. Treated as a harness problem (OPEN-ITEMS F-0201).
 
-**Decisions:** worker mode for pixel and image search; per-monitor DPI in the screen elements only; the seam uses monitor functions (DDC/CI) instead of the reserved ChangeDisplaySettings; Parameters() reads the monitor count without the seam; empty output names are skipped. The DDC question (resolution and similar not in v1) is `decision needed` (F-9000*).
+**Decisions:** worker mode for pixel and image search; per-monitor DPI in the screen elements only; the seam uses monitor functions (DDC/CI) instead of the reserved ChangeDisplaySettings; Parameters() reads the monitor count without the seam; empty output names are skipped. The DDC question (resolution and similar not in v1) is `decision needed` (F-0199).
 
-**Not done or not checked:** the multi-monitor and several-scale behaviour; the real DDC writes (probe read only); the owner's manual checks of the screen elements (F-9003*); the Search image help page was read (its remarks are v2-accurate) but only the Screenshot, pixel and settings pages were corrected.
+**Not done or not checked:** the multi-monitor and several-scale behaviour; the real DDC writes (probe read only); the owner's manual checks of the screen elements (F-0202); the Search image help page was read (its remarks are v2-accurate) but only the Screenshot, pixel and settings pages were corrected.
 
