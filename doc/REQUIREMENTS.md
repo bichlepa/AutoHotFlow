@@ -1409,7 +1409,7 @@ Export selected flows to an `.ahf` file (a ZIP archive); import from such a file
 - **Prio:** should
 - **Scope:** port
 - **Plan:** S0008
-- **Evidence:** `tests/integration/test_demo_flows.py`, `tests/e2e/test_manager_demo.py`, `tests/e2e/test_editor_demo.py`
+- **Evidence:** `tests/integration/test_demo_flows.py`, `tests/integration/test_demo_flows_run.py`, `tests/e2e/test_manager_demo.py`, `tests/e2e/test_editor_demo.py`
 
 AutoHotFlow ships demo flows in their own category "Demonstration". They cannot be deleted, renamed or changed: the editor shows them read only and says that a duplicate can be edited. The user can hide them (setting "Hide demonstration flows"). They are disabled until the user enables them. v2 ships three of the four v1 demos; the "Update checker" is left out, because a check for updates is a feature of its own that is off until the user switches it on (REQ-SEC-050, E0105).
 

@@ -98,6 +98,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0210 | The window trigger tests: a hung focus test stalls a full run (focus tests marked gui in eeb87467, cause of the stall not proven) and the session start of two serial tests exceeded 20 s | open | S0008 |
 | F-9000* | The element settings dialog of a demonstration flow: the draft refuses its save (`demo_read_only`, WI-0134), whether the dialog shows the refusal to the user is not checked | not checked | S0008 |
 | F-9001* | Import of a flow whose ID is the ID of a demonstration flow (a `.ahf` file or a v1 flow of the same ID): the conflict path is not tested for a demo ID | not checked | S0008 |
+| F-9002* | The Joke teller (WI-0134) runs on a copy with the local server as its URL: the flow ends without an exception, but the local server records no request (the element runs, its condition on the response is false); the cause is not found | open, not checked | S0008 |
 
 
 ## Findings
@@ -403,6 +404,11 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 
 **What:** A demonstration flow keeps its ID (`Flow 806132298`, WI-0134, M-0187). An imported flow with the same ID (a `.ahf` archive, or a v1 flow of the same ID in the import from v1) meets the table entry of the demo. The conflict path of the create (`_FixedId`, `conflict`) and the question of the import are not tested for this case.
 **Status:** not checked. Next step: a test that imports a `.ahf` archive holding `Flow 806132298.json` and checks that the import gives it another ID or asks, and that the demo is unchanged.
+
+### F-9002*: The Joke teller sends no request to the local server in the test
+
+**What:** `tests/integration/test_demo_flows_run.py` runs the Joke teller on a copy whose `Action_HTTP_Request` URL is the local test server (WI-0122). The flow ends with `finished` and without an exception, the path passes the HTTP element, but the server records no request. The same element with the same server records the GET of the corpus test (`test_corpus.py`, httpbin copy). Removing `OutputFile` changed nothing. The cause is not found; the test asserts only the end of the run.
+**Status:** open, not checked. Next step: trace the element's fetch with the URL of the copy (for example a log line of the request in the element or a run with the local server's log), then decide whether the element, the copy or the test is at fault.
 
 ## Observed only (not for the bug hunter)
 

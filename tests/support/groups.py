@@ -62,6 +62,7 @@ OTHER_RULES = [
     ("tests/ahk/helpers/render_bench.ahk", ["render", "tools"]),   # the renderer bench, driven by tools/measure_render.py
     ("assets/icons/*", ["render"]),                                # the icons of the editor drawing (WI-0085)
     ("assets/help/*", ["help"]),                                   # the general help pages and their stylesheet (WI-0112)
+    ("assets/demo_flows/*", ["engine", "storage", "manager", "editor"]),   # the demonstration flows (WI-0134)
     ("tests/ahk/helpers/renderer_bench.ahk", ["render", "tools"]),   # the renderer measurement (VS Code task, WI-0085)
     ("tests/ahk/helpers/render_samples.ahk", ["render", "tools"]),   # the editor screenshots (VS Code task, WI-0085)
     ("tests/ahk/helpers/element_rate_bench.ahk", ["element-units", "engine"]),   # benches: run by hand (VS Code tasks)
