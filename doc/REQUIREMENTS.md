@@ -1155,11 +1155,11 @@ Hotkeys, hooks and timers react at once, no matter how busy the running flows ar
 ### REQ-TRG-020 Triggers follow the enabled state, also after a restart
 
 - **v1:** yes
-- **v2:** partial (the arming works for the test triggers and for the timer and start-up triggers, with the restarts of the engine and of the trigger host; the hotkey trigger works with real keys, MS-0040)
+- **v2:** partial (the arming works for the test triggers and for the timer and start-up triggers, with the restarts of the engine and of the trigger host; the hotkey trigger works with real keys, MS-0040; the window and process triggers are armed with their flow, WI-0132, their restart is not tested)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0003 (done), S0008 (the other trigger types)
-- **Evidence:** `tests/integration/test_trigger_arming.py` (WI-0062: an enabled trigger is armed and fires, disabling disarms it, the startup trigger fires once per start, a restart of the engine or of the host re-arms), `tests/integration/test_time_triggers.py` (WI-0063), `tests/integration/test_hotkey_arming.py` (WI-0067: the hotkey trigger is armed, disarmed and re-armed after a restart of the trigger host; no keys are sent), `tests/ahk/engine_trigger_arms.test.ahk`
+- **Evidence:** `tests/integration/test_trigger_arming.py` (WI-0062: an enabled trigger is armed and fires, disabling disarms it, the startup trigger fires once per start, a restart of the engine or of the host re-arms), `tests/integration/test_time_triggers.py` (WI-0063), `tests/integration/test_hotkey_arming.py` (WI-0067: the hotkey trigger is armed, disarmed and re-armed after a restart of the trigger host; no keys are sent), `tests/ahk/engine_trigger_arms.test.ahk`, `tests/integration/test_window_triggers.py` and `tests/integration/test_process_triggers.py` (WI-0132: armed and fired with the flow, the refused arming gives the v1 text)
 
 The enabled triggers are active from the start of AutoHotFlow on, and again after an internal restart (REQ-ROB-040); disabling a flow deactivates the triggers that switch with it (REQ-EXE-070).
 
@@ -1302,30 +1302,36 @@ Creates a shortcut file (default on the desktop) that starts the flow through th
 ### REQ-TRG-260 Window triggers
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done
 - **Prio:** must
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0132)
+- **Evidence:** `tests/integration/test_window_triggers.py` (WI-0132: a new window fires once and gives its ID; a window that exists at the arming does not fire with the option, and fires at the first check without it; a closed window fires closes with its ID; gets active and gets inactive with the real focus under the input lock; a window that opens and closes between two polls is not seen; a missing identification and a bad interval are refused with the v1 text), `tests/ahk/element_window_watch.test.ahk` (WI-0132: the shared poll, one timer per interval), `tests/stress/test_window_trigger_cost.py` (MS-0044: ten armed window triggers, the timer keeps its schedule)
+
+Polling, not a Windows event: a window that opens and closes between two checks is not seen (the help page says so; MIGRATION M-0170).
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
-| `Trigger_Window_opens` | yes | open | S0008 |
-| `Trigger_Window_closes` | yes | open | S0008 |
-| `Trigger_Window_gets_active` | yes | open | S0008 |
-| `Trigger_Window_gets_inactive` | yes | open | S0008 |
+| `Trigger_Window_Opens` | yes | done (WI-0132) | S0008 (WI-0132 done) |
+| `Trigger_Window_Closes` | yes | done (WI-0132) | S0008 (WI-0132 done) |
+| `Trigger_Window_Gets_Active` | yes | done (WI-0132) | S0008 (WI-0132 done) |
+| `Trigger_Window_Gets_Inactive` | yes | done (WI-0132) | S0008 (WI-0132 done) |
 
 ### REQ-TRG-270 Process triggers
 
 - **v1:** yes
-- **v2:** open
+- **v2:** done
 - **Prio:** should
 - **Scope:** port
-- **Plan:** S0008
+- **Plan:** S0008 (WI-0132)
+- **Evidence:** `tests/integration/test_process_triggers.py` (WI-0132: a started process fires starts with its ID and name; a process that runs at the arming does not fire with the option; a closed process fires closes; the filter by process ID watches only that process; a bad interval is refused with the v1 text), `tests/integration/test_corpus.py::test_v1_process_test_runs_green_with_an_own_process` (corpus "Process Test", Flow 561135904, with its own test process), `tests/ahk/element_window_watch.test.ahk` (WI-0132: the process list, the filter)
+
+A process that cannot be opened is not in the list, so it is neither seen starting nor closing (MIGRATION M-0169).
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
-| `Trigger_Process_starts` | yes | open | S0008 |
-| `Trigger_Process_closes` | yes | open | S0008 |
+| `Trigger_Process_starts` | yes | done (WI-0132) | S0008 (WI-0132 done) |
+| `Trigger_Process_Closes` | yes | done (WI-0132) | S0008 (WI-0132 done) |
 
 ### REQ-TRG-280 File triggers
 
