@@ -92,6 +92,7 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0204 | Process triggers do not see processes that cannot be opened without the debug privilege (protected processes, a higher integrity level): their start and end are not seen (M-0176). v1 enabled `SeDebugPrivilege` and saw more | open, decision for the owner: whether the privilege is wanted (it needs the elevated program) | WI-0132 |
 | F-0205 | The own-window helper of the window tests exists twice: `tests/integration/test_window_elements.py` (WI-0125) and `tests/support/ownwindow.py` (WI-0132); the process helper of `test_process_elements.py` (WI-0123) is the same kind of copy | open, low; move both into `tests/support/` when the next window or process test changes | WI-0132 |
 | F-0206 | The label of the option of `Process starts` ("Do not trigger if a matching window exists when enabling the trigger") is the v1 text and says window; the help page explains it | open, low; a new language key for "process" needs the owner's decision on the text (en.ini and de.ini) | WI-0132 |
+| F-0207 | `tests/integration/test_time_triggers.py::test_time_of_day_fires_at_its_time_and_not_again_that_day` fails when run alone (WI-0131 trigger or test) | open | S0008 |
 
 
 ## Findings
@@ -582,3 +583,9 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 - **Found:** WI-0132 (read, `src/elements/Default/Triggers/Trigger_Process_starts.ahk`): the v1 label of NotTriggerOnEnable reads "Do not trigger if a matching window exists when enabling the trigger". The v1 help text describes a process.
 - **Open:** a language key with "process" in en.ini and de.ini, decided by the owner. The help page explains the label until then.
 - **Status:** verified (read).
+
+### F-0207: The time of day test fails alone
+
+- **Found:** WI-0132 author and reviewer (recheck 20261102-135605-24032, serial, alone): `test_time_of_day_fires_at_its_time_and_not_again_that_day` (WI-0131) fails also on `v2-port` without the changes of WI-0132. It also failed in the fast run of `f9c7ed1e` (green alone then). Cause not checked; possibly the wall-clock time of the test (a time close to midnight or a minute boundary) or the trigger.
+- **Open:** establish the cause with repeated serial runs at different times; fix the test or the trigger.
+- **Status:** not checked.
