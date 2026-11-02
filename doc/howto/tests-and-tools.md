@@ -575,3 +575,19 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 - **Right:** Rename in two steps: `git mv X.html X.tmp.html` and `git mv X.tmp.html Y.html`, then regenerate the pages. `git ls-files` shows the names that git tracks.
 - **Status:** verified (WI-0132, commit of the renamed help pages)
 - **Source:** `src/elements/Default/help/en/Triggers/`
+
+### An element file is not always an element class
+
+- **Problem:** `src/elements/Default/` holds 178 `.ahk` files for 152 element classes. The other 26 are shared helpers (`FileOps`, `SoundOps`, `WatchPoll`, ...) in the same folders. A test that counts files per folder counts them as classes.
+- **Wrong:** Counting all `*.ahk` files of `Actions/` or comparing the folder with the v1 folder.
+- **Right:** An element class is a file whose name starts with `Action_`, `Condition_`, `Loop_` or `Trigger_` (`tests/test_element_classes.py`). The v1 file names differ from the class names (`Absolute_Number.ahk` is `Action_Absolute_number`), so compare class lists, or counts per kind, never file names.
+- **Status:** verified (WI-0135)
+- **Source:** `tests/test_element_classes.py`
+
+### A whole-flow starter of the corpus cannot run headless when it starts flows that use the real desktop
+
+- **Problem:** The v1 flow "_AutomaticTest starter" starts all other test flows, among them one that presses real keys and one that operates real windows. Run headless, it would send keys to the desktop of the user.
+- **Wrong:** Running the starter in a test session just because all its elements are registered.
+- **Right:** Run the single flows (each with the setup it needs) and keep the starter, the Dialog test and the Hotkey test in `PENDING` with a reason, until the owner decides on test copies (F-9000*).
+- **Status:** verified by reading the flow (WI-0135); a headless run was not tried
+- **Source:** `tests/integration/test_corpus.py` (`PENDING`)

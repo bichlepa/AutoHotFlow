@@ -371,3 +371,18 @@ Status: **verified** for the numbers of the runs (one run each, two patch series
 
 The answer to a patch of 30 operations on the biggest flow (93 KB, `test_a_patch_of_30_operations_on_the_biggest_flow_is_answered_within_the_budget`, budget 3 s) passed in the fast tier of WI-0104 (run 20261021-182554-d3e830a3, commit d3e830a3); its measurement line is not kept.
 
+
+### MS-0059: memory of the background processes with all real classes and one editor (WI-0135, MS-0042 again, REQ-PRF-030, E0040)
+
+`tests/stress/test_all_classes_start.py::test_memory_of_the_processes_with_all_real_classes_and_one_editor`, 3 sessions, stress tier alone (run 20261102-204556-49a76b6b, commit 49a76b6b). Roles storage, engine, trigger host, manager (`--headless`), tray, one warm worker; the role entries include the 152 real classes of their mode. Private bytes after 10 s, then the same with one real editor process (opened through the headless manager). Load: system CPU 23 to 26 % from other processes.
+
+| Variant | Sum private MB (3 sessions) | Working set sum MB |
+|---|---|---|
+| background processes (supervisor, storage, engine, trigger host, manager, tray, 1 worker) | **61.3, 60.7, 60.5** | 138.5 to 138.6 |
+| the same plus one editor | 79.8, 79.4, 79.3 | 167.9 to 168.0 |
+
+Per role (private MB, run 0): engine 18.9, worker 10.0, manager 7.6, supervisor 7.1, trigger host 6.9, storage 5.6, tray 5.3, editor 18.3. Against MS-0042 (1 worker, with manager 62.5 MB): the sum is about the same, but the pieces moved: the engine grew from 12.6 to 18.9 MB and the worker from 6.7 to 10.0 MB (all classes are loaded), the supervisor shrank from 17.4 to 7.1 MB. **Budget of E0040 (below 100 MB without editors): met with 61 MB.** Three workers would add about 2 x 10 MB (about 81 MB, extrapolated, not measured here); eight waiting workers (the default pool, E0048) about 130 MB, above the budget as accepted in E0040/E0048 (extrapolated). One editor costs 18.4 MB and is not counted. Not measured: a session with the real manager window and several editors.
+
+### MS-0060: start of a worker with all real classes (WI-0135, MS-0029 again, R0003)
+
+Same run. `tools/measure_r3.py worker_start` with `tests/integration/helpers/AutoHotFlowTest.ahk`: time from `cmd.process.spawn` to the state `ready`, polled every 3 ms, 3 workers per session, 5 sessions (15 values). **Median 216 ms** (min 117, max 455). Memory of the worker 10.4 to 10.6 MB private, 21.4 MB working set. MS-0029 had 150 ms at N=0 to 176 ms at N=150 (synthetic classes); R0003 set the threshold at +150 ms against N=0: the result is +66 ms against N=0 (+40 ms against N=150), **not reached**. The load of the machine was 23 to 26 % from other processes, so the spread is wider than in MS-0029.

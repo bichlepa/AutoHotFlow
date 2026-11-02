@@ -132,7 +132,7 @@ L503-520   19.1 The subset that is compared
 L522-539   19.2 Deliberate deviations from native AutoHotkey v2
 ```
 
-## doc/MEASUREMENTS.md (76.2 KB, 373 lines)
+## doc/MEASUREMENTS.md (78.5 KB, 388 lines)
 ```text
 L11-21 Important: one machine, not an idle machine
 L23-77 Overview
@@ -151,10 +151,12 @@ L283-325 Patches of the engine on a flow of 300 elements (WI-0093, MS-0053, MS-0
 L285-295   MS-0053: engine time of one patch on a flow of 300 elements (WI-0093, task 6)
 L297-310   MS-0054: steps of a running flow during 100 patches in a row, and a patch of 30 operations on the biggest flow (WI-0093)
 L312-325   MS-0055: patch round trip of the editor, running and idle, against a plain request (WI-0096)
-L327-372 Editing, measured again at the end of S0006 (WI-0104, task 4)
+L327-388 Editing, measured again at the end of S0006 (WI-0104, task 4)
 L331-345   MS-0056: frame of a drag and the rebuilds of the editor renderer, 300 elements (WI-0104, MS-0051 again)
 L347-357   MS-0057: engine time of a patch on a flow of 300 elements (WI-0104, MS-0053 again)
 L359-372   MS-0058: round trip of a patch during a run, 100 patches, 300 steps (WI-0104, MS-0054 again)
+L375-384   MS-0059: memory of the background processes with all real classes and one editor (WI-0135, MS-0042 again, REQ-PRF-030, E0040)
+L386-388   MS-0060: start of a worker with all real classes (WI-0135, MS-0029 again, R0003)
 ```
 
 ## doc/CONVENTIONS.md (9.4 KB, 64 lines)
@@ -432,7 +434,7 @@ L628-633 Outputs with an empty name are skipped (WI-0127) (verified)
 L634-640 A class object has no Name property in AHK v2 (verified)
 ```
 
-## doc/howto/tests-and-tools.md (58.3 KB, 577 lines)
+## doc/howto/tests-and-tools.md (59.8 KB, 593 lines)
 ```text
 L5-11 Blocking error dialogs: `ahkrun.py` and the dialog watcher (verified)
 L14-20 ctypes: set `argtypes` and `restype`, and use an own `WinDLL` object (verified)
@@ -504,6 +506,8 @@ L547-553 A file held open by a test is a file in use for FileDelete (verified) (
 L555-561 One run_all per test: a second start of the session fails (verified) (verified)
 L563-569 Local times in file functions: compare file times through the elements (verified) (partly verified)
 L571-577 A file name that differs only in case is not renamed by a copy on Windows (verified)
+L579-585 An element file is not always an element class (verified)
+L587-593 A whole-flow starter of the corpus cannot run headless when it starts flows that use the real desktop (verified)
 ```
 
 ## doc/REQUIREMENTS.md

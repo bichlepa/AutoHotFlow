@@ -23,12 +23,12 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 | [AI integration (AI)](#ai-integration-ai) | 5 | 0 | 0 | 0 | 5 | 0 | 0 |
 | [Distribution (DST)](#distribution-dst) | 5 | 1 | 0 | 2 | 2 | 0 | 0 |
 | [Robustness (ROB)](#robustness-rob) | 12 | 11 | 0 | 1 | 0 | 0 | 0 |
-| [Performance and resources (PRF)](#performance-and-resources-prf) | 10 | 7 | 0 | 2 | 1 | 0 | 0 |
+| [Performance and resources (PRF)](#performance-and-resources-prf) | 10 | 8 | 0 | 1 | 1 | 0 | 0 |
 | [Security (SEC)](#security-sec) | 7 | 2 | 1 | 1 | 2 | 1 | 1 |
 | [Testability (TST)](#testability-tst) | 6 | 4 | 0 | 2 | 0 | 0 | 0 |
 | [Maintainability (MNT)](#maintainability-mnt) | 4 | 4 | 0 | 0 | 0 | 0 | 0 |
 | [Usability (USE)](#usability-use) | 10 | 2 | 0 | 4 | 4 | 0 | 0 |
-| **All** | **220** | **94** | **1** | **68** | **56** | **1** | **5** |
+| **All** | **220** | **95** | **1** | **67** | **56** | **1** | **5** |
 
 ## Flows and execution (EXE)
 
@@ -299,7 +299,7 @@ run the tool. The legend of the columns is at the top of the source. To read a r
 |---|---|---|---|---|---|---|---|
 | [REQ-PRF-010](REQUIREMENTS.md#req-prf-010-message-latency) | L2399-2408 | Message latency | n/a | done | must | port | - |
 | [REQ-PRF-020](REQUIREMENTS.md#req-prf-020-idle-cpu) | L2410-2419 | Idle CPU | n/a | done | must | port | - |
-| [REQ-PRF-030](REQUIREMENTS.md#req-prf-030-memory) | L2421-2430 | Memory | n/a | partial | must | port | S0004, S0008 (measure again with the editor and the manager) |
+| [REQ-PRF-030](REQUIREMENTS.md#req-prf-030-memory) | L2421-2430 | Memory | n/a | done | must | port | S0004, S0008 (WI-0135, MS-0059) |
 | [REQ-PRF-040](REQUIREMENTS.md#req-prf-040-start-time) | L2432-2441 | Start time | n/a | done | must | port | - |
 | [REQ-PRF-050](REQUIREMENTS.md#req-prf-050-many-big-flows-load-without-blocking) | L2443-2452 | Many big flows load without blocking | n/a | done | must | port | - |
 | [REQ-PRF-060](REQUIREMENTS.md#req-prf-060-editor-redraw) | L2454-2463 | Editor redraw | n/a | partial | must | port | S0005 |
