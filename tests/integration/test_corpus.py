@@ -48,6 +48,10 @@ FIX_LIST = [
     # M-0178: "Process Test" (Flow 561135904) starts and ends cttune.exe and notepad.exe of the user; the test copy uses
     # a copy of cmd.exe named ahf_wi0132_process_test.exe (found through PATH by Run) and ends only that copy
     ("Flow 561135904", "static_ProcessName is ahf_wi0132_process_test.exe (a copy of cmd.exe on PATH); the kill of notepad.exe ends the variable"),
+    # M-0179: "File link test" (Flow 74366368) writes its two shortcuts to %A_Desktop%; the test replaces %A_Desktop% by a folder of
+    # the test, so no shortcut is made on the desktop of the user (the shortcuts themselves are the real ones)
+    ("Flow 74366368", "%A_Desktop% replaced by a folder of the test in every parameter (shortcuts and files); a 2 s sleep after "
+     "each enable and disable of a Shortcut trigger: the engine answers before the shortcut file is written (F-9000*)"),
 ]
 
 # --- the flows that are not in the corpus yet ---------------------------------------------------------------------
@@ -62,8 +66,6 @@ PENDING = {
     "Flow 2133155705": dict(name="Hotkey test", missing={}),
     # its elements are all registered since WI-0124 (Action_Play_Sound); the flow itself runs with the acceptance (WI-0135)
     "Flow 65341778": dict(name="_AutomaticTest starter", missing={}),
-    "Flow 74366368": dict(name="File link test", missing={
-        "Trigger_Shortcut": "S0008"}),
 }
 
 
@@ -363,6 +365,54 @@ def test_v1_http_request_runs_green_against_the_local_server(flows, local_server
     pair = flows.wait_var("global_testResults")
     assert pair is not None and json.loads(pair[1]) == [data["name"]], pair
     assert [r["method"] for r in local_server.requests()] == ["GET", "POST", "POST"], local_server.requests()
+
+
+def _insert_sleep_after(data, source_id, target_id, sleep_id):
+    """Puts an Action_Sleep of 2 s between two elements of a v1 flow (the connection source -> target goes through it)."""
+    elements = data["allElements"]
+    sleep = json.loads(json.dumps(elements["element0000000030"]))      # a copy of the flow's own Sleep element
+    sleep.update({"ID": sleep_id, "name": "Sleep: 2 s (test copy)", "x": "0", "y": "0"})
+    sleep["pars"] = {"Duration": 2, "Unit": "Seconds"}
+    elements[sleep_id] = sleep
+    for key, conn in data["allConnections"].items():
+        if conn["from"] == source_id and conn["to"] == target_id:
+            conn["to"] = sleep_id
+            data["allConnections"][key + "_sleep"] = {"ConnectionType": "normal", "from": sleep_id, "ID": key + "_sleep",
+                                                      "to": target_id, "type": "Connection"}
+            return
+    raise AssertionError("no connection %s -> %s" % (source_id, target_id))
+
+
+# --- "File link test" (WI-0133) ---------------------------------------------------------------------------------------
+def test_v1_file_link_test_runs_green_with_shortcuts_in_a_test_folder(host_flows, tmp_path):
+    """"File link test" (Flow 74366368), as saved except the folder of its shortcuts (FIX_LIST, M-0179): %A_Desktop% is
+    replaced by a folder of the test. The flow enables its two Shortcut triggers (the files are written), runs both
+    shortcuts (each one starts this flow at its trigger through the second start), switches one trigger off (its file goes,
+    the option is on), deletes the other file, and adds its name to the global list when all checks hold. No file is left."""
+    desktop = tmp_path / "desktop"
+    desktop.mkdir()
+    data = json.loads((V1 / "Flow 74366368.json").read_text(encoding="utf-8-sig"))
+    for element in data["allElements"].values():
+        pars = element.get("pars", {})
+        for key, value in list(pars.items()):
+            if isinstance(value, str) and "%A_Desktop%" in value:
+                pars[key] = value.replace("%A_Desktop%", str(desktop))
+    source = tmp_path / "src" / "Flow 74366368.json"
+    source.parent.mkdir()
+    source.write_text(json.dumps(data), encoding="utf-8")
+    # F-9000*: the shortcut file is written after the answer of the enable; the copy waits 2 s after each switch
+    _insert_sleep_after(data, "element0000000034", "element0000000039", "element0000000050")
+    _insert_sleep_after(data, "element0000000004", "element0000000005", "element0000000051")
+    source.write_text(json.dumps(data), encoding="utf-8")
+    flow_id = host_flows.add_file(source)
+    host_flows.start()
+    run = host_flows.run(flow_id, trigger="element0000000001", timeout=scaled(120))
+    assert run.reason == "finished" and not run.exceptions, (run.reason, run.exceptions, run.names[-5:],
+                                                            host_flows.stderr_text()[-800:])
+    assert "element0000000024" in run.path, run.names[-8:]
+    assert list(desktop.iterdir()) == [], list(desktop.iterdir())
+    pair = host_flows.wait_var("global_testResults")
+    assert pair is not None and json.loads(pair[1]) == [data["name"]], pair
 
 
 # --- "external script test" (WI-0130) ---------------------------------------------------------------------------------
