@@ -99,9 +99,9 @@ Entries that only observe (not for the bug hunter) are in the chapter "Observed 
 | F-0211 | The element settings dialog of a demonstration flow: the draft refuses its save (`demo_read_only`, WI-0134), whether the dialog shows the refusal to the user is not checked | not checked | S0008 |
 | F-0212 | Import of a flow whose ID is the ID of a demonstration flow (a `.ahf` file or a v1 flow of the same ID): the conflict path is not tested for a demo ID | not checked | S0008 |
 | F-0213 | The Joke teller (WI-0134) runs on a copy with the local server as its URL: the flow ends without an exception, but the local server records no request (the element runs, its condition on the response is false); the cause is not found | open, not checked | S0008 |
-| F-9000* | The "_AutomaticTest starter", the "Dialog test" and the "Hotkey test" do not run headless; `PENDING` of the corpus is not empty (3 of 16 flows) | decision needed (owner) | WI-0135 |
-| F-9001* | 939 keys (ko) and 983 keys (ru) of the 1,054 keys of the package Default fall back to English; de is complete | open, low (see also F-0172) | WI-0135 |
-| F-9002* | The default pool of 8 workers is above the memory budget of E0040 when all wait at once: one worker costs 10.0 MB now (MS-0059), so about 130 MB (extrapolated, not measured) | decision needed (owner; E0040/E0048 accepted it for a peak) | WI-0135 |
+| F-0214 | The "_AutomaticTest starter", the "Dialog test" and the "Hotkey test" do not run headless; `PENDING` of the corpus is not empty (3 of 16 flows) | decision needed (owner) | WI-0135 |
+| F-0215 | 939 keys (ko) and 983 keys (ru) of the 1,054 keys of the package Default fall back to English; de is complete | open, low (see also F-0172) | WI-0135 |
+| F-0216 | The default pool of 8 workers is above the memory budget of E0040 when all wait at once: one worker costs 10.0 MB now (MS-0059), so about 130 MB (extrapolated, not measured) | decision needed (owner; E0040/E0048 accepted it for a peak) | WI-0135 |
 
 
 ## Findings
@@ -630,18 +630,18 @@ Decisions on entries are in the summary table (status `decision needed`, `accept
 - **Open:** the cause of the stall (controller or worker after `node down`) is not proven. A parallel run with the stall guard, after the rebase, would show whether it recurs. The two session-start failures of the serial run need the datadir stderr of those sessions.
 - **Status:** the margin change is verified (week day test passed alone, run 20261102-165342-24952, commit 837660e1). The read of the waits is verified by reading eeb87467. The stall cause is not checked.
 
-### F-9000*: The starter flow and two other Automatic tests flows are not run headless
+### F-0214: The starter flow and two other Automatic tests flows are not run headless
 
 - **Found:** WI-0135 task 3. 13 of the 16 "Automatic tests" flows run green in `tests/integration/test_corpus.py`. The "_AutomaticTest starter" (Flow 65341778) enables and starts all 15 other flows at once and waits until 15 results are in the list; two of them press real keys (Hotkey test) or read and operate real windows (Dialog test, F-0197), so a headless run would send keys to the desktop and hang without them.
 - **Open:** the owner decides: (a) accept the state (13 flows in the corpus, the starter and the two flows by the owner's run, manual check 12 steps 20, 34, 35); or (b) a test copy of the starter without the two flows and with `CountOfTests` 13, plus a copy of the Hotkey test with unassigned keys (WI-0126 open decision) and the gui part of the Dialog test (F-0197). The fix list gets an entry with a MIGRATION ID for each change.
 - **Status:** `PENDING` has a reason per flow and a test that checks the count (verified). A headless starter run: not tried.
 
-### F-9001*: Missing ko and ru texts in the package Default
+### F-0215: Missing ko and ru texts in the package Default
 
 - **Found:** WI-0135 task 7 (keys counted in `src/elements/Default/language/*.ini`, UTF-16): en 1,054, de 1,054, ko 115, ru 72 (one of them not in en). Missing: 939 (ko) and 983 (ru). The fallback is English. The editor texts are F-0172.
 - **Status:** counted (verified). Translation is a task for S0009 or later, with the owner or a helper.
 
-### F-9002*: Worker memory above the budget at the default pool size
+### F-0216: Worker memory above the budget at the default pool size
 
 - **Found:** WI-0135 task 4 (MS-0059): a worker with all real classes costs 10.0 MB private (6.7 MB in MS-0042), the engine 18.9 MB (12.6). The background processes with one worker are 61 MB, within the budget of E0040. The default pool is 8 (E0048); eight waiting workers would be about 61 - 10 + 8 x 10 = 131 MB (extrapolated, not measured).
 - **Open:** the owner decides whether a smaller default or a lazier worker (load element files of a mode on demand) is wanted. E0040 accepts peaks above the budget.

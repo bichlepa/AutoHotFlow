@@ -588,6 +588,6 @@ Entries of this category. Entry format, rules and index: [`../HOW-TO.md`](../HOW
 
 - **Problem:** The v1 flow "_AutomaticTest starter" starts all other test flows, among them one that presses real keys and one that operates real windows. Run headless, it would send keys to the desktop of the user.
 - **Wrong:** Running the starter in a test session just because all its elements are registered.
-- **Right:** Run the single flows (each with the setup it needs) and keep the starter, the Dialog test and the Hotkey test in `PENDING` with a reason, until the owner decides on test copies (F-9000*).
+- **Right:** Run the single flows (each with the setup it needs) and keep the starter, the Dialog test and the Hotkey test in `PENDING` with a reason, until the owner decides on test copies (F-0214).
 - **Status:** verified by reading the flow (WI-0135); a headless run was not tried
 - **Source:** `tests/integration/test_corpus.py` (`PENDING`)

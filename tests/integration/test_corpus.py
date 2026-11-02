@@ -65,7 +65,7 @@ PENDING = {
     # a copy with unassigned keys is an open decision (WI-0126, WI-0135)
     "Flow 2133155705": dict(name="Hotkey test", missing={}, reason="sends real key combinations to the desktop"),
     # all elements are registered since WI-0124. The flow enables and starts the 15 other flows at once, among them the two
-    # above (real keys and windows), and waits for 15 results; it is not run as a whole headless (WI-0135, F-9000*): the
+    # above (real keys and windows), and waits for 15 results; it is not run as a whole headless (WI-0135, F-0214): the
     # 13 other flows run each in this file, with the setup they need (local server, own process, folder for the shortcuts)
     "Flow 65341778": dict(name="_AutomaticTest starter", missing={}, reason="starts all flows, among them the Dialog test and the Hotkey test"),
 }

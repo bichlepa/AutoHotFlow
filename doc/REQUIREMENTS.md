@@ -2625,7 +2625,7 @@ A smoke test covers every registered element; each element has end-to-end tests 
 ### REQ-TST-040 The v1 test flows run green
 
 - **v1:** yes (the "Automatic tests" flows)
-- **v2:** partial (13 of the 16 "Automatic tests" flows run headless and green, as saved or on a copy with a fix list (`FIX_LIST` in `tests/integration/test_corpus.py`, MIGRATION IDs); the 3 in the table PENDING do not: "Dialog test" (reads the controls of real windows) and "Hotkey test" (sends real keys) wait for the owner's run, and "_AutomaticTest starter" starts all other flows at once, among them those two; WI-0135, F-9000*)
+- **v2:** partial (13 of the 16 "Automatic tests" flows run headless and green, as saved or on a copy with a fix list (`FIX_LIST` in `tests/integration/test_corpus.py`, MIGRATION IDs); the 3 in the table PENDING do not: "Dialog test" (reads the controls of real windows) and "Hotkey test" (sends real keys) wait for the owner's run, and "_AutomaticTest starter" starts all other flows at once, among them those two; WI-0135, F-0214)
 - **Prio:** must
 - **Scope:** port
 - **Plan:** S0008 (the 13 flows run; the 3 of PENDING in `tests/integration/test_corpus.py` wait for the owner, manual check 12, steps 20, 34 and 35)
