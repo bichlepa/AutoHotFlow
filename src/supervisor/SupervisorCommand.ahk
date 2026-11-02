@@ -9,7 +9,8 @@
 ;
 ;   SupervisorCommand(pipeName, ["text"]).Start()
 class SupervisorCommand {
-    static REQUEST_TIMEOUT_MS := 3000
+    ; A command of a shortcut is answered when the engine has started the flow (WI-0133): at most this long.
+    static REQUEST_TIMEOUT_MS := 15000
     static CONNECT_BUDGET_MS := 3000
     static EXIT_OK := 0
     static EXIT_FAILED := 1

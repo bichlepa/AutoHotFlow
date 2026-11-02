@@ -92,6 +92,7 @@ class Engine extends Role {
         this.importV1 := ImportV1Vars(this)     ; cmd.import.v1.vars: the variables of a v1 folder (WI-0076)
         this.importScan := ImportScan(this)     ; cmd.import.scan: the elements of an .ahf file that act on the system (WI-0081)
         this._flowsLoaded := false     ; not _loaded: that name is the method _Loaded (case-insensitive)
+        this._startsAtTrigger := []    ; cmd.flow.startAtTrigger that came before the start was complete (WI-0133)
         this._loadTries := 0           ; failed flow lists in a row for a real reason (not: storage missing)
         this._loadActive := false      ; flows.list or flow.read requests are on their way
         this._listPending := false     ; a cmd.process.list for the state of storage is on its way
@@ -118,6 +119,7 @@ class Engine extends Role {
         this.On("cmd.flow.error.get", (msg) => this._CmdFlowErrorGet(msg))
         this.On("cmd.flow.runstate", (msg) => this._CmdFlowRunstate(msg))
         this.On("cmd.flow.start", (msg) => this._CmdFlowStart(msg))
+        this.On("cmd.flow.startAtTrigger", (msg) => this._CmdFlowStartAtTrigger(msg))
         this.On("cmd.flow.stop", (msg) => this._CmdFlowStop(msg))
         this.On("cmd.flow.toggle", (msg) => this._CmdFlowToggle(msg))
         this.On("cmd.flow.enable", (msg) => this._CmdFlowEnable(msg))
@@ -509,6 +511,7 @@ class Engine extends Role {
         this.Emit("topic:engine", "evt.engine.ready", Map())
         this._Log("a1", "engine", "ready with " this.flows.Count " flow(s) and " this.varLoader.Count " variable(s)")
         this.arms.EngineReady()         ; the arms of the enabled triggers follow when the trigger host is ready (WI-0062)
+        this._RunStartsAtTrigger()      ; shortcuts that came before the start was complete (WI-0133)
     }
 
     _StorageError(op, path, message) {
@@ -734,6 +737,49 @@ class Engine extends Role {
         ; Policy wait while the flow runs: the instance is queued (PROTOCOL 4.2), "waiting" is only sent then.
         if (this.executor.IsWaiting(instId))
             return Map("instanceId", instId, "waiting", Json.True)
+        return Map("instanceId", instId)
+    }
+
+    ; cmd.flow.startAtTrigger {flowId, elementId} (WI-0133, REQ-DST-040, PROTOCOL 4.2): a shortcut of a trigger starts the flow
+    ; at that trigger. A trigger that is switched off starts nothing (the answer says so, and the log too). Before the start is
+    ; complete the flow table and the trigger states are not known: the request waits and is answered then.
+    _CmdFlowStartAtTrigger(msg) {
+        if (!this._flowsLoaded) {
+            this._startsAtTrigger.Push(msg)
+            return Deferred.Marker()
+        }
+        return this._StartAtTrigger(msg)
+    }
+
+    ; The waiting requests of cmd.flow.startAtTrigger, answered once the start is complete (_VarsLoaded).
+    _RunStartsAtTrigger() {
+        waiting := this._startsAtTrigger
+        this._startsAtTrigger := []
+        for msg in waiting {
+            try {
+                payload := this._StartAtTrigger(msg)
+            } catch as e {
+                payload := Map("ok", false, "error", Map("code", e is AhfError ? e.code : ErrCode.INTERNAL
+                    , "message", e.Message))
+            }
+            this.peer.Reply(msg, payload)
+        }
+    }
+
+    _StartAtTrigger(msg) {
+        flowId := Engine.Text(msg, "flowId")
+        elementId := Engine.Text(msg, "elementId")
+        rec := this.flows.Require(flowId)
+        if (this.IsDeleting(flowId))
+            throw AhfError("flow '" flowId "' is being deleted", ErrCode.BUSY)
+        if (rec.Def.ElementKind(elementId) != "trigger")
+            throw AhfError("'" elementId "' is not a trigger of flow '" flowId "'", ErrCode.NOT_FOUND)
+        if (!rec.TriggerEnabled(elementId)) {
+            Log.Write("f1", "engine", "shortcut of trigger '" elementId "' not started: the trigger is switched off", flowId)
+            throw AhfError("trigger '" elementId "' of flow '" flowId "' is switched off; nothing was started", ErrCode.DENIED)
+        }
+        instId := this.executor.StartFlow(rec, elementId)
+        Log.Write("a1", "engine", "shortcut started the flow at trigger '" elementId "' (instance " instId ")", flowId)
         return Map("instanceId", instId)
     }
 

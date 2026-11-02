@@ -55,6 +55,8 @@
 ;               thresholds of the settings (it learns them from evt.settings.changed of the engine).
 ;   --language=<code>  fixes the language of every role (tests); without it the setting "language" decides (WI-0077).
 ;   --workers=<n>  passed on to the engine; wins over the setting "workers" (WI-0027, WI-0077).
+;   (passed on to every role, not set by hand) --app-script=<file>: the program script of this supervisor (WI-0133); the
+;               trigger "Shortcut" builds its command line from it.
 ;
 ; Single instance: a named mutex per session. A second supervisor with the same session sends
 ; cmd.app.command {argv} to the running one and exits (exit 0 = delivered, 1 = no answer).
@@ -76,6 +78,9 @@ class Supervisor {
     ; The roles a start without --start runs (E0083). The test entry sets it to "": a test names its roles.
     static StartDefault := "storage,engine,triggerhost,manager"
     static STARTUP_ARGS := "--start=storage,engine,triggerhost --windows-startup"
+    ; The answer of the engine to a command of a shortcut (cmd.flow.startAtTrigger). The engine answers at once once it is
+    ; ready; before that (a start with a shortcut) it answers when its start is complete, so the wait is long (WI-0133).
+    static START_AT_TRIGGER_MS := 60000
 
     static TickFn := () => Supervisor.Current._Tick()
     static ErrorFn := (e, mode) => Supervisor._OnError(e, mode)
@@ -152,12 +157,17 @@ class Supervisor {
             throw AhfError("supervisor: --tray and --no-tray exclude each other", ErrCode.BAD_ARGS)
         this.startTray := opts.Has("tray") ? true : (opts.Has("no-tray") ? false : Supervisor.TrayDefault)
         this.startList := []
+        ; A start by a shortcut of a trigger (WI-0133) runs the flow and shows no manager window, like a start with Windows.
+        commandStart := opts.Has("command") && Supervisor.IsTriggerCommand(String(opts["command"]))
         for entry in StrSplit(String(opts.Get("start", Supervisor.StartDefault)), ",") {
             entry := Trim(entry)
             ; A start with Windows shows only the tray icon: no manager window (E0064, E0070).
-            if (entry != "" && !(opts.Has("windows-startup") && Role.BaseName(entry) = "manager"))
+            if (entry != "" && !((opts.Has("windows-startup") || commandStart) && Role.BaseName(entry) = "manager"))
                 this.startList.Push(entry)
         }
+        ; Trigger commands that wait for the engine (WI-0133): the first start of the command, and the second instances'
+        ; ones while the engine is not connected. Each is Map("payload", Map(flowId, elementId), "reply", fn).
+        this.pendingStarts := []
         this.fakeElevation := ""
         if (opts.Has(Elevation.FAKE) && Elevation.HooksAllowed()) {      ; the product entry ignores the hook
             this.fakeElevation := opts[Elevation.FAKE]
@@ -220,6 +230,8 @@ class Supervisor {
         this.shutdown.onDone := (code) => this._Finish(code)
         this._Wire()
         this.hub.Start()
+        if (this.hasCommand && Supervisor.IsTriggerCommand(this.command))
+            this._QueueFirstStart(this.command)
         ; The tray icon lives as long as the application: it is started first and, like the other long-lived roles, started
         ; again when it dies (Children.AUTO_RESTART). A start list that names "tray" does not start it twice.
         listed := false
@@ -259,6 +271,10 @@ class Supervisor {
     ; connects while the session ends gets sys.shutdown when its group has had its turn (Shutdown.OnHello, F-0037, WI-0034).
     _OnHello(link) {
         this.children.OnHello(link)
+        if (link["name"] = "engine") {
+            while (this.pendingStarts.Length > 0)
+                this._SendStartAtTrigger(this.pendingStarts.RemoveAt(1))
+        }
         if (link["name"] = DiagLog.STORAGE) {
             this.diag.Flush()
             this.report.OnStorageHello()
@@ -332,6 +348,8 @@ class Supervisor {
             Log.Write("a1", "supervisor", "command from " msg.from ": " text)
             if (StrLower(Trim(text)) = "debug")
                 return this._OpenDebug()
+            if (Supervisor.IsTriggerCommand(text))
+                return this._StartAtTrigger(msg, text)
             if (argv.Length = 0)
                 this._ShowManager()
             return Map()
@@ -371,6 +389,65 @@ class Supervisor {
         if (!started)
             this.hub.Send("debug", "evt.debug.show", Map())
         return Map("command", "debug", "started", Json.Bool(started))
+    }
+
+    ; --- shortcuts of triggers (WI-0133, PROTOCOL 4.1 "Trigger|<flow>|<element>", 4.2 cmd.flow.startAtTrigger) ---------------
+
+    ; True for a command of a trigger's shortcut ("Trigger|..."), any case.
+    static IsTriggerCommand(text) => SubStr(StrLower(String(text)), 1, 8) = "trigger|"
+
+    ; Map(flowId, elementId) of "Trigger|<flow>|<element>", "" when the text has another form.
+    static ParseTrigger(text) {
+        parts := StrSplit(String(text), "|")
+        if (parts.Length != 3 || StrLower(parts[1]) != "trigger" || parts[2] = "" || parts[3] = "")
+            return ""
+        return Map("flowId", parts[2], "elementId", parts[3])
+    }
+
+    ; A second instance sent the command: the engine starts the flow, and the answer goes back to the second instance (the
+    ; handler returns Deferred). A bad form is an error answer.
+    _StartAtTrigger(msg, text) {
+        start := Supervisor.ParseTrigger(text)
+        if (start = "")
+            throw AhfError("the command '" text "' must be Trigger|<flow>|<element>", ErrCode.BAD_PAYLOAD)
+        Log.Write("a1", "supervisor", "command from " msg.from ": start the flow at trigger " start["elementId"]
+            , start["flowId"])
+        this._SendStartAtTrigger(Map("payload", Map("flowId", start["flowId"], "elementId", start["elementId"])
+            , "reply", (payload) => this.hub.Reply(msg, payload)))
+        return Deferred.Marker()
+    }
+
+    ; The first start with a trigger command: the command waits for the engine's connection (_OnHello sends it).
+    _QueueFirstStart(text) {
+        start := Supervisor.ParseTrigger(text)
+        if (start = "") {
+            Log.Write("a0", "supervisor", "the command '" text "' must be Trigger|<flow>|<element>; not run")
+            return
+        }
+        Log.Write("a1", "supervisor", "first start by a shortcut: the flow starts at trigger " start["elementId"]
+            " when the engine is ready", start["flowId"])
+        this.pendingStarts.Push(Map("payload", Map("flowId", start["flowId"], "elementId", start["elementId"])
+            , "reply", (payload) => this._OnStartAnswer(payload)))
+    }
+
+    ; Sends one command to the engine, or keeps it until the engine is connected (_OnHello).
+    _SendStartAtTrigger(start) {
+        if (!this.hub.HasLink("engine")) {
+            this.pendingStarts.Push(start)
+            return
+        }
+        this.hub.Request("engine", "cmd.flow.startAtTrigger", start["payload"], (ans) => start["reply"](
+            IsObject(ans) ? ans.payload : Map("ok", false, "error", Map("code", ErrCode.PEER_GONE
+            , "message", "the engine did not answer"))), Supervisor.START_AT_TRIGGER_MS)
+    }
+
+    ; The engine's answer to a first-start command: logged (the second instances get the answer themselves).
+    _OnStartAnswer(payload) {
+        if (payload.Get("ok", false))
+            Log.Write("a1", "supervisor", "shortcut command: the flow was started")
+        else
+            Log.Write("a0", "supervisor", "shortcut command not run: " (payload.Has("error")
+                ? payload["error"]["message"] : "no answer"))
     }
 
     ; A plain second start (no --command, F-0074, the v1 behaviour): the manager shows its window. A running manager is
@@ -748,6 +825,8 @@ class Supervisor {
         }
         if (opts.Has("cancel-exit"))
             text .= " --cancel-exit"
+        ; The script of this program (WI-0133): a shortcut that a trigger writes starts this very program again (ctx.launch).
+        text .= ' "--app-script=' A_ScriptFullPath '"'
         return text
     }
 
