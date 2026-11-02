@@ -3,7 +3,7 @@
 ; The process list of the trigger host (WI-0132, Trigger_Process_starts and Trigger_Process_closes): the process IDs
 ; and base names of the processes that can be opened with PROCESS_QUERY_LIMITED_INFORMATION. It replaces the list of v1
 ; (Source_Elements/Default/lib/Process list, EnumProcesses with the debug privilege); a process that cannot be opened
-; is missing from the list, so a protected process is neither seen starting nor closing (MIGRATION M-0169).
+; is missing from the list, so a protected process is neither seen starting nor closing (MIGRATION M-0176).
 class ProcessSnapshot {
     static MAX_PROCESSES := 4096          ; room for the array of EnumProcesses (DWORDs); more than the machine has
 

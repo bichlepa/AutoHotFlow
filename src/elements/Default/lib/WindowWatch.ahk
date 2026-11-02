@@ -7,7 +7,7 @@
 ; The shared logic of the four window triggers of the package Default (WI-0132, REQ-TRG-260): Window opens, Window
 ; closes, Window gets active, Window gets inactive. Each trigger polls the windows that its identification names (WatchPoll,
 ; one timer per interval) and fires when the result changes. The rules are those of v1 (Source_Elements/Default/Triggers/
-; Window_*.ahk); the differences are in MIGRATION (M-0170):
+; Window_*.ahk); the differences are in MIGRATION (M-0177):
 ;
 ;   opens          the windows of the first poll are the baseline when NotTriggerOnEnable is set; otherwise every
 ;                  matching window fires at the first poll. Fires once for each new window ID.

@@ -1308,7 +1308,7 @@ Creates a shortcut file (default on the desktop) that starts the flow through th
 - **Plan:** S0008 (WI-0132)
 - **Evidence:** `tests/integration/test_window_triggers.py` (WI-0132: a new window fires once and gives its ID; a window that exists at the arming does not fire with the option, and fires at the first check without it; a closed window fires closes with its ID; gets active and gets inactive with the real focus under the input lock; a window that opens and closes between two polls is not seen; a missing identification and a bad interval are refused with the v1 text), `tests/ahk/element_window_watch.test.ahk` (WI-0132: the shared poll, one timer per interval), `tests/stress/test_window_trigger_cost.py` (MS-0044: ten armed window triggers, the timer keeps its schedule)
 
-Polling, not a Windows event: a window that opens and closes between two checks is not seen (the help page says so; MIGRATION M-0170).
+Polling, not a Windows event: a window that opens and closes between two checks is not seen (the help page says so; MIGRATION M-0177).
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|
@@ -1326,7 +1326,7 @@ Polling, not a Windows event: a window that opens and closes between two checks 
 - **Plan:** S0008 (WI-0132)
 - **Evidence:** `tests/integration/test_process_triggers.py` (WI-0132: a started process fires starts with its ID and name; a process that runs at the arming does not fire with the option; a closed process fires closes; the filter by process ID watches only that process; a bad interval is refused with the v1 text), `tests/integration/test_corpus.py::test_v1_process_test_runs_green_with_an_own_process` (corpus "Process Test", Flow 561135904, with its own test process), `tests/ahk/element_window_watch.test.ahk` (WI-0132: the process list, the filter)
 
-A process that cannot be opened is not in the list, so it is neither seen starting nor closing (MIGRATION M-0169).
+A process that cannot be opened is not in the list, so it is neither seen starting nor closing (MIGRATION M-0176).
 
 | Trigger | v1 | v2 | Plan |
 |---|---|---|---|

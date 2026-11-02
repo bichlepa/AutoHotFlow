@@ -8,7 +8,7 @@
 ; The shared logic of the two process triggers of the package Default (WI-0132, REQ-TRG-270): Process starts and Process
 ; closes. Each poll takes the process list (WatchPoll.Processes, one snapshot per interval for all process triggers) and
 ; compares the processes that match the filter with the last poll. The rules are those of v1
-; (Source_Elements/Default/Triggers/Process_*.ahk); the differences are in MIGRATION (M-0169).
+; (Source_Elements/Default/Triggers/Process_*.ahk); the differences are in MIGRATION (M-0176).
 ;
 ;   starts   the matching processes of the arming are the baseline when NotTriggerOnEnable is set; otherwise every
 ;            matching process fires at the first poll. Fires once for each new process ID.

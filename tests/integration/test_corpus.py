@@ -45,7 +45,7 @@ FIX_LIST = [
     # WI-0130 (M-0158): the scripts of the two "sleep, msgbox" elements are v2 code (Sleep 10000); the MsgBox is removed,
     # because a MsgBox in a script process is a real dialog that no test answers (the flow stops before it anyway)
     ("Flow 1849072261", "v1 scripts of elements 15 and 17 ported to v2 (Sleep 10000, MsgBox removed)"),
-    # M-0171: "Process Test" (Flow 561135904) starts and ends cttune.exe and notepad.exe of the user; the test copy uses
+    # M-0178: "Process Test" (Flow 561135904) starts and ends cttune.exe and notepad.exe of the user; the test copy uses
     # a copy of cmd.exe named ahf_wi0132_process_test.exe (found through PATH by Run) and ends only that copy
     ("Flow 561135904", "static_ProcessName is ahf_wi0132_process_test.exe (a copy of cmd.exe on PATH); the kill of notepad.exe ends the variable"),
 ]
@@ -316,7 +316,7 @@ def test_v1_user_idle_test_runs_green_with_the_idle_time_of_the_test_provider(ho
 
 # --- "Process Test" (WI-0132) ---------------------------------------------------------------------------------------------
 def test_v1_process_test_runs_green_with_an_own_process(host_flows, tmp_path, monkeypatch):
-    """"Process Test" (Flow 561135904), the copy in v2_adapted/ (FIX_LIST, M-0171). The flow starts the process named in its
+    """"Process Test" (Flow 561135904), the copy in v2_adapted/ (FIX_LIST, M-0178). The flow starts the process named in its
     variable static_ProcessName, watches it with Process starts and Process closes, and kills it again. The test process is
     a copy of cmd.exe under that name, in a folder first on PATH (Run finds it there, the flow's own Run starts it hidden);
     no process of the user is started or ended. Nothing is answered: the confirmation dialog of the flow is shown only
