@@ -80,7 +80,7 @@ def ok_answer(payload):
 
 
 def sole_other_flow(obs):
-    others = [f for f in state(obs)["flows"] if f["flowId"] != FLOW]
+    others = [f for f in state(obs)["flows"] if f["flowId"] != FLOW and not f["demo"]]   # demos not counted (WI-0134)
     assert len(others) == 1, others
     return others[0]
 
@@ -238,7 +238,7 @@ def test_new_flow_is_added_to_the_list_and_another_client_sees_its_flow_too(star
     sup, obs = started()
     payload = op(obs, "create", category="")
     assert ok_answer(payload) and payload["answer"]["payload"]["flowId"]
-    assert wait_state(obs, lambda s: len(s["flows"]) == 2)
+    assert wait_state(obs, lambda s: len([f for f in s["flows"] if not f["demo"]]) == 2)
     other = obs.request("engine", "cmd.flow.create", {"name": "From another client"}, timeout=scaled(10))
     assert other["payload"]["ok"] is True, other
     assert wait_state(obs, lambda s: any(f["name"] == "From another client" for f in s["flows"]))
@@ -278,7 +278,7 @@ def test_rename_with_the_dialog_accepts_a_new_name(started):
 def test_rename_with_the_dialog_refuses_a_taken_name_before_the_engine(started):
     sup, obs = started()
     assert op(obs, "create", category="")["sent"] is True
-    assert wait_state(obs, lambda s: len(s["flows"]) == 2)
+    assert wait_state(obs, lambda s: len([f for f in s["flows"] if not f["demo"]]) == 2)
     taken = sole_other_flow(obs)["name"]
     answers(obs, rename=taken)
     payload = op(obs, "rename", flowId=FLOW)
@@ -378,7 +378,7 @@ def test_a_category_can_be_moved_before_another(started):
 def test_ctrl_click_selects_several_flows_and_the_operations_act_on_them(started):
     sup, obs = started()
     assert op(obs, "create", category="")["sent"] is True
-    assert wait_state(obs, lambda s: len(s["flows"]) == 2)
+    assert wait_state(obs, lambda s: len([f for f in s["flows"] if not f["demo"]]) == 2)
     other = sole_other_flow(obs)["flowId"]
     op(obs, "select", flowId=FLOW)
     payload = op(obs, "selectToggle", flowId=other)
