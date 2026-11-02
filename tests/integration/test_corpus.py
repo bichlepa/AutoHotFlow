@@ -58,14 +58,16 @@ FIX_LIST = [
 # The v1 flow "Automatic tests" flows that are not in this corpus yet: the elements they lack and the step that brings them
 # (WI-0057 task 3). The test below keeps this table equal to the element registry.
 PENDING = {
-    # its elements are all registered since WI-0128; the trigger "Input Normal" runs headless (the test below), the other
-    # parts read the controls of the real windows and send keys to them (the gui part, the owner's test; open in WI-0128)
-    "Flow 130786371": dict(name="Dialog test", missing={}),
-    # its elements are all registered since WI-0126 (Action_Send_Keystrokes); the flow is not in the corpus yet (the
-    # Ctrl+F7 part is a gui part, and the test copy with unassigned keys is an open decision, see WI-0126)
-    "Flow 2133155705": dict(name="Hotkey test", missing={}),
-    # its elements are all registered since WI-0124 (Action_Play_Sound); the flow itself runs with the acceptance (WI-0135)
-    "Flow 65341778": dict(name="_AutomaticTest starter", missing={}),
+    # all elements are registered since WI-0128; the trigger "Input Normal" runs headless (test_dialog_elements), the other
+    # parts read the controls of the real windows and send keys to them: the gui part, the owner's run (WI-0135, F-0197)
+    "Flow 130786371": dict(name="Dialog test", missing={}, reason="reads the controls of real windows and presses their buttons"),
+    # all elements are registered since WI-0126; the flow presses real keys (Ctrl+F7 and others) that other programs may use;
+    # a copy with unassigned keys is an open decision (WI-0126, WI-0135)
+    "Flow 2133155705": dict(name="Hotkey test", missing={}, reason="sends real key combinations to the desktop"),
+    # all elements are registered since WI-0124. The flow enables and starts the 15 other flows at once, among them the two
+    # above (real keys and windows), and waits for 15 results; it is not run as a whole headless (WI-0135, F-9000*): the
+    # 13 other flows run each in this file, with the setup they need (local server, own process, folder for the shortcuts)
+    "Flow 65341778": dict(name="_AutomaticTest starter", missing={}, reason="starts all flows, among them the Dialog test and the Hotkey test"),
 }
 
 
@@ -780,3 +782,17 @@ def test_pending_flows_list_the_elements_that_are_still_missing():
         missing = {c for c in classes if c.lower() not in registered}
         table = {c for c in entry["missing"]}
         assert {c.lower() for c in missing} == {c.lower() for c in table}, (stem, sorted(missing), sorted(table))
+
+
+def test_the_automatic_tests_category_has_16_flows_and_3_of_them_wait_for_the_owner():
+    """WI-0135: the 16 "Automatic tests" flows of v1: 13 run headless in this file, 3 are in PENDING with a reason (the
+    starter, the Dialog test and the Hotkey test). The table says why; an entry without a reason is a failure."""
+    names = {}
+    for path in glob.glob(str(V1 / "Flow *.json")):
+        data = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+        if data.get("category") == "Automatic tests":
+            names[Path(path).stem] = data["name"]
+    assert len(names) == 16, sorted(names.values())
+    assert set(PENDING) <= set(names)
+    assert all(entry.get("reason") and entry["missing"] == {} for entry in PENDING.values())
+    assert len(set(names) - set(PENDING)) == 13
