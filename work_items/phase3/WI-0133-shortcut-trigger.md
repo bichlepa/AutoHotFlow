@@ -35,7 +35,7 @@ Other commands of the command line (export, import, ...); the target of the comp
 
 ## Result
 
-Commits (prefix WI-0133): storage writes the shortcut files; the trigger context gets launch data, the disarm reason and requests; the command `Trigger|<flow>|<element>` starts a flow at its trigger (supervisor, engine); the element `Trigger_Shortcut` with its tests, help page, MIGRATION M-0179 to M-0182, REQ-TRG-200, REQ-TRG-240 and REQ-DST-040; corpus "File link test" green on a test folder; OPEN-ITEMS F-9000* and F-9001*.
+Commits (prefix WI-0133): storage writes the shortcut files; the trigger context gets launch data, the disarm reason and requests; the command `Trigger|<flow>|<element>` starts a flow at its trigger (supervisor, engine); the element `Trigger_Shortcut` with its tests, help page, MIGRATION M-0179 to M-0182, REQ-TRG-200, REQ-TRG-240 and REQ-DST-040; corpus "File link test" green on a test folder; OPEN-ITEMS F-0208 and F-0209.
 
 Tests (commit e98a3ed5 and the steps before it):
 - AHK units: `storage_shortcut.test.ahk` 4 of 4 green; `element_shortcut.test.ahk` green (7 of 7 with the storage unit, 11 passed together).
@@ -52,6 +52,6 @@ Decisions (made by the implementer):
 - A first start by a shortcut opens no manager window (as a start with Windows).
 - The default path is `%A_Desktop%\AutoHotFlow shortcut.lnk` (v1: with the flow name); the path must be absolute (v1: relative allowed). Both are MIGRATION entries.
 
-Findings: F-9000* (the shortcut file is written after the enable answer; a Run right after enabling fails, the corpus copy waits 2 s), F-9001* (a first start with `--command=debug` is ignored).
+Findings: F-0208 (the shortcut file is written after the enable answer; a Run right after enabling fails, the corpus copy waits 2 s), F-0209 (a first start with `--command=debug` is ignored).
 
 Not checked: the desktop shortcut itself (starting AutoHotFlow from a real shortcut on the desktop) is a manual check for the owner; the window-trigger focus tests above on a machine that gives focus; the full fast and slow tiers.

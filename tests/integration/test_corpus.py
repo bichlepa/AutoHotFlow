@@ -51,7 +51,7 @@ FIX_LIST = [
     # M-0179: "File link test" (Flow 74366368) writes its two shortcuts to %A_Desktop%; the test replaces %A_Desktop% by a folder of
     # the test, so no shortcut is made on the desktop of the user (the shortcuts themselves are the real ones)
     ("Flow 74366368", "%A_Desktop% replaced by a folder of the test in every parameter (shortcuts and files); a 2 s sleep after "
-     "each enable and disable of a Shortcut trigger: the engine answers before the shortcut file is written (F-9000*)"),
+     "each enable and disable of a Shortcut trigger: the engine answers before the shortcut file is written (F-0208)"),
 ]
 
 # --- the flows that are not in the corpus yet ---------------------------------------------------------------------
@@ -400,7 +400,7 @@ def test_v1_file_link_test_runs_green_with_shortcuts_in_a_test_folder(host_flows
     source = tmp_path / "src" / "Flow 74366368.json"
     source.parent.mkdir()
     source.write_text(json.dumps(data), encoding="utf-8")
-    # F-9000*: the shortcut file is written after the answer of the enable; the copy waits 2 s after each switch
+    # F-0208: the shortcut file is written after the answer of the enable; the copy waits 2 s after each switch
     _insert_sleep_after(data, "element0000000034", "element0000000039", "element0000000050")
     _insert_sleep_after(data, "element0000000004", "element0000000005", "element0000000051")
     source.write_text(json.dumps(data), encoding="utf-8")
