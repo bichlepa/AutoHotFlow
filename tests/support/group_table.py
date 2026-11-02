@@ -160,6 +160,7 @@ TEST_GROUPS = {
     "integration/test_system_seam.py": ["element-units", "triggers", "workers"],
     "integration/test_window_elements.py": ["elements-e2e", "workers"],
     "integration/test_mouse_keyboard_elements.py": ["elements-e2e", "workers"],
+    "integration/test_screen_elements.py": ["elements-e2e", "workers"],
     "integration/test_engine.py": ["engine"],
     "integration/test_flow_patch.py": ["engine"],
     "integration/test_flow_patch_triggers.py": ["triggers", "engine"],
@@ -291,6 +292,41 @@ TEST_GROUPS = {
 # test function as `file::function`. An element without an entry (a new one) or with an empty list runs the element
 # units only. The guard test requires an entry for every element file.
 COVERS = {
+    # WI-0127: the screen elements (the real screen: an own window with a picture, helpers/screen_window.ahk)
+    "src/elements/Default/Actions/Action_Get_Pixel_Color.ahk": [
+        "integration/test_screen_elements.py::test_get_pixel_color_stores_the_colour_of_a_pixel_of_the_picture",
+        "integration/test_screen_elements.py::test_get_pixel_color_writes_each_channel_and_the_right_half_is_black",
+        "integration/test_screen_elements.py::test_get_pixel_color_of_the_background_is_red",
+    ],
+    "src/elements/Default/Actions/Action_Search_pixel.ahk": [
+        "integration/test_screen_elements.py::test_search_pixel_finds_the_first_black_pixel_of_the_picture",
+        "integration/test_screen_elements.py::test_search_pixel_of_a_colour_that_is_not_there_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Search_Image.ahk": [
+        "integration/test_screen_elements.py::test_search_image_finds_the_picture_at_its_position",
+        "integration/test_screen_elements.py::test_search_image_of_a_missing_file_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Screenshot.ahk": [
+        "integration/test_screen_elements.py::test_screenshot_of_a_region_saves_the_picture_in_a_bmp",
+        "integration/test_screen_elements.py::test_screenshot_of_a_window_with_method_2_has_the_size_of_the_window",
+        "integration/test_screen_elements.py::test_screenshot_into_a_file_without_an_image_extension_is_an_exception",
+        "integration/test_screen_elements.py::test_screenshot_of_a_window_that_does_not_exist_is_an_exception",
+    ],
+    "src/elements/Default/Actions/Action_Get_Screen_Settings.ahk": [
+        "integration/test_screen_elements.py::test_get_screen_settings_stores_the_values_of_the_monitor",
+        "integration/test_screen_elements.py::test_get_screen_settings_of_a_monitor_that_does_not_exist_is_an_exception",
+        "integration/test_screen_elements.py::test_get_screen_settings_without_ddc_is_an_exception_that_names_the_setting",
+    ],
+    "src/elements/Default/Actions/Action_Set_Screen_Settings.ahk": [
+        "integration/test_screen_elements.py::test_set_screen_settings_changes_brightness_and_red_gain_of_one_monitor",
+        "integration/test_screen_elements.py::test_set_screen_settings_of_all_monitors_changes_each_one",
+        "integration/test_screen_elements.py::test_set_screen_settings_writes_the_colour_temperature_index",
+        "integration/test_screen_elements.py::test_set_screen_settings_refused_by_the_monitor_is_an_exception",
+    ],
+    "src/elements/Default/lib/ScreenOps.ahk": [
+        "integration/test_screen_elements.py::test_search_pixel_finds_the_first_black_pixel_of_the_picture",
+        "integration/test_screen_elements.py::test_search_image_finds_the_picture_at_its_position",
+    ],
     "src/elements/Default/Actions/Action_Change_character_case.ahk": [
         "integration/test_text_elements.py::test_change_character_case",
     ],
@@ -1020,7 +1056,8 @@ SOURCE_AREAS = [
     ("storage", ["src/storage/*", "src/entry/storage.ahk"]),
     ("elements-base", ["src/elements/base/AhfElement.ahk", "src/elements/base/ElementRegistry.ahk",
                        "src/elements/base/ElementRunner.ahk", "src/elements/base/ExecContext.ahk",
-                       "src/elements/base/ParamEvaluator.ahk", "src/elements/base/SystemOps.ahk"]),
+                       "src/elements/base/ParamEvaluator.ahk", "src/elements/base/SystemOps.ahk",
+                       "src/elements/base/MonitorDdc.ahk"]),
     ("ui", ["src/ui_common/*", "src/core/GuiLayout.ahk", "src/elements/base/DialogWindow.ahk",
             "src/elements/base/Dialogs.ahk"]),
     ("render", ["src/editor/render/*", "src/gdip/*"]),   # the GDI+ wrapper (src/gdip/, WI-0127) is tested with the renderer

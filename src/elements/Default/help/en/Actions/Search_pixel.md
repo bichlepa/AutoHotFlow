@@ -30,12 +30,8 @@ If you specify 255 shades of variation, all colors will match. The default is 0 
 
 ### Method
 
-There are two searching methods.
+**Fast method** has no effect in AutoHotFlow v2: AutoHotkey v2 has no fast mode. The checkbox is kept so that flows keep their setting (MIGRATION M-0169).
 
-If **Fast method** is selected, this action uses a faster searching method that in most cases dramatically reduces the amount of CPU time used by the search. Although color depths as low as 8-bit (256-color) are supported, the fast mode performs much better in 24-bit or 32-bit color.
+The search starts at the upper left corner of the region and goes row by row, from left to right, down to the lower right corner (AutoHotkey v2). If there are several matching pixels, the first one in this order is found. The v1 slow mode searched column by column, so with several matches a different pixel may be found than in v1.
 
-If the screen's color depth is 16-bit or lower, the Variation parameter might behave slightly differently in fast mode than it does in slow mode.
-
-Finally, the fast mode searches the screen row by row (top down) instead of column by column. Therefore, it might find a different pixel than that of the slow mode if there is more than one matching pixel.
-
-Slow mode only: By default, the search starts at the upper-left pixel of the region and checks all pixels vertically beneath it for a match. If no match is found there, the search continues to the right, column by column, until it finds a matching pixel. The default left-to-right search order can be inverted by swapping X1 and X2 in the parameter list. In other words, if X1 is greater than X2, the search will be conducted from right to left, starting at column X1. Similarly, if Y1 is greater than Y2, each column of pixels to be searched starting at the bottom rather than the top. Finally, if the region to be searched is large and the search is repeated with high frequency, it may consume a lot of CPU time. To alleviate this, keep the size of the area to a minimum.
+The region must be visible on the screen. Keep it as small as the task allows, because a large region that is searched often uses much CPU time.

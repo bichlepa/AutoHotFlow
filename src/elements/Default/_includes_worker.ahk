@@ -16,9 +16,12 @@
 #Include lib\TarOps.ahk
 #Include lib\IniOps.ahk
 #Include lib\ControlIdent.ahk
+#Include lib\ScreenOps.ahk
 #Include lib\HttpOps.ahk
 #Include lib\ProcessOps.ahk
 #Include lib\SoundOps.ahk
+#Include ..\..\gdip\Gdip.ahk
+#Include ..\..\gdip\GdipCanvas.ahk
 #Include lib\DebugOps.ahk
 #Include lib\LoopOps.ahk
 
@@ -51,6 +54,8 @@ class Default {
     #Include Actions\Action_Get_File_Size.ahk
     #Include Actions\Action_Get_File_Time.ahk
     #Include Actions\Action_Get_Mouse_Position.ahk
+    #Include Actions\Action_Get_Pixel_Color.ahk
+    #Include Actions\Action_Get_Screen_Settings.ahk
     #Include Actions\Action_Get_shortcut_information.ahk
     #Include Actions\Action_Get_Volume.ahk
     #Include Actions\Action_Hibernate_Computer.ahk
@@ -75,6 +80,9 @@ class Default {
     #Include Actions\Action_Rename_File.ahk
     #Include Actions\Action_Rename_Folder.ahk
     #Include Actions\Action_Run.ahk
+    #Include Actions\Action_Screenshot.ahk
+    #Include Actions\Action_Search_Image.ahk
+    #Include Actions\Action_Search_pixel.ahk
     #Include Actions\Action_Select_file.ahk
     #Include Actions\Action_Select_Folder.ahk
     #Include Actions\Action_Send_Keystrokes.ahk
@@ -85,6 +93,7 @@ class Default {
     #Include Actions\Action_Set_file_time.ahk
     #Include Actions\Action_Set_Lock_Key.ahk
     #Include Actions\Action_Set_Process_Priority.ahk
+    #Include Actions\Action_Set_Screen_Settings.ahk
     #Include Actions\Action_Set_Volume.ahk
     #Include Actions\Action_Show_Window.ahk
     #Include Actions\Action_Shutdown.ahk
@@ -133,6 +142,8 @@ ElementRegistry.Register(Default.Action_Get_File_Attributes)
 ElementRegistry.Register(Default.Action_Get_File_Size)
 ElementRegistry.Register(Default.Action_Get_File_Time)
 ElementRegistry.Register(Default.Action_Get_Mouse_Position)
+ElementRegistry.Register(Default.Action_Get_Pixel_Color)
+ElementRegistry.Register(Default.Action_Get_Screen_Settings)
 ElementRegistry.Register(Default.Action_Get_shortcut_information)
 ElementRegistry.Register(Default.Action_Get_Volume)
 ElementRegistry.Register(Default.Action_Hibernate_Computer)
@@ -157,6 +168,9 @@ ElementRegistry.Register(Default.Action_Reboot_Computer)
 ElementRegistry.Register(Default.Action_Rename_File)
 ElementRegistry.Register(Default.Action_Rename_Folder)
 ElementRegistry.Register(Default.Action_Run)
+ElementRegistry.Register(Default.Action_Screenshot)
+ElementRegistry.Register(Default.Action_Search_Image)
+ElementRegistry.Register(Default.Action_Search_pixel)
 ElementRegistry.Register(Default.Action_Select_file)
 ElementRegistry.Register(Default.Action_Select_Folder)
 ElementRegistry.Register(Default.Action_Send_Keystrokes)
@@ -167,6 +181,7 @@ ElementRegistry.Register(Default.Action_Set_file_attributes)
 ElementRegistry.Register(Default.Action_Set_file_time)
 ElementRegistry.Register(Default.Action_Set_Lock_Key)
 ElementRegistry.Register(Default.Action_Set_Process_Priority)
+ElementRegistry.Register(Default.Action_Set_Screen_Settings)
 ElementRegistry.Register(Default.Action_Set_Volume)
 ElementRegistry.Register(Default.Action_Show_Window)
 ElementRegistry.Register(Default.Action_Shutdown)

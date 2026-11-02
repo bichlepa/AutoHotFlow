@@ -119,8 +119,8 @@ img {
 <h3>Color temperature</h3>
 <p>If <strong>Change color temperature</strong> is checked, the color temperature will be set to the specified value. If <strong>Color temperature</strong> and <strong>Color gain</strong> are set in one action, first the color gain and drive will be set and then the color temperature. Mostly the color temperature is a preset for each color gain and drive, therefore it will not make sense to set the color gain and drive and the color temperature in one action.</p>
 <h2>Remarks</h2>
-<p>Not every screen supports those settings.</p>
-<p>This action requires Windows Vista or later.</p>
+<p>The settings are changed through DDC/CI, the same way as the settings of the action Get screen settings. Not every monitor supports them; for such a monitor the action ends with an exception that names the setting. The monitors are changed one after the other.</p>
+<p>The choice "11500 K." is written "115000 K." in v1 (MIGRATION M-0173).</p>
 </main>
 </body>
 </html>

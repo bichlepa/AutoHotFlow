@@ -18,7 +18,7 @@ You can choose the reference point of the coordinates.
 
 ### Method
 
-There are three methods to get the pixel color.
+There are three methods to get the pixel color: **Default method**, **Alternative method** and **Slow method** (the modes Default, Alt and Slow of AutoHotkey v2's `PixelGetColor`).
 
 This parameter may be changed if this action does not produce accurate result for the desired application.
 
